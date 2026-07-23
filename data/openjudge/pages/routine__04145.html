@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 04145:放弃考试</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>计概2023fall每日选做</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/routine/" class="first">题目</a></li>
+            <li ><a href="/routine/ranking/">排名</a></li>
+                    <li ><a href="/routine/status/">状态</a></li>
+	    			        <li class="last"><a href="/routine/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>04145:放弃考试</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/routine/04145/">查看</a></li>
+		<li ><a href="/routine/04145/submit/">提交</a></li>
+				<li ><a href="/routine/04145/statistics/">统计</a></li>
+			
+		<li ><a href="/routine/clarify/04145/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p class="MsoNormal" style=";;line-height:150%"><span style="font-size: 11pt">在一门课程中，一共有</span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">n</span><span style="font-size: 11pt">场考试。假如你在</span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">i</span><span style="font-size: 11pt">场考试中可以答对</span><em><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">b<sub>i</sub></span></em><span style="font-size: 11pt">道题中的</span><em><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">a<sub>i</sub></span></em><span style="font-size: 11pt">道，那么你的累计平均分定义为：</span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">100·Σ<em>a<sub>i</sub></em>/Σ<em>b<sub>i</sub></em></span><span style="font-size: 11pt">。已知你这</span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">i</span><span style="font-size: 11pt">场考试的答题情况，并且允许你放弃其中的</span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">k</span><span style="font-size: 11pt">场考试，请你确定你最高能够得到多少的累计平均分。</span></p><p class="MsoNormal" style=";line-height:150%"><span style="font-size: 11pt">假设该课程一共有</span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">3</span><span style="font-size: 11pt">门考试，你的答题情况为</span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">5/5</span><span style="font-size: 11pt">，</span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">0/1</span><span style="font-size: 11pt">和</span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">2/6</span><span style="font-size: 11pt">。如果你每门都参加，你的累计平均分为</span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">100·(5+0+2)/(5+1+6)= 50</span><span style="font-size: 11pt">分。如果你放弃第</span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">3</span><span style="font-size: 11pt">场考试，你的累计平均分则提高到了</span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">100·(5+0)/(5+1)= 83.33 </span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">≈ </span><span style="font-size:11.0pt;font-family:&#39;Times New Roman&#39;,serif">83</span><span style="font-size: 11pt">分。</span></p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>有多组测试数据，每组测试数据包括3行。<br />每组测试数据第一行有两个数n和k，接下来一行有n个数ai，最后一行n个数bi。<br />(1 ≤ k < n ≤ 1000) (1 ≤ ai ≤ bi ≤ 1, 000, 000, 000)。<br />输入的最后一行为0 0，不作处理。</dd>
+		<dt>输出</dt>
+		<dd>输出最高的累计平均分。（四舍五入到整数）</dd>
+		<dt>样例输入</dt>
+		<dd><pre>3 1
+5 0 2
+5 1 6
+4 2
+1 2 7 9
+5 6 7 9
+0 0</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>83
+100</pre></dd>
+						<dt>来源</dt>
+		<dd>http://poj.org/problem?id=2976</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/routine/04145/">查看</a></li>
+		<li ><a href="/routine/04145/submit/">提交</a></li>
+				<li ><a href="/routine/04145/statistics/">统计</a></li>
+			
+		<li ><a href="/routine/clarify/04145/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>12067</dd>
+					<dt>添加于</dt>
+			<dd>2023-10-06</dd>
+				<dt>提交次数</dt>
+		<dd>68</dd>
+		<dt>尝试人数</dt>
+	    <dd>18</dd>
+	    <dt>通过人数</dt>
+	    <dd>16</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

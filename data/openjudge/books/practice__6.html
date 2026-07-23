@@ -1,0 +1,960 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - OpenJudge - 题目</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<div id="main" class="col-9">
+	<p class="page-bar">
+		<span class="pages">
+					<a href="?page=1">1</a>
+					<a href="?page=2">2</a>
+					<a href="?page=3">3</a>
+					<a href="?page=4">4</a>
+					<a href="?page=5">5</a>
+				
+			<span class="current">6</span>
+			
+					<a href="?page=7">7</a>
+					<a href="?page=8">8</a>
+					<a href="?page=9">9</a>
+					<a href="?page=10">10</a>
+	</span>
+	</p>
+	<div id="problemsList">
+		<table>
+	<thead>
+		<tr>
+						<td class="problem-id">题目ID</td>
+			<td class="title">标题</td>
+			            						<td class="ratio">通过率</td>
+			<td class="accepted">通过人数</td>
+			<td class="submissions">尝试人数</td>
+						
+		</tr>
+	</thead>
+	<tbody>
+			<tr>
+						<td class="problem-id"><a href="/practice/12559/">12559</a></td>
+			<td class="title"><a href="/practice/12559/">最大最小整数</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/practice/12559/statistics/">772</a></td>
+			<td class="submissions"><a href="/practice/12559/statistics/">875</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/12560/">12560</a></td>
+			<td class="title"><a href="/practice/12560/">生存游戏</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/practice/12560/statistics/">1044</a></td>
+			<td class="submissions"><a href="/practice/12560/statistics/">1067</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/12757/">12757</a></td>
+			<td class="title"><a href="/practice/12757/">阿尔法星人翻译官</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/practice/12757/statistics/">517</a></td>
+			<td class="submissions"><a href="/practice/12757/statistics/">538</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/12876/">12876</a></td>
+			<td class="title"><a href="/practice/12876/">生理周期</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/practice/12876/statistics/">32</a></td>
+			<td class="submissions"><a href="/practice/12876/statistics/">35</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/13058/">13058</a></td>
+			<td class="title"><a href="/practice/13058/">发型糟糕的一天</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/13058/statistics/">6</a></td>
+			<td class="submissions"><a href="/practice/13058/statistics/">6</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/14685/">14685</a></td>
+			<td class="title"><a href="/practice/14685/">你五毛我五毛，咱就能一块了</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/practice/14685/statistics/">13</a></td>
+			<td class="submissions"><a href="/practice/14685/statistics/">14</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/15265/">15265</a></td>
+			<td class="title"><a href="/practice/15265/">Shell排序</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/15265/statistics/">17</a></td>
+			<td class="submissions"><a href="/practice/15265/statistics/">17</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/15286/">15286</a></td>
+			<td class="title"><a href="/practice/15286/">忍者道具</a></td>
+			            						<td class="ratio">80%</td>
+			<td class="accepted"><a href="/practice/15286/statistics/">4</a></td>
+			<td class="submissions"><a href="/practice/15286/statistics/">5</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/15288/">15288</a></td>
+			<td class="title"><a href="/practice/15288/">课程大作业</a></td>
+			            						<td class="ratio">60%</td>
+			<td class="accepted"><a href="/practice/15288/statistics/">3</a></td>
+			<td class="submissions"><a href="/practice/15288/statistics/">5</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/15291/">15291</a></td>
+			<td class="title"><a href="/practice/15291/">华容道</a></td>
+			            						<td class="ratio">67%</td>
+			<td class="accepted"><a href="/practice/15291/statistics/">4</a></td>
+			<td class="submissions"><a href="/practice/15291/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/16527/">16527</a></td>
+			<td class="title"><a href="/practice/16527/">字符串连接位置</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/practice/16527/statistics/">349</a></td>
+			<td class="submissions"><a href="/practice/16527/statistics/">369</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/16528/">16528</a></td>
+			<td class="title"><a href="/practice/16528/">充实的寒假生活</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/practice/16528/statistics/">898</a></td>
+			<td class="submissions"><a href="/practice/16528/statistics/">954</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/16529/">16529</a></td>
+			<td class="title"><a href="/practice/16529/">股票</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/practice/16529/statistics/">327</a></td>
+			<td class="submissions"><a href="/practice/16529/statistics/">358</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/16530/">16530</a></td>
+			<td class="title"><a href="/practice/16530/">改卷子</a></td>
+			            						<td class="ratio">78%</td>
+			<td class="accepted"><a href="/practice/16530/statistics/">232</a></td>
+			<td class="submissions"><a href="/practice/16530/statistics/">299</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/16531/">16531</a></td>
+			<td class="title"><a href="/practice/16531/">上机考试</a></td>
+			            						<td class="ratio">92%</td>
+			<td class="accepted"><a href="/practice/16531/statistics/">540</a></td>
+			<td class="submissions"><a href="/practice/16531/statistics/">586</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/16532/">16532</a></td>
+			<td class="title"><a href="/practice/16532/">北大杯台球比赛</a></td>
+			            						<td class="ratio">90%</td>
+			<td class="accepted"><a href="/practice/16532/statistics/">245</a></td>
+			<td class="submissions"><a href="/practice/16532/statistics/">271</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/16926/">16926</a></td>
+			<td class="title"><a href="/practice/16926/">魔兽世界三(开战)</a></td>
+			            						<td class="ratio">75%</td>
+			<td class="accepted"><a href="/practice/16926/statistics/">6</a></td>
+			<td class="submissions"><a href="/practice/16926/statistics/">8</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/17746/">17746</a></td>
+			<td class="title"><a href="/practice/17746/">静音问题</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/17746/statistics/">3</a></td>
+			<td class="submissions"><a href="/practice/17746/statistics/">3</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/17968/">17968</a></td>
+			<td class="title"><a href="/practice/17968/">整型关键字的散列映射</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/practice/17968/statistics/">15</a></td>
+			<td class="submissions"><a href="/practice/17968/statistics/">16</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/17975/">17975</a></td>
+			<td class="title"><a href="/practice/17975/">用二次探查法建立散列表</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/practice/17975/statistics/">106</a></td>
+			<td class="submissions"><a href="/practice/17975/statistics/">114</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18071/">18071</a></td>
+			<td class="title"><a href="/practice/18071/">成环</a></td>
+			            						<td class="ratio">87%</td>
+			<td class="accepted"><a href="/practice/18071/statistics/">71</a></td>
+			<td class="submissions"><a href="/practice/18071/statistics/">82</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/18076/">18076</a></td>
+			<td class="title"><a href="/practice/18076/">链状基团大小判定</a></td>
+			            						<td class="ratio">33%</td>
+			<td class="accepted"><a href="/practice/18076/statistics/">2</a></td>
+			<td class="submissions"><a href="/practice/18076/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18104/">18104</a></td>
+			<td class="title"><a href="/practice/18104/">饼干分配(sorting)</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/practice/18104/statistics/">167</a></td>
+			<td class="submissions"><a href="/practice/18104/statistics/">175</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/18105/">18105</a></td>
+			<td class="title"><a href="/practice/18105/">h指数(math)</a></td>
+			            						<td class="ratio">90%</td>
+			<td class="accepted"><a href="/practice/18105/statistics/">167</a></td>
+			<td class="submissions"><a href="/practice/18105/statistics/">186</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18106/">18106</a></td>
+			<td class="title"><a href="/practice/18106/">螺旋矩阵</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/practice/18106/statistics/">896</a></td>
+			<td class="submissions"><a href="/practice/18106/statistics/">909</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/18107/">18107</a></td>
+			<td class="title"><a href="/practice/18107/">质数个数(Sieve of Eratosthenes)</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/practice/18107/statistics/">156</a></td>
+			<td class="submissions"><a href="/practice/18107/statistics/">165</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18108/">18108</a></td>
+			<td class="title"><a href="/practice/18108/">池塘数目</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/practice/18108/statistics/">393</a></td>
+			<td class="submissions"><a href="/practice/18108/statistics/">413</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/18109/">18109</a></td>
+			<td class="title"><a href="/practice/18109/">最频繁字符(dictionary)</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/practice/18109/statistics/">181</a></td>
+			<td class="submissions"><a href="/practice/18109/statistics/">183</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18146/">18146</a></td>
+			<td class="title"><a href="/practice/18146/">乌鸦坐飞机</a></td>
+			            						<td class="ratio">70%</td>
+			<td class="accepted"><a href="/practice/18146/statistics/">95</a></td>
+			<td class="submissions"><a href="/practice/18146/statistics/">135</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/18155/">18155</a></td>
+			<td class="title"><a href="/practice/18155/">组合乘积</a></td>
+			            						<td class="ratio">90%</td>
+			<td class="accepted"><a href="/practice/18155/statistics/">291</a></td>
+			<td class="submissions"><a href="/practice/18155/statistics/">322</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18156/">18156</a></td>
+			<td class="title"><a href="/practice/18156/">寻找离目标数最近的两数之和</a></td>
+			            						<td class="ratio">82%</td>
+			<td class="accepted"><a href="/practice/18156/statistics/">222</a></td>
+			<td class="submissions"><a href="/practice/18156/statistics/">272</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/18159/">18159</a></td>
+			<td class="title"><a href="/practice/18159/">个位为 1 的质数个数</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/practice/18159/statistics/">240</a></td>
+			<td class="submissions"><a href="/practice/18159/statistics/">263</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18160/">18160</a></td>
+			<td class="title"><a href="/practice/18160/">最大连通域面积</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/18160/statistics/">839</a></td>
+			<td class="submissions"><a href="/practice/18160/statistics/">861</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/18161/">18161</a></td>
+			<td class="title"><a href="/practice/18161/">矩阵运算(先乘再加)</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/18161/statistics/">750</a></td>
+			<td class="submissions"><a href="/practice/18161/statistics/">777</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18164/">18164</a></td>
+			<td class="title"><a href="/practice/18164/">剪绳子</a></td>
+			            						<td class="ratio">89%</td>
+			<td class="accepted"><a href="/practice/18164/statistics/">459</a></td>
+			<td class="submissions"><a href="/practice/18164/statistics/">518</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/18167/">18167</a></td>
+			<td class="title"><a href="/practice/18167/">寻找周期 v0.2 (data structures, string)</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/practice/18167/statistics/">192</a></td>
+			<td class="submissions"><a href="/practice/18167/statistics/">199</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18176/">18176</a></td>
+			<td class="title"><a href="/practice/18176/">2050年成绩计算</a></td>
+			            						<td class="ratio">81%</td>
+			<td class="accepted"><a href="/practice/18176/statistics/">339</a></td>
+			<td class="submissions"><a href="/practice/18176/statistics/">416</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/18177/">18177</a></td>
+			<td class="title"><a href="/practice/18177/">统计套利策略</a></td>
+			            						<td class="ratio">87%</td>
+			<td class="accepted"><a href="/practice/18177/statistics/">110</a></td>
+			<td class="submissions"><a href="/practice/18177/statistics/">126</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18182/">18182</a></td>
+			<td class="title"><a href="/practice/18182/">打怪兽</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/practice/18182/statistics/">884</a></td>
+			<td class="submissions"><a href="/practice/18182/statistics/">951</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/18188/">18188</a></td>
+			<td class="title"><a href="/practice/18188/">图像的均值滤波</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/practice/18188/statistics/">171</a></td>
+			<td class="submissions"><a href="/practice/18188/statistics/">174</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18189/">18189</a></td>
+			<td class="title"><a href="/practice/18189/">燃烧我的卡路里</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/18189/statistics/">57</a></td>
+			<td class="submissions"><a href="/practice/18189/statistics/">59</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/18209/">18209</a></td>
+			<td class="title"><a href="/practice/18209/">计算信息熵</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/18209/statistics/">31</a></td>
+			<td class="submissions"><a href="/practice/18209/statistics/">32</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18211/">18211</a></td>
+			<td class="title"><a href="/practice/18211/">军备竞赛</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/practice/18211/statistics/">596</a></td>
+			<td class="submissions"><a href="/practice/18211/statistics/">628</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/18223/">18223</a></td>
+			<td class="title"><a href="/practice/18223/">24点</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/18223/statistics/">402</a></td>
+			<td class="submissions"><a href="/practice/18223/statistics/">415</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18224/">18224</a></td>
+			<td class="title"><a href="/practice/18224/">找魔数</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/practice/18224/statistics/">420</a></td>
+			<td class="submissions"><a href="/practice/18224/statistics/">440</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/18250/">18250</a></td>
+			<td class="title"><a href="/practice/18250/">冰阔落 I</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/18250/statistics/">116</a></td>
+			<td class="submissions"><a href="/practice/18250/statistics/">119</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/18252/">18252</a></td>
+			<td class="title"><a href="/practice/18252/">最短路</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/18252/statistics/">9</a></td>
+			<td class="submissions"><a href="/practice/18252/statistics/">9</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/19164/">19164</a></td>
+			<td class="title"><a href="/practice/19164/">移动办公</a></td>
+			            						<td class="ratio">92%</td>
+			<td class="accepted"><a href="/practice/19164/statistics/">12</a></td>
+			<td class="submissions"><a href="/practice/19164/statistics/">13</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/19493/">19493</a></td>
+			<td class="title"><a href="/practice/19493/">SMA简单移动平均 v0.2</a></td>
+			            						<td class="ratio">74%</td>
+			<td class="accepted"><a href="/practice/19493/statistics/">14</a></td>
+			<td class="submissions"><a href="/practice/19493/statistics/">19</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/19546/">19546</a></td>
+			<td class="title"><a href="/practice/19546/">MOM价格动能指标</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/practice/19546/statistics/">13</a></td>
+			<td class="submissions"><a href="/practice/19546/statistics/">14</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/19757/">19757</a></td>
+			<td class="title"><a href="/practice/19757/">Saruman's Army</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/19757/statistics/">57</a></td>
+			<td class="submissions"><a href="/practice/19757/statistics/">59</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/19929/">19929</a></td>
+			<td class="title"><a href="/practice/19929/">环形穿梭车调度</a></td>
+			            						<td class="ratio">82%</td>
+			<td class="accepted"><a href="/practice/19929/statistics/">36</a></td>
+			<td class="submissions"><a href="/practice/19929/statistics/">44</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/19930/">19930</a></td>
+			<td class="title"><a href="/practice/19930/">寻宝</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/19930/statistics/">510</a></td>
+			<td class="submissions"><a href="/practice/19930/statistics/">525</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/19942/">19942</a></td>
+			<td class="title"><a href="/practice/19942/">二维矩阵上的卷积运算</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/practice/19942/statistics/">808</a></td>
+			<td class="submissions"><a href="/practice/19942/statistics/">820</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/19943/">19943</a></td>
+			<td class="title"><a href="/practice/19943/">图的拉普拉斯矩阵</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/practice/19943/statistics/">887</a></td>
+			<td class="submissions"><a href="/practice/19943/statistics/">898</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/19944/">19944</a></td>
+			<td class="title"><a href="/practice/19944/">这一天星期几</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/practice/19944/statistics/">572</a></td>
+			<td class="submissions"><a href="/practice/19944/statistics/">605</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/19946/">19946</a></td>
+			<td class="title"><a href="/practice/19946/">汉堡王v0.2</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/practice/19946/statistics/">13</a></td>
+			<td class="submissions"><a href="/practice/19946/statistics/">14</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/19947/">19947</a></td>
+			<td class="title"><a href="/practice/19947/">新型材料v0.2</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/19947/statistics/">8</a></td>
+			<td class="submissions"><a href="/practice/19947/statistics/">8</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/19948/">19948</a></td>
+			<td class="title"><a href="/practice/19948/">因材施教</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/practice/19948/statistics/">567</a></td>
+			<td class="submissions"><a href="/practice/19948/statistics/">576</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/19949/">19949</a></td>
+			<td class="title"><a href="/practice/19949/">提取实体</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/19949/statistics/">615</a></td>
+			<td class="submissions"><a href="/practice/19949/statistics/">633</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/19952/">19952</a></td>
+			<td class="title"><a href="/practice/19952/">刷漆工</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/practice/19952/statistics/">91</a></td>
+			<td class="submissions"><a href="/practice/19952/statistics/">96</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/19959/">19959</a></td>
+			<td class="title"><a href="/practice/19959/">倍数求和</a></td>
+			            						<td class="ratio">45%</td>
+			<td class="accepted"><a href="/practice/19959/statistics/">31</a></td>
+			<td class="submissions"><a href="/practice/19959/statistics/">69</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/19960/">19960</a></td>
+			<td class="title"><a href="/practice/19960/">恩尼格玛</a></td>
+			            						<td class="ratio">87%</td>
+			<td class="accepted"><a href="/practice/19960/statistics/">41</a></td>
+			<td class="submissions"><a href="/practice/19960/statistics/">47</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/19961/">19961</a></td>
+			<td class="title"><a href="/practice/19961/">最大点数(外太空2048)</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/practice/19961/statistics/">150</a></td>
+			<td class="submissions"><a href="/practice/19961/statistics/">164</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/19962/">19962</a></td>
+			<td class="title"><a href="/practice/19962/">快递点</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/19962/statistics/">12</a></td>
+			<td class="submissions"><a href="/practice/19962/statistics/">12</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/19963/">19963</a></td>
+			<td class="title"><a href="/practice/19963/">买学区房</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/19963/statistics/">467</a></td>
+			<td class="submissions"><a href="/practice/19963/statistics/">480</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/19965/">19965</a></td>
+			<td class="title"><a href="/practice/19965/">海贼王路飞v0.2</a></td>
+			            						<td class="ratio">62%</td>
+			<td class="accepted"><a href="/practice/19965/statistics/">8</a></td>
+			<td class="submissions"><a href="/practice/19965/statistics/">13</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/19967/">19967</a></td>
+			<td class="title"><a href="/practice/19967/">数组增删改查</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/practice/19967/statistics/">10</a></td>
+			<td class="submissions"><a href="/practice/19967/statistics/">11</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/19971/">19971</a></td>
+			<td class="title"><a href="/practice/19971/">组合数</a></td>
+			            						<td class="ratio">53%</td>
+			<td class="accepted"><a href="/practice/19971/statistics/">29</a></td>
+			<td class="submissions"><a href="/practice/19971/statistics/">55</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/19974/">19974</a></td>
+			<td class="title"><a href="/practice/19974/">看电影</a></td>
+			            						<td class="ratio">68%</td>
+			<td class="accepted"><a href="/practice/19974/statistics/">19</a></td>
+			<td class="submissions"><a href="/practice/19974/statistics/">28</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/19984/">19984</a></td>
+			<td class="title"><a href="/practice/19984/">合成路线</a></td>
+			            						<td class="ratio">40%</td>
+			<td class="accepted"><a href="/practice/19984/statistics/">2</a></td>
+			<td class="submissions"><a href="/practice/19984/statistics/">5</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/19998/">19998</a></td>
+			<td class="title"><a href="/practice/19998/">教科书般的亵渎</a></td>
+			            						<td class="ratio">92%</td>
+			<td class="accepted"><a href="/practice/19998/statistics/">44</a></td>
+			<td class="submissions"><a href="/practice/19998/statistics/">48</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20004/">20004</a></td>
+			<td class="title"><a href="/practice/20004/">最大回撤率Biggest Drawdown</a></td>
+			            						<td class="ratio">83%</td>
+			<td class="accepted"><a href="/practice/20004/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/20004/statistics/">6</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20018/">20018</a></td>
+			<td class="title"><a href="/practice/20018/">蚂蚁王国的越野跑</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/20018/statistics/">139</a></td>
+			<td class="submissions"><a href="/practice/20018/statistics/">143</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20025/">20025</a></td>
+			<td class="title"><a href="/practice/20025/">质因数分解</a></td>
+			            						<td class="ratio">74%</td>
+			<td class="accepted"><a href="/practice/20025/statistics/">20</a></td>
+			<td class="submissions"><a href="/practice/20025/statistics/">27</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20026/">20026</a></td>
+			<td class="title"><a href="/practice/20026/">正交向量族</a></td>
+			            						<td class="ratio">70%</td>
+			<td class="accepted"><a href="/practice/20026/statistics/">14</a></td>
+			<td class="submissions"><a href="/practice/20026/statistics/">20</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20027/">20027</a></td>
+			<td class="title"><a href="/practice/20027/">字符串问题</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/practice/20027/statistics/">47</a></td>
+			<td class="submissions"><a href="/practice/20027/statistics/">49</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20052/">20052</a></td>
+			<td class="title"><a href="/practice/20052/">最大点数（同2048规则）</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/practice/20052/statistics/">23</a></td>
+			<td class="submissions"><a href="/practice/20052/statistics/">26</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20074/">20074</a></td>
+			<td class="title"><a href="/practice/20074/">BMI指数</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/practice/20074/statistics/">32</a></td>
+			<td class="submissions"><a href="/practice/20074/statistics/">35</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20075/">20075</a></td>
+			<td class="title"><a href="/practice/20075/">寻宝2.0.v0.3</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/practice/20075/statistics/">32</a></td>
+			<td class="submissions"><a href="/practice/20075/statistics/">35</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20089/">20089</a></td>
+			<td class="title"><a href="/practice/20089/">NBA门票</a></td>
+			            						<td class="ratio">74%</td>
+			<td class="accepted"><a href="/practice/20089/statistics/">54</a></td>
+			<td class="submissions"><a href="/practice/20089/statistics/">73</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20090/">20090</a></td>
+			<td class="title"><a href="/practice/20090/">求个位数</a></td>
+			            						<td class="ratio">46%</td>
+			<td class="accepted"><a href="/practice/20090/statistics/">11</a></td>
+			<td class="submissions"><a href="/practice/20090/statistics/">24</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20091/">20091</a></td>
+			<td class="title"><a href="/practice/20091/">民主开锁v0.2</a></td>
+			            						<td class="ratio">50%</td>
+			<td class="accepted"><a href="/practice/20091/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/20091/statistics/">10</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20100/">20100</a></td>
+			<td class="title"><a href="/practice/20100/">冬泳v0.2</a></td>
+			            						<td class="ratio">85%</td>
+			<td class="accepted"><a href="/practice/20100/statistics/">11</a></td>
+			<td class="submissions"><a href="/practice/20100/statistics/">13</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20101/">20101</a></td>
+			<td class="title"><a href="/practice/20101/">完美配方</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/20101/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/20101/statistics/">5</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20102/">20102</a></td>
+			<td class="title"><a href="/practice/20102/">分圆问题</a></td>
+			            						<td class="ratio">64%</td>
+			<td class="accepted"><a href="/practice/20102/statistics/">9</a></td>
+			<td class="submissions"><a href="/practice/20102/statistics/">14</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20103/">20103</a></td>
+			<td class="title"><a href="/practice/20103/">繁荣的步行街v0.2</a></td>
+			            						<td class="ratio">67%</td>
+			<td class="accepted"><a href="/practice/20103/statistics/">6</a></td>
+			<td class="submissions"><a href="/practice/20103/statistics/">9</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20106/">20106</a></td>
+			<td class="title"><a href="/practice/20106/">走山路</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/practice/20106/statistics/">421</a></td>
+			<td class="submissions"><a href="/practice/20106/statistics/">440</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20107/">20107</a></td>
+			<td class="title"><a href="/practice/20107/">BOOM</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/20107/statistics/">2</a></td>
+			<td class="submissions"><a href="/practice/20107/statistics/">2</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20121/">20121</a></td>
+			<td class="title"><a href="/practice/20121/">解梦人kk</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/20121/statistics/">21</a></td>
+			<td class="submissions"><a href="/practice/20121/statistics/">21</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20122/">20122</a></td>
+			<td class="title"><a href="/practice/20122/">财报发布日期</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/20122/statistics/">9</a></td>
+			<td class="submissions"><a href="/practice/20122/statistics/">9</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20123/">20123</a></td>
+			<td class="title"><a href="/practice/20123/">7-友好数</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/practice/20123/statistics/">28</a></td>
+			<td class="submissions"><a href="/practice/20123/statistics/">32</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20125/">20125</a></td>
+			<td class="title"><a href="/practice/20125/">心理健康</a></td>
+			            						<td class="ratio">50%</td>
+			<td class="accepted"><a href="/practice/20125/statistics/">1</a></td>
+			<td class="submissions"><a href="/practice/20125/statistics/">2</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20127/">20127</a></td>
+			<td class="title"><a href="/practice/20127/">寻宝3.0 v0.2</a></td>
+			            						<td class="ratio">76%</td>
+			<td class="accepted"><a href="/practice/20127/statistics/">19</a></td>
+			<td class="submissions"><a href="/practice/20127/statistics/">25</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20134/">20134</a></td>
+			<td class="title"><a href="/practice/20134/">鹅腿阿姨送鹅腿</a></td>
+			            						<td class="ratio">71%</td>
+			<td class="accepted"><a href="/practice/20134/statistics/">12</a></td>
+			<td class="submissions"><a href="/practice/20134/statistics/">17</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20135/">20135</a></td>
+			<td class="title"><a href="/practice/20135/">鹅腿阿姨找纸条</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/20135/statistics/">6</a></td>
+			<td class="submissions"><a href="/practice/20135/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20136/">20136</a></td>
+			<td class="title"><a href="/practice/20136/">Rick's Adventure v0.2</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/20136/statistics/">2</a></td>
+			<td class="submissions"><a href="/practice/20136/statistics/">2</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20137/">20137</a></td>
+			<td class="title"><a href="/practice/20137/">贪吃蛇custom v0.2</a></td>
+			            						<td class="ratio">67%</td>
+			<td class="accepted"><a href="/practice/20137/statistics/">4</a></td>
+			<td class="submissions"><a href="/practice/20137/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/20138/">20138</a></td>
+			<td class="title"><a href="/practice/20138/">求解多元一次方程组</a></td>
+			            						<td class="ratio">87%</td>
+			<td class="accepted"><a href="/practice/20138/statistics/">13</a></td>
+			<td class="submissions"><a href="/practice/20138/statistics/">15</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/20140/">20140</a></td>
+			<td class="title"><a href="/practice/20140/">今日化学论文</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/practice/20140/statistics/">169</a></td>
+			<td class="submissions"><a href="/practice/20140/statistics/">186</a></td>
+						
+		</tr>
+		</tbody>
+</table>	</div>
+	<p class="page-bar"><span class="pages">
+					<a href="?page=1">1</a>
+					<a href="?page=2">2</a>
+					<a href="?page=3">3</a>
+					<a href="?page=4">4</a>
+					<a href="?page=5">5</a>
+				
+			<span class="current">6</span>
+			
+					<a href="?page=7">7</a>
+					<a href="?page=8">8</a>
+					<a href="?page=9">9</a>
+					<a href="?page=10">10</a>
+	</span>
+</p>
+	
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

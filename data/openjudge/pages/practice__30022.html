@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 30022:坐地铁</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>30022:坐地铁</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/30022/">查看</a></li>
+		<li ><a href="/practice/30022/submit/">提交</a></li>
+				<li ><a href="/practice/30022/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/30022/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>25000ms</dd>
+			<dt>单个测试点时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p>杏子是北大本部的学生，她的好朋友阿爽是医学部的学生。</p>
+<p>有一天杏子想坐班车去医学部找阿爽玩，但是她中午下课非要从理教跑到畅春园吃烧鸭饭导致错过了班车。</p>
+<p>下午回到东门附近，杏子提议和阿爽找一个地铁站，满足从北京大学东门站和从学院桥站到这站<strong>所经历的最少站数相同且是所有满足该条件的车站中的最小值</strong>，她们去那里见面。</p>
+<p>聪明的杏子立刻算出了她们应该前往知春里站，但是与此同时阿爽甚至还没弄明白规则，她绝望地坐在地铁站的长椅上，斜仰着头带着哭腔对着杏子说了一句&ldquo;我，真是个笨蛋&rdquo;。</p>
+<p>阿爽担心下次如果是不同的城市、不同的车站怎么办，于是她来求助你。</p>
+<p><em>作为提示，这里放出北京地铁局部图，很显然知春里站离北京大学东门站和学院桥站的距离都是三站，且是所有符合情况的最小值。</em></p>
+<p><em><img src="http://media.openjudge.cn/images/upload/5994/1764249749.jpg" alt="" width="508" height="259" /></em></p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行三个整数n∈[1,1000],k∈[0,n-1],s∈[0,n-1]，分别代表地铁站数（从0开始编号）、杏子的初始站点、阿爽的初始站点；<br />接下来n行每行n个在[0,1]的整数，表示地铁的邻接矩阵，邻接为1，否则为0。<br />保证矩阵对角对称（即地铁是无向图）、对角项均为0。</dd>
+		<dt>输出</dt>
+		<dd>一行一个数字，杏子和阿爽至少要坐几站地铁；<br />如果不存在符合条件的站点，输出-1。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>#样例1
+5 0 4
+0 1 0 0 1
+1 0 1 0 0
+0 1 0 1 0
+0 0 1 0 1
+1 0 0 1 0
+
+#样例2
+2 0 1
+0 1
+1 0
+
+#样例3
+2 1 1
+0 1
+1 0</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>2
+#样例1解释：杏子和阿爽在一条环线上，只有二号站离零号站和四号站的距离都是二
+
+-1
+#样例2解释：两站对两人的距离都分别是一个零一个一，故不存在符合条件的站点
+
+0
+#样例3解释：杏子和阿爽本就在一起，无需移动</pre></dd>
+				<dt>提示</dt>
+		<dd>bfs, dfs</dd>
+						<dt>来源</dt>
+		<dd>25B13.TA-zdw</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/30022/">查看</a></li>
+		<li ><a href="/practice/30022/submit/">提交</a></li>
+				<li ><a href="/practice/30022/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/30022/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>30022</dd>
+					<dt>添加于</dt>
+			<dd>2025-12-11</dd>
+				<dt>提交次数</dt>
+		<dd>74</dd>
+		<dt>尝试人数</dt>
+	    <dd>25</dd>
+	    <dt>通过人数</dt>
+	    <dd>23</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

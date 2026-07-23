@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 30162:简单的四则运算和函数求值</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>30162:简单的四则运算和函数求值</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/30162/">查看</a></li>
+		<li ><a href="/practice/30162/submit/">提交</a></li>
+				<li ><a href="/practice/30162/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/30162/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p class="md-end-block md-p md-focus"><span class="md-plain md-expand">正在学习python的小王同学觉得简单的带括号的四则运算求值太简单了，想给自己上上难度。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">现在的算式中不止会有四则运算、和括号，还有幂、函数和常量。</span></p>
+<ol class="ol-list" start="">
+<li class="md-list-item">
+<p class="md-end-block md-p"><span class="md-plain">幂用</span><span class="md-pair-s" spellcheck="false"><code>a ** b</code></span><span class="md-plain">的形式表示</span></p>
+</li>
+<li class="md-list-item">
+<p class="md-end-block md-p"><span class="md-plain">函数仅包括</span><span id="ty-mjx-1" class="md-inline-math math-jax-postprocess">abs</span> <span id="ty-mjx-2" class="md-inline-math math-jax-postprocess">sin</span> <span id="ty-mjx-3" class="md-inline-math math-jax-postprocess">cos</span> <span id="ty-mjx-4" class="md-inline-math math-jax-postprocess">tan</span></p>
+</li>
+<li class="md-list-item">
+<p class="md-end-block md-p"><span class="md-plain">常量的名字仅包括大小写英文字母和下划线，不和上面的函数重名，不和python的内置变量和函数等重名</span></p>
+</li>
+<li class="md-list-item">
+<p class="md-end-block md-p"><span class="md-plain">注意运算的优先级和数学中相同</span></p>
+</li>
+</ol>
+<p class="md-end-block md-p md-focus"><span class="md-plain">由于系统故障，存在</span><span class="md-pair-s "><strong><span class="md-plain">表达式有问题</span></strong></span><span class="md-plain">的情况，你需要指出表达式有误。</span> <span class="md-plain">注1. 问题包括：包括无法算出，使用了未定义的常量名和函数名、格式错误、根本不是数学表达式</span> <span class="md-plain">注2. 即使出现问题，表达式中也只会有数字、小数点、+-</span>*<span class="md-plain md-expand">/、括号、英文字母、下划线、空格，不会有引号、方括号之类的。</span></p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行是样例的个数t (t <= 10)<br />接下来的 2t 行每两行是一组数据，第一行是常量定义，第二行是要求的表达式。<br /><br />常量行的第一个数据 m (m <= 3) 表示有多少个常量，接下来是常量名和对应的数值，数值均以小数点后两位数的形式呈现，绝对值小于100。变量仅对当前案例有效。<br />表达式行是一个表达式，表达式长度在300个字节以下，表达式中可能有空格。</dd>
+		<dt>输出</dt>
+		<dd>表达式的求值结果，保留两位小数。如果表达式有误，输出一行`WRONG`。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>3
+2 a 1.00 b -2.00
+abs(abs(a) + abs(b) * abs(abs(3.14)))
+0
+PKU is the second greatest university in China.
+3 BanG_Dream 9.47 It_s 9.08 MyGo 5.27
+sin(BanG_Dream) * cos(It_s) + cos(BanG_Dream) * sin(MyGo)</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>7.28
+WRONG
+0.89</pre></dd>
+				<dt>提示</dt>
+		<dd>标签：Stack<br />以下提示仅针对python:<br /><br />1. 你可以使用`from math import sin, cos, tan`导入函数，之后你可以直接使用sin(xxx)来计算。<br />2. 你可以使用类似于`exec("a=0")`的代码来创建变量 `a` 并赋值为 `0`。你可以使用类似于`exec("del a")`来删除变量。<br />3. 你可以用类似于`eval(a**2)`的代码来计算python表达式的值。<br />4. 你可以用`try: ... except: ...`来捕获异常。</dd>
+						<dt>来源</dt>
+		<dd>2025fall-cs101 yjz</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/30162/">查看</a></li>
+		<li ><a href="/practice/30162/submit/">提交</a></li>
+				<li ><a href="/practice/30162/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/30162/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>30162</dd>
+					<dt>添加于</dt>
+			<dd>2025-11-17</dd>
+				<dt>提交次数</dt>
+		<dd>20</dd>
+		<dt>尝试人数</dt>
+	    <dd>5</dd>
+	    <dt>通过人数</dt>
+	    <dd>4</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 04113:北京地铁票价-BeiJing Subway</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>04113:北京地铁票价-BeiJing Subway</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/04113/">查看</a></li>
+		<li ><a href="/practice/04113/submit/">提交</a></li>
+				<li ><a href="/practice/04113/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/04113/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p class="MsoNormal" style="">从<span>2014</span>年<span>12</span>月<span>28</span>日起，北京市公交地铁将执行新的票价方案。其中地铁的票价方案改为：<span>6</span>公里<span>(</span>含<span>)</span>内<span>3</span>元；<span>6</span>公里至<span>12</span>公里<span>(</span>含<span>)4</span>元；<span>12</span>公里至<span>22</span>公里<span>(</span>含<span>)5</span>元；<span>22</span>公里至<span>32</span>公里<span>(</span>含<span>)6</span>元；<span>32</span>公里以上部分，每增加<span>1</span>元可乘坐<span>20</span>公里。</p><p class="MsoNormal" style="">地铁交通网络有许多线路组成，每条线路又由多个地铁站连接而成（为简化问题，部分线路和部分地铁站被从地图上略去）。比如地铁<span>4</span>号线和<span>1</span>号线的部分地铁站名称和相邻站之间的距离如下表：</p><p class="MsoNormal"><span> </span></p><table class="MsoTableGrid" border="1" cellspacing="0" cellpadding="0" style="border: none"><tbody><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>4</span>号线 起始<span>/</span>终到车站</p></td><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-left:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">区间距离（米）</p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">圆明园<span>——</span>北京大学东门</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>1295</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">北京大学东门<span>——</span>中关村</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>887</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">中关村<span>——</span>海淀黄庄</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>900</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">海淀黄庄<span>——</span>人民大学</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>1063</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">人民大学<span>——</span>国家图书馆</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>2709</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">国家图书馆<span>——</span>西直门</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>1958</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">西直门<span>——</span>西四</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>3225</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">西四<span>——</span>西单</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>1880</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">西单<span>——</span>宣武门</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>815</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>……</span></p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span> </span></p></td></tr></tbody></table><p class="MsoNormal"><span> </span></p><table class="MsoTableGrid" border="1" cellspacing="0" cellpadding="0" style="border: none"><tbody><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>1</span>号线 起始<span>/</span>终到车站</p></td><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-left:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">区间距离（米）</p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">军事博物馆——木樨地</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>1166</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">木樨地——复兴门</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>1715</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">复兴门<span>——</span>西单</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>1590</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">西单<span>——</span>天安门西</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>1217</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">天安门西<span>——</span>天安门东</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>925</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal">天安门东<span>——</span>王府井</p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>852</span></p></td></tr><tr><td width="277" valign="top" style="width:207.4pt;border:solid windowtext 1.0pt;border-top:none;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span>……</span></p></td><td width="277" valign="top" style="width:207.4pt;border-top:none;border-left:&nbsp;&nbsp;none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;;;;padding:0cm 5.4pt 0cm 5.4pt"><p class="MsoNormal"><span> </span></p></td></tr></tbody></table><p><img src="http://media.openjudge.cn/images/upload/1420519025.jpg" width="600" height="400" style="display: block;" /></p><div><div style="text-align: center;"><br /></div><p class="MsoNormal"><span> </span></p><p class="MsoNormal" style=";text-align:center;"><br /></p><p class="MsoNormal"><span>&nbsp;&nbsp;&nbsp;&nbsp;</span>如果我们从北京大学东门出发，前往天安门东，需要先乘坐地铁<span>4</span>号线到达西单站，然后在西单换乘地铁<span>1</span>号线，最后到达天安门东。整个行程的路程为：</p><p class="MsoNormal" style=""><span>(887+900+1063+2709+1958+3225+1880)+ (1217+925) = 14764(</span>米<span>)</span></p><p class="MsoNormal" style="">因此，按照新的票价方案，乘坐地铁从北京大学东门到达天安门东需要花费<span>5</span>元。</p><p class="MsoNormal"><span>&nbsp;&nbsp;&nbsp;&nbsp;</span></p><p class="MsoNormal"><span>&nbsp;&nbsp;&nbsp;&nbsp;</span>现在我们化简地铁网络，假设网络中至多只有<span>2</span>条线路，并且网络要么是“一”字形，要么是“十”字形，不存在环路（从一个站出发经过若干不同的站后又回到出发站）。</p><p class="MsoNormal" style="">现在任意给出两个地铁站，从其中一个出发到达另外一个地铁站的票价是多少？</p><p class="MsoNormal"><br /></p><p class="MsoNormal" style=""><br /></p><p class="MsoNormal"><span> </span></p><p class="MsoNormal"><br /></p><p class="MsoNormal" style=""><br /></p></div></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行是一个整数cases（1<=cases<=10），表示测试数据的个数。下面是cases组测试数据。<br /><br />对于每组测试数据，第一行是两个整数L(1<=L<=2)和D(1<=D<=10)，分别表示地铁线路的个数和问题的个数。<br /><br />然后是L行，每行表示一个地铁线路。每行首先是一个数字M(2<=M<=20)，表示这条线路上地铁站的个数。然后是用空格隔开的M个字符串和(M-1)个整数，字符串是M个地铁站的拼音，它们按线路上的顺序依次排列；数字位于两个字符串之间，表示这两个相邻地铁站之间的距离。<br /><br />然后是D行，每行两个字符串，分别为起点和终点地铁站，要求输出它们之间的票价。输入数据保证线路中存在起点和终点，并且有唯一的路线可达。</dd>
+		<dt>输出</dt>
+		<dd>对于每组测试数据，首先输出一行”Casei:”，然后是D行，每行代表从起点到达终点地铁站的票价。<br /><br />注意，不同组测试数据之间的地铁线路不能互用，例如，你不能用第1组测试数据的地铁线路去求解第2组测试数据中的票价。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>2
+1 2
+5 YuanMingYuan 1295 BeiJingDaXueDongMen 887 ZhongGuanCun 900 HaiDianHuangZhuang 1063 RenMinDaXue
+BeiJingDaXueDongMen ZhongGuanCun
+BeiJingDaXueDongMen RenMinDaXue
+2 1
+10 YuanMingYuan 1295 BeiJingDaXueDongMen 887 ZhongGuanCun 900 HaiDianHuangZhuang 1063 RenMinDaXue 2709 GuaJiaTuShuGuan 1958 XiZhiMen 3225 XiSi 1880 XiDan 815 XuanWuMen
+7 JunShiBoWuGuan 1166 MuXiDi 1715 FuXingMen 1590 XiDan 1217 TianAnMenXi 925 TianAnMenDong 852 WangFuJing
+BeiJingDaXueDongMen TianAnMenDong
+</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>Case 1:
+3
+3
+Case 2:
+5
+</pre></dd>
+						</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/04113/">查看</a></li>
+		<li ><a href="/practice/04113/submit/">提交</a></li>
+				<li ><a href="/practice/04113/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/04113/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>7818</dd>
+					<dt>添加于</dt>
+			<dd>2023-10-11</dd>
+				<dt>提交次数</dt>
+		<dd>3</dd>
+		<dt>尝试人数</dt>
+	    <dd>2</dd>
+	    <dt>通过人数</dt>
+	    <dd>2</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

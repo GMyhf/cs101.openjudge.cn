@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 29677:藏宝图</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>29677:藏宝图</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/29677/">查看</a></li>
+		<li ><a href="/practice/29677/submit/">提交</a></li>
+				<li ><a href="/practice/29677/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/29677/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p class="md-end-block md-p"><span class="md-plain">在学校图书馆里，有一个书架，有N个位置，上面整齐地排列着 </span><span class="md-pair-s "><strong><span class="md-plain">N</span></strong></span><span class="md-plain"> 本书。最初，这些书是按照出版序列号从左到右排列的，也就是第 1 本书（序列号为1）在最左边的第 1 个位置，第 2 本书（序列号为2）在第 2 个位置，&hellip;&hellip;，第 </span><span class="md-pair-s "><strong><span class="md-plain">N</span></strong></span><span class="md-plain"> 本书（序列号为N）在第 </span><span class="md-pair-s "><strong><span class="md-plain">N</span></strong></span><span class="md-plain"> 个位置（最右边）。</span></p>
+<p class="md-end-block md-p md-focus"><span class="md-plain">书架的每个位置</span><span class="md-plain">旁边都有一张魔法卡片，上面写着一个数字 <strong>d[i]</strong></span><span class="md-pair-s "><strong><span class="md-plain"><span style="font-size: 13.3333px;">，</span></span></strong></span><span class="md-plain">这意味着你可以对这个位置的书施展一个&ldquo;交换&rdquo;魔法：你可以让放在第 </span><span class="md-pair-s "><strong><span class="md-plain">i</span></strong></span><span class="md-plain"> 个位置上的书，和放在第 </span><span class="md-pair-s "><strong><span class="md-plain">i + d[i] </span></strong></span><span class="md-plain">个位置的书交换位置，或者和放在第 </span><span class="md-pair-s "><strong><span class="md-plain">i - d[i]</span></strong></span><span class="md-plain md-expand"> 个位置的书交换位置。这个&ldquo;交换&rdquo;魔法和书自身的序列号无关，也就是说，放在位置<strong> i </strong>的任何书都可以和 <span class="md-pair-s "><strong><span class="md-plain">i + d[i]</span> </strong><span class="md-plain">以及</span><strong> <span class="md-plain">i - d[i]</span> </strong><span class="md-plain">的位置的任何书进行交换</span><strong><span class="md-plain">（当然，目标位置必须是书架上真实存在的位置，也就是 1~N，超出书架范围的目标位置不可交换，也没有书）。</span></strong></span><br /><br /></span><span class="md-plain">现在，你发现了一张藏宝图，上面描绘了一种这些书的&ldquo;理想排列顺序&rdquo; <strong>t[i]</strong>，代表第 <strong>i</strong> 个位置的书架应该放上序列号为 <strong>t[i]</strong> 的书。只要书架上的书排列成这个顺序，就会触动某个神秘机关。 <br /><br />需要你来判断的是：从最初的按序列号排列的状态开始，通过使用任意次、任意位置的&ldquo;交换&rdquo;魔法，它们是否有可能排列成藏宝图上所示的&ldquo;理想排列顺序&rdquo;呢？请通过输出"YES"或者"NO"回答。</span></p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>输入有多组数据。<br />第一行是一个整数T，代表数据组数。<br />其后有 T 组数据，每组数据有三行：<br />每组数据的第一行是一个整数 N，代表书架有 N 个位置、最初有 N 本书顺序排列。第二行是 N 个正整数 t[i]，代表书的理想排列顺序，是 1~N 的一个排列。第三行是 N 个正整数 表示 d[i]。<br /><br />每组数据之间互相独立。</dd>
+		<dt>输出</dt>
+		<dd>输出 T 行，对应每组数据，如果能交换到“理想排列顺序”，输出 "YES"，否则输出 "NO"。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>3
+5
+5 4 3 2 1
+1 1 1 1 1
+7
+4 3 5 1 2 7 6
+4 6 6 1 6 6 1
+7
+4 2 5 1 3 7 6
+4 6 6 1 6 6 1</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>YES
+NO
+YES</pre></dd>
+				<dt>提示</dt>
+		<dd>【样例解释】<br />样例的第一组数据：书架上有5个位置，最初的排列是1, 2, 3, 4, 5.（按照序列号的初始排列）；理想排列顺序是5, 4, 3, 2, 1（输入的第二行），这个数据里的所有d[i]=1，代表每个位置都可以和相邻的位置的书交换。那么易知是可以从初始排列交换到理想排列顺序的。<br /><br />【数据范围】<br />对于50%的测试数据，T <= 10, N <= 10;<br />对于100%的测试数据，T <= 20, N <= 10,000.<br /><br />【提示】<br />可以考虑使用并查集来建模“交换”的关系。</dd>
+						</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/29677/">查看</a></li>
+		<li ><a href="/practice/29677/submit/">提交</a></li>
+				<li ><a href="/practice/29677/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/29677/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>29677</dd>
+					<dt>添加于</dt>
+			<dd>2025-06-06</dd>
+				<dt>提交次数</dt>
+		<dd>5</dd>
+		<dt>尝试人数</dt>
+	    <dd>3</dd>
+	    <dt>通过人数</dt>
+	    <dd>3</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

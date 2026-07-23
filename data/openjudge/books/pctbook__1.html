@@ -1,0 +1,946 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - OpenJudge - 题目</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>计算思维算法实践</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/pctbook/" class="first">题目</a></li>
+            <li ><a href="/pctbook/ranking/">排名</a></li>
+                    <li ><a href="/pctbook/status/">状态</a></li>
+	    			        <li class="last"><a href="/pctbook/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<div id="main" class="col-9">
+	<p class="page-bar">
+		<span class="pages">
+				
+			<span class="current">1</span>
+			
+					<a href="?page=2">2</a>
+					<a href="?page=3">3</a>
+	</span>
+	</p>
+	<div id="problemsList">
+		<table>
+	<thead>
+		<tr>
+						<td class="problem-id">题目ID</td>
+			<td class="title">标题</td>
+			            						<td class="ratio">通过率</td>
+			<td class="accepted">通过人数</td>
+			<td class="submissions">尝试人数</td>
+						
+		</tr>
+	</thead>
+	<tbody>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E01003/">E01003</a></td>
+			<td class="title"><a href="/pctbook/E01003/">Hangover</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/pctbook/E01003/statistics/">391</a></td>
+			<td class="submissions"><a href="/pctbook/E01003/statistics/">406</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E01218/">E01218</a></td>
+			<td class="title"><a href="/pctbook/E01218/">THE DRUNK JAILER</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E01218/statistics/">461</a></td>
+			<td class="submissions"><a href="/pctbook/E01218/statistics/">466</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E02676/">E02676</a></td>
+			<td class="title"><a href="/pctbook/E02676/">整数的个数</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E02676/statistics/">563</a></td>
+			<td class="submissions"><a href="/pctbook/E02676/statistics/">571</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E02689/">E02689</a></td>
+			<td class="title"><a href="/pctbook/E02689/">大小写字母互换</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E02689/statistics/">507</a></td>
+			<td class="submissions"><a href="/pctbook/E02689/statistics/">512</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E02701/">E02701</a></td>
+			<td class="title"><a href="/pctbook/E02701/">与7无关的数</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E02701/statistics/">514</a></td>
+			<td class="submissions"><a href="/pctbook/E02701/statistics/">517</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E02712/">E02712</a></td>
+			<td class="title"><a href="/pctbook/E02712/">细菌繁殖</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E02712/statistics/">440</a></td>
+			<td class="submissions"><a href="/pctbook/E02712/statistics/">446</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E02724/">E02724</a></td>
+			<td class="title"><a href="/pctbook/E02724/">生日相同</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/pctbook/E02724/statistics/">417</a></td>
+			<td class="submissions"><a href="/pctbook/E02724/statistics/">448</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E02733/">E02733</a></td>
+			<td class="title"><a href="/pctbook/E02733/">判断闰年</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E02733/statistics/">503</a></td>
+			<td class="submissions"><a href="/pctbook/E02733/statistics/">507</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E02734/">E02734</a></td>
+			<td class="title"><a href="/pctbook/E02734/">十进制到八进制</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E02734/statistics/">419</a></td>
+			<td class="submissions"><a href="/pctbook/E02734/statistics/">423</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E02750/">E02750</a></td>
+			<td class="title"><a href="/pctbook/E02750/">鸡兔同笼</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/E02750/statistics/">497</a></td>
+			<td class="submissions"><a href="/pctbook/E02750/statistics/">505</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E02753/">E02753</a></td>
+			<td class="title"><a href="/pctbook/E02753/">菲波那契数列</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E02753/statistics/">414</a></td>
+			<td class="submissions"><a href="/pctbook/E02753/statistics/">417</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E02767/">E02767</a></td>
+			<td class="title"><a href="/pctbook/E02767/">简单密码</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E02767/statistics/">360</a></td>
+			<td class="submissions"><a href="/pctbook/E02767/statistics/">362</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E02792/">E02792</a></td>
+			<td class="title"><a href="/pctbook/E02792/">集合加法</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/E02792/statistics/">309</a></td>
+			<td class="submissions"><a href="/pctbook/E02792/statistics/">314</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E02804/">E02804</a></td>
+			<td class="title"><a href="/pctbook/E02804/">词典</a></td>
+			            						<td class="ratio">92%</td>
+			<td class="accepted"><a href="/pctbook/E02804/statistics/">253</a></td>
+			<td class="submissions"><a href="/pctbook/E02804/statistics/">274</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E02808/">E02808</a></td>
+			<td class="title"><a href="/pctbook/E02808/">校门外的树</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E02808/statistics/">418</a></td>
+			<td class="submissions"><a href="/pctbook/E02808/statistics/">423</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E02883/">E02883</a></td>
+			<td class="title"><a href="/pctbook/E02883/">Checking order</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/pctbook/E02883/statistics/">249</a></td>
+			<td class="submissions"><a href="/pctbook/E02883/statistics/">266</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E02899/">E02899</a></td>
+			<td class="title"><a href="/pctbook/E02899/">矩阵交换行</a></td>
+			            						<td class="ratio">64%</td>
+			<td class="accepted"><a href="/pctbook/E02899/statistics/">174</a></td>
+			<td class="submissions"><a href="/pctbook/E02899/statistics/">274</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E02910/">E02910</a></td>
+			<td class="title"><a href="/pctbook/E02910/">提取数字</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/pctbook/E02910/statistics/">274</a></td>
+			<td class="submissions"><a href="/pctbook/E02910/statistics/">289</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E02911/">E02911</a></td>
+			<td class="title"><a href="/pctbook/E02911/">受限完全平方数</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/pctbook/E02911/statistics/">225</a></td>
+			<td class="submissions"><a href="/pctbook/E02911/statistics/">231</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E02913/">E02913</a></td>
+			<td class="title"><a href="/pctbook/E02913/">加密技术</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E02913/statistics/">198</a></td>
+			<td class="submissions"><a href="/pctbook/E02913/statistics/">199</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E02927/">E02927</a></td>
+			<td class="title"><a href="/pctbook/E02927/">判断数字个数</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/pctbook/E02927/statistics/">208</a></td>
+			<td class="submissions"><a href="/pctbook/E02927/statistics/">215</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E02936/">E02936</a></td>
+			<td class="title"><a href="/pctbook/E02936/">试剂配制</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E02936/statistics/">216</a></td>
+			<td class="submissions"><a href="/pctbook/E02936/statistics/">219</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E02940/">E02940</a></td>
+			<td class="title"><a href="/pctbook/E02940/">求和</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/pctbook/E02940/statistics/">263</a></td>
+			<td class="submissions"><a href="/pctbook/E02940/statistics/">263</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E02942/">E02942</a></td>
+			<td class="title"><a href="/pctbook/E02942/">吃糖果</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/pctbook/E02942/statistics/">254</a></td>
+			<td class="submissions"><a href="/pctbook/E02942/statistics/">255</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E02946/">E02946</a></td>
+			<td class="title"><a href="/pctbook/E02946/">玩游戏</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E02946/statistics/">207</a></td>
+			<td class="submissions"><a href="/pctbook/E02946/statistics/">209</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E03143/">E03143</a></td>
+			<td class="title"><a href="/pctbook/E03143/">验证“歌德巴赫猜想”</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/E03143/statistics/">263</a></td>
+			<td class="submissions"><a href="/pctbook/E03143/statistics/">268</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E03225/">E03225</a></td>
+			<td class="title"><a href="/pctbook/E03225/">满足条件的整数</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/E03225/statistics/">183</a></td>
+			<td class="submissions"><a href="/pctbook/E03225/statistics/">187</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E03248/">E03248</a></td>
+			<td class="title"><a href="/pctbook/E03248/">最大公约数</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/pctbook/E03248/statistics/">209</a></td>
+			<td class="submissions"><a href="/pctbook/E03248/statistics/">215</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E03406/">E03406</a></td>
+			<td class="title"><a href="/pctbook/E03406/">书架</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E03406/statistics/">193</a></td>
+			<td class="submissions"><a href="/pctbook/E03406/statistics/">194</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E03670/">E03670</a></td>
+			<td class="title"><a href="/pctbook/E03670/">计算鞍点</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/E03670/statistics/">195</a></td>
+			<td class="submissions"><a href="/pctbook/E03670/statistics/">199</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E04018/">E04018</a></td>
+			<td class="title"><a href="/pctbook/E04018/">子串</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/pctbook/E04018/statistics/">166</a></td>
+			<td class="submissions"><a href="/pctbook/E04018/statistics/">171</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E04067/">E04067</a></td>
+			<td class="title"><a href="/pctbook/E04067/">回文数字（Palindrome Number）</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/pctbook/E04067/statistics/">248</a></td>
+			<td class="submissions"><a href="/pctbook/E04067/statistics/">255</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E04138/">E04138</a></td>
+			<td class="title"><a href="/pctbook/E04138/">质数的和与积</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/E04138/statistics/">190</a></td>
+			<td class="submissions"><a href="/pctbook/E04138/statistics/">193</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E04146/">E04146</a></td>
+			<td class="title"><a href="/pctbook/E04146/">数字方格</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E04146/statistics/">166</a></td>
+			<td class="submissions"><a href="/pctbook/E04146/statistics/">168</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E06374/">E06374</a></td>
+			<td class="title"><a href="/pctbook/E06374/">文字排版</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E06374/statistics/">182</a></td>
+			<td class="submissions"><a href="/pctbook/E06374/statistics/">184</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E07618/">E07618</a></td>
+			<td class="title"><a href="/pctbook/E07618/">病人排队</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/E07618/statistics/">214</a></td>
+			<td class="submissions"><a href="/pctbook/E07618/statistics/">218</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E07743/">E07743</a></td>
+			<td class="title"><a href="/pctbook/E07743/">计算矩阵边缘元素之和</a></td>
+			            						<td class="ratio">92%</td>
+			<td class="accepted"><a href="/pctbook/E07743/statistics/">151</a></td>
+			<td class="submissions"><a href="/pctbook/E07743/statistics/">164</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E07810/">E07810</a></td>
+			<td class="title"><a href="/pctbook/E07810/">19岁生日礼物-Birthday Gift</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E07810/statistics/">159</a></td>
+			<td class="submissions"><a href="/pctbook/E07810/statistics/">160</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E08219/">E08219</a></td>
+			<td class="title"><a href="/pctbook/E08219/">判断数正负</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E08219/statistics/">139</a></td>
+			<td class="submissions"><a href="/pctbook/E08219/statistics/">140</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E12556/">E12556</a></td>
+			<td class="title"><a href="/pctbook/E12556/">编码字符串</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/E12556/statistics/">170</a></td>
+			<td class="submissions"><a href="/pctbook/E12556/statistics/">173</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E18161/">E18161</a></td>
+			<td class="title"><a href="/pctbook/E18161/">矩阵运算(先乘再加)</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/E18161/statistics/">235</a></td>
+			<td class="submissions"><a href="/pctbook/E18161/statistics/">239</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E18188/">E18188</a></td>
+			<td class="title"><a href="/pctbook/E18188/">图像的均值滤波</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/E18188/statistics/">109</a></td>
+			<td class="submissions"><a href="/pctbook/E18188/statistics/">111</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E18223/">E18223</a></td>
+			<td class="title"><a href="/pctbook/E18223/">24点</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/pctbook/E18223/statistics/">180</a></td>
+			<td class="submissions"><a href="/pctbook/E18223/statistics/">180</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E18224/">E18224</a></td>
+			<td class="title"><a href="/pctbook/E18224/">找魔数</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/pctbook/E18224/statistics/">126</a></td>
+			<td class="submissions"><a href="/pctbook/E18224/statistics/">130</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E19942/">E19942</a></td>
+			<td class="title"><a href="/pctbook/E19942/">二维矩阵上的卷积运算</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/pctbook/E19942/statistics/">211</a></td>
+			<td class="submissions"><a href="/pctbook/E19942/statistics/">211</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E19943/">E19943</a></td>
+			<td class="title"><a href="/pctbook/E19943/">图的拉普拉斯矩阵</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/pctbook/E19943/statistics/">172</a></td>
+			<td class="submissions"><a href="/pctbook/E19943/statistics/">172</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E19949/">E19949</a></td>
+			<td class="title"><a href="/pctbook/E19949/">提取实体</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E19949/statistics/">142</a></td>
+			<td class="submissions"><a href="/pctbook/E19949/statistics/">144</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E20742/">E20742</a></td>
+			<td class="title"><a href="/pctbook/E20742/">泰波拿契數</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E20742/statistics/">192</a></td>
+			<td class="submissions"><a href="/pctbook/E20742/statistics/">193</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E21459/">E21459</a></td>
+			<td class="title"><a href="/pctbook/E21459/">How old are you？</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/pctbook/E21459/statistics/">180</a></td>
+			<td class="submissions"><a href="/pctbook/E21459/statistics/">180</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E21727/">E21727</a></td>
+			<td class="title"><a href="/pctbook/E21727/">湾仔码头</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E21727/statistics/">136</a></td>
+			<td class="submissions"><a href="/pctbook/E21727/statistics/">138</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E21728/">E21728</a></td>
+			<td class="title"><a href="/pctbook/E21728/">排队做实验</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/pctbook/E21728/statistics/">91</a></td>
+			<td class="submissions"><a href="/pctbook/E21728/statistics/">95</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E22271/">E22271</a></td>
+			<td class="title"><a href="/pctbook/E22271/">绿水青山之植树造林活动</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/pctbook/E22271/statistics/">103</a></td>
+			<td class="submissions"><a href="/pctbook/E22271/statistics/">107</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E22548/">E22548</a></td>
+			<td class="title"><a href="/pctbook/E22548/">机智的股民老张</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/pctbook/E22548/statistics/">132</a></td>
+			<td class="submissions"><a href="/pctbook/E22548/statistics/">137</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E23555/">E23555</a></td>
+			<td class="title"><a href="/pctbook/E23555/">节省存储的矩阵乘法</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/E23555/statistics/">238</a></td>
+			<td class="submissions"><a href="/pctbook/E23555/statistics/">242</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E23556/">E23556</a></td>
+			<td class="title"><a href="/pctbook/E23556/">小青蛙跳荷叶</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/pctbook/E23556/statistics/">136</a></td>
+			<td class="submissions"><a href="/pctbook/E23556/statistics/">143</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E23563/">E23563</a></td>
+			<td class="title"><a href="/pctbook/E23563/">多项式时间复杂度</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/pctbook/E23563/statistics/">220</a></td>
+			<td class="submissions"><a href="/pctbook/E23563/statistics/">229</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E23564/">E23564</a></td>
+			<td class="title"><a href="/pctbook/E23564/">数论</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/E23564/statistics/">152</a></td>
+			<td class="submissions"><a href="/pctbook/E23564/statistics/">155</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E23566/">E23566</a></td>
+			<td class="title"><a href="/pctbook/E23566/">决战双十一</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/pctbook/E23566/statistics/">101</a></td>
+			<td class="submissions"><a href="/pctbook/E23566/statistics/">104</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E24684/">E24684</a></td>
+			<td class="title"><a href="/pctbook/E24684/">直播计票</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E24684/statistics/">99</a></td>
+			<td class="submissions"><a href="/pctbook/E24684/statistics/">100</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E25538/">E25538</a></td>
+			<td class="title"><a href="/pctbook/E25538/">二进制回文的整数</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E25538/statistics/">125</a></td>
+			<td class="submissions"><a href="/pctbook/E25538/statistics/">126</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E25580/">E25580</a></td>
+			<td class="title"><a href="/pctbook/E25580/">木板掉落</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/pctbook/E25580/statistics/">93</a></td>
+			<td class="submissions"><a href="/pctbook/E25580/statistics/">98</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E27273/">E27273</a></td>
+			<td class="title"><a href="/pctbook/E27273/">简单的数学题</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/pctbook/E27273/statistics/">138</a></td>
+			<td class="submissions"><a href="/pctbook/E27273/statistics/">144</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E27301/">E27301</a></td>
+			<td class="title"><a href="/pctbook/E27301/">给植物浇水</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/pctbook/E27301/statistics/">111</a></td>
+			<td class="submissions"><a href="/pctbook/E27301/statistics/">116</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E27653/">E27653</a></td>
+			<td class="title"><a href="/pctbook/E27653/">Fraction类</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E27653/statistics/">301</a></td>
+			<td class="submissions"><a href="/pctbook/E27653/statistics/">305</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E28336/">E28336</a></td>
+			<td class="title"><a href="/pctbook/E28336/">消消乐</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E28336/statistics/">116</a></td>
+			<td class="submissions"><a href="/pctbook/E28336/statistics/">117</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E28674/">E28674</a></td>
+			<td class="title"><a href="/pctbook/E28674/">《黑神话：悟空》之加密</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E28674/statistics/">285</a></td>
+			<td class="submissions"><a href="/pctbook/E28674/statistics/">287</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E28681/">E28681</a></td>
+			<td class="title"><a href="/pctbook/E28681/">奖学金</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/pctbook/E28681/statistics/">159</a></td>
+			<td class="submissions"><a href="/pctbook/E28681/statistics/">159</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E28691/">E28691</a></td>
+			<td class="title"><a href="/pctbook/E28691/">字符串中的整数求和</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/pctbook/E28691/statistics/">296</a></td>
+			<td class="submissions"><a href="/pctbook/E28691/statistics/">297</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/E29895/">E29895</a></td>
+			<td class="title"><a href="/pctbook/E29895/">分解因数</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/pctbook/E29895/statistics/">142</a></td>
+			<td class="submissions"><a href="/pctbook/E29895/statistics/">147</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/E29940/">E29940</a></td>
+			<td class="title"><a href="/pctbook/E29940/">机器猫斗恶龙</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/E29940/statistics/">142</a></td>
+			<td class="submissions"><a href="/pctbook/E29940/statistics/">143</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M01002/">M01002</a></td>
+			<td class="title"><a href="/pctbook/M01002/">方便记忆的电话号码</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/pctbook/M01002/statistics/">250</a></td>
+			<td class="submissions"><a href="/pctbook/M01002/statistics/">260</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M01017/">M01017</a></td>
+			<td class="title"><a href="/pctbook/M01017/">装箱问题</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/pctbook/M01017/statistics/">308</a></td>
+			<td class="submissions"><a href="/pctbook/M01017/statistics/">326</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M01088/">M01088</a></td>
+			<td class="title"><a href="/pctbook/M01088/">滑雪</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/pctbook/M01088/statistics/">194</a></td>
+			<td class="submissions"><a href="/pctbook/M01088/statistics/">204</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M01321/">M01321</a></td>
+			<td class="title"><a href="/pctbook/M01321/">棋盘问题</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/pctbook/M01321/statistics/">138</a></td>
+			<td class="submissions"><a href="/pctbook/M01321/statistics/">145</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M01328/">M01328</a></td>
+			<td class="title"><a href="/pctbook/M01328/">Radar Installation</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/pctbook/M01328/statistics/">109</a></td>
+			<td class="submissions"><a href="/pctbook/M01328/statistics/">117</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M01852/">M01852</a></td>
+			<td class="title"><a href="/pctbook/M01852/">Ants</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/pctbook/M01852/statistics/">122</a></td>
+			<td class="submissions"><a href="/pctbook/M01852/statistics/">122</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M01922/">M01922</a></td>
+			<td class="title"><a href="/pctbook/M01922/">Ride to School</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/pctbook/M01922/statistics/">215</a></td>
+			<td class="submissions"><a href="/pctbook/M01922/statistics/">231</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M02039/">M02039</a></td>
+			<td class="title"><a href="/pctbook/M02039/">反反复复</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/M02039/statistics/">132</a></td>
+			<td class="submissions"><a href="/pctbook/M02039/statistics/">135</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M02431/">M02431</a></td>
+			<td class="title"><a href="/pctbook/M02431/">Expedition</a></td>
+			            						<td class="ratio">89%</td>
+			<td class="accepted"><a href="/pctbook/M02431/statistics/">81</a></td>
+			<td class="submissions"><a href="/pctbook/M02431/statistics/">91</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M02524/">M02524</a></td>
+			<td class="title"><a href="/pctbook/M02524/">宗教信仰</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/pctbook/M02524/statistics/">151</a></td>
+			<td class="submissions"><a href="/pctbook/M02524/statistics/">162</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M02692/">M02692</a></td>
+			<td class="title"><a href="/pctbook/M02692/">假币问题</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/pctbook/M02692/statistics/">118</a></td>
+			<td class="submissions"><a href="/pctbook/M02692/statistics/">130</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M02694/">M02694</a></td>
+			<td class="title"><a href="/pctbook/M02694/">波兰表达式</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/pctbook/M02694/statistics/">134</a></td>
+			<td class="submissions"><a href="/pctbook/M02694/statistics/">143</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M02746/">M02746</a></td>
+			<td class="title"><a href="/pctbook/M02746/">约瑟夫问题</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/M02746/statistics/">291</a></td>
+			<td class="submissions"><a href="/pctbook/M02746/statistics/">293</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M02748/">M02748</a></td>
+			<td class="title"><a href="/pctbook/M02748/">全排列</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/pctbook/M02748/statistics/">129</a></td>
+			<td class="submissions"><a href="/pctbook/M02748/statistics/">129</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M02749/">M02749</a></td>
+			<td class="title"><a href="/pctbook/M02749/">分解因数</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/pctbook/M02749/statistics/">116</a></td>
+			<td class="submissions"><a href="/pctbook/M02749/statistics/">121</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M02757/">M02757</a></td>
+			<td class="title"><a href="/pctbook/M02757/">最长上升子序列</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/M02757/statistics/">154</a></td>
+			<td class="submissions"><a href="/pctbook/M02757/statistics/">157</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M02760/">M02760</a></td>
+			<td class="title"><a href="/pctbook/M02760/">数字三角形</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/M02760/statistics/">153</a></td>
+			<td class="submissions"><a href="/pctbook/M02760/statistics/">155</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M02766/">M02766</a></td>
+			<td class="title"><a href="/pctbook/M02766/">最大子矩阵</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/pctbook/M02766/statistics/">215</a></td>
+			<td class="submissions"><a href="/pctbook/M02766/statistics/">222</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M02773/">M02773</a></td>
+			<td class="title"><a href="/pctbook/M02773/">采药</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/M02773/statistics/">130</a></td>
+			<td class="submissions"><a href="/pctbook/M02773/statistics/">133</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M02786/">M02786</a></td>
+			<td class="title"><a href="/pctbook/M02786/">Pell数列</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/M02786/statistics/">300</a></td>
+			<td class="submissions"><a href="/pctbook/M02786/statistics/">305</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M02806/">M02806</a></td>
+			<td class="title"><a href="/pctbook/M02806/">公共子序列</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/pctbook/M02806/statistics/">117</a></td>
+			<td class="submissions"><a href="/pctbook/M02806/statistics/">125</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M02810/">M02810</a></td>
+			<td class="title"><a href="/pctbook/M02810/">完美立方</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/pctbook/M02810/statistics/">264</a></td>
+			<td class="submissions"><a href="/pctbook/M02810/statistics/">277</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M02815/">M02815</a></td>
+			<td class="title"><a href="/pctbook/M02815/">城堡问题</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/pctbook/M02815/statistics/">75</a></td>
+			<td class="submissions"><a href="/pctbook/M02815/statistics/">77</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M02945/">M02945</a></td>
+			<td class="title"><a href="/pctbook/M02945/">拦截导弹</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/pctbook/M02945/statistics/">281</a></td>
+			<td class="submissions"><a href="/pctbook/M02945/statistics/">282</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M02977/">M02977</a></td>
+			<td class="title"><a href="/pctbook/M02977/">生理周期</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/pctbook/M02977/statistics/">92</a></td>
+			<td class="submissions"><a href="/pctbook/M02977/statistics/">96</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M02981/">M02981</a></td>
+			<td class="title"><a href="/pctbook/M02981/">大整数加法</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/M02981/statistics/">174</a></td>
+			<td class="submissions"><a href="/pctbook/M02981/statistics/">177</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M02992/">M02992</a></td>
+			<td class="title"><a href="/pctbook/M02992/">Lab杯</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/pctbook/M02992/statistics/">94</a></td>
+			<td class="submissions"><a href="/pctbook/M02992/statistics/">95</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M02995/">M02995</a></td>
+			<td class="title"><a href="/pctbook/M02995/">登山</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/pctbook/M02995/statistics/">123</a></td>
+			<td class="submissions"><a href="/pctbook/M02995/statistics/">128</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/pctbook/M03247/">M03247</a></td>
+			<td class="title"><a href="/pctbook/M03247/">回文素数</a></td>
+			            						<td class="ratio">82%</td>
+			<td class="accepted"><a href="/pctbook/M03247/statistics/">123</a></td>
+			<td class="submissions"><a href="/pctbook/M03247/statistics/">150</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/pctbook/M03254/">M03254</a></td>
+			<td class="title"><a href="/pctbook/M03254/">约瑟夫问题No.2</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/pctbook/M03254/statistics/">100</a></td>
+			<td class="submissions"><a href="/pctbook/M03254/statistics/">102</a></td>
+						
+		</tr>
+		</tbody>
+</table>	</div>
+	<p class="page-bar"><span class="pages">
+				
+			<span class="current">1</span>
+			
+					<a href="?page=2">2</a>
+					<a href="?page=3">3</a>
+	</span>
+</p>
+	
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

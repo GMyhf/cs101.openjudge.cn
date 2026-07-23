@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 02793:孙子问题</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>02793:孙子问题</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/02793/">查看</a></li>
+		<li ><a href="/practice/02793/submit/">提交</a></li>
+				<li ><a href="/practice/02793/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/02793/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>15000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p>我国古代《孙子算经》中，记有如下算题：&ldquo;今有物不知其数，三三数之剩二，五五数之剩三，七七数之剩二，问物几何？&rdquo;并给出得数：&ldquo;答曰：23。&rdquo; 为解决这个问题民间流传了如下歌诀：&ldquo;三人同行七十稀，五树梅花廿一枝，七子团员正半月，除百零五便得知。&rdquo; 把上面的问题说得明白一点就是：有一个正整数N，除以3的余数是2，除以5的余数是3，除以7的余数是2，要求这个数。 民间给出的解法是：把N除以3的余数乘以70，把N除以5的余数乘以21，把N除以7的余数乘以15，把这三个结果加起来，最后把得到的结果除以105得到的就是答案。 其实在民间的解法中不除以105得到的也是一个符合题意的答案，而且民间的解法对于已知&ldquo;除以3的余数，除以5的余数和除以7的余数&rdquo; 的问题都能得到一个符合要求的答案。比如对于上面的问题，得到的结果是2 * 70 + 3 * 21 + 2 * 15 = 233，这个结果也能满足除以3的余数是2，除以5的余数是3，除以7的余数是2。如果已知的问题是&ldquo;除以3的余数是1，除以5的余数是4，除以7的余数是4&rdquo;，民间解法得到的结果1 * 70 + 4 * 21 + 4 * 15 = 214，这个结果也满足除以3的余数是1，除以5的余数是4，除以7的余数是4。 把这个问题推广到更普遍的情况：对于给定的正整数a<sub>1</sub>, a<sub>2</sub>, ... a<sub>n</sub>，是否存在正整数b<sub>1</sub>, b<sub>2</sub>, ... b<sub>n</sub>，使得对于任意的一个正整数N，如果用N除以a<sub>1</sub>的余数是p<sub>1</sub>，用N除以a<sub>2</sub>的余数是p<sub>2</sub>&hellip;&hellip;用N除以a<sub>n</sub>的余数是p<sub>n</sub>，那么M = p<sub>1</sub> * b<sub>1</sub> + p<sub>2</sub> * b<sub>2</sub> + ... + p<sub>n</sub> * b<sub>n</sub>能满足M除以a<sub>1</sub>的余数也是p<sub>1</sub>，M除以a<sub>2</sub>的余数也是p<sub>2</sub>&hellip;&hellip;M除以a<sub>n</sub>的余数也是p<sub>n</sub>。</p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>输入包括多组测试数据(不多于30组)，每组数据包括一行。在每组数据中，首先给出a<sub>i</sub>的个数n (1 <= n <= 10)，然后给出n个不大于50的正整数a<sub>1</sub>, a<sub>2</sub>, ... a<sub>n</sub>。最后一组测试数据中n = 0，表示输入的结束，这组数据不用处理。</dd>
+		<dt>输出</dt>
+		<dd>对于每一组测试数据，输出一行，如果存在正整数b<sub>1</sub>, b<sub>2</sub>, ... b<sub>n</sub>满足题意，则输出这n个正整数（数的长度不要超过50位）<font color=red>如果有多组答案，输出任意一组即可</font>，相邻的正整数之间用一个空格隔开；否则，输出“NO”。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>3 3 5 7
+0
+</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>70 21 15</pre></dd>
+				<dt>提示</dt>
+		<dd>这题使用了special judge，使用special judge一般不判断Presentation Error，因此请大家注意输出格式。</dd>
+						</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/02793/">查看</a></li>
+		<li ><a href="/practice/02793/submit/">提交</a></li>
+				<li ><a href="/practice/02793/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/02793/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>1795</dd>
+					<dt>添加于</dt>
+			<dd>2024-07-03</dd>
+				<dt>提交次数</dt>
+		<dd>34</dd>
+		<dt>尝试人数</dt>
+	    <dd>5</dd>
+	    <dt>通过人数</dt>
+	    <dd>4</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

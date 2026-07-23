@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 30172:嘎啦给木里不是这样的</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>30172:嘎啦给木里不是这样的</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/30172/">查看</a></li>
+		<li ><a href="/practice/30172/submit/">提交</a></li>
+				<li ><a href="/practice/30172/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/30172/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p class="md-end-block md-p md-focus"><span class="md-pair-s md-expand"><del><span class="md-plain">热爱游玩嘎啦给木的小王同学被暗恋他的学妹表白了，他直呼：&ldquo;你为啥跟我直接表白啊，嘎啦给木里不是这样。你应该先计算所有节点的入度，然后不断拿出入度为0的节点，删除相连的边，得到拓扑排序。然后在每个节点，计算所有前驱节点的积分加边权重的最大值。最后，在某个出度为0的节点上停止，输出最终的结果。我同意你的算法，然后我给你看你最喜欢的</span><span class="md-html-inline" spellcheck="false"><strong><span class="md-plain">Accepted</span></strong></span><span class="md-plain">呀。你怎么直接上来跟我表白，嘎啦给木里根本不是这样！&ldquo;</span></del></span></p>
+<p class="md-end-block md-p"><span class="md-plain">（注：&ldquo;嘎啦给木&rdquo;，galgame的谐音。galgame，视觉小说类游戏的子类，玩家需要在特定时刻做出选择，选择将会影响剧情走向和结局，这样的选择分歧点被称为&ldquo;选择肢&rdquo;）</span></p>
+<p class="md-end-block md-p"><span class="md-plain">在一个简化的galgame中，你在开始游戏时拥有0个&ldquo;积分&rdquo;，你的每个剧情选择会对&ldquo;积分&rdquo;产生影响，可正可负，有些选项还会将剧情导向完全不同的方向，影响后续触发的选项。在达到结局时，总是希望&ldquo;积分&rdquo;尽可能高。</span></p>
+<p class="md-end-block md-p md-focus"><span class="md-plain md-expand">一个galgame可以简化为如下的流程图，游戏中的故事和选项可以简化为一个个的节点，而&ldquo;积分&rdquo;增量可以视为边上的权重。你希望找到从起始节点到结局节点，总&ldquo;积分&rdquo;最高的路径，由此得到游戏攻略。</span></p>
+<p class="md-end-block md-p md-focus"><span class="md-plain md-expand"><img src="http://media.openjudge.cn/images/upload/6536/1763540558.png" alt="" width="301" height="688" /></span></p>
+<p class="md-end-block md-p md-focus"> </p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行是数字n (n <= 1000)，表示节点的总数（包括起始节点和终止节点）<br /><br />第二行是两个节点的名字，用空格分开，依次是起始节点（保证没有节点指向它）和终止节点（保证它不指向任何节点）<br /><br />接下来的 n - 1 行，每一行描述一个节点（结局节点除外）。第一个数据是节点名字，第二个是数据是这个节点指向的节点数量 m (m <= 10)，接下来的m对数据，分别是指向的节点名称和这么选的“积分”变化。以上数据之间用空格分开。<br /><br />节点的名称只包含小写英文字母和下划线</dd>
+		<dt>输出</dt>
+		<dd>第一行是最高的积分。<br /><br />第二行依次输出经过的节点（包括起始和结束），用空格分开。若有多组选择方式，输出字典序最小的一组。<br /><br />如果你发现输入中有环（即可以按照某种方式一直玩下去，不到达终点），或者终点无法被达到，请只输出一行不带引号的`WRONG INPUT`</dd>
+		<dt>样例输入</dt>
+		<dd><pre>14
+kai_shi jie_ju
+kai_shi 1 yi_yi_si 0
+yi_yi_si 1 jie_xia_lai 0
+jie_xia_lai 2 leet -100 cinema 10
+leet 1 chi_fan 0
+cinema 1 chi_fan 0
+chi_fan 1 fa_xian 0
+fa_xian 2 liu_xia 0 hui_qu -1000000
+hui_qu 1 jie_ju -1000000
+liu_xia 1 wu_yi_si 0
+wu_yi_si 1 qu_na 0
+qu_na 2 li_mian 10 wai_mian 10
+li_mian 1 jie_ju 0
+wai_mian 1 jie_ju 0</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>20
+kai_shi yi_yi_si jie_xia_lai cinema chi_fan fa_xian liu_xia wu_yi_si qu_na li_mian jie_ju</pre></dd>
+				<dt>提示</dt>
+		<dd>DAG 最长路 (可以参考小王同学说的话)</dd>
+						<dt>来源</dt>
+		<dd>2025fall-cs101, yjz</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/30172/">查看</a></li>
+		<li ><a href="/practice/30172/submit/">提交</a></li>
+				<li ><a href="/practice/30172/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/30172/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>30172</dd>
+					<dt>添加于</dt>
+			<dd>2025-11-19</dd>
+				<dt>提交次数</dt>
+		<dd>51</dd>
+		<dt>尝试人数</dt>
+	    <dd>9</dd>
+	    <dt>通过人数</dt>
+	    <dd>4</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

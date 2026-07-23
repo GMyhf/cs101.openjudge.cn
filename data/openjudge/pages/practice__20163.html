@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 20163:鹅腿阿姨学外语</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>20163:鹅腿阿姨学外语</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/20163/">查看</a></li>
+		<li ><a href="/practice/20163/submit/">提交</a></li>
+				<li ><a href="/practice/20163/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/20163/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p>鹅腿阿姨制作的鹅腿物美价廉，得到了全世界人民的一致喜爱。因此，鹅腿阿姨时常需要去国外签订一些大额鹅腿买卖合同。现在，鹅腿阿姨准备从北京大学动身前往越南清化省清化市的一所高等学府：清化大学(Thanh H&oacute;a University，简称THU)，并在该校建立鹅腿群，以满足越南消费者的需求。既然要出国，就应当先学会外语。鹅腿阿姨在语言带师&mdash;&mdash;羊肉串叔叔买买提明&middot;买买提的帮助下，很快学会了越南语的基本语法。但鹅腿阿姨发现，越南语里有为数甚多的专有名词，十分难记，于是她希望把一篇文章里所有的专有名词全部摘录出来，方便记忆。请你帮鹅腿阿姨实现这一目标，让鹅腿阿姨顺利学会越南语，在THU建立鹅腿群。</p>
+<p>判定一个越南语单词/词组是否是专有名词，有以下两条标准：</p>
+<p>1.如果一个不在句首的词的首字母为大写，则这个词为专有名词。如&ldquo;Được c&ocirc; Thanh share n&ecirc;n sắp kh&oacute;c rồi .&rdquo;一句中，只有&ldquo;Thanh&rdquo;一个专有名词。&ldquo;Được&rdquo;的首字母虽然大写，但由于在句首，所以不是专有名词。</p>
+<p>2.如果一个句子中，有连续多个词的首字母均为大写，则不论这些词在不在句首，它们组成一个专有名词词组。如&ldquo;B&aacute;c Hồ về thăm Quảng B&igrave;nh .&rdquo;一句中，有两个专有名词：&ldquo;B&aacute;c Hồ&rdquo;和&ldquo;Quảng B&igrave;nh&rdquo;。</p>
+<p>保证输入的文章中，标点符号只有半角逗号(',')和句点('.')，且标点符号前后均以一个空格与其他单词隔开。只有句点可以作为句子结束的标志，因此逗号后的第一个词并不属于句首。</p>
+<p>保证文章中所有单词的首字母都属于英文字母A~Z。测试数据中不包含以&ldquo;Đ&rdquo;等非英文字母开头的单词。</p>
+<p> </p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行一个整数n，表示文章有n段。<br /><br />接下来的n行，每行一个字符串，表示该段文章的内容。</dd>
+		<dt>输出</dt>
+		<dd>按在文章中出现的顺序输出专有名词（可以为单词或词组），已经输出过的不再输出。每行一个专有名词。如果文章不含专有名词，输出“Khong!”（不含引号）。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>Sample Input  I:
+
+2
+Những mẫu bánh sinh nhật và dễ thương với đủ hình dáng , màu sắc khác nhau khiến ai ngắm nhìn cũng vô cùng thích thú và muốn ngay lập tức lựa chọn chiếc bánh cho bữa tiệc sinh nhật của mình .
+Những mẫu bánh sinh nhật hình con chó , hình con khỉ .
+
+Sample Output I:
+
+Khong!</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>Sample Input II:
+
+2
+Hồ Chí Minh , tên khai sinh là Nguyễn Sinh Cung , là nhà cách mạng .
+Tuần Báo TIME của Hoa Kỳ bình chọn Hồ Chí Minh là một trong 100 nhân vật có ảnh hưởng lớn nhất trong thế kỷ XX .
+
+Sample Output II:
+
+Hồ Chí Minh
+Nguyễn Sinh Cung
+Tuần Báo TIME
+Hoa Kỳ
+XX
+
+解释：文章中“Hồ Chí Minh”出现了两次，故第二次不再输出。</pre></dd>
+						<dt>来源</dt>
+		<dd>cs101-2019 姜铖</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/20163/">查看</a></li>
+		<li ><a href="/practice/20163/submit/">提交</a></li>
+				<li ><a href="/practice/20163/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/20163/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>20163</dd>
+					<dt>添加于</dt>
+			<dd>2019-12-27</dd>
+				<dt>提交次数</dt>
+		<dd>19</dd>
+		<dt>尝试人数</dt>
+	    <dd>6</dd>
+	    <dt>通过人数</dt>
+	    <dd>5</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

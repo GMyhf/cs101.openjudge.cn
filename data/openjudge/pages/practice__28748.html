@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 28748:PKU游戏</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>28748:PKU游戏</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/28748/">查看</a></li>
+		<li ><a href="/practice/28748/submit/">提交</a></li>
+				<li ><a href="/practice/28748/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/28748/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p class="md-end-block md-p md-focus"><span class="md-plain md-expand">PKU 是一种多人参与的机会游戏。每个玩家会得到一张写有一些数字的纸，游戏主持人会随机报出这些数字。玩家需要将自己听到的数字划掉，最先划掉所有数字的玩家获胜。这个基础版本的游戏有点名声不好，因为它有点无聊。玩家唯一的任务就是不要睡着。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">在这个问题中，我们将分析一种更加动态的PKU游戏的版本，它需要玩家快速反应。我们的版本叫做 &ldquo;Speed PKU&rdquo;（极速PKU），游戏主持人同样会随机报出纸上的数字。然而，每当一个数字被报出时，只有第一个表示自己有这个数字的玩家才被允许在自己的纸上划掉这个数字。如果某个玩家有多个相同的数字，每次只能划掉其中一个。当多个玩家的纸上都有相同的数字时，反应最快的玩家在&ldquo;极速PKU&rdquo;中将占有优势。但这个优势到底有多大？我们需要你来帮忙计算。</span></p>
+<p class="md-end-block md-p md-focus"><span class="md-plain md-expand">严谨的描述：有 n 位玩家，每个玩家会收到一张写有 k 个（不一定不同的）数字的纸。玩家 1 的反应速度比玩家 2 快，玩家 2 的反应速度比玩家 3 快，以此类推，玩家 n 是反应最慢的。考虑以下示例，来自第一个样例输入，三位玩家每人收到四个数字：</span></p>
+<p class="md-end-block md-p md-focus"><span class="md-plain md-expand"><img src="http://media.openjudge.cn/images/upload/2919/1729652082.jpg" alt="" width="299" height="98" /></span></p>
+<p class="md-end-block md-p md-focus"><span class="md-plain md-expand">当数字&ldquo;1&rdquo;第一次被叫到时，反应更快的玩家 1 将优先把它划掉。第二次数字&ldquo;1&rdquo;被叫到时，玩家 2 将能够划掉它。以此类推，平均来说，玩家 1 的表现会比玩家 2 和玩家 3 更好，因为后两位玩家需要某些玩家 1 会先抢到的数字。然而，由于玩家 2 和玩家 3 没有相同的数字，他们的表现彼此独立，尽管玩家 2 比玩家 3 反应更快。</span></p>
+<p class="md-end-block md-p md-focus"><span class="md-plain">所有</span><span id="ty-mjx-1" class="md-inline-math math-jax-postprocess">n x k</span><span class="md-plain md-expand">个数字（包括重复的数字）被制作成抽签放入暗箱中，主持人每次从中不放回地抽出一个签作为本次叫出的数字，直到所有数字都被抽出。那么每个玩家最后一个完成的概率是多少呢？</span></p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>输入描述的是一局 Speed PKU 的游戏。第一行包含两个整数 n 和 k，分别表示玩家的数量和每个玩家纸上的数字数量（1 ≤ n ≤ 100，1 ≤ k ≤ 1000)。接下来的n行，每行包含k个整数，第i行表示第i位玩家纸上的数字。这些数字都在 1 到 10^9之间（含 1 和 10^9）。</dd>
+		<dt>输出</dt>
+		<dd>输出包含n行，每行对应一个玩家。第i行应包含玩家i最后完成游戏的概率。所有的值的绝对误差必须不超过10^-6，保留九位小数。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>sample1 input:
+3 4
+1 2 3 4
+1 2 5 6
+3 4 7 8
+
+sample1 output:
+0.000000000
+0.500000000
+0.500000000</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>sample2 input:
+4 2
+1 2
+3 4
+10 5
+7 8
+
+sample2 output:
+0.250000000
+0.250000000
+0.250000000
+0.250000000</pre></dd>
+				<dt>提示</dt>
+		<dd>greedy</dd>
+						<dt>来源</dt>
+		<dd>2024 TA-Xjk</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/28748/">查看</a></li>
+		<li ><a href="/practice/28748/submit/">提交</a></li>
+				<li ><a href="/practice/28748/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/28748/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>28748</dd>
+					<dt>添加于</dt>
+			<dd>2025-11-20</dd>
+				<dt>提交次数</dt>
+		<dd>88</dd>
+		<dt>尝试人数</dt>
+	    <dd>37</dd>
+	    <dt>通过人数</dt>
+	    <dd>31</dd>
+	</dl>
+		
+		<h4>Other language verions</h4>
+	<ul>
+				<li><a href="?lang=en_US">English</a></li>
+			</ul>
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 04112:情报破译-Cryptanalysis</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>计概2023fall每日选做</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/routine/" class="first">题目</a></li>
+            <li ><a href="/routine/ranking/">排名</a></li>
+                    <li ><a href="/routine/status/">状态</a></li>
+	    			        <li class="last"><a href="/routine/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>04112:情报破译-Cryptanalysis</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/routine/04112/">查看</a></li>
+		<li ><a href="/routine/04112/submit/">提交</a></li>
+				<li ><a href="/routine/04112/statistics/">统计</a></li>
+			
+		<li ><a href="/routine/clarify/04112/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p class="MsoNormal" style=";text-align:left;"><span style="font-size:14.0pt">A</span><span style="font-size: 14pt">国和</span><span style="font-size:14.0pt">B</span><span style="font-size: 14pt">国正在进行一场战争。</span><span style="font-size:14.0pt">A</span><span style="font-size: 14pt">国通过间谍知道</span><span style="font-size:14.0pt">B</span><span style="font-size: 14pt">国的情报加密规则为：</span></p><p class="MsoNormal" style="margin-left: 36pt;;vertical-align: baseline;text-align:left;"><span style="font-size:14.0pt">1.<span style="font-size: 7pt;font-family: &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;&nbsp;</span></span><span style="font-size: 14pt">仅对字母加密，其他符号保留（如空格，逗号等）</span></p><p class="MsoNormal" style="margin-left: 36pt;;vertical-align: baseline;text-align:left;"><span style="font-size:14.0pt">2.<span style="font-size: 7pt;font-family: &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;&nbsp;</span></span><span style="font-size: 14pt">对第</span><span style="font-size:14.0pt">i</span><span style="font-size: 14pt">个单词（</span><span style="font-size:14.0pt">i</span><span style="font-size: 14pt">从</span><span style="font-size:14.0pt">1</span><span style="font-size: 14pt">开始）的加密方法是把第</span><span style="font-size:14.0pt">i</span><span style="font-size: 14pt">个单词反转（如</span><span style="font-size:14.0pt">abc</span><span style="font-size: 14pt">变成</span><span style="font-size:14.0pt">cba</span><span style="font-size: 14pt">），然后对单词内的每个字母采用经典的</span><span style="font-size:14.0pt">Caesar</span><span style="font-size: 14pt">加密法，循环后移</span><span style="font-size:14.0pt">i</span><span style="font-size: 14pt">个字母。例如：第</span><span style="font-size:14.0pt">5</span><span style="font-size: 14pt">个单词的加密表如下所示：</span></p><p class="MsoNormal" style=";text-align:left;"><span style="font-size: 14pt">密码字母：</span><span style="font-size:14.0pt">A B C D E F G H I J K L M N O P Q R S T U VW X Y Z</span></p><p class="MsoNormal" style=";text-align:left;"><span style="font-size: 14pt">原文字母：</span><span style="font-size:14.0pt">V W X Y Z A B C D E F G H I J K L M N O P QR S T U</span></p><p class="MsoNormal" style="margin-left: 0cm;;vertical-align: baseline;text-align:left;"><span style="font-size:14.0pt">3.<span style="font-size: 7pt;font-family: &#39;Times New Roman&#39;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span style="font-size: 14pt">单词的定义是：任何一串极大的连续字母串。</span></p><p class="MsoNormal" style=";text-align:left;"><span style="font-size: 14pt">比如，样例输出第三行，第二个单词为</span><span style="font-size: 14pt">ba</span><span style="font-size: 14pt">，反转后为</span><span style="font-size: 14pt">ab</span><span style="font-size: 14pt">，</span><span style="font-size: 14pt">a</span><span style="font-size: 14pt">后移</span><span style="font-size: 14pt">2</span><span style="font-size: 14pt">个单词变成</span><span style="font-size: 14pt">c</span><span style="font-size: 14pt">，</span><span style="font-size: 14pt">b</span><span style="font-size: 14pt">后移两个单词变成</span><span style="font-size: 14pt">d</span><span style="font-size: 14pt">，故该单词加密后为</span><span style="font-size: 14pt">cd</span><span style="font-size: 14pt">（见样例输入第三行）。</span><br /></p><p class="MsoNormal" style=";text-align:left;"><span style="font-size: 14pt">现在</span><span style="font-size: 14pt;font-family: Calibri, sans-serif">A</span><span style="font-size: 14pt">国又截获了一些</span><span style="font-size: 14pt;font-family: Calibri, sans-serif">B</span><span style="font-size: 14pt">国的情报密文。请你帮</span><span style="font-size: 14pt;font-family: Calibri, sans-serif">A</span><span style="font-size: 14pt">国破译出情报的内容。</span><br /></p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>一共有不超过int范围行，每行为一个字符串（int范围）。注意，每行是可以以空格开头的。</dd>
+		<dt>输出</dt>
+		<dd>情报破译后得到的内容。每条情报对应输出一行。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>fiU umncv oolz  ioex jhfqu,  zg uh zqI nlaxO  ockl yz kmpzgE.
+fX gxcj , ghlsxffr cxmG K.
+ab3cd</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>The talks will  take place,  at an Air Force  base on Sunday.
+We have , occupied City F.
+az3ba
+</pre></dd>
+						</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/routine/04112/">查看</a></li>
+		<li ><a href="/routine/04112/submit/">提交</a></li>
+				<li ><a href="/routine/04112/statistics/">统计</a></li>
+			
+		<li ><a href="/routine/clarify/04112/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>7816</dd>
+					<dt>添加于</dt>
+			<dd>2023-12-28</dd>
+				<dt>提交次数</dt>
+		<dd>19</dd>
+		<dt>尝试人数</dt>
+	    <dd>9</dd>
+	    <dt>通过人数</dt>
+	    <dd>9</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

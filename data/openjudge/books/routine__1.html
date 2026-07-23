@@ -1,0 +1,946 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - OpenJudge - 题目</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>计概2023fall每日选做</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/routine/" class="first">题目</a></li>
+            <li ><a href="/routine/ranking/">排名</a></li>
+                    <li ><a href="/routine/status/">状态</a></li>
+	    			        <li class="last"><a href="/routine/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<div id="main" class="col-9">
+	<p class="page-bar">
+		<span class="pages">
+				
+			<span class="current">1</span>
+			
+					<a href="?page=2">2</a>
+					<a href="?page=3">3</a>
+	</span>
+	</p>
+	<div id="problemsList">
+		<table>
+	<thead>
+		<tr>
+						<td class="problem-id">题目ID</td>
+			<td class="title">标题</td>
+			            						<td class="ratio">通过率</td>
+			<td class="accepted">通过人数</td>
+			<td class="submissions">尝试人数</td>
+						
+		</tr>
+	</thead>
+	<tbody>
+			<tr>
+						<td class="problem-id"><a href="/routine/01011/">01011</a></td>
+			<td class="title"><a href="/routine/01011/">Sticks</a></td>
+			            						<td class="ratio">67%</td>
+			<td class="accepted"><a href="/routine/01011/statistics/">20</a></td>
+			<td class="submissions"><a href="/routine/01011/statistics/">30</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01035/">01035</a></td>
+			<td class="title"><a href="/routine/01035/">拼写检查</a></td>
+			            						<td class="ratio">90%</td>
+			<td class="accepted"><a href="/routine/01035/statistics/">26</a></td>
+			<td class="submissions"><a href="/routine/01035/statistics/">29</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01037/">01037</a></td>
+			<td class="title"><a href="/routine/01037/">A decorative fence</a></td>
+			            						<td class="ratio">50%</td>
+			<td class="accepted"><a href="/routine/01037/statistics/">3</a></td>
+			<td class="submissions"><a href="/routine/01037/statistics/">6</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01042/">01042</a></td>
+			<td class="title"><a href="/routine/01042/">Gone Fishing</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01042/statistics/">12</a></td>
+			<td class="submissions"><a href="/routine/01042/statistics/">12</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01056/">01056</a></td>
+			<td class="title"><a href="/routine/01056/">IMMEDIATE DECODABILITY</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01056/statistics/">7</a></td>
+			<td class="submissions"><a href="/routine/01056/statistics/">7</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01065/">01065</a></td>
+			<td class="title"><a href="/routine/01065/">Wooden Sticks</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/routine/01065/statistics/">20</a></td>
+			<td class="submissions"><a href="/routine/01065/statistics/">22</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01077/">01077</a></td>
+			<td class="title"><a href="/routine/01077/">Eight</a></td>
+			            						<td class="ratio">83%</td>
+			<td class="accepted"><a href="/routine/01077/statistics/">5</a></td>
+			<td class="submissions"><a href="/routine/01077/statistics/">6</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01088/">01088</a></td>
+			<td class="title"><a href="/routine/01088/">滑雪</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/routine/01088/statistics/">46</a></td>
+			<td class="submissions"><a href="/routine/01088/statistics/">48</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01159/">01159</a></td>
+			<td class="title"><a href="/routine/01159/">Palindrome</a></td>
+			            						<td class="ratio">84%</td>
+			<td class="accepted"><a href="/routine/01159/statistics/">16</a></td>
+			<td class="submissions"><a href="/routine/01159/statistics/">19</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01160/">01160</a></td>
+			<td class="title"><a href="/routine/01160/">Post Office</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01160/statistics/">11</a></td>
+			<td class="submissions"><a href="/routine/01160/statistics/">11</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01182/">01182</a></td>
+			<td class="title"><a href="/routine/01182/">食物链</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01182/statistics/">13</a></td>
+			<td class="submissions"><a href="/routine/01182/statistics/">13</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01185/">01185</a></td>
+			<td class="title"><a href="/routine/01185/">炮兵阵地</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01185/statistics/">7</a></td>
+			<td class="submissions"><a href="/routine/01185/statistics/">7</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01190/">01190</a></td>
+			<td class="title"><a href="/routine/01190/">生日蛋糕</a></td>
+			            						<td class="ratio">78%</td>
+			<td class="accepted"><a href="/routine/01190/statistics/">7</a></td>
+			<td class="submissions"><a href="/routine/01190/statistics/">9</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01191/">01191</a></td>
+			<td class="title"><a href="/routine/01191/">棋盘分割</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01191/statistics/">6</a></td>
+			<td class="submissions"><a href="/routine/01191/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01204/">01204</a></td>
+			<td class="title"><a href="/routine/01204/">Word Puzzles</a></td>
+			            						<td class="ratio">60%</td>
+			<td class="accepted"><a href="/routine/01204/statistics/">3</a></td>
+			<td class="submissions"><a href="/routine/01204/statistics/">5</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01230/">01230</a></td>
+			<td class="title"><a href="/routine/01230/">Pass-Muraille</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01230/statistics/">6</a></td>
+			<td class="submissions"><a href="/routine/01230/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01251/">01251</a></td>
+			<td class="title"><a href="/routine/01251/">丛林中的路</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01251/statistics/">6</a></td>
+			<td class="submissions"><a href="/routine/01251/statistics/">6</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01273/">01273</a></td>
+			<td class="title"><a href="/routine/01273/">Drainage Ditches</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01273/statistics/">3</a></td>
+			<td class="submissions"><a href="/routine/01273/statistics/">3</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01276/">01276</a></td>
+			<td class="title"><a href="/routine/01276/">Cash Machine</a></td>
+			            						<td class="ratio">80%</td>
+			<td class="accepted"><a href="/routine/01276/statistics/">4</a></td>
+			<td class="submissions"><a href="/routine/01276/statistics/">5</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01321/">01321</a></td>
+			<td class="title"><a href="/routine/01321/">棋盘问题</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01321/statistics/">22</a></td>
+			<td class="submissions"><a href="/routine/01321/statistics/">22</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01328/">01328</a></td>
+			<td class="title"><a href="/routine/01328/">Radar Installation</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/routine/01328/statistics/">28</a></td>
+			<td class="submissions"><a href="/routine/01328/statistics/">29</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01384/">01384</a></td>
+			<td class="title"><a href="/routine/01384/">Piggy-Bank</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/routine/01384/statistics/">19</a></td>
+			<td class="submissions"><a href="/routine/01384/statistics/">20</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01390/">01390</a></td>
+			<td class="title"><a href="/routine/01390/">Blocks</a></td>
+			            						<td class="ratio">50%</td>
+			<td class="accepted"><a href="/routine/01390/statistics/">4</a></td>
+			<td class="submissions"><a href="/routine/01390/statistics/">8</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01481/">01481</a></td>
+			<td class="title"><a href="/routine/01481/">The Die Is Cast</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01481/statistics/">7</a></td>
+			<td class="submissions"><a href="/routine/01481/statistics/">7</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01661/">01661</a></td>
+			<td class="title"><a href="/routine/01661/">帮助 Jimmy</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/routine/01661/statistics/">17</a></td>
+			<td class="submissions"><a href="/routine/01661/statistics/">18</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01664/">01664</a></td>
+			<td class="title"><a href="/routine/01664/">放苹果</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01664/statistics/">18</a></td>
+			<td class="submissions"><a href="/routine/01664/statistics/">18</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01724/">01724</a></td>
+			<td class="title"><a href="/routine/01724/">ROADS</a></td>
+			            						<td class="ratio">80%</td>
+			<td class="accepted"><a href="/routine/01724/statistics/">8</a></td>
+			<td class="submissions"><a href="/routine/01724/statistics/">10</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01729/">01729</a></td>
+			<td class="title"><a href="/routine/01729/">Jack and Jill</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01729/statistics/">3</a></td>
+			<td class="submissions"><a href="/routine/01729/statistics/">3</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01742/">01742</a></td>
+			<td class="title"><a href="/routine/01742/">Coins</a></td>
+			            						<td class="ratio">55%</td>
+			<td class="accepted"><a href="/routine/01742/statistics/">26</a></td>
+			<td class="submissions"><a href="/routine/01742/statistics/">47</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01753/">01753</a></td>
+			<td class="title"><a href="/routine/01753/">Flip Game</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01753/statistics/">8</a></td>
+			<td class="submissions"><a href="/routine/01753/statistics/">8</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01802/">01802</a></td>
+			<td class="title"><a href="/routine/01802/">垂直直方图</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/routine/01802/statistics/">26</a></td>
+			<td class="submissions"><a href="/routine/01802/statistics/">27</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01833/">01833</a></td>
+			<td class="title"><a href="/routine/01833/">排列</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/routine/01833/statistics/">42</a></td>
+			<td class="submissions"><a href="/routine/01833/statistics/">48</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01835/">01835</a></td>
+			<td class="title"><a href="/routine/01835/">宇航员</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01835/statistics/">5</a></td>
+			<td class="submissions"><a href="/routine/01835/statistics/">5</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01837/">01837</a></td>
+			<td class="title"><a href="/routine/01837/">Balance</a></td>
+			            						<td class="ratio">86%</td>
+			<td class="accepted"><a href="/routine/01837/statistics/">6</a></td>
+			<td class="submissions"><a href="/routine/01837/statistics/">7</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01852/">01852</a></td>
+			<td class="title"><a href="/routine/01852/">Ants</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01852/statistics/">37</a></td>
+			<td class="submissions"><a href="/routine/01852/statistics/">37</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/01905/">01905</a></td>
+			<td class="title"><a href="/routine/01905/">Expanding Rods</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/routine/01905/statistics/">7</a></td>
+			<td class="submissions"><a href="/routine/01905/statistics/">8</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/01958/">01958</a></td>
+			<td class="title"><a href="/routine/01958/">Strange Towers of Hanoi</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/01958/statistics/">11</a></td>
+			<td class="submissions"><a href="/routine/01958/statistics/">11</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02181/">02181</a></td>
+			<td class="title"><a href="/routine/02181/">Jumping Cows</a></td>
+			            						<td class="ratio">90%</td>
+			<td class="accepted"><a href="/routine/02181/statistics/">19</a></td>
+			<td class="submissions"><a href="/routine/02181/statistics/">21</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02184/">02184</a></td>
+			<td class="title"><a href="/routine/02184/">Cow Exhibition</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02184/statistics/">4</a></td>
+			<td class="submissions"><a href="/routine/02184/statistics/">4</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02191/">02191</a></td>
+			<td class="title"><a href="/routine/02191/">Mersenne Composite Numbers</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02191/statistics/">5</a></td>
+			<td class="submissions"><a href="/routine/02191/statistics/">5</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02229/">02229</a></td>
+			<td class="title"><a href="/routine/02229/">Sumsets</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/routine/02229/statistics/">30</a></td>
+			<td class="submissions"><a href="/routine/02229/statistics/">32</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02255/">02255</a></td>
+			<td class="title"><a href="/routine/02255/">重建二叉树</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02255/statistics/">6</a></td>
+			<td class="submissions"><a href="/routine/02255/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02287/">02287</a></td>
+			<td class="title"><a href="/routine/02287/">Tian Ji -- The Horse Racing</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/routine/02287/statistics/">38</a></td>
+			<td class="submissions"><a href="/routine/02287/statistics/">41</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02313/">02313</a></td>
+			<td class="title"><a href="/routine/02313/">Sequence</a></td>
+			            						<td class="ratio">71%</td>
+			<td class="accepted"><a href="/routine/02313/statistics/">10</a></td>
+			<td class="submissions"><a href="/routine/02313/statistics/">14</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02373/">02373</a></td>
+			<td class="title"><a href="/routine/02373/">Dividing the Path</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02373/statistics/">4</a></td>
+			<td class="submissions"><a href="/routine/02373/statistics/">4</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02385/">02385</a></td>
+			<td class="title"><a href="/routine/02385/">Apple Catching</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02385/statistics/">18</a></td>
+			<td class="submissions"><a href="/routine/02385/statistics/">18</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02386/">02386</a></td>
+			<td class="title"><a href="/routine/02386/">Lake Counting</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/routine/02386/statistics/">21</a></td>
+			<td class="submissions"><a href="/routine/02386/statistics/">24</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02431/">02431</a></td>
+			<td class="title"><a href="/routine/02431/">Expedition</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02431/statistics/">18</a></td>
+			<td class="submissions"><a href="/routine/02431/statistics/">18</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02456/">02456</a></td>
+			<td class="title"><a href="/routine/02456/">Aggressive cows</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02456/statistics/">14</a></td>
+			<td class="submissions"><a href="/routine/02456/statistics/">14</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02488/">02488</a></td>
+			<td class="title"><a href="/routine/02488/">A Knight's Journey</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/routine/02488/statistics/">10</a></td>
+			<td class="submissions"><a href="/routine/02488/statistics/">11</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02503/">02503</a></td>
+			<td class="title"><a href="/routine/02503/">Babelfish</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02503/statistics/">18</a></td>
+			<td class="submissions"><a href="/routine/02503/statistics/">18</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02538/">02538</a></td>
+			<td class="title"><a href="/routine/02538/">WERTYU</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02538/statistics/">12</a></td>
+			<td class="submissions"><a href="/routine/02538/statistics/">12</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02692/">02692</a></td>
+			<td class="title"><a href="/routine/02692/">假币问题</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/routine/02692/statistics/">47</a></td>
+			<td class="submissions"><a href="/routine/02692/statistics/">48</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02694/">02694</a></td>
+			<td class="title"><a href="/routine/02694/">波兰表达式</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02694/statistics/">44</a></td>
+			<td class="submissions"><a href="/routine/02694/statistics/">44</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02706/">02706</a></td>
+			<td class="title"><a href="/routine/02706/">麦森数</a></td>
+			            						<td class="ratio">84%</td>
+			<td class="accepted"><a href="/routine/02706/statistics/">32</a></td>
+			<td class="submissions"><a href="/routine/02706/statistics/">38</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02707/">02707</a></td>
+			<td class="title"><a href="/routine/02707/">求一元二次方程的根</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/routine/02707/statistics/">36</a></td>
+			<td class="submissions"><a href="/routine/02707/statistics/">38</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02711/">02711</a></td>
+			<td class="title"><a href="/routine/02711/">合唱队形</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/routine/02711/statistics/">37</a></td>
+			<td class="submissions"><a href="/routine/02711/statistics/">39</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02746/">02746</a></td>
+			<td class="title"><a href="/routine/02746/">显示器</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/routine/02746/statistics/">31</a></td>
+			<td class="submissions"><a href="/routine/02746/statistics/">32</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02748/">02748</a></td>
+			<td class="title"><a href="/routine/02748/">全排列</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02748/statistics/">29</a></td>
+			<td class="submissions"><a href="/routine/02748/statistics/">29</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02749/">02749</a></td>
+			<td class="title"><a href="/routine/02749/">分解因数</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/routine/02749/statistics/">26</a></td>
+			<td class="submissions"><a href="/routine/02749/statistics/">28</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02754/">02754</a></td>
+			<td class="title"><a href="/routine/02754/">八皇后</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/routine/02754/statistics/">47</a></td>
+			<td class="submissions"><a href="/routine/02754/statistics/">48</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02755/">02755</a></td>
+			<td class="title"><a href="/routine/02755/">神奇的口袋</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02755/statistics/">21</a></td>
+			<td class="submissions"><a href="/routine/02755/statistics/">21</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02756/">02756</a></td>
+			<td class="title"><a href="/routine/02756/">二叉树</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02756/statistics/">21</a></td>
+			<td class="submissions"><a href="/routine/02756/statistics/">21</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02757/">02757</a></td>
+			<td class="title"><a href="/routine/02757/">最长上升子序列</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/routine/02757/statistics/">45</a></td>
+			<td class="submissions"><a href="/routine/02757/statistics/">47</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02766/">02766</a></td>
+			<td class="title"><a href="/routine/02766/">最大子矩阵</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/routine/02766/statistics/">16</a></td>
+			<td class="submissions"><a href="/routine/02766/statistics/">17</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02773/">02773</a></td>
+			<td class="title"><a href="/routine/02773/">采药</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/routine/02773/statistics/">49</a></td>
+			<td class="submissions"><a href="/routine/02773/statistics/">51</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02774/">02774</a></td>
+			<td class="title"><a href="/routine/02774/">木材加工</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02774/statistics/">18</a></td>
+			<td class="submissions"><a href="/routine/02774/statistics/">18</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02775/">02775</a></td>
+			<td class="title"><a href="/routine/02775/">文件结构“图”</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/routine/02775/statistics/">14</a></td>
+			<td class="submissions"><a href="/routine/02775/statistics/">15</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02783/">02783</a></td>
+			<td class="title"><a href="/routine/02783/">Holiday Hotel</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/routine/02783/statistics/">25</a></td>
+			<td class="submissions"><a href="/routine/02783/statistics/">27</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02787/">02787</a></td>
+			<td class="title"><a href="/routine/02787/">算24</a></td>
+			            						<td class="ratio">76%</td>
+			<td class="accepted"><a href="/routine/02787/statistics/">19</a></td>
+			<td class="submissions"><a href="/routine/02787/statistics/">25</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02791/">02791</a></td>
+			<td class="title"><a href="/routine/02791/">矩形覆盖</a></td>
+			            						<td class="ratio">60%</td>
+			<td class="accepted"><a href="/routine/02791/statistics/">3</a></td>
+			<td class="submissions"><a href="/routine/02791/statistics/">5</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02792/">02792</a></td>
+			<td class="title"><a href="/routine/02792/">集合加法</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02792/statistics/">16</a></td>
+			<td class="submissions"><a href="/routine/02792/statistics/">16</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02795/">02795</a></td>
+			<td class="title"><a href="/routine/02795/">金银岛</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02795/statistics/">33</a></td>
+			<td class="submissions"><a href="/routine/02795/statistics/">33</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02797/">02797</a></td>
+			<td class="title"><a href="/routine/02797/">最短前缀</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/routine/02797/statistics/">21</a></td>
+			<td class="submissions"><a href="/routine/02797/statistics/">24</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02802/">02802</a></td>
+			<td class="title"><a href="/routine/02802/">小游戏</a></td>
+			            						<td class="ratio">89%</td>
+			<td class="accepted"><a href="/routine/02802/statistics/">34</a></td>
+			<td class="submissions"><a href="/routine/02802/statistics/">38</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02806/">02806</a></td>
+			<td class="title"><a href="/routine/02806/">公共子序列</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02806/statistics/">34</a></td>
+			<td class="submissions"><a href="/routine/02806/statistics/">34</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02810/">02810</a></td>
+			<td class="title"><a href="/routine/02810/">完美立方</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/routine/02810/statistics/">59</a></td>
+			<td class="submissions"><a href="/routine/02810/statistics/">63</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02811/">02811</a></td>
+			<td class="title"><a href="/routine/02811/">熄灯问题</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02811/statistics/">41</a></td>
+			<td class="submissions"><a href="/routine/02811/statistics/">41</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02812/">02812</a></td>
+			<td class="title"><a href="/routine/02812/">恼人的青蛙</a></td>
+			            						<td class="ratio">63%</td>
+			<td class="accepted"><a href="/routine/02812/statistics/">10</a></td>
+			<td class="submissions"><a href="/routine/02812/statistics/">16</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02814/">02814</a></td>
+			<td class="title"><a href="/routine/02814/">拨钟问题</a></td>
+			            						<td class="ratio">83%</td>
+			<td class="accepted"><a href="/routine/02814/statistics/">5</a></td>
+			<td class="submissions"><a href="/routine/02814/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02815/">02815</a></td>
+			<td class="title"><a href="/routine/02815/">城堡问题</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/02815/statistics/">15</a></td>
+			<td class="submissions"><a href="/routine/02815/statistics/">15</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02818/">02818</a></td>
+			<td class="title"><a href="/routine/02818/">密码</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/routine/02818/statistics/">10</a></td>
+			<td class="submissions"><a href="/routine/02818/statistics/">11</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02945/">02945</a></td>
+			<td class="title"><a href="/routine/02945/">拦截导弹</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/routine/02945/statistics/">24</a></td>
+			<td class="submissions"><a href="/routine/02945/statistics/">25</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02979/">02979</a></td>
+			<td class="title"><a href="/routine/02979/">陪审团的人选</a></td>
+			            						<td class="ratio">78%</td>
+			<td class="accepted"><a href="/routine/02979/statistics/">7</a></td>
+			<td class="submissions"><a href="/routine/02979/statistics/">9</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02982/">02982</a></td>
+			<td class="title"><a href="/routine/02982/">Sudoku</a></td>
+			            						<td class="ratio">86%</td>
+			<td class="accepted"><a href="/routine/02982/statistics/">6</a></td>
+			<td class="submissions"><a href="/routine/02982/statistics/">7</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/02995/">02995</a></td>
+			<td class="title"><a href="/routine/02995/">登山</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/routine/02995/statistics/">29</a></td>
+			<td class="submissions"><a href="/routine/02995/statistics/">30</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/02996/">02996</a></td>
+			<td class="title"><a href="/routine/02996/">选课</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/routine/02996/statistics/">22</a></td>
+			<td class="submissions"><a href="/routine/02996/statistics/">23</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/03248/">03248</a></td>
+			<td class="title"><a href="/routine/03248/">最大公约数</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/routine/03248/statistics/">37</a></td>
+			<td class="submissions"><a href="/routine/03248/statistics/">38</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/03254/">03254</a></td>
+			<td class="title"><a href="/routine/03254/">约瑟夫问题No.2</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/routine/03254/statistics/">35</a></td>
+			<td class="submissions"><a href="/routine/03254/statistics/">36</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/03263/">03263</a></td>
+			<td class="title"><a href="/routine/03263/">新数字三角形</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/03263/statistics/">15</a></td>
+			<td class="submissions"><a href="/routine/03263/statistics/">15</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/03406/">03406</a></td>
+			<td class="title"><a href="/routine/03406/">书架</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/03406/statistics/">41</a></td>
+			<td class="submissions"><a href="/routine/03406/statistics/">41</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/03441/">03441</a></td>
+			<td class="title"><a href="/routine/03441/">4 Values whose Sum is 0</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/routine/03441/statistics/">23</a></td>
+			<td class="submissions"><a href="/routine/03441/statistics/">24</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/03468/">03468</a></td>
+			<td class="title"><a href="/routine/03468/">电池的寿命</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/routine/03468/statistics/">23</a></td>
+			<td class="submissions"><a href="/routine/03468/statistics/">24</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/03704/">03704</a></td>
+			<td class="title"><a href="/routine/03704/">扩号匹配问题</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/03704/statistics/">27</a></td>
+			<td class="submissions"><a href="/routine/03704/statistics/">27</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/03717/">03717</a></td>
+			<td class="title"><a href="/routine/03717/">移动路线</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/03717/statistics/">24</a></td>
+			<td class="submissions"><a href="/routine/03717/statistics/">24</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/03866/">03866</a></td>
+			<td class="title"><a href="/routine/03866/">Red and Black</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/03866/statistics/">12</a></td>
+			<td class="submissions"><a href="/routine/03866/statistics/">12</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/04001/">04001</a></td>
+			<td class="title"><a href="/routine/04001/">抓住那头牛</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/04001/statistics/">16</a></td>
+			<td class="submissions"><a href="/routine/04001/statistics/">16</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/04005/">04005</a></td>
+			<td class="title"><a href="/routine/04005/">拼点游戏</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/routine/04005/statistics/">21</a></td>
+			<td class="submissions"><a href="/routine/04005/statistics/">23</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/routine/04006/">04006</a></td>
+			<td class="title"><a href="/routine/04006/">小兔子捡金币</a></td>
+			            						<td class="ratio">82%</td>
+			<td class="accepted"><a href="/routine/04006/statistics/">9</a></td>
+			<td class="submissions"><a href="/routine/04006/statistics/">11</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/routine/04018/">04018</a></td>
+			<td class="title"><a href="/routine/04018/">子串</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/routine/04018/statistics/">21</a></td>
+			<td class="submissions"><a href="/routine/04018/statistics/">21</a></td>
+						
+		</tr>
+		</tbody>
+</table>	</div>
+	<p class="page-bar"><span class="pages">
+				
+			<span class="current">1</span>
+			
+					<a href="?page=2">2</a>
+					<a href="?page=3">3</a>
+	</span>
+</p>
+	
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

@@ -1,0 +1,944 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - OpenJudge - 题目</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>数算2024pre每日选做</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/dsapre/" class="first">题目</a></li>
+            <li ><a href="/dsapre/ranking/">排名</a></li>
+                    <li ><a href="/dsapre/status/">状态</a></li>
+	    			        <li class="last"><a href="/dsapre/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<div id="main" class="col-9">
+	<p class="page-bar">
+		<span class="pages">
+				
+			<span class="current">1</span>
+			
+					<a href="?page=2">2</a>
+	</span>
+	</p>
+	<div id="problemsList">
+		<table>
+	<thead>
+		<tr>
+						<td class="problem-id">题目ID</td>
+			<td class="title">标题</td>
+			            						<td class="ratio">通过率</td>
+			<td class="accepted">通过人数</td>
+			<td class="submissions">尝试人数</td>
+						
+		</tr>
+	</thead>
+	<tbody>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/01094/">01094</a></td>
+			<td class="title"><a href="/dsapre/01094/">Sorting It All Out</a></td>
+			            						<td class="ratio">71%</td>
+			<td class="accepted"><a href="/dsapre/01094/statistics/">10</a></td>
+			<td class="submissions"><a href="/dsapre/01094/statistics/">14</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/01145/">01145</a></td>
+			<td class="title"><a href="/dsapre/01145/">Tree Summing</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/dsapre/01145/statistics/">15</a></td>
+			<td class="submissions"><a href="/dsapre/01145/statistics/">17</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/01178/">01178</a></td>
+			<td class="title"><a href="/dsapre/01178/">Camelot</a></td>
+			            						<td class="ratio">83%</td>
+			<td class="accepted"><a href="/dsapre/01178/statistics/">5</a></td>
+			<td class="submissions"><a href="/dsapre/01178/statistics/">6</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/01258/">01258</a></td>
+			<td class="title"><a href="/dsapre/01258/">Agri-Net</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/01258/statistics/">25</a></td>
+			<td class="submissions"><a href="/dsapre/01258/statistics/">25</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/01321/">01321</a></td>
+			<td class="title"><a href="/dsapre/01321/">棋盘问题</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/dsapre/01321/statistics/">22</a></td>
+			<td class="submissions"><a href="/dsapre/01321/statistics/">25</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/01376/">01376</a></td>
+			<td class="title"><a href="/dsapre/01376/">Robot</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/01376/statistics/">9</a></td>
+			<td class="submissions"><a href="/dsapre/01376/statistics/">9</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/01426/">01426</a></td>
+			<td class="title"><a href="/dsapre/01426/">Find The Multiple</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/01426/statistics/">15</a></td>
+			<td class="submissions"><a href="/dsapre/01426/statistics/">15</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/01611/">01611</a></td>
+			<td class="title"><a href="/dsapre/01611/">The Suspects</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/dsapre/01611/statistics/">14</a></td>
+			<td class="submissions"><a href="/dsapre/01611/statistics/">15</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/01760/">01760</a></td>
+			<td class="title"><a href="/dsapre/01760/">Disk Tree</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/dsapre/01760/statistics/">20</a></td>
+			<td class="submissions"><a href="/dsapre/01760/statistics/">21</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/01789/">01789</a></td>
+			<td class="title"><a href="/dsapre/01789/">Truck History</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/01789/statistics/">6</a></td>
+			<td class="submissions"><a href="/dsapre/01789/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/01860/">01860</a></td>
+			<td class="title"><a href="/dsapre/01860/">Currency Exchange</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/01860/statistics/">6</a></td>
+			<td class="submissions"><a href="/dsapre/01860/statistics/">6</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/01944/">01944</a></td>
+			<td class="title"><a href="/dsapre/01944/">Fiber Communications</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/01944/statistics/">5</a></td>
+			<td class="submissions"><a href="/dsapre/01944/statistics/">5</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/02039/">02039</a></td>
+			<td class="title"><a href="/dsapre/02039/">反反复复</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/02039/statistics/">50</a></td>
+			<td class="submissions"><a href="/dsapre/02039/statistics/">50</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/02049/">02049</a></td>
+			<td class="title"><a href="/dsapre/02049/">Finding Nemo</a></td>
+			            						<td class="ratio">80%</td>
+			<td class="accepted"><a href="/dsapre/02049/statistics/">4</a></td>
+			<td class="submissions"><a href="/dsapre/02049/statistics/">5</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/02092/">02092</a></td>
+			<td class="title"><a href="/dsapre/02092/">Grandpa is Famous</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/02092/statistics/">10</a></td>
+			<td class="submissions"><a href="/dsapre/02092/statistics/">10</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/02226/">02226</a></td>
+			<td class="title"><a href="/dsapre/02226/">Muddy Fields</a></td>
+			            						<td class="ratio">83%</td>
+			<td class="accepted"><a href="/dsapre/02226/statistics/">5</a></td>
+			<td class="submissions"><a href="/dsapre/02226/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/02253/">02253</a></td>
+			<td class="title"><a href="/dsapre/02253/">Frogger</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/02253/statistics/">4</a></td>
+			<td class="submissions"><a href="/dsapre/02253/statistics/">4</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/02255/">02255</a></td>
+			<td class="title"><a href="/dsapre/02255/">重建二叉树</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/02255/statistics/">29</a></td>
+			<td class="submissions"><a href="/dsapre/02255/statistics/">29</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/02299/">02299</a></td>
+			<td class="title"><a href="/dsapre/02299/">Ultra-QuickSort</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/dsapre/02299/statistics/">18</a></td>
+			<td class="submissions"><a href="/dsapre/02299/statistics/">19</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/02337/">02337</a></td>
+			<td class="title"><a href="/dsapre/02337/">Catenyms</a></td>
+			            						<td class="ratio">50%</td>
+			<td class="accepted"><a href="/dsapre/02337/statistics/">6</a></td>
+			<td class="submissions"><a href="/dsapre/02337/statistics/">12</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/02488/">02488</a></td>
+			<td class="title"><a href="/dsapre/02488/">A Knight's Journey</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/02488/statistics/">12</a></td>
+			<td class="submissions"><a href="/dsapre/02488/statistics/">12</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/02524/">02524</a></td>
+			<td class="title"><a href="/dsapre/02524/">宗教信仰</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/dsapre/02524/statistics/">57</a></td>
+			<td class="submissions"><a href="/dsapre/02524/statistics/">59</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/02694/">02694</a></td>
+			<td class="title"><a href="/dsapre/02694/">波兰表达式</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/02694/statistics/">37</a></td>
+			<td class="submissions"><a href="/dsapre/02694/statistics/">37</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/02756/">02756</a></td>
+			<td class="title"><a href="/dsapre/02756/">二叉树</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/02756/statistics/">30</a></td>
+			<td class="submissions"><a href="/dsapre/02756/statistics/">30</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/02766/">02766</a></td>
+			<td class="title"><a href="/dsapre/02766/">最大子矩阵</a></td>
+			            						<td class="ratio">86%</td>
+			<td class="accepted"><a href="/dsapre/02766/statistics/">18</a></td>
+			<td class="submissions"><a href="/dsapre/02766/statistics/">21</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/02773/">02773</a></td>
+			<td class="title"><a href="/dsapre/02773/">采药</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/02773/statistics/">26</a></td>
+			<td class="submissions"><a href="/dsapre/02773/statistics/">26</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/02774/">02774</a></td>
+			<td class="title"><a href="/dsapre/02774/">木材加工</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/02774/statistics/">27</a></td>
+			<td class="submissions"><a href="/dsapre/02774/statistics/">27</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/02788/">02788</a></td>
+			<td class="title"><a href="/dsapre/02788/">二叉树</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/dsapre/02788/statistics/">29</a></td>
+			<td class="submissions"><a href="/dsapre/02788/statistics/">32</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/02945/">02945</a></td>
+			<td class="title"><a href="/dsapre/02945/">拦截导弹</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/02945/statistics/">32</a></td>
+			<td class="submissions"><a href="/dsapre/02945/statistics/">32</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/03720/">03720</a></td>
+			<td class="title"><a href="/dsapre/03720/">文本二叉树</a></td>
+			            						<td class="ratio">92%</td>
+			<td class="accepted"><a href="/dsapre/03720/statistics/">22</a></td>
+			<td class="submissions"><a href="/dsapre/03720/statistics/">24</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/04079/">04079</a></td>
+			<td class="title"><a href="/dsapre/04079/">二叉搜索树</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/04079/statistics/">17</a></td>
+			<td class="submissions"><a href="/dsapre/04079/statistics/">17</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/04081/">04081</a></td>
+			<td class="title"><a href="/dsapre/04081/">树的转换</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/dsapre/04081/statistics/">122</a></td>
+			<td class="submissions"><a href="/dsapre/04081/statistics/">123</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/04082/">04082</a></td>
+			<td class="title"><a href="/dsapre/04082/">树的镜面映射</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/04082/statistics/">17</a></td>
+			<td class="submissions"><a href="/dsapre/04082/statistics/">17</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/04084/">04084</a></td>
+			<td class="title"><a href="/dsapre/04084/">拓扑排序</a></td>
+			            						<td class="ratio">89%</td>
+			<td class="accepted"><a href="/dsapre/04084/statistics/">16</a></td>
+			<td class="submissions"><a href="/dsapre/04084/statistics/">18</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/04089/">04089</a></td>
+			<td class="title"><a href="/dsapre/04089/">电话号码</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/dsapre/04089/statistics/">20</a></td>
+			<td class="submissions"><a href="/dsapre/04089/statistics/">21</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/04117/">04117</a></td>
+			<td class="title"><a href="/dsapre/04117/">简单的整数划分问题</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/dsapre/04117/statistics/">31</a></td>
+			<td class="submissions"><a href="/dsapre/04117/statistics/">32</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/04135/">04135</a></td>
+			<td class="title"><a href="/dsapre/04135/">月度开销</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/dsapre/04135/statistics/">27</a></td>
+			<td class="submissions"><a href="/dsapre/04135/statistics/">28</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/04136/">04136</a></td>
+			<td class="title"><a href="/dsapre/04136/">矩形分割</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/04136/statistics/">16</a></td>
+			<td class="submissions"><a href="/dsapre/04136/statistics/">16</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/04143/">04143</a></td>
+			<td class="title"><a href="/dsapre/04143/">和为给定数</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/04143/statistics/">93</a></td>
+			<td class="submissions"><a href="/dsapre/04143/statistics/">93</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/05344/">05344</a></td>
+			<td class="title"><a href="/dsapre/05344/">最后的最后</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/05344/statistics/">30</a></td>
+			<td class="submissions"><a href="/dsapre/05344/statistics/">30</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/05345/">05345</a></td>
+			<td class="title"><a href="/dsapre/05345/">位查询</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/05345/statistics/">31</a></td>
+			<td class="submissions"><a href="/dsapre/05345/statistics/">31</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/05430/">05430</a></td>
+			<td class="title"><a href="/dsapre/05430/">表达式·表达式树·表达式求值</a></td>
+			            						<td class="ratio">75%</td>
+			<td class="accepted"><a href="/dsapre/05430/statistics/">6</a></td>
+			<td class="submissions"><a href="/dsapre/05430/statistics/">8</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/05442/">05442</a></td>
+			<td class="title"><a href="/dsapre/05442/">兔子与星空</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/05442/statistics/">18</a></td>
+			<td class="submissions"><a href="/dsapre/05442/statistics/">18</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/05443/">05443</a></td>
+			<td class="title"><a href="/dsapre/05443/">兔子与樱花</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/dsapre/05443/statistics/">17</a></td>
+			<td class="submissions"><a href="/dsapre/05443/statistics/">18</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/05467/">05467</a></td>
+			<td class="title"><a href="/dsapre/05467/">多项式加法</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/dsapre/05467/statistics/">28</a></td>
+			<td class="submissions"><a href="/dsapre/05467/statistics/">32</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/05907/">05907</a></td>
+			<td class="title"><a href="/dsapre/05907/">二叉树的操作</a></td>
+			            						<td class="ratio">89%</td>
+			<td class="accepted"><a href="/dsapre/05907/statistics/">32</a></td>
+			<td class="submissions"><a href="/dsapre/05907/statistics/">36</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/06250/">06250</a></td>
+			<td class="title"><a href="/dsapre/06250/">字符串最大跨距</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/06250/statistics/">19</a></td>
+			<td class="submissions"><a href="/dsapre/06250/statistics/">19</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/06364/">06364</a></td>
+			<td class="title"><a href="/dsapre/06364/">牛的选举</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/06364/statistics/">24</a></td>
+			<td class="submissions"><a href="/dsapre/06364/statistics/">24</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/06646/">06646</a></td>
+			<td class="title"><a href="/dsapre/06646/">二叉树的深度</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/06646/statistics/">44</a></td>
+			<td class="submissions"><a href="/dsapre/06646/statistics/">44</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/06648/">06648</a></td>
+			<td class="title"><a href="/dsapre/06648/">Sequence</a></td>
+			            						<td class="ratio">90%</td>
+			<td class="accepted"><a href="/dsapre/06648/statistics/">18</a></td>
+			<td class="submissions"><a href="/dsapre/06648/statistics/">20</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/07161/">07161</a></td>
+			<td class="title"><a href="/dsapre/07161/">森林的带度数层次序列存储</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/07161/statistics/">15</a></td>
+			<td class="submissions"><a href="/dsapre/07161/statistics/">15</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/07745/">07745</a></td>
+			<td class="title"><a href="/dsapre/07745/">整数奇偶排序</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/07745/statistics/">31</a></td>
+			<td class="submissions"><a href="/dsapre/07745/statistics/">31</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/08581/">08581</a></td>
+			<td class="title"><a href="/dsapre/08581/">扩展二叉树</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/08581/statistics/">136</a></td>
+			<td class="submissions"><a href="/dsapre/08581/statistics/">136</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/08758/">08758</a></td>
+			<td class="title"><a href="/dsapre/08758/">2的幂次方表示</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/dsapre/08758/statistics/">29</a></td>
+			<td class="submissions"><a href="/dsapre/08758/statistics/">33</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/09201/">09201</a></td>
+			<td class="title"><a href="/dsapre/09201/">Freda的越野跑</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/09201/statistics/">28</a></td>
+			<td class="submissions"><a href="/dsapre/09201/statistics/">28</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/14683/">14683</a></td>
+			<td class="title"><a href="/dsapre/14683/">合并果子</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/dsapre/14683/statistics/">24</a></td>
+			<td class="submissions"><a href="/dsapre/14683/statistics/">25</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/20449/">20449</a></td>
+			<td class="title"><a href="/dsapre/20449/">是否被5整除</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/20449/statistics/">24</a></td>
+			<td class="submissions"><a href="/dsapre/20449/statistics/">24</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/20453/">20453</a></td>
+			<td class="title"><a href="/dsapre/20453/">和为k的子数组个数</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/20453/statistics/">18</a></td>
+			<td class="submissions"><a href="/dsapre/20453/statistics/">18</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/20456/">20456</a></td>
+			<td class="title"><a href="/dsapre/20456/">统计封闭岛屿的数目</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/20456/statistics/">15</a></td>
+			<td class="submissions"><a href="/dsapre/20456/statistics/">15</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/20472/">20472</a></td>
+			<td class="title"><a href="/dsapre/20472/">死循环的机器人</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/dsapre/20472/statistics/">19</a></td>
+			<td class="submissions"><a href="/dsapre/20472/statistics/">20</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/20576/">20576</a></td>
+			<td class="title"><a href="/dsapre/20576/">printExp</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/20576/statistics/">12</a></td>
+			<td class="submissions"><a href="/dsapre/20576/statistics/">12</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/20625/">20625</a></td>
+			<td class="title"><a href="/dsapre/20625/">1跟0数量相等的子字串</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/20625/statistics/">12</a></td>
+			<td class="submissions"><a href="/dsapre/20625/statistics/">12</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/20626/">20626</a></td>
+			<td class="title"><a href="/dsapre/20626/">对子数列做XOR运算</a></td>
+			            						<td class="ratio">93%</td>
+			<td class="accepted"><a href="/dsapre/20626/statistics/">13</a></td>
+			<td class="submissions"><a href="/dsapre/20626/statistics/">14</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/20644/">20644</a></td>
+			<td class="title"><a href="/dsapre/20644/">统计全为 1 的正方形子矩阵</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/20644/statistics/">15</a></td>
+			<td class="submissions"><a href="/dsapre/20644/statistics/">15</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/20650/">20650</a></td>
+			<td class="title"><a href="/dsapre/20650/">最长的公共子序列的长度</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/20650/statistics/">23</a></td>
+			<td class="submissions"><a href="/dsapre/20650/statistics/">23</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/20741/">20741</a></td>
+			<td class="title"><a href="/dsapre/20741/">两座孤岛最短距离</a></td>
+			            						<td class="ratio">84%</td>
+			<td class="accepted"><a href="/dsapre/20741/statistics/">21</a></td>
+			<td class="submissions"><a href="/dsapre/20741/statistics/">25</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/20742/">20742</a></td>
+			<td class="title"><a href="/dsapre/20742/">泰波拿契數</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/20742/statistics/">31</a></td>
+			<td class="submissions"><a href="/dsapre/20742/statistics/">31</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/20743/">20743</a></td>
+			<td class="title"><a href="/dsapre/20743/">整人的提词本</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/dsapre/20743/statistics/">25</a></td>
+			<td class="submissions"><a href="/dsapre/20743/statistics/">26</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/20744/">20744</a></td>
+			<td class="title"><a href="/dsapre/20744/">土豪购物</a></td>
+			            						<td class="ratio">90%</td>
+			<td class="accepted"><a href="/dsapre/20744/statistics/">26</a></td>
+			<td class="submissions"><a href="/dsapre/20744/statistics/">29</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/20746/">20746</a></td>
+			<td class="title"><a href="/dsapre/20746/">满足合法工时的最少人数</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/20746/statistics/">17</a></td>
+			<td class="submissions"><a href="/dsapre/20746/statistics/">17</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/21006/">21006</a></td>
+			<td class="title"><a href="/dsapre/21006/">放苹果（盘子相同）</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/21006/statistics/">29</a></td>
+			<td class="submissions"><a href="/dsapre/21006/statistics/">29</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/22067/">22067</a></td>
+			<td class="title"><a href="/dsapre/22067/">快速堆猪</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/dsapre/22067/statistics/">22</a></td>
+			<td class="submissions"><a href="/dsapre/22067/statistics/">23</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/22068/">22068</a></td>
+			<td class="title"><a href="/dsapre/22068/">合法出栈序列</a></td>
+			            						<td class="ratio">92%</td>
+			<td class="accepted"><a href="/dsapre/22068/statistics/">36</a></td>
+			<td class="submissions"><a href="/dsapre/22068/statistics/">39</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/22275/">22275</a></td>
+			<td class="title"><a href="/dsapre/22275/">二叉搜索树的遍历</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/dsapre/22275/statistics/">19</a></td>
+			<td class="submissions"><a href="/dsapre/22275/statistics/">20</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/22359/">22359</a></td>
+			<td class="title"><a href="/dsapre/22359/">Goldbach Conjecture</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/22359/statistics/">30</a></td>
+			<td class="submissions"><a href="/dsapre/22359/statistics/">30</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/22509/">22509</a></td>
+			<td class="title"><a href="/dsapre/22509/">解方程</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/22509/statistics/">12</a></td>
+			<td class="submissions"><a href="/dsapre/22509/statistics/">12</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/22548/">22548</a></td>
+			<td class="title"><a href="/dsapre/22548/">机智的股民老张</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/dsapre/22548/statistics/">34</a></td>
+			<td class="submissions"><a href="/dsapre/22548/statistics/">35</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/22636/">22636</a></td>
+			<td class="title"><a href="/dsapre/22636/">修仙之路</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/22636/statistics/">22</a></td>
+			<td class="submissions"><a href="/dsapre/22636/statistics/">22</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/23451/">23451</a></td>
+			<td class="title"><a href="/dsapre/23451/">交互四则运算计算器_带错误表达式版</a></td>
+			            						<td class="ratio">67%</td>
+			<td class="accepted"><a href="/dsapre/23451/statistics/">2</a></td>
+			<td class="submissions"><a href="/dsapre/23451/statistics/">3</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/23563/">23563</a></td>
+			<td class="title"><a href="/dsapre/23563/">多项式时间复杂度</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/23563/statistics/">37</a></td>
+			<td class="submissions"><a href="/dsapre/23563/statistics/">37</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/23568/">23568</a></td>
+			<td class="title"><a href="/dsapre/23568/">幸福的寒假生活</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/dsapre/23568/statistics/">20</a></td>
+			<td class="submissions"><a href="/dsapre/23568/statistics/">21</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/23570/">23570</a></td>
+			<td class="title"><a href="/dsapre/23570/">特殊密码锁</a></td>
+			            						<td class="ratio">92%</td>
+			<td class="accepted"><a href="/dsapre/23570/statistics/">11</a></td>
+			<td class="submissions"><a href="/dsapre/23570/statistics/">12</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/23660/">23660</a></td>
+			<td class="title"><a href="/dsapre/23660/">7的倍数取法有多少种</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/23660/statistics/">14</a></td>
+			<td class="submissions"><a href="/dsapre/23660/statistics/">14</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/24375/">24375</a></td>
+			<td class="title"><a href="/dsapre/24375/">小木棍</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/dsapre/24375/statistics/">17</a></td>
+			<td class="submissions"><a href="/dsapre/24375/statistics/">18</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/24588/">24588</a></td>
+			<td class="title"><a href="/dsapre/24588/">后序表达式求值</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/24588/statistics/">33</a></td>
+			<td class="submissions"><a href="/dsapre/24588/statistics/">33</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/24591/">24591</a></td>
+			<td class="title"><a href="/dsapre/24591/">中序表达式转后序表达式</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/dsapre/24591/statistics/">30</a></td>
+			<td class="submissions"><a href="/dsapre/24591/statistics/">33</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/24676/">24676</a></td>
+			<td class="title"><a href="/dsapre/24676/">共同富裕</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/24676/statistics/">16</a></td>
+			<td class="submissions"><a href="/dsapre/24676/statistics/">16</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/24677/">24677</a></td>
+			<td class="title"><a href="/dsapre/24677/">安全位置</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/24677/statistics/">16</a></td>
+			<td class="submissions"><a href="/dsapre/24677/statistics/">16</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/24678/">24678</a></td>
+			<td class="title"><a href="/dsapre/24678/">任性买房</a></td>
+			            						<td class="ratio">89%</td>
+			<td class="accepted"><a href="/dsapre/24678/statistics/">16</a></td>
+			<td class="submissions"><a href="/dsapre/24678/statistics/">18</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/24684/">24684</a></td>
+			<td class="title"><a href="/dsapre/24684/">直播计票</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/24684/statistics/">33</a></td>
+			<td class="submissions"><a href="/dsapre/24684/statistics/">33</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/24686/">24686</a></td>
+			<td class="title"><a href="/dsapre/24686/">树的重量</a></td>
+			            						<td class="ratio">72%</td>
+			<td class="accepted"><a href="/dsapre/24686/statistics/">13</a></td>
+			<td class="submissions"><a href="/dsapre/24686/statistics/">18</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/24687/">24687</a></td>
+			<td class="title"><a href="/dsapre/24687/">封锁管控</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/dsapre/24687/statistics/">15</a></td>
+			<td class="submissions"><a href="/dsapre/24687/statistics/">17</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/24750/">24750</a></td>
+			<td class="title"><a href="/dsapre/24750/">根据二叉树中后序序列建树</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/dsapre/24750/statistics/">28</a></td>
+			<td class="submissions"><a href="/dsapre/24750/statistics/">29</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/25815/">25815</a></td>
+			<td class="title"><a href="/dsapre/25815/">回文字符串</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/dsapre/25815/statistics/">28</a></td>
+			<td class="submissions"><a href="/dsapre/25815/statistics/">32</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/26572/">26572</a></td>
+			<td class="title"><a href="/dsapre/26572/">多余的括号（数据增强）</a></td>
+			            						<td class="ratio">70%</td>
+			<td class="accepted"><a href="/dsapre/26572/statistics/">14</a></td>
+			<td class="submissions"><a href="/dsapre/26572/statistics/">20</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/26573/">26573</a></td>
+			<td class="title"><a href="/dsapre/26573/">康托集的图像表示</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/dsapre/26573/statistics/">23</a></td>
+			<td class="submissions"><a href="/dsapre/26573/statistics/">23</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/27625/">27625</a></td>
+			<td class="title"><a href="/dsapre/27625/">AVL树至少有几个结点</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/dsapre/27625/statistics/">17</a></td>
+			<td class="submissions"><a href="/dsapre/27625/statistics/">18</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/27626/">27626</a></td>
+			<td class="title"><a href="/dsapre/27626/">AVL树最多有几层</a></td>
+			            						<td class="ratio">85%</td>
+			<td class="accepted"><a href="/dsapre/27626/statistics/">17</a></td>
+			<td class="submissions"><a href="/dsapre/27626/statistics/">20</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/dsapre/27635/">27635</a></td>
+			<td class="title"><a href="/dsapre/27635/">判断无向图是否连通有无回路(同23163)</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/dsapre/27635/statistics/">16</a></td>
+			<td class="submissions"><a href="/dsapre/27635/statistics/">17</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/dsapre/27637/">27637</a></td>
+			<td class="title"><a href="/dsapre/27637/">括号嵌套二叉树</a></td>
+			            						<td class="ratio">82%</td>
+			<td class="accepted"><a href="/dsapre/27637/statistics/">14</a></td>
+			<td class="submissions"><a href="/dsapre/27637/statistics/">17</a></td>
+						
+		</tr>
+		</tbody>
+</table>	</div>
+	<p class="page-bar"><span class="pages">
+				
+			<span class="current">1</span>
+			
+					<a href="?page=2">2</a>
+	</span>
+</p>
+	
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 03141:魔兽世界之二：装备</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>03141:魔兽世界之二：装备</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/03141/">查看</a></li>
+		<li ><a href="/practice/03141/submit/">提交</a></li>
+				<li ><a href="/practice/03141/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/03141/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p>魔兽世界的西面是红魔军的司令部，东面是蓝魔军的司令部。两个司令部之间是依次排列的若干城市。 <br /><br />红司令部，City 1，City 2，……，City n，蓝司令部<br /><br />两军的司令部都会制造武士。武士一共有 dragon 、ninja、iceman、lion、wolf 五种。每种武士都有编号、生命值这两种属性。 <br />有的武士可以拥有武器。武器有三种，sword, bomb,和arrow，编号分别为0,1,2。<br />双方的武士编号都是从1开始计算。红方制造出来的第 n 个武士，编号就是n。同样，蓝方制造出来的第 n 个武士，编号也是n。 <br /><br />不同的武士有不同的特点。<br />dragon 可以拥有一件武器。编号为n的dragon降生时即获得编号为 n%3 的武器。dragon还有“士气”这个属性，是个浮点数，其值为它降生后其司令部剩余生命元的数量除以造dragon所需的生命元数量。<br />ninja可以拥有两件武器。编号为n的ninja降生时即获得编号为 n%3 和 (n+1)%3的武器。<br />iceman有一件武器。编号为n的iceman降生时即获得编号为 n%3 的武器。<br />lion 有“忠诚度”这个属性，其值等于它降生后其司令部剩余生命元的数目。<br />wolf没特点。<br />请注意，在以后的题目里，武士的士气，生命值，忠诚度在其生存期间都可能发生变化，都有作用，武士手中的武器随着使用攻击力也会发生变化。<br /><br />武士在刚降生的时候有一个生命值。 <br /><br />在每个整点，双方的司令部中各有一个武士降生。 <br /><br />红方司令部按照 iceman、lion、wolf、ninja、dragon 的顺序循环制造武士。 <br /><br />蓝方司令部按照 lion、dragon、ninja、iceman、wolf 的顺序循环制造武士。 <br /><br />制造武士需要生命元。 <br /><br />制造一个初始生命值为 m 的武士，司令部中的生命元就要减少 m 个。 <br /><br />如果司令部中的生命元不足以制造某个按顺序应该制造的武士，那么司令部就试图制造下一个。如果所有武士都不能制造了，则司令部停止制造武士。<br />给定一个时间，和双方司令部的初始生命元数目，要求你将从0点0分开始到双方司令部停止制造武士为止的所有事件按顺序输出。<br />一共有两种事件，其对应的输出样例如下： <br /><br />1) 武士降生 <br />输出样例： 004 blue lion 5 born with strength 5,2 lion in red headquarter<br />表示在 4点整，编号为5的蓝魔lion武士降生，它降生时生命值为5,降生后蓝魔司令部里共有2个lion武士。(为简单起见，不考虑单词的复数形式)注意，每制造出一个新的武士，都要输出此时司令部里共有多少个该种武士。<br />如果造出的是dragon，那么还要输出一行，例：<br />It has a arrow,and it&#39;s morale is 23.34<br />表示该dragon降生时得到了arrow,其士气是23.34（为简单起见，本题中arrow前面的冠词用a,不用an，士气精确到小数点后面2位，四舍五入）<br />如果造出的是ninja，那么还要输出一行，例：<br />It has a bomb and a arrow<br />表示该ninja降生时得到了bomb和arrow。<br />如果造出的是iceman，那么还要输出一行，例：<br />It has a sword<br />表示该iceman降生时得到了sword。<br />如果造出的是lion，那么还要输出一行，例：<br />It&#39;s loyalty is 24<br />表示该lion降生时的忠诚度是24。<br />2) 司令部停止制造武士<br />输出样例： 010 red headquarter stops making warriors<br />表示在 10点整，红方司令部停止制造武士<br /><br />输出事件时： <br /><br />首先按时间顺序输出； <br /><br />同一时间发生的事件，先输出红司令部的，再输出蓝司令部的。</p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行是一个整数,代表测试数据组数。<br /><br />每组测试数据共两行。 <br /><br />第一行，一个整数M。其含义为： 每个司令部一开始都有M个生命元( 1 <= M <= 10000) <br /><br />第二行：五个整数，依次是 dragon 、ninja、iceman、lion、wolf 的初始生命值。它们都大于0小于等于10000</dd>
+		<dt>输出</dt>
+		<dd>对每组测试数据，要求输出从0时0分开始，到双方司令部都停止制造武士为止的所有事件。<br />对每组测试数据，首先输出“Case:n" n是测试数据的编号，从1开始 <br />接下来按恰当的顺序和格式输出所有事件。每个事件都以事件发生的时间开头，时间以小时为单位，有三位。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>1
+20
+3 4 5 6 7</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>Case:1
+000 red iceman 1 born with strength 5,1 iceman in red headquarter
+It has a bomb
+000 blue lion 1 born with strength 6,1 lion in blue headquarter
+It's loyalty is 14
+001 red lion 2 born with strength 6,1 lion in red headquarter
+It's loyalty is 9
+001 blue dragon 2 born with strength 3,1 dragon in blue headquarter
+It has a arrow,and it's morale is 3.67
+002 red wolf 3 born with strength 7,1 wolf in red headquarter
+002 blue ninja 3 born with strength 4,1 ninja in blue headquarter
+It has a sword and a bomb
+003 red headquarter stops making warriors
+003 blue iceman 4 born with strength 5,1 iceman in blue headquarter
+It has a bomb
+004 blue headquarter stops making warriors</pre></dd>
+						</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/03141/">查看</a></li>
+		<li ><a href="/practice/03141/submit/">提交</a></li>
+				<li ><a href="/practice/03141/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/03141/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>3141</dd>
+					<dt>添加于</dt>
+			<dd>2026-03-13</dd>
+				<dt>提交次数</dt>
+		<dd>13</dd>
+		<dt>尝试人数</dt>
+	    <dd>10</dd>
+	    <dt>通过人数</dt>
+	    <dd>10</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

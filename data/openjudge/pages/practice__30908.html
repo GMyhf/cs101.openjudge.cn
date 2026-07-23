@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 30908:力场叠加模拟 (在线版)</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>30908:力场叠加模拟 (在线版)</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/30908/">查看</a></li>
+		<li ><a href="/practice/30908/submit/">提交</a></li>
+				<li ><a href="/practice/30908/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/30908/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>8000ms</dd>
+			<dt>单个测试点时间限制: </dt>
+		<dd>3000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>524288kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p class="md-end-block md-p md-focus"><span class="md-plain md-expand">在一个物理仿真系统中，一排 </span><span id="ty-mjx-2" class="md-inline-math math-jax-postprocess">N</span><span class="md-plain"> 个静止的粒子（索引从 1 到 </span><span id="ty-mjx-3" class="md-inline-math math-jax-postprocess">N</span><span class="md-plain">）初始受力均为 0。系统需要实时处理 </span><span id="ty-mjx-4" class="md-inline-math math-jax-postprocess">Q</span><span class="md-plain"> 次物理力场事件，并反馈指定区域的受力情况。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">为了检验算法的实时性，本题</span><span class="md-pair-s "><strong><span class="md-plain">强制在线</span></strong></span><span class="md-plain">。你需要维护一个变量 </span><span class="md-pair-s" spellcheck="false"><code>lastans</code></span><span class="md-plain">（表示上一次 </span><span class="md-pair-s" spellcheck="false"><code>Query</code></span><span class="md-plain"> 操作输出的答案，初始时 </span><span class="md-pair-s" spellcheck="false"><code>lastans = 0</code></span><span class="md-plain">）。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">对于每一次操作，输入会给出解密前的区间端点 </span><span id="ty-mjx-5" class="md-inline-math math-jax-postprocess">l_raw</span><span class="md-plain"> 和 </span><span id="ty-mjx-6" class="md-inline-math math-jax-postprocess">r_raw</span><span class="md-plain">。真实的区间 </span><span id="ty-mjx-7" class="md-inline-math math-jax-postprocess">[l, r]</span><span class="md-plain"> 需要通过以下规则进行解密：</span></p>
+<p class="md-end-block md-p"><span id="ty-mjx-8" class="md-inline-math math-jax-postprocess">l = (l_raw &oplus; |lastans|) mod N + 1，</span><span id="ty-mjx-9" class="md-inline-math math-jax-postprocess">r = (r_raw &oplus; |lastans|) mod N + 1</span></p>
+<p class="md-end-block md-p"><span class="md-plain">（其中 &oplus;</span><span class="md-plain"> 为异或运算，</span><span id="ty-mjx-11" class="md-inline-math math-jax-postprocess">|lastans|</span><span class="md-plain"> 为上一次查询答案的绝对值）。</span> <span class="md-plain">如果计算出的 </span><span id="ty-mjx-12" class="md-inline-math math-jax-postprocess">l &gt; r</span><span class="md-plain">，则需要交换 </span><span id="ty-mjx-13" class="md-inline-math math-jax-postprocess">l</span><span class="md-plain"> 和 </span><span id="ty-mjx-14" class="md-inline-math math-jax-postprocess">r</span><span class="md-plain">。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">你需要实现以下两种操作：</span></p>
+<ol class="ol-list" start="">
+<li class="md-list-item">
+<p class="md-end-block md-p"><span class="md-pair-s" spellcheck="false"><code>Add l_raw r_raw v</code></span><span class="md-plain">：解密后在区间 </span><span id="ty-mjx-15" class="md-inline-math math-jax-postprocess">[l, r]</span><span class="md-plain"> 内的每个粒子上叠加一个大小为 </span><span id="ty-mjx-16" class="md-inline-math math-jax-postprocess">v</span><span class="md-plain"> 的恒定力（</span><span id="ty-mjx-17" class="md-inline-math math-jax-postprocess">v</span><span class="md-plain"> 可正可负）。</span></p>
+</li>
+<li class="md-list-item md-focus-container">
+<p class="md-end-block md-p md-focus"><span class="md-pair-s" spellcheck="false"><code>Query l_raw r_raw</code></span><span class="md-plain">：解密后查询当前区间 </span><span id="ty-mjx-18" class="md-inline-math math-jax-postprocess">[l, r]</span><span class="md-plain"> 内所有粒子受力的</span><span class="md-pair-s "><strong><span class="md-plain">最大值</span></strong></span><span class="md-plain md-expand">。</span></p>
+</li>
+</ol>
+<h3 class="md-end-block md-heading md-focus"><span class="md-plain md-expand">数据范围</span></h3>
+<ul class="ul-list" data-mark="*">
+<li class="md-list-item">
+<p class="md-end-block md-p"><span id="ty-mjx-25" class="md-inline-math math-jax-postprocess">1 &lt;= N &lt;= 10^9，</span><span id="ty-mjx-26" class="md-inline-math math-jax-postprocess">1 <span id="ty-mjx-25" class="md-inline-math math-jax-postprocess">&lt;=</span> Q <span id="ty-mjx-25" class="md-inline-math math-jax-postprocess">&lt;=</span> 10^5</span></p>
+</li>
+<li class="md-list-item">
+<p class="md-end-block md-p"><span id="ty-mjx-27" class="md-inline-math math-jax-postprocess">-10^9 <span id="ty-mjx-25" class="md-inline-math math-jax-postprocess">&lt;=</span> v <span id="ty-mjx-25" class="md-inline-math math-jax-postprocess">&lt;=</span> 10^9，</span><span id="ty-mjx-28" class="md-inline-math math-jax-postprocess">0 <span id="ty-mjx-25" class="md-inline-math math-jax-postprocess">&lt;=</span> l_raw, r_raw &lt; 2^31</span></p>
+</li>
+</ul></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行包含两个整数 N 和 Q。<br />接下来 Q 行，每行描述一个操作：<br /><br />Add l_raw r_raw v：表示将解密后的区间 [l, r] 增加力 v。<br />Query l_raw r_raw：表示查询解密后的区间 [l, r] 的受力最大值。</dd>
+		<dt>输出</dt>
+		<dd>对于每一个 Query 操作，输出一个整数，表示该区间的最大受力值。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>5 4
+Add 0 2 10
+Query 11 13
+Add 8 14 5
+Query 11 9</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>10
+15</pre></dd>
+				<dt>提示</dt>
+		<dd>动态开点线段树</dd>
+						<dt>来源</dt>
+		<dd>yan, 30878:力场叠加模拟</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/30908/">查看</a></li>
+		<li ><a href="/practice/30908/submit/">提交</a></li>
+				<li ><a href="/practice/30908/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/30908/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>30908</dd>
+					<dt>添加于</dt>
+			<dd>2026-05-22</dd>
+				<dt>提交次数</dt>
+		<dd>35</dd>
+		<dt>尝试人数</dt>
+	    <dd>6</dd>
+	    <dt>通过人数</dt>
+	    <dd>5</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

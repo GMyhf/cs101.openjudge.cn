@@ -1,0 +1,225 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 28321:电影排片</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>28321:电影排片</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/28321/">查看</a></li>
+		<li ><a href="/practice/28321/submit/">提交</a></li>
+				<li ><a href="/practice/28321/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/28321/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>单个测试点时间限制: </dt>
+		<dd>300ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65535kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><div>
+<div>一个电影排片系统现在要安排n部电影的上映，第i部电影的评分要求不小于b<sub>i</sub>。</div>
+<div>现在已经有一个初步的上映电影的列表，长度为n，第i部电影的评分为a<sub>i</sub>。</div>
+<div>最初，数组 {a<sub>i</sub>} 和 {b<sub>i</sub>} 均按升序排列。</div>
+<br />
+<div>由于某些电影的评分可能低于要求，即存在 a<sub>i</sub> &lt; b<sub>i</sub>，因此我们需要添加评分更高的电影（假设我们有无数多的任何评分的电影供选择）。</div>
+<div>当我们添加一个评分为 0 &lt;= w &lt;= 100 的新电影进入排片系统时，系统将删除评分最低的电影，并按升序排列电影的评分。</div>
+<br />
+<div>换句话说，在每次操作中，你选择一个整数 w，将其插入数组 {a<sub>i</sub>} 中，然后将数组 {a<sub>i</sub>} 按升序排列，并移除第一个元素。</div>
+<br />
+<div>求需要添加的最少新电影数量，使得对于所有的 i，满足 a<sub>i</sub> &gt;= b<sub>i</sub>。</div>
+</div></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>每个测试包含多个测试用例。第一行包含测试用例的数量 t（1 ≤ t ≤ 10000）。每个测试用例的描述如下。<br /><br />每个测试用例的第一行包含一个正整数 n（1 ≤ n ≤ 100），表示电影数量。<br /><br />第二行包含一个长度为 n 的数组 a（0 ≤ a1 ≤ a2 ≤ ... ≤ an ≤ 100）。<br /><br />第三行包含一个长度为 n 的数组 b（0 ≤ b1 ≤ b2 ≤ ... ≤ bn ≤ 100）。</dd>
+		<dt>输出</dt>
+		<dd>对于每个测试用例，输出一个整数作为答案，每个答案占一行。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>2
+6
+10 20 30 40 50 60
+8 21 35 35 55 65
+
+6
+9 9 9 30 40 50
+10 20 30 40 50 60</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>1
+3</pre></dd>
+				<dt>提示</dt>
+		<dd>在第一个测试用例中：<br />- 添加一个评分为 w = 70 的电影，数组 a 变为 [20, 30, 40, 50, 60, 70]。<br /><br />在第二个测试用例中：<br />- 添加一个评分为 w = 60 的电影，数组 a 变为 [9, 9, 30, 40, 50, 60]。<br />- 添加一个评分为 w = 20 的电影，数组 a 变为 [9, 20, 30, 40, 50, 60]。<br />- 添加一个评分为 w = 10 的电影，数组 a 变为 [10, 20, 30, 40, 50, 60]。</dd>
+						</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/28321/">查看</a></li>
+		<li ><a href="/practice/28321/submit/">提交</a></li>
+				<li ><a href="/practice/28321/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/28321/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>28321</dd>
+					<dt>添加于</dt>
+			<dd>2024-05-31</dd>
+				<dt>提交次数</dt>
+		<dd>30</dd>
+		<dt>尝试人数</dt>
+	    <dd>12</dd>
+	    <dt>通过人数</dt>
+	    <dd>11</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 20100:冬泳v0.2</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>20100:冬泳v0.2</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/20100/">查看</a></li>
+		<li ><a href="/practice/20100/submit/">提交</a></li>
+				<li ><a href="/practice/20100/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/20100/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p>说到冬泳，就不得不提网络红人怪先生。怪先生喜欢在冬泳前发布励志演讲，因此迅速走红。<br />某个寒冷的冬天，怪先生前往某个群岛挑战一项冬泳纪录。他将从第一个岛开始按照顺序游过第2、3、......n个岛。<br />现在已知第i和第i+1个岛之间的直线距离di，并且已知世界纪录，即第i和第i+1个岛之间世界纪录保持者所游的时间ti。<br />就在刚才，怪先生大喊着“奥力给”完成了冬泳，所以我们也知道了他的纪录，即第i和第i+1个岛之间怪先生所游的时间ai。<br />我们称从第j个岛到第j+1个岛，怪先生的冬泳是“打破纪录”的，如果满足以下两个条件之一：<br /><span style="background-color: rgb(255, 255, 255);color: rgb(35, 31, 23);font-family: " vera="" bitstream="" lucida=""><span style="background-color: rgb(255, 255, 255);color: rgb(35, 31, 23);font-family: &quot;Lucida Grande&quot;,Verdana,&quot;Bitstream Vera Sans&quot;,Arial,sans-serif;font-size: 14px;text-decoration: none">1）怪先生所游时间小于之前他在每次冬泳所花的时间，即aj &lt; ak，k=1,2,3......j-1，并且小于纪录保持者游这段距离的时间</span><br style="color: rgb(35, 31, 23); font-family: &amp;quot;Lucida Grande&amp;quot;,Verdana,&amp;quot;Bitstream Vera Sans&amp;quot;,Arial,sans-serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: left; text-decoration: none; text-indent: 0px; text-transform: none; -webkit-text-stroke-width: 0px; white-space: normal; word-spacing: 0px;" /><span style="background-color: rgb(255, 255, 255);color: rgb(35, 31, 23);font-family: &quot;Lucida Grande&quot;,Verdana,&quot;Bitstream Vera Sans&quot;,Arial,sans-serif;font-size: 14px;text-decoration: none">2）怪先生所游速度大于之前他在每次冬泳速度，即vj &gt; vk，k=1,2,3.......j-1，并且大于纪录保持者游这段距离的速度</span><br style="color: rgb(35, 31, 23); font-family: &amp;quot;Lucida Grande&amp;quot;,Verdana,&amp;quot;Bitstream Vera Sans&amp;quot;,Arial,sans-serif; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: left; text-decoration: none; text-indent: 0px; text-transform: none; -webkit-text-stroke-width: 0px; white-space: normal; word-spacing: 0px;" /><span style="background-color: rgb(255, 255, 255);color: rgb(35, 31, 23);font-family: &quot;Lucida Grande&quot;,Verdana,&quot;Bitstream Vera Sans&quot;,Arial,sans-serif;font-size: 14px;text-decoration: none">怪先生迫不及待想知道自己有几次“打破纪录”了，请求你帮忙解决这个问题。</span><ak，k=1,2,3......j-1，并且小于纪录保持者游这段距离的时间< span=""><br /></ak，k=1,2,3......j-1，并且小于纪录保持者游这段距离的时间<></span></p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行是n，表示岛屿个数(0 < n <= 2000)<br />第二行是n-1个以空格分开的数，表示岛屿之间的距离di （0 < di < =10000）<br />第三行是纪录保持者的时间ti(0 < ti <= 10000)<br />第四行是怪先生的时间ai(0 < ai <= 10000)</dd>
+		<dt>输出</dt>
+		<dd>一个整数，即怪先生“打破纪录”的次数<br /><br />注：所有di单位相同，所有ti和ai计量单位也相同，为了简化，均为大于0的整数</dd>
+		<dt>样例输入</dt>
+		<dd><pre>4
+6 6 6
+3 4 5
+1 4 6</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>1</pre></dd>
+						<dt>来源</dt>
+		<dd>cs101-2019 徐可</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/20100/">查看</a></li>
+		<li ><a href="/practice/20100/submit/">提交</a></li>
+				<li ><a href="/practice/20100/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/20100/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>20100</dd>
+					<dt>添加于</dt>
+			<dd>2019-12-22</dd>
+				<dt>提交次数</dt>
+		<dd>29</dd>
+		<dt>尝试人数</dt>
+	    <dd>13</dd>
+	    <dt>通过人数</dt>
+	    <dd>11</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

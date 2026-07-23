@@ -1,0 +1,233 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - M19963:买学区房</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>计算思维算法实践</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/pctbook/" class="first">题目</a></li>
+            <li ><a href="/pctbook/ranking/">排名</a></li>
+                    <li ><a href="/pctbook/status/">状态</a></li>
+	    			        <li class="last"><a href="/pctbook/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>M19963:买学区房</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/pctbook/M19963/">查看</a></li>
+		<li ><a href="/pctbook/M19963/submit/">提交</a></li>
+				<li ><a href="/pctbook/M19963/statistics/">统计</a></li>
+			
+		<li ><a href="/pctbook/clarify/M19963/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p>小明同学的家长为了让小明同学接受更好的教育，最近在考虑买某重点中学附近的房子，已知他们买房子要考虑两个因素：房子离学校的距离，以及房子的价格。现在他们有一系列备选的房子，已知这些房子距离学校的x方向距离和y方向距离，以及每栋房子的价格。小明的家长认为，只有同时满足了以下两个条件的房子H买了才是不亏的：</p>
+<p>1.小明的家长比较精打细算，所以房子的性价比大于所用备选房子性价比的中位数（定义见下图）<br />2.小明的家长想攒钱，所以房子的价格小于所有备选房子价格的中位数</p>
+<p>注：<br />性价比 = 房子和学校之间的交通距离 / 房子的价格<br />（由于该城市的街道布局接近方格状，且从学校到房子无法穿墙而过，房子H去学校的交通距离定义为，房子H距离学校的x方向距离和y方向距离的和）</p>
+<p>现在需要你来帮小明的家长判断，一系列备选房子里，值得买的房子有多少栋。</p>
+<p><img style="width: 904px; height: 735px;" src="http://media.openjudge.cn/images/upload/1576132102.png" width="985" height="770" /></p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第1行为1个整数，n，代表备选房子的数目<br />第2行为n个房子离学校的x，y距离对，如“(x,y)”，距离均为整数<br />第3行为n个整数，代表每个房子的价格</dd>
+		<dt>输出</dt>
+		<dd>一个整数，代表n个房子中值得买的房子数目。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>Sample1 Input:
+5
+(100,200) (50,50) (100,300) (150,50) (50,50)
+100 300 200 400 500
+
+Sample1 Output:
+2
+
+# 共有5个房子备选，离学校的交通距离分别是100+200=300，50+50=100，
+100+300=400，150+50=200，50+50=100。
+这些房子的性价比依次为300/100=3， 100/300=1/3， 400/200=2， 200/400=0.5， 
+100/500=0.2，中位数是0.5，满足第1个条件的只有第1个和第3个房子。
+这些房子的价格中位数是300，因此满足第2个条件的只有第1个和第3个房子。
+所以同时满足两个条件的有第1个和第3个房子，输出2.</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>Sample2 Input:
+3
+(10,90) (20,180) (30,270)
+100 200 300
+
+Sample2 Output:
+0
+
+# 共有三个房子备选，离学校的交通距离分别是10+90=100，20+180=200，30+270=300。
+这些房子性价比依次为100/100=1，200/200=1，300/300=1，中位数是1，
+没有房子满足第1个条件，因此不用考虑第二个条件，输出一定是0.</pre></dd>
+				<dt>提示</dt>
+		<dd>tags: sort, math<br />求中位数,要先进行数据的排序（从小到大）,然后计算中位数的序号,分数据为奇数与偶数两种来求.排序时,相同的数字不能省略.<br />如果总数个数是奇数的话,按从小到大的顺序,取中间的那个数. <br />如果总数个数是偶数的话,按从小到大的顺序,取中间那两个数的平均数.<br /><br />同学发现测试数据结尾多空格。可以这样来接收数据：<br />pairs = [i[1:-1] for i in input().split()]<br />distances = [ sum(map(int,i.split(','))) for i in pairs]</dd>
+						<dt>来源</dt>
+		<dd>cs101 2019 Final Exam</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/pctbook/M19963/">查看</a></li>
+		<li ><a href="/pctbook/M19963/submit/">提交</a></li>
+				<li ><a href="/pctbook/M19963/statistics/">统计</a></li>
+			
+		<li ><a href="/pctbook/clarify/M19963/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>19963</dd>
+					<dt>添加于</dt>
+			<dd>2025-03-13</dd>
+				<dt>提交次数</dt>
+		<dd>175</dd>
+		<dt>尝试人数</dt>
+	    <dd>78</dd>
+	    <dt>通过人数</dt>
+	    <dd>76</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

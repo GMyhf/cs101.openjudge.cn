@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - T28776:国王游戏</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>计算思维算法实践</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/pctbook/" class="first">题目</a></li>
+            <li ><a href="/pctbook/ranking/">排名</a></li>
+                    <li ><a href="/pctbook/status/">状态</a></li>
+	    			        <li class="last"><a href="/pctbook/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>T28776:国王游戏</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/pctbook/T28776/">查看</a></li>
+		<li ><a href="/pctbook/T28776/submit/">提交</a></li>
+				<li ><a href="/pctbook/T28776/statistics/">统计</a></li>
+			
+		<li ><a href="/pctbook/clarify/T28776/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p class="md-end-block md-p md-focus"><span class="md-plain md-expand">恰逢 H 国国庆，国王邀请 </span><span id="ty-mjx-31" class="md-inline-math math-jax-postprocess">n</span><span class="md-plain"> 位大臣来玩一个有奖游戏。首先，他让每个大臣在左、右手上面分别写下一个整数，国王自己也在左、右手上各写一个整数。然后，让这 </span><span id="ty-mjx-32" class="md-inline-math math-jax-postprocess">n</span><span class="md-plain"> 位大臣排成一排，国王站在队伍的最前面。排好队后，所有的大臣都会获得国王奖赏的若干金币，每位大臣获得的金币数分别是：排在该大臣前面的所有人的左手上的数的乘积除以他自己右手上的数，然后<span style="color: #e03e2d;">向下取整</span>得到的结果。</span></p>
+<p class="md-end-block md-p md-focus"><span class="md-plain md-expand">国王不希望某一个大臣获得特别多的奖赏，所以他想请你帮他重新安排一下队伍的顺序，使得获得奖赏最多的大臣，所获奖赏尽可能的少。注意，国王的位置始终在队伍的最前面。</span></p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行包含一个整数 n，表示大臣的人数。<br /><br />第二行包含两个整数 a 和 b，之间用一个空格隔开，分别表示国王左手和右手上的整数。<br /><br />接下来 n 行，每行包含两个整数 a 和 b，之间用一个空格隔开，分别表示每个大臣左手和右手上的整数。<br /><br />1 <= n <= 100, 1 <= a,b <= 10。</dd>
+		<dt>输出</dt>
+		<dd>一个整数，表示重新排列后的队伍中获奖赏最多的大臣所获得的金币数。<br />提示：使用C或C++的同学需要实现高精度乘法，否则数据会溢出。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>sample1 input:
+3 
+1 1 
+2 3 
+7 4 
+4 6
+
+sample1 output:
+2
+
+# 
+按 1、2、3 这样排列队伍，获得奖赏最多的大臣所获得金币数为 2；
+按 1、3、2 这样排列队伍，获得奖赏最多的大臣所获得金币数为 2；
+按 2、1、3 这样排列队伍，获得奖赏最多的大臣所获得金币数为 2；
+按 2、3、1这样排列队伍，获得奖赏最多的大臣所获得金币数为 9；
+按 3、1、2这样排列队伍，获得奖赏最多的大臣所获得金币数为 2；
+按 3、2、1 这样排列队伍，获得奖赏最多的大臣所获得金币数为 9。
+因此，奖赏最多的大臣最少获得 2 个金币，答案输出 2。</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>sample2 input:
+18
+10 2
+5 2
+8 8
+8 7
+4 2
+8 1
+7 7
+10 1
+8 5
+4 10
+2 6
+1 1
+1 9
+1 7
+4 7
+1 9
+4 8
+8 9
+4 6
+
+sample2 output:
+3262236444</pre></dd>
+				<dt>提示</dt>
+		<dd>greedy</dd>
+						<dt>来源</dt>
+		<dd>2024 TA-Wjl, https://www.luogu.com.cn/problem/P1080</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/pctbook/T28776/">查看</a></li>
+		<li ><a href="/pctbook/T28776/submit/">提交</a></li>
+				<li ><a href="/pctbook/T28776/statistics/">统计</a></li>
+			
+		<li ><a href="/pctbook/clarify/T28776/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>28776</dd>
+					<dt>添加于</dt>
+			<dd>2025-03-13</dd>
+				<dt>提交次数</dt>
+		<dd>141</dd>
+		<dt>尝试人数</dt>
+	    <dd>65</dd>
+	    <dt>通过人数</dt>
+	    <dd>62</dd>
+	</dl>
+		
+		<h4>Other language verions</h4>
+	<ul>
+				<li><a href="?lang=en_US">English</a></li>
+			</ul>
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

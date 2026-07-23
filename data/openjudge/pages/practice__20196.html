@@ -1,0 +1,206 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 20196:鹅腿阿姨算日期</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>20196:鹅腿阿姨算日期</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/20196/">查看</a></li>
+		<li ><a href="/practice/20196/submit/">提交</a></li>
+				<li ><a href="/practice/20196/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/20196/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p>羊肉串叔叔买买提明·买买提的公历生日就要到了，鹅腿阿姨准备给他一份惊喜——1辣腿。但是买买提明·买买提信奉伊斯兰教，伊斯兰历每年9月（赖买丹月）要封斋。而伊斯兰历是一种纯粹的阴历，一年只有354天（闰年355天），因此在不同的年份，伊斯兰历的同一个月份可能对应着公历的不同月份。这就意味着如果买买提明·买买提的公历生日当天恰好处于伊斯兰历的斋戒月，那么他当天从“邦达”（晨礼）开始直到日落前都不能进食，自然也就无法在白天享用鹅腿阿姨精心准备的1辣腿了。于是，鹅腿阿姨希望算出买买提明·买买提当年的公历生日是伊斯兰历的几月几日，以便决定是否用1辣腿作为送给他的生日礼物。公历（格里高利历）和伊斯兰历之间的转换有如下近似公式：</p><p>(G-621.5774) / 0.970224 ＝ H</p><p>其中：<br />G代表公历年份，月和日以小数形式加在表示年份的整数部分之后。如平年2019年1月10日（0时）对应G=2019+9/365=2019.024658...，又如闰年2020年2月29日（0时）对应G=2020+59/366=2020.161202...。<br />H代表伊斯兰历年份，月和日以小数形式加在表示年份的整数部分之后。如平年1441年1月10日（0时）对应H=1441+9/354=1441.025424...，又如闰年1439年12月30日（0时）对应H=1439+354/355=1439.997183...。</p><p>伊斯兰历平年奇数月30天，偶数月29天，闰年则12月增加一天，有30天。伊斯兰历闰年有如下计算规则，即年份符合：</p><p>x mod 30 = 2、5、7、10、13、16、18、21、24、26、29</p><p>的是闰年，其中mod代表整除取余运算。因此每30年里有11个闰年。</p><p>公历闰年的计算方法是：年份不能被100整除者能被4整除为闰年，能被100整除者能被400整除为闰年。</p><p>现在给出买买提明·买买提的公历生日的日期，请估算出对应的伊斯兰历日期。详见样例解析。</p><p><br /></p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>三个整数，分别代表买买提明·买买提公历生日的年、月、日。</dd>
+		<dt>输出</dt>
+		<dd>三个整数，分别代表根据上述公式估算的买买提明·买买提当年公历生日对应伊斯兰历的年、月、日。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>2020 1 10</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>1441 5 12</pre></dd>
+				<dt>提示</dt>
+		<dd>2020年是闰年，故2020年1月10日（0时）对应G=2020+9/366=2020.02459，代入公式算得H=1441.365283。伊斯兰历1441年是平年，故0.365283*354=129.3101202...，不足一日部分向上取整（设想，一年的第0.3101202天应属于这一年的1月1日，即第1天），因此是当年的第130天，即1441年5月12日。<br />*该题中提供的仅是估算公式，得到的结果与真实伊斯兰历日期可能有偏差，只需输出通过公式计算得到的结果即可。</dd>
+						<dt>来源</dt>
+		<dd>cs101-2019 姜铖</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/20196/">查看</a></li>
+		<li ><a href="/practice/20196/submit/">提交</a></li>
+				<li ><a href="/practice/20196/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/20196/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>20196</dd>
+					<dt>添加于</dt>
+			<dd>2020-01-11</dd>
+				<dt>提交次数</dt>
+		<dd>32</dd>
+		<dt>尝试人数</dt>
+	    <dd>9</dd>
+	    <dt>通过人数</dt>
+	    <dd>5</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

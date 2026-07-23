@@ -1,0 +1,222 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 30381:疯狂动物城</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>30381:疯狂动物城</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/30381/">查看</a></li>
+		<li ><a href="/practice/30381/submit/">提交</a></li>
+				<li ><a href="/practice/30381/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/30381/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>10000ms</dd>
+			<dt>单个测试点时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><dl class="problem-content">
+<dd>
+<div data-page-id="THBKdM1yVojeW9xAMhWcN1vtnlh" data-lark-html-role="root" data-docx-has-block-data="false">
+<div class="ace-line ace-line old-record-id-DHVEdu2i3oyFHSxgvHXc6sy1n94">2026 年，动物城迎来了盛大的马年春节！动物城的市长马飞扬对这个本命年充满了执念，他决定要&ldquo;大展马威，有所作为&rdquo;。他亲自策划了一场史无前例的集卡活动，名为&ldquo;集 N 星颂马年&rdquo;。</div>
+<div class="ace-line ace-line old-record-id-VxmydRtK2oW0r9xTngYcQw3Inrd">你需要集齐一套完整的 <strong>N 种不同的动物城明星卡片</strong>（例如：兔朱迪、狐尼克、夏奇羊等），才能向市政府兑换马飞扬市长的亲笔签名照一张。马市长为此专门聘请了数百万替身来签名，所以签名照数量无限，但兑换卡片严格要求：每兑换一份签名照，需要每种明星卡各一张。</div>
+<div class="ace-line ace-line old-record-id-IzQSd9NnRolg6HxUac8c5u2EnRd">活动中有一种特殊的卡片，名为<strong>万能卡</strong>（据说是马市长通过特殊渠道获得的），它可以替代兑换所需的<strong>任意一张</strong>明星卡。但为了其他卡牌（尤其是自己的卡牌）能更好地流通，马市长规定<strong>一套卡组至多使用一张万能卡</strong>。</div>
+<div class="ace-line ace-line old-record-id-DLtidhlAlouzh6xeyWicFk2wnBh">现在，你拥有第 i 种明星卡 ci 张，以及万能卡 M 张。你的任务是利用手头的所有卡片，集齐<strong>数量最多</strong>的完整套卡，以兑换最多的马市长亲笔签名照。每张卡片（明星卡或万能卡）最多只能使用一次。</div>
+</div>
+</dd>
+</dl></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行包含两个整数 N, M，分别表示明星卡的种类数和万能卡的张数。<br />第二行包含 N 个整数 c1, c2, ... ，cN, 表示每种明星卡的张数。<br />数据满足：2<=N<=50, 0<=M, ci<=500,000,000。</dd>
+		<dt>输出</dt>
+		<dd>输出仅一个整数，即最多可以兑换的马飞扬市长亲笔签名照数目。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>3 4
+1 2 3</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>3
+
+# 解释：1 张明星卡 1，2 张明星卡 2，3 张明星卡 3，以及 4 张万能卡。
+最多可以集齐三套卡片。套组 1: {万能卡, 明星卡 2, 明星卡 3}，
+套组 2: {万能卡, 明星卡 2, 明星卡 3}，套组 3: {明星卡 1, 万能卡, 明星卡 3}。</pre></dd>
+				<dt>提示</dt>
+		<dd>binary search</dd>
+						<dt>来源</dt>
+		<dd>2025fall</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/30381/">查看</a></li>
+		<li ><a href="/practice/30381/submit/">提交</a></li>
+				<li ><a href="/practice/30381/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/30381/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>30381</dd>
+					<dt>添加于</dt>
+			<dd>2025-12-20</dd>
+				<dt>提交次数</dt>
+		<dd>27</dd>
+		<dt>尝试人数</dt>
+	    <dd>14</dd>
+	    <dt>通过人数</dt>
+	    <dd>13</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 19944:这一天星期几</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>计概2024fall每日选做</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/2024fallroutine/" class="first">题目</a></li>
+            <li ><a href="/2024fallroutine/ranking/">排名</a></li>
+                    <li ><a href="/2024fallroutine/status/">状态</a></li>
+	    			        <li class="last"><a href="/2024fallroutine/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>19944:这一天星期几</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/2024fallroutine/19944/">查看</a></li>
+		<li ><a href="/2024fallroutine/19944/submit/">提交</a></li>
+				<li ><a href="/2024fallroutine/19944/statistics/">统计</a></li>
+			
+		<li ><a href="/2024fallroutine/clarify/19944/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p style="margin: 0cm 0cm 8pt;"><span style="font-family: 等线;">在日常生活中，计算某一个具体的日期是星期几，往往需要去翻阅日历。请你</span><span style="font-family: 等线;">帮助更快地计算出每个日期在一星期是第几天。</span></p>
+<p style="margin: 0cm 0cm 8pt;"><span style="font-family: Calibri;"> </span></p>
+<p style="margin: 0cm 0cm 8pt;"><span style="font-family: 等线;">参考：</span></p>
+<p>蔡勒公式（Zeller's congruence），是一种计算任何一日属一星期中哪一日的算法，由德国数学家克里斯提安&middot;蔡勒推算出来，可以计算<span style="color: #222222; font-family: 等线; font-size: 11.5pt; background-color: white;">1582</span><span style="color: #222222; font-family: 等线; font-size: 11.5pt; background-color: white;">年</span><span style="color: #222222; font-family: 等线; font-size: 11.5pt; background-color: white;">10</span><span style="color: #222222; font-family: 等线; font-size: 11.5pt; background-color: white;">月</span><span style="color: #222222; font-family: 等线; font-size: 11.5pt; background-color: white;">15</span><span style="color: #222222; font-family: 微软雅黑; font-size: 11.5pt; background-color: white;">日之后的情况</span>。</p>
+<p><span style="font-family: 等线;"><img src="http://media.openjudge.cn/images/upload/1575881738.png" width="523" height="60" /></span></p>
+<p><span style="font-family: 等线;"> </span></p>
+<p style="margin: 0cm 0cm 8pt;"><span style="font-family: 等线;">公式都是基于公历的置闰规则来考虑。</span></p>
+<p style="margin: 0cm 0cm 8pt;"><span style="font-family: Calibri;"> </span></p>
+<p style="margin: 0cm 0cm 8pt;"><span style="font-family: 等线;">公式中的符号含义如下：</span></p>
+<p style="margin: 0cm 0cm 8pt;"><span style="font-family: Calibri;"> </span></p>
+<p style="margin: 0cm 0cm 8pt;"><span style="font-family: Calibri;">w</span><span style="font-family: 等线;">：星期（计算所得的数值对应的星期：</span><span lang="EN-US">0-Sunday</span><span style="font-family: Calibri; font-size: 11pt;">；</span><span lang="EN-US">1-Monday</span><span style="font-family: Calibri; font-size: 11pt;">；</span><span lang="EN-US">2-Tuesday</span><span style="font-family: Calibri; font-size: 11pt;">；</span><span lang="EN-US">3-Wednesday</span><span style="font-family: Calibri; font-size: 11pt;">；</span><span lang="EN-US">4-Thursday</span><span style="font-family: Calibri; font-size: 11pt;">；</span><span lang="EN-US">5-Friday</span><span style="font-family: Calibri; font-size: 11pt;">；</span><span lang="EN-US">6-Saturday</span></p>
+<p style="margin: 0cm 0cm 8pt;"><span style="font-family: Calibri;">c</span><span style="font-family: 等线;">：年份前两位数</span></p>
+<p style="margin: 0cm 0cm 8pt;"><span style="font-family: Calibri;">y</span><span style="font-family: 等线;">：年份后两位数</span></p>
+<p style="margin: 0cm 0cm 8pt;"><span style="font-family: Calibri;">m</span><span style="font-family: 等线;">：月（</span><strong><span style="font-family: Calibri;">m</span></strong><strong><span style="font-family: 等线;">的取值范围为</span><span style="font-family: Calibri;">3</span></strong><strong><span style="font-family: 等线;">至</span><span style="font-family: Calibri;">14</span></strong><strong><span style="font-family: 等线;">，即在蔡勒公式中，某年的</span><span style="font-family: Calibri;">1</span></strong><strong><span style="font-family: 等线;">、</span><span style="font-family: Calibri;">2</span></strong><strong><span style="font-family: 等线;">月要看作上一年的</span><span style="font-family: Calibri;">13</span></strong><strong><span style="font-family: 等线;">、</span><span style="font-family: Calibri;">14</span></strong><strong><span style="font-family: 等线;">月来计算，比如</span><span style="font-family: Calibri;">2003</span></strong><strong><span style="font-family: 等线;">年</span><span style="font-family: Calibri;">1</span></strong><strong><span style="font-family: 等线;">月</span><span style="font-family: Calibri;">1</span></strong><strong><span style="font-family: 等线;">日要看作</span><span style="font-family: Calibri;">2002</span></strong><strong><span style="font-family: 等线;">年的</span><span style="font-family: Calibri;">13</span></strong><strong><span style="font-family: 等线;">月</span><span style="font-family: Calibri;">1</span></strong><strong><span style="font-family: 等线;">日来计算</span></strong><span style="font-family: 等线;">）</span></p>
+<p style="margin: 0cm 0cm 8pt;"><span style="font-family: Calibri;">d</span><span style="font-family: 等线;">：日</span></p>
+<p style="margin: 0cm 0cm 8pt;"><span style="font-family: Calibri;">[ ]</span><span style="font-family: 等线;">：称作高斯符号，代表向下取整，即，取不大于原数的最大整数。</span></p>
+<p>mod：同余（这里代表括号里的答案除以7后的余数）</p>
+<p> </p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行1个整数n，代表输入日期的个数。<br />接下来n行分别为n个以8位数字表示的日期，如20190101<br />保证所有输入都在蔡勒公式的计算范围之内。</dd>
+		<dt>输出</dt>
+		<dd>共n行，每行为该日期对应的weekday名称（Sunday,  Monday, Tuesday, Wednesday, Thursday, Friday, Saturday）。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>15
+19850706
+19710710
+20041125
+20141220
+19841128
+19760429
+19931102
+19951002
+20161006
+20151226
+19790715
+20080410
+20091104
+19910621
+19891012</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>Saturday
+Saturday
+Thursday
+Saturday
+Wednesday
+Thursday
+Tuesday
+Monday
+Thursday
+Saturday
+Sunday
+Thursday
+Wednesday
+Friday
+Thursday</pre></dd>
+				<dt>提示</dt>
+		<dd>2020/11/13 增加说明：<br />当年份为整百，如果截取两位，月份为1或2时，会导致y=-1，而c比正确值大1。<br />如19000101，正确结果是Monday.</dd>
+						<dt>来源</dt>
+		<dd>cs101 2019 Final Exam</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/2024fallroutine/19944/">查看</a></li>
+		<li ><a href="/2024fallroutine/19944/submit/">提交</a></li>
+				<li ><a href="/2024fallroutine/19944/statistics/">统计</a></li>
+			
+		<li ><a href="/2024fallroutine/clarify/19944/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>19944</dd>
+					<dt>添加于</dt>
+			<dd>2024-09-12</dd>
+				<dt>提交次数</dt>
+		<dd>408</dd>
+		<dt>尝试人数</dt>
+	    <dd>140</dd>
+	    <dt>通过人数</dt>
+	    <dd>134</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

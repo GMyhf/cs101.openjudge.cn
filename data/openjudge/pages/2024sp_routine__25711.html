@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 25711:推免工作</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>数算2024spring每日选做</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/2024sp_routine/" class="first">题目</a></li>
+            <li ><a href="/2024sp_routine/ranking/">排名</a></li>
+                    <li ><a href="/2024sp_routine/status/">状态</a></li>
+	    			        <li class="last"><a href="/2024sp_routine/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>25711:推免工作</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/2024sp_routine/25711/">查看</a></li>
+		<li ><a href="/2024sp_routine/25711/submit/">提交</a></li>
+				<li ><a href="/2024sp_routine/25711/statistics/">统计</a></li>
+			
+		<li ><a href="/2024sp_routine/clarify/25711/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65535kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p>一年一度的保研时间又到了，XX大学XX学院即将准备推免工作。为简化问题，我们假设该学院仅按照平均绩点来进行排名，不考虑挂科，综测排名等各种因素。</p>
+<p>推免优先级按照学生的平均绩点来决定，平均绩点更高的同学比平均绩点更低的同学更优先获得推免资格。(输入数据保证同学绩点均不相同，无需考虑绩点相同的情况）</p>
+<p>当某门课的得分低于60分时，该门课程绩点为0，当得分score满足60&lt;=score&lt;=100时，分数和绩点的转换公式如下：</p>
+<p>gpa=4-3*(100-score)**2/1600</p>
+<p>每门课程的绩点按照 该课程的学分/总学分 的权重进行加权平均，得到平均绩点。</p>
+<p>例如，一个同学修过三门课，三门课绩点分别是2.0,3.0,4.0 ； 三门课学分分别是2，3，3 ; 则该学生所修总学分为2+3+3=8，则三门课对应的权重分别为2/8, 3/8, 3/8</p>
+<p>该同学平均绩点为：2.0*(2/8)+3.0*(3/8)+4.0*(3/8)=3.125</p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行输入两个整数N和M，并用空格隔开，表示总共有N个同学，M个推免资格<br />下面是N行，每行表示一个学生的信息（保证一个同学的信息仅出现1次，不会重复出现）：<br />第1个数据表示该学生的学号，后面的数据两两一组，表示该学生所修某门课程的得分和该课程的学分，学分一定是整数，得分可能带有小数。数据间用空格隔开。<br />例如"2201111002 78 5 80 2"表示学号为2201111002的同学选修过2门课，第一门5学分得分78，第二门2学分得分80</dd>
+		<dt>输出</dt>
+		<dd>输出共一行，输出所有获得推免同学的学号，中间用空格隔开（按照平均绩点高的在前的顺序输出，输入数据保证不存在绩点相同的同学）</dd>
+		<dt>样例输入</dt>
+		<dd><pre>5 3
+2201111000 80 5 78 3 95 2
+2201111001 59 2 67 3 60 4 57 2
+2201111002 78 5 80 2
+2201111003 60 2 100 5
+2201111004 78 4 84 2</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>2201111000 2201111004 2201111003</pre></dd>
+						</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/2024sp_routine/25711/">查看</a></li>
+		<li ><a href="/2024sp_routine/25711/submit/">提交</a></li>
+				<li ><a href="/2024sp_routine/25711/statistics/">统计</a></li>
+			
+		<li ><a href="/2024sp_routine/clarify/25711/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>25711</dd>
+					<dt>添加于</dt>
+			<dd>2024-03-28</dd>
+				<dt>提交次数</dt>
+		<dd>72</dd>
+		<dt>尝试人数</dt>
+	    <dd>36</dd>
+	    <dt>通过人数</dt>
+	    <dd>35</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

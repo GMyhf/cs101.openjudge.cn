@@ -1,0 +1,232 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 29954:逃离紫罗兰监狱</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>29954:逃离紫罗兰监狱</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/29954/">查看</a></li>
+		<li ><a href="/practice/29954/submit/">提交</a></li>
+				<li ><a href="/practice/29954/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/29954/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p>作为一名强大的肯瑞托大法师，你在巡视达拉然的紫罗兰监狱时，牢房突然失控，你被困在了一片禁魔区域中！这片区域可以被视为一个 <code>R x C</code> 的网格。</p>
+<p>网格地形如下：</p>
+<ul>
+<li>
+<p><code>.</code> : 开放的走廊，可以安全移动。</p>
+</li>
+<li>
+<p><code>#</code> : 闪烁的魔法屏障，阻挡了你的去路。</p>
+</li>
+<li>
+<p><code>S</code> : 你被困的初始位置。</p>
+</li>
+<li>
+<p><code>E</code> : 区域的紧急传送出口。</p>
+</li>
+</ul>
+<p>幸运的是，你对空间魔法的精通使你依然能勉强使用招牌技能&mdash;&mdash;&ldquo;闪现术&rdquo;。由于禁魔区域的干扰，你的法力只够支撑你施展<strong>最多</strong> K 次闪现术<span style="color: #e03e2d;">，且</span><span style="color: #e03e2d;">你的闪现术无法直接抵达魔法屏障另一边的位置，只能让你暂时留存于屏障内。当然，你在屏障中时可以正常移动到开放的走廊，如果有足够的法力也可以继续使用闪现术移动到其他相邻魔法屏障内。</span></p>
+<p>你现在想尽快地逃离紫罗兰监狱，于是你开始计算从 <code>S</code> 点抵达出口 <code>E</code> 所需要的最少行动次数。无论是正常移动到相邻<span style="color: #e03e2d;">（上、下、左、右）</span>的走廊，还是使用一次闪现术穿过屏障，都算作一次行动。</p>
+<p><span style="color: #e03e2d;"><strong>移动规则补充说明：<br /></strong>你的每一次行动，都是从当前所在的格子，向其<strong>上、下、左、右</strong>四个方向中的一个<strong>相邻格子</strong>进行移动。每次移动，无论是否使用闪现术，都记为 <strong>1 次行动</strong>。</span></p>
+<p><span style="color: #e03e2d;">是否消耗法力（或&rdquo;闪现术次数&rdquo;）仅由你的<strong>目标格子</strong>类型决定：</span></p>
+<p><span style="color: #e03e2d;">如果你的<strong>目标格子</strong>是走廊 <code>.</code>：不消耗闪现术次数；</span></p>
+<p><span style="color: #e03e2d;">如果你的<strong>目标格子</strong>是屏障 <code>#</code>：你必须消耗 <strong>1 次闪现术次数</strong>才能完成移动。（如果你没有剩余闪现术次数，则此路不通）。</span></p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行包含三个整数 R, C, K (1 <= R, C <= 100, 0 <= K <= 10)。<br /><br />接下来 R 行，每行 C 个字符，描述监狱区域的布局。</dd>
+		<dt>输出</dt>
+		<dd>输出一个整数，代表最短行动次数。如果无法到达，输出 -1。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>5 5 1
+S.###
+.#.#.
+.#.##
+..#.#
+###.E</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>8</pre></dd>
+				<dt>提示</dt>
+		<dd>tag: bfs</dd>
+						<dt>来源</dt>
+		<dd>2025 TA-lxy</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/29954/">查看</a></li>
+		<li ><a href="/practice/29954/submit/">提交</a></li>
+				<li ><a href="/practice/29954/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/29954/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>29954</dd>
+					<dt>添加于</dt>
+			<dd>2025-10-10</dd>
+				<dt>提交次数</dt>
+		<dd>444</dd>
+		<dt>尝试人数</dt>
+	    <dd>158</dd>
+	    <dt>通过人数</dt>
+	    <dd>155</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

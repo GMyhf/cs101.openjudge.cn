@@ -1,0 +1,960 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - OpenJudge - 题目</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<div id="main" class="col-9">
+	<p class="page-bar">
+		<span class="pages">
+				
+			<span class="current">1</span>
+			
+					<a href="?page=2">2</a>
+					<a href="?page=3">3</a>
+					<a href="?page=4">4</a>
+					<a href="?page=5">5</a>
+					<a href="?page=6">6</a>
+					<a href="?page=7">7</a>
+					<a href="?page=8">8</a>
+					<a href="?page=9">9</a>
+					<a href="?page=10">10</a>
+	</span>
+	</p>
+	<div id="problemsList">
+		<table>
+	<thead>
+		<tr>
+						<td class="problem-id">题目ID</td>
+			<td class="title">标题</td>
+			            						<td class="ratio">通过率</td>
+			<td class="accepted">通过人数</td>
+			<td class="submissions">尝试人数</td>
+						
+		</tr>
+	</thead>
+	<tbody>
+			<tr>
+						<td class="problem-id"><a href="/practice/00000/">00000</a></td>
+			<td class="title"><a href="/practice/00000/">猫猫测效率</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/practice/00000/statistics/">24</a></td>
+			<td class="submissions"><a href="/practice/00000/statistics/">25</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01001/">01001</a></td>
+			<td class="title"><a href="/practice/01001/">Exponentiation</a></td>
+			            						<td class="ratio">60%</td>
+			<td class="accepted"><a href="/practice/01001/statistics/">29</a></td>
+			<td class="submissions"><a href="/practice/01001/statistics/">48</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01002/">01002</a></td>
+			<td class="title"><a href="/practice/01002/">方便记忆的电话号码</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/practice/01002/statistics/">70</a></td>
+			<td class="submissions"><a href="/practice/01002/statistics/">80</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01003/">01003</a></td>
+			<td class="title"><a href="/practice/01003/">Hangover</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/practice/01003/statistics/">568</a></td>
+			<td class="submissions"><a href="/practice/01003/statistics/">590</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01004/">01004</a></td>
+			<td class="title"><a href="/practice/01004/">财务管理</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/practice/01004/statistics/">84</a></td>
+			<td class="submissions"><a href="/practice/01004/statistics/">86</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01005/">01005</a></td>
+			<td class="title"><a href="/practice/01005/">I Think I Need a Houseboat</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/practice/01005/statistics/">471</a></td>
+			<td class="submissions"><a href="/practice/01005/statistics/">483</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01006/">01006</a></td>
+			<td class="title"><a href="/practice/01006/">Biorhythms</a></td>
+			            						<td class="ratio">86%</td>
+			<td class="accepted"><a href="/practice/01006/statistics/">19</a></td>
+			<td class="submissions"><a href="/practice/01006/statistics/">22</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01007/">01007</a></td>
+			<td class="title"><a href="/practice/01007/">DNA排序</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/practice/01007/statistics/">49</a></td>
+			<td class="submissions"><a href="/practice/01007/statistics/">52</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01008/">01008</a></td>
+			<td class="title"><a href="/practice/01008/">Maya Calendar</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/practice/01008/statistics/">436</a></td>
+			<td class="submissions"><a href="/practice/01008/statistics/">447</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01011/">01011</a></td>
+			<td class="title"><a href="/practice/01011/">Sticks</a></td>
+			            						<td class="ratio">57%</td>
+			<td class="accepted"><a href="/practice/01011/statistics/">52</a></td>
+			<td class="submissions"><a href="/practice/01011/statistics/">91</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01017/">01017</a></td>
+			<td class="title"><a href="/practice/01017/">装箱问题</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/practice/01017/statistics/">980</a></td>
+			<td class="submissions"><a href="/practice/01017/statistics/">1114</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01019/">01019</a></td>
+			<td class="title"><a href="/practice/01019/">Number Sequence</a></td>
+			            						<td class="ratio">87%</td>
+			<td class="accepted"><a href="/practice/01019/statistics/">62</a></td>
+			<td class="submissions"><a href="/practice/01019/statistics/">71</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01021/">01021</a></td>
+			<td class="title"><a href="/practice/01021/">2D-Nim</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01021/statistics/">3</a></td>
+			<td class="submissions"><a href="/practice/01021/statistics/">3</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01026/">01026</a></td>
+			<td class="title"><a href="/practice/01026/">Cipher</a></td>
+			            						<td class="ratio">85%</td>
+			<td class="accepted"><a href="/practice/01026/statistics/">17</a></td>
+			<td class="submissions"><a href="/practice/01026/statistics/">20</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01035/">01035</a></td>
+			<td class="title"><a href="/practice/01035/">拼写检查</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01035/statistics/">20</a></td>
+			<td class="submissions"><a href="/practice/01035/statistics/">20</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01037/">01037</a></td>
+			<td class="title"><a href="/practice/01037/">A decorative fence</a></td>
+			            						<td class="ratio">69%</td>
+			<td class="accepted"><a href="/practice/01037/statistics/">9</a></td>
+			<td class="submissions"><a href="/practice/01037/statistics/">13</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01042/">01042</a></td>
+			<td class="title"><a href="/practice/01042/">Gone Fishing</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/practice/01042/statistics/">37</a></td>
+			<td class="submissions"><a href="/practice/01042/statistics/">39</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01047/">01047</a></td>
+			<td class="title"><a href="/practice/01047/">Round and Round We Go</a></td>
+			            						<td class="ratio">92%</td>
+			<td class="accepted"><a href="/practice/01047/statistics/">34</a></td>
+			<td class="submissions"><a href="/practice/01047/statistics/">37</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01050/">01050</a></td>
+			<td class="title"><a href="/practice/01050/">To the Max</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01050/statistics/">7</a></td>
+			<td class="submissions"><a href="/practice/01050/statistics/">7</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01056/">01056</a></td>
+			<td class="title"><a href="/practice/01056/">IMMEDIATE DECODABILITY</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01056/statistics/">9</a></td>
+			<td class="submissions"><a href="/practice/01056/statistics/">9</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01061/">01061</a></td>
+			<td class="title"><a href="/practice/01061/">青蛙的约会</a></td>
+			            						<td class="ratio">90%</td>
+			<td class="accepted"><a href="/practice/01061/statistics/">28</a></td>
+			<td class="submissions"><a href="/practice/01061/statistics/">31</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01062/">01062</a></td>
+			<td class="title"><a href="/practice/01062/">昂贵的聘礼</a></td>
+			            						<td class="ratio">92%</td>
+			<td class="accepted"><a href="/practice/01062/statistics/">12</a></td>
+			<td class="submissions"><a href="/practice/01062/statistics/">13</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01064/">01064</a></td>
+			<td class="title"><a href="/practice/01064/">网线主管</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/practice/01064/statistics/">42</a></td>
+			<td class="submissions"><a href="/practice/01064/statistics/">44</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01065/">01065</a></td>
+			<td class="title"><a href="/practice/01065/">Wooden Sticks</a></td>
+			            						<td class="ratio">96%</td>
+			<td class="accepted"><a href="/practice/01065/statistics/">24</a></td>
+			<td class="submissions"><a href="/practice/01065/statistics/">25</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01067/">01067</a></td>
+			<td class="title"><a href="/practice/01067/">取石子游戏</a></td>
+			            						<td class="ratio">71%</td>
+			<td class="accepted"><a href="/practice/01067/statistics/">29</a></td>
+			<td class="submissions"><a href="/practice/01067/statistics/">41</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01068/">01068</a></td>
+			<td class="title"><a href="/practice/01068/">Parencodings</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01068/statistics/">8</a></td>
+			<td class="submissions"><a href="/practice/01068/statistics/">8</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01073/">01073</a></td>
+			<td class="title"><a href="/practice/01073/">The Willy Memorial Program</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01073/statistics/">2</a></td>
+			<td class="submissions"><a href="/practice/01073/statistics/">2</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01077/">01077</a></td>
+			<td class="title"><a href="/practice/01077/">Eight</a></td>
+			            						<td class="ratio">92%</td>
+			<td class="accepted"><a href="/practice/01077/statistics/">12</a></td>
+			<td class="submissions"><a href="/practice/01077/statistics/">13</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01080/">01080</a></td>
+			<td class="title"><a href="/practice/01080/">Human Gene Functions</a></td>
+			            						<td class="ratio">80%</td>
+			<td class="accepted"><a href="/practice/01080/statistics/">12</a></td>
+			<td class="submissions"><a href="/practice/01080/statistics/">15</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01084/">01084</a></td>
+			<td class="title"><a href="/practice/01084/">正方形破坏者</a></td>
+			            						<td class="ratio">83%</td>
+			<td class="accepted"><a href="/practice/01084/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01084/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01088/">01088</a></td>
+			<td class="title"><a href="/practice/01088/">滑雪</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/01088/statistics/">565</a></td>
+			<td class="submissions"><a href="/practice/01088/statistics/">584</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01089/">01089</a></td>
+			<td class="title"><a href="/practice/01089/">Intervals</a></td>
+			            						<td class="ratio">84%</td>
+			<td class="accepted"><a href="/practice/01089/statistics/">16</a></td>
+			<td class="submissions"><a href="/practice/01089/statistics/">19</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01091/">01091</a></td>
+			<td class="title"><a href="/practice/01091/">跳蚤</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01091/statistics/">9</a></td>
+			<td class="submissions"><a href="/practice/01091/statistics/">9</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01094/">01094</a></td>
+			<td class="title"><a href="/practice/01094/">Sorting It All Out</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/01094/statistics/">34</a></td>
+			<td class="submissions"><a href="/practice/01094/statistics/">35</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01095/">01095</a></td>
+			<td class="title"><a href="/practice/01095/">Trees Made to Order</a></td>
+			            						<td class="ratio">86%</td>
+			<td class="accepted"><a href="/practice/01095/statistics/">6</a></td>
+			<td class="submissions"><a href="/practice/01095/statistics/">7</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01113/">01113</a></td>
+			<td class="title"><a href="/practice/01113/">Wall</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01113/statistics/">6</a></td>
+			<td class="submissions"><a href="/practice/01113/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01114/">01114</a></td>
+			<td class="title"><a href="/practice/01114/">Chemical Reactions</a></td>
+			            						<td class="ratio">50%</td>
+			<td class="accepted"><a href="/practice/01114/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01114/statistics/">10</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01125/">01125</a></td>
+			<td class="title"><a href="/practice/01125/">Stockbroker Grapevine</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01125/statistics/">7</a></td>
+			<td class="submissions"><a href="/practice/01125/statistics/">7</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01129/">01129</a></td>
+			<td class="title"><a href="/practice/01129/">Channel Allocation</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01129/statistics/">3</a></td>
+			<td class="submissions"><a href="/practice/01129/statistics/">3</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01145/">01145</a></td>
+			<td class="title"><a href="/practice/01145/">Tree Summing</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/01145/statistics/">28</a></td>
+			<td class="submissions"><a href="/practice/01145/statistics/">29</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01154/">01154</a></td>
+			<td class="title"><a href="/practice/01154/">LETTERS</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01154/statistics/">9</a></td>
+			<td class="submissions"><a href="/practice/01154/statistics/">9</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01159/">01159</a></td>
+			<td class="title"><a href="/practice/01159/">Palindrome</a></td>
+			            						<td class="ratio">95%</td>
+			<td class="accepted"><a href="/practice/01159/statistics/">19</a></td>
+			<td class="submissions"><a href="/practice/01159/statistics/">20</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01160/">01160</a></td>
+			<td class="title"><a href="/practice/01160/">Post Office</a></td>
+			            						<td class="ratio">90%</td>
+			<td class="accepted"><a href="/practice/01160/statistics/">9</a></td>
+			<td class="submissions"><a href="/practice/01160/statistics/">10</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01163/">01163</a></td>
+			<td class="title"><a href="/practice/01163/">The Triangle</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/01163/statistics/">34</a></td>
+			<td class="submissions"><a href="/practice/01163/statistics/">35</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01164/">01164</a></td>
+			<td class="title"><a href="/practice/01164/">The Castle</a></td>
+			            						<td class="ratio">83%</td>
+			<td class="accepted"><a href="/practice/01164/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01164/statistics/">6</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01166/">01166</a></td>
+			<td class="title"><a href="/practice/01166/">The Clocks</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01166/statistics/">6</a></td>
+			<td class="submissions"><a href="/practice/01166/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01178/">01178</a></td>
+			<td class="title"><a href="/practice/01178/">Camelot</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01178/statistics/">2</a></td>
+			<td class="submissions"><a href="/practice/01178/statistics/">2</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01182/">01182</a></td>
+			<td class="title"><a href="/practice/01182/">食物链</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/practice/01182/statistics/">169</a></td>
+			<td class="submissions"><a href="/practice/01182/statistics/">186</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01183/">01183</a></td>
+			<td class="title"><a href="/practice/01183/">反正切函数的应用</a></td>
+			            						<td class="ratio">90%</td>
+			<td class="accepted"><a href="/practice/01183/statistics/">19</a></td>
+			<td class="submissions"><a href="/practice/01183/statistics/">21</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01184/">01184</a></td>
+			<td class="title"><a href="/practice/01184/">聪明的打字员</a></td>
+			            						<td class="ratio">71%</td>
+			<td class="accepted"><a href="/practice/01184/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01184/statistics/">7</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01185/">01185</a></td>
+			<td class="title"><a href="/practice/01185/">炮兵阵地</a></td>
+			            						<td class="ratio">80%</td>
+			<td class="accepted"><a href="/practice/01185/statistics/">8</a></td>
+			<td class="submissions"><a href="/practice/01185/statistics/">10</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01190/">01190</a></td>
+			<td class="title"><a href="/practice/01190/">生日蛋糕</a></td>
+			            						<td class="ratio">77%</td>
+			<td class="accepted"><a href="/practice/01190/statistics/">10</a></td>
+			<td class="submissions"><a href="/practice/01190/statistics/">13</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01191/">01191</a></td>
+			<td class="title"><a href="/practice/01191/">棋盘分割</a></td>
+			            						<td class="ratio">79%</td>
+			<td class="accepted"><a href="/practice/01191/statistics/">19</a></td>
+			<td class="submissions"><a href="/practice/01191/statistics/">24</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01193/">01193</a></td>
+			<td class="title"><a href="/practice/01193/">内存分配</a></td>
+			            						<td class="ratio">125%</td>
+			<td class="accepted"><a href="/practice/01193/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01193/statistics/">4</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01204/">01204</a></td>
+			<td class="title"><a href="/practice/01204/">Word Puzzles</a></td>
+			            						<td class="ratio">83%</td>
+			<td class="accepted"><a href="/practice/01204/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01204/statistics/">6</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01218/">01218</a></td>
+			<td class="title"><a href="/practice/01218/">THE DRUNK JAILER</a></td>
+			            						<td class="ratio">99%</td>
+			<td class="accepted"><a href="/practice/01218/statistics/">476</a></td>
+			<td class="submissions"><a href="/practice/01218/statistics/">482</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01230/">01230</a></td>
+			<td class="title"><a href="/practice/01230/">Pass-Muraille</a></td>
+			            						<td class="ratio">83%</td>
+			<td class="accepted"><a href="/practice/01230/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01230/statistics/">6</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01236/">01236</a></td>
+			<td class="title"><a href="/practice/01236/">Network of Schools</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01236/statistics/">71</a></td>
+			<td class="submissions"><a href="/practice/01236/statistics/">71</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01240/">01240</a></td>
+			<td class="title"><a href="/practice/01240/">Pre-Post-erous!</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01240/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01240/statistics/">5</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01248/">01248</a></td>
+			<td class="title"><a href="/practice/01248/">Safecracker</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01248/statistics/">4</a></td>
+			<td class="submissions"><a href="/practice/01248/statistics/">4</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01251/">01251</a></td>
+			<td class="title"><a href="/practice/01251/">丛林中的路</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01251/statistics/">8</a></td>
+			<td class="submissions"><a href="/practice/01251/statistics/">8</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01258/">01258</a></td>
+			<td class="title"><a href="/practice/01258/">Agri-Net</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/practice/01258/statistics/">282</a></td>
+			<td class="submissions"><a href="/practice/01258/statistics/">287</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01269/">01269</a></td>
+			<td class="title"><a href="/practice/01269/">Intersecting Lines</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01269/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01269/statistics/">5</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01273/">01273</a></td>
+			<td class="title"><a href="/practice/01273/">Drainage Ditches</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01273/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01273/statistics/">5</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01276/">01276</a></td>
+			<td class="title"><a href="/practice/01276/">Cash Machine</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01276/statistics/">3</a></td>
+			<td class="submissions"><a href="/practice/01276/statistics/">3</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01307/">01307</a></td>
+			<td class="title"><a href="/practice/01307/">Mapping the Route</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01307/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01307/statistics/">5</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01308/">01308</a></td>
+			<td class="title"><a href="/practice/01308/">Is It A Tree?</a></td>
+			            						<td class="ratio">78%</td>
+			<td class="accepted"><a href="/practice/01308/statistics/">7</a></td>
+			<td class="submissions"><a href="/practice/01308/statistics/">9</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01321/">01321</a></td>
+			<td class="title"><a href="/practice/01321/">棋盘问题</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/practice/01321/statistics/">63</a></td>
+			<td class="submissions"><a href="/practice/01321/statistics/">64</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01324/">01324</a></td>
+			<td class="title"><a href="/practice/01324/">Holedox Moving</a></td>
+			            						<td class="ratio">67%</td>
+			<td class="accepted"><a href="/practice/01324/statistics/">2</a></td>
+			<td class="submissions"><a href="/practice/01324/statistics/">3</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01328/">01328</a></td>
+			<td class="title"><a href="/practice/01328/">Radar Installation</a></td>
+			            						<td class="ratio">94%</td>
+			<td class="accepted"><a href="/practice/01328/statistics/">511</a></td>
+			<td class="submissions"><a href="/practice/01328/statistics/">543</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01376/">01376</a></td>
+			<td class="title"><a href="/practice/01376/">Robot</a></td>
+			            						<td class="ratio">90%</td>
+			<td class="accepted"><a href="/practice/01376/statistics/">9</a></td>
+			<td class="submissions"><a href="/practice/01376/statistics/">10</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01384/">01384</a></td>
+			<td class="title"><a href="/practice/01384/">Piggy-Bank</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/practice/01384/statistics/">220</a></td>
+			<td class="submissions"><a href="/practice/01384/statistics/">224</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01390/">01390</a></td>
+			<td class="title"><a href="/practice/01390/">Blocks</a></td>
+			            						<td class="ratio">67%</td>
+			<td class="accepted"><a href="/practice/01390/statistics/">4</a></td>
+			<td class="submissions"><a href="/practice/01390/statistics/">6</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01426/">01426</a></td>
+			<td class="title"><a href="/practice/01426/">Find The Multiple</a></td>
+			            						<td class="ratio">98%</td>
+			<td class="accepted"><a href="/practice/01426/statistics/">153</a></td>
+			<td class="submissions"><a href="/practice/01426/statistics/">156</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01458/">01458</a></td>
+			<td class="title"><a href="/practice/01458/">Common Subsequence</a></td>
+			            						<td class="ratio">91%</td>
+			<td class="accepted"><a href="/practice/01458/statistics/">30</a></td>
+			<td class="submissions"><a href="/practice/01458/statistics/">33</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01459/">01459</a></td>
+			<td class="title"><a href="/practice/01459/">Power Network</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01459/statistics/">3</a></td>
+			<td class="submissions"><a href="/practice/01459/statistics/">3</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01481/">01481</a></td>
+			<td class="title"><a href="/practice/01481/">The Die Is Cast</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01481/statistics/">3</a></td>
+			<td class="submissions"><a href="/practice/01481/statistics/">3</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01548/">01548</a></td>
+			<td class="title"><a href="/practice/01548/">Robots</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01548/statistics/">2</a></td>
+			<td class="submissions"><a href="/practice/01548/statistics/">2</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01577/">01577</a></td>
+			<td class="title"><a href="/practice/01577/">Falling Leaves</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/01577/statistics/">99</a></td>
+			<td class="submissions"><a href="/practice/01577/statistics/">102</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01581/">01581</a></td>
+			<td class="title"><a href="/practice/01581/">A Contesting Decision</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01581/statistics/">2</a></td>
+			<td class="submissions"><a href="/practice/01581/statistics/">2</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01610/">01610</a></td>
+			<td class="title"><a href="/practice/01610/">四分树</a></td>
+			            						<td class="ratio">83%</td>
+			<td class="accepted"><a href="/practice/01610/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01610/statistics/">6</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01611/">01611</a></td>
+			<td class="title"><a href="/practice/01611/">The Suspects</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01611/statistics/">53</a></td>
+			<td class="submissions"><a href="/practice/01611/statistics/">53</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01657/">01657</a></td>
+			<td class="title"><a href="/practice/01657/">Distance on Chessboard</a></td>
+			            						<td class="ratio">90%</td>
+			<td class="accepted"><a href="/practice/01657/statistics/">260</a></td>
+			<td class="submissions"><a href="/practice/01657/statistics/">289</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01661/">01661</a></td>
+			<td class="title"><a href="/practice/01661/">帮助 Jimmy</a></td>
+			            						<td class="ratio">83%</td>
+			<td class="accepted"><a href="/practice/01661/statistics/">143</a></td>
+			<td class="submissions"><a href="/practice/01661/statistics/">172</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01664/">01664</a></td>
+			<td class="title"><a href="/practice/01664/">放苹果</a></td>
+			            						<td class="ratio">97%</td>
+			<td class="accepted"><a href="/practice/01664/statistics/">64</a></td>
+			<td class="submissions"><a href="/practice/01664/statistics/">66</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01686/">01686</a></td>
+			<td class="title"><a href="/practice/01686/">等价表达式</a></td>
+			            						<td class="ratio">83%</td>
+			<td class="accepted"><a href="/practice/01686/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01686/statistics/">6</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01696/">01696</a></td>
+			<td class="title"><a href="/practice/01696/">Space Ant</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01696/statistics/">2</a></td>
+			<td class="submissions"><a href="/practice/01696/statistics/">2</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01702/">01702</a></td>
+			<td class="title"><a href="/practice/01702/">Eva's Balance</a></td>
+			            						<td class="ratio">86%</td>
+			<td class="accepted"><a href="/practice/01702/statistics/">6</a></td>
+			<td class="submissions"><a href="/practice/01702/statistics/">7</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01703/">01703</a></td>
+			<td class="title"><a href="/practice/01703/">发现它，抓住它</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01703/statistics/">21</a></td>
+			<td class="submissions"><a href="/practice/01703/statistics/">21</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01724/">01724</a></td>
+			<td class="title"><a href="/practice/01724/">ROADS</a></td>
+			            						<td class="ratio">82%</td>
+			<td class="accepted"><a href="/practice/01724/statistics/">23</a></td>
+			<td class="submissions"><a href="/practice/01724/statistics/">28</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01729/">01729</a></td>
+			<td class="title"><a href="/practice/01729/">Jack and Jill</a></td>
+			            						<td class="ratio">75%</td>
+			<td class="accepted"><a href="/practice/01729/statistics/">3</a></td>
+			<td class="submissions"><a href="/practice/01729/statistics/">4</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01742/">01742</a></td>
+			<td class="title"><a href="/practice/01742/">Coins</a></td>
+			            						<td class="ratio">61%</td>
+			<td class="accepted"><a href="/practice/01742/statistics/">23</a></td>
+			<td class="submissions"><a href="/practice/01742/statistics/">38</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01753/">01753</a></td>
+			<td class="title"><a href="/practice/01753/">Flip Game</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01753/statistics/">8</a></td>
+			<td class="submissions"><a href="/practice/01753/statistics/">8</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01760/">01760</a></td>
+			<td class="title"><a href="/practice/01760/">Disk Tree</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01760/statistics/">8</a></td>
+			<td class="submissions"><a href="/practice/01760/statistics/">8</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01789/">01789</a></td>
+			<td class="title"><a href="/practice/01789/">Truck History</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01789/statistics/">8</a></td>
+			<td class="submissions"><a href="/practice/01789/statistics/">8</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01816/">01816</a></td>
+			<td class="title"><a href="/practice/01816/">Wild Words</a></td>
+			            						<td class="ratio">60%</td>
+			<td class="accepted"><a href="/practice/01816/statistics/">3</a></td>
+			<td class="submissions"><a href="/practice/01816/statistics/">5</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01828/">01828</a></td>
+			<td class="title"><a href="/practice/01828/">Monkeys' Pride</a></td>
+			            						<td class="ratio">100%</td>
+			<td class="accepted"><a href="/practice/01828/statistics/">7</a></td>
+			<td class="submissions"><a href="/practice/01828/statistics/">7</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01833/">01833</a></td>
+			<td class="title"><a href="/practice/01833/">排列</a></td>
+			            						<td class="ratio">92%</td>
+			<td class="accepted"><a href="/practice/01833/statistics/">211</a></td>
+			<td class="submissions"><a href="/practice/01833/statistics/">229</a></td>
+						
+		</tr>
+			<tr>
+						<td class="problem-id"><a href="/practice/01835/">01835</a></td>
+			<td class="title"><a href="/practice/01835/">宇航员</a></td>
+			            						<td class="ratio">88%</td>
+			<td class="accepted"><a href="/practice/01835/statistics/">7</a></td>
+			<td class="submissions"><a href="/practice/01835/statistics/">8</a></td>
+						
+		</tr>
+			<tr class="alt">
+						<td class="problem-id"><a href="/practice/01836/">01836</a></td>
+			<td class="title"><a href="/practice/01836/">Alignment</a></td>
+			            						<td class="ratio">83%</td>
+			<td class="accepted"><a href="/practice/01836/statistics/">5</a></td>
+			<td class="submissions"><a href="/practice/01836/statistics/">6</a></td>
+						
+		</tr>
+		</tbody>
+</table>	</div>
+	<p class="page-bar"><span class="pages">
+				
+			<span class="current">1</span>
+			
+					<a href="?page=2">2</a>
+					<a href="?page=3">3</a>
+					<a href="?page=4">4</a>
+					<a href="?page=5">5</a>
+					<a href="?page=6">6</a>
+					<a href="?page=7">7</a>
+					<a href="?page=8">8</a>
+					<a href="?page=9">9</a>
+					<a href="?page=10">10</a>
+	</span>
+</p>
+	
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

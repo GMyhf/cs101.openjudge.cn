@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 18177:统计套利策略</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>18177:统计套利策略</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/18177/">查看</a></li>
+		<li ><a href="/practice/18177/submit/">提交</a></li>
+				<li ><a href="/practice/18177/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/18177/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p style="background: white; margin: 12pt 0cm 0pt;"><span style="color: black;">Mike</span><span style="color: black; font-size: 10.5pt;">最近在课上学习了统计套利交易的简单思想，他想自己编写程序来对市场上的品种</span><span style="color: black;">(</span><span style="color: black; font-size: 10.5pt;">股票、期货、外汇</span><span style="color: black;">)</span><span style="color: black; font-size: 10.5pt;">进行交易。在众多资产中</span><span style="color: black;">, </span><span style="color: black; font-size: 10.5pt;">他打算选取只两个品种来配对交易</span><span style="color: black;">(</span><span style="color: black; font-size: 10.5pt;">选定之后就无法更改</span><span style="color: black;">). </span><span style="color: black; font-size: 10.5pt;">试帮他找出选取哪两个品种可以获得最大的利润，且计算该利润。</span></p>
+<p style="background: white; margin: 6pt 0cm 0pt;"><span style="color: black;">Mike</span><span style="color: black; font-size: 10.5pt;">的策略</span><span style="color: black;">: </span></p>
+<p style="background: white; margin: 6pt 0cm 0pt;"><span style="color: black;">1）</span><span style="color: black; font-size: 10.5pt;">选定两种资产后</span><span style="color: black;">, </span><span style="color: black; font-size: 10.5pt;">每一个交易日，他会计算之前所有日期两者价格的平均差值（下面提示中的第一个公式），作为他对两者价差的</span><span style="color: black;">"</span><span style="color: black; font-size: 10.5pt;">合理估计</span><span style="color: black;">"</span><span style="color: black; font-size: 10.5pt;">。</span></p>
+<p style="background: white; margin: 6pt 0cm 0pt;"><span style="color: black; font-size: 10.5pt;">2）计算之前所有日期两者价差序列的标准差（下面提示中的第二个公式）作为对风险的</span><span style="color: black;">"</span><span style="color: black; font-size: 10.5pt;">合理估计</span><span style="color: black;">"</span><span style="color: black; font-size: 10.5pt;">。</span></p>
+<p style="background: white; margin: 6pt 0cm 0pt;"><span style="color: black; font-size: 10.5pt;">3）在新的每一天，如果选定两个品种的价差偏离历史平均一个标准差, Mike预期会发生均值回归。故会相应在两个品种分别持有1单位做空（即卖出，估计之后要跌）和做多（即买入，估计之后要涨）的仓位(方向为假设发生均值回归会盈利的方向)，偏离历史平均两个标准差则持有2单位，以此类推。</span></p>
+<p style="background: white; margin: 6pt 0cm 0pt;"><strong><span style="color: black;">Mike</span></strong><strong><span style="color: black; font-size: 10.5pt;">在第四天才开始交易</span></strong><strong><span style="color: black;">, </span></strong><strong><span style="color: black; font-size: 10.5pt;">以前三天的平均值和标准差作为初始值。</span></strong></p>
+<p style="background: white; margin: 12pt 0cm 0pt;"><span style="color: black; font-size: 10.5pt;">配对交易维基定义</span><span style="color: black;">: </span><span style="color: black;">Pairstrading is a market-neutral trading strategy that matches a long position witha short position in a pair of highly correlated instruments such as two stocks,exchange-traded funds (ETFs), currencies, commodities or options.</span></p>
+<p style="background: white; margin: 12pt 0cm 0pt;"><span style="color: black; font-size: 10.5pt;">具体的例子：比如下图中当两者价格偏离过大的时候，就可以买入其中一者卖出另一者，并期待其差值回归以获利。</span><span style="color: black;">(</span><span style="color: black; font-size: 10.5pt;">绿箭头代表买入，红箭头代表卖出</span><span style="color: black;">)</span></p>
+<p style="background: white; margin: 12pt 0cm 0pt;"><span style="color: black;"><img src="http://media.openjudge.cn/images/upload/1545660147.png" width="600" height="307" /></span></p>
+<p><span style="color: black;"> </span></p>
+<p><strong><span style="color: black;">提示：</span></strong></p>
+<p><span style="color: black;"><span style="color: black;"><img src="http://media.openjudge.cn/images/upload/1545660199.png" width="543" height="285" /></span></span></p>
+<p style="background: white; margin: 12pt 0cm 0pt;"> </p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行输入两个正整数，分别代表总共的品种数目N，和总共的天数D<br />接着会输入N行，每行D个正整数，代表一个品种观测期间所有的价格数据。</dd>
+		<dt>输出</dt>
+		<dd>从第四天（含）起总收益最大的两个品种的序号(从小到大，序号从1开始，连续编号),以及最后的总收益（整数）。<br />(注：测试数据保证有唯一最优的套利对)</dd>
+		<dt>样例输入</dt>
+		<dd><pre>4 8
+18	14	15	17	10	11	10	14
+19	15	18	18	15	11	15	16
+16	18	13	10	17	13	14	17
+20	12	11	16	14	17	11	15
+</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>1 3 38</pre></dd>
+				<dt>提示</dt>
+		<dd>样例计算过程分析：<br />此时选取第1和第3个资产可以取得最大利润.<br />资产A价格序列: 18 14 15 17 10 11 10 14<br />资产B价格序列: 16 18 13 10 17 13 14 17<br />差价定义为A-B, 则意味着向上偏离历史均值, A高估,应做空, B应做多. 反之亦然<br />第4天<br />-历史平均差价:0.00, 历史方差:2.83, 今日差价:7<br />-A持有到明天单位收益=A(Day5)-A(Day4)=-7, 持有A做空手数:-2, 收益:14<br />-B持到到明天单位收益=B(Day5)-B(Day4)=7, 持有B做多手数:2, 收益:14<br />-总收益:28, 累积收益:28<br />第5天<br />-历史平均差价:1.75, 历史方差:3.90, 今日差价:-7<br />-A持有到明天单位收益=A(Day6)-A(Day5)=1, 持有A手数:2, 收益:2<br />-B持到到明天单位收益=B(Day6)-B(Day5)=-4, 持有B手数:-2, 收益:8<br />-总收益:10, 累积收益:38<br />第6天<br />-历史平均差价:0.00, 历史方差:4.94, 今日差价:-2<br />-A持有到明天单位收益=A(Day7)-A(Day6)=-1, 持有A手数:0, 收益:0<br />-B持到到明天单位收益=B(Day7)-B(Day6)=1, 持有B手数:0, 收益:0<br />-总收益:0, 累积收益:38<br />第7天<br />-历史平均差价:-0.33, 历史方差:4.57, 今日差价:-4<br />-A持有到明天单位收益=A(Day8)-A(Day7)=4, 持有A手数:0, 收益:0<br />-B持到到明天单位收益=B(Day8)-B(Day7)=3, 持有B手数:0, 收益:0<br />-总收益:0, 累积收益:38</dd>
+						<dt>来源</dt>
+		<dd>cs101-2018</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/18177/">查看</a></li>
+		<li ><a href="/practice/18177/submit/">提交</a></li>
+				<li ><a href="/practice/18177/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/18177/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>18177</dd>
+					<dt>添加于</dt>
+			<dd>2019-01-02</dd>
+				<dt>提交次数</dt>
+		<dd>694</dd>
+		<dt>尝试人数</dt>
+	    <dd>126</dd>
+	    <dt>通过人数</dt>
+	    <dd>110</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

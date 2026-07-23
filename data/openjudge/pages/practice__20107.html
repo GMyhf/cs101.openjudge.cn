@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 20107:BOOM</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>20107:BOOM</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/20107/">查看</a></li>
+		<li ><a href="/practice/20107/submit/">提交</a></li>
+				<li ><a href="/practice/20107/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/20107/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>9000ms</dd>
+			<dt>单个测试点时间限制: </dt>
+		<dd>3000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p style="margin: 0cm 0cm 0pt;"><span style="font-family: Times New Roman;"><span>A</span></span><span style="font-family:;" new="" times="">市警察局接到报警电话，称一枚炸弹已经被安放在该市的某个地点并即将引爆。由于时间紧迫，可怜的情报员只能调查到以下信息：炸弹被安放在城市最繁华的区域，并将在其覆盖区域内人流最密集的时候引爆。为简化起见，假设该城市的布局为由平行的</span><span style="font-family: Times New Roman;"><span>128</span></span><span style="font-family:;" new="" times="">条东西向街道和</span><span style="font-family: Times New Roman;"><span>128 </span></span><span style="font-family:;" new="" times="">条南北向街道所形成的网格状，平行街道的距离均为</span><span style="font-family: Times New Roman;"><span>1</span></span><span style="font-family:;" new="" times="">。东西向街道从北到南依次编号为</span><span style="font-family: Times New Roman;"><span>0,1,2…128,</span></span><span style="font-family:;" new="" times="">南北向街道从西到东依次编号为</span><span style="font-family: Times New Roman;"><span>0,1,2,…128</span></span><span style="font-family:;" new="" times="">。东西向街道和南北向街道相交形成路口，规定编号为</span><span style="font-family: Times New Roman;"><span>x </span></span><span style="font-family:;" new="" times="">的南北向街道和编号为</span><span style="font-family: Times New Roman;"><span>y </span></span><span style="font-family:;" new="" times="">的东西向街道形成的路口的坐标是</span><span style="font-family: Times New Roman;"><span>(x, y)</span></span><span style="font-family:;" new="" times="">。在某些路口存在公共场所，这些公共场所在每天营业的</span><span style="font-family: Times New Roman;"><span>T</span></span><span style="font-family:;" new="" times="">小时内每小时内停留的人数分别为</span>P<sub>1</sub>,P<sub>2</sub>,...P<sub>T</sub><span style="font-family: Times New Roman;"><span><span> </span></span></span><span style="font-family:;" new="" times="">而炸弹被安装在某个路口，爆炸伤害范围是一个以该点为中心，边长为</span><span style="font-family: Times New Roman;"><span>2*d</span></span><span style="font-family:;" new="" times="">的正方形，<strong>包括正方形的边界。</strong></span></p><p><span style="font-family: 宋体; font-size: 11pt;">现在警察局长焦急地找到你，希望你能帮他找出炸弹可能的安放位置数量和爆炸时间</span><span style="font-family: 宋体; font-size: 11pt;">T</span><span style="font-family: 宋体; font-size: 11pt;">，以及一旦爆炸发生会造成的伤亡人数（爆炸威力很大，保证覆盖范围内所有人伤亡）。</span></p><p><br /></p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行一个整数d，表示爆炸伤害范围，其意义见题目描述。<br />第二行两个整数k和T，表示该城市公共场所的数量和每个公共场所每天的营业时间长度。<br />接下来k行每行2+T个整数，每行前两个整数为公共场所坐标，后T个整数为每个时间段内场所的停留人数。数据保证坐标不重复。<br />数据保证：1<=d<=20, 1<=k<=20, 1<=T<=10, 0<=x,y<=128, 0<=Pi<=1,000,000</dd>
+		<dt>输出</dt>
+		<dd>输出1行3个整数，分别为炸弹可能安放位置的数量，预定爆炸的时间T（从0开始编号）和爆炸一旦发生会造成的总伤亡人数。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>【样例输入1】
+1
+2 1
+4 4 10
+6 6 20
+【样例输出1】
+1 0 30
+</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>【样例输入2】
+4
+3 3
+100 100 30 21 29
+108 108 20 20 20
+50 50 50 10 10
+【样例输出2】
+82 0 50
+</pre></dd>
+				<dt>提示</dt>
+		<dd>由于炸弹爆炸影响范围较大，因此可能有多个安放地点爆炸范围覆盖相同的公共场所，这是不同可能位置数量的来源。<br />改编自NOIP2014，向已经不复存在的NOIP致敬！</dd>
+						<dt>来源</dt>
+		<dd>cs101-2019 张思成</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/20107/">查看</a></li>
+		<li ><a href="/practice/20107/submit/">提交</a></li>
+				<li ><a href="/practice/20107/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/20107/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>20107</dd>
+					<dt>添加于</dt>
+			<dd>2019-12-23</dd>
+				<dt>提交次数</dt>
+		<dd>5</dd>
+		<dt>尝试人数</dt>
+	    <dd>2</dd>
+	    <dt>通过人数</dt>
+	    <dd>2</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

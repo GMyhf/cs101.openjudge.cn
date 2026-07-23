@@ -1,0 +1,210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 04105:拯救公主</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>04105:拯救公主</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/04105/">查看</a></li>
+		<li ><a href="/practice/04105/submit/">提交</a></li>
+				<li ><a href="/practice/04105/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/04105/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>65536kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p class="MsoNormal"><span style="font-family:宋体">&nbsp;&nbsp;&nbsp;&nbsp;多灾多难的公主又被大魔王抓走啦！国王派遣了第一勇士阿福去拯救她。</span></p><p class="MsoNormal" style=""><span style="font-family:宋体">&nbsp;&nbsp;&nbsp;&nbsp;身为超级厉害的术士，同时也是阿福的好伙伴，你决定祝他一臂之力。你为阿福提供了一张大魔王根据地的地图，上面标记了阿福和公主所在的位置，以及一些不能够踏入的禁区。你还贴心地为阿福制造了一些传送门，通过一个传送门可以瞬间转移到任意一个传送门，当然阿福也可以选择不通过传送门瞬移。传送门的位置也被标记在了地图上。此外，你还查探到公主所在的地方被设下了结界，需要集齐</span><span>K</span><span style="font-family:宋体">种宝石才能打开。当然，你在地图上也标记出了不同宝石所在的位置。</span></p><p class="MsoNormal" style=""><span style="font-family:宋体">&nbsp;&nbsp;&nbsp;&nbsp;你希望阿福能够带着公主早日凯旋。于是在阿福出发之前，你还需要为阿福计算出他最快救出公主的时间。</span></p><p class="MsoNormal" style=""><span style="font-family:宋体">&nbsp;&nbsp;&nbsp;&nbsp;地图用一个</span><span>R</span><span style="font-family:宋体">×</span><span>C</span><span style="font-family:宋体">的字符矩阵来表示。字符</span><span>S</span><span style="font-family:宋体">表示阿福所在的位置，字符</span><span>E</span><span style="font-family:宋体">表示公主所在的位置，字符</span><span>#</span><span style="font-family:宋体">表示不能踏入的禁区，字符</span><span>$</span><span style="font-family:宋体">表示传送门，字符</span><span>.</span><span style="font-family:宋体">表示该位置安全，数字字符</span><span>0</span><span style="font-family:宋体">至</span><span>4</span><span style="font-family:宋体">表示了宝石的类型。阿福每次可以从当前的位置走到他上下左右四个方向上的任意一个位置，但不能走出地图边界。阿福每走一步需要花费</span><span>1</span><span style="font-family:宋体">个单位时间，从一个传送门到达另一个传送门不需要花费时间。当阿福走到宝石所在的位置时，就视为得到了该宝石，不需要花费额外时间。</span></p><p><br /></p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>第一行是一个正整数T（1 <= T <= 10），表示一共有T组数据。<br />	每一组数据的第一行包含了三个用空格分开的正整数R、C（2 <= R, C <= 200）和K，表示地图是一个R×C的矩阵，而阿福需要集齐K种宝石才能够打开拘禁公主的结界。<br />	接下来的R行描述了地图的具体内容，每一行包含了C个字符。字符含义如题目描述中所述。保证有且仅有一个S和E。$的数量不超过10个。宝石的类型在数字0至4范围内，即不会超过5种宝石。</dd>
+		<dt>输出</dt>
+		<dd>对于每一组数据，输出阿福救出公主所花费的最少单位时间。若阿福无法救出公主，则输出“oop!”（只输出引号里面的内容，不输出引号）。每组数据的输出结果占一行。</dd>
+		<dt>样例输入</dt>
+		<dd><pre>1
+7 8 2
+........
+..S..#0.
+.##..1..
+.0#.....
+...1#...
+...##E..
+...1....</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>11</pre></dd>
+						</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/04105/">查看</a></li>
+		<li ><a href="/practice/04105/submit/">提交</a></li>
+				<li ><a href="/practice/04105/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/04105/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>7221</dd>
+					<dt>添加于</dt>
+			<dd>2023-10-11</dd>
+				<dt>提交次数</dt>
+		<dd>33</dd>
+		<dt>尝试人数</dt>
+	    <dd>7</dd>
+	    <dt>通过人数</dt>
+	    <dd>7</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>
