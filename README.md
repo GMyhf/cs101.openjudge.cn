@@ -6,7 +6,7 @@
 python3 server.py
 ```
 
-本机局域网访问 `http://10.129.81.235:8000/`；同一 Tailnet 的其他机器访问 `http://100.123.12.92:8000/`。默认管理员账号为 `GMyhf`，口令为 `legend200909`；生产环境可通过 `CS101_ADMIN_USER` 和 `CS101_ADMIN_PASSWORD` 覆盖。
+本机局域网访问 `http://10.129.81.235:8000/`；同一 Tailnet 的其他机器访问 `http://100.123.12.92:8000/`。管理员账号通过 `CS101_ADMIN_USER` 配置，口令通过 `CS101_ADMIN_PASSWORD` 或本机未跟踪的 `data/.admin_password` 配置。
 
 ## 本地题库
 

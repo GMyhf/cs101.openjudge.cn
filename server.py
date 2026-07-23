@@ -19,7 +19,8 @@ ROOT = Path(__file__).parent
 DB = ROOT / "data" / "course.db"
 MIRROR = ROOT / "data" / "openjudge"
 ADMIN_USER = os.environ.get("CS101_ADMIN_USER", "GMyhf")
-ADMIN_PASSWORD = os.environ.get("CS101_ADMIN_PASSWORD", "legend200909")
+PASSWORD_FILE = ROOT / "data" / ".admin_password"
+ADMIN_PASSWORD = os.environ.get("CS101_ADMIN_PASSWORD") or (PASSWORD_FILE.read_text(encoding="utf-8").strip() if PASSWORD_FILE.is_file() else "")
 TOKENS = set()
 SESSION_USERS = {}
 
