@@ -1,6 +1,10 @@
 __pycache__/
 data/*.db
 data/.admin_password
-data/openjudge/tests/
+# 抓取的真实测试数据不入库；生成的 *_made 数据入库（2026-07-24 人拍板）
+data/openjudge/tests/**
+!data/openjudge/tests/*/
+!data/openjudge/tests/*/*_made/
+!data/openjudge/tests/*/*_made/**
 data/openjudge/__MACOSX/
 collab/review-input.md
