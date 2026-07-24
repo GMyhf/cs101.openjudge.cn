@@ -91,11 +91,20 @@ def g5907(r):
 
 
 def g6250(r):
-    alphabet = "abcdefghijklmnopqrstuvwxyz0123456789"
-    prefix = "".join(r.choice(alphabet) for _ in range(r.randint(3, 15)))
-    middle = "".join(r.choice(alphabet) for _ in range(r.randint(3, 15)))
-    suffix = "".join(r.choice(alphabet) for _ in range(r.randint(3, 15)))
-    return f"{prefix}a{middle}b{suffix},a,b\n"
+    # S1/S2 用互不相交的字母表(xy/wv),填充串不含这四个字母:
+    # 出现与否完全由构造决定,才能可靠制造 -1 分支(缺失/次序颠倒)
+    filler = "abcdefghij0123456789"
+    body = lambda: "".join(r.choice(filler) for _ in range(r.randint(3, 15)))
+    s1 = "".join(r.choice("xy") for _ in range(r.randint(1, 3)))
+    s2 = "".join(r.choice("wv") for _ in range(r.randint(1, 3)))
+    roll = r.random()
+    if roll < 0.15:
+        s = body() + s2 + body()                     # S1 缺失 → -1
+    elif roll < 0.30:
+        s = body() + s2 + body() + s1 + body()       # 次序颠倒 → -1
+    else:
+        s = body() + s1 + body() + s2 + body()       # 正常跨距
+    return f"{s},{s1},{s2}\n"
 
 
 def g6263(r):
