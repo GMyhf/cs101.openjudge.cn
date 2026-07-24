@@ -23,8 +23,24 @@ def bucket(n):
     return "30000-"
 
 
+# 题解合集在两台机器上的挂载点不同(manifest 里记的是生成时所在机器的绝对路径)
+SOURCE_PREFIXES = ["/home/rocky/git/", "/home/ubuntu/hongfei/"]
+
+
+def locate_source(source):
+    if Path(source).is_file():
+        return Path(source)
+    for prefix in SOURCE_PREFIXES:
+        for other in SOURCE_PREFIXES:
+            if source.startswith(prefix):
+                candidate = Path(other + source[len(prefix):])
+                if candidate.is_file():
+                    return candidate
+    raise FileNotFoundError(source)
+
+
 def get_section(source, number):
-    lines = Path(source).read_text(encoding="utf-8", errors="ignore").splitlines()
+    lines = locate_source(source).read_text(encoding="utf-8", errors="ignore").splitlines()
     starts = [i for i, line in enumerate(lines) if re.match(r"^##\s+", line)]
     for i, start in enumerate(starts):
         if re.match(rf"^##\s+0*{number}[:：]", lines[start]):
@@ -89,9 +105,11 @@ def g3532(r):
 
 def g3720(r):
     def make_tree(labels):
+        # 题面是二叉树:每个节点最多两个子节点
         children = {label: [] for label in labels}
         for label in labels[1:]:
-            children[r.choice(labels[:labels.index(label)])].append(label)
+            parents = [p for p in labels[:labels.index(label)] if len(children[p]) < 2]
+            children[r.choice(parents)].append(label)
         return children
 
     def serialize(node, children, depth, lines):
