@@ -56,13 +56,65 @@ def g3441(r):
     return str(n) + "\n" + "\n".join(" ".join(map(str, x)) for x in rows) + "\n"
 
 
+def g3447(r):
+    n = r.randint(4, 26)
+    planets = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ"[:n])
+    edges = set()
+    for node in planets[1:]:
+        other = r.choice(planets[:planets.index(node)])
+        edges.add(tuple(sorted((node, other))))
+    for a in planets:
+        for b in planets:
+            if a < b and (a, b) not in edges and r.random() < 0.18:
+                edges.add((a, b))
+    routes = {node: set() for node in planets}
+    for a, b in edges:
+        routes[a].add(b)
+        routes[b].add(a)
+    earth = r.sample(planets, r.randint(1, min(3, n)))
+    lines = []
+    for node in r.sample(planets, n):
+        value = r.randint(1, 1000) / 100
+        route = sorted(routes[node])
+        if node in earth:
+            route.append("*")
+        lines.append(f"{node} {value:.2f} {''.join(route)}")
+    return str(n) + "\n" + "\n".join(lines) + "\n"
+
+
 def g3532(r):
     n = r.randint(1, 100); a = [r.randint(1, 1000) for _ in range(n)]
     return f"{n}\n" + " ".join(map(str, a)) + "\n"
 
 
 def g3720(r):
-    return "1\nA\n-B\n--*\n--C\n0\n"
+    def make_tree(labels):
+        children = {label: [] for label in labels}
+        for label in labels[1:]:
+            children[r.choice(labels[:labels.index(label)])].append(label)
+        return children
+
+    def serialize(node, children, depth, lines):
+        lines.append("-" * depth + node)
+        kids = children[node]
+        if len(kids) == 1:
+            lines.append("-" * (depth + 1) + "*")
+        for child in kids:
+            serialize(child, children, depth + 1, lines)
+
+    tree_count = r.randint(1, 3)
+    lines = [str(tree_count)]
+    next_label = 0
+    for _ in range(tree_count):
+        size = r.randint(2, 12)
+        labels = [chr(ord("A") + (next_label + i) % 26) for i in range(size)]
+        next_label += size
+        children = make_tree(labels)
+        tree_lines = []
+        serialize(labels[0], children, 0, tree_lines)
+        lines.extend(tree_lines)
+        lines.append("0")
+    return "\n".join(lines) + "\n"
 
 
 def g4005(r):
@@ -109,10 +161,66 @@ def g4080(r):
     n = r.randint(1, 30); return f"{n}\n" + " ".join(str(r.randint(1, 1000)) for _ in range(n)) + "\n"
 
 
-def g4081(r): return r.choice(["dudduduudu", "ddduuu", "dududu", "dduduu"]) + "\n"
+def g4081(r):
+    node_count = r.randint(2, 80)
+    children = [[] for _ in range(node_count)]
+    for node in range(1, node_count):
+        children[r.randrange(node)].append(node)
+
+    def encode(node):
+        result = []
+        for child in children[node]:
+            result.append("d")
+            result.append(encode(child))
+            result.append("u")
+        return "".join(result)
+
+    return encode(0) + "\n"
 
 
-def g4082(r): return "9\na0 b0 $1 c0 d0 $1 e1 f1 $1\n"
+def g4082(r):
+    node_count = r.randint(4, 16)
+    children = [[] for _ in range(node_count)]
+    for node in range(1, node_count):
+        children[r.randrange(node)].append(node)
+
+    class Binary:
+        def __init__(self, label):
+            self.label = label
+            self.left = None
+            self.right = None
+
+    def convert(node, sibling=None):
+        result = Binary(chr(ord("a") + node))
+        if children[node]:
+            result.left = convert(children[node][0], children[node][1:])
+        if sibling:
+            result.right = convert(sibling[0], sibling[1:])
+        return result
+
+    def complete(node):
+        if node is None:
+            return
+        if node.left is None and node.right is not None:
+            node.left = Binary("$")
+        elif node.left is not None and node.right is None:
+            node.right = Binary("$")
+        complete(node.left)
+        complete(node.right)
+
+    def tokens(node):
+        if node is None:
+            return []
+        internal = node.left is not None or node.right is not None
+        result = [node.label + ("0" if internal else "1")]
+        result += tokens(node.left)
+        result += tokens(node.right)
+        return result
+
+    root = convert(0)
+    complete(root)
+    values = tokens(root)
+    return str(len(values)) + "\n" + " ".join(values) + "\n"
 
 
 def g4084(r):
@@ -156,7 +264,7 @@ def g4141(r):
     return " ".join(str(r.randint(0, 4)) for _ in range(6)) + "\n"
 
 
-GENERATORS = dict(zip(IDS, [g3406, g3441, None, g3532, g3720, g4005, g4036, g4075, g4077, g4078, g4079, g4080, g4081, g4082, g4084, g4089, g4093, g4103, g4109, g4141]))
+GENERATORS = dict(zip(IDS, [g3406, g3441, g3447, g3532, g3720, g4005, g4036, g4075, g4077, g4078, g4079, g4080, g4081, g4082, g4084, g4089, g4093, g4103, g4109, g4141]))
 
 
 def run(code, text):
@@ -217,7 +325,11 @@ for index in range(20):
         for i, (value, output) in enumerate(zip(cases, outputs)):
             (data / f"{i}.in").write_text(value, encoding="utf-8")
             (data / f"{i}.out").write_text(output, encoding="utf-8")
-        report.append({"local_number": number, "status": "generated", "source": entry["source"], "source_heading": entry["source_heading"], "source_code": "solution collection", "generator": f"g{number}", "seed": number, "output_reference": "embedded solution source", "test_cases": 20})
+        distinct = len(set(cases))
+        item = {"local_number": number, "status": "generated", "source": entry["source"], "source_heading": entry["source_heading"], "source_code": "solution collection", "generator": f"g{number}", "seed": number, "output_reference": "embedded solution source", "test_cases": 20, "distinct_input_cases": distinct}
+        if distinct < 15:
+            item["distinct_input_note"] = "input domain is bounded; exception recorded for review"
+        report.append(item)
     (ROOT / "collab" / "t002-001a-report.json").write_text(json.dumps({"batch": "001a", "entries": report}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
