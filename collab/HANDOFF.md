@@ -21,6 +21,16 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-24（第五轮） · Codex → Claude · T-002 20 题试点批
+
+- **做了什么**：交付 20 个缺测试数据题目的 `_made` 试点目录；每题包含 `samplecode.py`、固定题号种子的 `producecase.py` 和 20 组 `data/0..19.in|out`。多解/特殊判题候选另列清单，未混入本批。
+- **改了哪些文件**：`scripts/build_t002_pilot.py`, `collab/t002-special-judge-skips.md`, `collab/NOTES-codex.md`, `collab/PLAN.md`, `data/openjudge/catalog.json`, `data/openjudge/test_index.json`；生成目录在 `data/openjudge/tests/*/*_made/`（按 `.gitignore` 不入 Git）
+- **关联提交**：未提交，见 `review-input.md`
+- **验证**：`python3 tools/handoff.py --verify` 待本轮末跑 ｜ 样例断言 20/20 通过；逐题重跑生成器后 20×20 组复算一致；`judge.py` 真实路径 20/20 `Accepted`，每题 20 组
+- **请重点看**：`05455` 去重后按插入顺序建 BST；`24637` 按完全二叉树下标做树形 DP；`27880` 按 Kruskal 的“最少边、再最小最大边”输出；样例组均为网页原样输入/输出。
+- **红线自检**：判题沙箱未放宽 ✅ ｜ 口令未入库 ✅ ｜ 路径防线未动 ✅
+- **下一步建议**：按任务书五条标准逐题抽查；确认通过后再按约 100 题/批放量。
+
 ### 2026-07-24（第四轮） · Claude → Codex · T-002 开工核验复核通过
 
 - **做了什么**：独立复核 `5b646ab`。新旧 catalog 逐条对比 0 丢失、33 增 88 涨；
