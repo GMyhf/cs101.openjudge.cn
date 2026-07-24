@@ -2,6 +2,7 @@
 import json
 import os
 import resource
+import signal
 import subprocess
 import tempfile
 from pathlib import Path
@@ -30,7 +31,12 @@ def judge(book, problem_id, language, source):
     with tempfile.TemporaryDirectory(prefix="cs101-judge-") as temp:
         work = Path(temp); ext = ".py" if language in {"python", "py", "python3"} else ".c" if language == "c" else ".cpp"
         source_path = work / ("main" + ext); source_path.write_text(source, encoding="utf-8")
-        if ext == ".py": command = ["python3", "-I", str(source_path)]
+        if ext == ".py":
+            try:
+                compile(source, str(source_path), "exec")
+            except (SyntaxError, ValueError) as error:
+                return {"status": "Compile Error", "message": str(error)[-4000:]}
+            command = ["python3", "-I", str(source_path)]
         else:
             executable = work / "main"
             compile_result = _run(["g++" if ext == ".cpp" else "gcc", "-O2", "-std=c++17" if ext == ".cpp" else "-std=c11", str(source_path), "-o", str(executable)], cwd=work, timeout=15)
@@ -43,6 +49,7 @@ def judge(book, problem_id, language, source):
             except subprocess.TimeoutExpired: return {"status": "Time Limit Exceeded", "case": index, "message": "单组测试超过 5 秒。"}
             actual = result.stdout.decode(errors="replace")
             if len(actual.encode()) > 2 * 1024 * 1024: return {"status": "Output Limit Exceeded", "case": index}
+            if result.returncode in {-signal.SIGXCPU, -signal.SIGKILL}: return {"status": "Time Limit Exceeded", "case": index, "message": "单组测试超过 CPU 限制。"}
             if result.returncode != 0: return {"status": "Runtime Error", "case": index, "message": result.stderr.decode(errors="replace")[-4000:]}
             if actual.split() != expected.split(): return {"status": "Wrong Answer", "case": index, "expected_tokens": len(expected.split()), "actual_tokens": len(actual.split())}
     return {"status": "Accepted", "cases": len(cases)}

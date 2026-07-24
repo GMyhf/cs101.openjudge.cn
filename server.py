@@ -12,11 +12,11 @@ import urllib.request
 import re
 from html import escape
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 from judge import judge
 
 ROOT = Path(__file__).parent
-DB = ROOT / "data" / "course.db"
+DB = Path(os.environ.get("CS101_DB", ROOT / "data" / "course.db"))
 MIRROR = ROOT / "data" / "openjudge"
 ADMIN_USER = os.environ.get("CS101_ADMIN_USER", "GMyhf")
 PASSWORD_FILE = ROOT / "data" / ".admin_password"
@@ -97,6 +97,9 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
+        decoded_path = unquote(path)
+        if any(part == ".." for part in decoded_path.split("/")):
+            self.send_json({"error": "Not found"}, 404); return
         if path == "/auth/login/":
             self.send_html(self.account_page()); return
         if path == "/register/":
@@ -136,7 +139,7 @@ class Handler(BaseHTTPRequestHandler):
             if catalog.is_file():
                 payload = json.loads(catalog.read_text(encoding="utf-8"))
                 self.send_json(payload); return
-        file = ROOT / ("index.html" if path in ("/", "") else path.lstrip("/"))
+        file = ROOT / ("index.html" if path in ("/", "") else decoded_path.lstrip("/"))
         if file.is_file() and ROOT in file.parents:
             content_type = "text/html; charset=utf-8" if file.suffix == ".html" else "text/css; charset=utf-8" if file.suffix == ".css" else "text/javascript; charset=utf-8"
             body = file.read_bytes()

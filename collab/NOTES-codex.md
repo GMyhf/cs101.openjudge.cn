@@ -4,6 +4,12 @@
 > 只有 Codex 写这个文件；Claude 的回话写在 `NOTES-claude.md`。
 > 保持简短，过期内容可清理——真正的历史在 git 和 `HANDOFF.md` 里。
 
+## 2026-07-24 · T-001 完成
+
+- 新增 `tests/` 标准库 `unittest` 回归套件，覆盖判题 AC/WA/TLE/RE/CE、token 语义、CPU/输出限制，以及服务端注册、登录、会话、未登录提交 401、认证提交和 URL 编码后的路径穿越。
+- 修正 `judge.py` 的 Python CE 分类和 CPU 限制信号分类；`server.py` 支持 `CS101_DB` 隔离测试数据库，并在本地文件分发前拒绝解码后的 `..` 路径。
+- 验证：`python3 -m unittest discover -s tests -p 'test_*.py'` 为 9/9；`python3 tools/handoff.py --verify` 为测试 9/9、py_compile 11 文件、node --check 全部通过。
+
 ## 2026-07-24 · T-002-001c 交付准备
 
 - 001c 题号：`05804, 05902, 05907, 06250, 06263, 06640, 06901, 07161, 07207, 07218, 07576, 07734, 07743, 08758, 09198, 09201, 09202, 12029, 12757, 14683`。全部来自题解合集，出处、题面约束和输出唯一性检查写入 `collab/t002-001c-report.json`。

@@ -15,9 +15,8 @@
 
 > `git` 是最硬的桥梁，测试是最硬的仲裁。文档负责「为什么」和「接下来」，
 > 代码与测试负责「是什么」。冲突时，能跑通验证的方案胜出。
-> **本项目暂无自动化测试套件**——在它建成之前（见 PLAN T-001），仲裁标准是
-> `python3 tools/handoff.py --verify`（语法编译检查）+ 手动冒烟（起 `server.py`、
-> 提交一道有测试数据的题、确认判题结果）。这是个已知的弱闸门，补测试优先级高。
+> `tests/` 是当前自动化仲裁套件，覆盖判题状态、token 比对、CPU/输出限制和服务端
+> 认证/路径边界；`python3 tools/handoff.py --verify` 会先运行全套测试，再做语法检查。
 
 ## 一轮标准循环
 
@@ -25,7 +24,7 @@
 1. 人：把目标写进 collab/PLAN.md（Backlog 里加一条任务）
 2. 实现方（如 Claude）：
      - 认领任务 → 改 PLAN.md 状态为 In progress，署名
-     - 实现 → python3 tools/handoff.py --verify → 手动冒烟 → git commit（小步、清晰 message）
+     - 实现 → `python3 tools/handoff.py --verify` → git commit（小步、清晰 message）
      - 写 NOTES-claude.md：做了什么 / 哪里没把握 / 想让对方重点看哪里
      - 追加一条 HANDOFF.md 交接记录
      - 运行 python3 tools/handoff.py --from claude --to codex
@@ -50,8 +49,8 @@
 - 开工前先在 `PLAN.md` 认领任务并署名；**不要两个 agent 同时改同一文件的同一段**。
 - 小步提交、清晰 commit message，审查方才看得懂 diff。
 - 交接格式统一走 `HANDOFF.md` 模板，减少人工搬运。
-- **交回时必须附一次真正跑完的验证结果**（当前是 `--verify` 输出 + 冒烟结论；
-  测试套件建成后是全套测试尾部计数）。不接受「我觉得没问题」。
+- **交回时必须附一次真正跑完的验证结果**（`--verify` 输出必须包含全套测试尾部计数）。
+  不接受「我觉得没问题」。
 - **交付后回来销账：任务落地时，把它回答掉的「未决 / 待拍板 / TODO」逐条改成带出处的已决记录。**
   保留原问题、注明最终取值与代码出处，不要删除，让来回可查。
   两个 agent 每轮都读这些文档，一份多数已决的待办清单会让人重开已经关掉的方向。

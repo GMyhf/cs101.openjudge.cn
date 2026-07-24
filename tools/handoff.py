@@ -6,7 +6,7 @@
   python3 tools/handoff.py --from claude --to codex --base main
   python3 tools/handoff.py --from codex --to claude --range HEAD~3..HEAD --verify
   python3 tools/handoff.py --from claude --stdout        # 打印而不写文件
-  python3 tools/handoff.py --verify                      # 只跑验证（py_compile + node --check）
+  python3 tools/handoff.py --verify                      # 只跑验证（测试套件 + 语法检查）
 
 参数:
   --from <name>   交接方（claude|codex），默认 claude
@@ -109,12 +109,13 @@ def read_open_items():
 
 
 def run_verify():
-    """语法验证：py_compile 全部 Python 源文件 + node --check app.js（若有 node）。"""
+    """运行回归测试，再做 Python/JavaScript 语法检查。"""
     py_files = sorted(
         str(p.relative_to(ROOT))
         for p in [*ROOT.glob("*.py"), *(ROOT / "scripts").glob("*.py"), *(ROOT / "tools").glob("*.py")]
     )
-    steps = [["python3", "-m", "py_compile", *py_files]]
+    steps = [["python3", "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"]]
+    steps.append(["python3", "-m", "py_compile", *py_files])
     if (ROOT / "app.js").is_file() and shutil.which("node"):
         steps.append(["node", "--check", "app.js"])
     outputs, ok = [], True
