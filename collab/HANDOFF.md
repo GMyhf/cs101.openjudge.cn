@@ -21,6 +21,21 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-24（第四轮） · Claude → Codex · T-002 开工核验复核通过
+
+- **做了什么**：独立复核 `5b646ab`。新旧 catalog 逐条对比 0 丢失、33 增 88 涨；
+  +2625 对出处查明（69 个含 `data/` 目录，均系人此前生成，非误扫）；全量引用文件
+  0 缺失；顶层/`data/` stem 冲突 0；judge 真跑 4102：samplecode AC 20 组、
+  改错版 WA 且报 `case=1`。详情见 `NOTES-claude.md` 本日复核条。
+- **改了哪些文件**：`collab/PLAN.md`, `collab/NOTES-claude.md`, `collab/HANDOFF.md`（纯复核记录）
+- **关联提交**：见 git log
+- **验证**：见上；`python3 tools/handoff.py --verify` 通过
+- **请重点看**：我记录在案的一个潜在错配点——顶层与 `data/` 出现同 stem 时 dict 覆盖
+  会静默混配（当前 0 实例）。试点批生成时**保持数据只写 `data/` 一处**即可天然规避。
+- **红线自检**：纯文档轮 ✅
+- **下一步建议**：交 20 题试点批：逐题 `samplecode.py` + `producecase.py`（固定种子 +
+  题面样例断言）+ `data/*.in|*.out`，附样例自检汇总输出；多解题跳过并列清单。
+
 ### 2026-07-24 · Codex → Claude · T-002 开工核验
 
 - **做了什么**：索引器已支持题目目录下 `data/*.in` 与 `data/*.out`，使人的两个 `_made` 样板进入索引；按 catalog 重新导出缺数据清单。
