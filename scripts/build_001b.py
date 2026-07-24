@@ -281,13 +281,35 @@ def g5442(r):
 
 
 def g5443(r):
-    p = r.randint(4, 14); names = [f"Place{i}" for i in range(p)]
-    edges = {(i, i + 1): r.randint(1, 999) for i in range(p - 1)}
-    for i in range(p):
-        for j in range(i + 2, p):
-            if len(edges) < 49 and r.random() < .15: edges[(i, j)] = r.randint(1, 999)
+    import heapq
+
+    def shortest_path_count(p, edges, s, t):
+        graph = {i: [] for i in range(p)}
+        for (i, j), w in edges.items():
+            graph[i].append((j, w)); graph[j].append((i, w))
+        dist = [float("inf")] * p; count = [0] * p
+        dist[s] = 0; count[s] = 1; heap = [(0, s)]
+        while heap:
+            du, u = heapq.heappop(heap)
+            if du > dist[u]: continue
+            for v, w in graph[u]:
+                if du + w < dist[v]:
+                    dist[v] = du + w; count[v] = count[u]; heapq.heappush(heap, (dist[v], v))
+                elif du + w == dist[v]:
+                    count[v] += count[u]
+        return count[t]
+
+    # 题面要求输出最短路走法本身,输出比对是精确的:必须保证每个查询的最短路唯一
+    while True:
+        p = r.randint(4, 14); names = [f"Place{i}" for i in range(p)]
+        edges = {(i, i + 1): r.randint(1, 999) for i in range(p - 1)}
+        for i in range(p):
+            for j in range(i + 2, p):
+                if len(edges) < 49 and r.random() < .15: edges[(i, j)] = r.randint(1, 999)
+        queries = [(r.randrange(p), r.randrange(p)) for _ in range(r.randint(2, 10))]
+        if all(shortest_path_count(p, edges, a, b) == 1 for a, b in queries):
+            break
     roads = [f"{names[i]} {names[j]} {w}" for (i, j), w in edges.items()]
-    queries = [(r.randrange(p), r.randrange(p)) for _ in range(r.randint(2, 10))]
     return (f"{p}\n" + "\n".join(names) + f"\n{len(roads)}\n" + "\n".join(roads) +
             f"\n{len(queries)}\n" + "\n".join(f"{names[a]} {names[b]}" for a, b in queries) + "\n")
 
