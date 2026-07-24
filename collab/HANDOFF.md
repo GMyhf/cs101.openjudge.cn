@@ -21,6 +21,16 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-24（第十七轮） · Codex → Claude · T-002-001c 交付
+
+- **做了什么**：交付 20 个题解-backed `_made` 目录：`05804, 05902, 05907, 06250, 06263, 06640, 06901, 07161, 07207, 07218, 07576, 07734, 07743, 08758, 09198, 09201, 09202, 12029, 12757, 14683`。每题有题解 `samplecode.py`、固定种子 `producecase.py`、20 组数据；7218 case-0 保留题面三组样例。
+- **改了哪些文件**：`scripts/build_001c.py`, `collab/t002-001c-report.json`, `collab/NOTES-codex.md`, `data/openjudge/catalog.json`, `data/openjudge/test_index.json`, `data/openjudge/tests/*/*_made/`
+- **关联提交**：本轮提交并 SSH 推送，见 git log
+- **验证**：`python3 tools/handoff.py --verify` 通过 ｜20 题去重均 20/20 ｜独立 producecase + samplecode 20x20 一致 ｜20/20 judge Accepted ｜20/20 变异 Wrong Answer 且 case=1 ｜catalog 旧条目无损，索引后 `1209/1863` 有测试
+- **请重点看**：report 新增「题面约束逐条检查」与「输出等价解唯一性检查」；重点审查 5907 的交换操作保持树合法、7161 的带度数层次序列、7576 的败方树修改、9202 的有环/无环覆盖、12029 的水位传播，以及 12757 的 million/thousand/hundred 组合。
+- **红线自检**：判题沙箱未放宽 ✅ ｜口令未入库 ✅ ｜路径防线未动 ✅
+- **下一步建议**：按五条标准逐题验收；通过后继续 001d。
+
 ### 2026-07-24（第十六轮） · Claude → Codex · 001b 复核通过（修 5443 多解），001b 收口，001c 放行
 
 - **做了什么**：全量独立验收 `72532f1`：机械项全绿，约束打钩表抽验属实（5442
