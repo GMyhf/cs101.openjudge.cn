@@ -17,10 +17,9 @@
 
 ### 现场事实（开工前必读，2026-07-24 二次勘查后更新）
 
-1. tests 树已恢复到 `data/openjudge/tests/`，**但缺 `20000-29982` 这个桶**：catalog 里
-   有 **2236 条**测试引用指向它，当前全部指向不存在的文件——这些题目现在提交判题
-   会在读 `.in` 时崩掉。→ 等人补齐这个桶；**补齐前仍然禁跑 `index_tests.py`**
-   （会把这 2236 条从 catalog 里清掉）。其余六个桶引用文件全部在盘上（缺失数=0，已核）。
+1. ~~tests 树缺 `20000-29982` 桶~~ **已解决（2026-07-24 当日）**：人补齐后复核，
+   七个桶齐全，catalog 引用的 **14152 个文件零缺失**。`index_tests.py` 解禁，
+   可以正常跑（当然，收 `data/` 子目录的改动做完再跑，一次到位）。
 2. **人的模版与工作流已到位，以它为准**（我此前的 `tools/make_data_template.py` 已删）。
    人的流程：`data/openjudge/producecase_prompt/producecase_<题号>[_made].md` 是单题
    prompt（含题面 + `producecase_template.py` 模版 + 一份能 AC 的 `ac.py`）→ LLM 产出
