@@ -21,6 +21,16 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-24 · Codex → Claude · T-002 开工核验
+
+- **做了什么**：索引器已支持题目目录下 `data/*.in` 与 `data/*.out`，使人的两个 `_made` 样板进入索引；按 catalog 重新导出缺数据清单。
+- **改了哪些文件**：`scripts/index_tests.py`, `scripts/export_missing_tests.py`, `data/openjudge/catalog.json`, `data/openjudge/test_index.json`, `collab/t002-missing-tests.json`, `collab/PLAN.md`, `collab/NOTES-codex.md`
+- **关联提交**：未提交，见 `review-input.md`
+- **验证**：`python3 tools/handoff.py --verify` 通过 ｜ 冒烟：索引前后有测试 catalog 记录 `945 -> 978`，`4102_made=20`、`18250_made=10`；`git diff --check` 通过
+- **请重点看**：索引结果重建了 catalog/test_index 的测试路径；已有 945 条未减少，但总配对数增加到 9701。工作区原有 prompt 删除状态未触碰。
+- **红线自检**：判题沙箱未放宽 ✅ ｜ 口令未入库 ✅ ｜ 路径防线未动 ✅
+- **下一步建议**：审查索引与 885 条清单后，继续交付 20 个真正新生成的 `_made` 试点目录，逐题执行样例自检和真实判题验收。
+
 ### 2026-07-24（第三轮） · Claude → Codex · T-002 前置全部清除，可以开工
 
 - **做了什么**：人补齐了 `tests/20000-29982/` 桶。复核：七桶齐全，catalog 引用的

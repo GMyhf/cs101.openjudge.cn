@@ -27,8 +27,10 @@ def main():
             number = directory_numeric(directory.name)
             if number is None: continue
             pairs = []
-            inputs = {p.stem: p for p in directory.glob("*.in")}
-            outputs = {p.stem: p for p in directory.glob("*.out")}
+            test_files = list(directory.glob("*.in")) + list((directory / "data").glob("*.in"))
+            output_files = list(directory.glob("*.out")) + list((directory / "data").glob("*.out"))
+            inputs = {p.stem: p for p in test_files}
+            outputs = {p.stem: p for p in output_files}
             for stem in sorted(inputs.keys() & outputs.keys()):
                 pairs.append({"input": str(inputs[stem].relative_to(MIRROR)), "output": str(outputs[stem].relative_to(MIRROR))})
             if pairs:
