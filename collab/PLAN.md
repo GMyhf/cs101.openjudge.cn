@@ -15,7 +15,7 @@
 | --- | --- | --- | --- | --- |
 | T-000 | 搭建 Claude⇄Codex 协作脚手架（本目录 + `tools/handoff.py`） | Done | Claude | 移植自 Redmoon/collab，红线清单按本项目改写 |
 | T-001 | **建立测试套件**：判题核心（AC/WA/TLE/RE/CE、输出比对的 token 语义、资源限制真的生效）+ 服务端（注册/登录/会话、`/api/submit` 未登录 401、静态文件不可穿越）。建成后它取代 `--verify` 成为交接闸门 | Backlog | — | 无测试是当前最大的协作风险：审查方没有仲裁工具，只能人肉读 diff |
-| T-002 | **为缺测试数据的题目 LLM 生成测试数据**（实现方 = Codex，复核方 = Claude）：按 `tools/make_data_template.py` 模版，为 catalog 中 `test_cases` 为空的题目逐题写参考解法 + 数据生成器，产出 `data/openjudge/tests/<bucket>/<题号>_made/`。**先做 20 题试点批交 Claude 复核，复核通过再分批放量**。详细规格见 `NOTES-claude.md` 2026-07-24 条 | Backlog | Codex | 前置：真实 tests 树在本克隆缺失（未跟踪），人需先恢复；恢复前**严禁跑 `index_tests.py`**（会把 945 条已索引数据清空） |
+| T-002 | **为缺测试数据的题目 LLM 生成测试数据**（实现方 = Codex，复核方 = Claude）：按 `tools/make_data_template.py` 模版，为 catalog 中 `test_cases` 为空的题目逐题写参考解法 + 数据生成器，产出 `data/openjudge/tests/<bucket>/<题号>_made/`。**先做 20 题试点批交 Claude 复核，复核通过再分批放量**。详细规格见 `NOTES-claude.md` 2026-07-24 条（二次勘查后已更新：以人的 producecase 工作流为准） | Backlog | Codex | 前置：tests 树已恢复但**缺 `20000-29982` 桶**（catalog 2236 条引用悬空，等人补齐；补齐前禁跑 `index_tests.py`）。范围内含：索引器改收 `data/` 子目录，让人已有的 `4102_made`/`18250_made` 生效 |
 
 ## Decision Log
 
@@ -26,6 +26,11 @@
 - 2026-07-24 · 人拍板 T-002：项目本意是把 cs101.openjudge.cn 现代化，提供完整的
   编写、提交、反馈错在哪组数据的闭环；缺数据的题目用 LLM 生成测试数据，
   目录命名 `<题号>_made`（如 `4102_made`）以标记出处。分工：Codex 生成、Claude 复核。
-- 2026-07-24 · 待人确认：人提到「可以提供生成测试数据的 python 模版」。Claude 已按
-  自己的理解起草了 `tools/make_data_template.py`；**若人有自己的模版，以人的为准**，
-  替换后 Codex 再开工。
+- 2026-07-24 ·（已决）人的模版落地：`data/openjudge/producecase_prompt/` 37 份单题
+  prompt（题面 + producecase_template.py + ac.py → LLM 产出 producecase.py），实物
+  样板 `tests/4000-8210/4102_made/`。**以人的工作流为准**，Claude 起草的
+  `tools/make_data_template.py` 已删；其样例自检 + 固定种子两条纪律并入 T-002 规格。
+- 2026-07-24 · Claude 勘查发现并记录：① 恢复的 tests 树缺 `20000-29982` 桶
+  （2236 条 catalog 引用悬空，判题会崩），等人补齐；② 人已生成的 `4102_made`/
+  `18250_made` 因数据在 `data/` 子目录而未被索引器收录（`test_count=0`），
+  修索引器纳入 T-002 范围。
