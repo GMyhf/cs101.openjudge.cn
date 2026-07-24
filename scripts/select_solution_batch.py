@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "data" / "openjudge" / "catalog.json"
 OUTPUT = ROOT / "collab" / "t002-batch-001-manifest.json"
+SKIPS = ROOT / "collab" / "t002-special-judge-skips.md"
 SOURCES = [
     Path("/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md"),
     Path("/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md"),
@@ -33,6 +34,15 @@ def sections(path):
         yield int(match.group(1)), match.group(2).strip(), body, codes, samples
 
 
+def skip_numbers():
+    if not SKIPS.exists():
+        return set()
+    return {
+        int(match.group(1))
+        for match in re.finditer(r"\|\s*0*(\d+)\s*\|", SKIPS.read_text(encoding="utf-8"))
+    }
+
+
 def main():
     catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
     missing = {
@@ -40,10 +50,11 @@ def main():
         for item in catalog["problems"]
         if not item.get("test_cases")
     }
+    skipped = skip_numbers()
     selected = {}
     for source in SOURCES:
         for number, title, body, codes, samples in sections(source):
-            if number not in missing or number in selected or not codes or not samples:
+            if number not in missing or number in skipped or number in selected or not codes or not samples:
                 continue
             python_codes = [code for code in codes if "import " in code or "def " in code]
             if not python_codes:
@@ -59,7 +70,8 @@ def main():
     batch = [selected[number] for number in sorted(selected)[:100]]
     result = {
         "batch": "T-002-001",
-        "selection_rule": "catalog test_cases is empty, solution source exists, sample input exists",
+        "selection_rule": "catalog test_cases is empty, solution source exists, sample input exists, skip-list excluded",
+        "excluded_skip_numbers": sorted(skipped),
         "candidate_count": len(selected),
         "selected_count": len(batch),
         "entries": batch,
