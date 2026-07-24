@@ -43,7 +43,7 @@ def get_section(source, number):
     lines = locate_source(source).read_text(encoding="utf-8", errors="ignore").splitlines()
     starts = [i for i, line in enumerate(lines) if re.match(r"^##\s+", line)]
     for i, start in enumerate(starts):
-        if re.match(rf"^##\s+0*{number}[:：]", lines[start]):
+        if re.match(rf"^##\s+[^\d]*0*{number}[:：]", lines[start]):
             end = starts[i + 1] if i + 1 < len(starts) else len(lines)
             return "\n".join(lines[start:end])
     raise ValueError(number)
