@@ -362,9 +362,14 @@ def gen_catalan(rng): return f"{rng.randint(1, 1000)}\n"
 
 
 def gen_mst(rng):
+    # 题面约束:两个交叉路口之间最多一条道路,生成时必须去重
     n = rng.randint(2, 30); edges = [(i, i + 1, rng.randint(1, 10000)) for i in range(1, n)]
+    seen = {(u, v) for u, v, _ in edges}
     for _ in range(rng.randint(n, n * 3)):
-        u, v = rng.sample(range(1, n + 1), 2); edges.append((u, v, rng.randint(1, 10000)))
+        u, v = rng.sample(range(1, n + 1), 2)
+        key = (min(u, v), max(u, v))
+        if key in seen: continue
+        seen.add(key); edges.append((u, v, rng.randint(1, 10000)))
     return f"{n} {len(edges)}\n" + "\n".join(f"{u} {v} {c}" for u, v, c in edges) + "\n"
 
 

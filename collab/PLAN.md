@@ -15,7 +15,7 @@
 | --- | --- | --- | --- | --- |
 | T-000 | 搭建 Claude⇄Codex 协作脚手架（本目录 + `tools/handoff.py`） | Done | Claude | 移植自 Redmoon/collab，红线清单按本项目改写 |
 | T-001 | **建立测试套件**：判题核心（AC/WA/TLE/RE/CE、输出比对的 token 语义、资源限制真的生效）+ 服务端（注册/登录/会话、`/api/submit` 未登录 401、静态文件不可穿越）。建成后它取代 `--verify` 成为交接闸门 | Backlog | — | 无测试是当前最大的协作风险：审查方没有仲裁工具，只能人肉读 diff |
-| T-002 | **为缺测试数据的题目 LLM 生成测试数据**（实现方 = Codex，复核方 = Claude）：按 `tools/make_data_template.py` 模版，为 catalog 中 `test_cases` 为空的题目逐题写参考解法 + 数据生成器，产出 `data/openjudge/tests/<bucket>/<题号>_made/`。**先做 20 题试点批交 Claude 复核，复核通过再分批放量**。详细规格见 `NOTES-claude.md` 2026-07-24 条（二次勘查后已更新：以人的 producecase 工作流为准） | Review | Codex | 20 题试点已生成并完成自动/真实 judge 验收，待 Claude 按五条标准复核 |
+| T-002 | **为缺测试数据的题目 LLM 生成测试数据**（实现方 = Codex，复核方 = Claude）：按 `tools/make_data_template.py` 模版，为 catalog 中 `test_cases` 为空的题目逐题写参考解法 + 数据生成器，产出 `data/openjudge/tests/<bucket>/<题号>_made/`。**先做 20 题试点批交 Claude 复核，复核通过再分批放量**。详细规格见 `NOTES-claude.md` 2026-07-24 条（二次勘查后已更新：以人的 producecase 工作流为准） | In progress | Codex | 20 题试点已生成并完成自动/真实 judge 验收，待 Claude 按五条标准复核 — **Claude 复核试点批（`6add82f`）通过**：样例保真 20/20、双路径复现一致、judge AC 20/20 + 变异 WA 20/20、三题精读算法全对；**抓到并修掉一处真 bug**（`gen_mst` 重复边违反 27880 题面约束，100/100 种子必现，已去重重建，仅 27880 数据变动）。放量批新增两要求（贴上界数据组 + 题面约束逐条过生成器），见 NOTES。**可以按 ~100 题/批放量** |
 
 ## Decision Log
 
@@ -34,3 +34,7 @@
   （2236 条 catalog 引用悬空，判题会崩），等人补齐；② 人已生成的 `4102_made`/
   `18250_made` 因数据在 `data/` 子目录而未被索引器收录（`test_count=0`），
   修索引器纳入 T-002 范围。
+- 2026-07-24 · **待人拍板**：生成数据入不入 git。现状 `tests/` 整体在 `.gitignore`，
+  Codex 提交 catalog 后到本机重建前，本机 73 个条目判题短暂指向不存在的文件；
+  放量后每台机器都要「pull 后跑构建器」。选项 A：豁免 `*_made/` 入库（纯文本、
+  自洽）；选项 B：维持不入库 + README 写死「pull 后必跑构建器」。Claude 倾向 A。
