@@ -231,7 +231,7 @@
       },
       "producecase_reproduced": true,
       "claude_risk_tier": "low",
-      "platform_ac_reference": "samplecode_ac.cpp（C++，平台 Accepted）；同目录 samplecode.py 在平台 TLE，仅用于本地生成数据与对拍"
+      "platform_ac_reference": "samplecode_ac.cpp（C++，平台 Accepted）；同目录 samplecode.py 在 Python3 档 TLE、**在 PyPy3 档 Accepted**，本地 judge 不支持 PyPy3 故仍以 C++ 为准。详见 pypy3_check_2026_07_26"
     },
     {
       "local_number": 3744,
@@ -739,7 +739,7 @@
       "claude_judge_note": "以 Python 参考解法提交判 TLE（case-0 需 ~55s）；这是语言/算法的限制，不是数据缺陷。C++ 同算法 0.71s 通过 case-0。",
       "claude_risk_tier": "low",
       "claude_cpp_cross_check": "同算法 C++ 实现跑 case-0 用时 0.71s，输出与入库一致（15 1896 / 16 5160 / 19 32757 / 20 59984）；n=24 需 10.1s，故不覆盖题面上界",
-      "platform_ac_reference": "samplecode_ac.cpp（C++，平台 Accepted）；同目录 samplecode.py 在平台 TLE，仅用于本地生成数据与对拍"
+      "platform_ac_reference": "samplecode_ac.cpp（C++，平台 Accepted）；同目录 samplecode.py 在 Python3 档 TLE、**在 PyPy3 档 Accepted**，本地 judge 不支持 PyPy3 故仍以 C++ 为准。详见 pypy3_check_2026_07_26"
     },
     {
       "local_number": 4010,
@@ -1041,6 +1041,33 @@
       "data/openjudge/tests/4000-8210/04009_made/samplecode_ac.cpp"
     ],
     "local_check": "两份都与本地 21 组数据逐组一致；4009 题面上界 n=24 单跑 2.3s、1..24 全跑 4.1s，且三种写法（位枚举 / 逐列 DFS 剪枝 / 查表+镜像+双向剪枝）在 n=1..24 结果逐行一致",
-    "status_change": "round4 的「3728 与 4009 无 AC 参考实现」这一条**已解除**：两题现在都有平台背书的参考实现，只是语言是 C++ 而非 Python"
+    "status_change": "round4 的「3728 与 4009 无 AC 参考实现」一条已解除。更准确地说：Python 实现在 PyPy3 档就能过（见 pypy3_check_2026_07_26），C++ 版本的意义在于本地 judge 不支持 PyPy3，它是这两题在**本地**唯一跑得进时限的参考实现"
+  },
+  "pypy3_check_2026_07_26": {
+    "why": "人拍板：Python 提交可能超时，增加 PyPy3 提交这一档",
+    "oracles_retried": {
+      "submitted": [
+        3727,
+        3728,
+        3789,
+        3791,
+        3906,
+        4006,
+        4008,
+        4034
+      ],
+      "result": "8 份全部仍未通过（6 TLE / 2 MLE）",
+      "reading": "这些 oracle 是**算法层面**的暴力（指数或高次多项式），换个更快的解释器救不回来。这反过来确认了它们「只适用于小规模生成数据」是设计使然，不是解释器速度问题"
+    },
+    "references_retried": {
+      "3728": "samplecode.py + PyPy3 -> **Accepted 3094ms**（#52995172）。Python3 下是 TLE",
+      "4009": "samplecode.py + PyPy3 -> **Accepted 389ms**（#52995173）。Python3 下是 TLE"
+    },
+    "correction": "这一条**推翻了本报告先前的说法**。此前记「3728 与 4009 没有 AC 的 Python 参考实现，只有 C++ 有平台背书」——不对。两题的 Python 实现**算法本身是够的**，只是 CPython 跑不进时限；换 PyPy3 双双 Accepted。准确的说法是：**这 2 题的 Python 参考解法在 Python3 档超时、在 PyPy3 档通过**",
+    "local_judge_gap": {
+      "fact": "本地 judge.py 支持 python3 / c / cpp，**不支持 pypy3**（第 32、39 行）；本机也未安装 pypy3",
+      "consequence": "同一份 Python 参考解法，平台 PyPy3 档能过，本地判题器判 TLE。就 3728、4009 这类题而言，本地镜像比真实平台更严",
+      "not_acted": "加 PyPy3 属判题沙箱改动 -> **红线 1，需人拍板**，本轮只记录不动手"
+    }
   }
 }
