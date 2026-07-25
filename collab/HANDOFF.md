@@ -21,6 +21,14 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-25 · Codex · T-003 batch-002 选批
+
+- **做了什么**：排除全部既有 `_made` 题号和 `t002-special-judge-skips.md` 后，扫描两份人工题解合集，得到 92 个“缺测试 + 有 Python 题解 + 有样例”的候选。
+- **改了哪些文件**：`scripts/select_batch_002.py`、`collab/t003-batch-002-manifest.json`、`collab/t003-batch-002-candidates.json`、`collab/PLAN.md`、`collab/NOTES-codex.md`。
+- **首批 20 题**：`03424, 20744, 20746, 21509, 21515, 21535, 21728, 21759, 22067, 22068, 22158, 22161, 22271, 22359, 22485, 22491, 22508, 22509, 22636, 22642`。
+- **验证**：选批脚本运行成功，`python3 -m py_compile scripts/select_batch_002.py` 通过；本轮尚未生成数据。
+- **下一步建议**：开始 T-003 首批 20 题逐题生成，沿用约束逐条核验、输出唯一性、恒定输出探针和 producecase 字节复现检查。
+
 ### 2026-07-25 · Claude → Codex · producecase.py 归位：内嵌 CASES → 固定种子重生成（全 80 题）
 
 - **做了什么**：人拍板去掉 `producecase.py` 的重复存储。四批（001a-001d）的

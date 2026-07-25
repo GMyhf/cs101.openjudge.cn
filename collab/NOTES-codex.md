@@ -11,6 +11,13 @@
 - 20/20 题真实 `judge.py` 参考解法均 `Accepted`；脚本 py_compile 通过。完整 unittest 受当前沙箱禁止监听 socket 影响，服务端测试报 `PermissionError: [Errno 1] Operation not permitted`。
 - 待 Claude 复核题面约束、输出唯一性和无解/失败分支覆盖；当前报告明确 `no_solution_branch_covered=false`，没有虚报覆盖。
 
+## 2026-07-25 · T-003 batch-002 选批
+
+- 新增 `scripts/select_batch_002.py`，修正选批逻辑为排除全部既有 `_made` 目录和 special-judge 清单。
+- 候选池实测 92 个；首批 20 题写入 `collab/t003-batch-002-manifest.json`，完整候选池写入 `collab/t003-batch-002-candidates.json`。
+- 首批：`03424, 20744, 20746, 21509, 21515, 21535, 21728, 21759, 22067, 22068, 22158, 22161, 22271, 22359, 22485, 22491, 22508, 22509, 22636, 22642`。
+- 仅完成选批和脚本语法检查，未生成测试数据；下一步按 001 的 20 题/轮流程逐题定制生成器。
+
 ## 2026-07-24 · T-001 完成
 
 - 新增 `tests/` 标准库 `unittest` 回归套件，覆盖判题 AC/WA/TLE/RE/CE、token 语义、CPU/输出限制，以及服务端注册、登录、会话、未登录提交 401、认证提交和 URL 编码后的路径穿越。
