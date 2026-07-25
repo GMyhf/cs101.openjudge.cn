@@ -345,6 +345,158 @@ def alt(n,s):
                 if (sp&set(qa))-ends: continue
                 best=max(best,sum(g[x] for x in sp|set(qa)))
         return str(best)+"\n"
+    if n==3726 or n==3866:
+        # 参考用 BFS 队列；这里 3726 改「Bellman-Ford 式反复松弛到不动点」、
+        # 3866 改「并查集连通块」——都与 BFS 不同族。
+        a=s.split();p=0;out=[]
+        while p<len(a):
+            R,C=int(a[p]),int(a[p+1]);p+=2
+            if not R:break
+            rows=R if n==3726 else C
+            g=a[p:p+rows];p+=rows
+            H,W=len(g),len(g[0])
+            if n==3726:
+                st=next((i,j) for i in range(H) for j in range(W) if g[i][j]=="@")
+                INF=1<<30;dist=[[INF]*W for _ in range(H)];dist[st[0]][st[1]]=0
+                changed=True
+                while changed:                       # 反复松弛到不动点
+                    changed=False
+                    for i in range(H):
+                        for j in range(W):
+                            if g[i][j]=="#" or dist[i][j]==INF:continue
+                            for u,v in ((i-1,j),(i+1,j),(i,j-1),(i,j+1)):
+                                if 0<=u<H and 0<=v<W and g[u][v]!="#" and dist[i][j]+1<dist[u][v]:
+                                    dist[u][v]=dist[i][j]+1;changed=True
+                tg=next(((i,j) for i in range(H) for j in range(W) if g[i][j]=="*"),None)
+                out.append(str(-1 if tg is None or dist[tg[0]][tg[1]]>=INF else dist[tg[0]][tg[1]]))
+            else:
+                par=list(range(H*W))
+                def find(x):
+                    while par[x]!=x: par[x]=par[par[x]];x=par[x]
+                    return x
+                for i in range(H):
+                    for j in range(W):
+                        if g[i][j]=="#":continue
+                        for u,v in ((i+1,j),(i,j+1)):
+                            if u<H and v<W and g[u][v]!="#":
+                                x,y=find(i*W+j),find(u*W+v)
+                                if x!=y: par[x]=y
+                st=next((i,j) for i in range(H) for j in range(W) if g[i][j]=="@")
+                root=find(st[0]*W+st[1])
+                out.append(str(sum(1 for i in range(H) for j in range(W)
+                                   if g[i][j]!="#" and find(i*W+j)==root)))
+        return "\n".join(out)+"\n"
+    if n==3727:
+        # 参考是滚动 DP；这里枚举全部下/右路径（R,C<=8，最多 C(14,7)=3432 条）
+        a=s.split();p=1;out=[]
+        for _ in range(int(a[0])):
+            R,C=int(a[p]),int(a[p+1]);p+=2
+            g=[int(x) for x in a[p:p+R*C]];p+=R*C
+            best=[-1]
+            def walk(i,j,acc):
+                acc+=g[i*C+j]
+                if i==R-1 and j==C-1:
+                    if acc>best[0]:best[0]=acc
+                    return
+                if i+1<R: walk(i+1,j,acc)
+                if j+1<C: walk(i,j+1,acc)
+            walk(0,0,0)
+            out.append(str(best[0]))
+        return "\n".join(out)+"\n"
+    if n==3728:
+        # 参考用堆按需弹出；这里先闭包生成一批再排序取第 n 小
+        out=[]
+        for line in s.splitlines():
+            if not line.strip():continue
+            b,k=map(int,line.split())
+            cap=b;got=[]
+            while len(got)<k:                        # 逐步放大上界直到够 k 个
+                cap*=3
+                seen={b};stack=[b]
+                while stack:
+                    x=stack.pop()
+                    for y in (2*x+1,3*x+1):
+                        if y<=cap and y not in seen: seen.add(y);stack.append(y)
+                got=sorted(seen)
+            out.append(str(got[k-1]))
+        return "\n".join(out)+"\n"
+    if n==3744:
+        # 参考按 n%(x*y) 筛；这里先求全部因子，再枚举因子三元组
+        a=s.split();out=[]
+        for t in a[1:]:
+            v=int(t);divs=[d for d in range(1,v+1) if v%d==0]
+            best=None
+            for x in divs:
+                for y in divs:
+                    if x*y>v or v%(x*y):continue
+                    z=v//(x*y);area=2*(x*y+x*z+y*z)
+                    if best is None or area<best: best=area
+            out.append(str(best))
+        return "\n".join(out)+"\n"
+    if n==4002:
+        # 参考对每个元素 count；这里建「书 -> 读者集合」的邻接视角
+        a=s.split();m=int(a[0]);v=[int(x) for x in a[2:2+m]]
+        by={}
+        for i,x in enumerate(v): by.setdefault(x,[]).append(i)
+        out=[]
+        for i,x in enumerate(v):
+            friends={j for j in by[x] if j!=i}
+            out.append(str(len(friends)) if friends else "BeiJu")
+        return "\n".join(out)+"\n"
+    if n==4006:
+        # 参考用闭式环公式；这里真的按规则模拟螺旋走一遍，把编号填进网格
+        a=s.split();q,m=int(a[0]),int(a[1])
+        grid=[[0]*m for _ in range(m)]
+        x=y=0;dx,dy=0,1;num=1
+        for _ in range(m*m):
+            grid[x][y]=num;num+=1
+            nx,ny=x+dx,y+dy
+            if not(0<=nx<m and 0<=ny<m and grid[nx][ny]==0):
+                dx,dy=dy,-dx                 # 撞墙/撞到已填格就右转
+                nx,ny=x+dx,y+dy
+            x,y=nx,ny
+        out=[]
+        for k in range(q):
+            i,j=int(a[2+2*k]),int(a[3+2*k])
+            out.append(str(grid[i-1][j-1]))
+        return "\n".join(out)+"\n"
+    if n==4008:
+        # 参考是剩余类 DP；这里枚举全部子集（n<=12 -> 至多 4096 个）
+        a=s.split();m,k=int(a[0]),int(a[1]);v=[int(x) for x in a[2:2+m]]
+        best=0
+        for msk in range(1<<m):
+            t=sum(v[i] for i in range(m) if msk>>i&1)
+            if t%k==0 and t>best: best=t
+        return str(best)+"\n"
+    if n==4010:
+        # 参考用内置模幂；这里先求 2011^t mod 10000 的周期，再按指数取模查表
+        a=s.split();cyc=[];x=1
+        for _ in range(10000):
+            x=x*2011%10000;cyc.append(x)
+            if len(cyc)>1 and x==cyc[0]: cyc.pop();break
+        P=len(cyc)                                   # cyc[i] = 2011^(i+1) mod 10000
+        return "\n".join(str(cyc[(int(t)-1)%P]) for t in a[1:])+"\n"
+    if n==4021:
+        # 参考对每个 i 重算整段乘积；这里用前后缀乘积一次扫完
+        a=s.split();p=1;out=[]
+        for _ in range(int(a[0])):
+            m=int(a[p]);v=[int(x) for x in a[p+1:p+1+m]];p+=m+1
+            pre=[1]*(m+1);suf=[1]*(m+1)
+            for i in range(m): pre[i+1]=pre[i]*v[i]
+            for i in range(m-1,-1,-1): suf[i]=suf[i+1]*v[i]
+            z=[pre[i]*suf[i+1] for i in range(m)]
+            top=max(z);out.append(str(v[z.index(top)]))
+        return "\n".join(out)+"\n"
+    if n==4033:
+        # 参考是正序扫描保留最后一个；这里收集全部覆盖者再取最大编号
+        a=s.split();m=int(a[0]);x,y=int(a[1+4*m]),int(a[2+4*m])
+        hit=[i+1 for i in range(m)
+             if int(a[1+4*i])<=x<=int(a[1+4*i])+int(a[3+4*i])
+             and int(a[2+4*i])<=y<=int(a[2+4*i])+int(a[4+4*i])]
+        return str(max(hit) if hit else -1)+"\n"
+    # 4009 没有 Python 第二实现：题面样例需算到 n=20，任何 Theta(2^n) 的
+    # 第二实现同样跑不动（参考实现单跑 n=20 就要 ~38s）。已改用 C++ 同算法交叉验证
+    # case-0（0.71s，输出一致），结论记在报告的 independent_oracle_status 里。
     if n==4034:
         a=list(map(int,s.split()));m,_,p=a[0],a[1],a[2]
         v=[(a[3+2*i],a[4+2*i]) for i in range(m)]
@@ -407,7 +559,11 @@ def main():
             else:raise AssertionError(("diversity",n))
         # A direct mutation of a decision point must be caught by the data.
         badref=ref
-        mutations={3723:("len(e)==1","len(e)==0"),3725:("min(q)","max(q)"),3726:("g[u][v]!=\"#\"","g[u][v]==\"#\""),3727:("max(d[j],","min(d[j],"),3728:("3*x+1","3*x+2"),3744:("2*(x*y+x*w+y*w)","2*(x*y+x*w+y*w)+1"),3789:("range(n-L+1)","range(n-L)"),3791:("y.startswith(x)","x.startswith(y)"),3866:("out.append(str(len(seen)))","out.append(str(len(seen)-1))"),3906:("(X,Y)!=(U,W)","(X,Y)==(U,W)"),4001:("2*x","2*x+1"),4002:("v.count(x)>1","v.count(x)>2"),4006:("min(i-1,j-1,n-i,n-j)","min(i-1,j-1,n-i+1,n-j)"),4007:("(c!=y[j])","(c==y[j])"),4008:("return str(d[0])","return str(d[-1])"),4009:("z==0","z==1"),4010:("10000","1000"),4021:("max(z)","min(z)"),4033:("ans=i+1","ans=i"),4034:("<=p","<p")}
+        # 变异必须**真的改变行为**：只断言源码变了是不够的——3726/4010 原先的变异
+        # 分别落在死代码和别题的分支上，21 组输出一模一样，探针等于在测一个不存在的变化。
+        def mutation_is_effective(original, mutated, samples):
+            return any(run(original, c) != run(mutated, c) for c in samples)
+        mutations={3723:("len(e)==1","len(e)==0"),3725:("min(q)","max(q)"),3726:("ans=d","ans=d+1"),3727:("max(d[j],","min(d[j],"),3728:("3*x+1","3*x+2"),3744:("2*(x*y+x*w+y*w)","2*(x*y+x*w+y*w)+1"),3789:("range(n-L+1)","range(n-L)"),3791:("y.startswith(x)","x.startswith(y)"),3866:("out.append(str(len(seen)))","out.append(str(len(seen)-1))"),3906:("(X,Y)!=(U,W)","(X,Y)==(U,W)"),4001:("(x-1,x+1,2*x)","(x-1,x+1,2*x+1)"),4002:("v.count(x)>1","v.count(x)>2"),4006:("min(i-1,j-1,n-i,n-j)","min(i-1,j-1,n-i+1,n-j)"),4007:("(c!=y[j])","(c==y[j])"),4008:("return str(d[0])","return str(d[-1])"),4009:("z==0","z==1"),4010:("2011,int(x),10000","2011,int(x),1000"),4021:("max(z)","min(z)"),4033:("ans=i+1","ans=i"),4034:("<=p","<p")}
         old,new=mutations[n];mut=ref.replace(old,new);assert mut!=ref
         if n in NO_INDEPENDENT_ORACLE:
             hits=[]
