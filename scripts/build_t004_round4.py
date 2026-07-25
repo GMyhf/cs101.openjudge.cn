@@ -3,6 +3,9 @@ import json, random, subprocess, sys, tempfile, inspect, hashlib
 from pathlib import Path
 from collections import deque
 from build_001a import bucket
+# 共享自检模块：判据实现一次、各轮 import，避免修复留在旧脚本里带不过来
+# （001d 的写死字段、round4 的手维护 oracle 清单，都在 round5 又出现了一遍）。
+import t004_common as common
 
 ROOT=Path(__file__).resolve().parents[1]
 MANIFEST=ROOT/"collab/t004-round4-manifest.json"
@@ -343,6 +346,31 @@ def alt(n,s):
             cand=(sum(abs(load-M) for load,_ in h),-k)
             if best is None or cand<best: best=cand
         return f"{-best[1]}\n"
+    # 2026-07-26 找回：这两个 oracle 曾在同日的 6f45e36 里被误删 —— 当时重写 3725 的
+    # oracle 用了「从 `if n==3725:` 切到 `if n==3726 or n==3866:`」的文本区间替换，
+    # 而 3789、3906 正好夹在这个区间里。报告却一直写着它们 passed。
+    # 教训：改代码不要按文本区间整段替换，按行定位插入/替换。
+    if n==3789:
+        a=list(map(int,s.split()));m,k=a[0],a[1];v=a[2:]
+        for L in range(m,0,-1):
+            for i in range(m-L+1):
+                pat=v[i:i+L]
+                if sum(v[j:j+L]==pat for j in range(m-L+1))>=k: return str(L)+"\n"
+        return "0\n"
+    if n==3906:
+        a=list(map(int,s.split()));m,c=a[0],a[1];g=a[2:];paths=[]
+        def walk(x,y,cells):
+            if x==m-1 and y==c-1: paths.append(cells);return
+            if x+1<m: walk(x+1,y,cells+[(x+1)*c+y])
+            if y+1<c: walk(x,y+1,cells+[x*c+y+1])
+        walk(0,0,[0])
+        ends={0,(m-1)*c+c-1};best=-1
+        for pa in paths:
+            sp=set(pa)
+            for qa in paths:
+                if (sp&set(qa))-ends: continue
+                best=max(best,sum(g[x] for x in sp|set(qa)))
+        return str(best)+"\n"
     if n==3726 or n==3866:
         # 参考用 BFS 队列；这里 3726 改「Bellman-Ford 式反复松弛到不动点」、
         # 3866 改「并查集连通块」——都与 BFS 不同族。
@@ -545,11 +573,7 @@ CPP_CROSS_CHECKED={4009}   # 无 Python 第二实现（Theta(2^n) 跑不动）�
 
 def has_oracle(n, sample):
     """alt() 是否真为这题实现了独立 oracle。以能不能跑通为准，不靠手维护的清单。"""
-    try:
-        alt(n, sample)
-    except LookupError:
-        return False
-    return True
+    return common.has_oracle(alt, n, sample)
 
 def main():
     man=json.loads(MANIFEST.read_text(encoding="utf-8")); rows=[]
@@ -575,7 +599,7 @@ def main():
         # 变异必须**真的改变行为**：只断言源码变了是不够的——3726/4010 原先的变异
         # 分别落在死代码和别题的分支上，21 组输出一模一样，探针等于在测一个不存在的变化。
         def mutation_is_effective(original, mutated, samples):
-            return any(run(original, c) != run(mutated, c) for c in samples)
+            return common.mutation_is_effective(run, original, mutated, samples)["status"] == "passed"
         mutations={3723:("len(e)==1","len(e)==0"),3725:("min(q)","max(q)"),3726:("ans=d","ans=d+1"),3727:("max(d[j],","min(d[j],"),3728:("3*v[i3]+1","3*v[i3]+2"),3744:("2*(x*y+x*w+y*w)","2*(x*y+x*w+y*w)+1"),3789:("min(lcp[i+1:i+k])","max(lcp[i+1:i+k])"),3791:("y.startswith(x)","x.startswith(y)"),3866:("out.append(str(len(seen)))","out.append(str(len(seen)-1))"),3906:("(X,Y)!=(U,W)","(X,Y)==(U,W)"),4001:("(x-1,x+1,2*x)","(x-1,x+1,2*x+1)"),4002:("v.count(x)>1","v.count(x)>2"),4006:("min(i-1,j-1,n-i,n-j)","min(i-1,j-1,n-i+1,n-j)"),4007:("(c!=y[j])","(c==y[j])"),4008:("return str(d[0])","return str(d[-1])"),4009:("z==0","z==1"),4010:("2011,int(x),10000","2011,int(x),1000"),4021:("max(z)","min(z)"),4033:("ans=i+1","ans=i"),4034:("<=p","<p")}
         if not independent:
             hits=[]
@@ -619,7 +643,7 @@ with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as h:
         p=subprocess.run([sys.executable,"producecase.py"],cwd=d,capture_output=True,text=True,timeout=600)
         after={p.name:p.read_bytes() for p in data.iterdir()};assert p.returncode==0 and before==after,(n,p.stderr)
         f=max(outs.count(x) for x in outs)
-        row={"local_number":n,"title":e["title"],"source":e["source"],"reference_source":"LLM-written","generator":gen.__name__,"seed":n,"test_cases":21,"distinct_input_cases":len(set(cases)),"distinct_outputs":len(set(outs)),"constant_output_probe":{"status":"rejected" if f<21 else "accepted","frequency":f,"total":21},"constraints":CONSTRAINTS[n],"structure_checked":True,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"independent_oracle_smoke":{"seeds":400,"status":"passed"} if independent else {"seeds":0,"status":"not_available","reason":"no independent oracle implemented"},"independent_oracle_status":"passed" if independent else ("no_python_oracle_cross_checked_in_cpp" if n in CPP_CROSS_CHECKED else "no_independent_oracle"),"sample_reproduced":True,"independent_sample_agreement":True if independent else None,"misconception_probe":{"data_catches_misreading":True,"data_catching_cases":hits,"status":"caught"} if independent else {"status":"not_available","reason":"no independent oracle implemented"},"producecase_reproduced":True}
+        row={"local_number":n,"title":e["title"],"source":e["source"],"reference_source":"LLM-written","generator":gen.__name__,"seed":n,"test_cases":21,"distinct_input_cases":len(set(cases)),"distinct_outputs":len(set(outs)),"constant_output_probe":common.constant_output_probe(outs),"constraints":CONSTRAINTS[n],"structure_checked":True,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"independent_oracle_smoke":{"seeds":400,"status":"passed"} if independent else {"seeds":0,"status":"not_available","reason":"no independent oracle implemented"},"independent_oracle_status":"passed" if independent else ("no_python_oracle_cross_checked_in_cpp" if n in CPP_CROSS_CHECKED else "no_independent_oracle"),"sample_reproduced":True,"independent_sample_agreement":True if independent else None,"misconception_probe":{"data_catches_misreading":True,"data_catching_cases":hits,"status":"caught"} if independent else {"status":"not_available","reason":"no independent oracle implemented"},"producecase_reproduced":True}
         if n==4009: row["coverage_note"]="无查表实测：n=20 样例可在约 8 秒完成，n=21 可在约 16 秒完成；n=22 未在 60 秒限制内完成，因此本批不声称覆盖题面上界 24。"
         rows.append(row)
         print("built",n,flush=True)

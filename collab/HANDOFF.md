@@ -21,6 +21,56 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-26 · Claude → Codex · T-009 共享自检模块｜**下一轮请从 round4 脚本派生**
+
+人拍板：把反复回来的判据抽成共享模块，下一轮从 `build_t004_round4.py` 派生而不是从零重写。
+
+**为什么**：同一批缺陷跨轮反复出现 —— 001d 立的「报告字段必须实测」在 round5 又成了字面量；
+round4 拆掉的「手维护 oracle 清单」round5 又写了一份；001a 的「去重 >=15」被 T-007 和 round5
+各抓一次。**根因不是粗心，是修复留在旧脚本里，新脚本从零重写就带不过来。**
+
+**`scripts/t004_common.py`** —— 判据实现一次：
+
+| 函数 | 管住的那个缺陷 |
+| --- | --- |
+| `constant_output_probe` | status **由测量推出**，不接受传入（round5 写成了字面量 `"rejected"`） |
+| `distinct_cases` | 不足 15 组**必须**给豁免理由，否则 FAILED（round5 的 4012 是 4 组） |
+| `has_oracle` | 从实现推导，不查手维护清单（round4/round5 各栽一次） |
+| `oracle_independence` | 逐字重合分诊（round5 的 4011 是 15/27 行相同） |
+| `mutation_is_effective` | 变异必须真的改变行为（round4 有 3 条空操作） |
+| `byte_reproduction` / `samplecode_recompute` / `sample_is_case_zero` | 2026-07-25 立的三条 |
+
+接口上有条硬规矩：**凡是「实测值」字段一律由模块自己算，函数不接受调用方传现成结果**。
+「写死 status」这件事在这个接口下做不到 —— 001d 那条规矩失效，正是因为它只写进了文档。
+
+**`scripts/oj_submit.py`** —— 平台提交客户端。三档 `Python3 → PyPy3 → C++`；
+**口令只从 `OJ_USER`/`OJ_PASS` 读，不落盘、不回显、不接受当参数传**（红线 2）。
+另外记着：**整份分派器交上去会被平台 pylint 判 `E0102 function-redefined`**，要按题拆单题程序。
+
+**`tests/test_t004_common.py`** —— 19 条，**每条判据都成对写「通过路径」和「失败路径」**。
+其中一条专门钉住误报：round5 的 3377 曾因两行模板被判「重合过高」，
+阈值改成「比率 >= 0.80 **或** 逐字相同 >= 5 行」后不再误报 —— **一个乱叫的检查会被整体忽略。**
+
+**验收标准是拿它回扫历史批次**，不是「跑通了」：
+round4 **报警 0 题**（无误报）、round5 **精确报出**我手工复核发现的 3433 / 4011 / 4012 / 4140 四条。
+也就是说，这个模块在 round5 构建时就能拦下那四条。
+
+**副产品：模块上线当天照出一处潜伏回归，而且是我自己造的。**
+3789 和 3906 的 oracle 在 `6f45e36` 被我误删 —— 当时重写 3725 的 oracle 用了
+「从 `if n==3725:` 切到 `if n==3726 or n==3866:`」的**文本区间整段替换**，
+而这两个分支正好夹在区间里。round4 报告至今写着它们 `passed`，代码里却已经没有了。
+已从 `1cb07c9` 找回并重验：题面样例一致、400 种子各 0 不一致，`has_oracle` 回到 19+1。
+**教训：改代码按行定位插入/替换，不要按文本区间整段替换。**
+
+- **改了哪些文件**：`scripts/t004_common.py`（新增）、`scripts/oj_submit.py`（新增）、
+  `tests/test_t004_common.py`（新增）、`scripts/build_t004_round4.py`（接入模块 + 找回两个 oracle）、
+  `collab/PLAN.md`、`collab/HANDOFF.md`、`collab/NOTES-claude.md`。**题目数据零改动。**
+- **验证**：模块测试 19/19 ｜ 回扫 round4 零报警、round5 精确命中 4 条 ｜
+  `has_oracle` 19+1 与报告一致 ｜ 3789/3906 各 400 种子 0 不一致 ｜ `--verify` 全绿。
+- **红线自检**：判题沙箱未动 ✅ ｜ 口令未入库 ✅（客户端只读环境变量）｜ 路径防线未动 ✅
+- **下一轮怎么开工**：复制 `build_t004_round4.py` 改题号与 `GENERATORS`/`alt()`/`mutations`/`CONSTRAINTS`，
+  报告字段全部走 `common.*`。round5 的 6 条打回项仍待你处理（见上一条交接）。
+
 ### 2026-07-26 · Claude → Codex · **round5 打回**：4 题的参考解法在平台判错，数据是错的
 
 先说最重的一条：**3750、4012、4076 平台判 Wrong Answer，3377 判 Presentation Error。

@@ -1,0 +1,192 @@
+"""共享自检模块的回归测试。
+
+这个模块存在的意义就是「让判据不会再退化成写死的字面量」，所以它自己的每条判据
+都必须能输出「失败」。下面每个用例都成对写：一条证明通过路径、一条证明失败路径。
+"""
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+import t004_common as common
+
+
+class ConstantOutputProbeTests(unittest.TestCase):
+    def test_all_outputs_identical_means_the_probe_accepts(self):
+        # 21 组输出一模一样 -> 常量解法能过全部数据 -> 这份数据没有鉴别力。
+        # round5 把这个字段写成了字面量 "rejected"，4140 的 21/21 就这么被盖住了。
+        probe = common.constant_output_probe(["5.705085930\n"] * 21)
+        self.assertEqual(probe["status"], "accepted")
+        self.assertEqual((probe["frequency"], probe["total"]), (21, 21))
+
+    def test_one_differing_output_is_enough_to_reject(self):
+        probe = common.constant_output_probe(["1"] * 20 + ["2"])
+        self.assertEqual(probe["status"], "rejected")
+        self.assertEqual(probe["frequency"], 20)
+
+    def test_token_semantics_match_the_judge(self):
+        # 判题按 token 比对，探针也必须按 token，否则空白差异会假装成「有鉴别力」。
+        self.assertEqual(common.constant_output_probe(["1 2", " 1  2 ", "1\n2"])["status"],
+                         "accepted")
+
+
+class DistinctCasesTests(unittest.TestCase):
+    def test_below_threshold_without_exemption_fails(self):
+        row = common.distinct_cases(["a"] * 18 + ["b", "c", "d"])
+        self.assertEqual(row["status"], "FAILED")
+        self.assertEqual(row["distinct"], 4)            # round5 的 4012 就是 4 组
+
+    def test_below_threshold_with_exemption_is_recorded_not_hidden(self):
+        row = common.distinct_cases(["x"], exemption="题面无输入，输入域只有 1 个取值")
+        self.assertEqual(row["status"], "exempted")
+        self.assertIn("题面无输入", row["exemption"])
+
+    def test_at_threshold_passes(self):
+        self.assertEqual(common.distinct_cases([str(i) for i in range(15)])["status"], "passed")
+
+
+class HasOracleTests(unittest.TestCase):
+    def test_derives_from_the_implementation_not_a_list(self):
+        def oracle(number, text):
+            if number == 1:
+                return "ok"
+            raise LookupError(number)
+        self.assertTrue(common.has_oracle(oracle, 1, ""))
+        self.assertFalse(common.has_oracle(oracle, 2, ""))
+
+    def test_a_real_error_is_not_swallowed_as_absent(self):
+        # 只有 LookupError 才算「没实现」；其他异常是真 bug，必须抛出来，
+        # 否则一个手滑的 NameError 会被静默记成「这题没有 oracle」。
+        def oracle(number, text):
+            raise ValueError("boom")
+        with self.assertRaises(ValueError):
+            common.has_oracle(oracle, 1, "")
+
+
+class OracleIndependenceTests(unittest.TestCase):
+    def test_renamed_copy_raises_the_alarm(self):
+        reference = "\n".join(f"line{i} = compute({i})" for i in range(12))
+        oracle = reference.replace("line3", "renamed3")     # 只改一行
+        self.assertEqual(common.oracle_independence(reference, oracle)["status"], "ALARM")
+
+    def test_short_implementations_sharing_boilerplate_do_not_alarm(self):
+        # 回归：round5 的 3377 曾因两行模板（`while i<=j:` / `else:...`）被误报。
+        # 一个乱叫的检查会被整体忽略，所以这条必须钉住。
+        reference = ("n=int(a[0]);v=a[1:1+n];i,j=0,n-1;out=[]\n"
+                     "while i<=j:\n"
+                     "if v[i:j+1] <= v[i:j+1][::-1]:out.append(v[i]);i+=1\n"
+                     "else:out.append(v[j]);j-=1\n"
+                     'return "".join(out)+"\\n"')
+        oracle = ("a=text.split(); v=a[1:1+int(a[0])]\n"
+                  "i,j=0,len(v)-1; out=[]\n"
+                  "while i<=j:\n"
+                  "if v[i] < v[j]: out.append(v[i]); i+=1\n"
+                  "elif v[i] > v[j]: out.append(v[j]); j-=1\n"
+                  "else:\n"
+                  "k=0\n"
+                  "while i+k<=j-k and v[i+k]==v[j-k]: k+=1\n"
+                  "if i+k>j-k or v[i+k] < v[j-k]: out.append(v[i]); i+=1\n"
+                  "else:out.append(v[j]);j-=1\n"
+                  "return ''.join(out)+'\\n'")
+        row = common.oracle_independence(reference, oracle)
+        self.assertEqual(row["status"], "passed", row)
+
+    def test_identical_one_liner_alarms(self):
+        # round5 的 4140：参考解法与 oracle 是同一句写死的常量。
+        line = 'return "5.705085930\\n"'
+        self.assertEqual(common.oracle_independence(line, line)["status"], "ALARM")
+
+
+class MutationTests(unittest.TestCase):
+    @staticmethod
+    def _run(source, case):
+        return source.replace("X", case)          # 一个便于观察的假 run
+
+    def test_no_op_mutation_fails(self):
+        # 变异串没匹配上 -> 源码没变 -> 探针在测一个不存在的变化。
+        row = common.mutation_is_effective(self._run, "same", "same", ["a", "b"])
+        self.assertEqual(row["status"], "FAILED")
+
+    def test_mutation_that_changes_no_output_fails(self):
+        # 源码变了但落在死代码上：21 组输出一模一样。round4 抓到过 3 条这样的。
+        row = common.mutation_is_effective(lambda src, case: "constant",
+                                           "before", "after", ["a", "b", "c"])
+        self.assertEqual(row["status"], "FAILED")
+        self.assertEqual(row["changed_cases"], 0)
+
+    def test_effective_mutation_passes(self):
+        row = common.mutation_is_effective(self._run, "X", "Y", ["a", "b"])
+        self.assertEqual(row["status"], "passed")
+        self.assertEqual(row["changed_cases"], 2)
+
+
+def _make_fixture(folder, *, cases, sample="1 2\n", broken_reference=False):
+    """搭一个最小的 `_made` 目录：samplecode.py 求和，producecase.py 固定重放。"""
+    made = Path(folder) / "00001_made"
+    (made / "data").mkdir(parents=True)
+    for index, text in enumerate(cases):
+        (made / "data" / f"{index}.in").write_text(text, encoding="utf-8")
+        total = "999" if broken_reference and index else str(sum(int(x) for x in text.split()))
+        (made / "data" / f"{index}.out").write_text(total + "\n", encoding="utf-8")
+    (made / "samplecode.py").write_text(
+        "import sys\nprint(sum(int(x) for x in sys.stdin.read().split()))\n", encoding="utf-8")
+    (made / "producecase.py").write_text(
+        "from pathlib import Path\n"
+        f"CASES = {cases!r}\n"
+        "root = Path(__file__).parent / 'data'\n"
+        "for i, c in enumerate(CASES):\n"
+        "    (root / f'{i}.in').write_text(c, encoding='utf-8')\n"
+        "    (root / f'{i}.out').write_text(str(sum(int(x) for x in c.split())) + '\\n', encoding='utf-8')\n",
+        encoding="utf-8")
+    return made
+
+
+class DiskCheckTests(unittest.TestCase):
+    def test_sample_must_be_case_zero(self):
+        with tempfile.TemporaryDirectory() as folder:
+            made = _make_fixture(folder, cases=["1 2\n", "3 4\n"])
+            self.assertEqual(common.sample_is_case_zero(made, "1 2\n")["status"], "passed")
+            self.assertEqual(common.sample_is_case_zero(made, "9 9\n")["status"], "FAILED")
+
+    def test_samplecode_recompute_catches_wrong_expected_output(self):
+        with tempfile.TemporaryDirectory() as folder:
+            good = _make_fixture(folder, cases=["1 2\n", "3 4\n"])
+            self.assertEqual(common.samplecode_recompute(good)["status"], "passed")
+        with tempfile.TemporaryDirectory() as folder:
+            bad = _make_fixture(folder, cases=["1 2\n", "3 4\n"], broken_reference=True)
+            row = common.samplecode_recompute(bad)
+            self.assertEqual(row["status"], "FAILED")
+            self.assertIn("1.in", row["mismatched"])
+
+    def test_missing_samplecode_is_reported(self):
+        # round5 的 3433 就是这种：目录里根本没有 samplecode.py。
+        with tempfile.TemporaryDirectory() as folder:
+            made = _make_fixture(folder, cases=["1 2\n"])
+            (made / "samplecode.py").unlink()
+            row = common.samplecode_recompute(made)
+            self.assertEqual(row["status"], "FAILED")
+            self.assertIn("samplecode.py", row["reason"])
+
+    def test_byte_reproduction_passes_and_can_fail(self):
+        with tempfile.TemporaryDirectory() as folder:
+            made = _make_fixture(folder, cases=["1 2\n", "3 4\n"])
+            self.assertEqual(common.byte_reproduction(made)["status"], "passed")
+            # 把入库数据改掉，重跑就对不上——这条检查必须能红。
+            (made / "data" / "0.out").write_text("777\n", encoding="utf-8")
+            row = common.byte_reproduction(made)
+            self.assertEqual(row["status"], "FAILED")
+            self.assertIn("0.out", row["differing_files"])
+
+    def test_audit_collects_every_failure(self):
+        with tempfile.TemporaryDirectory() as folder:
+            made = _make_fixture(folder, cases=["1 2\n"] * 21)      # 21 组全一样
+            row = common.audit(made, cases=["1 2\n"] * 21, outputs=["3\n"] * 21,
+                               sample_input="1 2\n", run_byte_reproduction=False)
+            self.assertIn("distinct_cases", row["failed"])          # 去重 1 组
+            self.assertIn("constant_output_probe", row["failed"])   # 常量解法必 AC
+
+
+if __name__ == "__main__":
+    unittest.main()
