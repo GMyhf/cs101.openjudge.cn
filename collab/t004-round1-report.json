@@ -17,11 +17,11 @@
         "frequency": 1,
         "total": 21
       },
-      "constraints": {
-        "题面": "see source page",
-        "生成器工程域": "small valid instances for independent oracle",
-        "semantic_check": "parsed valid input; reference and oracle agree"
-      },
+      "constraints": [
+        "每组先给三角形层数 n，n=0 结束",
+        "查询给出起点行列（1-based）",
+        "答案为从该点出发向下相邻两格走到底的最大和"
+      ],
       "structure_checked": true,
       "generator_seed_smoke": {
         "seeds": 20000,
@@ -37,7 +37,8 @@
       },
       "sample_reproduced": true,
       "independent_sample_agreement": true,
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_independent_third_implementation": "verified: 21/21 一致（3421 用方向向量+visited，3263 用自底向上迭代 DP）"
     },
     {
       "local_number": 3376,
@@ -55,12 +56,8 @@
         "frequency": 1,
         "total": 21
       },
-      "constraints": {
-        "题面": "see source page",
-        "生成器工程域": "small valid instances for independent oracle",
-        "semantic_check": "parsed valid input; reference and oracle agree"
-      },
-      "structure_checked": true,
+      "constraints": null,
+      "structure_checked": false,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -93,11 +90,14 @@
         "frequency": 2,
         "total": 21
       },
-      "constraints": {
-        "题面": "see source page",
-        "生成器工程域": "small valid instances for independent oracle",
-        "semantic_check": "parsed valid input; reference and oracle agree"
-      },
+      "constraints": [
+        "1<=R<=20, 1<=C<=20",
+        "字符串只含大写字母和空格",
+        "字符串长度 <= (R*C)/5",
+        "空格=0, A=1..Z=26，每字符 5 位二进制",
+        "按螺旋顺序填入，末尾用 0 补满 R*C 位",
+        "生成器目前 R,C 只到 8，未贴题面上界 20"
+      ],
       "structure_checked": true,
       "generator_seed_smoke": {
         "seeds": 20000,
@@ -113,7 +113,8 @@
       },
       "sample_reproduced": true,
       "independent_sample_agreement": true,
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_independent_third_implementation": "verified: 21/21 一致（3421 用方向向量+visited，3263 用自底向上迭代 DP）"
     },
     {
       "local_number": 3527,
@@ -131,12 +132,8 @@
         "frequency": 4,
         "total": 21
       },
-      "constraints": {
-        "题面": "see source page",
-        "生成器工程域": "small valid instances for independent oracle",
-        "semantic_check": "parsed valid input; reference and oracle agree"
-      },
-      "structure_checked": true,
+      "constraints": null,
+      "structure_checked": false,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -169,12 +166,8 @@
         "frequency": 1,
         "total": 21
       },
-      "constraints": {
-        "题面": "see source page",
-        "生成器工程域": "small valid instances for independent oracle",
-        "semantic_check": "parsed valid input; reference and oracle agree"
-      },
-      "structure_checked": true,
+      "constraints": null,
+      "structure_checked": false,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -207,12 +200,8 @@
         "frequency": 1,
         "total": 21
       },
-      "constraints": {
-        "题面": "see source page",
-        "生成器工程域": "small valid instances for independent oracle",
-        "semantic_check": "parsed valid input; reference and oracle agree"
-      },
-      "structure_checked": true,
+      "constraints": null,
+      "structure_checked": false,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -245,12 +234,8 @@
         "frequency": 1,
         "total": 21
       },
-      "constraints": {
-        "题面": "see source page",
-        "生成器工程域": "small valid instances for independent oracle",
-        "semantic_check": "parsed valid input; reference and oracle agree"
-      },
-      "structure_checked": true,
+      "constraints": null,
+      "structure_checked": false,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -283,12 +268,8 @@
         "frequency": 17,
         "total": 21
       },
-      "constraints": {
-        "题面": "see source page",
-        "生成器工程域": "small valid instances for independent oracle",
-        "semantic_check": "parsed valid input; reference and oracle agree"
-      },
-      "structure_checked": true,
+      "constraints": null,
+      "structure_checked": false,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -321,12 +302,8 @@
         "frequency": 4,
         "total": 21
       },
-      "constraints": {
-        "题面": "see source page",
-        "生成器工程域": "small valid instances for independent oracle",
-        "semantic_check": "parsed valid input; reference and oracle agree"
-      },
-      "structure_checked": true,
+      "constraints": null,
+      "structure_checked": false,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -359,12 +336,8 @@
         "frequency": 3,
         "total": 21
       },
-      "constraints": {
-        "题面": "see source page",
-        "生成器工程域": "small valid instances for independent oracle",
-        "semantic_check": "parsed valid input; reference and oracle agree"
-      },
-      "structure_checked": true,
+      "constraints": null,
+      "structure_checked": false,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"

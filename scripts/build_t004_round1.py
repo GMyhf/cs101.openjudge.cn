@@ -194,6 +194,18 @@ for p,v in zip(a[2::2],a[3::2]):
  for x in range(cap,p-1,-1): dp[x]=max(dp[x],dp[x-p]+v)
 print(dp[cap])'''
 
+# 001b 确立的「题面保证 X -> 生成器保证 X」逐条打钩表。
+# 原来是 10 题共用一个 {"题面":"see source page", ...} 的占位 dict —— 「see source page」
+# 就是「没填」，但它看起来像填了。只填本轮复核真正逐条核对过题面的题，其余留 None 待补。
+CONSTRAINTS = {
+    3421: ["1<=R<=20, 1<=C<=20", "字符串只含大写字母和空格", "字符串长度 <= (R*C)/5",
+           "空格=0, A=1..Z=26，每字符 5 位二进制", "按螺旋顺序填入，末尾用 0 补满 R*C 位",
+           "生成器目前 R,C 只到 8，未贴题面上界 20"],
+    3263: ["每组先给三角形层数 n，n=0 结束", "查询给出起点行列（1-based）",
+           "答案为从该点出发向下相邻两格走到底的最大和"],
+}
+
+
 def oracle(number, content):
     if number == 3263:
         a=iter(content.split()); ans=[]
@@ -322,7 +334,7 @@ with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as handle:
         for i,out in enumerate(outputs):
             (data/f"{i}.in").write_text(cases[i],encoding="utf-8");(data/f"{i}.out").write_text(out,encoding="utf-8")
         freq=Counter(tuple(x.split()) for x in outputs)
-        report.append({"local_number":n,"title":entry["title"],"source":entry["source"],"reference_source":"LLM-written","generator":GENERATORS[n].__name__,"seed":n,"test_cases":len(cases),"distinct_input_cases":len(set(cases)),"distinct_outputs":len(freq),"max_output_frequency":max(freq.values()),"constant_output_probe":{"status":"rejected","frequency":max(freq.values()),"total":len(cases)},"constraints":{"题面":"see source page","生成器工程域":"small valid instances for independent oracle","semantic_check":"parsed valid input; reference and oracle agree"},"structure_checked":True,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":2000,"status":"passed"},"independent_oracle_smoke":{"seeds":2000,"status":"passed"},"sample_reproduced":True,"independent_sample_agreement":True,"producecase_reproduced":reproduce(d)})
+        report.append({"local_number":n,"title":entry["title"],"source":entry["source"],"reference_source":"LLM-written","generator":GENERATORS[n].__name__,"seed":n,"test_cases":len(cases),"distinct_input_cases":len(set(cases)),"distinct_outputs":len(freq),"max_output_frequency":max(freq.values()),"constant_output_probe":{"status":"rejected" if max(freq.values())<len(cases) else "accepted","frequency":max(freq.values()),"total":len(cases)},"constraints":CONSTRAINTS.get(n),"structure_checked":n in CONSTRAINTS,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":2000,"status":"passed"},"independent_oracle_smoke":{"seeds":2000,"status":"passed"},"sample_reproduced":True,"independent_sample_agreement":True,"producecase_reproduced":reproduce(d)})
         print("built",n,flush=True)
     REPORT.write_text(json.dumps({"batch":"T-004-r1","entries":report},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 if __name__=="__main__":main()
