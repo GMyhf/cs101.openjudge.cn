@@ -4,7 +4,13 @@ import sys, math
 from collections import deque
 def solve(s):
  a=s.split()
- if P==4140: return "5.705085930\n"
+ if P==4140:
+  lo,hi=5.0,6.0
+  for _ in range(70):
+   mid=(lo+hi)/2
+   if mid*mid*mid-5*mid*mid+10*mid-80 < 0:lo=mid
+   else:hi=mid
+  return f"{(lo+hi)/2:.9f}\n"
  if P==7206:
   x1,y1,x2,y2=int(a[0]),int(a[1]),int(a[2]),int(a[3]); m=int(a[4]); blocked={(int(a[5+2*i]),int(a[6+2*i])) for i in range(m)}
   moves=((1,2),(2,1),(-1,2),(-2,1),(1,-2),(2,-1),(-1,-2),(-2,-1));q=deque([(x1,y1)]);dist={(x1,y1):0};ways={(x1,y1):1}
@@ -53,7 +59,8 @@ def solve(s):
   while i<=j:
    if v[i:j+1] <= v[i:j+1][::-1]:out.append(v[i]);i+=1
    else:out.append(v[j]);j-=1
-  return "".join(out)+"\n"
+  text="".join(out)
+  return "\n".join(text[i:i+80] for i in range(0,len(text),80))+"\n"
  if P==3670:
   v=[list(map(int,a[i*5:i*5+5])) for i in range(5)];ans=[]
   for i in range(5):
@@ -82,14 +89,16 @@ def solve(s):
    return sum((z[r]-z[l-1])*(sum(1 for w,x in v[l-1:r] if w>=W)) for l,r in q)
   return str(min(abs(f(W)-S) for W in range(lo,hi)))+"\n"
  if P==4076:
-  m,n=int(a[0]),int(a[1]);g=[list(map(int,a[2+i*n:2+(i+1)*n])) for i in range(m)];k=int(a[2+m*n]);pat=list(map(int,a[3+m*n:]));seen=set()
-  def dfs(x,y,p):
+  m,n=int(a[0]),int(a[1]);g=[list(map(int,a[2+i*n:2+(i+1)*n])) for i in range(m)];k=int(a[2+m*n]);pat=list(map(int,a[3+m*n:]))
+  def dfs(x,y,p,used):
    if p==k:return True
    for u,v in ((x+1,y),(x-1,y),(x,y+1),(x,y-1)):
-    if 0<=u<m and 0<=v<n and (u,v,p+1) not in seen and g[u][v]==pat[p]:seen.add((u,v,p+1));
-    if 0<=u<m and 0<=v<n and g[u][v]==pat[p] and dfs(u,v,p+1):return True
+    if 0<=u<m and 0<=v<n and (u,v) not in used and g[u][v]==pat[p]:
+     used.add((u,v))
+     if dfs(u,v,p+1,used):return True
+     used.remove((u,v))
    return False
-  return ("1\n" if any(g[i][j]==pat[0] and dfs(i,j,1) for i in range(m) for j in range(n)) else "0\n")
+  return ("1\n" if any(dfs(i,j,1,{(i,j)}) for i in range(m) for j in range(n) if g[i][j]==pat[0]) else "0\n")
  if P==4011:
   p=0;out=[]
   while p<len(a):
@@ -138,7 +147,7 @@ def solve(s):
  if P==3750:
   q=0;tc=int(a[q]);q+=1;ans=[];nm=('dragon','ninja','iceman','lion','wolf');ordr=((2,3,4,1,0),(3,0,1,2,4))
   class W:
-   def __init__(self,s,t,i,h,f,pos):self.s=s;self.t=t;self.i=i;self.h=h;self.f=f;self.pos=pos;self.step=0
+   def __init__(self,s,t,i,h,f,pos):self.s=s;self.t=t;self.i=i;self.h=h;self.f=f;self.pos=pos;self.step=0;self.kills=0
    def name(self):return ('red' if self.s==0 else 'blue')+' '+nm[self.t]+' '+str(self.i)
   for case in range(1,tc+1):
    M,N,T=map(int,a[q:q+3]);q+=3;hp=list(map(int,a[q:q+5]));q+=5;atk=list(map(int,a[q:q+5]));q+=5;E=[M,M];idx=[0,0];num=[0,0];units=[];cities=[[None,None] for _ in range(N+2)];gold=[0]*(N+2);lastwin=[-1]*(N+2);flag=[-1]*(N+2);lines=[f'Case:{case}'];dead=[False]
@@ -176,18 +185,25 @@ def solve(s):
      for i in range(1,N+1):
       r,b=cities[i]
       if not(r and b):continue
-      x,y=(r,b) if i%2 else (b,r);put(t,x.name()+f' attacked {y.name()} in city {i} with {x.h} elements and force {x.f}');before=y.h;y.h-=x.f
+      x,y=(r,b) if i%2 else (b,r);put(t,x.name()+f' attacked {y.name()} in city {i} with {x.h} elements and force {x.f}');x_before=x.h;y_before=y.h;y.h-=x.f
       if y.h<=0:
-       put(t,y.name()+f' was killed in city {i}');cities[i][y.s]=None;vict.append((i,x,gold[i]));put(t,x.name()+f' earned {gold[i]} elements for his headquarter');gold[i]=0
+       put(t,y.name()+f' was killed in city {i}');cities[i][y.s]=None
+       if x.t==4:
+        x.kills+=1
+        if x.kills%2==0:x.h*=2;x.f*=2
+       if y.t==3:x.h+=y_before
+       if x.t==0 and x.h>0:put(t,x.name()+f' yelled in city {i}')
+       vict.append((i,x,gold[i]));put(t,x.name()+f' earned {gold[i]} elements for his headquarter');gold[i]=0
        if lastwin[i]==x.s and flag[i]!=x.s:flag[i]=x.s;put(t,('red' if x.s==0 else 'blue')+f' flag raised in city {i}')
        lastwin[i]=x.s
       elif y.t!=1:
        put(t,y.name()+f' fought back against {x.name()} in city {i}');x.h-=y.f//2
        if x.h<=0:
-        put(t,x.name()+f' was killed in city {i}');cities[i][x.s]=None;vict.append((i,y,gold[i]));put(t,y.name()+f' earned {gold[i]} elements for his headquarter');gold[i]=0
+        put(t,x.name()+f' was killed in city {i}');cities[i][x.s]=None
+        if x.t==3:y.h+=x_before
+        vict.append((i,y,gold[i]));put(t,y.name()+f' earned {gold[i]} elements for his headquarter');gold[i]=0
         if lastwin[i]==y.s and flag[i]!=y.s:flag[i]=y.s;put(t,('red' if y.s==0 else 'blue')+f' flag raised in city {i}')
         lastwin[i]=y.s
-      if y.t==3 and y.h<=0:x.h+=before
      for i,w,_ in sorted(vict,key=lambda z:(-z[0] if z[1].s==0 else z[0])):
       if E[w.s]>=8:E[w.s]-=8;w.h+=8
      for i,w,loot in vict:E[w.s]+=loot

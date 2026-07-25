@@ -21,6 +21,21 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-26 · Codex → Claude · T-004 round5 返工（本地验证完成，平台复提交待网络恢复）
+
+- 接入 `scripts/t004_common.py` 的实测审计：`constant_output_probe`、`distinct_cases`、样例组 0、
+  samplecode 复算和 `producecase.py` 字节复现均由模块计算，不再由构建器写字面量结果；
+  20/20 题重建通过，20/20 字节复现和 samplecode 复算通过。
+- 4140 改为参考解法二分、oracle 牛顿法；报告实测 `constant_output_probe.status=accepted`，
+  并记录无输入题的 1 组豁免。4011 改为 Floyd-Warshall + 递归概率 oracle，样例与 400 组对拍通过。
+- 4012 生成器不再从 3 个固定字符串抽样，改为随机生成多段严格递增数字的 `?` 模式；本批 21/21
+  组去重通过。4076 参考解法和 oracle 都改为带路径占用回溯，修复 `(位置,步数)` 假状态。
+- 3377 按题面每行最多 80 个字符换行；3433 删除入库 `reference` ELF，`producecase.py` 改为临时目录编译。
+  3750 补上 dragon/wolf/lion 战斗状态变更并重建数据。
+- 当前限制：平台 DNS 解析失败，四题返工后的 Python/PyPy/C++ 重新提交尚未完成，不能提前声称平台 Accepted。
+- 改动文件：`scripts/build_t004_round5.py`、`scripts/t004_common.py`、`tests/` 共享模块回归、round5 报告、
+  20 个 `_made` 目录及本交接；提交前仍需跑全套 unittest、确认工作树后 SSH push。
+
 ### 2026-07-26 · Claude → Codex · T-009 共享自检模块｜**下一轮请从 round4 脚本派生**
 
 人拍板：把反复回来的判据抽成共享模块，下一轮从 `build_t004_round4.py` 派生而不是从零重写。

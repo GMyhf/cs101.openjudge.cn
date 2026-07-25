@@ -24,6 +24,7 @@ CPP3433 = ROOT / "scripts/t004_platform_accepted_3433.cpp"
 CPP3433_BIN = Path(tempfile.gettempdir()) / "t004-platform-accepted-3433"
 sys.path.insert(0, str(ROOT / "scripts"))
 from build_001a import bucket  # noqa: E402
+import t004_common as common  # noqa: E402
 
 
 def run(source: str, text: str, interpreter=sys.executable) -> str:
@@ -176,8 +177,18 @@ def g3750(r):
 
 
 def g4012(r):
-    patterns = ["?,10,?????????????????,16,??", "?2?5??7?,??", "1,?,??,???"]
-    return r.choice(patterns) + "\n"
+    # Keep the separator ambiguity from the statement: '?' may be a digit or
+    # a comma.  Generate many different valid shapes instead of three fixtures.
+    count = r.randint(2, 6)
+    numbers = []
+    value = r.randint(1, 20)
+    for _ in range(count):
+        value += r.randint(1, 40)
+        numbers.append(str(value))
+    parts = []
+    for number in numbers:
+        parts.append("".join("?" if r.random() < 0.35 else ch for ch in number))
+    return "?".join(parts) + "\n"
 
 
 def g4035(r):
@@ -198,7 +209,13 @@ import sys, math
 from collections import deque
 def solve(s):
  a=s.split()
- if P==4140: return "5.705085930\n"
+ if P==4140:
+  lo,hi=5.0,6.0
+  for _ in range(70):
+   mid=(lo+hi)/2
+   if mid*mid*mid-5*mid*mid+10*mid-80 < 0:lo=mid
+   else:hi=mid
+  return f"{(lo+hi)/2:.9f}\n"
  if P==7206:
   x1,y1,x2,y2=int(a[0]),int(a[1]),int(a[2]),int(a[3]); m=int(a[4]); blocked={(int(a[5+2*i]),int(a[6+2*i])) for i in range(m)}
   moves=((1,2),(2,1),(-1,2),(-2,1),(1,-2),(2,-1),(-1,-2),(-2,-1));q=deque([(x1,y1)]);dist={(x1,y1):0};ways={(x1,y1):1}
@@ -247,7 +264,8 @@ def solve(s):
   while i<=j:
    if v[i:j+1] <= v[i:j+1][::-1]:out.append(v[i]);i+=1
    else:out.append(v[j]);j-=1
-  return "".join(out)+"\n"
+  text="".join(out)
+  return "\n".join(text[i:i+80] for i in range(0,len(text),80))+"\n"
  if P==3670:
   v=[list(map(int,a[i*5:i*5+5])) for i in range(5)];ans=[]
   for i in range(5):
@@ -276,14 +294,16 @@ def solve(s):
    return sum((z[r]-z[l-1])*(sum(1 for w,x in v[l-1:r] if w>=W)) for l,r in q)
   return str(min(abs(f(W)-S) for W in range(lo,hi)))+"\n"
  if P==4076:
-  m,n=int(a[0]),int(a[1]);g=[list(map(int,a[2+i*n:2+(i+1)*n])) for i in range(m)];k=int(a[2+m*n]);pat=list(map(int,a[3+m*n:]));seen=set()
-  def dfs(x,y,p):
+  m,n=int(a[0]),int(a[1]);g=[list(map(int,a[2+i*n:2+(i+1)*n])) for i in range(m)];k=int(a[2+m*n]);pat=list(map(int,a[3+m*n:]))
+  def dfs(x,y,p,used):
    if p==k:return True
    for u,v in ((x+1,y),(x-1,y),(x,y+1),(x,y-1)):
-    if 0<=u<m and 0<=v<n and (u,v,p+1) not in seen and g[u][v]==pat[p]:seen.add((u,v,p+1));
-    if 0<=u<m and 0<=v<n and g[u][v]==pat[p] and dfs(u,v,p+1):return True
+    if 0<=u<m and 0<=v<n and (u,v) not in used and g[u][v]==pat[p]:
+     used.add((u,v))
+     if dfs(u,v,p+1,used):return True
+     used.remove((u,v))
    return False
-  return ("1\n" if any(g[i][j]==pat[0] and dfs(i,j,1) for i in range(m) for j in range(n)) else "0\n")
+  return ("1\n" if any(dfs(i,j,1,{(i,j)}) for i in range(m) for j in range(n) if g[i][j]==pat[0]) else "0\n")
  if P==4011:
   p=0;out=[]
   while p<len(a):
@@ -332,7 +352,7 @@ def solve(s):
  if P==3750:
   q=0;tc=int(a[q]);q+=1;ans=[];nm=('dragon','ninja','iceman','lion','wolf');ordr=((2,3,4,1,0),(3,0,1,2,4))
   class W:
-   def __init__(self,s,t,i,h,f,pos):self.s=s;self.t=t;self.i=i;self.h=h;self.f=f;self.pos=pos;self.step=0
+   def __init__(self,s,t,i,h,f,pos):self.s=s;self.t=t;self.i=i;self.h=h;self.f=f;self.pos=pos;self.step=0;self.kills=0
    def name(self):return ('red' if self.s==0 else 'blue')+' '+nm[self.t]+' '+str(self.i)
   for case in range(1,tc+1):
    M,N,T=map(int,a[q:q+3]);q+=3;hp=list(map(int,a[q:q+5]));q+=5;atk=list(map(int,a[q:q+5]));q+=5;E=[M,M];idx=[0,0];num=[0,0];units=[];cities=[[None,None] for _ in range(N+2)];gold=[0]*(N+2);lastwin=[-1]*(N+2);flag=[-1]*(N+2);lines=[f'Case:{case}'];dead=[False]
@@ -370,18 +390,25 @@ def solve(s):
      for i in range(1,N+1):
       r,b=cities[i]
       if not(r and b):continue
-      x,y=(r,b) if i%2 else (b,r);put(t,x.name()+f' attacked {y.name()} in city {i} with {x.h} elements and force {x.f}');before=y.h;y.h-=x.f
+      x,y=(r,b) if i%2 else (b,r);put(t,x.name()+f' attacked {y.name()} in city {i} with {x.h} elements and force {x.f}');x_before=x.h;y_before=y.h;y.h-=x.f
       if y.h<=0:
-       put(t,y.name()+f' was killed in city {i}');cities[i][y.s]=None;vict.append((i,x,gold[i]));put(t,x.name()+f' earned {gold[i]} elements for his headquarter');gold[i]=0
+       put(t,y.name()+f' was killed in city {i}');cities[i][y.s]=None
+       if x.t==4:
+        x.kills+=1
+        if x.kills%2==0:x.h*=2;x.f*=2
+       if y.t==3:x.h+=y_before
+       if x.t==0 and x.h>0:put(t,x.name()+f' yelled in city {i}')
+       vict.append((i,x,gold[i]));put(t,x.name()+f' earned {gold[i]} elements for his headquarter');gold[i]=0
        if lastwin[i]==x.s and flag[i]!=x.s:flag[i]=x.s;put(t,('red' if x.s==0 else 'blue')+f' flag raised in city {i}')
        lastwin[i]=x.s
       elif y.t!=1:
        put(t,y.name()+f' fought back against {x.name()} in city {i}');x.h-=y.f//2
        if x.h<=0:
-        put(t,x.name()+f' was killed in city {i}');cities[i][x.s]=None;vict.append((i,y,gold[i]));put(t,y.name()+f' earned {gold[i]} elements for his headquarter');gold[i]=0
+        put(t,x.name()+f' was killed in city {i}');cities[i][x.s]=None
+        if x.t==3:y.h+=x_before
+        vict.append((i,y,gold[i]));put(t,y.name()+f' earned {gold[i]} elements for his headquarter');gold[i]=0
         if lastwin[i]==y.s and flag[i]!=y.s:flag[i]=y.s;put(t,('red' if y.s==0 else 'blue')+f' flag raised in city {i}')
         lastwin[i]=y.s
-      if y.t==3 and y.h<=0:x.h+=before
      for i,w,_ in sorted(vict,key=lambda z:(-z[0] if z[1].s==0 else z[0])):
       if E[w.s]>=8:E[w.s]-=8;w.h+=8
      for i,w,loot in vict:E[w.s]+=loot
@@ -542,15 +569,21 @@ sys.stdout.write(solve(sys.stdin.read()))
 '''
 
 SUPPORTED = set(GENERATORS)
-NO_INDEPENDENT_ORACLE = {3433, 3750, 4012, 4035, 4054}
-NO_INDEPENDENT_ORACLE.add(3433)
 REFERENCE_SOURCES = {3433: "platform Accepted G++ #52301277", 4054: "platform Accepted Python3 #49639414"}
 
 
+def has_oracle(number, sample_input):
+    return common.has_oracle(alt, number, sample_input)
+
+
 def alt(n, text):
-    # Independent implementations are deliberately limited to the first slice.
+    # Independent implementations use a different algorithmic shape where possible.
     if n == 4140:
-        return "5.705085930\n"
+        x = 6.0
+        for _ in range(80):
+            f = x * x * x - 5 * x * x + 10 * x - 80
+            x -= f / (3 * x * x - 10 * x + 10)
+        return f"{x:.9f}\n"
     if n == 7206:
         a=text.split(); src=(int(a[0]),int(a[1])); dst=(int(a[2]),int(a[3])); m=int(a[4])
         blocked={(int(a[5+2*i]),int(a[6+2*i])) for i in range(m)}
@@ -635,10 +668,15 @@ def alt(n, text):
         return str(min(vals))+'\n'
     if n == 4076:
         a=list(map(int,text.split()));M,N=a[:2];g=[a[2+i*N:2+(i+1)*N] for i in range(M)];K=a[2+M*N];p=a[3+M*N:]
-        front={(i,j) for i in range(M) for j in range(N) if g[i][j]==p[0]}
-        for x in p[1:]:
-            front={(u,v) for i,j in front for u,v in ((i-1,j),(i+1,j),(i,j-1),(i,j+1)) if 0<=u<M and 0<=v<N and g[u][v]==x}
-        return ('1\n' if front else '0\n')
+        def search(i,j,k,used):
+            if k == K:
+                return True
+            for u,v in ((i-1,j),(i+1,j),(i,j-1),(i,j+1)):
+                if 0 <= u < M and 0 <= v < N and (u,v) not in used and g[u][v] == p[k]:
+                    if search(u,v,k+1,used | {(u,v)}):
+                        return True
+            return False
+        return ('1\n' if any(search(i,j,1,{(i,j)}) for i in range(M) for j in range(N) if g[i][j] == p[0]) else '0\n')
     if n == 4083:
         a=text.split();p=0;N=int(a[p]);p+=1;names=a[p:p+N];p+=N;M=int(a[p]);p+=1;idx={x:i for i,x in enumerate(names)};d=[[10**9]*N for _ in range(N)];nxt=[[None]*N for _ in range(N)]
         for i in range(N):d[i][i]=0;nxt[i][i]=i
@@ -660,6 +698,38 @@ def alt(n, text):
             while x!=y:x=nxt[x][y];path.append(names[x])
             out.append(path[0]+''.join(f'->({d[idx[path[i-1]]][idx[path[i]]] })->{z}' for i,z in enumerate(path[1:],1)))
         return '\n'.join(out)+'\n'
+    if n == 4011:
+        a=text.split();pos=0;answers=[]
+        while pos < len(a):
+            N,M=map(int,a[pos:pos+2]);pos+=2
+            if N == 0:break
+            dist=[[10**9]*N for _ in range(N)]
+            links=[[] for _ in range(N)]
+            for i in range(N):dist[i][i]=0
+            for _ in range(M):
+                u,v,w=map(int,a[pos:pos+3]);pos+=3;dist[u][v]=dist[v][u]=min(dist[u][v],w);links[u].append((v,w));links[v].append((u,w))
+            for mid in range(N):
+                for left in range(N):
+                    for right in range(N):dist[left][right]=min(dist[left][right],dist[left][mid]+dist[mid][right])
+            choices=int(a[pos]);pos+=1
+            chance=[[0.0]+list(map(float,a[pos+i*choices:pos+(i+1)*choices])) for i in range(N)];pos+=N*choices
+            forward=[[v for v,w in links[u] if dist[0][v]==dist[0][u]+w] for u in range(N)]
+            plan=[0]*N;best=[0.0]
+            def score():
+                memo={}
+                def value(u):
+                    if u in memo:return memo[u]
+                    future=sum(value(v) for v in forward[u])/len(forward[u]) if forward[u] else 0.0
+                    memo[u]=chance[u][plan[u]]+(1-chance[u][plan[u]])*future
+                    return memo[u]
+                return value(0)
+            def allocate(i,left):
+                if i==N:
+                    if left==0:best[0]=max(best[0],score())
+                    return
+                for amount in range(left+1):plan[i]=amount;allocate(i+1,left-amount)
+            allocate(0,choices);answers.append(f'{best[0]*100:.2f}')
+        return '\n'.join(answers)+'\n'
     if n == 4011:
         import heapq
         a=text.split();p=0;out=[]
@@ -765,7 +835,7 @@ def main():
         # reference invocation, not a generator-only counter.
         for seed in range(400):
             run(ref, gen(random.Random(n + 100000 + seed)))
-        independent = n not in NO_INDEPENDENT_ORACLE
+        independent = has_oracle(n, entry["sample_input"])
         if independent:
             for seed, c in enumerate(cases):
                 assert run(ref, c).split() == alt(n, c).split(), (n, seed)
@@ -779,11 +849,14 @@ def main():
             (data / f"{i}.out").write_text(o, encoding="utf-8")
         if n == 3433:
             (d / "samplecode_ac.cpp").write_bytes(CPP3433.read_bytes())
+            stale = d / "reference"
+            if stale.exists():
+                stale.unlink()
         else:
             (d / "samplecode.py").write_text(f"# T-004-r5\n{ref}", encoding="utf-8")
         source = inspect.getsource(gen)
         if n == 3433:
-            produce = f'''import random, subprocess\nfrom pathlib import Path\nSAMPLE_IN={entry["sample_input"]!r}\n{source}\nroot=Path(__file__).parent; binary=root/"reference"\nsubprocess.run(["g++", "-std=c++17", "-O2", str(root/"samplecode_ac.cpp"), "-o", str(binary)], check=True)\nfor i in range(21):\n c=SAMPLE_IN if i == 0 else {gen.__name__}(random.Random({n}+i))\n p=subprocess.run([str(binary)], input=c, text=True, capture_output=True, check=True)\n (root/"data"/f"{{i}}.in").write_text(c); (root/"data"/f"{{i}}.out").write_text(p.stdout)\n'''
+            produce = f'''import random, subprocess, tempfile\nfrom pathlib import Path\nSAMPLE_IN={entry["sample_input"]!r}\n{source}\nroot=Path(__file__).parent\nwith tempfile.TemporaryDirectory() as folder:\n binary=Path(folder)/"reference"\n subprocess.run(["g++", "-std=c++17", "-O2", str(root/"samplecode_ac.cpp"), "-o", str(binary)], check=True)\n for i in range(21):\n  c=SAMPLE_IN if i == 0 else {gen.__name__}(random.Random({n}+i))\n  p=subprocess.run([str(binary)], input=c, text=True, capture_output=True, check=True)\n  (root/"data"/f"{{i}}.in").write_text(c); (root/"data"/f"{{i}}.out").write_text(p.stdout)\n'''
         else:
             produce = f'''import random, subprocess, tempfile\nfrom pathlib import Path\nREFERENCE_SOURCE={ref!r}\nSAMPLE_IN={entry["sample_input"]!r}\n{source}\nwith tempfile.NamedTemporaryFile("w", suffix=".py") as h:\n h.write(REFERENCE_SOURCE); h.flush(); root=Path(__file__).parent/"data"\n for i in range(21):\n  c=SAMPLE_IN if i == 0 else {gen.__name__}(random.Random({n}+i))\n  p=subprocess.run(["python3", h.name], input=c, text=True, capture_output=True, check=True)\n  (root/f"{{i}}.in").write_text(c); (root/f"{{i}}.out").write_text(p.stdout)\n'''
         (d / "producecase.py").write_text(produce, encoding="utf-8")
@@ -791,19 +864,30 @@ def main():
         p = subprocess.run([sys.executable, "producecase.py"], cwd=d, capture_output=True, text=True, timeout=600)
         after = {p.name: p.read_bytes() for p in data.iterdir()}
         assert p.returncode == 0 and before == after, (n, p.stderr)
-        freq = max(outs.count(x) for x in outs)
+        exemption = "题面无输入，输入域只有 1 个取值" if n == 4140 else None
+        audit_row = common.audit(d, cases=cases, outputs=outs,
+                                 sample_input=entry["sample_input"], exemption=exemption,
+                                 reference_source=None if n == 3433 else ref,
+                                 oracle_source=None)
         rows.append({"local_number": n, "title": entry["title"], "source": entry["source"],
                      "reference_source": REFERENCE_SOURCES.get(n, "LLM-written"), "generator": gen.__name__, "seed": n,
                      "test_cases": len(cases), "distinct_input_cases": len(set(cases)),
-                     "distinct_outputs": len(set(outs)), "constant_output_probe": {"status": "rejected", "frequency": freq, "total": len(outs)},
+                     "distinct_outputs": len(set(outs)), "constant_output_probe": audit_row["constant_output_probe"],
+                     "distinct_cases": audit_row["distinct_cases"],
                      "constraints": CONSTRAINTS[n], "generator_seed_smoke": {"seeds": 20000, "status": "passed"},
                      "reference_seed_smoke": {"seeds": 400, "status": "passed"},
                      "independent_oracle_smoke": {"seeds": len(cases), "status": "passed"} if independent else {"seeds": 0, "status": "not_available", "reason": "no independent oracle implemented"},
                      "independent_oracle_status": "passed" if independent else "no_independent_oracle", "sample_reproduced": True,
-                     "independent_sample_agreement": True if independent else None, "producecase_reproduced": True})
+                     "independent_sample_agreement": True if independent else None,
+                     "producecase_reproduced": audit_row.get("byte_reproduction", {}).get("status") == "passed",
+                     "sample_is_case_zero": audit_row["sample_is_case_zero"],
+                     "samplecode_recompute": audit_row["samplecode_recompute"],
+                     "byte_reproduction": audit_row.get("byte_reproduction"),
+                     "self_audit": audit_row})
         print("built", n, flush=True)
     rows.sort(key=lambda x: x["local_number"])
-    REPORT.write_text(json.dumps({"batch": manifest["batch"], "entries": rows,
+    extra = {k: v for k, v in previous.items() if k not in ("batch", "entries", "unbuilt")}
+    REPORT.write_text(json.dumps({"batch": manifest["batch"], **extra, "entries": rows,
                                   "unbuilt": sorted(set(x["local_number"] for x in manifest["entries"]) - SUPPORTED)},
                                  ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 

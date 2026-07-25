@@ -182,15 +182,30 @@ def samplecode_recompute(made_dir, timeout=60):
     """
     made_dir = Path(made_dir)
     script = made_dir / "samplecode.py"
-    if not script.exists():
-        return {"status": "FAILED", "reason": "目录里没有 samplecode.py",
+    cpp = made_dir / "samplecode_ac.cpp"
+    if not script.exists() and not cpp.exists():
+        return {"status": "FAILED", "reason": "目录里没有 samplecode.py 或 samplecode_ac.cpp",
                 "files": sorted(p.name for p in made_dir.iterdir())}
+    executable = None
+    if cpp.exists():
+        with tempfile.TemporaryDirectory() as folder:
+            executable = Path(folder) / "samplecode"
+            build = subprocess.run(["g++", "-std=c++17", "-O2", str(cpp), "-o", str(executable)],
+                                   capture_output=True, text=True, timeout=timeout)
+            if build.returncode:
+                return {"status": "FAILED", "reason": "samplecode_ac.cpp 编译失败",
+                        "detail": (build.stderr or build.stdout).strip()[-300:]}
+            return _recompute_cases(made_dir, [str(executable)], timeout)
+    return _recompute_cases(made_dir, [sys.executable, str(script)], timeout)
+
+
+def _recompute_cases(made_dir, command, timeout):
     bad = []
     inputs = sorted((made_dir / "data").glob("*.in"), key=lambda p: int(p.stem))
     for path in inputs:
         expected = path.with_suffix(".out")
         try:
-            got = subprocess.run([sys.executable, str(script)],
+            got = subprocess.run(command,
                                  input=path.read_text(errors="replace"),
                                  text=True, capture_output=True, timeout=timeout)
         except subprocess.TimeoutExpired:
