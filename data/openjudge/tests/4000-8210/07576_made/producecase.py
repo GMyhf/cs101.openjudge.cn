@@ -1,18 +1,55 @@
-import random, subprocess, tempfile
+"""7576 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+
+出处：build_001c
+生成器与循环取自 scripts/build_001c.py（批次 001c），保持同一形状；
+不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
+"""
+import random
+import subprocess
+import tempfile
 from pathlib import Path
+
+NUMBER = 7576
 SAMPLE_IN = '8 1\n10 9 20 6 16 12 90 17\n3 15\n'
 SAMPLE_OUT = '6 12 9 17 10 20 16 90\n9 12 15 17 10 20 16 90\n'
-CASES = ['8 1\n10 9 20 6 16 12 90 17\n3 15\n', '21 6\n226 774 418 852 345 498 15 760 981 603 51 484 656 931 746 332 431 128 456 317 586\n11 166\n1 440\n5 914\n16 26\n1 358\n4 825\n', '19 2\n509 124 385 123 494 774 487 927 726 824 138 717 130 947 801 799 468 568 482\n4 194\n8 683\n', '26 7\n332 270 944 577 286 62 424 720 657 989 876 85 516 568 893 260 556 639 601 807 310 755 950 616 239 742\n22 259\n5 464\n18 578\n3 218\n3 638\n11 872\n0 326\n', '23 8\n158 701 156 289 9 430 41 300 579 249 464 597 581 329 279 69 254 722 253 50 766 342 47\n0 461\n3 347\n17 59\n17 991\n13 993\n6 680\n13 959\n22 227\n', '25 4\n406 153 76 956 468 632 991 94 722 165 223 516 553 438 585 585 232 917 931 464 929 567 980 673 471\n8 687\n22 76\n11 649\n6 52\n', '2 5\n61 240\n1 772\n0 537\n0 453\n1 755\n0 75\n', '21 1\n358 633 38 256 545 690 646 766 550 539 119 814 861 160 692 647 280 268 45 975 993\n5 672\n', '29 2\n654 892 622 823 395 165 963 807 42 652 876 895 590 757 965 46 668 505 424 901 879 408 86 60 977 376 557 181 198\n0 633\n5 850\n', '29 7\n689 907 79 645 907 698 891 855 320 26 3 821 906 205 751 450 77 535 401 7 838 462 48 900 100 602 338 143 461\n11 974\n20 767\n5 481\n16 987\n18 847\n20 814\n2 485\n', '3 6\n181 94 241\n0 45\n2 240\n0 116\n0 869\n2 220\n1 640\n', '23 7\n564 512 200 134 101 532 551 595 235 408 247 443 619 706 685 35 335 696 512 381 83 585 682\n20 85\n6 864\n21 492\n16 524\n3 34\n16 495\n7 28\n', '15 2\n608 647 932 826 999 903 147 118 663 266 727 211 503 818 565\n0 947\n3 983\n', '9 5\n488 614 198 487 768 983 785 692 395\n2 150\n8 16\n1 819\n8 984\n1 283\n', '26 8\n382 268 565 275 229 425 339 863 505 651 638 310 575 845 694 815 85 169 408 786 828 425 325 929 757 95\n9 24\n6 522\n13 196\n11 725\n9 289\n12 195\n3 871\n10 556\n', '5 3\n845 143 499 492 946\n2 365\n4 347\n4 176\n', '19 6\n55 675 883 724 831 337 729 576 670 253 269 660 734 607 42 318 719 770 482\n14 640\n6 927\n15 225\n15 50\n5 257\n18 121\n', '23 6\n947 429 476 911 175 450 690 95 234 399 229 329 516 227 384 894 944 996 473 560 564 7 386\n5 117\n9 380\n10 417\n9 6\n9 846\n21 739\n', '16 3\n44 921 901 901 248 145 359 671 148 712 197 378 162 665 552 427\n5 886\n11 275\n14 460\n', '15 4\n243 743 447 428 670 86 331 101 845 631 743 425 983 488 709\n14 72\n1 195\n1 87\n11 708\n']
 REFERENCE_SOURCE = 'import sys\nfrom collections import deque\n\nclass Node:\n    # 使用 __slots__ 减少内存占用，加快属性访问\n    __slots__ = [\'val\', \'win\', \'left\', \'right\', \'parent\']\n    def __init__(self, v=0):\n        self.val = v      # 内部节点存储：败者 (Loser)\n        self.win = v      # 内部节点存储：该场胜者 (Winner)，用于向上传递\n        self.left = None\n        self.right = None\n        self.parent = None\n\ndef solve():\n    # 快速读取所有输入\n    input_data = sys.stdin.read().split()\n    if not input_data: return\n    n, m = int(input_data[0]), int(input_data[1])\n    vals = [int(x) for x in input_data[2:2+n]]\n    \n    # 1. 初始构建树：O(n)\n    # 将初始值包装为叶子节点\n    leaves = [Node(v) for v in vals]\n    queue = deque(leaves)\n    \n    # 两两分组模拟比赛，构建完全二叉树\n    while len(queue) > 1:\n        l = queue.popleft()\n        r = queue.popleft()\n        # 创建比赛节点：val存大值(败者)，win存小值(胜者)\n        match = Node()\n        match.val, match.win = max(l.win, r.win), min(l.win, r.win)\n        match.left, match.right = l, r\n        l.parent = r.parent = match\n        queue.append(match)\n    \n    # 创建顶层冠军节点 (只有一个左孩子)\n    battle_root = queue.popleft()\n    root = Node(battle_root.win)\n    root.left, battle_root.parent = battle_root, root\n\n    # 2. 预处理：确定内部节点的输出顺序\n    # 题目要求输出内部节点（从上到下，从左到右），且结构不变\n    internal_nodes = []\n    bfs_q = deque([root])\n    while bfs_q and len(internal_nodes) < n:\n        curr = bfs_q.popleft()\n        internal_nodes.append(curr)\n        if curr.left: bfs_q.append(curr.left)\n        if curr.right: bfs_q.append(curr.right)\n\n    # 辅助函数：按序输出当前树的所有内部节点值\n    def print_internal_nodes():\n        sys.stdout.write(" ".join(str(node.val) for node in internal_nodes) + "\\n")\n\n    # 输出初始状态\n    print_internal_nodes()\n\n    # 3. 处理修改：每次 O(log n + n)\n    ptr = 2 + n\n    for _ in range(m):\n        idx, new_val = int(input_data[ptr]), int(input_data[ptr+1])\n        ptr += 2\n        \n        # 向上更新路径\n        curr_leaf = leaves[idx]\n        curr_leaf.win = new_val\n        p = curr_leaf.parent\n        while p:\n            if p.right: # 普通比赛节点：有两个孩子\n                p.val = max(p.left.win, p.right.win)\n                p.win = min(p.left.win, p.right.win)\n            else:       # 顶层冠军节点：只有一个孩子\n                p.val = p.win = p.left.win\n            p = p.parent\n        \n        print_internal_nodes()\n\nif __name__ == "__main__":\n    solve()\n'
-assert CASES[0] == SAMPLE_IN
-random.seed(7576)
+
+def g7576(r):
+    n = r.randint(2, 30); m = r.randint(1, 8); values = [r.randint(1, 1000) for _ in range(n)]
+    changes = [f"{r.randrange(n)} {r.randint(1, 1000)}" for _ in range(m)]
+    return f"{n} {m}\n" + " ".join(map(str, values)) + "\n" + "\n".join(changes) + "\n"
+
+def build_cases():
+    cases = [SAMPLE_IN]
+    for i in range(1, 20):
+        for attempt in range(100):
+            value = g7576(random.Random(NUMBER + i + attempt * 1000))
+            if value not in cases:
+                cases.append(value)
+                break
+        else:
+            raise AssertionError("生成器多样性不足")
+    return cases
+
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
-        handle.write(REFERENCE_SOURCE); handle.flush()
-        result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=5, check=True)
+        handle.write(REFERENCE_SOURCE)
+        handle.flush()
+        result = subprocess.run(["python3", handle.name], input=content, text=True,
+                                capture_output=True, timeout=120, check=True)
     return result.stdout
-assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split()
-root = Path(__file__).parent / "data"
-for index, content in enumerate(CASES):
-    (root / f"{index}.in").write_text(content, encoding="utf-8")
-    (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+def main():
+    cases = build_cases()
+    assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
+    root = Path(__file__).parent / "data"
+    root.mkdir(exist_ok=True)
+    for index, content in enumerate(cases):
+        (root / f"{index}.in").write_text(content, encoding="utf-8")
+        (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

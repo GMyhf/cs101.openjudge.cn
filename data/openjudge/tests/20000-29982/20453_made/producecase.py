@@ -1,10 +1,53 @@
-import subprocess, tempfile
+"""20453 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+
+出处：build_001d
+生成器与循环取自 scripts/build_001d.py（批次 001d），保持同一形状；
+不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
+"""
+import random
+import subprocess
+import tempfile
 from pathlib import Path
-CASES=['1 1 1\n2\n', '7 8 4 8 0 2 -2 2 8 -4 3 -3 4 5 -2 8 2 -1 4 -5\n12\n', '2 6\n14\n', '3 3 1 -2 3 7 -2 -3 7 -5 -2\n14\n', '-1 -2 -4 -5\n-8\n', '2 5 2 8 3 -1 -1 0 5 6 0 -4 2\n-2\n', '2 8 8 6 3 -3 -2 7 -2 6 7 6 4 2 -1 3 -3 5\n3\n', '2 -5 -1 7\n14\n', '-5 -1 2 -4 -2 -2 2 8 -2 -2 -4 -2 4 -1 6 6\n0\n', '0 6 -3 -5 -1 3 7 6 -4 8 4 -3 -3 0 4 0 0 -5\n3\n', '0 4 -4 6 4\n8\n', '-2 0 1 0 -1 6 -1 7 6\n15\n', '-1 -3 1 -1 -3 5 6\n-8\n', '1 6 -1 3 8 -1 2 -2 4 2 5\n4\n', '4 -3 1\n-8\n', '-4 0 -5 3 2 -2 1 2 -3 1\n15\n', '0 -1 3 3 -3 -1 -2 4 0 5 2\n-3\n', '3 2 4 -2 -4 -2 -3 -1 8 -5 -4 2 -4 -5 5 4 3 6 5 -3\n13\n', '6 4 3 3 5 0 2 4 1 -4 3 -3 -4 5 3 3\n3\n', '0 -4 1\n4\n']
-SOURCE='def subarray_sum(nums, k):\n    count = 0\n    sums = 0\n    d = dict()\n    d[0] = 1\n\n    for i in range(len(nums)):\n        sums += nums[i]\n        count += d.get(sums - k, 0)\n        d[sums] = d.get(sums, 0) + 1\n\n    return count\n\nnums = list(map(int, input().split()))\nk = int(input().strip())\nprint(subarray_sum(nums, k))\n'
-with tempfile.NamedTemporaryFile('w',suffix='.py') as f:
- f.write(SOURCE); f.flush()
- root=Path(__file__).parent/'data'
- for i,c in enumerate(CASES):
-  o=subprocess.run(['python3',f.name],input=c,text=True,capture_output=True,check=True).stdout
-  (root/f'{i}.in').write_text(c); (root/f'{i}.out').write_text(o)
+
+NUMBER = 20453
+SAMPLE_IN = '1 1 1\n2\n'
+SAMPLE_OUT = '2\n'
+REFERENCE_SOURCE = 'def subarray_sum(nums, k):\n    count = 0\n    sums = 0\n    d = dict()\n    d[0] = 1\n\n    for i in range(len(nums)):\n        sums += nums[i]\n        count += d.get(sums - k, 0)\n        d[sums] = d.get(sums, 0) + 1\n\n    return count\n\nnums = list(map(int, input().split()))\nk = int(input().strip())\nprint(subarray_sum(nums, k))\n'
+
+def g20453(r):
+    a=[r.randint(-5,8) for _ in range(r.randint(2,20))]; return " ".join(map(str,a))+"\n"+str(r.randint(-8,15))+"\n"
+
+def build_cases():
+    cases = [SAMPLE_IN]
+    for i in range(1, 20):
+        for attempt in range(100):
+            value = g20453(random.Random(NUMBER + i + attempt * 1000))
+            if value not in cases:
+                cases.append(value)
+                break
+        else:
+            raise AssertionError("生成器多样性不足")
+    return cases
+
+def solve_reference(content):
+    with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
+        handle.write(REFERENCE_SOURCE)
+        handle.flush()
+        result = subprocess.run(["python3", handle.name], input=content, text=True,
+                                capture_output=True, timeout=120, check=True)
+    return result.stdout
+
+
+def main():
+    cases = build_cases()
+    assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
+    root = Path(__file__).parent / "data"
+    root.mkdir(exist_ok=True)
+    for index, content in enumerate(cases):
+        (root / f"{index}.in").write_text(content, encoding="utf-8")
+        (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,18 +1,58 @@
-import random, subprocess, tempfile
+"""12029 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+
+出处：build_001c
+生成器与循环取自 scripts/build_001c.py（批次 001c），保持同一形状；
+不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
+"""
+import random
+import subprocess
+import tempfile
 from pathlib import Path
+
+NUMBER = 12029
 SAMPLE_IN = '1\n5 5\n1 1 1 1 1\n1 0 0 0 1\n1 0 1 0 1\n1 0 0 0 1\n1 1 1 1 1\n3 3\n2\n1 1\n2 2\n'
 SAMPLE_OUT = 'No\n'
-CASES = ['1\n5 5\n1 1 1 1 1\n1 0 0 0 1\n1 0 1 0 1\n1 0 0 0 1\n1 1 1 1 1\n3 3\n2\n1 1\n2 2\n', '1\n7 4\n72 70 10 49\n41 44 17 50\n5 3 6 49\n78 83 44 30\n52 53 98 61\n88 93 1 5\n19 46 49 0\n7 1\n2\n5 2\n2 4\n', '2\n7 8\n20 100 92 29 17 6 84 13\n74 18 30 37 7 97 14 12\n72 34 39 81 56 68 91 13\n24 58 37 66 28 84 22 77\n81 97 30 24 41 100 46 79\n92 92 16 77 5 95 47 88\n87 70 82 99 53 67 35 93\n7 3\n4\n7 3\n7 8\n4 2\n3 2\n6 6\n21 40 64 91 66 8\n35 59 47 9 84 28\n58 9 27 19 1 2\n67 99 31 72 25 91\n62 40 19 50 12 76\n50 49 46 75 22 21\n4 3\n4\n1 4\n1 6\n3 4\n2 2\n', '3\n6 4\n79 44 89 44\n65 43 12 72\n63 53 26 72\n34 3 85 21\n94 3 60 91\n47 52 13 36\n2 2\n5\n1 1\n4 1\n1 3\n6 4\n3 2\n5 4\n87 64 47 75\n26 34 73 22\n22 74 89 77\n32 14 4 23\n75 40 37 76\n1 3\n5\n4 1\n5 3\n3 4\n4 1\n2 4\n8 5\n60 100 25 99 41\n88 73 52 90 46\n1 34 69 81 17\n24 65 63 26 87\n93 77 75 88 23\n72 73 14 27 34\n100 58 54 10 82\n60 43 27 51 44\n2 2\n4\n3 2\n5 1\n4 2\n4 1\n', '3\n8 4\n5 11 56 39\n57 24 39 95\n46 53 30 54\n93 11 70 26\n38 19 10 90\n90 6 81 8\n99 73 66 94\n64 75 91 76\n7 2\n4\n4 1\n4 1\n4 1\n6 1\n4 3\n18 31 13\n99 96 91\n67 25 9\n80 25 90\n1 2\n2\n2 2\n2 1\n4 6\n0 38 45 38 85 39\n34 81 22 83 22 61\n21 60 61 1 66 65\n6 23 59 67 85 35\n3 3\n2\n1 2\n2 2\n', '1\n3 3\n93 51 85\n99 59 3\n31 66 30\n1 1\n5\n2 3\n3 1\n1 2\n3 2\n2 3\n', '1\n6 3\n51 94 75\n2 27 50\n18 70 81\n66 86 26\n74 88 22\n93 71 25\n2 3\n2\n3 2\n2 3\n', '1\n5 7\n84 42 53 59 18 30 61\n83 74 43 52 69 62 22\n7 72 31 50 82 90 13\n30 99 49 61 75 96 75\n6 3 23 39 33 43 7\n5 3\n1\n1 4\n', '2\n5 4\n8 60 100 66\n78 62 92 67\n42 85 51 73\n31 25 71 77\n26 6 21 16\n3 3\n2\n3 2\n3 2\n8 3\n81 92 88\n67 60 49\n30 22 99\n0 99 52\n100 17 61\n46 26 38\n35 37 80\n22 26 58\n1 2\n5\n8 1\n2 1\n6 2\n4 1\n6 2\n', '2\n6 8\n0 45 15 91 2 3 18 38\n51 99 58 44 77 27 47 1\n71 53 10 66 1 31 54 41\n85 63 50 80 54 49 25 33\n76 9 68 96 7 34 85 96\n35 77 4 46 63 44 78 52\n5 3\n1\n6 3\n4 6\n36 99 72 20 66 59\n46 0 85 8 3 27\n49 85 72 70 57 32\n77 55 90 65 30 90\n4 4\n5\n3 5\n1 4\n2 1\n1 3\n4 5\n', '3\n3 7\n49 42 88 18 41 37 13\n96 1 34 40 63 27 75\n93 74 52 47 26 66 52\n1 2\n5\n1 4\n2 1\n1 7\n2 2\n2 3\n8 8\n20 25 20 51 76 9 48 76\n82 94 10 21 2 36 5 68\n88 16 18 23 76 39 75 32\n86 58 93 23 23 57 66 12\n24 5 93 12 83 50 59 51\n47 13 65 83 78 95 51 66\n26 37 51 46 46 54 72 46\n42 15 52 8 84 66 75 70\n7 2\n2\n6 2\n7 2\n5 7\n55 44 10 90 30 37 87\n26 13 31 37 49 13 0\n27 45 30 82 51 77 69\n39 42 7 98 11 94 1\n92 35 22 65 72 67 46\n2 3\n4\n4 6\n2 7\n4 2\n2 7\n', '2\n5 8\n20 94 68 6 5 65 96 97\n52 69 31 56 75 79 45 82\n9 24 91 92 0 96 92 9\n39 12 82 93 61 0 45 52\n1 71 89 95 37 41 30 57\n2 2\n1\n3 3\n8 5\n13 20 48 54 0\n50 9 98 99 93\n8 14 37 79 16\n6 44 69 42 9\n5 55 29 96 12\n92 53 25 3 81\n83 2 49 59 2\n87 96 82 62 38\n1 2\n3\n6 1\n4 4\n6 4\n', '3\n5 6\n0 97 84 83 95 32\n70 32 37 98 96 86\n72 100 32 53 50 40\n50 40 44 30 72 56\n0 79 43 55 68 95\n5 4\n5\n2 4\n4 2\n4 4\n2 4\n5 1\n5 6\n38 97 75 47 64 67\n4 47 24 73 59 45\n71 71 83 88 68 60\n11 6 58 20 59 9\n76 54 25 20 20 74\n5 1\n1\n2 5\n3 6\n71 22 90 20 95 65\n3 60 85 18 5 88\n22 22 69 97 58 48\n3 3\n1\n3 3\n', '1\n5 5\n68 59 68 61 13\n58 24 91 40 85\n80 9 30 58 31\n32 65 26 15 71\n8 58 34 73 44\n2 4\n1\n1 4\n', '3\n6 5\n83 39 79 26 82\n15 70 86 48 40\n76 46 13 71 96\n44 50 81 92 98\n43 47 81 98 82\n38 34 68 48 84\n4 3\n4\n1 4\n6 2\n3 2\n1 1\n8 5\n30 55 43 71 1\n63 67 23 21 32\n45 85 72 61 72\n73 22 74 59 30\n48 26 12 52 58\n2 61 88 93 64\n97 64 45 15 23\n49 52 38 67 50\n4 1\n1\n8 4\n6 7\n79 81 26 69 84 93 69\n6 97 0 33 19 18 1\n3 91 21 32 67 69 33\n36 59 43 1 64 88 87\n74 69 26 67 61 93 59\n2 80 34 15 58 13 45\n6 2\n2\n6 6\n3 3\n', '3\n8 3\n31 46 87\n93 1 2\n13 0 77\n7 34 66\n83 67 8\n70 19 94\n4 76 4\n10 75 53\n4 1\n5\n7 3\n8 3\n5 1\n5 1\n8 3\n6 3\n73 99 53\n44 75 90\n76 45 4\n90 34 8\n57 80 10\n94 57 51\n1 1\n2\n6 1\n2 3\n8 4\n36 49 46 46\n95 59 80 56\n88 28 52 49\n54 89 49 6\n95 6 84 20\n6 82 81 86\n83 52 30 20\n56 80 25 86\n4 2\n5\n1 2\n3 3\n3 3\n1 1\n2 1\n', '2\n7 5\n33 31 48 96 3\n84 63 53 75 40\n60 65 80 62 56\n60 2 51 30 48\n13 38 42 12 75\n44 8 95 3 43\n6 51 22 12 73\n3 2\n4\n2 2\n5 2\n7 5\n2 3\n6 3\n38 9 14\n64 80 22\n96 64 92\n77 54 35\n41 28 35\n70 98 95\n5 3\n2\n6 2\n4 3\n', '1\n8 5\n44 61 57 100 44\n10 84 53 27 2\n82 11 47 18 68\n39 20 52 19 91\n0 78 14 75 78\n65 12 10 9 25\n13 47 17 48 5\n55 99 98 13 66\n1 2\n2\n3 4\n4 4\n', '2\n6 6\n55 51 45 88 95 43\n87 88 18 68 84 5\n36 29 85 88 50 64\n34 31 76 82 10 74\n51 38 76 41 24 34\n1 3 36 53 49 44\n5 3\n2\n2 2\n4 3\n4 7\n11 27 15 46 58 53 64\n20 41 1 86 14 18 85\n30 97 100 43 78 47 71\n45 87 98 14 66 94 100\n2 7\n4\n1 6\n3 2\n1 1\n2 4\n', '3\n5 4\n100 80 63 41\n55 18 74 89\n12 24 46 12\n56 87 3 24\n16 14 7 17\n5 2\n2\n2 2\n4 2\n8 6\n72 19 19 74 21 46\n75 74 45 90 65 22\n48 28 28 28 52 6\n87 42 28 30 5 14\n13 62 81 23 45 68\n44 88 71 74 58 30\n80 34 50 46 15 9\n39 81 66 66 12 31\n4 5\n2\n3 3\n4 3\n3 4\n6 6 16 56\n45 17 39 78\n15 81 28 72\n3 3\n4\n2 2\n2 3\n3 1\n3 3\n']
 REFERENCE_SOURCE = 'from collections import deque\nimport sys\ninput = sys.stdin.read\n\n# 判断坐标是否有效\ndef is_valid(x, y, m, n):\n    return 0 <= x < m and 0 <= y < n\n\n# 广度优先搜索模拟水流\ndef bfs(start_x, start_y, start_height, m, n, h, water_height):\n    dx = [-1, 1, 0, 0]\n    dy = [0, 0, -1, 1]\n    q = deque([(start_x, start_y, start_height)])\n    water_height[start_x][start_y] = start_height\n\n    while q:\n        x, y, height = q.popleft()\n        for i in range(4):\n            nx, ny = x + dx[i], y + dy[i]\n            if is_valid(nx, ny, m, n) and h[nx][ny] < height:\n                if water_height[nx][ny] < height:\n                    water_height[nx][ny] = height\n                    q.append((nx, ny, height))\n\n# 主函数\ndef main():\n    data = input().split()  # 快速读取所有输入数据\n    idx = 0\n    k = int(data[idx])\n    idx += 1\n    results = []\n\n    for _ in range(k):\n        m, n = map(int, data[idx:idx + 2])\n        idx += 2\n        h = []\n        for i in range(m):\n            h.append(list(map(int, data[idx:idx + n])))\n            idx += n\n        water_height = [[0] * n for _ in range(m)]\n\n        i, j = map(int, data[idx:idx + 2])\n        idx += 2\n        i, j = i - 1, j - 1\n\n        p = int(data[idx])\n        idx += 1\n\n        for _ in range(p):\n            x, y = map(int, data[idx:idx + 2])\n            idx += 2\n            x, y = x - 1, y - 1\n\n            bfs(x, y, h[x][y], m, n, h, water_height)\n\n        results.append("Yes" if water_height[i][j] > 0 else "No")\n\n    sys.stdout.write("\\n".join(results) + "\\n")\n\nif __name__ == "__main__":\n    main()\n'
-assert CASES[0] == SAMPLE_IN
-random.seed(12029)
+
+def g12029(r):
+    cases = []
+    for _ in range(r.randint(1, 3)):
+        m, n = r.randint(3, 8), r.randint(3, 8); grid = [[r.randint(0, 100) for _ in range(n)] for _ in range(m)]
+        i, j = r.randint(1, m), r.randint(1, n); points = [(r.randint(1, m), r.randint(1, n)) for _ in range(r.randint(1, min(5, m*n)))]
+        cases.append(f"{m} {n}\n" + "\n".join(" ".join(map(str, row)) for row in grid) + f"\n{i} {j}\n{len(points)}\n" + "\n".join(f"{x} {y}" for x, y in points))
+    return str(len(cases)) + "\n" + "\n".join(cases) + "\n"
+
+def build_cases():
+    cases = [SAMPLE_IN]
+    for i in range(1, 20):
+        for attempt in range(100):
+            value = g12029(random.Random(NUMBER + i + attempt * 1000))
+            if value not in cases:
+                cases.append(value)
+                break
+        else:
+            raise AssertionError("生成器多样性不足")
+    return cases
+
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
-        handle.write(REFERENCE_SOURCE); handle.flush()
-        result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=5, check=True)
+        handle.write(REFERENCE_SOURCE)
+        handle.flush()
+        result = subprocess.run(["python3", handle.name], input=content, text=True,
+                                capture_output=True, timeout=120, check=True)
     return result.stdout
-assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split()
-root = Path(__file__).parent / "data"
-for index, content in enumerate(CASES):
-    (root / f"{index}.in").write_text(content, encoding="utf-8")
-    (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+def main():
+    cases = build_cases()
+    assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
+    root = Path(__file__).parent / "data"
+    root.mkdir(exist_ok=True)
+    for index, content in enumerate(cases):
+        (root / f"{index}.in").write_text(content, encoding="utf-8")
+        (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

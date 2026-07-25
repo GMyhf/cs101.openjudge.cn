@@ -1,27 +1,85 @@
+"""4082 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+
+出处：build_001a
+生成器与循环取自 scripts/build_001a.py（批次 001a），保持同一形状；
+不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
+"""
 import random
 import subprocess
 import tempfile
 from pathlib import Path
+
+NUMBER = 4082
 SAMPLE_IN = '9\na0 b0 $1 c0 d0 $1 e1 f1 $1\n'
 SAMPLE_OUT = 'a f c b e d\n'
-CASES = ['9\na0 b0 $1 c0 d0 $1 e1 f1 $1\n', '17\na0 b0 $1 c0 h0 $1 k1 d0 e0 l1 f0 g0 i1 j1 $1 $1 $1\n', '21\na0 b0 e0 l1 $1 c0 d0 f0 i0 $1 j1 h0 n1 m1 g0 $1 k0 o1 $1 $1 $1\n', '15\na0 b0 c0 $1 d0 g0 j1 $1 $1 e0 f1 h0 $1 i1 $1\n', '9\na0 b0 c0 $1 d0 $1 e1 $1 $1\n', '13\na0 b0 c0 $1 f0 g0 $1 h1 $1 d0 e1 $1 $1\n', '7\na0 b0 c0 d1 $1 $1 $1\n', '9\na0 b0 c0 g1 d0 $1 e1 f1 $1\n', '21\na0 b0 $1 c0 e0 f0 g0 k0 l1 $1 $1 $1 $1 d0 h0 i0 j1 $1 $1 $1 $1\n', '17\na0 b0 c0 d0 g0 h0 $1 j1 $1 k1 $1 e0 f0 $1 i1 $1 $1\n', '19\na0 b0 e0 k0 l0 $1 m1 $1 $1 c0 g0 h1 i0 j1 $1 d0 f1 $1 $1\n', '19\na0 b0 e1 c0 m0 $1 n1 d0 f0 $1 g1 h0 i0 $1 j0 l1 k1 o1 $1\n', '11\na0 b0 c0 d0 $1 g1 e0 f1 $1 h1 $1\n', '19\na0 b0 c0 g0 $1 k1 d0 $1 e0 f0 $1 h0 i0 j1 $1 $1 $1 $1 $1\n', '21\na0 b0 c0 $1 d0 j1 e0 h0 $1 k0 $1 m0 $1 n1 f0 i1 $1 g0 $1 l1 $1\n', '11\na0 b0 $1 c0 d0 e0 $1 f1 $1 g1 $1\n', '15\na0 b0 k1 c0 d0 e0 g0 i1 $1 h0 j1 $1 $1 f1 $1\n', '13\na0 b0 d0 e0 $1 g1 f0 h1 i1 c0 j1 $1 $1\n', '19\na0 b0 h0 $1 l1 c0 d0 $1 e0 $1 f0 g0 i1 k1 $1 j0 m1 $1 $1\n', '23\na0 b0 d0 $1 f0 i1 g0 k0 p1 $1 h0 m0 n1 $1 j1 c0 $1 e0 $1 l0 $1 o1 $1\n']
 REFERENCE_SOURCE = "from collections import defaultdict\n\nn = int(input())\nif n == 0:\n    print()\n    exit()\n\npreorder = input().split()\n\n# 初始化根节点\nroot = preorder[0][0]\nroot_type = preorder[0][1]\n\ntier = defaultdict(list)\ntier[0].append(root)\n\nnodes = [root]\nlevel = 0\ntypes = {root: root_type}\n\nfor i in range(1, n):\n    current = preorder[i]\n    name = current[0]\n    typ = current[1]\n    types[name] = typ\n\n    prev_node = nodes[-1]\n    prev_type = types[prev_node]\n\n    # 计算层级变化\n    if prev_type == '1':\n        level -= 1\n    else:\n        level += 1\n\n    nodes.append(name)\n\n    # 只添加非虚节点到对应层级\n    if name != '$':\n        tier[level].append(name)\n\n# 按层级顺序排序并逆序每层节点\nsorted_levels = sorted(tier.items(), key=lambda x: x[0])\nresult = []\nfor level, chars in sorted_levels:\n    result.extend(reversed(chars))\n\nprint(' '.join(result))\n"
-assert SAMPLE_IN.strip()
-assert SAMPLE_OUT.strip()
-random.seed(4082)
-assert CASES[0] == SAMPLE_IN
+
+def g4082(r):
+    node_count = r.randint(4, 16)
+    children = [[] for _ in range(node_count)]
+    for node in range(1, node_count):
+        children[r.randrange(node)].append(node)
+
+    class Binary:
+        def __init__(self, label):
+            self.label = label
+            self.left = None
+            self.right = None
+
+    def convert(node, sibling=None):
+        result = Binary(chr(ord("a") + node))
+        if children[node]:
+            result.left = convert(children[node][0], children[node][1:])
+        if sibling:
+            result.right = convert(sibling[0], sibling[1:])
+        return result
+
+    def complete(node):
+        if node is None:
+            return
+        if node.left is None and node.right is not None:
+            node.left = Binary("$")
+        elif node.left is not None and node.right is None:
+            node.right = Binary("$")
+        complete(node.left)
+        complete(node.right)
+
+    def tokens(node):
+        if node is None:
+            return []
+        internal = node.left is not None or node.right is not None
+        result = [node.label + ("0" if internal else "1")]
+        result += tokens(node.left)
+        result += tokens(node.right)
+        return result
+
+    root = convert(0)
+    complete(root)
+    values = tokens(root)
+    return str(len(values)) + "\n" + " ".join(values) + "\n"
+
+def build_cases():
+    return [SAMPLE_IN] + [g4082(random.Random(NUMBER + i)) for i in range(1, 20)]
+
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
         handle.write(REFERENCE_SOURCE)
         handle.flush()
         result = subprocess.run(["python3", handle.name], input=content, text=True,
-                                capture_output=True, timeout=5, check=True)
+                                capture_output=True, timeout=120, check=True)
     return result.stdout
-assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split()
-def generate_case(index):
-    return CASES[index]
-root = Path(__file__).parent / "data"
-for index in range(20):
-    content = generate_case(index)
-    (root / f"{index}.in").write_text(content, encoding="utf-8")
-    (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+def main():
+    cases = build_cases()
+    assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
+    root = Path(__file__).parent / "data"
+    root.mkdir(exist_ok=True)
+    for index, content in enumerate(cases):
+        (root / f"{index}.in").write_text(content, encoding="utf-8")
+        (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

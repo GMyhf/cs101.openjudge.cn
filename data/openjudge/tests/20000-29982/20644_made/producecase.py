@@ -1,10 +1,53 @@
-import subprocess, tempfile
+"""20644 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+
+出处：build_001d
+生成器与循环取自 scripts/build_001d.py（批次 001d），保持同一形状；
+不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
+"""
+import random
+import subprocess
+import tempfile
 from pathlib import Path
-CASES=['3 4\n0111\n1111\n0111\n', '7 4\n0111\n0010\n0011\n1100\n1011\n0001\n0110\n', '8 9\n111111011\n111011100\n011101010\n100011100\n010111100\n011111001\n100001100\n001111011\n', '2 9\n010111010\n101100100\n', '9 10\n1010100000\n0111010001\n1010111000\n0010010111\n0100001100\n0011010011\n1101011001\n1001011010\n0101010110\n', '4 3\n101\n101\n111\n001\n', '3 4\n0010\n0001\n1000\n', '7 7\n1111011\n1011110\n1100001\n1101011\n1110011\n1101011\n1111110\n', '9 6\n100101\n111011\n000010\n101111\n000111\n010000\n011011\n011110\n011000\n', '7 5\n00101\n01011\n00010\n10000\n01010\n00111\n11011\n', '9 4\n0000\n0011\n0101\n0010\n1001\n0100\n1010\n0000\n1110\n', '4 5\n11010\n11010\n00001\n01011\n', '10 10\n0001000011\n1101011100\n0101101101\n1101101011\n0000011101\n0111000000\n1110011111\n1101110001\n1100101111\n0110010101\n', '5 8\n00101100\n11010111\n00100000\n01101000\n00100000\n', '7 10\n0110100111\n1100101010\n1100111110\n1000100111\n1000111100\n1111010111\n0001100001\n', '5 10\n1101000010\n0011000111\n1110010101\n0110000010\n0000100101\n', '6 6\n111101\n001001\n000010\n101000\n011010\n010101\n', '8 8\n11001110\n01100100\n00110011\n10000100\n11101110\n01001100\n10010101\n11011111\n', '2 4\n1010\n0001\n', '7 8\n11011100\n10100110\n00110000\n10001101\n01110001\n01000000\n00000000\n']
-SOURCE='m,n = map(int, input().split())\nmatrix = []\nfor i in range(m):\n    matrix.append(list(map(int, list(input()))))\n\ndef check(matrix, i, j, step):\n    for x in range(i, i+step+1):\n        for y in range(j, j+step+1):\n            if matrix[x][y] == 0:\n                return False\n    return True\n\ncnt = 0\nstep = 0\n\nwhile step <= min(m, n):\n    for i in range(m-step):\n        for j in range(n-step):\n            if check(matrix, i, j, step):\n                cnt += 1\n    step += 1\n\nprint(cnt)\n'
-with tempfile.NamedTemporaryFile('w',suffix='.py') as f:
- f.write(SOURCE); f.flush()
- root=Path(__file__).parent/'data'
- for i,c in enumerate(CASES):
-  o=subprocess.run(['python3',f.name],input=c,text=True,capture_output=True,check=True).stdout
-  (root/f'{i}.in').write_text(c); (root/f'{i}.out').write_text(o)
+
+NUMBER = 20644
+SAMPLE_IN = '3 4\n0111\n1111\n0111\n'
+SAMPLE_OUT = '15\n'
+REFERENCE_SOURCE = 'm,n = map(int, input().split())\nmatrix = []\nfor i in range(m):\n    matrix.append(list(map(int, list(input()))))\n\ndef check(matrix, i, j, step):\n    for x in range(i, i+step+1):\n        for y in range(j, j+step+1):\n            if matrix[x][y] == 0:\n                return False\n    return True\n\ncnt = 0\nstep = 0\n\nwhile step <= min(m, n):\n    for i in range(m-step):\n        for j in range(n-step):\n            if check(matrix, i, j, step):\n                cnt += 1\n    step += 1\n\nprint(cnt)\n'
+
+def g20644(r):
+    m,n=r.randint(2,10),r.randint(2,10); return f"{m} {n}\n"+"\n".join("".join(r.choice("01") for _ in range(n)) for _ in range(m))+"\n"
+
+def build_cases():
+    cases = [SAMPLE_IN]
+    for i in range(1, 20):
+        for attempt in range(100):
+            value = g20644(random.Random(NUMBER + i + attempt * 1000))
+            if value not in cases:
+                cases.append(value)
+                break
+        else:
+            raise AssertionError("生成器多样性不足")
+    return cases
+
+def solve_reference(content):
+    with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
+        handle.write(REFERENCE_SOURCE)
+        handle.flush()
+        result = subprocess.run(["python3", handle.name], input=content, text=True,
+                                capture_output=True, timeout=120, check=True)
+    return result.stdout
+
+
+def main():
+    cases = build_cases()
+    assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
+    root = Path(__file__).parent / "data"
+    root.mkdir(exist_ok=True)
+    for index, content in enumerate(cases):
+        (root / f"{index}.in").write_text(content, encoding="utf-8")
+        (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

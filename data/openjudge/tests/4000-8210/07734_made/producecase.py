@@ -1,18 +1,61 @@
-import random, subprocess, tempfile
+"""7734 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+
+出处：build_001c
+生成器与循环取自 scripts/build_001c.py（批次 001c），保持同一形状；
+不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
+"""
+import random
+import subprocess
+import tempfile
 from pathlib import Path
+
+NUMBER = 7734
 SAMPLE_IN = '2\n3 3\n1 2\n2 3\n1 3\n4 2\n1 2\n3 4\n'
 SAMPLE_OUT = 'Scenario #1:\nSuspicious bugs found!\n\nScenario #2:\nNo suspicious bugs found!\n'
-CASES = ['2\n3 3\n1 2\n2 3\n1 3\n4 2\n1 2\n3 4\n', '2\n18 20\n8 8\n1 2\n11 10\n3 1\n14 7\n5 1\n16 15\n2 2\n1 3\n13 11\n6 2\n10 4\n1 1\n4 2\n2 3\n12 12\n15 9\n17 11\n7 5\n9 1\n12 11\n4 4\n7 4\n5 5\n2 1\n6 5\n10 8\n3 1\n1 1\n11 9\n8 5\n9 4\n', '2\n20 22\n18 17\n4 3\n5 4\n10 3\n2 2\n1 3\n11 11\n7 7\n14 6\n17 5\n9 7\n19 8\n1 2\n6 4\n15 13\n12 11\n3 2\n8 7\n1 1\n2 3\n13 12\n16 11\n11 13\n7 4\n8 8\n1 2\n1 3\n2 1\n6 1\n1 1\n10 7\n2 3\n9 5\n3 2\n4 1\n5 2\n', '2\n10 9\n3 1\n1 1\n6 4\n4 2\n7 3\n9 5\n2 2\n5 3\n8 5\n6 5\n2 1\n1 1\n5 4\n4 2\n3 2\n', '3\n20 19\n8 3\n17 15\n13 2\n7 4\n12 12\n14 3\n9 7\n11 4\n10 5\n2 1\n16 15\n18 12\n3 2\n4 1\n5 2\n19 1\n1 1\n15 6\n6 3\n5 4\n3 1\n1 1\n4 3\n2 2\n6 8\n5 5\n1 2\n4 3\n1 1\n2 3\n3 3\n2 2\n1 3\n', '3\n20 22\n14 1\n9 8\n10 3\n11 8\n1 3\n3 3\n19 8\n1 2\n2 1\n13 1\n16 12\n15 10\n12 2\n4 1\n5 5\n8 4\n1 1\n17 13\n2 3\n6 6\n7 5\n18 14\n4 3\n1 1\n3 2\n2 2\n10 12\n1 2\n1 1\n5 4\n9 2\n4 2\n7 3\n2 3\n2 2\n3 2\n6 3\n1 3\n8 5\n', '2\n7 9\n1 2\n6 1\n1 1\n5 1\n4 2\n2 3\n3 3\n2 2\n1 3\n13 15\n1 2\n12 7\n2 1\n4 3\n3 1\n10 4\n1 1\n5 4\n2 3\n7 6\n11 5\n8 2\n6 3\n1 3\n9 4\n', '3\n15 14\n10 5\n14 14\n3 1\n1 1\n5 4\n4 2\n7 3\n8 3\n2 2\n13 2\n11 8\n6 3\n9 7\n12 8\n16 15\n11 1\n6 2\n2 1\n1 1\n5 4\n10 1\n4 2\n7 3\n8 3\n13 9\n15 6\n12 2\n14 12\n3 2\n9 1\n7 9\n4 4\n1 2\n1 1\n2 3\n2 2\n6 6\n3 2\n1 3\n5 2\n', '2\n5 4\n4 3\n1 1\n3 3\n2 2\n15 17\n1 3\n1 2\n2 1\n9 3\n5 4\n1 1\n11 3\n13 13\n2 3\n10 3\n12 6\n3 3\n7 2\n8 6\n14 12\n6 3\n4 1\n', '2\n14 13\n12 1\n7 5\n4 3\n10 8\n1 1\n5 1\n13 12\n2 2\n6 6\n8 2\n3 2\n9 7\n11 11\n20 19\n3 1\n5 4\n9 2\n11 2\n2 2\n15 11\n16 13\n4 2\n17 5\n19 2\n8 5\n10 2\n7 6\n18 15\n12 8\n14 11\n1 1\n13 9\n6 3\n', '3\n7 9\n1 3\n6 2\n1 2\n1 1\n2 3\n3 3\n2 2\n5 3\n4 1\n6 8\n5 5\n1 2\n4 3\n1 1\n2 3\n2 2\n3 2\n1 3\n4 3\n1 1\n3 3\n2 2\n', '2\n4 3\n1 1\n2 1\n3 2\n20 19\n14 1\n11 2\n2 2\n13 2\n18 4\n15 14\n12 3\n3 3\n17 2\n9 4\n4 4\n5 5\n19 4\n8 1\n1 1\n10 7\n16 5\n7 2\n6 6\n', '1\n8 10\n1 3\n1 2\n2 1\n1 1\n6 6\n7 3\n2 3\n3 3\n5 3\n4 1\n', '1\n11 10\n5 5\n8 4\n2 1\n3 1\n1 1\n10 7\n6 6\n7 5\n4 1\n9 4\n', '1\n9 8\n4 4\n7 4\n8 8\n6 1\n1 1\n5 1\n3 3\n2 2\n', '3\n17 16\n15 14\n13 7\n6 1\n1 1\n9 6\n14 7\n12 3\n7 3\n8 3\n3 3\n10 6\n16 15\n2 2\n5 3\n4 1\n11 11\n16 18\n4 4\n8 8\n11 7\n1 2\n7 1\n2 1\n1 3\n3 1\n14 1\n1 1\n9 6\n2 3\n12 12\n15 6\n10 3\n5 3\n6 3\n13 5\n13 15\n6 2\n1 2\n3 1\n1 1\n5 4\n11 3\n9 2\n4 2\n2 3\n7 6\n12 12\n2 2\n10 9\n1 3\n8 5\n', '2\n13 12\n5 5\n8 4\n4 3\n1 1\n9 6\n11 9\n12 3\n7 3\n2 2\n3 2\n6 3\n10 2\n4 6\n2 3\n1 2\n2 2\n3 1\n1 1\n1 3\n', '3\n3 2\n1 1\n2 2\n16 18\n1 3\n9 7\n1 2\n8 4\n2 1\n7 7\n15 4\n1 1\n13 10\n6 6\n10 7\n11 6\n2 3\n3 3\n12 2\n5 3\n4 1\n14 12\n11 13\n4 4\n5 5\n1 2\n2 1\n6 1\n1 1\n10 7\n7 3\n2 3\n9 5\n8 3\n3 3\n1 3\n', '1\n4 3\n1 1\n2 1\n3 2\n', '3\n19 18\n13 5\n17 7\n7 1\n2 1\n4 3\n5 4\n1 1\n11 3\n15 13\n16 3\n18 15\n3 3\n12 12\n10 3\n6 6\n8 2\n9 7\n14 12\n7 9\n6 2\n1 2\n4 3\n3 1\n1 1\n5 1\n2 3\n2 2\n1 3\n5 7\n2 3\n3 3\n2 2\n1 2\n4 3\n1 1\n1 3\n']
 REFERENCE_SOURCE = 'import sys\nsys.setrecursionlimit(1000000)\n\n\ndef solve():\n    T = int(input())\n\n    for case in range(1, T + 1):\n        n, m = map(int, input().split())\n\n        # 扩展域：1~n 表示性别A，n+1~2n 表示性别B\n        parent = list(range(2 * n + 1))\n\n        def find(i):\n            if parent[i] == i:\n                return i\n            parent[i] = find(parent[i])\n            return parent[i]\n\n        def union(i, j):\n            root_i = find(i)\n            root_j = find(j)\n            if root_i != root_j:\n                parent[root_i] = root_j\n\n        suspicious = False\n        for _ in range(m):\n            u, v = map(int, input().split())\n            if suspicious: continue\n\n            # 如果 u 和 v 已经在同一个性别域里，说明他们是同性！\n            if find(u) == find(v):\n                suspicious = True\n            else:\n                # u 恋爱对象必须是 v 的异性分身\n                union(u, v + n)\n                # v 恋爱对象必须是 u 的异性分身\n                union(v, u + n)\n\n        print(f"Scenario #{case}:")\n        if suspicious:\n            print("Suspicious bugs found!")\n        else:\n            print("No suspicious bugs found!")\n        print()\n\n\nsolve()\n'
-assert CASES[0] == SAMPLE_IN
-random.seed(7734)
+
+def g7734(r):
+    cases = []
+    for _ in range(r.randint(1, 3)):
+        n = r.randint(3, 20); edges = set()
+        for i in range(1, n):
+            edges.add((i, r.randint(1, i)))
+        if r.random() < .5:
+            edges.update({(1, 2), (2, 3), (1, 3)})
+        cases.append(f"{n} {len(edges)}\n" + "\n".join(f"{a} {b}" for a, b in edges))
+    return str(len(cases)) + "\n" + "\n".join(cases) + "\n"
+
+def build_cases():
+    cases = [SAMPLE_IN]
+    for i in range(1, 20):
+        for attempt in range(100):
+            value = g7734(random.Random(NUMBER + i + attempt * 1000))
+            if value not in cases:
+                cases.append(value)
+                break
+        else:
+            raise AssertionError("生成器多样性不足")
+    return cases
+
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
-        handle.write(REFERENCE_SOURCE); handle.flush()
-        result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=5, check=True)
+        handle.write(REFERENCE_SOURCE)
+        handle.flush()
+        result = subprocess.run(["python3", handle.name], input=content, text=True,
+                                capture_output=True, timeout=120, check=True)
     return result.stdout
-assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split()
-root = Path(__file__).parent / "data"
-for index, content in enumerate(CASES):
-    (root / f"{index}.in").write_text(content, encoding="utf-8")
-    (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+def main():
+    cases = build_cases()
+    assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
+    root = Path(__file__).parent / "data"
+    root.mkdir(exist_ok=True)
+    for index, content in enumerate(cases):
+        (root / f"{index}.in").write_text(content, encoding="utf-8")
+        (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,27 +1,45 @@
+"""4036 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+
+出处：build_001a
+生成器与循环取自 scripts/build_001a.py（批次 001a），保持同一形状；
+不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
+"""
 import random
 import subprocess
 import tempfile
 from pathlib import Path
+
+NUMBER = 4036
 SAMPLE_IN = '1 1 3 1 2\n'
 SAMPLE_OUT = '3\n'
-CASES = ['1 1 3 1 2\n', '73 58 14 9 5\n', '32 44 4 1 3\n', '25 46 13 11 2\n', '8 42 20 17 3\n', '83 70 17 10 7\n', '72 5 16 5 11\n', '54 65 20 18 2\n', '85 84 19 14 5\n', '70 4 9 0 9\n', '73 71 5 4 1\n', '58 88 17 4 13\n', '73 60 19 17 2\n', '85 58 15 7 8\n', '59 63 11 0 11\n', '67 5 10 8 2\n', '72 29 19 16 3\n', '4 55 6 2 4\n', '12 18 4 1 3\n', '1 69 18 1 17\n']
 REFERENCE_SOURCE = 'import math\na, b, k, n, m = map(int, input().split());\nprint((pow(a, n, 10007) * pow(b, m, 10007) * math.comb(k, m)) % 10007)\n'
-assert SAMPLE_IN.strip()
-assert SAMPLE_OUT.strip()
-random.seed(4036)
-assert CASES[0] == SAMPLE_IN
+
+def g4036(r):
+    a, b, k = r.randint(0, 100), r.randint(0, 100), r.randint(0, 20)
+    n = r.randint(0, k); return f"{a} {b} {k} {n} {k-n}\n"
+
+def build_cases():
+    return [SAMPLE_IN] + [g4036(random.Random(NUMBER + i)) for i in range(1, 20)]
+
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
         handle.write(REFERENCE_SOURCE)
         handle.flush()
         result = subprocess.run(["python3", handle.name], input=content, text=True,
-                                capture_output=True, timeout=5, check=True)
+                                capture_output=True, timeout=120, check=True)
     return result.stdout
-assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split()
-def generate_case(index):
-    return CASES[index]
-root = Path(__file__).parent / "data"
-for index in range(20):
-    content = generate_case(index)
-    (root / f"{index}.in").write_text(content, encoding="utf-8")
-    (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+def main():
+    cases = build_cases()
+    assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
+    root = Path(__file__).parent / "data"
+    root.mkdir(exist_ok=True)
+    for index, content in enumerate(cases):
+        (root / f"{index}.in").write_text(content, encoding="utf-8")
+        (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

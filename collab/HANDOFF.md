@@ -21,6 +21,39 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-25 · Claude → Codex · producecase.py 归位：内嵌 CASES → 固定种子重生成（全 80 题）
+
+- **做了什么**：人拍板去掉 `producecase.py` 的重复存储。四批（001a-001d）的
+  `producecase.py` 都把 20 组输入原样内嵌成 `CASES = [...]`，等于**同一份输入在仓库里
+  存两份**（全仓库 2.23MB，其中 001d 占 1.88MB，20018 一题就 590K、20626 一题 1070K）。
+  而**人的模版 `tests/4000-8210/4102_made/producecase.py` 本来就是真生成器**
+  （`generate_random_case(epoch)` + 随机），所以内嵌 CASES 是 agent 偏离模版——这轮是归位，
+  不是改约定。新增 `scripts/slim_producecase.py` 逐题改写：把 `CASES` 换成
+  **生成器源码 + 各批 build 脚本里原样的生成循环**，`SAMPLE_IN`/`SAMPLE_OUT`/
+  `REFERENCE_SOURCE` 保留（第 0 组是题面样例，不是生成的）。
+- **各批循环形状不同，逐字复刻了**：001a/001b 无去重重试
+  （`[sample] + [gen(random.Random(number+i)) for i in 1..19]`）；001c/001d 有去重重试
+  （`seed = number + i + attempt*1000`）。001a 少数没有生成器的题按原逻辑退化成 20 组全样例。
+- **验收标准就是「重跑后 data/ 逐字节不变」**：`slim_producecase.py --verify` 逐题跑
+  `producecase.py` 再比对 git 工作树，**80/80 字节不变**。
+- **中途抓到自己一个 bug**：闭包只抓了传递依赖的**函数**，漏了**模块级常量**——
+  5430 引用 `EXPRESSIONS`、12757 引用 `ONES`，改写后直接 NameError。已把常量纳入闭包，
+  这两题从 HEAD 恢复旧文件重新改写，复跑通过。**这正是「重跑必须字节不变」这条验收
+  抓出来的**——只看体积变小就收工的话，这两题的 producecase.py 会以坏掉的状态入库。
+- **改了哪些文件**：`scripts/slim_producecase.py`（新增）、全部 80 个
+  `data/openjudge/tests/*/*_made/producecase.py`、`collab/HANDOFF.md`、
+  `collab/NOTES-claude.md`、`collab/PLAN.md`
+- **验证**：`--verify` 全绿（unittest 13 文件 / py_compile / node --check）｜
+  **producecase 重跑 80/80 逐字节不变** ｜ **测试数据零变动**（`_made/data/` 下 0 个文件改动，
+  所以上一轮的 AC 20/20、变异 WA、恒定输出探针结论原样成立，无需重跑）｜
+  `producecase.py` **2.23MB → 0.37MB**，已入库 `_made` 数据 **10.8MB → 8.92MB**。
+- **请重点看**：净效果是**贴上界多花的 1.9MB 被这次去重完全抵掉**，入库数据回到我改 001d
+  之前的 8.9MB 水平——所以贴上界那几组不用再砍了。人工的 24 题 `_made` 目录我没动
+  （本来就是人写的真生成器）。
+- **红线自检**：判题沙箱未动 ✅ ｜ 口令未入库 ✅ ｜ 路径防线未动 ✅
+- **下一步建议**：T-003 开批时 `producecase.py` 直接按新式写（生成器 + 种子，不要内嵌 CASES），
+  并把「重跑后 data/ 逐字节不变」作为交付前自检的一项——它比体积检查强得多。
+
 ### 2026-07-25 · Claude → Codex · 001d 复核：**打回 4 题、我已逐题修好并重建；001d 收口 20/20，T-002-001 收口**
 
 - **做了什么**：全量独立验收 `8cd5557`。机械项全绿（零重叠、catalog 1863 条无损、

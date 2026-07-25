@@ -1,27 +1,48 @@
+"""4089 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+
+出处：build_001a
+生成器与循环取自 scripts/build_001a.py（批次 001a），保持同一形状；
+不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
+"""
 import random
 import subprocess
 import tempfile
 from pathlib import Path
+
+NUMBER = 4089
 SAMPLE_IN = '2\n3\n911\n97625999\n91125426\n5\n113\n12340\n123440\n12345\n98346\n'
 SAMPLE_OUT = 'NO\nYES\n'
-CASES = ['2\n3\n911\n97625999\n91125426\n5\n113\n12340\n123440\n12345\n98346\n', '6\n8\n59824\n33766\n917282\n339923\n639340\n699548\n396709\n484081\n10\n422924\n686655\n983184\n918763\n410891\n75129\n564311\n74347\n586951\n248360\n8\n918074\n608654\n969173\n183328\n648801\n363591\n994317\n110978\n3\n716477\n799040\n39476\n3\n234432\n696909\n384546\n8\n235300\n187348\n303037\n327600\n562618\n874467\n859377\n808218\n', '5\n4\n908576\n472652\n658400\n99054\n11\n522238\n871520\n817270\n291593\n937858\n437033\n180628\n899690\n872020\n47636\n118424\n5\n562378\n42162\n228558\n442374\n123318\n9\n856719\n613495\n718923\n343120\n314289\n459245\n810670\n993604\n138757\n5\n748756\n480727\n825925\n109354\n990130\n', '6\n5\n117848\n261596\n802180\n528590\n159851\n8\n293706\n825650\n704148\n866784\n663662\n157970\n593364\n849947\n10\n995035\n266092\n657430\n655979\n984152\n283652\n286373\n358324\n790196\n305367\n2\n730776\n762717\n8\n73550\n614637\n256414\n935146\n499928\n449219\n258316\n217333\n11\n869001\n36524\n972723\n667751\n667074\n237691\n337186\n34192\n483701\n194366\n465042\n', '5\n3\n940129\n56189\n243659\n8\n516918\n118091\n791839\n523384\n484067\n512345\n640142\n139564\n4\n22209\n340464\n252905\n432049\n5\n762471\n142598\n765324\n615797\n924144\n3\n891939\n881456\n708325\n', '4\n8\n307491\n609284\n190343\n562910\n941313\n986935\n286086\n77642\n8\n143650\n750976\n847909\n435675\n218820\n570397\n178650\n609666\n10\n995387\n252296\n572081\n527211\n188338\n444258\n487013\n377563\n758508\n386836\n7\n88209\n610079\n915577\n334957\n781596\n312513\n852206\n', '5\n4\n906854\n617605\n629334\n535117\n10\n574288\n966342\n706014\n282165\n451190\n644509\n812038\n726661\n251198\n525250\n6\n616230\n726386\n482674\n572254\n173240\n305299\n8\n779977\n190594\n310084\n324965\n15883\n261264\n410578\n581466\n7\n956459\n929964\n774920\n452254\n549621\n813585\n751867\n', '2\n12\n622023\n329131\n440972\n211416\n894900\n133444\n95853\n632997\n358285\n883768\n965646\n256885\n6\n51153\n825886\n301857\n289461\n759711\n309601\n', '3\n9\n199743\n562734\n904190\n467902\n517994\n130229\n196004\n207070\n929763\n9\n141049\n13845\n783099\n776145\n142075\n658143\n840755\n916829\n622648\n9\n220352\n197843\n896791\n290611\n10690\n764264\n530010\n903247\n371448\n', '5\n4\n60002\n651660\n599682\n444528\n3\n567319\n397642\n414742\n9\n739966\n127233\n385024\n302590\n62782\n981203\n485015\n872213\n636067\n3\n934387\n648094\n602563\n6\n186703\n816922\n499707\n324701\n551403\n372510\n', '5\n8\n25764\n378581\n404810\n705952\n754207\n226483\n430428\n694796\n3\n148797\n496536\n471061\n4\n597254\n375724\n89766\n41094\n11\n332013\n744977\n479249\n546901\n463204\n503977\n993841\n86490\n60596\n278264\n873851\n12\n34434\n641980\n196029\n229466\n912161\n195831\n92408\n871606\n229268\n268139\n362501\n390191\n', '6\n6\n874177\n533609\n150684\n638243\n587494\n314002\n6\n719965\n180683\n963664\n744057\n566545\n953215\n8\n618168\n10517\n353072\n66624\n968947\n646249\n362639\n274357\n11\n869336\n854563\n625549\n230996\n535815\n886780\n966764\n419142\n270640\n780280\n714019\n7\n928158\n97821\n674493\n816131\n671737\n772113\n707323\n8\n29040\n810439\n800689\n862707\n714568\n592515\n163191\n233019\n', '6\n11\n131371\n222053\n352534\n56326\n179254\n152353\n248947\n625391\n351525\n127725\n405781\n2\n515348\n797109\n2\n707984\n523143\n10\n647892\n133086\n812255\n965540\n663581\n85187\n551075\n216721\n422199\n888342\n8\n201005\n226344\n931913\n120909\n926792\n217536\n474679\n916720\n8\n4469\n959283\n872609\n655587\n940476\n474322\n390082\n410895\n', '6\n11\n899969\n581026\n151338\n891333\n265588\n688903\n307477\n286770\n113903\n65681\n341858\n10\n975372\n87025\n735249\n215287\n247347\n189485\n222565\n195144\n993651\n913227\n4\n829564\n802129\n467293\n143611\n11\n708285\n242891\n848039\n434635\n190963\n712888\n660911\n49306\n799414\n536136\n250576\n8\n154592\n821754\n191472\n172057\n272097\n862602\n622541\n633112\n5\n680877\n473555\n33000\n232603\n886494\n', '5\n4\n747569\n146121\n478756\n61050\n8\n309475\n372079\n641231\n453220\n534083\n821370\n349241\n456009\n3\n757231\n528813\n130174\n11\n489403\n173051\n139883\n241887\n943551\n843871\n173797\n611336\n938622\n537347\n299967\n9\n670627\n199868\n154026\n333658\n709828\n777742\n129272\n414888\n873631\n', '2\n9\n585541\n770686\n640653\n809504\n805994\n138249\n675168\n769831\n216437\n12\n217801\n810859\n598389\n37926\n736922\n599182\n551654\n419952\n651309\n311532\n591631\n61678\n', '6\n3\n146641\n726031\n385746\n4\n387338\n117038\n416344\n125852\n7\n979347\n361474\n622202\n274056\n896328\n833733\n294879\n6\n212237\n645261\n990614\n242881\n696975\n316699\n11\n778858\n447891\n400165\n777161\n615456\n804323\n797976\n842533\n8958\n831857\n754564\n6\n188737\n902976\n904604\n893412\n19599\n209628\n', '4\n9\n96080\n878162\n289533\n933923\n503014\n269498\n760210\n347048\n248230\n6\n825980\n110255\n800860\n804547\n405612\n379791\n9\n326355\n970302\n117275\n488812\n466123\n370251\n904713\n456930\n912473\n4\n117055\n533329\n13591\n636518\n', '4\n12\n38480\n164775\n726079\n120760\n371033\n462490\n6043\n153641\n551968\n724853\n102978\n653348\n2\n111327\n256483\n8\n527336\n588898\n681226\n789258\n278401\n444945\n607353\n626760\n12\n403168\n519077\n453545\n34263\n810364\n923854\n680064\n574005\n600911\n966279\n105467\n282822\n', '5\n2\n857545\n358382\n5\n116233\n384689\n442864\n28831\n667015\n11\n183798\n727763\n904827\n321622\n541323\n257040\n459326\n878529\n92912\n301493\n691817\n6\n453873\n362217\n627943\n728790\n100463\n509020\n2\n774700\n833774\n']
 REFERENCE_SOURCE = 'class TrieNode:\n    def __init__(self):\n        self.children = {}\n        self.is_end_of_number = False\n\nclass Trie:\n    def __init__(self):\n        self.root = TrieNode()\n    \n    def insert(self, number):\n        node = self.root\n        for digit in number:\n            if digit not in node.children:\n                node.children[digit] = TrieNode()\n            node = node.children[digit]\n            # 如果当前节点已经是某个电话号码的结尾，则说明存在前缀冲突\n            if node.is_end_of_number:\n                return False\n        # 插入完成后，标记为完整电话号码\n        node.is_end_of_number = True\n        # 如果当前节点还有子节点，说明有其他号码以它为前缀\n        return len(node.children) == 0\n    \n    def is_consistent(self, numbers):\n        # 按长度从短到长排序，确保短号码先被检查\n        numbers.sort(key=len)\n        for number in numbers:\n            if not self.insert(number):\n                return False\n        return True\n\ndef main():\n    import sys\n    input = sys.stdin.read\n    data = input().splitlines()\n    \n    t = int(data[0])  # 测试样例数量\n    index = 1\n    results = []\n    \n    for _ in range(t):\n        n = int(data[index])  # 当前测试样例的电话号码数量\n        index += 1\n        numbers = data[index:index + n]\n        index += n\n        \n        trie = Trie()\n        if trie.is_consistent(numbers):\n            results.append("YES")\n        else:\n            results.append("NO")\n    \n    print("\\n".join(results))\n\n# 调用主函数\nif __name__ == "__main__":\n    main()\n'
-assert SAMPLE_IN.strip()
-assert SAMPLE_OUT.strip()
-random.seed(4089)
-assert CASES[0] == SAMPLE_IN
+
+def g4089(r):
+    t = r.randint(2, 6); lines = [str(t)]
+    for _ in range(t):
+        nums = [str(r.randint(100, 999999)) for _ in range(r.randint(2, 12))]
+        lines += [str(len(nums))] + nums
+    return "\n".join(lines) + "\n"
+
+def build_cases():
+    return [SAMPLE_IN] + [g4089(random.Random(NUMBER + i)) for i in range(1, 20)]
+
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
         handle.write(REFERENCE_SOURCE)
         handle.flush()
         result = subprocess.run(["python3", handle.name], input=content, text=True,
-                                capture_output=True, timeout=5, check=True)
+                                capture_output=True, timeout=120, check=True)
     return result.stdout
-assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split()
-def generate_case(index):
-    return CASES[index]
-root = Path(__file__).parent / "data"
-for index in range(20):
-    content = generate_case(index)
-    (root / f"{index}.in").write_text(content, encoding="utf-8")
-    (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+def main():
+    cases = build_cases()
+    assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
+    root = Path(__file__).parent / "data"
+    root.mkdir(exist_ok=True)
+    for index, content in enumerate(cases):
+        (root / f"{index}.in").write_text(content, encoding="utf-8")
+        (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

@@ -32,6 +32,11 @@
   CPU 限额触发的 `SIGXCPU`/`SIGKILL` 返回 TLE；服务端对 URL 解码后的 `..` 路径
   直接返回 404，并支持 `CS101_DB` 注入隔离测试数据库（出处：`judge.py`、`server.py`、
   `tests/test_judge.py`、`tests/test_server.py`）。
+- 2026-07-25 · 人拍板去掉 `producecase.py` 的重复存储（出处：`scripts/slim_producecase.py`、
+  本轮 HANDOFF）：改回人的模版形状——**生成器 + 固定种子重新生成，不内嵌 CASES**
+  （原来同一份输入在仓库里存两份，2.23MB）。全 80 题改写后 `producecase.py`
+  2.23MB → 0.37MB，入库 `_made` 数据 10.8MB → 8.92MB。
+  交付前自检新增一项：**重跑 `producecase.py` 后 `data/` 必须逐字节不变**。
 - 2026-07-25 · 001d 复核后追加第五代自检项（出处：本轮 HANDOFF、`scripts/build_001d.py`）：
   ①**恒定输出探针** —— 把 20 组里频次最高的那份输出原样当解法提交，判 AC 即说明该题数据没有
   鉴别力（20123、6250 都是这个形状，此项可机械抓住）。②**报告自检字段必须是实测值**，

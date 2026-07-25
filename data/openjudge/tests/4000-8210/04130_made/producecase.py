@@ -1,22 +1,63 @@
+"""4130 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+
+出处：build_001b
+生成器与循环取自 scripts/build_001b.py（批次 001b），保持同一形状；
+不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
+"""
 import random
 import subprocess
 import tempfile
 from pathlib import Path
+
+NUMBER = 4130
 SAMPLE_IN = '3 1\nK.S\n##1\n1#T\n3 1\nK#T\n.S#\n1#.\n3 2\nK#T\n.S.\n21.\n0 0\n'
 SAMPLE_OUT = '5\nimpossible\n8\n'
-CASES = ['3 1\nK.S\n##1\n1#T\n3 1\nK#T\n.S#\n1#.\n3 2\nK#T\n.S.\n21.\n0 0\n', '3 2\nS.T\n...\nK12\n0 0\n', '7 1\nS...S.T\n....#..\n.S.....\nS#..S..\n.#.#.#.\n.S..#..\nK1.....\n5 1\nS...T\n.#S..\n.#SS.\nS....\nK1...\n0 0\n', '6 1\nS....T\nS.#...\n#.....\n......\nS#S...\nK1....\n7 1\nS..##.T\n...#.#.\n.......\n.#.S...\nS...#..\n....SS.\nK1.....\n0 0\n', '6 2\nS....T\n....S.\n.#....\n#.##..\n...#..\nK12...\n7 3\nS.....T\n.......\n.S#....\n.S.....\nS..S.S.\nS...S..\nK123...\n0 0\n', '3 2\nS.T\n.S.\nK12\n4 1\nS..T\n#S#.\n..#.\nK1..\n0 0\n', '3 1\nS.T\nS#.\nK1.\n3 2\nS.T\n#..\nK12\n6 1\nS.S..T\n.#..#.\n.S....\n....#.\n.#..S.\nK1....\n0 0\n', '5 2\nS.#.T\n...S.\nS....\n.##..\nK12..\n0 0\n', '4 1\nS..T\n#...\nSS..\nK1..\n7 2\nS.S..#T\n...#.S.\nS...#..\n....#..\n.S.....\n....S..\nK12....\n3 1\nS#T\n#..\nK1.\n0 0\n', '5 1\nSS..T\n#.S..\n.....\n#.S..\nK1...\n0 0\n', '6 2\nS..S#T\n...S..\n...S..\n......\n.S....\nK12...\n0 0\n', '4 2\nS#.T\n....\n....\nK12.\n0 0\n', '4 3\nS..T\n.#..\n.#..\nK123\n0 0\n', '5 2\nS...T\n.....\n.....\n.....\nK12..\n7 3\nS.....T\n#...#..\n.S.....\n....S..\nS......\n.S.....\nK123...\n5 2\nS.#.T\n#....\n..#..\n.....\nK12..\n0 0\n', '7 2\nS.....T\n.S..S..\nS#..S..\n.......\nS......\n...#...\nK12....\n7 2\nSS..#ST\n#...S..\n.S...#.\n.......\n.S.S...\n..SS...\nK12....\n3 2\nS.T\n...\nK12\n0 0\n', '4 1\nS.#T\n....\n#S..\nK1..\n0 0\n', '5 2\nS.S.T\nS....\n.S#..\n#S.#.\nK12..\n4 1\nS#.T\n.#..\n....\nK1..\n6 3\nS....T\nS#.#S.\n......\n.S....\n..S##.\nK123..\n0 0\n', '3 1\nSST\n...\nK1.\n0 0\n', '4 3\nS..T\n##..\n..#.\nK123\n0 0\n', '3 1\nS.T\n...\nK1.\n4 3\nSS.T\nS...\n..#.\nK123\n0 0\n']
 REFERENCE_SOURCE = 'import sys\nimport heapq\nfrom collections import deque\n\ndef solve():\n    data = sys.stdin.read().splitlines()\n    if not data:\n        return\n    line_index = 0\n    # 四个方向：上、下、左、右\n    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]\n    results = []\n    \n    while line_index < len(data):\n        if not data[line_index].strip():\n            line_index += 1\n            continue\n        parts = data[line_index].split()\n        line_index += 1\n        n = int(parts[0])\n        m = int(parts[1])\n        if n == 0 and m == 0:\n            break\n        \n        # 读入迷宫\n        g = []\n        xs = ys = xe = ye = None\n        snake_index = {}\n        snake_count = 0\n        for i in range(n):\n            row = list(data[line_index].strip())\n            line_index += 1\n            for j, ch in enumerate(row):\n                if ch == \'K\':\n                    xs, ys = i, j\n                elif ch == \'T\':\n                    xe, ye = i, j\n                elif ch == \'S\':\n                    snake_index[(i, j)] = snake_count\n                    snake_count += 1\n            g.append(row)\n        \n        # 预处理：BFS 判断目标和所有钥匙是否可达（忽略杀蛇额外时间）\n        reachable = [[False]*n for _ in range(n)]\n        # flag[0] 表示唐僧所在房间可达，flag[1..m] 表示钥匙1..m可达\n        flag = [False]*(m+1)\n        q = deque([(xs, ys)])\n        reachable[xs][ys] = True\n        while q:\n            x0, y0 = q.popleft()\n            for dx, dy in directions:\n                x1, y1 = x0 + dx, y0 + dy\n                if not (0 <= x1 < n and 0 <= y1 < n):\n                    continue\n                if g[x1][y1] == \'#\':\n                    continue\n                if not reachable[x1][y1]:\n                    reachable[x1][y1] = True\n                    q.append((x1, y1))\n                    if g[x1][y1].isdigit():\n                        key_val = int(g[x1][y1])\n                        if 1 <= key_val <= m:\n                            flag[key_val] = True\n                    elif x1 == xe and y1 == ye:\n                        flag[0] = True\n        # 如果目标房间或任一必须钥匙不可达，直接输出 "impossible"\n        if not (flag[0] and all(flag[1:])):\n            results.append("impossible")\n            continue\n        \n        # 若预处理通过，则利用 Dijkstra 求最短时间\n        # 状态编码：将 (已取钥匙数, 蛇杀记) 合并为一个整数\n        def encode(keys, smask):\n            return keys * (1 << snake_count) + smask\n        \n        # 在每个格子上用字典记录状态编码对应的最短耗时，降低内存占用\n        visited = [[{} for _ in range(n)] for _ in range(n)]\n        init_state = encode(0, 0)\n        visited[xs][ys][init_state] = 0\n        heap = [(0, xs, ys, 0, 0)]  # (耗时, x, y, keys, snake_mask)\n        ans = -1\n        while heap:\n            t, x, y, keys, smask = heapq.heappop(heap)\n            state_code = encode(keys, smask)\n            if visited[x][y].get(state_code, float(\'inf\')) < t:\n                continue\n            if x == xe and y == ye and keys == m:\n                ans = t\n                break\n            for dx, dy in directions:\n                nx, ny = x + dx, y + dy\n                if not (0 <= nx < n and 0 <= ny < n):\n                    continue\n                if g[nx][ny] == \'#\':\n                    continue\n                nkeys = keys\n                nsmask = smask\n                nt = t + 1  # 每走一步耗时1分钟\n                cell = g[nx][ny]\n                # 若该房间有蛇且尚未杀死，则需额外1分钟，并更新蛇状态\n                if cell == \'S\':\n                    idx = snake_index[(nx, ny)]\n                    if not (smask & (1 << idx)):\n                        nt += 1\n                        nsmask = smask | (1 << idx)\n                # 若该房间有钥匙且正是下一个需要的钥匙，则拾取钥匙\n                if cell.isdigit():\n                    k = int(cell)\n                    if keys < m and k == keys + 1:\n                        nkeys = keys + 1\n                new_state = encode(nkeys, nsmask)\n                if new_state not in visited[nx][ny] or nt < visited[nx][ny][new_state]:\n                    visited[nx][ny][new_state] = nt\n                    heapq.heappush(heap, (nt, nx, ny, nkeys, nsmask))\n        results.append("impossible" if ans == -1 else str(ans))\n    \n    sys.stdout.write("\\n".join(results))\n    \nif __name__ == \'__main__\':\n    solve()\n'
-assert CASES[0] == SAMPLE_IN
-random.seed(4130)
+
+def g4130(r):
+    cases = []
+    for _ in range(r.randint(1, 3)):
+        size = r.randint(3, 7)
+        key_count = r.randint(1, min(3, size - 1))
+        path = {(size - 1, j) for j in range(size)} | {(i, size - 1) for i in range(size)}
+        rows = []
+        key_positions = [(size - 1, j) for j in range(1, min(size, key_count + 1))]
+        for i in range(size):
+            row = []
+            for j in range(size):
+                if (i, j) == (size - 1, 0): ch = "K"
+                elif (i, j) == (0, size - 1): ch = "T"
+                elif (i, j) in key_positions: ch = str(key_positions.index((i, j)) + 1)
+                elif (i, j) in path: ch = "."
+                elif (i, j) == (0, 0): ch = "S"
+                else: ch = r.choice(["."] * 6 + ["#", "S"])
+                row.append(ch)
+            rows.append("".join(row))
+        cases.append(f"{size} {key_count}\n" + "\n".join(rows))
+    return "\n".join(cases) + "\n0 0\n"
+
+def build_cases():
+    return [SAMPLE_IN] + [g4130(random.Random(NUMBER + i)) for i in range(1, 20)]
+
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
-        handle.write(REFERENCE_SOURCE); handle.flush()
+        handle.write(REFERENCE_SOURCE)
+        handle.flush()
         result = subprocess.run(["python3", handle.name], input=content, text=True,
-                                capture_output=True, timeout=5, check=True)
+                                capture_output=True, timeout=120, check=True)
     return result.stdout
-assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split()
-root = Path(__file__).parent / "data"
-for index in range(20):
-    content = CASES[index]
-    (root / f"{index}.in").write_text(content, encoding="utf-8")
-    (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+def main():
+    cases = build_cases()
+    assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
+    root = Path(__file__).parent / "data"
+    root.mkdir(exist_ok=True)
+    for index, content in enumerate(cases):
+        (root / f"{index}.in").write_text(content, encoding="utf-8")
+        (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

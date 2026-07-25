@@ -1,18 +1,53 @@
-import random, subprocess, tempfile
+"""14683 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+
+出处：build_001c
+生成器与循环取自 scripts/build_001c.py（批次 001c），保持同一形状；
+不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
+"""
+import random
+import subprocess
+import tempfile
 from pathlib import Path
+
+NUMBER = 14683
 SAMPLE_IN = '3 \n1 2 9\n'
 SAMPLE_OUT = '15\n'
-CASES = ['3 \n1 2 9\n', '80\n5138 675 8788 9248 5312 2213 3320 6212 781 6896 6366 9662 9719 2189 344 1673 735 1874 3814 6961 7392 4150 6847 5711 3589 7651 4446 3501 1884 9313 6557 9745 1207 278 2189 7243 5298 4458 7597 1710 5022 9791 4211 8724 5214 3189 5545 8033 2597 557 5476 2117 3170 3030 3722 1886 3793 5147 1544 6495 3727 9340 9075 2177 2152 682 3003 9012 1013 8783 7383 1020 8072 2826 5028 5956 3010 7422 2572 9007\n', '17\n6268 3339 8323 673 9981 7920 8316 6933 3451 834 1191 5013 7881 9748 1298 6235 7122\n', '51\n5928 5280 1475 3429 8606 891 4272 3758 9577 4546 442 8007 5768 3802 4736 8510 6628 8852 7541 7555 9133 8108 9025 6144 3765 8418 2060 9958 588 1214 1223 891 2449 7052 8565 5189 8743 4084 2851 409 5476 6727 7962 2026 6444 3782 6699 4851 5622 736 9986\n', '71\n788 8329 5127 6029 5145 9880 8364 3299 6009 3139 7182 269 1288 2869 9625 7283 6597 1946 4286 1604 7357 7773 9441 168 9368 5868 7154 776 8352 7913 2098 4139 1205 5804 3315 9630 3959 1473 1174 7722 1190 3137 4970 7314 9066 3364 9440 9393 7834 2388 7583 6736 4080 1604 1598 6374 6341 7058 6541 9728 5987 1791 8479 6121 6464 5897 52 9421 1568 8049 9031\n', '29\n5840 148 3244 583 7075 6494 4507 6870 3908 9704 5495 6276 9105 6509 4972 7248 510 2140 4897 1484 3039 5328 160 4726 4415 6848 6418 6216 9362\n', '3\n6625 6267 6094\n', '20\n7986 3046 6198 8736 6158 2309 7070 2063 9767 5166 5984 6595 3783 2853 8864 3193 7671 705 4551 4915\n', '14\n982 6174 159 9649 6581 7410 6708 7460 7029 3529 1173 8822 4927 3271\n', '5\n1555 3450 9055 2785 6144\n', '8\n2017 3149 9972 5625 3134 8015 6833 2891\n', '54\n3845 2557 4694 5347 7237 71 9957 9359 5941 3554 4023 7122 8618 2515 1464 3660 2663 9972 5154 2533 141 1819 638 1795 9004 2174 9454 6756 8074 9174 4547 7486 7932 5329 6061 9977 7303 6302 577 2254 4757 4452 6009 7894 6538 8230 4398 1750 8463 7333 672 779 2663 3969\n', '34\n3900 8108 6210 5514 5985 9676 3796 4601 7805 8595 4835 6820 8381 4592 2637 8538 1867 1563 2891 4293 2956 293 7488 549 164 1148 546 4288 1758 2433 4310 8310 8623 296\n', '24\n4057 4476 4764 8583 2153 6808 6370 429 1221 6201 687 6683 4639 5112 5690 3747 2207 5136 1892 47 7863 7344 5752 7749\n', '40\n7196 3575 5572 8259 1276 8926 724 3447 4668 9931 8253 9911 9203 6990 5489 8636 9034 9493 5748 9364 4438 7239 9009 5348 9368 2431 4272 605 58 1499 6448 3255 2118 6314 2912 5617 5756 736 8148 2898\n', '8\n5313 4895 8172 6899 1035 6989 9566 2584\n', '74\n4928 7414 440 9685 433 5393 5991 5909 2767 8419 2175 3878 9743 7112 1701 3286 3825 1960 1296 906 1171 3621 8443 6201 5943 9349 9628 7185 6123 2972 3236 1701 3259 780 9085 503 4824 3193 2104 1434 6929 4923 4111 8445 2060 4551 7574 4788 8441 2696 9809 2699 4799 6274 5915 3830 1033 7652 5516 6364 2122 5958 236 5747 560 9776 6530 9195 6932 37 845 5701 2012 1250\n', '14\n7031 9660 5586 9527 2365 4370 3148 6160 3966 9080 411 2798 157 9087\n', '20\n9098 3401 6722 984 2807 3217 4301 3202 2140 7307 97 2910 3147 2637 4229 873 1804 3664 2904 9828\n', '17\n9953 4668 4157 5676 3127 1718 6878 9449 1858 3637 4865 4157 3052 1881 553 5336 742\n']
 REFERENCE_SOURCE = 'import heapq\n\nn = int(input())\nl = list(map(int, input().split()))\nheapq.heapify(l)\nans = 0\n\nwhile len(l) > 1:\n    a = heapq.heappop(l)\n    b = heapq.heappop(l)\n    ans += a + b\n    heapq.heappush(l, a + b)\n\nprint(ans)\n'
-assert CASES[0] == SAMPLE_IN
-random.seed(14683)
+
+def g14683(r):
+    n = r.randint(2, 80); return f"{n}\n" + " ".join(str(r.randint(1, 10000)) for _ in range(n)) + "\n"
+
+def build_cases():
+    cases = [SAMPLE_IN]
+    for i in range(1, 20):
+        for attempt in range(100):
+            value = g14683(random.Random(NUMBER + i + attempt * 1000))
+            if value not in cases:
+                cases.append(value)
+                break
+        else:
+            raise AssertionError("生成器多样性不足")
+    return cases
+
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
-        handle.write(REFERENCE_SOURCE); handle.flush()
-        result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=5, check=True)
+        handle.write(REFERENCE_SOURCE)
+        handle.flush()
+        result = subprocess.run(["python3", handle.name], input=content, text=True,
+                                capture_output=True, timeout=120, check=True)
     return result.stdout
-assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split()
-root = Path(__file__).parent / "data"
-for index, content in enumerate(CASES):
-    (root / f"{index}.in").write_text(content, encoding="utf-8")
-    (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+def main():
+    cases = build_cases()
+    assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
+    root = Path(__file__).parent / "data"
+    root.mkdir(exist_ok=True)
+    for index, content in enumerate(cases):
+        (root / f"{index}.in").write_text(content, encoding="utf-8")
+        (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()
