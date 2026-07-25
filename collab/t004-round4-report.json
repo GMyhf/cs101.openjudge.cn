@@ -906,66 +906,18 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 400,
-        "status": "passed"
+        "seeds": 0,
+        "status": "not_available",
+        "reason": "no independent oracle implemented"
       },
-      "independent_oracle_status": "passed",
+      "independent_oracle_status": "no_independent_oracle",
       "sample_reproduced": true,
-      "independent_sample_agreement": true,
+      "independent_sample_agreement": null,
       "misconception_probe": {
-        "mutation": "<=p -> <p",
-        "effective_on_cases": 5,
-        "sample_pins_interpretation": false,
-        "basis": "题面样例输出（不是未变异的 oracle——那样任何有效变异都必然不同）",
-        "data_verdict_when_sample_blind": "Wrong Answer"
+        "status": "not_available",
+        "reason": "no independent oracle implemented"
       },
-      "producecase_reproduced": true,
-      "claude_risk_tier": "high"
+      "producecase_reproduced": true
     }
-  ],
-  "claude_oracle_triage": {
-    "criterion": "三条判据占两条以上算高风险：①输出规则含并列/例外裁决 ②需从题面推断未明说的规则 ③错误实现仍会产生形状合理的输出",
-    "coverage": "人拍板后已补至 19/20 题有 Python 独立 oracle；4009 无 Python 第二实现（Theta(2^n) 跑不动），改用同算法 C++ 交叉验证 case-0",
-    "high_risk": [
-      3723,
-      3725,
-      3789,
-      3906,
-      4034
-    ],
-    "low_risk_now_also_covered": [
-      3726,
-      3727,
-      3728,
-      3744,
-      3866,
-      4002,
-      4006,
-      4008,
-      4010,
-      4021,
-      4033
-    ],
-    "already_had_oracle": [
-      3791,
-      4001,
-      4007
-    ],
-    "cross_check": "每题 400 种子对拍，全部 0 组不一致；样例一致 20/20"
-  },
-  "claude_mutation_audit": {
-    "finding": "原变异表用 str.replace(old,new,1) 在整份 BASE 源码上做首次替换，而 BASE 含全部题目的代码——3726/4001/4010 三条的首次出现分别落在死代码、P==3728 分支、P==4001 分支，实测 0/21 组输出不同，即探针一直在测一个不存在的变化。",
-    "fixed": {
-      "3726": "改钉「步数 vs 方格数」的真歧义，21/21 生效",
-      "4001": "精确到 (x-1,x+1,2*x)，5/21 生效",
-      "4010": "精确到 2011,int(x),10000，19/21 生效"
-    },
-    "rule": "变异必须**真的改变行为**（至少一组输出不同），只断言源码文本变了是不够的。",
-    "sample_blind_but_data_catches": {
-      "3789": "Runtime Error",
-      "4001": "Wrong Answer",
-      "4006": "Wrong Answer",
-      "4034": "Wrong Answer"
-    }
-  }
+  ]
 }

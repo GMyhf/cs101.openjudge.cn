@@ -58,19 +58,35 @@ def go(s):
  if P==3728:
   out=[]
   for line in s.splitlines():
-   b,n=map(int,line.split());q={b};h=[b];outv=[]
-   while len(outv)<n:
-    x=heapq.heappop(h);outv.append(x)
-    for y in (2*x+1,3*x+1):
-     if y not in q:q.add(y);heapq.heappush(h,y)
-   out.append(str(outv[-1]))
+   b,n=map(int,line.split());v=[b];i2=i3=0
+   while len(v)<n:
+    x=min(2*v[i2]+1,3*v[i3]+1);v.append(x)
+    while 2*v[i2]+1<=x:i2+=1
+    while 3*v[i3]+1<=x:i3+=1
+   out.append(str(v[-1]))
   return "\n".join(out)+"\n"
  if P==3744:
   return "\n".join(str(min(2*(x*y+x*w+y*w) for x in range(1,n+1) for y in range(x,n+1) if n%(x*y)==0 for w in [n//(x*y)])) for n in map(int,a[1:]))+"\n"
  if P==3789:
-  n,k=map(int,a[:2]);v=list(map(int,a[2:]))
-  for L in range(n,0,-1):
-   if any(sum(v[i:i+L]==v[j:j+L] for j in range(n-L+1))>=k for i in range(n-L+1)):return str(L)+"\n"
+  n,k=map(int,a[:2]);v=list(map(int,a[2:]));sa=list(range(n));rank=v[:];step=1
+  while step<n:
+   sa.sort(key=lambda i:(rank[i],rank[i+step] if i+step<n else -1));nr=[0]*n
+   for j in range(1,n):nr[sa[j]]=nr[sa[j-1]]+((rank[sa[j-1]],rank[sa[j-1]+step] if sa[j-1]+step<n else -1)<(rank[sa[j]],rank[sa[j]+step] if sa[j]+step<n else -1))
+   rank=nr;step*=2
+  pos=[0]*n
+  for i,x in enumerate(sa):pos[x]=i
+  lcp=[0]*n;h=0
+  for i in range(n):
+   p=pos[i]
+   if p==0:continue
+   j=sa[p-1]
+   while i+h<n and j+h<n and v[i+h]==v[j+h]:h+=1
+   lcp[p]=h
+   if h:h-=1
+  best=0
+  for i in range(n-k+1):
+   best=max(best,min(lcp[i+1:i+k]))
+  return str(best)+"\n"
  if P==3791:
   p=1;out=[]
   for _ in range(int(a[0])):
@@ -143,7 +159,13 @@ def go(s):
    if A<=x<=A+G and B<=y<=B+K:ans=i+1
   return str(ans)+"\n"
  if P==4034:
-  n,k,p=map(int,a[:3]);v=[tuple(map(int,a[i:i+2])) for i in range(3,3+2*n,2)]
-  return str(sum(v[i][0]==v[j][0] and min(x[1] for x in v[i:j+1])<=p for i in range(n) for j in range(i+1,n)))+"\n"
+  import bisect
+  n,k,p=map(int,a[:3]);v=[tuple(map(int,a[i:i+2])) for i in range(3,3+2*n,2)];ans=0;positions={};last_good=-1
+  for j,(color,cost) in enumerate(v):
+   if cost<=p:last_good=j
+   if last_good>=0:
+    same=positions.get(color,[]);ans+=bisect.bisect_right(same,last_good)
+   positions.setdefault(color,[]).append(j)
+  return str(ans)+"\n"
 for line in []:pass
 sys.stdout.write(go(sys.stdin.read()))
