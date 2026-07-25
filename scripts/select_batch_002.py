@@ -2,6 +2,8 @@
 """Select the next solution-backed T-003 batch after T-002-001."""
 import json
 import re
+import subprocess
+import tempfile
 from pathlib import Path
 
 from build_001a import locate_source
@@ -17,6 +19,39 @@ SOURCES = [
 ]
 
 
+# 题解常把多组样例塞进同一个代码块，用 `sample1 in:` / `Sample Input1:` / `样例输入1`
+# 这类标签行分隔。整块当样例会把标签行写进 case-0，题解喂进去直接 ValueError。
+SAMPLE_LABEL = re.compile(
+    r"^\s*(?:sample|样例)\s*\d*\s*[-_ ]?\s*(in(?:put)?|out(?:put)?|输入|输出)?\s*\d*\s*[:：]?\s*$",
+    re.I,
+)
+
+
+def split_labelled(block):
+    """把带标签的样例块拆开，返回 (第一组输入, 第一组输出)。无标签则原样返回。"""
+    lines = block.splitlines()
+    if not any(SAMPLE_LABEL.match(line) for line in lines):
+        return block, None
+    parts, current = [], None
+    for line in lines:
+        match = SAMPLE_LABEL.match(line)
+        if match:
+            tag = (match.group(1) or "").lower()
+            current = ["out" if tag.startswith(("out", "输出")) else "in", []]
+            parts.append(current)
+            continue
+        if current is not None:
+            current[1].append(line)
+
+    def first(kind):
+        for name, body in parts:
+            if name == kind and "\n".join(body).strip():
+                return "\n".join(body).strip() + "\n"
+        return None
+
+    return first("in") or block, first("out")
+
+
 def sections(path):
     path = locate_source(str(path))
     lines = path.read_text(encoding="utf-8", errors="ignore").splitlines()
@@ -29,7 +64,28 @@ def sections(path):
         text = "\n".join(lines[start:end])
         codes = re.findall(r"```(?:python|py)?\s*\n(.*?)```", text, re.S | re.I)
         samples = re.findall(r"(?:样例输入|Sample Input|sample input)\s*\n+```\n(.*?)```", text, re.S | re.I)
-        yield int(match.group(1)), match.group(2).strip(), codes, samples
+        outputs = re.findall(r"(?:样例输出|Sample Output|sample output)\s*\n+```\n(.*?)```", text, re.S | re.I)
+        yield int(match.group(1)), match.group(2).strip(), codes, samples, outputs
+
+
+def reproduces(codes, sample_in, sample_out):
+    """题解里是否真有一段能跑出样例。
+
+    选批只检查「有 import/def 的代码块」是不够的：构建器要求候选代码跑通样例，
+    跑不通就 AssertionError 硬失败。把这条前移到选批，后面几批不会再被埋雷。
+    """
+    for code in codes:
+        try:
+            with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
+                handle.write(code)
+                handle.flush()
+                result = subprocess.run(["python3", handle.name], input=sample_in, text=True,
+                                        capture_output=True, timeout=10)
+            if result.returncode == 0 and result.stdout.split() == sample_out.split():
+                return True
+        except (OSError, subprocess.SubprocessError):
+            continue
+    return False
 
 
 def number(value):
@@ -56,35 +112,51 @@ def main():
     excluded = skipped() | made_numbers()
     candidates = {}
     for source in SOURCES:
-        for local, title, codes, samples in sections(source):
+        for local, title, codes, samples, outputs in sections(source):
             if local not in missing or local in excluded or local in candidates:
                 continue
             usable = [code for code in codes if "import " in code or "def " in code]
             if not usable or not samples:
                 continue
+            sample_in, sample_out = split_labelled(samples[0].strip() + "\n")
+            if sample_out is None and outputs:
+                block = outputs[0].strip() + "\n"
+                head, tail = split_labelled(block)
+                # 无标签时 split_labelled 原样返回，整块就是样例输出
+                sample_out = tail or (block if head == block else None)
+            if sample_out is None:
+                continue                       # 没有样例输出就无法校验题解，不进候选池
             candidates[local] = {
                 "local_number": local,
                 "title": title,
                 "source": str(locate_source(str(source))),
                 "source_heading": f"{local}: {title}",
                 "python_solution_count": len(usable),
-                "sample_input": samples[0].strip() + "\n",
+                "sample_input": sample_in,
+                "sample_output": sample_out,
+                "sample_reproduced": reproduces(usable, sample_in, sample_out),
                 "selection_source": "solution-backed candidate pool",
             }
     ordered = [candidates[key] for key in sorted(candidates)]
+    buildable = [x for x in ordered if x["sample_reproduced"]]
     manifest = {
         "batch": "T-003-002",
-        "selection_rule": "catalog test_cases empty, no existing _made directory, Python solution and sample present, special-judge skip excluded",
+        "selection_rule": ("catalog test_cases empty, no existing _made directory, special-judge skip excluded, "
+                           "Python solution AND sample present, and the solution actually reproduces the sample"),
         "candidate_count": len(ordered),
-        "selected_count": min(20, len(ordered)),
+        "buildable_count": len(buildable),
+        "unbuildable": [x["local_number"] for x in ordered if not x["sample_reproduced"]],
+        "selected_count": min(20, len(buildable)),
         "excluded_special_judge": sorted(skipped()),
         "excluded_existing_made": sorted(made_numbers()),
-        "entries": ordered[:20],
+        "entries": buildable[:20],
     }
     OUT.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     POOL_OUT.write_text(json.dumps({"batch": "T-003-002", "candidates": ordered}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"selected {len(ordered[:20])} of {len(ordered)} candidates")
-    print("batch:", ", ".join(f"{x['local_number']:05d}" for x in ordered[:20]))
+    print(f"selected {len(buildable[:20])} of {len(buildable)} buildable ({len(ordered)} candidates scanned)")
+    print("batch:", ", ".join(f"{x['local_number']:05d}" for x in buildable[:20]))
+    if manifest["unbuildable"]:
+        print("题解跑不出样例、已排除:", ", ".join(f"{n:05d}" for n in manifest["unbuildable"]))
 
 
 if __name__ == "__main__":
