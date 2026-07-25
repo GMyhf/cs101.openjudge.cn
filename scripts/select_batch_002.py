@@ -22,8 +22,15 @@ SOURCES = [
 
 # 题解常把多组样例塞进同一个代码块，用 `sample1 in:` / `Sample Input1:` / `样例输入1`
 # 这类标签行分隔。整块当样例会把标签行写进 case-0，题解喂进去直接 ValueError。
+# 覆盖到的写法（T-003 五轮 + T-004 候选里实际出现过的）：
+#   sample1 in:  Sample Input1:  Sample1 Input:  Sample input 1:  sample1 in：
+#   样例输入1  样例输出2  输入样例1  输出样例2  样例1:  样例 #1:  样例 ＃2：
 SAMPLE_LABEL = re.compile(
-    r"^\s*(?:sample|样例)\s*\d*\s*[-_ ]?\s*(in(?:put)?|out(?:put)?|输入|输出)?\s*\d*\s*[:：]?\s*$",
+    r"^\s*(?:(?P<pre>输入|输出|in(?:put)?|out(?:put)?)\s*)?"
+    r"(?:sample|样例|测试数据|测试)\s*"
+    r"[#＃]?\s*\d*\s*[-_ ]?\s*"
+    r"(?P<post>in(?:put)?|out(?:put)?|输入|输出)?\s*"
+    r"[#＃]?\s*\d*\s*[:：]?\s*$",
     re.I,
 )
 
@@ -37,7 +44,7 @@ def split_labelled(block):
     for line in lines:
         match = SAMPLE_LABEL.match(line)
         if match:
-            tag = (match.group(1) or "").lower()
+            tag = (match.group("post") or match.group("pre") or "").lower()
             current = ["out" if tag.startswith(("out", "输出")) else "in", []]
             parts.append(current)
             continue
