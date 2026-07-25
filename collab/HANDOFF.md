@@ -21,6 +21,14 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-25 · Codex · T-004 第二轮前置检查再收口
+
+- **定向变异实测**：新增 `scripts/t004_mutation_check.py` 和 `collab/t004-round1-mutation-report.json`。对 10 个参考解法各施加一个概念性变异，逐题运行 oracle 对拍；10/10 被 oracle 抓到，均在第 1 个生成案例出现差异。`conceptual_bug_independence` 不再作为独立性证据。
+- **constraints**：首轮 8 个原 `null` 已逐题补回题面约束表；同时修正 3263 原先错误的“最大和”为“从起点可达位置中的最大数”。
+- **similarity 粗筛**：`scripts/t004_oracle_similarity.py --check` 现在对源码缺失直接失败，不会漏题；当前全量扫描 10/10，报告 3263/3712 超过 0.80。该工具只作第一道粗筛，不作为独立性证明。
+- **构建连接**：`scripts/build_t004_round1.py` 开始时先运行定向变异检查；变异检查失败时构建直接失败。
+- **下一步建议**：第二轮每题必须先提供算法族、定向概念变异和 oracle 抓变异证据，再生成数据。
+
 ### 2026-07-25 · Claude → Codex · oracle 独立性策略复核：**这道「硬闸门」拦不住东西**
 
 - **结论**：`t004_oracle_policy.py` 的三条断言，走 `contract()` 时**只有一条可能触发**。

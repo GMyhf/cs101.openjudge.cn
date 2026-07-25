@@ -1,0 +1,77 @@
+{
+  "batch": "T-004-r1",
+  "criterion": "targeted conceptual reference mutation must be caught by oracle",
+  "entries": [
+    {
+      "local_number": 3263,
+      "mutation": "max(nrows[i][j],f(i+1,j),f(i+1,j+1)) -> nrows[i][j]+max(f(i+1,j),f(i+1,j+1))",
+      "cases_checked_until_first_difference": 1,
+      "oracle_caught_mutation": true,
+      "status": "passed"
+    },
+    {
+      "local_number": 3376,
+      "mutation": "if i>j or s[i]<=s[j]: -> if i>j or s[i]>=s[j]:",
+      "cases_checked_until_first_difference": 1,
+      "oracle_caught_mutation": true,
+      "status": "passed"
+    },
+    {
+      "local_number": 3421,
+      "mutation": "for j in range(rr,l-1,-1): yield b,j -> for j in range(l,rr+1): yield b,j",
+      "cases_checked_until_first_difference": 1,
+      "oracle_caught_mutation": true,
+      "status": "passed"
+    },
+    {
+      "local_number": 3527,
+      "mutation": "c.get(x+2,0) -> c.get(x+3,0)",
+      "cases_checked_until_first_difference": 1,
+      "oracle_caught_mutation": true,
+      "status": "passed"
+    },
+    {
+      "local_number": 3708,
+      "mutation": "bin(int(x)).count(\"1\") -> bin(int(x)).count(\"0\")",
+      "cases_checked_until_first_difference": 1,
+      "oracle_caught_mutation": true,
+      "status": "passed"
+    },
+    {
+      "local_number": 3709,
+      "mutation": "n%3 -> n%2",
+      "cases_checked_until_first_difference": 1,
+      "oracle_caught_mutation": true,
+      "status": "passed"
+    },
+    {
+      "local_number": 3710,
+      "mutation": "bin(x^y).count(\"1\") -> bin(x|y).count(\"1\")",
+      "cases_checked_until_first_difference": 1,
+      "oracle_caught_mutation": true,
+      "status": "passed"
+    },
+    {
+      "local_number": 3711,
+      "mutation": "a in b+b or b in a+a -> a in b or b in a",
+      "cases_checked_until_first_difference": 1,
+      "oracle_caught_mutation": true,
+      "status": "passed"
+    },
+    {
+      "local_number": 3712,
+      "mutation": "m[y] -> m.get(str(int(y)+1),\"\")",
+      "cases_checked_until_first_difference": 1,
+      "oracle_caught_mutation": true,
+      "status": "passed"
+    },
+    {
+      "local_number": 3714,
+      "mutation": "range(cap,p-1,-1) -> range(p,cap+1)",
+      "cases_checked_until_first_difference": 1,
+      "oracle_caught_mutation": true,
+      "status": "passed"
+    }
+  ],
+  "failed": []
+}

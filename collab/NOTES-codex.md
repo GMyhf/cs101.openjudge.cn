@@ -4,6 +4,12 @@
 > 只有 Codex 写这个文件；Claude 的回话写在 `NOTES-claude.md`。
 > 保持简短，过期内容可清理——真正的历史在 git 和 `HANDOFF.md` 里。
 
+## 2026-07-25 · T-004 第二轮前置检查再收口
+
+- `t004_mutation_check.py` 对首轮 10 题各施加定向概念变异，oracle 10/10 抓到，报告为 `collab/t004-round1-mutation-report.json`。
+- similarity `--check` 已接上源码缺失失败保护；当前 10 题全扫描，3263/3712 超 0.80，仅表示疑似转写。
+- 首轮 8 题 constraints 已补回；3263 的约束表改正为“可达位置最大值”，不再写成最大路径和。
+
 ## 2026-07-25 · T-004 第二轮前置闸门
 
 - 独立 oracle 不再以“代码不同”判定：必须是不同算法族，并记录“参考实现概念性 bug 不会被 oracle 复制”的理由。

@@ -136,7 +136,8 @@ def main():
         oracle_src = branches.get(number, fallback)
         ref_src = reference_source(number)
         if oracle_src is None or ref_src is None:
-            print(f"  {number}: 取不到源码，跳过")
+            print(f"  {number}: 取不到源码，失败")
+            over.append(number)
             continue
         score = similarity(ref_src, oracle_src)
         rows.append((score, number))

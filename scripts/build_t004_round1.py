@@ -202,7 +202,15 @@ CONSTRAINTS = {
            "空格=0, A=1..Z=26，每字符 5 位二进制", "按螺旋顺序填入，末尾用 0 补满 R*C 位",
            "生成器目前 R,C 只到 8，未贴题面上界 20"],
     3263: ["每组先给三角形层数 n，n=0 结束", "查询给出起点行列（1-based）",
-           "答案为从该点出发向下相邻两格走到底的最大和"],
+           "从起点向下相邻两格可达位置中取最大数"],
+    3376: ["1<=N<=30000", "每行一个 A..Z 初始字母", "每次只能取剩余原序列的首或尾", "输出可形成的字典序最小串"],
+    3527: ["每个数字为1..9", "每个数字出现次数不超过4", "集合长度不超过14", "长度必须为3n+2且n<=4", "三元组为相等或连续递增，二元组相等"],
+    3708: ["第一行给测试组数", "每组输入一个十进制整数", "每组输出其二进制表示中的1的个数"],
+    3709: ["测试组数n与输入行数一致", "每个输入是长度1..64的0/1字符串", "输出对应的三进制表示"],
+    3710: ["A、B为正整数", "每组比较二进制表示并按高位补0", "输出不同位数"],
+    3711: ["两个字符串仅含字母和数字", "长度不超过30", "判定循环移位所得字符串是否包含另一字符串"],
+    3712: ["测试组数n与输入行数一致", "两个字符串长度不超过20且可不同", "电话数字使用2..9键盘映射", "输出Y或N"],
+    3714: ["1<=C<=1000", "1<=N<=100", "每道菜价格和评价均为1..100", "每道菜最多选择一次", "总价格不超过C"],
 }
 
 
@@ -290,6 +298,8 @@ def reproduce(directory):
     return p.returncode==0 and before=={p.name:p.read_bytes() for p in data.iterdir()}
 
 def main():
+    # First gate: a concrete reference mutation must be caught by the oracle.
+    subprocess.run([sys.executable, str(ROOT / "scripts/t004_mutation_check.py")], check=True)
     manifest=json.loads(MANIFEST.read_text(encoding="utf-8")); report=[]
     for entry in manifest["entries"]:
         n=entry["local_number"]; ref=REFERENCE[n]
