@@ -72,9 +72,11 @@ SUBMIT_PAGE = """<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  th{color:var(--muted);font-size:12px;font-weight:600}
  td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
  .muted{color:var(--muted)}
+ .snip{margin-top:12px}
+ .snip-h{color:var(--muted);font-size:13px;margin-bottom:4px}
 </style>
 <h1>__PROBLEM__ 本地提交</h1>
-<p class="sub">题库：__BOOK__ · 判题运行在本机 · <a href="/problems/">题库目录</a> · <a href="/__BOOK__/__PROBLEM__/">看题面</a></p>
+<p class="sub">题库：__BOOK__ · 判题运行在本机 · <a href="/problems/">题库目录</a> · <a href="/__BOOK__/__PROBLEM__/">看题面</a><span id="adminlink"></span></p>
 <p id="auth" class="muted">正在检查登录状态…</p>
 <form id="form">
   <textarea name="source" placeholder="在这里粘贴代码" spellcheck="false"></textarea>
@@ -100,6 +102,9 @@ fetch("/api/me", { credentials: "same-origin" }).then(r => r.json()).then(me => 
     : '<a href="/auth/login/">请先登录后提交</a>';
   loadHistory();
 });
+fetch("/api/settings", { credentials: "same-origin" }).then(r => r.json()).then(s => {
+  if (s.is_admin) adminlink.innerHTML = ' · <a href="/admin/">判题设置</a>';
+});
 
 function badge(status) {
   const cls = CLS[status] || (status === "No Test Data" || status === "Problem Not Found" ? "b-info" : "b-other");
@@ -113,10 +118,18 @@ function renderVerdict(data) {
   if (data.cases !== undefined) rows.push(["通过的数据组", data.cases + " 组全部通过"]);
   if (data.expected_tokens !== undefined)
     rows.push(["输出规模", "期望 " + data.expected_tokens + " 个 token，实际 " + data.actual_tokens + " 个"]);
+  // failing_input 只在管理员打开开关时才由服务端下发；关着时这里根本收不到。
+  let snippet = "";
+  if (data.failing_input) {
+    const f = data.failing_input;
+    const tail = f.truncated ? "（共 " + f.total_lines + " 行 / " + f.total_chars + " 字符，已截断）" : "";
+    snippet = '<div class="snip"><div class="snip-h">第 ' + data.case + ' 组的输入 ' + tail
+            + '</div><pre class="msg">' + esc(f.text) + "</pre></div>";
+  }
   verdict.innerHTML = '<div class="verdict">' + badge(data.status)
     + (rows.length ? "<dl>" + rows.map(r => "<dt>" + r[0] + "</dt><dd>" + esc(r[1]) + "</dd>").join("") + "</dl>" : "")
     + (data.message ? '<pre class="msg">' + esc(data.message) + "</pre>" : "")
-    + "</div>";
+    + snippet + "</div>";
 }
 
 form.onsubmit = async e => {
@@ -160,11 +173,56 @@ def init_db():
     with sqlite3.connect(DB) as db:
         db.execute("create table if not exists submissions (id integer primary key, user text, problem text, result text, created text default current_timestamp)")
         db.execute("create table if not exists users (username text primary key, password_hash text not null, created text default current_timestamp)")
+        db.execute("create table if not exists settings (key text primary key, value text not null)")
         # 历史库里没有这几列；用 ALTER 补，已存在则跳过（create table if not exists 加不了列）。
         existing = {row[1] for row in db.execute("pragma table_info(submissions)")}
         for column in ("book text", "language text", "detail text"):
             if column.split()[0] not in existing:
                 db.execute(f"alter table submissions add column {column}")
+
+# 「出错那组的输入片段」开关。默认**关**：管理员忘了考前关掉是泄题，
+# 忘了课后打开只是少点帮助——两种疏忽的代价不对称，所以默认取保守的一侧。
+REVEAL_KEY = "reveal_failing_input"
+SNIPPET_CHARS = 400
+SNIPPET_LINES = 12
+
+
+def get_setting(key, default=""):
+    with sqlite3.connect(DB) as db:
+        row = db.execute("select value from settings where key = ?", (key,)).fetchone()
+    return row[0] if row else default
+
+
+def set_setting(key, value):
+    with sqlite3.connect(DB) as db:
+        db.execute("insert into settings(key, value) values (?, ?)"
+                   " on conflict(key) do update set value = excluded.value", (key, value))
+
+
+def reveal_enabled():
+    return get_setting(REVEAL_KEY, "off") == "on"
+
+
+def failing_input_snippet(book, problem_id, case_index):
+    """取出错那组的输入片段。只给输入，绝不给期望输出——那是答案。"""
+    catalog_path = MIRROR / "catalog.json"
+    if not catalog_path.is_file():
+        return None
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    item = next((p for p in catalog["problems"] if p["book"] == book and p["id"] == problem_id), None)
+    cases = (item or {}).get("test_cases") or []
+    if not 1 <= case_index <= len(cases):
+        return None
+    path = MIRROR / cases[case_index - 1]["input"]
+    if not path.is_file():
+        return None
+    text = path.read_text(encoding="utf-8", errors="replace")
+    lines = text.splitlines()
+    clipped = "\n".join(lines[:SNIPPET_LINES])
+    truncated = len(lines) > SNIPPET_LINES or len(clipped) > SNIPPET_CHARS
+    return {"text": clipped[:SNIPPET_CHARS], "truncated": truncated,
+            "total_lines": len(lines), "total_chars": len(text)}
+
 
 def password_hash(password):
     return hashlib.pbkdf2_hmac("sha256", password.encode(), b"cs101-local-user", 120000).hex()
@@ -252,6 +310,13 @@ class Handler(BaseHTTPRequestHandler):
                 count = db.execute("select count(*) from submissions").fetchone()[0]
             self.send_json({"submissions": count, "accepted": 1284, "streak": 12})
             return
+        if path == "/api/settings":
+            self.send_json({REVEAL_KEY: reveal_enabled(), "is_admin": self.current_user() == ADMIN_USER})
+            return
+        if path in ("/admin", "/admin/"):
+            page = ROOT / "admin.html"
+            if page.is_file():
+                self.send_html(page.read_text(encoding="utf-8")); return
         if path == "/api/submissions":
             user = self.current_user()
             if user is None:
@@ -356,10 +421,20 @@ class Handler(BaseHTTPRequestHandler):
             jar = cookies.SimpleCookie(self.headers.get("Cookie", "")); token = jar.get("session")
             if token: TOKENS.discard(token.value); SESSION_USERS.pop(token.value, None)
             self.send_response(200); self.send_header("Set-Cookie", "session=; Max-Age=0; Path=/"); self.end_headers(); return
+        if path == "/api/settings":
+            if self.current_user() != ADMIN_USER:
+                self.send_json({"error": "Forbidden"}, 403); return
+            value = "on" if data.get(REVEAL_KEY) else "off"
+            set_setting(REVEAL_KEY, value)
+            self.send_json({REVEAL_KEY: value == "on"}); return
         if path in {"/api/submit", "/api/submit/"} and self.authorized():
             book, problem = data.get("book", ""), data.get("problem", "")
             language = data.get("language", "python")
             result = judge(book, problem, language, data.get("source", data.get("code", "")))
+            # 开关关闭时片段根本不进 response —— 不是前端藏起来，是后端不发。
+            if reveal_enabled() and result.get("case"):
+                snippet = failing_input_snippet(book, problem, result["case"])
+                if snippet: result["failing_input"] = snippet
             # detail 存判题器返回的全部字段（case / expected_tokens / message…），
             # 历史页要靠它回答「错在哪组数据」，只存 status 是答不了的。
             detail = json.dumps({k: v for k, v in result.items() if k != "status"}, ensure_ascii=False)

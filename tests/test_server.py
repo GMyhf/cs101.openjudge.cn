@@ -2,6 +2,7 @@ import http.client
 import json
 import os
 import socket
+import sqlite3
 import subprocess
 import sys
 import tempfile
@@ -158,6 +159,80 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(latest["book"], SUBMIT_BOOK)
         self.assertEqual(latest["language"], "python")
         self.assertEqual(latest["detail"]["case"], verdict["case"])
+
+    def _admin_cookie(self):
+        status, headers, _ = request(self.port, "POST", "/api/login", {
+            "username": "GMyhf", "password": "T001-admin-only",
+        })
+        self.assertEqual(status, 200)
+        return headers["Set-Cookie"].split(";", 1)[0]
+
+    def _set_reveal(self, cookie, enabled):
+        status, _, body = request(self.port, "POST", "/api/settings",
+                                  {"reveal_failing_input": enabled}, cookie=cookie)
+        self.assertEqual(status, 200)
+        return json.loads(body)["reveal_failing_input"]
+
+    def test_reveal_switch_defaults_to_off(self):
+        """必须在**没有任何设置记录**的全新库上验，否则测的是上一个用例写进去的值。
+
+        本类的用例按字母序执行，`test_failing_input_...` 排在前面并会把开关显式写成 off；
+        若在共享库上读 `/api/settings`，读到的是那行记录，默认值这条分支根本走不到
+        （改默认为 on 也照样通过）。所以这里另开一个干净的库直接问 `reveal_enabled()`。
+        """
+        import server
+        with tempfile.TemporaryDirectory() as folder:
+            fresh = Path(folder) / "fresh.db"
+            saved = server.DB
+            server.DB = fresh
+            try:
+                server.init_db()
+                with sqlite3.connect(fresh) as db:
+                    self.assertEqual(db.execute("select count(*) from settings").fetchone()[0], 0)
+                self.assertIs(server.reveal_enabled(), False)
+            finally:
+                server.DB = saved
+
+    def test_reveal_switch_rejects_non_admin(self):
+        username = "t006_switch_student"
+        _, headers, _ = request(self.port, "POST", "/api/user/register", {
+            "username": username, "password": "T006-password",
+        })
+        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        status, _, _ = request(self.port, "POST", "/api/settings",
+                               {"reveal_failing_input": True}, cookie=cookie)
+        self.assertEqual(status, 403)
+        _, _, body = request(self.port, "GET", "/api/settings")
+        self.assertIs(json.loads(body)["reveal_failing_input"], False)
+
+    def test_failing_input_snippet_follows_the_switch(self):
+        """开关关着时片段不能出现在接口返回里——是服务端不下发，不是前端隐藏。"""
+        admin = self._admin_cookie()
+        self.addCleanup(self._set_reveal, admin, False)
+        username = "t006_switch_user"
+        _, headers, _ = request(self.port, "POST", "/api/user/register", {
+            "username": username, "password": "T006-password",
+        })
+        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        payload = {"book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM,
+                   "language": "python", "source": "print('wrong')"}
+
+        self._set_reveal(admin, False)
+        _, _, body = request(self.port, "POST", "/api/submit", payload, cookie=cookie)
+        self.assertNotIn("failing_input", json.loads(body))
+
+        self.assertIs(self._set_reveal(admin, True), True)
+        _, _, body = request(self.port, "POST", "/api/submit", payload, cookie=cookie)
+        verdict = json.loads(body)
+        snippet = verdict.get("failing_input")
+        self.assertIsNotNone(snippet)
+        self.assertTrue(snippet["text"])
+        # 只给输入。期望输出是答案，任何情况下都不能出现在返回里。
+        self.assertEqual(set(snippet), {"text", "truncated", "total_lines", "total_chars"})
+
+        self._set_reveal(admin, False)
+        _, _, body = request(self.port, "POST", "/api/submit", payload, cookie=cookie)
+        self.assertNotIn("failing_input", json.loads(body))
 
     def test_static_path_cannot_traverse(self):
         for path in ("/../server.py", "/%2e%2e/server.py", "/data/../server.py"):

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>判题设置 · CS101</title>
+<style>
+  :root { --ink:#17221d; --muted:#6b7a72; --line:#d9e0da; --bg:#f7f9f7; --warn:#b04f43; }
+  * { box-sizing:border-box; }
+  body { font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink);
+         max-width:720px; margin:0 auto; padding:28px 20px 60px; }
+  h1 { font-size:24px; margin:0 0 4px; }
+  .sub { color:var(--muted); margin:0 0 24px; }
+  .sub a { color:#3d8b68; }
+  .card { border:1px solid var(--line); border-radius:8px; padding:18px 20px; background:var(--bg); }
+  .head { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .title { font-weight:600; }
+  .desc { color:var(--muted); font-size:14px; margin:8px 0 0; }
+  .state { display:inline-block; padding:2px 10px; border-radius:999px; font-size:13px; font-weight:600; }
+  .on { background:#e7f3ec; color:#2f7d55; }
+  .off { background:#eef1f4; color:#55606b; }
+  button { padding:9px 16px; border:1px solid #17221d; border-radius:5px; font:inherit;
+           background:#17221d; color:#fff; cursor:pointer; white-space:nowrap; }
+  button[disabled] { opacity:.5; cursor:default; }
+  .note { border-left:3px solid var(--warn); padding:2px 0 2px 12px; margin:18px 0 0;
+          color:var(--muted); font-size:14px; }
+  #gate { color:var(--warn); }
+</style>
+<h1>判题设置</h1>
+<p class="sub">仅管理员可改。<a href="/problems/">题库目录</a></p>
+
+<div id="gate" hidden>需要以管理员身份登录才能修改。<a href="/auth/login/">去登录</a></div>
+
+<div class="card">
+  <div class="head">
+    <div>
+      <div class="title">判错时展示出错那组的输入片段</div>
+      <p class="desc">开启后，提交结果里会附上判错那一组测试数据的<b>输入</b>片段（截断显示，
+        不含期望输出）。平时练习开着便于定位问题；<b>考试、比赛请关闭</b>。</p>
+    </div>
+    <div style="text-align:right">
+      <div><span id="state" class="state off">读取中…</span></div>
+      <div style="margin-top:10px"><button id="toggle" disabled>切换</button></div>
+    </div>
+  </div>
+  <p class="note">开关关闭时，片段<b>不会出现在接口返回里</b>——是服务端不下发，
+    不是前端隐藏，所以改前端或看网络请求都拿不到。默认为关。</p>
+</div>
+
+<script>
+const KEY = "reveal_failing_input";
+let isAdmin = false;
+
+function paint(on) {
+  state.textContent = on ? "已开启（练习模式）" : "已关闭（考试模式）";
+  state.className = "state " + (on ? "on" : "off");
+  toggle.textContent = on ? "关闭" : "开启";
+  toggle.disabled = !isAdmin;
+  toggle.dataset.next = on ? "" : "1";
+}
+
+async function load() {
+  const s = await fetch("/api/settings", { credentials: "same-origin" }).then(r => r.json());
+  isAdmin = s.is_admin;
+  gate.hidden = isAdmin;
+  paint(s[KEY]);
+}
+
+toggle.onclick = async () => {
+  toggle.disabled = true;
+  const r = await fetch("/api/settings", {
+    method: "POST", credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ [KEY]: !!toggle.dataset.next }),
+  });
+  if (r.status === 403) { gate.hidden = false; isAdmin = false; }
+  else paint((await r.json())[KEY]);
+  toggle.disabled = !isAdmin;
+};
+
+load();
+</script>
+</html>
