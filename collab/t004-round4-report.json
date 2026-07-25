@@ -906,18 +906,86 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 0,
-        "status": "not_available",
-        "reason": "no independent oracle implemented"
+        "seeds": 400,
+        "status": "passed"
       },
-      "independent_oracle_status": "no_independent_oracle",
+      "independent_oracle_status": "passed",
       "sample_reproduced": true,
-      "independent_sample_agreement": null,
+      "independent_sample_agreement": true,
       "misconception_probe": {
-        "status": "not_available",
-        "reason": "no independent oracle implemented"
+        "mutation": "<=p -> <p",
+        "effective_on_cases": 5,
+        "sample_pins_interpretation": false,
+        "basis": "题面样例输出（不是未变异的 oracle——那样任何有效变异都必然不同）",
+        "data_verdict_when_sample_blind": "Wrong Answer"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "reference_rewritten_2026_07_26": {
+        "why": "codex 真实平台提交发现 TLE，参考解法从「逐对重算区间 min」改为「最近合格咖啡店位置 + 按颜色位置计数（bisect）」",
+        "recheck": "Claude 用 alt() 的独立实现重新对拍：样例一致，400 种子 0 组不一致；变异 <=p -> <p 真的改变行为 5/21 组、对拍全部抓住",
+        "downgrade_root_cause": "此前被标成 no_independent_oracle 并非真的缺 oracle——alt() 一直有 4034 的实现；是 build_t004_round4.py 里手维护的NO_INDEPENDENT_ORACLE 常量停留在返工前的 17 题旧集合，重跑该题时把 passed 覆盖掉了。常量已改为从 alt() 推导"
+      }
     }
-  ]
+  ],
+  "claude_oracle_triage": {
+    "criterion": "三条判据占两条以上算高风险：①输出规则含并列/例外裁决 ②需从题面推断未明说的规则 ③错误实现仍会产生形状合理的输出",
+    "coverage": "19/20 题有 Python 独立 oracle（各换算法族）；4009 无 Python 第二实现（Theta(2^n) 跑不动），改用同算法 C++ 交叉验证 case-0",
+    "high_risk": [
+      3723,
+      3725,
+      3789,
+      3906,
+      4034
+    ],
+    "low_risk_now_also_covered": [
+      3726,
+      3727,
+      3728,
+      3744,
+      3866,
+      4002,
+      4006,
+      4008,
+      4010,
+      4021,
+      4033
+    ],
+    "already_had_oracle": [
+      3791,
+      4001,
+      4007
+    ],
+    "cross_check": "每题 400 种子对拍，0 组不一致；样例一致 20/20",
+    "restored_note": "本节与 claude_mutation_audit 不是 build_t004_round4.py 产出的，2026-07-26 重跑该脚本时被整体重写报告顺带冲掉，现已恢复；脚本已改为重写时原样带走顶层键，不会再发生"
+  },
+  "claude_mutation_audit": {
+    "finding": "首轮 20 条变异里有 3 条是空操作——替换串落在别题分支或死代码上，21 组输出一模一样，等于在测一个不存在的变化（3726 落在死代码、4001 与 4010 落在别题分支）",
+    "fixed": {
+      "3726": "ans=d -> ans=d+1",
+      "4001": "(x-1,x+1,2*x) -> (x-1,x+1,2*x+1)",
+      "4010": "2011,int(x),10000 -> 2011,int(x),1000"
+    },
+    "rule": "变异必须**真的改变行为**（至少 1 组输出不同），只断言源码变了是不够的",
+    "sample_blind_but_data_catches": "误解探针以**题面样例**为基准，不是拿未变异的 oracle 比——那样任何有效变异都必然不同，探针恒为真",
+    "second_round_2026_07_26": {
+      "trigger": "codex 为修平台 TLE 重写了 3728 与 3789 的参考解法",
+      "finding": "两题的变异串随之消失（3728 的 `3*x+1`、3789 的 `range(n-L+1)` 都不在新实现里），同一个「空操作变异」形状被参考解法的重写重新引入",
+      "fixed": {
+        "3728": "3*v[i3]+1 -> 3*v[i3]+2",
+        "3789": "min(lcp[i+1:i+k]) -> max(lcp[i+1:i+k])"
+      },
+      "rescan": "19 题变异有效性全量重扫：全部真的改变行为，且对拍全部抓住，0 题有问题",
+      "lesson": "参考解法一旦被重写，挂在它源码上的变异探针要跟着重定向——否则探针会静默退化成空操作"
+    }
+  },
+  "codex_platform_submission_2026_07_26": {
+    "what": "用真实账号把 round4 的 20 份 samplecode.py 提交到 cs101.openjudge.cn 并轮询到终态",
+    "result": "首次 16/20 Accepted；3728/3789/4009/4034 为 TLE。修复重提后 3789、4034 转 Accepted，最终 18/20",
+    "still_tle": [
+      3728,
+      4009
+    ],
+    "meaning": "这 2 题的参考解法在真实平台跑不过 —— 其正确性目前只有本地对拍支撑，没有平台背书。本地数据仍自洽（samplecode 对 21 组逐组复算全对），但不应称其为 AC 参考实现",
+    "claude_note": "codex 明确拒绝用本地小域对拍结果掩盖平台 TLE，这个口径是对的"
+  }
 }

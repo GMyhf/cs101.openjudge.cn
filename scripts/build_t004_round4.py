@@ -560,18 +560,33 @@ def alt(n,s):
         return "\n".join(o)+"\n"
     raise LookupError(f"no independent oracle for {n}")
 
-NO_INDEPENDENT_ORACLE={3723,3725,3726,3727,3728,3744,3789,3866,3906,4002,4006,4008,4009,4010,4021,4033,4034}
+# 这里原本是一个手维护的常量，返工补完 oracle 之后一直没跟上：alt() 实际已覆盖 19/20 题，
+# 常量却还写着 17 题没有 oracle。后果是**任何一次重跑都会把报告里的 passed 悄悄改回
+# no_independent_oracle**——4034 就是这么掉的（2026-07-26 codex 重跑该题时触发）。
+# 改成从 alt() 的实际实现推导，事实是什么就报什么。
+CPP_CROSS_CHECKED={4009}   # 无 Python 第二实现（Theta(2^n) 跑不动），改用同算法 C++ 交叉验证 case-0
+
+
+def has_oracle(n, sample):
+    """alt() 是否真为这题实现了独立 oracle。以能不能跑通为准，不靠手维护的清单。"""
+    try:
+        alt(n, sample)
+    except LookupError:
+        return False
+    return True
 
 def main():
     man=json.loads(MANIFEST.read_text(encoding="utf-8")); rows=[]
     only=int(__import__("os").environ["R4_ONLY"]) if "R4_ONLY" in __import__("os").environ else None
-    previous=json.loads(REPORT.read_text(encoding="utf-8"))["entries"] if REPORT.exists() else []
+    prevdoc=json.loads(REPORT.read_text(encoding="utf-8")) if REPORT.exists() else {}
+    previous=prevdoc.get("entries",[])
     for e in man["entries"]:
         n=e["local_number"]; ref=BASE.replace("P=0",f"P={n}"); gen=GENERATORS[n]
+        independent=has_oracle(n,e["sample_input"])
         if only is not None and n != only: continue
         print("start",n,flush=True)
         assert run(ref,e["sample_input"]).split()==e["sample_output"].split(),n
-        if n not in NO_INDEPENDENT_ORACLE:
+        if independent:
             assert alt(n,e["sample_input"]).split()==e["sample_output"].split(),n
         cases=[e["sample_input"]]
         for i in range(1,21):
@@ -585,8 +600,8 @@ def main():
         # 分别落在死代码和别题的分支上，21 组输出一模一样，探针等于在测一个不存在的变化。
         def mutation_is_effective(original, mutated, samples):
             return any(run(original, c) != run(mutated, c) for c in samples)
-        mutations={3723:("len(e)==1","len(e)==0"),3725:("min(q)","max(q)"),3726:("ans=d","ans=d+1"),3727:("max(d[j],","min(d[j],"),3728:("3*x+1","3*x+2"),3744:("2*(x*y+x*w+y*w)","2*(x*y+x*w+y*w)+1"),3789:("range(n-L+1)","range(n-L)"),3791:("y.startswith(x)","x.startswith(y)"),3866:("out.append(str(len(seen)))","out.append(str(len(seen)-1))"),3906:("(X,Y)!=(U,W)","(X,Y)==(U,W)"),4001:("(x-1,x+1,2*x)","(x-1,x+1,2*x+1)"),4002:("v.count(x)>1","v.count(x)>2"),4006:("min(i-1,j-1,n-i,n-j)","min(i-1,j-1,n-i+1,n-j)"),4007:("(c!=y[j])","(c==y[j])"),4008:("return str(d[0])","return str(d[-1])"),4009:("z==0","z==1"),4010:("2011,int(x),10000","2011,int(x),1000"),4021:("max(z)","min(z)"),4033:("ans=i+1","ans=i"),4034:("<=p","<p")}
-        if n in NO_INDEPENDENT_ORACLE:
+        mutations={3723:("len(e)==1","len(e)==0"),3725:("min(q)","max(q)"),3726:("ans=d","ans=d+1"),3727:("max(d[j],","min(d[j],"),3728:("3*v[i3]+1","3*v[i3]+2"),3744:("2*(x*y+x*w+y*w)","2*(x*y+x*w+y*w)+1"),3789:("min(lcp[i+1:i+k])","max(lcp[i+1:i+k])"),3791:("y.startswith(x)","x.startswith(y)"),3866:("out.append(str(len(seen)))","out.append(str(len(seen)-1))"),3906:("(X,Y)!=(U,W)","(X,Y)==(U,W)"),4001:("(x-1,x+1,2*x)","(x-1,x+1,2*x+1)"),4002:("v.count(x)>1","v.count(x)>2"),4006:("min(i-1,j-1,n-i,n-j)","min(i-1,j-1,n-i+1,n-j)"),4007:("(c!=y[j])","(c==y[j])"),4008:("return str(d[0])","return str(d[-1])"),4009:("z==0","z==1"),4010:("2011,int(x),10000","2011,int(x),1000"),4021:("max(z)","min(z)"),4033:("ans=i+1","ans=i"),4034:("<=p","<p")}
+        if not independent:
             hits=[]
         else:
             old,new=mutations[n];mut=ref.replace(old,new);assert mut!=ref
@@ -597,7 +612,7 @@ def main():
         for seed in range(20000):gen(random.Random(n+seed))
         for seed in range(400):
             c=gen(random.Random(n+seed))
-            if n not in NO_INDEPENDENT_ORACLE:
+            if independent:
                 assert run(ref,c).split()==alt(n,c).split(),(n,seed)
         d=TESTS/bucket(n)/f"{n:05d}_made";data=d/"data";data.mkdir(parents=True,exist_ok=True)
         (d/"samplecode.py").write_text("# T-004-r4\n"+ref,encoding="utf-8")
@@ -628,13 +643,15 @@ with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as h:
         p=subprocess.run([sys.executable,"producecase.py"],cwd=d,capture_output=True,text=True,timeout=600)
         after={p.name:p.read_bytes() for p in data.iterdir()};assert p.returncode==0 and before==after,(n,p.stderr)
         f=max(outs.count(x) for x in outs)
-        independent=n not in NO_INDEPENDENT_ORACLE
-        row={"local_number":n,"title":e["title"],"source":e["source"],"reference_source":"LLM-written","generator":gen.__name__,"seed":n,"test_cases":21,"distinct_input_cases":len(set(cases)),"distinct_outputs":len(set(outs)),"constant_output_probe":{"status":"rejected" if f<21 else "accepted","frequency":f,"total":21},"constraints":CONSTRAINTS[n],"structure_checked":True,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"independent_oracle_smoke":{"seeds":400,"status":"passed"} if independent else {"seeds":0,"status":"not_available","reason":"no independent oracle implemented"},"independent_oracle_status":"passed" if independent else "no_independent_oracle","sample_reproduced":True,"independent_sample_agreement":True if independent else None,"misconception_probe":{"data_catches_misreading":True,"data_catching_cases":hits,"status":"caught"} if independent else {"status":"not_available","reason":"no independent oracle implemented"},"producecase_reproduced":True}
+        row={"local_number":n,"title":e["title"],"source":e["source"],"reference_source":"LLM-written","generator":gen.__name__,"seed":n,"test_cases":21,"distinct_input_cases":len(set(cases)),"distinct_outputs":len(set(outs)),"constant_output_probe":{"status":"rejected" if f<21 else "accepted","frequency":f,"total":21},"constraints":CONSTRAINTS[n],"structure_checked":True,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"independent_oracle_smoke":{"seeds":400,"status":"passed"} if independent else {"seeds":0,"status":"not_available","reason":"no independent oracle implemented"},"independent_oracle_status":"passed" if independent else ("no_python_oracle_cross_checked_in_cpp" if n in CPP_CROSS_CHECKED else "no_independent_oracle"),"sample_reproduced":True,"independent_sample_agreement":True if independent else None,"misconception_probe":{"data_catches_misreading":True,"data_catching_cases":hits,"status":"caught"} if independent else {"status":"not_available","reason":"no independent oracle implemented"},"producecase_reproduced":True}
         if n==4009: row["coverage_note"]="无查表实测：n=20 样例可在约 8 秒完成，n=21 可在约 16 秒完成；n=22 未在 60 秒限制内完成，因此本批不声称覆盖题面上界 24。"
         rows.append(row)
         print("built",n,flush=True)
     if only is not None:
         updated={x["local_number"] for x in rows}; rows=[x for x in previous if x["local_number"] not in updated]+rows
         rows.sort(key=lambda x:x["local_number"])
-    REPORT.write_text(json.dumps({"batch":"T-004-r4","entries":rows},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
+    # 顶层的复核记录（claude_oracle_triage / claude_mutation_audit 等）不是本脚本产出的，
+    # 重写报告时必须原样带过去——2026-07-26 那次重跑就是这么把它们冲掉的。
+    extra={k:v for k,v in prevdoc.items() if k not in ("batch","entries")}
+    REPORT.write_text(json.dumps({"batch":"T-004-r4",**extra,"entries":rows},ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
 if __name__=="__main__":main()
