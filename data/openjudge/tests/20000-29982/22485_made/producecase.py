@@ -4,9 +4,12 @@ REFERENCE_SOURCE = "from collections import deque\n\ndef right_view(n, tree):\n 
 SAMPLE_IN = '5\n2 3\n-1 5\n-1 4\n-1 -1\n-1 -1\n'
 SAMPLE_OUT = '1 3 4\n'
 def generate_case(r):
-    n = r.randint(1, 30); rows = [[-1, -1] for _ in range(n)]
+    n = 1000 if r.random() < .15 else r.randint(1, 60)               # 题面：1<=N<=1000
+    rows = [[-1, -1] for _ in range(n)]
     for i in range(1, n):
-        p = r.randrange(i); side = 0 if rows[p][0] == -1 else 1; rows[p][side] = i + 1
+        p = r.choice([k for k in range(i) if -1 in rows[k]])          # 只挑还有空位的父节点
+        side = r.choice([k for k in (0, 1) if rows[p][k] == -1])      # 左右都可能，覆盖「只有右子」
+        rows[p][side] = i + 1
     return str(n) + "\n" + "\n".join(f"{a} {b}" for a, b in rows) + "\n"
 
 assert SAMPLE_IN == '5\n2 3\n-1 5\n-1 4\n-1 -1\n-1 -1\n'

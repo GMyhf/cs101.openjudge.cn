@@ -4,10 +4,19 @@ REFERENCE_SOURCE = "class TreeNode:\n    def __init__(self, value):\n        sel
 SAMPLE_IN = 'DURPA\nRUDPA\nXTCNB\nCTBNX\n'
 SAMPLE_OUT = 'RUAPD\nCBNTX\n'
 def generate_case(r):
+    def build(seq):
+        if not seq: return None
+        i = r.randrange(len(seq))
+        return (seq[i], build(seq[:i]), build(seq[i + 1:]))
+
+    def preorder(node):
+        return "" if node is None else node[0] + preorder(node[1]) + preorder(node[2])
+
     out = []
     for _ in range(r.randint(2, 4)):
-        chars = list(r.sample("ABCDEFGHIJKLMNOPQRSTUVWXYZ", r.randint(2, 10))); r.shuffle(chars)
-        pre = "".join(chars); ino = "".join(chars); out.extend([pre, ino])
+        size = 26 if r.random() < .25 else r.randint(2, 26)          # 题面：长度均不超过 26
+        chars = r.sample("ABCDEFGHIJKLMNOPQRSTUVWXYZ", size)
+        out.extend([preorder(build(chars)), "".join(chars)])
     return "\n".join(out) + "\n"
 
 assert SAMPLE_IN == 'DURPA\nRUDPA\nXTCNB\nCTBNX\n'
