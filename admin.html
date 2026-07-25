@@ -4,79 +4,170 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>判题设置 · CS101</title>
 <style>
-  :root { --ink:#17221d; --muted:#6b7a72; --line:#d9e0da; --bg:#f7f9f7; --warn:#b04f43; }
+  :root { --ink:#17221d; --muted:#6b7a72; --line:#d9e0da; --bg:#f7f9f7; --warn:#b04f43; --ok:#2f7d55; }
   * { box-sizing:border-box; }
   body { font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink);
-         max-width:720px; margin:0 auto; padding:28px 20px 60px; }
+         max-width:820px; margin:0 auto; padding:28px 20px 80px; }
   h1 { font-size:24px; margin:0 0 4px; }
-  .sub { color:var(--muted); margin:0 0 24px; }
+  h2 { font-size:16px; margin:28px 0 10px; }
+  .sub { color:var(--muted); margin:0 0 20px; }
   .sub a { color:#3d8b68; }
-  .card { border:1px solid var(--line); border-radius:8px; padding:18px 20px; background:var(--bg); }
-  .head { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .card { border:1px solid var(--line); border-radius:8px; padding:16px 18px; background:var(--bg); }
+  .head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
   .title { font-weight:600; }
-  .desc { color:var(--muted); font-size:14px; margin:8px 0 0; }
+  .desc { color:var(--muted); font-size:14px; margin:6px 0 0; }
   .state { display:inline-block; padding:2px 10px; border-radius:999px; font-size:13px; font-weight:600; }
-  .on { background:#e7f3ec; color:#2f7d55; }
-  .off { background:#eef1f4; color:#55606b; }
-  button { padding:9px 16px; border:1px solid #17221d; border-radius:5px; font:inherit;
+  .on { background:#e7f3ec; color:var(--ok); } .off { background:#eef1f4; color:#55606b; }
+  .alarm { background:#fdeceb; color:var(--warn); }
+  button { padding:8px 14px; border:1px solid #17221d; border-radius:5px; font:inherit;
            background:#17221d; color:#fff; cursor:pointer; white-space:nowrap; }
+  button.ghost { background:#fff; color:var(--ink); }
   button[disabled] { opacity:.5; cursor:default; }
-  .note { border-left:3px solid var(--warn); padding:2px 0 2px 12px; margin:18px 0 0;
+  .note { border-left:3px solid var(--warn); padding:2px 0 2px 12px; margin:16px 0 0;
           color:var(--muted); font-size:14px; }
-  #gate { color:var(--warn); }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th,td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--line); }
+  th { color:var(--muted); font-size:12px; font-weight:600; }
+  select, input[type=datetime-local], input[type=text] {
+    padding:6px 8px; border:1px solid var(--line); border-radius:5px; font:inherit; background:#fff; }
+  .banner { border-radius:8px; padding:12px 16px; margin:0 0 18px; font-weight:600; }
+  .banner.exam { background:#fdeceb; color:var(--warn); }
+  .banner.free { background:#e7f3ec; color:var(--ok); }
+  #gate { color:var(--warn); margin-bottom:16px; }
+  .muted { color:var(--muted); }
 </style>
 <h1>判题设置</h1>
 <p class="sub">仅管理员可改。<a href="/problems/">题库目录</a></p>
 
 <div id="gate" hidden>需要以管理员身份登录才能修改。<a href="/auth/login/">去登录</a></div>
+<div id="banner" class="banner free">读取中…</div>
 
 <div class="card">
   <div class="head">
     <div>
       <div class="title">判错时展示出错那组的输入片段</div>
-      <p class="desc">开启后，提交结果里会附上判错那一组测试数据的<b>输入</b>片段（截断显示，
-        不含期望输出）。平时练习开着便于定位问题；<b>考试、比赛请关闭</b>。</p>
+      <p class="desc">开启后，提交结果会附上判错那一组测试数据的<b>输入</b>片段（截断，
+        不含期望输出）。这是<b>全局默认值</b>，可被下面的题库覆盖，并被考试时段一票否决。</p>
     </div>
-    <div style="text-align:right">
-      <div><span id="state" class="state off">读取中…</span></div>
+    <div style="text-align:right; flex:0 0 auto">
+      <div><span id="state" class="state off">…</span></div>
       <div style="margin-top:10px"><button id="toggle" disabled>切换</button></div>
     </div>
   </div>
-  <p class="note">开关关闭时，片段<b>不会出现在接口返回里</b>——是服务端不下发，
-    不是前端隐藏，所以改前端或看网络请求都拿不到。默认为关。</p>
+  <p class="note">生效规则：<b>考试时段内一律关闭</b> → 否则看题库覆盖 → 再否则用全局默认。
+    时段只会让结果更严，永远不会意外放开。开关关闭时片段<b>不进接口返回</b>，是服务端不下发。</p>
+</div>
+
+<h2>按题库覆盖</h2>
+<p class="muted" style="margin:0 0 8px">未设置的题库跟随全局默认。</p>
+<table>
+  <thead><tr><th>题库</th><th>可判题数</th><th>策略</th><th>此刻生效</th></tr></thead>
+  <tbody id="books"></tbody>
+</table>
+
+<h2>考试时段（时段内强制关闭）</h2>
+<table>
+  <thead><tr><th>开始</th><th>结束</th><th>备注</th><th></th></tr></thead>
+  <tbody id="windows"></tbody>
+</table>
+<div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+  <input type="datetime-local" id="ws"><span class="muted">至</span><input type="datetime-local" id="we">
+  <input type="text" id="wn" placeholder="备注，如 期末考" maxlength="60">
+  <button id="addwin" class="ghost" disabled>添加时段</button>
+  <span id="werr" class="muted"></span>
 </div>
 
 <script>
 const KEY = "reveal_failing_input";
-let isAdmin = false;
+let state = null, isAdmin = false, books = [];
 
-function paint(on) {
-  state.textContent = on ? "已开启（练习模式）" : "已关闭（考试模式）";
-  state.className = "state " + (on ? "on" : "off");
-  toggle.textContent = on ? "关闭" : "开启";
-  toggle.disabled = !isAdmin;
-  toggle.dataset.next = on ? "" : "1";
-}
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-async function load() {
-  const s = await fetch("/api/settings", { credentials: "same-origin" }).then(r => r.json());
-  isAdmin = s.is_admin;
-  gate.hidden = isAdmin;
-  paint(s[KEY]);
-}
-
-toggle.onclick = async () => {
-  toggle.disabled = true;
+async function save(patch) {
   const r = await fetch("/api/settings", {
     method: "POST", credentials: "same-origin",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ [KEY]: !!toggle.dataset.next }),
+    headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch),
   });
-  if (r.status === 403) { gate.hidden = false; isAdmin = false; }
-  else paint((await r.json())[KEY]);
+  if (r.status === 403) { gate.hidden = false; isAdmin = false; paint(); return null; }
+  if (!r.ok) { werr.textContent = (await r.json()).error || "保存失败"; return null; }
+  werr.textContent = "";
+  state = Object.assign(state, await r.json());
+  paint();
+  return state;
+}
+
+function effectiveFor(book) {
+  if (state.active_window) return false;
+  const o = state.books[book];
+  return o === "on" ? true : o === "off" ? false : state[KEY];
+}
+
+function paint() {
+  const w = state.active_window;
+  banner.className = "banner " + (w ? "exam" : "free");
+  banner.textContent = w
+    ? "考试模式生效中：" + (w.note || "无备注") + "（" + w.start + " → " + w.end + "），所有题库一律不展示片段"
+    : "当前无考试时段，按下面的全局/题库策略执行";
+
+  state_el().textContent = state[KEY] ? "全局：开" : "全局：关";
+  state_el().className = "state " + (state[KEY] ? "on" : "off");
+  toggle.textContent = state[KEY] ? "关闭" : "开启";
   toggle.disabled = !isAdmin;
+
+  books_el().innerHTML = books.map(b => {
+    const o = state.books[b.book] || "";
+    const eff = effectiveFor(b.book);
+    return `<tr><td>${esc(b.book)}</td><td class="muted">${b.ok}/${b.total}</td>
+      <td><select data-book="${esc(b.book)}" ${isAdmin ? "" : "disabled"}>
+        <option value=""${o === "" ? " selected" : ""}>跟随全局</option>
+        <option value="on"${o === "on" ? " selected" : ""}>开</option>
+        <option value="off"${o === "off" ? " selected" : ""}>关</option>
+      </select></td>
+      <td><span class="state ${eff ? "on" : "off"}">${eff ? "展示" : "不展示"}</span></td></tr>`;
+  }).join("");
+  for (const sel of books_el().querySelectorAll("select")) {
+    sel.onchange = () => {
+      const next = Object.assign({}, state.books);
+      if (sel.value) next[sel.dataset.book] = sel.value; else delete next[sel.dataset.book];
+      save({ books: next });
+    };
+  }
+
+  windows_el().innerHTML = state.windows.length
+    ? state.windows.map((x, i) => `<tr><td>${esc(x.start)}</td><td>${esc(x.end)}</td>
+        <td>${esc(x.note || "")}</td>
+        <td><button class="ghost" data-i="${i}" ${isAdmin ? "" : "disabled"}>删除</button></td></tr>`).join("")
+    : `<tr><td colspan="4" class="muted">还没有设置考试时段。</td></tr>`;
+  for (const b of windows_el().querySelectorAll("button[data-i]")) {
+    b.onclick = () => save({ windows: state.windows.filter((_, i) => i !== +b.dataset.i) });
+  }
+  addwin.disabled = !isAdmin;
+}
+
+const state_el = () => document.getElementById("state");
+const books_el = () => document.getElementById("books");
+const windows_el = () => document.getElementById("windows");
+
+toggle.onclick = () => save({ [KEY]: !state[KEY] });
+
+addwin.onclick = () => {
+  if (!ws.value || !we.value) { werr.textContent = "请填开始和结束时间"; return; }
+  save({ windows: state.windows.concat([{ start: ws.value, end: we.value, note: wn.value }]) })
+    .then(ok => { if (ok) { ws.value = we.value = wn.value = ""; } });
 };
 
-load();
+Promise.all([
+  fetch("/api/settings", { credentials: "same-origin" }).then(r => r.json()),
+  fetch("/api/catalog", { credentials: "same-origin" }).then(r => r.json()).catch(() => ({ problems: [] })),
+]).then(([s, cat]) => {
+  state = s; isAdmin = s.is_admin; gate.hidden = isAdmin;
+  const agg = {};
+  for (const p of cat.problems || []) {
+    agg[p.book] = agg[p.book] || { book: p.book, ok: 0, total: 0 };
+    agg[p.book].total++; if (p.test_count > 0) agg[p.book].ok++;
+  }
+  books = Object.values(agg).sort((a, b) => a.book.localeCompare(b.book));
+  paint();
+});
 </script>
 </html>

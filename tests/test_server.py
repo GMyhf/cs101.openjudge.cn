@@ -1,6 +1,7 @@
 import http.client
 import json
 import os
+import shutil
 import socket
 import sqlite3
 import subprocess
@@ -233,6 +234,88 @@ class ServerApiTests(unittest.TestCase):
         self._set_reveal(admin, False)
         _, _, body = request(self.port, "POST", "/api/submit", payload, cookie=cookie)
         self.assertNotIn("failing_input", json.loads(body))
+
+    def test_book_override_accepts_on_off_strings(self):
+        """管理页下拉框发的是 "on"/"off" 字符串。
+
+        `"off"` 是非空字符串，按真值判会被存成 `"on"`——即「选关变成开」，
+        而且这条路径只有走 HTTP 才会经过（直接 `set_setting` 写的是已归一化的值）。
+        """
+        admin = self._admin_cookie()
+        self.addCleanup(request, self.port, "POST", "/api/settings", {"books": {}}, admin)
+        status, _, body = request(self.port, "POST", "/api/settings",
+                                  {"books": {SUBMIT_BOOK: "off"}}, cookie=admin)
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["books"].get(SUBMIT_BOOK), "off")
+
+        status, _, body = request(self.port, "POST", "/api/settings",
+                                  {"books": {SUBMIT_BOOK: "on"}}, cookie=admin)
+        self.assertEqual(json.loads(body)["books"].get(SUBMIT_BOOK), "on")
+
+        # 空值表示「跟随全局」，不该留在覆盖表里
+        status, _, body = request(self.port, "POST", "/api/settings",
+                                  {"books": {SUBMIT_BOOK: ""}}, cookie=admin)
+        self.assertNotIn(SUBMIT_BOOK, json.loads(body)["books"])
+
+    def test_reveal_policy_layers(self):
+        """考试时段一票否决 → 题库覆盖 → 全局默认；坏时段必须 fail closed。"""
+        import server
+        from datetime import datetime
+        with tempfile.TemporaryDirectory() as folder:
+            saved, server.DB = server.DB, Path(folder) / "policy.db"
+            try:
+                server.init_db()
+                now = datetime(2026, 7, 26, 10, 0)
+                self.assertFalse(server.reveal_effective("practice", now))     # 默认关
+
+                server.set_setting(server.REVEAL_KEY, "on")
+                self.assertTrue(server.reveal_effective("practice", now))
+
+                server.set_setting(server.BOOKS_KEY, json.dumps({"practice": "off"}))
+                self.assertFalse(server.reveal_effective("practice", now))     # 题库覆盖全局
+                self.assertTrue(server.reveal_effective("dsapre", now))        # 未覆盖的跟随全局
+
+                server.set_setting(server.WINDOWS_KEY, json.dumps(
+                    [{"start": "2026-07-26T09:00", "end": "2026-07-26T11:00", "note": "期末考"}]))
+                self.assertFalse(server.reveal_effective("dsapre", now))       # 时段内一票否决
+                self.assertTrue(server.reveal_effective("dsapre", datetime(2026, 7, 26, 12, 0)))
+
+                # 坏配置宁可误关：若按「不命中」处理，一条手改坏的时段会静默失去考试保护
+                server.set_setting(server.WINDOWS_KEY, json.dumps([{"start": "x", "end": "y"}]))
+                self.assertFalse(server.reveal_effective("dsapre", now))
+                self.assertTrue(server.active_window(now)["malformed"])
+            finally:
+                server.DB = saved
+
+    @unittest.skipUnless(shutil.which("node"), "需要 node 才能真跑页面里的高亮代码")
+    def test_submit_page_highlighter_runs(self):
+        """在 node 里真跑一遍页面发出的高亮函数。
+
+        光看 `--check` 语法是不够的：`SUBMIT_PAGE` 若不是 raw 字符串，
+        JS 里的 `\\\\b` 会被 Python 吃成退格符，关键字正则**静默失效**——
+        页面照样能加载、语法照样合法，只是高亮不对。只有真跑才看得出来。
+        """
+        import server
+        page = server.SUBMIT_PAGE
+        script = page[page.index("<script>") + 8: page.rindex("</script>")]
+        core = script[script.index("const PY_KW"): script.index("function paintEditor")]
+        harness = (
+            'const esc = s => String(s).replace(/[&<>"]/g,'
+            ' c => ({"&":"&amp;","<":"&lt;",">":"&gt;",\'"\':"&quot;"}[c]));\n'
+            + core + "\n"
+            'const out = highlight("def f(): # c\\n  return \'a\' + 1", "python");\n'
+            'const checks = ["t-kw", "t-com", "t-str", "t-num"].every(c => out.includes(\'class="\' + c + \'"\'));\n'
+            'const boundary = !highlight("classic = 1", "python").includes(\'class="t-kw"\');\n'
+            'const escaped = !highlight("x = \'<b>\'", "python").includes("<b>");\n'
+            'process.exit(checks && boundary && escaped ? 0 : 1);\n')
+        with tempfile.NamedTemporaryFile("w", suffix=".mjs", encoding="utf-8", delete=False) as handle:
+            handle.write(harness)
+            path = handle.name
+        self.addCleanup(os.unlink, path)
+        result = subprocess.run(["node", path], capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0,
+                         "高亮未按预期工作（关键字/注释/字符串/数字、词边界、HTML 转义）："
+                         + (result.stderr or result.stdout)[:400])
 
     def test_static_path_cannot_traverse(self):
         for path in ("/../server.py", "/%2e%2e/server.py", "/data/../server.py"):

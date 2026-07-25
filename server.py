@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Small local course portal for cs101.openjudge.cn."""
 from http import cookies
+from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import hashlib
@@ -41,7 +42,7 @@ PROBLEMS = [
 
 # 提交页。判题结果不再直接 dump JSON —— 项目的立意是「反馈错在哪组数据」，
 # 所以 WA 要把 case 编号、期望/实际 token 数摆出来，TLE/RE 要把判题器的 message 摆出来。
-SUBMIT_PAGE = """<!doctype html><html lang="zh-CN"><meta charset="utf-8">
+SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>本地提交 - __PROBLEM__</title>
 <style>
@@ -52,8 +53,22 @@ SUBMIT_PAGE = """<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  h1{font-size:24px;margin:0 0 4px}
  .sub{color:var(--muted);margin:0 0 20px}
  .sub a{color:#3d8b68}
- textarea{width:100%;min-height:340px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;
-          padding:12px;border:1px solid var(--line);border-radius:6px;resize:vertical;tab-size:4}
+ /* 编辑器：透明 textarea 叠在高亮层上。两层的字体/行高/padding 必须逐项一致，
+    差一点点光标就会和文字错位。 */
+ .editor{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff}
+ .gutter{flex:0 0 auto;padding:12px 8px 12px 12px;text-align:right;color:#aab4ad;background:#fbfcfb;
+         border-right:1px solid var(--line);user-select:none;white-space:pre}
+ .codewrap{position:relative;flex:1;min-width:0}
+ .gutter,.codewrap pre,.codewrap textarea{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;tab-size:4}
+ .codewrap pre,.codewrap textarea{margin:0;padding:12px;border:0;white-space:pre;overflow:auto;width:100%;height:360px}
+ .codewrap pre{position:absolute;inset:0;pointer-events:none;color:var(--ink)}
+ .codewrap textarea{position:relative;background:transparent;color:transparent;caret-color:var(--ink);
+          resize:vertical;outline:none}
+ .t-com{color:#7a8a80;font-style:italic}
+ .t-str{color:#2f7d55}
+ .t-num{color:#8a6d1f}
+ .t-kw{color:#9a3d8f;font-weight:600}
+ .t-pre{color:#3d6b8b}
  .row{display:flex;gap:10px;align-items:center;margin:12px 0}
  select,button{padding:9px 14px;border:1px solid var(--line);border-radius:5px;font:inherit;background:#fff}
  button{background:#17221d;color:#fff;border-color:#17221d;cursor:pointer}
@@ -79,7 +94,14 @@ SUBMIT_PAGE = """<!doctype html><html lang="zh-CN"><meta charset="utf-8">
 <p class="sub">题库：__BOOK__ · 判题运行在本机 · <a href="/problems/">题库目录</a> · <a href="/__BOOK__/__PROBLEM__/">看题面</a><span id="adminlink"></span></p>
 <p id="auth" class="muted">正在检查登录状态…</p>
 <form id="form">
-  <textarea name="source" placeholder="在这里粘贴代码" spellcheck="false"></textarea>
+  <div class="editor">
+    <div class="gutter" id="gutter">1</div>
+    <div class="codewrap">
+      <pre id="hl" aria-hidden="true"></pre>
+      <textarea name="source" id="src" placeholder="在这里粘贴代码" spellcheck="false"
+                autocomplete="off" autocapitalize="off"></textarea>
+    </div>
+  </div>
   <div class="row">
     <select name="language">
       <option value="python">Python 3</option><option value="cpp">C++17</option><option value="c">C11</option>
@@ -105,6 +127,72 @@ fetch("/api/me", { credentials: "same-origin" }).then(r => r.json()).then(me => 
 fetch("/api/settings", { credentials: "same-origin" }).then(r => r.json()).then(s => {
   if (s.is_admin) adminlink.innerHTML = ' · <a href="/admin/">判题设置</a>';
 });
+
+// ---- 语法高亮 ----------------------------------------------------------
+// 不引外部库：粘性正则按位置扫一遍，命中就包 span，没命中的连续片段整段转义。
+// 顺序要紧：注释和字符串必须排在关键字前面，否则 "# def" 里的 def 会被当关键字。
+const PY_KW = "False|None|True|and|as|assert|async|await|break|class|continue|def|del|elif|else|"
+            + "except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|"
+            + "return|try|while|with|yield";
+const C_KW  = "auto|bool|break|case|char|class|const|constexpr|continue|default|delete|do|double|"
+            + "else|enum|extern|false|float|for|goto|if|inline|int|long|namespace|new|nullptr|"
+            + "operator|private|protected|public|return|short|signed|sizeof|static|struct|switch|"
+            + "template|this|throw|true|try|typedef|typename|union|unsigned|using|virtual|void|"
+            + "volatile|while";
+const NUM = /\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b/y;
+const SPECS = {
+  python: [
+    ["com", /#[^\n]*/y],
+    ["str", /(["]{3}|''')[\s\S]*?\1|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'/y],
+    ["num", NUM],
+    ["kw", new RegExp("\\b(?:" + PY_KW + ")\\b", "y")],
+  ],
+  c: [
+    ["com", /\/\/[^\n]*|\/\*[\s\S]*?\*\//y],
+    ["pre", /#[a-z]+/y],
+    ["str", /"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'/y],
+    ["num", NUM],
+    ["kw", new RegExp("\\b(?:" + C_KW + ")\\b", "y")],
+  ],
+};
+SPECS.cpp = SPECS.c;
+
+function highlight(code, lang) {
+  const specs = SPECS[lang] || SPECS.python;
+  let out = "", i = 0, plain = 0;
+  const flush = () => { if (plain) { out += esc(code.slice(i - plain, i)); plain = 0; } };
+  while (i < code.length) {
+    let hit = null;
+    for (const spec of specs) {
+      spec[1].lastIndex = i;
+      const m = spec[1].exec(code);
+      if (m && m.index === i && m[0]) { hit = [spec[0], m[0]]; break; }
+    }
+    if (hit) { flush(); out += '<span class="t-' + hit[0] + '">' + esc(hit[1]) + "</span>"; i += hit[1].length; }
+    else { i++; plain++; }
+  }
+  flush();
+  return out;
+}
+
+function paintEditor() {
+  const code = src.value;
+  // 末尾补一个换行：最后一行为空时，高亮层会比 textarea 少一行高度，滚动就对不齐
+  hl.innerHTML = highlight(code + "\n", form.language.value);
+  gutter.textContent = Array.from({ length: code.split("\n").length }, (_, k) => k + 1).join("\n");
+  hl.scrollTop = src.scrollTop; hl.scrollLeft = src.scrollLeft;
+}
+
+src.addEventListener("input", paintEditor);
+src.addEventListener("scroll", () => { hl.scrollTop = src.scrollTop; hl.scrollLeft = src.scrollLeft; });
+form.language.addEventListener("change", paintEditor);
+src.addEventListener("keydown", e => {
+  if (e.key !== "Tab") return;
+  e.preventDefault();
+  src.setRangeText("    ", src.selectionStart, src.selectionEnd, "end");
+  paintEditor();
+});
+paintEditor();
 
 function badge(status) {
   const cls = CLS[status] || (status === "No Test Data" || status === "Problem Not Found" ? "b-info" : "b-other");
@@ -199,8 +287,55 @@ def set_setting(key, value):
                    " on conflict(key) do update set value = excluded.value", (key, value))
 
 
+BOOKS_KEY = "reveal_books"        # {book: "on"/"off"}，覆盖全局
+WINDOWS_KEY = "reveal_windows"    # [{start, end, note}]，命中即强制关闭
+
+
 def reveal_enabled():
     return get_setting(REVEAL_KEY, "off") == "on"
+
+
+def _json_setting(key, fallback):
+    try:
+        value = json.loads(get_setting(key, fallback))
+    except json.JSONDecodeError:
+        return json.loads(fallback)
+    return value if type(value) is type(json.loads(fallback)) else json.loads(fallback)
+
+
+def reveal_books():
+    return _json_setting(BOOKS_KEY, "{}")
+
+
+def reveal_windows():
+    return _json_setting(WINDOWS_KEY, "[]")
+
+
+def active_window(now=None):
+    """命中的考试时段。时段只能让结果更严，不能更松——加时段永远不会意外放开。"""
+    now = now or datetime.now()
+    for window in reveal_windows():
+        try:
+            start = datetime.fromisoformat(window["start"])
+            end = datetime.fromisoformat(window["end"])
+        except (KeyError, TypeError, ValueError):
+            # 坏条目一律视为命中（宁可误关，不可误开）：按「不命中」处理的话，
+            # 一条被手改坏的时段会静默失去考试保护，而误关是看得见、可修的。
+            return {"start": "?", "end": "?", "note": "时段配置损坏，已按考试模式处理",
+                    "malformed": True, "raw": window}
+        if start <= now <= end:
+            return window
+    return None
+
+
+def reveal_effective(book, now=None):
+    """某题库此刻是否展示片段：考试时段一票否决，其次题库覆盖，最后全局默认。"""
+    if active_window(now) is not None:
+        return False
+    override = reveal_books().get(book)
+    if override in ("on", "off"):
+        return override == "on"
+    return reveal_enabled()
 
 
 def failing_input_snippet(book, problem_id, case_index):
@@ -311,7 +446,11 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"submissions": count, "accepted": 1284, "streak": 12})
             return
         if path == "/api/settings":
-            self.send_json({REVEAL_KEY: reveal_enabled(), "is_admin": self.current_user() == ADMIN_USER})
+            book = parse_qs(parsed.query).get("book", [""])[0]
+            self.send_json({REVEAL_KEY: reveal_enabled(), "books": reveal_books(),
+                            "windows": reveal_windows(), "active_window": active_window(),
+                            "effective": reveal_effective(book) if book else None,
+                            "is_admin": self.current_user() == ADMIN_USER})
             return
         if path in ("/admin", "/admin/"):
             page = ROOT / "admin.html"
@@ -424,15 +563,37 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/settings":
             if self.current_user() != ADMIN_USER:
                 self.send_json({"error": "Forbidden"}, 403); return
-            value = "on" if data.get(REVEAL_KEY) else "off"
-            set_setting(REVEAL_KEY, value)
-            self.send_json({REVEAL_KEY: value == "on"}); return
+            if REVEAL_KEY in data:
+                set_setting(REVEAL_KEY, "on" if data[REVEAL_KEY] else "off")
+            if "books" in data:
+                # 前端下拉框发的是 "on"/"off" 字符串，而 "off" 是非空字符串、按真值判会存成 on。
+                # 所以字符串按字面判，布尔按真值判，空值表示「跟随全局」（不落库）。
+                books = {}
+                for key, value in (data["books"] or {}).items():
+                    if value in (None, ""):
+                        continue
+                    books[str(key)] = ("on" if value.lower() == "on" else "off") \
+                        if isinstance(value, str) else ("on" if value else "off")
+                set_setting(BOOKS_KEY, json.dumps(books, ensure_ascii=False))
+            if "windows" in data:
+                windows = []
+                for w in (data["windows"] or []):
+                    try:                      # 存进去之前先解析一遍，坏时段不落库
+                        datetime.fromisoformat(w["start"]); datetime.fromisoformat(w["end"])
+                    except (KeyError, TypeError, ValueError):
+                        self.send_json({"error": "Invalid window"}, 400); return
+                    if w["end"] < w["start"]:
+                        self.send_json({"error": "Window ends before it starts"}, 400); return
+                    windows.append({"start": w["start"], "end": w["end"], "note": str(w.get("note", ""))[:60]})
+                set_setting(WINDOWS_KEY, json.dumps(windows, ensure_ascii=False))
+            self.send_json({REVEAL_KEY: reveal_enabled(), "books": reveal_books(),
+                            "windows": reveal_windows(), "active_window": active_window()}); return
         if path in {"/api/submit", "/api/submit/"} and self.authorized():
             book, problem = data.get("book", ""), data.get("problem", "")
             language = data.get("language", "python")
             result = judge(book, problem, language, data.get("source", data.get("code", "")))
             # 开关关闭时片段根本不进 response —— 不是前端藏起来，是后端不发。
-            if reveal_enabled() and result.get("case"):
+            if reveal_effective(book) and result.get("case"):
                 snippet = failing_input_snippet(book, problem, result["case"])
                 if snippet: result["failing_input"] = snippet
             # detail 存判题器返回的全部字段（case / expected_tokens / message…），
