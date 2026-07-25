@@ -7,6 +7,7 @@ def generate_case(r):
     origin = "".join(r.sample("abcXYZ0123456789", r.randint(3, 10))); queries = []
     for _ in range(r.randint(5, 15)):
         q = list(origin); r.shuffle(q); queries.append("".join(q))
+    assert len(set(origin)) == len(origin) and all(sorted(q) == sorted(origin) for q in queries)
     return origin + "\n" + "\n".join(queries) + "\n"
 
 assert SAMPLE_IN == 'abc\nabc\nbca\ncab\n'

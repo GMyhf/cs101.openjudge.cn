@@ -5,6 +5,7 @@ SAMPLE_IN = '5 6\n1 0\n2 0\n3 0\n4 1\n4 2\n4 3\n'
 SAMPLE_OUT = '505\n'
 def generate_case(r):
     n = r.randint(2, 20); edges = [(i, j) for i in range(n) for j in range(i) if r.random() < .18]
+    assert len(edges) == len(set(edges)) and all(0 <= b < a < n for a, b in edges)
     return f"{n} {len(edges)}\n" + "\n".join(f"{a} {b}" for a, b in edges) + ("\n" if edges else "")
 
 assert SAMPLE_IN == '5 6\n1 0\n2 0\n3 0\n4 1\n4 2\n4 3\n'

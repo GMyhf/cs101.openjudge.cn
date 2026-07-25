@@ -10,6 +10,14 @@ def generate_case(r):
         p = r.choice([k for k in range(i) if -1 in rows[k]])          # 只挑还有空位的父节点
         side = r.choice([k for k in (0, 1) if rows[p][k] == -1])      # 左右都可能，覆盖「只有右子」
         rows[p][side] = i + 1
+    reachable = {1}; changed = True
+    while changed:
+        changed = False
+        for left, right in rows:
+            for child in (left, right):
+                if child != -1 and any(parent + 1 in reachable for parent, row in enumerate(rows) if child in row):
+                    changed |= child not in reachable; reachable.add(child)
+    assert reachable == set(range(1, n + 1))
     return str(n) + "\n" + "\n".join(f"{a} {b}" for a, b in rows) + "\n"
 
 assert SAMPLE_IN == '5\n2 3\n-1 5\n-1 4\n-1 -1\n-1 -1\n'

@@ -9,6 +9,7 @@ def generate_case(r):
         if not size or r.random() < .6: lines.append(f"push {r.randint(0, 20000)}"); size += 1
         elif r.random() < .5: lines.append("min")
         else: lines.append("pop"); size -= 1
+    assert lines and size >= 0
     return "\n".join(lines) + "\n"
 
 assert SAMPLE_IN == 'pop\nmin\npush 5\npush 2\npush 3\nmin\npush 4\nmin\n'

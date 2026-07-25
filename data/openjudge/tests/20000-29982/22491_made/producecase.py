@@ -4,7 +4,9 @@ REFERENCE_SOURCE = 'def max_gpa_increase(h, courses):\n    # 总复习时间，�
 SAMPLE_IN = '10\n4\n1.000000 1.000000\n2.000000 1.000000\n2.500000 1.000000\n1.000000 1.000000\n'
 SAMPLE_OUT = '20.0\n'
 def generate_case(r):
-    m = r.randint(1, 10); return f"{r.randint(6, 10)}\n{m}\n" + "\n".join(f"{r.uniform(.5, 3):.6f} {r.randint(1, 5):.6f}" for _ in range(m)) + "\n"
+    m = r.randint(1, 10); h = r.randint(6, 10); rows = [(r.uniform(.5, 3), r.randint(1, 5)) for _ in range(m)]
+    assert 6 <= h <= 10 and 1 <= m <= 10 and all(s > 0 and c > 0 for s, c in rows)
+    return f"{h}\n{m}\n" + "\n".join(f"{s:.6f} {c:.6f}" for s, c in rows) + "\n"
 
 assert SAMPLE_IN == '10\n4\n1.000000 1.000000\n2.000000 1.000000\n2.500000 1.000000\n1.000000 1.000000\n'
 with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:

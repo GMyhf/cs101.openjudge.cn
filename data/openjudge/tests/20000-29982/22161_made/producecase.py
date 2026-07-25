@@ -5,7 +5,9 @@ SAMPLE_IN = '3\ng 4\nd 8\nc 10\ndc\n110\n'
 SAMPLE_OUT = '110\ndc\n'
 def generate_case(r):
     chars = r.sample("abcdefghi", r.randint(3, 6)); lines = [str(len(chars))]
-    for i, c in enumerate(chars): lines.append(f"{c} {2 ** (i * 4)}")
+    weights = [2 ** (i * 4) for i in range(len(chars))]
+    assert len(set(chars)) == len(chars) and len(set(weights)) == len(weights)
+    for c, weight in zip(chars, weights): lines.append(f"{c} {weight}")
     words = ["".join(r.choice(chars) for _ in range(r.randint(1, 8))) for _ in range(3)]
     return "\n".join(lines + words) + "\n"
 

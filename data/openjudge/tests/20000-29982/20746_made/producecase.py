@@ -4,7 +4,9 @@ REFERENCE_SOURCE = "def min_employees(tasks, t):\n    left, right = 1, max(tasks
 SAMPLE_IN = '1,2,5,9\n5\n'
 SAMPLE_OUT = '5\n'
 def generate_case(r):
-    a = [r.randint(1, 50) for _ in range(r.randint(2, 20))]; return ",".join(map(str, a)) + "\n" + str(r.randint(max(a), sum(a))) + "\n"
+    a = [r.randint(1, 50) for _ in range(r.randint(2, 20))]; t = r.randint(max(a), sum(a))
+    assert all(x > 0 for x in a) and t >= max(a)
+    return ",".join(map(str, a)) + "\n" + str(t) + "\n"
 
 assert SAMPLE_IN == '1,2,5,9\n5\n'
 with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:

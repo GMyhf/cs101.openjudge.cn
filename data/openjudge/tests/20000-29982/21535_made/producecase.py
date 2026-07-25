@@ -5,7 +5,9 @@ SAMPLE_IN = '10 13\n108 76\n33 6\n36 18\n102 19\n98 5\n114 11\n0 5\n39 12\n108 6
 SAMPLE_OUT = '3\n'
 def generate_case(r):
     n = r.randint(2, 30); w = r.randint(0, 100); p, q = r.randint(0, 200), r.randint(0, 200)
-    return f"{n} {w}\n{p} {q}\n" + "\n".join(f"{r.randint(0, 1000)} {r.randint(0, 70)}" for _ in range(n)) + "\n"
+    monsters = [(r.randint(0, 1000), r.randint(0, 70)) for _ in range(n)]
+    assert n >= 1 and w >= 0 and p >= 0 and q >= 0 and all(x >= 0 and y >= 0 for x, y in monsters)
+    return f"{n} {w}\n{p} {q}\n" + "\n".join(f"{x} {y}" for x, y in monsters) + "\n"
 
 assert SAMPLE_IN == '10 13\n108 76\n33 6\n36 18\n102 19\n98 5\n114 11\n0 5\n39 12\n108 6\n99 0\n34 4\n'
 with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:

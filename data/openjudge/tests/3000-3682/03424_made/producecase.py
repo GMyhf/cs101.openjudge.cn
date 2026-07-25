@@ -5,8 +5,12 @@ SAMPLE_IN = '2 2\n1 2 5\n2 1 4\n'
 SAMPLE_OUT = '5\n'
 def generate_case(r):
     n = r.randint(3, 20); edges = [(i, i + 1, r.randint(1, 30)) for i in range(1, n)]
+    pairs = {(a, b) for a, b, _ in edges}
     for _ in range(r.randint(0, n * 2)):
-        a, b = sorted(r.sample(range(1, n + 1), 2)); edges.append((a, b, r.randint(1, 30)))
+        a, b = sorted(r.sample(range(1, n + 1), 2))
+        if (a, b) not in pairs:
+            pairs.add((a, b)); edges.append((a, b, r.randint(1, 30)))
+    assert len(pairs) == len(edges) and all(1 <= a < b <= n for a, b, _ in edges)
     return f"{n} {len(edges)}\n" + "\n".join(f"{a} {b} {w}" for a, b, w in edges) + "\n"
 
 assert SAMPLE_IN == '2 2\n1 2 5\n2 1 4\n'

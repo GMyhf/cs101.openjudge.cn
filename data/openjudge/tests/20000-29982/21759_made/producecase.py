@@ -6,7 +6,8 @@ SAMPLE_OUT = 'yes\nno\nno\n'
 def generate_case(r):
     students = ["A", "B", "C", "D"]; courses = ["Math", "CS", "Art", "Bio"]; rows = []
     for _ in range(r.randint(5, 25)): rows.append(f"{r.choice(courses)} {r.choice(students)} {r.randint(0, 100)}")
-    q = r.sample(students, len(students)); return f"{len(rows)} {r.randint(1, 4)} {r.randint(40, 90)}\n" + "\n".join(rows) + f"\n{len(q)}\n" + "\n".join(q) + "\n"
+    q = r.sample(students, len(students)); assert rows and len(set(q)) == len(q)
+    return f"{len(rows)} {r.randint(1, 4)} {r.randint(40, 90)}\n" + "\n".join(rows) + f"\n{len(q)}\n" + "\n".join(q) + "\n"
 
 assert SAMPLE_IN == '7 3 90\nJiSuanGaiLunA XiaoWang 100\nJiSuanGaiLunA XiaoZhang 98\nGaoDengShuXue XiaoHong 90\nGaoDengShuXue XiaoWang 99\nMeiRenLiJieJiSuanJiXiTong XiaoWang 93\nPythonCongRuMengDaoFangQi XiaoHong 92\nJiSuanGaiLunA XiaoHong 88\n3\nXiaoWang\nXiaoHong\nXiaoZhang\n'
 with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:

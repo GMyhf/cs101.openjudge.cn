@@ -16,7 +16,11 @@ def generate_case(r):
     for _ in range(r.randint(2, 4)):
         size = 26 if r.random() < .25 else r.randint(2, 26)          # 题面：长度均不超过 26
         chars = r.sample("ABCDEFGHIJKLMNOPQRSTUVWXYZ", size)
-        out.extend([preorder(build(chars)), "".join(chars)])
+        tree = build(chars); pre = preorder(tree); ino = "".join(chars)
+        def inorder(node):
+            return "" if node is None else inorder(node[1]) + node[0] + inorder(node[2])
+        assert inorder(tree) == ino and sorted(pre) == sorted(ino) and len(set(pre)) == size
+        out.extend([pre, ino])
     return "\n".join(out) + "\n"
 
 assert SAMPLE_IN == 'DURPA\nRUDPA\nXTCNB\nCTBNX\n'

@@ -3,6 +3,7 @@
 import json
 import re
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -107,6 +108,10 @@ def made_numbers():
 
 
 def main():
+    round2 = len(sys.argv) > 1 and sys.argv[1] == "--round2"
+    batch_name = "T-003-002-r2" if round2 else "T-003-002"
+    out = ROOT / ("collab/t003-batch-002-round2-manifest.json" if round2 else "collab/t003-batch-002-manifest.json")
+    pool_out = ROOT / ("collab/t003-batch-002-round2-candidates.json" if round2 else "collab/t003-batch-002-candidates.json")
     catalog = json.loads(CATALOG.read_text(encoding="utf-8"))["problems"]
     missing = {number(item["id"]) for item in catalog if not item.get("test_cases")}
     excluded = skipped() | made_numbers()
@@ -140,7 +145,7 @@ def main():
     ordered = [candidates[key] for key in sorted(candidates)]
     buildable = [x for x in ordered if x["sample_reproduced"]]
     manifest = {
-        "batch": "T-003-002",
+        "batch": batch_name,
         "selection_rule": ("catalog test_cases empty, no existing _made directory, special-judge skip excluded, "
                            "Python solution AND sample present, and the solution actually reproduces the sample"),
         "candidate_count": len(ordered),
@@ -151,8 +156,8 @@ def main():
         "excluded_existing_made": sorted(made_numbers()),
         "entries": buildable[:20],
     }
-    OUT.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    POOL_OUT.write_text(json.dumps({"batch": "T-003-002", "candidates": ordered}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    out.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    pool_out.write_text(json.dumps({"batch": batch_name, "candidates": ordered}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"selected {len(buildable[:20])} of {len(buildable)} buildable ({len(ordered)} candidates scanned)")
     print("batch:", ", ".join(f"{x['local_number']:05d}" for x in buildable[:20]))
     if manifest["unbuildable"]:

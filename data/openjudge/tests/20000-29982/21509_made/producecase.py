@@ -4,7 +4,9 @@ REFERENCE_SOURCE = 'import heapq\nimport sys\n\ndef main():\n    data = sys.stdi
 SAMPLE_IN = '7\n1 3 5 7 9 11 6\n'
 SAMPLE_OUT = '1\n3\n5\n6\n'
 def generate_case(r):
-    n = r.choice([5, 7, 9, 11, 21, 51]); return f"{n}\n" + " ".join(str(r.randint(0, 1000)) for _ in range(n)) + "\n"
+    n = r.choice([5, 7, 9, 11, 21, 51]); values = [r.randint(0, 1000) for _ in range(n)]
+    assert n % 2 == 1 and all(0 <= x <= 10**9 for x in values)
+    return f"{n}\n" + " ".join(map(str, values)) + "\n"
 
 assert SAMPLE_IN == '7\n1 3 5 7 9 11 6\n'
 with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:

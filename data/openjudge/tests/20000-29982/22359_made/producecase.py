@@ -3,7 +3,9 @@ from pathlib import Path
 REFERENCE_SOURCE = 'def is_prime(n):\n    if n < 2:\n        return False\n    for i in range(2, int(n**0.5) + 1):\n        if n % i == 0:\n            return False\n    return True\n\ndef goldbach(n):\n    for i in range(2, n):\n        if is_prime(i) and is_prime(n - i):\n            return i, n - i\n\nn = int(input())\na, b = goldbach(n)\nprint(a, b)\n'
 SAMPLE_IN = '10\n'
 SAMPLE_OUT = '3 7\n'
-def generate_case(r): return str(r.randrange(2, 10001, 2)) + "\n"
+def generate_case(r):
+    value = r.randrange(2, 10001, 2); assert value >= 4 and value % 2 == 0
+    return str(value) + "\n"
 
 assert SAMPLE_IN == '10\n'
 with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:

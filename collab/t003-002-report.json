@@ -9,15 +9,23 @@
       "seed": 3424,
       "test_cases": 20,
       "distinct_input_cases": 20,
-      "distinct_outputs": 19,
-      "max_output_frequency": 2,
+      "distinct_outputs": 17,
+      "max_output_frequency": 3,
       "constant_output_probe": {
-        "frequency": 2,
+        "frequency": 3,
         "total": 20,
         "status": "rejected"
       },
-      "max_input_bytes": 391,
-      "constraints": null,
+      "max_input_bytes": 373,
+      "constraints": [
+        "1<=N<=30000",
+        "1<=M<=150000",
+        "1<=A,B<=N",
+        "c is an integer",
+        "the largest difference is finite"
+      ],
+      "structure_checked": true,
+      "structure_check": "unique directed edge pairs and a 1-to-N chain are asserted",
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -37,7 +45,14 @@
         "status": "rejected"
       },
       "max_input_bytes": 94,
-      "constraints": null,
+      "constraints": [
+        "input is a comma-separated integer sequence",
+        "values may be negative",
+        "the selected segment is non-empty",
+        "at most one value may be removed"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -57,7 +72,14 @@
         "status": "rejected"
       },
       "max_input_bytes": 59,
-      "constraints": null,
+      "constraints": [
+        "the task-hour sequence is positive integers",
+        "t is a positive integer",
+        "each task time is ceil(hours/k)",
+        "a valid k is guaranteed"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -77,7 +99,13 @@
         "status": "rejected"
       },
       "max_input_bytes": 204,
-      "constraints": null,
+      "constraints": [
+        "N is positive and at most 100000",
+        "Ai is non-negative and at most 10^9",
+        "outputs cover prefix lengths 1,3,5,..."
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -89,15 +117,22 @@
       "seed": 21515,
       "test_cases": 20,
       "distinct_input_cases": 20,
-      "distinct_outputs": 12,
+      "distinct_outputs": 13,
       "max_output_frequency": 7,
       "constant_output_probe": {
         "frequency": 7,
         "total": 20,
         "status": "rejected"
       },
-      "max_input_bytes": 168,
-      "constraints": null,
+      "max_input_bytes": 159,
+      "constraints": [
+        "1<=N and 0<=K<N",
+        "edges are undirected with positive costs",
+        "P is the number of cable rows",
+        "a path from 1 to N may be absent and then output is -1"
+      ],
+      "structure_checked": true,
+      "structure_check": "unique undirected edge pairs and a 1-to-N chain are asserted",
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -117,7 +152,14 @@
         "status": "rejected"
       },
       "max_input_bytes": 212,
-      "constraints": null,
+      "constraints": [
+        "n and w are non-negative within the stated input domain",
+        "P,Q are non-negative",
+        "monster shield x and life y are non-negative",
+        "damage is P+Q"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -137,7 +179,14 @@
         "status": "rejected"
       },
       "max_input_bytes": 195,
-      "constraints": null,
+      "constraints": [
+        "n is positive",
+        "durations are positive integers",
+        "order is a permutation of 1..n",
+        "waiting time starts at time 0"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -157,7 +206,14 @@
         "status": "rejected"
       },
       "max_input_bytes": 245,
-      "constraints": null,
+      "constraints": [
+        "scores are integers from 0 to 100",
+        "course and student names are whitespace-separated names",
+        "queries refer to student names",
+        "the input contains n records followed by queries"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -177,7 +233,13 @@
         "status": "rejected"
       },
       "max_input_bytes": 376,
-      "constraints": null,
+      "constraints": [
+        "commands are push, pop, or min",
+        "push values are in 0..20000",
+        "pop/min on an empty structure are no-ops"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -197,7 +259,13 @@
         "status": "rejected"
       },
       "max_input_bytes": 154,
-      "constraints": null,
+      "constraints": [
+        "the origin string has unique alphanumeric characters",
+        "each query is a permutation of the origin",
+        "pop order is checked by stack simulation"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -222,6 +290,8 @@
         "节点为互不相同的大写字母",
         "两序列必须来自同一棵二叉树（前序由中序+随机根位置递归导出）"
       ],
+      "structure_checked": true,
+      "structure_check": "inorder(tree) equals the supplied inorder and preorder has the same nodes",
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -241,7 +311,14 @@
         "status": "rejected"
       },
       "max_input_bytes": 65,
-      "constraints": null,
+      "constraints": [
+        "characters are distinct English letters",
+        "weights are positive and distinct",
+        "queries are letter strings or binary encodings",
+        "Huffman tie ordering is deterministic"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -261,7 +338,13 @@
         "status": "rejected"
       },
       "max_input_bytes": 156,
-      "constraints": null,
+      "constraints": [
+        "1<=N<=100000",
+        "each tree name is an English name",
+        "percentages are printed to four decimal places"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -281,7 +364,13 @@
         "status": "rejected"
       },
       "max_input_bytes": 5,
-      "constraints": null,
+      "constraints": [
+        "the input sum is even and at least 4",
+        "the two output addends must be prime",
+        "the input is one integer"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -308,6 +397,8 @@
         "每个节点至多两个子节点，空子节点记 -1",
         "N 个节点必须全部从根可达（生成器只挑有空位的父节点，杜绝覆盖产生孤儿）"
       ],
+      "structure_checked": true,
+      "structure_check": "every generated node is reachable from root 1 and child slots are not overwritten",
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -327,7 +418,15 @@
         "status": "rejected"
       },
       "max_input_bytes": 185,
-      "constraints": null,
+      "constraints": [
+        "6<=h<=10",
+        "1<=m<=10",
+        "s and c are positive real numbers",
+        "each course has a 5-point improvement cap",
+        "each course receives a 0.5-hour base allocation"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -347,7 +446,14 @@
         "status": "rejected"
       },
       "max_input_bytes": 217,
-      "constraints": null,
+      "constraints": [
+        "1<=n<=1000",
+        "0<=m<=2000",
+        "team ids are 0..n-1",
+        "the win relation is a DAG"
+      ],
+      "structure_checked": true,
+      "structure_check": "edge pairs are unique and every edge points from a larger id to a smaller id",
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -367,7 +473,13 @@
         "status": "rejected"
       },
       "max_input_bytes": 88,
-      "constraints": null,
+      "constraints": [
+        "10<=y<=100000000",
+        "there are multiple input lines until EOF",
+        "x is rounded to four decimal places"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -387,7 +499,14 @@
         "status": "rejected"
       },
       "max_input_bytes": 727,
-      "constraints": null,
+      "constraints": [
+        "1<=r,c<=100",
+        "levels are in 0..100000000",
+        "moves go only to a strictly higher adjacent level",
+        "the path may start at any cell"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     },
@@ -412,6 +531,8 @@
         "输出全部合法括号组合并按字典序排列",
         "输入域只有 10 个取值，10 组即穷尽"
       ],
+      "structure_checked": false,
+      "structure_check": null,
       "sample_reproduced": true,
       "producecase_reproduced": true
     }

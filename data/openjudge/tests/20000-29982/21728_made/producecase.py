@@ -5,6 +5,7 @@ SAMPLE_IN = '10\n81 365 72 99 22 7 444 203 1024 203\n6 5 3 1 4 8 10 2 7 9\n'
 SAMPLE_OUT = '431.90\n'
 def generate_case(r):
     n = r.randint(2, 30); durations = [r.randint(1, 1000) for _ in range(n)]; order = list(range(1, n + 1)); r.shuffle(order)
+    assert all(x > 0 for x in durations) and sorted(order) == list(range(1, n + 1))
     return f"{n}\n" + " ".join(map(str, durations)) + "\n" + " ".join(map(str, order)) + "\n"
 
 assert SAMPLE_IN == '10\n81 365 72 99 22 7 444 203 1024 203\n6 5 3 1 4 8 10 2 7 9\n'

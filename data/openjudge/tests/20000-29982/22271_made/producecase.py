@@ -5,6 +5,7 @@ SAMPLE_IN = '4\nApple\nCherry\nPear\nPeach\n'
 SAMPLE_OUT = 'Apple 25.0000% \nCherry 25.0000%\nPeach 25.0000%\nPear 25.0000%\n'
 def generate_case(r):
     names = ["Oak", "Pine", "Birch", "Maple", "Cedar", "Elm"]; n = r.randint(5, 30); values = [r.choice(names) for _ in range(n)]
+    assert 1 <= n <= 100000 and len(values) == n
     return str(n) + "\n" + "\n".join(values) + "\n"
 
 assert SAMPLE_IN == '4\nApple\nCherry\nPear\nPeach\n'
