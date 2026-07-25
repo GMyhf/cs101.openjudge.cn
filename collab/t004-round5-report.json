@@ -1,0 +1,493 @@
+{
+  "batch": "T-004-r5",
+  "entries": [
+    {
+      "local_number": 3377,
+      "title": "Best Cow Line, Gold",
+      "source": "data/openjudge/pages/practice__03377.html",
+      "reference_source": "LLM-written",
+      "generator": "g3377",
+      "seed": 3377,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "输出长度等于输入长度",
+        "每步从两端取一个字符",
+        "两端相同按剩余串字典序裁决"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3670,
+      "title": "E03670:计算鞍点",
+      "source": "data/openjudge/pages/pctbook__E03670.html",
+      "reference_source": "LLM-written",
+      "generator": "g3670",
+      "seed": 3670,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 2,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 20,
+        "total": 21
+      },
+      "constraints": [
+        "输入固定为5*5矩阵",
+        "鞍点为行最大且列最小",
+        "无唯一鞍点输出not found"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4022,
+      "title": "买房子",
+      "source": "data/openjudge/pages/practice__04022.html",
+      "reference_source": "LLM-written",
+      "generator": "g4022",
+      "seed": 4022,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 5,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 8,
+        "total": 21
+      },
+      "constraints": [
+        "10<=N<=50",
+        "1<=K<=20",
+        "每年先存入年薪再比较当年房价"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4031,
+      "title": "瑞士轮",
+      "source": "data/openjudge/pages/practice__04031.html",
+      "reference_source": "LLM-written",
+      "generator": "g4031",
+      "seed": 4031,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 10,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 4,
+        "total": 21
+      },
+      "constraints": [
+        "共有2N名选手",
+        "每轮按当前排名两两比赛",
+        "得分降序且编号升序排名"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4037,
+      "title": "聪明的质监员",
+      "source": "data/openjudge/pages/practice__04037.html",
+      "reference_source": "LLM-written",
+      "generator": "g4037",
+      "seed": 4037,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 18,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 2,
+        "total": 21
+      },
+      "constraints": [
+        "矿石区间使用1-based闭区间",
+        "检验值只计w>=W的矿石",
+        "W取正整数阈值"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4076,
+      "title": "寻找矩阵路径（Find Path in a Matrix）",
+      "source": "data/openjudge/pages/practice__04076.html",
+      "reference_source": "LLM-written",
+      "generator": "g4076",
+      "seed": 4076,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 2,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 15,
+        "total": 21
+      },
+      "constraints": [
+        "矩阵尺寸不超过200",
+        "路径相邻移动且不可复用同一位置",
+        "序列必须连续匹配"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4083,
+      "title": "我爱北大",
+      "source": "data/openjudge/pages/practice__04083.html",
+      "reference_source": "LLM-written",
+      "generator": "g4083",
+      "seed": 4083,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "地点数不超过30",
+        "道路为无向边",
+        "输出最短路径及每段距离"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4140,
+      "title": "方程求解",
+      "source": "data/openjudge/pages/routine__04140.html",
+      "reference_source": "LLM-written",
+      "generator": "g4140",
+      "seed": 4140,
+      "test_cases": 21,
+      "distinct_input_cases": 1,
+      "distinct_outputs": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 21,
+        "total": 21
+      },
+      "constraints": [
+        "题面无输入",
+        "输出为唯一实根的九位小数"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 7206,
+      "title": "T07206:我是最快的马",
+      "source": "data/openjudge/pages/pctbook__T07206.html",
+      "reference_source": "LLM-written",
+      "generator": "g7206",
+      "seed": 7206,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 16,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 6,
+        "total": 21
+      },
+      "constraints": [
+        "棋盘坐标在0..10",
+        "障碍点不占起终点",
+        "只使用马步"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 22528,
+      "title": "厚道的调分方法",
+      "source": "data/openjudge/pages/2025sp_routine__22528.html",
+      "reference_source": "LLM-written",
+      "generator": "g22528",
+      "seed": 22528,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "原始分数在40..100",
+        "至少60%的人达到85分",
+        "b在1..1e9"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 23554,
+      "title": "小朋友春游",
+      "source": "data/openjudge/pages/2024fallroutine__23554.html",
+      "reference_source": "LLM-written",
+      "generator": "g23554",
+      "seed": 23554,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "学号范围由1..n和大于n两部分组成",
+        "输出缺失学号及外班学号均升序"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 25570,
+      "title": "洋葱",
+      "source": "data/openjudge/pages/practice__25570.html",
+      "reference_source": "LLM-written",
+      "generator": "g25570",
+      "seed": 25570,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 20,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 2,
+        "total": 21
+      },
+      "constraints": [
+        "矩阵为n*n",
+        "每层边界只计一次",
+        "中心元素在奇数n时单独成层"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 27384,
+      "title": "候选人追踪",
+      "source": "data/openjudge/pages/practice__27384.html",
+      "reference_source": "LLM-written",
+      "generator": "g27384",
+      "seed": 27384,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 2,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 20,
+        "total": 21
+      },
+      "constraints": [
+        "投票按时间非递减处理",
+        "前K名要求严格大于集合外候选人",
+        "统计0到最后一票时刻的持续时间"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    }
+  ],
+  "unbuilt": [
+    3433,
+    3750,
+    4011,
+    4012,
+    4035,
+    4038,
+    4054
+  ]
+}
