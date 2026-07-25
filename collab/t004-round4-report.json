@@ -91,7 +91,8 @@
         "data_verdict_when_sample_blind": null
       },
       "producecase_reproduced": true,
-      "claude_risk_tier": "high"
+      "claude_risk_tier": "high",
+      "oracle_rewritten_2026_07_26": "旧 oracle 答的是另一个问题（全局最优划分 vs 题面规定的贪心过程），20 万组小输入里 3 组分歧；已按题面过程重写并平台 Accepted。详见 claude_oracle_platform_check_2026_07_26"
     },
     {
       "local_number": 3726,
@@ -229,7 +230,8 @@
         "data_verdict_when_sample_blind": null
       },
       "producecase_reproduced": true,
-      "claude_risk_tier": "low"
+      "claude_risk_tier": "low",
+      "platform_ac_reference": "samplecode_ac.cpp（C++，平台 Accepted）；同目录 samplecode.py 在平台 TLE，仅用于本地生成数据与对拍"
     },
     {
       "local_number": 3744,
@@ -736,7 +738,8 @@
       "coverage_note": "判题限额是 5 秒墙钟 / 4 秒 CPU（judge.py），不是 60 秒——原注记用 60 秒作标尺，结论方向对但数字不可比。Claude 实测：Python 参考解法 n<=17 可在限额内完成（3.7s），n=18 起 TLE（8.6s）；case-0 是题面样例（15/16/19/20），Python 跑完需 ~55s，故**用 Python 提交本题无法在判题限额内通过**。同一算法的 C++ 实现跑 case-0 仅 0.71s（可过），跑 n=24 需 10.1s（仍超限）。结论：数据本身正确且可判（C++ 可过），但本题在当前限额下对 Python 提交不可解；题面上界 24 无论 Python 还是 C++ 都覆盖不到，不声称覆盖是对的。",
       "claude_judge_note": "以 Python 参考解法提交判 TLE（case-0 需 ~55s）；这是语言/算法的限制，不是数据缺陷。C++ 同算法 0.71s 通过 case-0。",
       "claude_risk_tier": "low",
-      "claude_cpp_cross_check": "同算法 C++ 实现跑 case-0 用时 0.71s，输出与入库一致（15 1896 / 16 5160 / 19 32757 / 20 59984）；n=24 需 10.1s，故不覆盖题面上界"
+      "claude_cpp_cross_check": "同算法 C++ 实现跑 case-0 用时 0.71s，输出与入库一致（15 1896 / 16 5160 / 19 32757 / 20 59984）；n=24 需 10.1s，故不覆盖题面上界",
+      "platform_ac_reference": "samplecode_ac.cpp（C++，平台 Accepted）；同目录 samplecode.py 在平台 TLE，仅用于本地生成数据与对拍"
     },
     {
       "local_number": 4010,
@@ -987,5 +990,57 @@
     ],
     "meaning": "这 2 题的参考解法在真实平台跑不过 —— 其正确性目前只有本地对拍支撑，没有平台背书。本地数据仍自洽（samplecode 对 21 组逐组复算全对），但不应称其为 AC 参考实现",
     "claude_note": "codex 明确拒绝用本地小域对拍结果掩盖平台 TLE，这个口径是对的"
+  },
+  "claude_oracle_platform_check_2026_07_26": {
+    "what": "人拍板：除对拍外，把对拍用的 oracle 本身提交到 cs101.openjudge.cn 验一遍。19 份 oracle 各拆成单题独立程序提交（整份 alt() 分派器会被平台的 pylint 判 E0102 function-redefined，算 Compile Error）",
+    "accepted": {
+      "3723": "51ms",
+      "3725": "688ms（重写后）",
+      "3726": "1171ms",
+      "3744": "24ms",
+      "3866": "34ms",
+      "4001": "87ms",
+      "4002": "25ms",
+      "4007": "1133ms",
+      "4010": "22ms",
+      "4021": "22ms",
+      "4033": "30ms"
+    },
+    "accepted_count": 11,
+    "time_limit_exceeded": [
+      3727,
+      3728,
+      3789,
+      3791,
+      4008,
+      4034
+    ],
+    "memory_limit_exceeded": [
+      3906,
+      4006
+    ],
+    "how_to_read": "TLE / MLE 说明这份 oracle 是为小规模生成数据写的暴力实现，跑不动平台的满规模数据——**它不否定本地对拍的有效性，但也不提供任何正确性证据**。Accepted 才是真的外部背书：11 份 oracle 在真实平台通过，意味着这些题的「参考解法 vs oracle」对拍是两个都被独立验证过的实现在比",
+    "key_finding_3725": {
+      "symptom": "旧 oracle 提交后 Runtime Error（题面 K<=1000，而它是 tot=[0]*(1<<m) 的子集 DP，1<<1000 直接 MemoryError）",
+      "real_problem": "查下去发现的不是性能问题：题面把过程写死了——「按照从大到小的顺序，依次为每个整数分别选择一个集合；确定一个整数所属集合时，先计算各集合的负荷，将该整数分配给负荷最小的那个集合」。**贪心不是启发式，是规则本身**。旧 oracle 算的是「所有划分里的全局最优」，那是另一个问题",
+      "evidence": "在 20 万组小规模随机输入里找到 3 组分歧（约 1/67000），例：`8 8 14 5 5 7 5 12 6` 参考=5 / 旧 oracle=4。400 种子对拍能过纯属分布运气 —— **那份 oracle 一直在验错的东西**",
+      "fix": "按题面规定的过程重写，用小根堆维护负荷（参考解法是线性扫描找最小值），堆元素取 (负荷, 下标) 以匹配 `q.index(min(q))` 的并列取最小下标语义",
+      "reverified": "3 组分歧全部一致；题面样例一致；400 种子 0 不一致；原先抓到 3 组分歧的那 20 万组输入现在 0 分歧；**平台提交 Accepted 688ms**",
+      "data_unaffected": "该题数据由参考解法（题面规定的贪心）生成，而参考解法平台 Accepted，所以**数据本身是对的，不需要重新生成**；出问题的只是对拍这一侧的声称",
+      "root_cause": "我在 alt() 的注释里写「参考的贪心对该目标不保证最优，这条最值得对拍」——把题面规定的过程当成了可疑的启发式。**oracle 里编码的是我对题面的误解**，这正是「误解探针」要防的东西，只是这次发生在 oracle 自己身上"
+    }
+  },
+  "cpp_reference_2026_07_26": {
+    "why": "3728 与 4009 的 Python 参考解法在真实平台 TLE，本地小域对拍过不代表能过平台。人拍板：Python 超时就写 C++",
+    "results": {
+      "3728": "Accepted 17ms（提交 #52995114）",
+      "4009": "Accepted 40ms（提交 #52995115）"
+    },
+    "files": [
+      "data/openjudge/tests/4000-8210/03728_made/samplecode_ac.cpp",
+      "data/openjudge/tests/4000-8210/04009_made/samplecode_ac.cpp"
+    ],
+    "local_check": "两份都与本地 21 组数据逐组一致；4009 题面上界 n=24 单跑 2.3s、1..24 全跑 4.1s，且三种写法（位枚举 / 逐列 DFS 剪枝 / 查表+镜像+双向剪枝）在 n=1..24 结果逐行一致",
+    "status_change": "round4 的「3728 与 4009 无 AC 参考实现」这一条**已解除**：两题现在都有平台背书的参考实现，只是语言是 C++ 而非 Python"
   }
 }

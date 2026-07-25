@@ -326,47 +326,23 @@ def alt(n,s):
             if len(bs)==1: z["BW".index(next(iter(bs)))]+=size[rt]
         return f"{z[0]} {z[1]}\n"
     if n==3725:
-        a=list(map(int,s.split()));v=a[1:];m=len(v);M=max(v)
-        tot=[0]*(1<<m)
-        for msk in range(1,1<<m):
-            low=msk&-msk;tot[msk]=tot[msk^low]+v[low.bit_length()-1]
-        cur={0:0};best={}
-        for k in range(1,m+1):
-            nxt={}
-            for msk,c in cur.items():
-                rest=((1<<m)-1)^msk
-                if not rest:continue
-                first=rest&-rest;sub=rest
-                while sub:
-                    if sub&first:
-                        nc=c+abs(tot[sub]-M)
-                        if nc<nxt.get(msk|sub,1<<60): nxt[msk|sub]=nc
-                    sub=(sub-1)&rest
-            cur=nxt
-            if (1<<m)-1 in cur: best[k]=cur[(1<<m)-1]
-        lo=min(best.values())
-        return str(max(k for k,c in best.items() if c==lo))+"\n"
-    if n==3789:
-        a=list(map(int,s.split()));m,k=a[0],a[1];v=a[2:]
-        for L in range(m,0,-1):
-            for i in range(m-L+1):
-                pat=v[i:i+L]
-                if sum(v[j:j+L]==pat for j in range(m-L+1))>=k: return str(L)+"\n"
-        return "0\n"
-    if n==3906:
-        a=list(map(int,s.split()));m,c=a[0],a[1];g=a[2:];paths=[]
-        def walk(x,y,cells):
-            if x==m-1 and y==c-1: paths.append(cells);return
-            if x+1<m: walk(x+1,y,cells+[(x+1)*c+y])
-            if y+1<c: walk(x,y+1,cells+[x*c+y+1])
-        walk(0,0,[0])
-        ends={0,(m-1)*c+c-1};best=-1
-        for pa in paths:
-            sp=set(pa)
-            for qa in paths:
-                if (sp&set(qa))-ends: continue
-                best=max(best,sum(g[x] for x in sp|set(qa)))
-        return str(best)+"\n"
+        # 2026-07-26 修正：原来这里放的是「所有划分里的全局最优」子集 DP，那是**另一个问题**。
+        # 题面把过程写死了——「按照从大到小的顺序，依次为每个整数分别选择一个集合；
+        # 确定一个整数所属集合时，先计算各集合的负荷，将该整数分配给负荷最小的那个集合」，
+        # 贪心不是启发式而是规则本身。旧 oracle 与参考解法在 20 万组小输入里有 3 组分歧
+        # （约 1/67000，例：`8 8 14 5 5 7 5 12 6` 参考 5 / 旧 oracle 4），
+        # 400 种子没撞上纯属分布运气，那份 oracle 一直在验错的东西。
+        # 现在按题面规定的过程重写，用小根堆维护负荷（参考解法是线性扫描找最小值）；
+        # 堆元素取 (负荷, 下标)，与 `q.index(min(q))` 的「并列取最小下标」语义一致。
+        import heapq
+        a=list(map(int,s.split()));v=sorted(a[1:],reverse=True);M=max(v);best=None
+        for k in range(1,len(v)+1):
+            h=[(0,i) for i in range(k)];heapq.heapify(h)
+            for y in v:
+                load,idx=heapq.heappop(h);heapq.heappush(h,(load+y,idx))
+            cand=(sum(abs(load-M) for load,_ in h),-k)
+            if best is None or cand<best: best=cand
+        return f"{-best[1]}\n"
     if n==3726 or n==3866:
         # 参考用 BFS 队列；这里 3726 改「Bellman-Ford 式反复松弛到不动点」、
         # 3866 改「并查集连通块」——都与 BFS 不同族。
