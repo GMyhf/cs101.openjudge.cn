@@ -330,6 +330,44 @@ class ServerApiTests(unittest.TestCase):
                          "高亮未按预期工作（关键字/注释/字符串/数字、词边界、HTML 转义）："
                          + (result.stderr or result.stdout)[:400])
 
+    def test_submit_page_offers_pypy3(self):
+        # 判题器 2026-07-26 起支持 PyPy3（人拍板），提交页要给得出这个选项。
+        import server
+        self.assertIn('value="pypy3"', server.SUBMIT_PAGE)
+
+    @unittest.skipUnless(shutil.which("node"), "需要 node 才能真跑页面里的编辑器代码")
+    def test_editor_treats_pypy3_as_python(self):
+        """PyPy3 是 Python 语法：高亮表和自动缩进都必须走 python 那套。
+
+        这条防的是「加了下拉选项但编辑器不认」——`SPECS[lang]` 取不到就回退到 python，
+        看着像是对的；真正会露馅的是 `indentFor`，它写的是 `lang === "python"`，
+        漏掉 pypy3 就会按 C 系规则去看行尾的 `{`，冒号后不再缩进。
+        """
+        import server
+        page = server.SUBMIT_PAGE
+        script = page[page.index("<script>") + 8: page.rindex("</script>")]
+        core = script[script.index("const PY_KW"): script.index("function paintEditor")]
+        harness = (
+            'const esc = s => String(s).replace(/[&<>"]/g,'
+            ' c => ({"&":"&amp;","<":"&lt;",">":"&gt;",\'"\':"&quot;"}[c]));\n'
+            + core + "\n"
+            # 高亮：pypy3 必须拿到 python 的规则表，而不是靠回退撞对
+            'const specOK = SPECS.pypy3 === SPECS.python;\n'
+            'const kw = highlight("def f(): pass", "pypy3").includes(\'class="t-kw"\');\n'
+            # 缩进：冒号后要多缩一级；漏掉 pypy3 的话这里只会返回原缩进
+            'const ind = indentFor("    if x:", 9, "pypy3") === "        ";\n'
+            # 反面：C 系的花括号规则不该套到 pypy3 上
+            'const notC = indentFor("  if (x) {", 10, "pypy3") === "  ";\n'
+            'process.exit(specOK && kw && ind && notC ? 0 : 1);\n')
+        with tempfile.NamedTemporaryFile("w", suffix=".mjs", encoding="utf-8", delete=False) as handle:
+            handle.write(harness)
+            path = handle.name
+        self.addCleanup(os.unlink, path)
+        result = subprocess.run(["node", path], capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0,
+                         "编辑器没把 pypy3 当成 Python 处理："
+                         + (result.stderr or result.stdout)[:400])
+
     def test_history_page_and_limit(self):
         status, _, body = request(self.port, "GET", "/history/")
         self.assertEqual(status, 200)

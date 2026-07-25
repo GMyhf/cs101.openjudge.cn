@@ -2,6 +2,7 @@
 import json
 import os
 import resource
+import shutil
 import signal
 import subprocess
 import tempfile
@@ -9,6 +10,13 @@ from pathlib import Path
 
 ROOT = Path(__file__).parent
 MIRROR = ROOT / "data" / "openjudge"
+
+# CPython 与 PyPy3 都跑 .py 源码，但是两个独立解释器：本机 PyPy 是 Python 3.9，
+# 宿主 CPython 是 3.12，语法能力并不一致，所以 PyPy 的语法检查必须交给它自己做。
+CPYTHON_LANGUAGES = {"python", "py", "python3"}
+PYPY_LANGUAGES = {"pypy", "pypy3"}
+# 只做语法检查、不执行用户代码；compile() 本身不运行被编译的源码。
+SYNTAX_CHECK = "import sys;compile(open(sys.argv[1],encoding='utf-8').read(),sys.argv[1],'exec')"
 
 def _limits():
     resource.setrlimit(resource.RLIMIT_CPU, (4, 4))
@@ -29,14 +37,24 @@ def judge(book, problem_id, language, source):
     if len(source.encode()) > 512 * 1024: return {"status": "Source Too Large", "message": "代码不能超过 512 KiB。"}
     language = language.lower()
     with tempfile.TemporaryDirectory(prefix="cs101-judge-") as temp:
-        work = Path(temp); ext = ".py" if language in {"python", "py", "python3"} else ".c" if language == "c" else ".cpp"
+        work = Path(temp); ext = ".py" if language in CPYTHON_LANGUAGES | PYPY_LANGUAGES else ".c" if language == "c" else ".cpp"
         source_path = work / ("main" + ext); source_path.write_text(source, encoding="utf-8")
         if ext == ".py":
-            try:
-                compile(source, str(source_path), "exec")
-            except (SyntaxError, ValueError) as error:
-                return {"status": "Compile Error", "message": str(error)[-4000:]}
-            command = ["python3", "-I", str(source_path)]
+            interpreter = "pypy3" if language in PYPY_LANGUAGES else "python3"
+            if shutil.which(interpreter) is None:
+                return {"status": "Language Unavailable", "message": f"本机没有安装 {interpreter}，换一种语言提交。"}
+            if interpreter == "python3":
+                try:
+                    compile(source, str(source_path), "exec")
+                except (SyntaxError, ValueError) as error:
+                    return {"status": "Compile Error", "message": str(error)[-4000:]}
+            else:
+                # 不能用宿主 CPython 的 compile() 代劳：PyPy3 是另一个版本的解释器，
+                # 语法判定必须由它自己给出，否则会把 CE 误判成 RE。
+                check = _run([interpreter, "-I", "-c", SYNTAX_CHECK, str(source_path)], cwd=work, timeout=15)
+                if check.returncode:
+                    return {"status": "Compile Error", "message": check.stderr.decode(errors="replace")[-4000:]}
+            command = [interpreter, "-I", str(source_path)]
         else:
             executable = work / "main"
             compile_result = _run(["g++" if ext == ".cpp" else "gcc", "-O2", "-std=c++17" if ext == ".cpp" else "-std=c11", str(source_path), "-o", str(executable)], cwd=work, timeout=15)

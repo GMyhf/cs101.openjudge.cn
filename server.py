@@ -126,7 +126,7 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
   </div>
   <div class="row">
     <select name="language">
-      <option value="python">Python 3</option><option value="cpp">C++17</option><option value="c">C11</option>
+      <option value="python">Python 3</option><option value="pypy3">PyPy3</option><option value="cpp">C++17</option><option value="c">C11</option>
     </select>
     <button id="go">提交并判题</button>
     <button id="theme" type="button" class="ghost">深色</button>
@@ -179,6 +179,7 @@ const SPECS = {
   ],
 };
 SPECS.cpp = SPECS.c;
+SPECS.pypy3 = SPECS.python;      // PyPy3 就是 Python 语法，高亮与缩进规则共用一套
 
 // 一次扫描出所有 token 区间；高亮和括号匹配都基于它，保证两者看到的是同一份切分。
 function scan(code, lang) {
@@ -233,7 +234,7 @@ function indentFor(code, pos, lang) {
   const line = code.slice(lineStart, pos);
   const base = (line.match(/^[ \t]*/) || [""])[0];
   const trimmed = line.replace(/\s+$/, "");
-  const opens = lang === "python" ? trimmed.endsWith(":") : trimmed.endsWith("{");
+  const opens = (lang === "python" || lang === "pypy3") ? trimmed.endsWith(":") : trimmed.endsWith("{");
   return base + (opens ? "    " : "");
 }
 
