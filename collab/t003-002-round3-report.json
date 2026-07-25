@@ -1,0 +1,692 @@
+{
+  "batch": "T-003-002-r3",
+  "entries": [
+    {
+      "local_number": 25573,
+      "source_heading": "25573: 红蓝玫瑰",
+      "source_code": "solution collection",
+      "generator": "g25573",
+      "seed": 25573,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 15,
+      "max_output_frequency": 2,
+      "constant_output_probe": {
+        "frequency": 2,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 79,
+      "constraints": [
+        "n<500000",
+        "each rose is R or B",
+        "operations are single-position or prefix color flips"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 25655,
+      "source_heading": "25655: 核酸检测统计",
+      "source_code": "solution collection",
+      "generator": "g25655",
+      "seed": 25655,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 17,
+      "max_output_frequency": 2,
+      "constant_output_probe": {
+        "frequency": 2,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 723,
+      "constraints": [
+        "the observation window is days 1..9",
+        "each student has a day-1 record",
+        "each record names an existing student and a valid day",
+        "a student needs one test in every three-day window"
+      ],
+      "structure_checked": true,
+      "structure_check": "every student has a day-1 test record",
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 25815,
+      "source_heading": "25815: 回文字符串",
+      "source_code": "solution collection",
+      "generator": "g25815",
+      "seed": 25815,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 14,
+      "max_output_frequency": 4,
+      "constant_output_probe": {
+        "frequency": 4,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 75,
+      "constraints": [
+        "length is at most 100",
+        "characters are uppercase A-Z",
+        "insert/delete/replace each cost one operation"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 26573,
+      "source_heading": "26573: 康托集的图像表示",
+      "source_code": "solution collection",
+      "generator": "g26573",
+      "seed": 26573,
+      "test_cases": 9,
+      "distinct_input_cases": 9,
+      "distinct_outputs": 9,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "frequency": 1,
+        "total": 9,
+        "status": "rejected"
+      },
+      "max_input_bytes": 2,
+      "constraints": [
+        "n is in the finite domain 0..8",
+        "each remaining interval is represented by *",
+        "other unit positions are represented by -"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 26646,
+      "source_heading": "26646: 建筑修建",
+      "source_code": "solution collection",
+      "generator": "g26646",
+      "seed": 26646,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 3,
+      "max_output_frequency": 10,
+      "constant_output_probe": {
+        "frequency": 10,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 105,
+      "constraints": [
+        "building intervals are left-closed/right-open",
+        "0<=x<m and 1<=y<=m",
+        "a building containing x has width y",
+        "selected buildings cannot overlap"
+      ],
+      "structure_checked": true,
+      "structure_check": "each building interval stays inside [0,m)",
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 26999,
+      "source_heading": "26999: 2023找出全部子串位置",
+      "source_code": "solution collection",
+      "generator": "g26999",
+      "seed": 26999,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 14,
+      "max_output_frequency": 5,
+      "constant_output_probe": {
+        "frequency": 5,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 199,
+      "constraints": [
+        "number of cases is positive",
+        "0<len(pattern)<=len(text)<2*10^7",
+        "matches are reported from zero-based positions",
+        "no match is printed as no"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 27273,
+      "source_heading": "27273: 简单的数学题",
+      "source_code": "solution collection",
+      "generator": "g27273",
+      "seed": 27273,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 20,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "frequency": 1,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 86,
+      "constraints": [
+        "1<=t<=100",
+        "1<=n<=10^6",
+        "powers of two through n receive a negative sign"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 27274,
+      "source_heading": "27274: 字符串提炼",
+      "source_code": "solution collection",
+      "generator": "g27274",
+      "seed": 27274,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 20,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "frequency": 1,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 79,
+      "constraints": [
+        "input uses ASCII digits and upper/lowercase letters",
+        "indices are one-based powers of two",
+        "the extracted characters are interleaved from both ends"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 27528,
+      "source_heading": "27528: 跳台阶",
+      "source_code": "solution collection",
+      "generator": "g27528",
+      "seed": 27528,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 20,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "frequency": 1,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 3,
+      "constraints": [
+        "1<=N<=25",
+        "a move may climb any positive number of remaining stairs",
+        "each distinct composition is one way"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 27635,
+      "source_heading": "27635: 判断无向图是否连通有无回路(同23163)",
+      "source_code": "solution collection",
+      "generator": "g27635",
+      "seed": 27635,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 3,
+      "max_output_frequency": 9,
+      "constant_output_probe": {
+        "frequency": 9,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 131,
+      "constraints": [
+        "1<=n<=110",
+        "1<=m<=10000",
+        "vertices are 0..n-1",
+        "edges are undirected"
+      ],
+      "structure_checked": true,
+      "structure_check": "edges have distinct in-range endpoints",
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28127,
+      "source_heading": "28127: 北大夺冠",
+      "source_code": "solution collection",
+      "generator": "g28127",
+      "seed": 28127,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 20,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "frequency": 1,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 350,
+      "constraints": [
+        "each record is university, medal, and yes/no",
+        "medals are A/B/C",
+        "duplicate records are allowed and counted"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28170,
+      "source_heading": "28170: 算鹰",
+      "source_code": "solution collection",
+      "generator": "g28170",
+      "seed": 28170,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 10,
+      "max_output_frequency": 4,
+      "constant_output_probe": {
+        "frequency": 4,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 110,
+      "constraints": [
+        "the board is exactly 10 by 10",
+        "- is empty and . is the player's stone",
+        "an eagle is a four-direction connected component"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28389,
+      "source_heading": "28389: 跳高",
+      "source_code": "solution collection",
+      "generator": "g28389",
+      "seed": 28389,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 8,
+      "max_output_frequency": 7,
+      "constant_output_probe": {
+        "frequency": 7,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 205,
+      "constraints": [
+        "N<=100000",
+        "scores are non-negative millimeter integers at most 10000",
+        "the number of instruments is minimized online"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28664,
+      "source_heading": "28664: 验证身份证号",
+      "source_code": "solution collection",
+      "generator": "g28664",
+      "seed": 28664,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 17,
+      "max_output_frequency": 3,
+      "constant_output_probe": {
+        "frequency": 3,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 154,
+      "constraints": [
+        "each ID has 18 characters",
+        "the first 17 characters are digits",
+        "the final check digit follows the modulus-11 mapping"
+      ],
+      "structure_checked": true,
+      "structure_check": "generated IDs use the stated check-digit algorithm",
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28678,
+      "source_heading": "28678: 角谷猜想",
+      "source_code": "solution collection",
+      "generator": "g28678",
+      "seed": 28678,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 20,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "frequency": 1,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 4,
+      "constraints": [
+        "1<=n<=2000000",
+        "odd n is transformed by 3n+1",
+        "even n is transformed by n/2 until 1"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28691,
+      "source_heading": "28691: 字符串中的整数求和",
+      "source_code": "solution collection",
+      "generator": "g28691",
+      "seed": 28691,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 18,
+      "max_output_frequency": 3,
+      "constant_output_probe": {
+        "frequency": 3,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 8,
+      "constraints": [
+        "there are two strings",
+        "each string has two digits followed by a letter",
+        "the numeric prefixes are summed"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28702,
+      "source_heading": "28702: 合理的饭票设计",
+      "source_code": "solution collection",
+      "generator": "g28702",
+      "seed": 28702,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 19,
+      "max_output_frequency": 2,
+      "constant_output_probe": {
+        "frequency": 2,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 55,
+      "constraints": [
+        "n<=500",
+        "each test gives m,k,n positive integers",
+        "at most k tickets may be used for one meal",
+        "coverage must be continuous from 1 to n"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28748,
+      "source_heading": "28748: PKU游戏",
+      "source_code": "solution collection",
+      "generator": "g28748",
+      "seed": 28748,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 19,
+      "max_output_frequency": 2,
+      "constant_output_probe": {
+        "frequency": 2,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 98,
+      "constraints": [
+        "n and k are positive",
+        "each player has k numbers",
+        "numbers are drawn without replacement",
+        "probabilities are printed to nine decimals"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28780,
+      "source_heading": "28780: 零钱兑换3",
+      "source_code": "solution collection",
+      "generator": "g28780",
+      "seed": 28780,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 6,
+      "max_output_frequency": 7,
+      "constant_output_probe": {
+        "frequency": 7,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 22,
+      "constraints": [
+        "1<=number of coin types<=100",
+        "target is 0..10^6",
+        "coin values are positive and distinct",
+        "unlimited copies are available"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28810,
+      "source_heading": "28810: 是否同一棵二叉排序树",
+      "source_code": "solution collection",
+      "generator": "g28810",
+      "seed": 28810,
+      "test_cases": 20,
+      "distinct_input_cases": 20,
+      "distinct_outputs": 13,
+      "max_output_frequency": 5,
+      "constant_output_probe": {
+        "frequency": 5,
+        "total": 20,
+        "status": "rejected"
+      },
+      "max_input_bytes": 148,
+      "constraints": [
+        "N<=10 and L is positive",
+        "each sequence is a permutation of N distinct positive values",
+        "comparison is by the resulting binary-search-tree shape"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    }
+  ]
+}

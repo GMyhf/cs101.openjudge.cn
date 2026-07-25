@@ -108,10 +108,11 @@ def made_numbers():
 
 
 def main():
-    round2 = len(sys.argv) > 1 and sys.argv[1] == "--round2"
-    batch_name = "T-003-002-r2" if round2 else "T-003-002"
-    out = ROOT / ("collab/t003-batch-002-round2-manifest.json" if round2 else "collab/t003-batch-002-manifest.json")
-    pool_out = ROOT / ("collab/t003-batch-002-round2-candidates.json" if round2 else "collab/t003-batch-002-candidates.json")
+    round_name = sys.argv[1] if len(sys.argv) > 1 else ""
+    suffix = {"--round2": "round2", "--round3": "round3"}.get(round_name)
+    batch_name = f"T-003-002-r{suffix[-1]}" if suffix else "T-003-002"
+    out = ROOT / (f"collab/t003-batch-002-{suffix}-manifest.json" if suffix else "collab/t003-batch-002-manifest.json")
+    pool_out = ROOT / (f"collab/t003-batch-002-{suffix}-candidates.json" if suffix else "collab/t003-batch-002-candidates.json")
     catalog = json.loads(CATALOG.read_text(encoding="utf-8"))["problems"]
     missing = {number(item["id"]) for item in catalog if not item.get("test_cases")}
     excluded = skipped() | made_numbers()
