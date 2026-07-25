@@ -55,6 +55,12 @@
   **顺带记一个缺口**：本地 `judge.py` 支持 python3/c/cpp、**不支持 pypy3**，本机也未装。
   于是同一份 Python 参考解法平台 PyPy3 能过、本地判 TLE——就这类题而言本地镜像比真实平台更严。
   是否给本地判题器加 PyPy3 属**判题沙箱改动（红线 1），留待人拍板**。
+
+- 2026-07-26 · **工作规范：所有 `_made` 数据目录及其内容必须纳入 Git**。包括当前已有目录和今后
+  新生成的目录；交付生成数据时必须与对应报告、索引变更一起提交并 SSH 推送，不能只提交生成器
+  或依赖工作区临时重建。`.gitignore` 仅排除抓取的真实测试数据，已明确豁免
+  `data/openjudge/tests/*/*_made/` 及其全部内容。
+
 - 2026-07-26 · **人拍板：Python 参考解法在平台超时就写 C++**（出处：同上）。
   已落地：`03728_made/samplecode_ac.cpp`（Accepted 17ms）、`04009_made/samplecode_ac.cpp`（Accepted 40ms）。
   `samplecode.py` 保留，用于本地生成数据与对拍；平台背书的参考实现以 `samplecode_ac.cpp` 为准。
