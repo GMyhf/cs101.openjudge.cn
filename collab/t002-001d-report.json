@@ -105,7 +105,7 @@
       "distinct_input_cases": 20,
       "distinct_outputs": 19,
       "max_input_bytes": 10,
-      "constraints": null,
+      "constraints": ["a is lowercase letters", "k is positive", "output has same length as a"],
       "no_solution_branch_covered": null
     },
     {
@@ -156,7 +156,7 @@
       "distinct_input_cases": 20,
       "distinct_outputs": 20,
       "max_input_bytes": 29,
-      "constraints": null,
+      "constraints": ["input contains only 0 and 1", "output length equals input length", "prefix divisibility is modulo 5"],
       "no_solution_branch_covered": null
     },
     {
@@ -170,7 +170,7 @@
       "distinct_input_cases": 20,
       "distinct_outputs": 8,
       "max_input_bytes": 53,
-      "constraints": null,
+      "constraints": ["array is one space-separated integer line", "k is an integer", "subarrays are contiguous"],
       "no_solution_branch_covered": true
     },
     {
@@ -217,7 +217,7 @@
       "distinct_input_cases": 20,
       "distinct_outputs": 2,
       "max_input_bytes": 57,
-      "constraints": null,
+      "constraints": ["tokens are True/False and not/and/or", "parentheses are balanced", "operator precedence is not > and > or"],
       "no_solution_branch_covered": true
     },
     {
@@ -231,7 +231,7 @@
       "distinct_input_cases": 20,
       "distinct_outputs": 20,
       "max_input_bytes": 57,
-      "constraints": null,
+      "constraints": ["tokens are True/False and not/and/or", "parentheses are balanced", "output removes only redundant parentheses"],
       "no_solution_branch_covered": null
     },
     {
@@ -245,7 +245,7 @@
       "distinct_input_cases": 20,
       "distinct_outputs": 16,
       "max_input_bytes": 50,
-      "constraints": null,
+      "constraints": ["input contains only 0 and 1", "counted substrings have two consecutive runs", "substring must be nonempty"],
       "no_solution_branch_covered": null
     },
     {
@@ -278,7 +278,7 @@
       "distinct_input_cases": 20,
       "distinct_outputs": 18,
       "max_input_bytes": 116,
-      "constraints": null,
+      "constraints": ["matrix entries are 0 or 1", "matrix dimensions match header", "counted shapes are square submatrices"],
       "no_solution_branch_covered": null
     },
     {
@@ -292,7 +292,7 @@
       "distinct_input_cases": 20,
       "distinct_outputs": 9,
       "max_input_bytes": 42,
-      "constraints": null,
+      "constraints": ["input has two character sequences", "subsequence preserves order", "output is the LCS length"],
       "no_solution_branch_covered": null
     },
     {
@@ -306,7 +306,7 @@
       "distinct_input_cases": 20,
       "distinct_outputs": 19,
       "max_input_bytes": 3,
-      "constraints": null,
+      "constraints": ["1<=n<=30", "T0=0", "T1=T2=1", "Tn+3=Tn+Tn+1+Tn+2"],
       "no_solution_branch_covered": null
     },
     {
@@ -320,7 +320,7 @@
       "distinct_input_cases": 20,
       "distinct_outputs": 20,
       "max_input_bytes": 28,
-      "constraints": null,
+      "constraints": ["input contains lowercase letters and balanced parentheses", "inner parenthesized letters are reversed", "output contains no parentheses"],
       "no_solution_branch_covered": null
     }
   ]

@@ -11,6 +11,13 @@
 - 20/20 题真实 `judge.py` 参考解法均 `Accepted`；脚本 py_compile 通过。完整 unittest 受当前沙箱禁止监听 socket 影响，服务端测试报 `PermissionError: [Errno 1] Operation not permitted`。
 - 待 Claude 复核题面约束、输出唯一性和无解/失败分支覆盖；当前报告明确 `no_solution_branch_covered=false`，没有虚报覆盖。
 
+## 2026-07-25 · T-003 batch-002 首批生成
+
+- 新增 `scripts/build_t003_002.py`，完成 manifest 首批 20 题；19 题各 20 组，22642 因 `N=1..10` 输入域有限做 10/10 穷尽覆盖。
+- `producecase.py` 按新式生成器 + 固定种子落盘，不内嵌 `CASES`。逐题重跑后 `data/` SHA-256 逐字节不变，20/20 通过。
+- 恒定输出探针 20/20 被拒；参考解法真实 judge AC 20/20；输入去重 20/20。索引后 catalog 为 `1300/1863` 有测试。
+- 补齐 `collab/t002-001d-report.json` 中 10 个 `constraints: null` 的逐条约束表；本轮报告增加输出频率、恒定输出探针和 producecase 复现字段。
+
 ## 2026-07-25 · T-003 batch-002 选批
 
 - 新增 `scripts/select_batch_002.py`，修正选批逻辑为排除全部既有 `_made` 目录和 special-judge 清单。
