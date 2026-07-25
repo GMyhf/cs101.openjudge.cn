@@ -1,0 +1,195 @@
+{
+  "batch": "T-004-r5",
+  "selection_rule": "catalog 跨 book 全部 0 组数据、无 _made、有本地题面页且样例可抽取；并入原特判跳过清单的 6 题（复核确认均不需要 SPJ）",
+  "folded_in_from_skip_list": [
+    4140,
+    7206,
+    22528,
+    23554,
+    25570,
+    27384
+  ],
+  "count": 20,
+  "entries": [
+    {
+      "local_number": 4140,
+      "title": "方程求解",
+      "source": "data/openjudge/pages/routine__04140.html",
+      "sample_input": "",
+      "sample_output": "5.705085930\n",
+      "note": "题面无输入、无样例；答案由独立高精度二分（Decimal 40 位）验证为 5.705085930，三次方程判别式 -142300<0 故实根唯一。输入域为空 -> 只可能 1 组数据，属「输入域小于 15」的正当例外。合集里 3 段题解输出与之一致。",
+      "route": "solution-backed"
+    },
+    {
+      "local_number": 7206,
+      "title": "T07206:我是最快的马",
+      "source": "data/openjudge/pages/pctbook__T07206.html",
+      "sample_input": "0 0\n2 4\n1\n1 1\n",
+      "sample_output": "(0,0)-(1,2)-(2,4)\n",
+      "note": "题面规定「最快路线不唯一时只输出数目 N」，输出确定，不需要 SPJ。",
+      "route": "solution-backed"
+    },
+    {
+      "local_number": 22528,
+      "title": "厚道的调分方法",
+      "source": "data/openjudge/pages/2025sp_routine__22528.html",
+      "sample_input": "50.5 100.0 40.0\n",
+      "sample_output": "791111236\n",
+      "note": "输出是唯一最小整数 b。内部有 a=b/1e9 的浮点运算，生成数据须避开 b 卡在精度临界的输入，否则两个都正确的实现可能差 1。",
+      "route": "solution-backed"
+    },
+    {
+      "local_number": 23554,
+      "title": "小朋友春游",
+      "source": "data/openjudge/pages/2024fallroutine__23554.html",
+      "sample_input": "10\n2 6 1 8 4 10 33 1000\n",
+      "sample_output": "3 5 7 9\n33 1000\n",
+      "note": "输出两行整数且按升序 -> 唯一。合集里没有可执行题解，须走自写解法 + 独立 oracle；oracle 请换算法族（本题求两集合差集，参考解法若用集合运算，oracle 就用排序双指针）。",
+      "route": "self-written"
+    },
+    {
+      "local_number": 25570,
+      "title": "洋葱",
+      "source": "data/openjudge/pages/practice__25570.html",
+      "sample_input": "5\n1 0 1 0 1\n0 1 1 1 0\n0 1 7 1 0\n0 1 1 1 0\n1 0 1 0 1\n",
+      "sample_output": "8\n",
+      "note": "输出单个整数，唯一。样例输出原文粘着「解释：」尾巴，已用 trim_explanation 截断。",
+      "route": "solution-backed"
+    },
+    {
+      "local_number": 27384,
+      "title": "候选人追踪",
+      "source": "data/openjudge/pages/practice__27384.html",
+      "sample_input": "10 2  \n3 1 4 1 5 1 4 3 6 5 8 3 7 5 8 5 9 1 10 5  \n1 5\n",
+      "sample_output": "3\n",
+      "note": "输出单个整数，唯一。",
+      "route": "solution-backed"
+    },
+    {
+      "local_number": 3377,
+      "title": "Best Cow Line, Gold",
+      "source": "data/openjudge/pages/practice__03377.html",
+      "sample_input": "6\nA\nC\nD\nB\nC\nB\n",
+      "sample_output": "ABCBCD\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    },
+    {
+      "local_number": 3433,
+      "title": "魔兽世界终极版",
+      "source": "data/openjudge/pages/practice__03433.html",
+      "sample_input": "1\n20 1 10 10 1000\n20 20 30 10 20\n5 5 5 5 5\n",
+      "sample_output": "Case 1:\n000:00 blue lion 1 born\nIts loyalty is 10\n000:10 blue lion 1 marched to city 1 with 10 elements and force 5\n000:30 blue lion 1 earned 10 elements for his headquarter\n000:50 20 elements in red headquarter\n000:50 20 elements in blue headquarter\n000:55 blue lion 1 has no weapon\n001:00 blue dragon 2 born\nIts morale is 0.00\n001:10 blue lion 1 reached red headquarter with 10 elements and force 5\n001:10 blue dragon 2 marched to city 1 with 20 elements and force 5\n001:30 blue dragon 2 earned 10 elements for his headquarter\n001:50 20 elements in red headquarter\n001:50 10 elements in blue headquarter\n001:55 blue lion 1 has no weapon\n001:55 blue dragon 2 has arrow(3)\n002:10 blue dragon 2 reached red headquarter with 20 elements and force 5\n002:10 red headquarter was taken\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    },
+    {
+      "local_number": 3670,
+      "title": "E03670:计算鞍点",
+      "source": "data/openjudge/pages/pctbook__E03670.html",
+      "sample_input": "11 3 5 6 9\n12 4 7 8 10\n10 5 6 9 11\n8  6 4 7 2\n15 10 11 20 25\n",
+      "sample_output": "4 1 8\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    },
+    {
+      "local_number": 3750,
+      "title": "魔兽世界",
+      "source": "data/openjudge/pages/practice__03750.html",
+      "sample_input": "2\n99 2 1000\n10 20 50 50  30\n20 50 50 50  50\n40 1 1000\n20 20 20 20 20\n20 20 20 20 20\n",
+      "sample_output": "Case:1\n000:00 red iceman 1 born\n000:00 blue lion 1 born\n000:10 red iceman 1 marched to city 1 with 50 elements and force 50\n000:10 blue lion 1 marched to city 2 with 50 elements and force 50\n000:30 red iceman 1 earned 10 elements for his headquarter\n000:30 blue lion 1 earned 10 elements for his headquarter\n000:50 59 elements in red headquarter\n000:50 59 elements in blue headquarter\n001:00 red lion 2 born\n001:00 blue dragon 2 born\n001:10 red lion 2 marched to city 1 with 50 elements and force 50\n001:10 blue lion 1 marched to city 1 with 50 elements and force 50\n001:10 red iceman 1 marched to city 2 with 41 elements and force 70\n001:10 blue dragon 2 marched to city 2 with 10 elements and force 20\n001:40 red lion 2 attacked blue lion 1 in city 1 with 50 elements and force 50\n001:40 blue lion 1 was killed in city 1\n001:40 red lion 2 earned 10 elements for his headquarter\n001:40 blue dragon 2 attacked red iceman 1 in city 2 with 10 elements and force 20\n001:40 red iceman 1 fought back against blue dragon 2 in city 2\n001:40 blue dragon 2 was killed in city 2\n001:40 red iceman 1 earned 10 elements for his headquarter\n001:50 21 elements in red headquarter\n001:50 49 elements in blue headquarter\n002:00 blue ninja 3 born\n002:10 red lion 2 marched to city 2 with 100 elements and force 50\n002:10 blue ninja 3 marched to city 2 with 20 elements and force 50\n002:10 red iceman 1 reached blue headquarter with 29 elements and force 70\n002:40 blue ninja 3 attacked red lion 2 in city 2 with 20 elements and force 50\n002:40 red lion 2 fought back against blue ninja 3 in city 2\n002:40 blue ninja 3 was killed in city 2\n002:40 red lion 2 earned 10 elements for his headquarter\n002:40 red flag raised in city 2\n002:50 23 elements in red headquarter\n002:50 29 elements in blue headquarter\n003:10 red lion 2 reached blue headquarter with 58 elements and force 50\n003:10 blue headquarter was taken\nCase:2\n000:00 red iceman 1 born\n000:00 blue lion 1 born\n000:10 red iceman 1 marched to city 1 with 20 elements and force 20\n000:10 blue lion 1 marched to city 1 with 20 elements and force 20\n000:40 red iceman 1 attacked blue lion 1 in city 1 with 20 elements and force 20\n000:40 blue lion 1 was killed in city 1\n000:40 red iceman 1 earned 10 elements for his headquarter\n000:50 22 elements in red headquarter\n000:50 20 elements in blue headquarter\n001:00 red lion 2 born\n001:00 blue dragon 2 born\n001:10 red lion 2 marched to city 1 with 20 elements and force 20\n001:10 blue dragon 2 marched to city 1 with 20 elements and force 20\n001:10 red iceman 1 reached blue headquarter with 39 elements and force 40\n001:40 red lion 2 attacked blue dragon 2 in city 1 with 20 elements and force 20\n001:40 blue dragon 2 was killed in city 1\n001:40 red lion 2 earned 10 elements for his headquarter\n001:40 red flag raised in city 1\n001:50 12 elements in red headquarter\n001:50 0 elements in blue headquarter\n002:10 red lion 2 reached blue headquarter with 20 elements and force 20\n002:10 blue headquarter was taken\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    },
+    {
+      "local_number": 4011,
+      "title": "Chase",
+      "source": "data/openjudge/pages/practice__04011.html",
+      "sample_input": "4 4\n0 1 1\n0 2 2\n1 3 3\n2 3 1\n2\n0.01 0.1\n0.5 0.8\n0.5 0.8\n0.7 0.9\n0 0\n",
+      "sample_output": "60.00\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    },
+    {
+      "local_number": 4012,
+      "title": "Decrypt the Dragon Scroll",
+      "source": "data/openjudge/pages/practice__04012.html",
+      "sample_input": "?,10,?????????????????,16,??\n?2?5??7?,??\n???????????????????????????????,???\n",
+      "sample_output": "impossible\n12,50,70,71\n1,2,3,4,5,6,7,8,9,10,11,100,101,102\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    },
+    {
+      "local_number": 4022,
+      "title": "买房子",
+      "source": "data/openjudge/pages/practice__04022.html",
+      "sample_input": "50 10\n",
+      "sample_output": "8\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    },
+    {
+      "local_number": 4031,
+      "title": "瑞士轮",
+      "source": "data/openjudge/pages/practice__04031.html",
+      "sample_input": "2 4 2 \n7 6 6 7 \n10 5 20 15\n",
+      "sample_output": "1\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    },
+    {
+      "local_number": 4035,
+      "title": "Mayan 游戏",
+      "source": "data/openjudge/pages/practice__04035.html",
+      "sample_input": "3 \n1 0 \n2 1 0 \n2 3 4 0 \n3 1 0 \n2 4 3 4 0\n",
+      "sample_output": "2 1 1 \n3 1 1 \n3 0 1\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    },
+    {
+      "local_number": 4037,
+      "title": "聪明的质监员",
+      "source": "data/openjudge/pages/practice__04037.html",
+      "sample_input": "5 3 15 \n1 5 \n2 5 \n3 5 \n4 5 \n5 5 \n1 5 \n2 4 \n3 3\n",
+      "sample_output": "10\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    },
+    {
+      "local_number": 4038,
+      "title": "观光公交",
+      "source": "data/openjudge/pages/routine__04038.html",
+      "sample_input": "3 3 2 \n1 4 \n0 1 3 \n1 1 2 \n5 2 3\n",
+      "sample_output": "10\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    },
+    {
+      "local_number": 4054,
+      "title": "Cubic Eight-Puzzle",
+      "source": "data/openjudge/pages/practice__04054.html",
+      "sample_input": "1 2 \nW W W \nE W W \nW W W \n2 1 \nR B W \nR W W \nE W W \n3 3 \nW B W \nB R E \nR B R \n3 3 \nB W R \nB W R \nB E R \n2 1 \nB B B \nB R B \nB R E \n1 1 \nR R R \nW W W \nR R E \n2 1 \nR R R \nB W B \nR R E \n3 2 \nR R R \nW E W \nR R R\n0 0\n",
+      "sample_output": "0 \n3 \n13 \n23 \n29 \n30 \n-1 \n-1\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    },
+    {
+      "local_number": 4076,
+      "title": "寻找矩阵路径（Find Path in a Matrix）",
+      "source": "data/openjudge/pages/practice__04076.html",
+      "sample_input": "3 4\n0 1 2 4\n10 5 2 10\n0 3 4 4\n6\n0 1 2 2 4 3\n",
+      "sample_output": "1\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    },
+    {
+      "local_number": 4083,
+      "title": "我爱北大",
+      "source": "data/openjudge/pages/practice__04083.html",
+      "sample_input": "6\nXueYiShiTang\nCanYinZhongXin\nXueWuShiTang\nXueYiXiaoBaiFang\nBaiNianJiangTang\nGongHangQuKuanJi\n6\nXueYiShiTang CanYinZhongXin 80\nXueWuShiTang CanYinZhongXin 40\nXueYiShiTang XueYiXiaoBaiFang 35\nXueYiXiaoBaiFang XueWuShiTang 85\nCanYinZhongXin GongHangQuKuanJi 60\nGongHangQuKuanJi BaiNianJiangTang 35\n2\nXueYiXiaoBaiFang BaiNianJiangTang\nGongHangQuKuanJi GongHangQuKuanJi\n",
+      "sample_output": "XueYiXiaoBaiFang->(35)->XueYiShiTang->(80)->CanYinZhongXin->(60)->GongHangQuKuanJi->(35)->BaiNianJiangTang\nGongHangQuKuanJi\n",
+      "route": "self-written",
+      "solution_blocks": 0
+    }
+  ]
+}
