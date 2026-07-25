@@ -1,0 +1,774 @@
+{
+  "batch": "T-004-r3",
+  "entries": [
+    {
+      "local_number": 3704,
+      "title": "括号匹配问题",
+      "source": "data/openjudge/pages/2025sp_routine__03704.html",
+      "reference_source": "LLM-written",
+      "generator": "g3704",
+      "seed": 3704,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "每行长度<=100",
+        "只含括号和大小写字母",
+        "输入多组行直到EOF",
+        "未匹配左括号标$、右括号标?"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "<runtime error: RuntimeError>"
+        ],
+        "sample_expected": [
+          "((ABCD(x)",
+          "$$",
+          ")(rttyy())sss)(",
+          "?",
+          "?$"
+        ],
+        "sample_runtime_error": true,
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3713,
+      "title": "英文数字转换",
+      "source": "data/openjudge/pages/practice__03713.html",
+      "reference_source": "LLM-written",
+      "generator": "g3713",
+      "seed": 3713,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "数值范围-999999999..999999999",
+        "单词来自题面给定词表",
+        "negative表示负号",
+        "输入多行直到EOF"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "6",
+          "-136",
+          "1000102",
+          "122022"
+        ],
+        "sample_expected": [
+          "6",
+          "-729",
+          "1000101",
+          "814022"
+        ],
+        "sample_runtime_error": false,
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          13,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3715,
+      "title": "员工最长工作时间",
+      "source": "data/openjudge/pages/practice__03715.html",
+      "reference_source": "LLM-written",
+      "generator": "g3715",
+      "seed": 3715,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 19,
+      "max_output_frequency": 3,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 3,
+        "total": 21
+      },
+      "constraints": [
+        "只有一个测试样例",
+        "学生数不超过题面限制",
+        "姓名最长18字符",
+        "日期范围1900-01-01..9999-12-31",
+        "同天数按输入顺序"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "abbot",
+          "9",
+          "alcott",
+          "9",
+          "john",
+          "1"
+        ],
+        "sample_expected": [
+          "abbot",
+          "10",
+          "alcott",
+          "10",
+          "john",
+          "2"
+        ],
+        "sample_runtime_error": false,
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          7,
+          8,
+          9,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3716,
+      "title": "配置文件解析",
+      "source": "data/openjudge/pages/practice__03716.html",
+      "reference_source": "LLM-written",
+      "generator": "g3716",
+      "seed": 3716,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "行数<20",
+        "每行<50字符",
+        "配置行由空格分隔",
+        "#开头和空行无效",
+        "末行固定# End of the config file"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "3",
+          "timevar",
+          "TIMESLOT",
+          "120",
+          "timevar",
+          "TIMEOUT",
+          "600",
+          "portvar",
+          "HTTP_PORTS",
+          "[80,8000,8080,8888]"
+        ],
+        "sample_expected": [
+          "3",
+          "TIMESLOT",
+          "120",
+          "TIMEOUT",
+          "600",
+          "HTTP_PORTS",
+          "[80,8000,8080,8888]"
+        ],
+        "sample_runtime_error": false,
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3717,
+      "title": "蚂蚁移动路线",
+      "source": "data/openjudge/pages/routine__03717.html",
+      "reference_source": "LLM-written",
+      "generator": "g3717",
+      "seed": 3717,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 16,
+      "max_output_frequency": 6,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 6,
+        "total": 21
+      },
+      "constraints": [
+        "m,n为正整数",
+        "m+n<=20",
+        "每步只能向上或向右",
+        "输出路线数"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "6"
+        ],
+        "sample_expected": [
+          "3"
+        ],
+        "sample_runtime_error": false,
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          12,
+          13,
+          15,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3719,
+      "title": "学生信息排序",
+      "source": "data/openjudge/pages/practice__03719.html",
+      "reference_source": "LLM-written",
+      "generator": "g3719",
+      "seed": 3719,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "学生信息按姓名行与信息行成对输入直到EOF",
+        "姓名由英文字母和空格构成",
+        "学号<=100000",
+        "性别为M或F",
+        "年龄<=100",
+        "输出学号补足8位"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "sample_pins_interpretation": false,
+        "sample_mutated_output": [
+          "Mary",
+          "Lu",
+          "00018343,F",
+          "21",
+          "Santa",
+          "Fe",
+          "00027863,M",
+          "17",
+          "Tom",
+          "Hanks",
+          "00007863,M",
+          "18"
+        ],
+        "sample_expected": [
+          "Mary",
+          "Lu",
+          "00018343,F",
+          "21",
+          "Santa",
+          "Fe",
+          "00027863,M",
+          "17",
+          "Tom",
+          "Hanks",
+          "00007863,M",
+          "18"
+        ],
+        "sample_runtime_error": false,
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          1,
+          2,
+          3,
+          5,
+          7,
+          8,
+          9,
+          11,
+          12,
+          16,
+          17,
+          18
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3721,
+      "title": "和为其他两个数之和",
+      "source": "data/openjudge/pages/practice__03721.html",
+      "reference_source": "LLM-written",
+      "generator": "g3721",
+      "seed": 3721,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 3,
+      "max_output_frequency": 18,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 18,
+        "total": 21
+      },
+      "constraints": [
+        "1<=n<=100",
+        "每个数为正整数且<=10000",
+        "目标数需等于其他两个数之和",
+        "两个加数来自其他位置"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "0"
+        ],
+        "sample_expected": [
+          "2"
+        ],
+        "sample_runtime_error": false,
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          8,
+          18
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3722,
+      "title": "因子的和",
+      "source": "data/openjudge/pages/practice__03722.html",
+      "reference_source": "LLM-written",
+      "generator": "g3722",
+      "seed": 3722,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 2,
+      "max_output_frequency": 19,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 19,
+        "total": 21
+      },
+      "constraints": [
+        "N<=1000000",
+        "a为正整数",
+        "M-a为正整数",
+        "a和M-a均为N的因子",
+        "无解输出-1"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "1"
+        ],
+        "sample_expected": [
+          "5"
+        ],
+        "sample_runtime_error": false,
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3724,
+      "title": "Unix时间戳转换",
+      "source": "data/openjudge/pages/practice__03724.html",
+      "reference_source": "LLM-written",
+      "generator": "g3724",
+      "seed": 3724,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "0<=t<2^31",
+        "Unix epoch为1970-01-01 00:00:00",
+        "输出YYYY-mm-dd HH:ii:ss"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "1970-01-01",
+          "00:01:10",
+          "2009-02-13",
+          "23:32:30"
+        ],
+        "sample_expected": [
+          "1970-01-01",
+          "00:00:10",
+          "2009-02-13",
+          "23:31:30"
+        ],
+        "sample_runtime_error": false,
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3752,
+      "title": "迷宫最短路",
+      "source": "data/openjudge/pages/practice__03752.html",
+      "reference_source": "LLM-written",
+      "generator": "g3752",
+      "seed": 3752,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 13,
+      "max_output_frequency": 3,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 3,
+        "total": 21
+      },
+      "constraints": [
+        "1<=R,C<=40",
+        ".可走、#不可走",
+        "左上角和右下角为.",
+        "保证存在路径",
+        "只能上下左右移动"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "8"
+        ],
+        "sample_expected": [
+          "9"
+        ],
+        "sample_runtime_error": false,
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    }
+  ]
+}

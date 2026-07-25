@@ -127,9 +127,12 @@ def reference_source(number):
 
 
 def main():
-    manifest = json.loads((ROOT / "collab/t004-round1-manifest.json").read_text(encoding="utf-8"))
+    round_number = 1
+    if "--round3" in sys.argv:
+        round_number = 3
+    manifest = json.loads((ROOT / f"collab/t004-round{round_number}-manifest.json").read_text(encoding="utf-8"))
     numbers = [x["local_number"] for x in manifest["entries"]]
-    branches = oracle_branches(ROOT / "scripts/build_t004_round1.py")
+    branches = oracle_branches(ROOT / f"scripts/build_t004_round{round_number}.py")
     fallback = branches.get(None)
     rows, over = [], []
     for number in numbers:
