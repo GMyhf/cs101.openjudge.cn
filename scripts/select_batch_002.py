@@ -69,12 +69,35 @@ def sections(path):
         yield int(match.group(1)), match.group(2).strip(), codes, samples, outputs
 
 
+EXPLAIN = re.compile(r"^\s*(#|解释|说明|===+|-{5,})")
+
+
+def trim_explanation(block):
+    """砍掉样例输出尾巴上的题面讲解。
+
+    题解里的样例输出块常把答案和讲解写在一起，例如
+    `0 0 7\n1 0 -7\n1 2 3\n\n解释：\nA = [...`、`5\nHHHOO\n# 1->H->3->...`。
+    整块当期望输出，题解算得再对也「跑不出样例」——11 个被判不可构建的候选里有 10 个是这么来的。
+    只在未截断版本对不上、截断版本对得上时才采用（见 reproduces），并在候选里标记，
+    这样最坏情况只是少救回一题，不会把错解法放进来。
+    """
+    kept = []
+    for line in block.splitlines():
+        if EXPLAIN.match(line):
+            break
+        kept.append(line)
+    while kept and not kept[-1].strip():
+        kept.pop()
+    return ("\n".join(kept) + "\n") if kept else block
+
+
 def reproduces(codes, sample_in, sample_out):
     """题解里是否真有一段能跑出样例。
 
     选批只检查「有 import/def 的代码块」是不够的：构建器要求候选代码跑通样例，
     跑不通就 AssertionError 硬失败。把这条前移到选批，后面几批不会再被埋雷。
     """
+    trimmed = trim_explanation(sample_out)
     for code in codes:
         try:
             with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
@@ -82,11 +105,15 @@ def reproduces(codes, sample_in, sample_out):
                 handle.flush()
                 result = subprocess.run(["python3", handle.name], input=sample_in, text=True,
                                         capture_output=True, timeout=10)
-            if result.returncode == 0 and result.stdout.split() == sample_out.split():
-                return True
+            if result.returncode:
+                continue
+            if result.stdout.split() == sample_out.split():
+                return True, sample_out, False
+            if trimmed != sample_out and result.stdout.split() == trimmed.split():
+                return True, trimmed, True
         except (OSError, subprocess.SubprocessError):
             continue
-    return False
+    return False, sample_out, False
 
 
 def number(value):
@@ -109,7 +136,7 @@ def made_numbers():
 
 def main():
     round_name = sys.argv[1] if len(sys.argv) > 1 else ""
-    suffix = {"--round2": "round2", "--round3": "round3", "--round4": "round4"}.get(round_name)
+    suffix = {f"--round{k}": f"round{k}" for k in range(2, 10)}.get(round_name)
     batch_name = f"T-003-002-r{suffix[-1]}" if suffix else "T-003-002"
     out = ROOT / (f"collab/t003-batch-002-{suffix}-manifest.json" if suffix else "collab/t003-batch-002-manifest.json")
     pool_out = ROOT / (f"collab/t003-batch-002-{suffix}-candidates.json" if suffix else "collab/t003-batch-002-candidates.json")
@@ -140,9 +167,16 @@ def main():
                 "python_solution_count": len(usable),
                 "sample_input": sample_in,
                 "sample_output": sample_out,
-                "sample_reproduced": reproduces(usable, sample_in, sample_out),
+                "sample_reproduced": None,        # 下面统一填，顺带可能修正 sample_output
                 "selection_source": "solution-backed candidate pool",
+                "_codes": usable,
             }
+    for entry in candidates.values():
+        ok, corrected, was_trimmed = reproduces(entry.pop("_codes"),
+                                                entry["sample_input"], entry["sample_output"])
+        entry["sample_reproduced"] = ok
+        entry["sample_output"] = corrected
+        entry["sample_output_trimmed"] = was_trimmed
     ordered = [candidates[key] for key in sorted(candidates)]
     buildable = [x for x in ordered if x["sample_reproduced"]]
     manifest = {
