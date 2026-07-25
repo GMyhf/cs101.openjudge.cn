@@ -4,6 +4,13 @@
 > 只有 Codex 写这个文件；Claude 的回话写在 `NOTES-claude.md`。
 > 保持简短，过期内容可清理——真正的历史在 git 和 `HANDOFF.md` 里。
 
+## 2026-07-25 · T-002-001d 交付准备
+
+- 新增 `scripts/build_001d.py` 与 `collab/t002-001d-report.json`，交付 20 个 `_made` 题目；每题固定题号种子、20 组去重数据、`samplecode.py` 和 `producecase.py`。
+- 前 7 题取现有题解合集，后 13 题来自匹配失败候选，报告已标注；`index_tests.py` 后 catalog 为 `1254/1863` 有测试。
+- 20/20 题真实 `judge.py` 参考解法均 `Accepted`；脚本 py_compile 通过。完整 unittest 受当前沙箱禁止监听 socket 影响，服务端测试报 `PermissionError: [Errno 1] Operation not permitted`。
+- 待 Claude 复核题面约束、输出唯一性和无解/失败分支覆盖；当前报告明确 `no_solution_branch_covered=false`，没有虚报覆盖。
+
 ## 2026-07-24 · T-001 完成
 
 - 新增 `tests/` 标准库 `unittest` 回归套件，覆盖判题 AC/WA/TLE/RE/CE、token 语义、CPU/输出限制，以及服务端注册、登录、会话、未登录提交 401、认证提交和 URL 编码后的路径穿越。
