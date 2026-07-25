@@ -31,18 +31,29 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 0,
-        "status": "not_available",
-        "reason": "no independent oracle implemented"
+        "seeds": 400,
+        "status": "passed"
       },
-      "independent_oracle_status": "no_independent_oracle",
+      "independent_oracle_status": "passed",
       "sample_reproduced": true,
-      "independent_sample_agreement": null,
+      "independent_sample_agreement": true,
       "misconception_probe": {
-        "status": "not_available",
-        "reason": "no independent oracle implemented"
+        "status": "caught",
+        "basis": "题面样例输出（不是 oracle——拿未变异的 oracle 当基准，任何有效变异都必然不同）",
+        "mutation": "len(e)==1 -> len(e)==0",
+        "sample_pins_interpretation": true,
+        "mutated_sample_output": [
+          "2",
+          "1"
+        ],
+        "sample_expected": [
+          "15",
+          "1"
+        ],
+        "runtime_error": false
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "high"
     },
     {
       "local_number": 3725,
@@ -74,18 +85,27 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 0,
-        "status": "not_available",
-        "reason": "no independent oracle implemented"
+        "seeds": 400,
+        "status": "passed"
       },
-      "independent_oracle_status": "no_independent_oracle",
+      "independent_oracle_status": "passed",
       "sample_reproduced": true,
-      "independent_sample_agreement": null,
+      "independent_sample_agreement": true,
       "misconception_probe": {
-        "status": "not_available",
-        "reason": "no independent oracle implemented"
+        "status": "caught",
+        "basis": "题面样例输出（不是 oracle——拿未变异的 oracle 当基准，任何有效变异都必然不同）",
+        "mutation": "min(q) -> max(q)",
+        "sample_pins_interpretation": true,
+        "mutated_sample_output": [
+          "1"
+        ],
+        "sample_expected": [
+          "3"
+        ],
+        "runtime_error": false
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "high"
     },
     {
       "local_number": 3726,
@@ -128,7 +148,8 @@
         "status": "not_available",
         "reason": "no independent oracle implemented"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 3727,
@@ -171,7 +192,8 @@
         "status": "not_available",
         "reason": "no independent oracle implemented"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 3728,
@@ -214,7 +236,8 @@
         "status": "not_available",
         "reason": "no independent oracle implemented"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 3744,
@@ -257,7 +280,8 @@
         "status": "not_available",
         "reason": "no independent oracle implemented"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 3789,
@@ -289,18 +313,28 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 0,
-        "status": "not_available",
-        "reason": "no independent oracle implemented"
+        "seeds": 400,
+        "status": "passed"
       },
-      "independent_oracle_status": "no_independent_oracle",
+      "independent_oracle_status": "passed",
       "sample_reproduced": true,
-      "independent_sample_agreement": null,
+      "independent_sample_agreement": true,
       "misconception_probe": {
-        "status": "not_available",
-        "reason": "no independent oracle implemented"
+        "status": "missed",
+        "basis": "题面样例输出（不是 oracle——拿未变异的 oracle 当基准，任何有效变异都必然不同）",
+        "mutation": "range(n-L+1) -> range(n-L)",
+        "sample_pins_interpretation": false,
+        "mutated_sample_output": [
+          "4"
+        ],
+        "sample_expected": [
+          "4"
+        ],
+        "runtime_error": false,
+        "data_catches_when_sample_does_not": "样例钉不住该变异（range(n-L+1)->range(n-L) 在样例上同为 4）；已入库数据接住了——变异体判 Runtime Error（第 2 组）。"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "high"
     },
     {
       "local_number": 3791,
@@ -345,7 +379,8 @@
         ],
         "status": "caught"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 3866,
@@ -388,7 +423,8 @@
         "status": "not_available",
         "reason": "no independent oracle implemented"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 3906,
@@ -420,18 +456,27 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 0,
-        "status": "not_available",
-        "reason": "no independent oracle implemented"
+        "seeds": 400,
+        "status": "passed"
       },
-      "independent_oracle_status": "no_independent_oracle",
+      "independent_oracle_status": "passed",
       "sample_reproduced": true,
-      "independent_sample_agreement": null,
+      "independent_sample_agreement": true,
       "misconception_probe": {
-        "status": "not_available",
-        "reason": "no independent oracle implemented"
+        "status": "caught",
+        "basis": "题面样例输出（不是 oracle——拿未变异的 oracle 当基准，任何有效变异都必然不同）",
+        "mutation": "(X,Y)!=(U,W) -> (X,Y)==(U,W)",
+        "sample_pins_interpretation": true,
+        "mutated_sample_output": [
+          "36"
+        ],
+        "sample_expected": [
+          "34"
+        ],
+        "runtime_error": false
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "high"
     },
     {
       "local_number": 4001,
@@ -480,7 +525,8 @@
         ],
         "status": "caught"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 4002,
@@ -523,7 +569,8 @@
         "status": "not_available",
         "reason": "no independent oracle implemented"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 4006,
@@ -566,7 +613,8 @@
         "status": "not_available",
         "reason": "no independent oracle implemented"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 4007,
@@ -630,7 +678,8 @@
         ],
         "status": "caught"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 4008,
@@ -673,7 +722,8 @@
         "status": "not_available",
         "reason": "no independent oracle implemented"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 4009,
@@ -718,7 +768,8 @@
       },
       "producecase_reproduced": true,
       "coverage_note": "判题限额是 5 秒墙钟 / 4 秒 CPU（judge.py），不是 60 秒——原注记用 60 秒作标尺，结论方向对但数字不可比。Claude 实测：Python 参考解法 n<=17 可在限额内完成（3.7s），n=18 起 TLE（8.6s）；case-0 是题面样例（15/16/19/20），Python 跑完需 ~55s，故**用 Python 提交本题无法在判题限额内通过**。同一算法的 C++ 实现跑 case-0 仅 0.71s（可过），跑 n=24 需 10.1s（仍超限）。结论：数据本身正确且可判（C++ 可过），但本题在当前限额下对 Python 提交不可解；题面上界 24 无论 Python 还是 C++ 都覆盖不到，不声称覆盖是对的。",
-      "claude_judge_note": "以 Python 参考解法提交判 TLE（case-0 需 ~55s）；这是语言/算法的限制，不是数据缺陷。C++ 同算法 0.71s 通过 case-0。"
+      "claude_judge_note": "以 Python 参考解法提交判 TLE（case-0 需 ~55s）；这是语言/算法的限制，不是数据缺陷。C++ 同算法 0.71s 通过 case-0。",
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 4010,
@@ -761,7 +812,8 @@
         "status": "not_available",
         "reason": "no independent oracle implemented"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 4021,
@@ -804,7 +856,8 @@
         "status": "not_available",
         "reason": "no independent oracle implemented"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 4033,
@@ -847,7 +900,8 @@
         "status": "not_available",
         "reason": "no independent oracle implemented"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "low"
     },
     {
       "local_number": 4034,
@@ -879,18 +933,58 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 0,
-        "status": "not_available",
-        "reason": "no independent oracle implemented"
+        "seeds": 400,
+        "status": "passed"
       },
-      "independent_oracle_status": "no_independent_oracle",
+      "independent_oracle_status": "passed",
       "sample_reproduced": true,
-      "independent_sample_agreement": null,
+      "independent_sample_agreement": true,
       "misconception_probe": {
-        "status": "not_available",
-        "reason": "no independent oracle implemented"
+        "status": "missed",
+        "basis": "题面样例输出（不是 oracle——拿未变异的 oracle 当基准，任何有效变异都必然不同）",
+        "mutation": "<=p -> <p",
+        "sample_pins_interpretation": false,
+        "mutated_sample_output": [
+          "3"
+        ],
+        "sample_expected": [
+          "3"
+        ],
+        "runtime_error": false,
+        "data_catches_when_sample_does_not": "样例钉不住该变异（<=p -> <p 在样例上同为 3）；已入库数据接住了——变异体判 Wrong Answer（第 2 组）。"
       },
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "claude_risk_tier": "high"
     }
-  ]
+  ],
+  "claude_oracle_triage": {
+    "criterion": "三条判据占两条以上算高风险：①输出规则含并列/例外裁决 ②需从题面推断未明说的规则 ③错误实现仍会产生形状合理的输出",
+    "high_risk_with_oracle": [
+      3723,
+      3725,
+      3789,
+      3906,
+      4034
+    ],
+    "already_had_oracle": [
+      3791,
+      4001,
+      4007
+    ],
+    "low_risk_no_oracle": [
+      3726,
+      3727,
+      3728,
+      3744,
+      3866,
+      4002,
+      4006,
+      4008,
+      4009,
+      4010,
+      4021,
+      4033
+    ],
+    "note": "低风险题仍无独立 oracle，报告如实标 no_independent_oracle；不声称全题独立对拍完成。"
+  }
 }

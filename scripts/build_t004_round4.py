@@ -270,6 +270,92 @@ sys.stdout.write(go(sys.stdin.read()))
 '''
 
 def alt(n,s):
+    # 人拍板：按风险分级补独立 oracle。判据三条，占两条以上算高风险——
+    # ①输出规则含并列/例外裁决 ②需从题面推断未明说的规则 ③错误实现仍产生形状合理的输出。
+    # 下面五题按此判定为高风险，各自用与参考解法**不同算法族**的实现：
+    #   3723 并查集聚合   vs 参考的 BFS 洪泛
+    #   3725 子集精确 DP  vs 参考的贪心（贪心对该目标不保证最优，这条最值得对拍）
+    #   3789 逐解读枚举   vs 参考的降序扫描（真风险在「重复」是否允许重叠）
+    #   3906 路径对暴力   vs 参考的四元组 DP（经典坑：两条路径能否共格）
+    #   4034 前缀最近廉价点 vs 参考的逐对重算 min
+    if n==3723:
+        tok=s.split();sz=int(tok[0]);g=tok[1:1+sz];par=list(range(sz*sz))
+        def find(x):
+            while par[x]!=x: par[x]=par[par[x]];x=par[x]
+            return x
+        for i in range(sz):
+            for j in range(sz):
+                if g[i][j]!=".":continue
+                for di,dj in ((1,0),(0,1)):
+                    a,b=i+di,j+dj
+                    if a<sz and b<sz and g[a][b]==".":
+                        u,w=find(i*sz+j),find(a*sz+b)
+                        if u!=w: par[u]=w
+        border={};size={}
+        for i in range(sz):
+            for j in range(sz):
+                if g[i][j]!=".":continue
+                rt=find(i*sz+j);size[rt]=size.get(rt,0)+1;bs=border.setdefault(rt,set())
+                for di,dj in ((1,0),(-1,0),(0,1),(0,-1)):
+                    a,b=i+di,j+dj
+                    if 0<=a<sz and 0<=b<sz and g[a][b] in "BW": bs.add(g[a][b])
+        z=[sum(x.count("B") for x in g),sum(x.count("W") for x in g)]
+        for rt,bs in border.items():
+            if len(bs)==1: z["BW".index(next(iter(bs)))]+=size[rt]
+        return f"{z[0]} {z[1]}\n"
+    if n==3725:
+        a=list(map(int,s.split()));v=a[1:];m=len(v);M=max(v)
+        tot=[0]*(1<<m)
+        for msk in range(1,1<<m):
+            low=msk&-msk;tot[msk]=tot[msk^low]+v[low.bit_length()-1]
+        cur={0:0};best={}
+        for k in range(1,m+1):
+            nxt={}
+            for msk,c in cur.items():
+                rest=((1<<m)-1)^msk
+                if not rest:continue
+                first=rest&-rest;sub=rest
+                while sub:
+                    if sub&first:
+                        nc=c+abs(tot[sub]-M)
+                        if nc<nxt.get(msk|sub,1<<60): nxt[msk|sub]=nc
+                    sub=(sub-1)&rest
+            cur=nxt
+            if (1<<m)-1 in cur: best[k]=cur[(1<<m)-1]
+        lo=min(best.values())
+        return str(max(k for k,c in best.items() if c==lo))+"\n"
+    if n==3789:
+        a=list(map(int,s.split()));m,k=a[0],a[1];v=a[2:]
+        for L in range(m,0,-1):
+            for i in range(m-L+1):
+                pat=v[i:i+L]
+                if sum(v[j:j+L]==pat for j in range(m-L+1))>=k: return str(L)+"\n"
+        return "0\n"
+    if n==3906:
+        a=list(map(int,s.split()));m,c=a[0],a[1];g=a[2:];paths=[]
+        def walk(x,y,cells):
+            if x==m-1 and y==c-1: paths.append(cells);return
+            if x+1<m: walk(x+1,y,cells+[(x+1)*c+y])
+            if y+1<c: walk(x,y+1,cells+[x*c+y+1])
+        walk(0,0,[0])
+        ends={0,(m-1)*c+c-1};best=-1
+        for pa in paths:
+            sp=set(pa)
+            for qa in paths:
+                if (sp&set(qa))-ends: continue
+                best=max(best,sum(g[x] for x in sp|set(qa)))
+        return str(best)+"\n"
+    if n==4034:
+        a=list(map(int,s.split()));m,_,p=a[0],a[1],a[2]
+        v=[(a[3+2*i],a[4+2*i]) for i in range(m)]
+        nxt=[m]*(m+1)                       # nxt[i]=从 i 起最近的「消费<=p」位置
+        for i in range(m-1,-1,-1): nxt[i]=i if v[i][1]<=p else nxt[i+1]
+        total=0
+        for i in range(m):
+            for j in range(i+1,m):
+                if v[i][0]==v[j][0] and nxt[i]<=j: total+=1
+        return str(total)+"\n"
+
     # Independent implementations for the high-risk branches; simple counting
     # problems use a separately structured formulation.
     if n==4001:
