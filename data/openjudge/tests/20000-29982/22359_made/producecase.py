@@ -4,7 +4,16 @@ REFERENCE_SOURCE = 'def is_prime(n):\n    if n < 2:\n        return False\n    f
 SAMPLE_IN = '10\n'
 SAMPLE_OUT = '3 7\n'
 def generate_case(r):
-    value = r.randrange(2, 10001, 2); assert value >= 4 and value % 2 == 0
+    def is_prime(x):
+        return x >= 2 and all(x % d for d in range(2, int(x ** 0.5) + 1))
+
+    if r.random() < .3:
+        while True:                                   # 奇数和：拒绝采样保证 sum-2 是素数
+            value = r.randrange(5, 10001, 2)
+            if is_prime(value - 2): break
+    else:
+        value = r.randrange(4, 10001, 2)              # 偶数和：下界改到 4，排除无解的 2
+    assert value >= 4 and (value % 2 == 0 or is_prime(value - 2))
     return str(value) + "\n"
 
 assert SAMPLE_IN == '10\n'

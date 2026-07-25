@@ -365,9 +365,10 @@
       },
       "max_input_bytes": 5,
       "constraints": [
-        "the input sum is even and at least 4",
-        "the two output addends must be prime",
-        "the input is one integer"
+        "和为正整数且 <= 10000",
+        "和必须能拆成两个素数之和（排除无解的 2）",
+        "题面未限定偶数：奇数和在 sum-2 为素数时合法，此时必有一个加数是 2",
+        "输出取最小的素数 a 及 sum-a，结果唯一"
       ],
       "structure_checked": false,
       "structure_check": null,

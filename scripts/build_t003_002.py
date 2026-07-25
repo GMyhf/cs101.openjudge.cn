@@ -109,8 +109,23 @@ def g22271(r):
     names = ["Oak", "Pine", "Birch", "Maple", "Cedar", "Elm"]; n = r.randint(5, 30); values = [r.choice(names) for _ in range(n)]
     assert 1 <= n <= 100000 and len(values) == n
     return str(n) + "\n" + "\n".join(values) + "\n"
+# 两处问题：
+# ① 原范围 randrange(2, 10001, 2) 会产出 2，而 2 拆不成两个素数之和 —— 参考解法的
+#    goldbach(2) 返回 None，解包直接 TypeError；同函数里的 assert value >= 4 也会先炸。
+#    深度 fuzz 每题 2 万种子，20 题里只有这一处命中（seed 923），是颗定时炸弹。
+# ② 题面只说「和 <= 10000 的正整数」，没限定偶数。奇数和在 sum-2 为素数时同样合法
+#    （此时必有一个加数是 2），而原生成器只出偶数，这条分支一次都没被数据触发。
 def g22359(r):
-    value = r.randrange(2, 10001, 2); assert value >= 4 and value % 2 == 0
+    def is_prime(x):
+        return x >= 2 and all(x % d for d in range(2, int(x ** 0.5) + 1))
+
+    if r.random() < .3:
+        while True:                                   # 奇数和：拒绝采样保证 sum-2 是素数
+            value = r.randrange(5, 10001, 2)
+            if is_prime(value - 2): break
+    else:
+        value = r.randrange(4, 10001, 2)              # 偶数和：下界改到 4，排除无解的 2
+    assert value >= 4 and (value % 2 == 0 or is_prime(value - 2))
     return str(value) + "\n"
 # 原实现选父节点时不看它有没有空位：两个子节点都满时会覆盖右子，把已挂上的节点变成
 # 孤儿——实测 15/20 组的可达节点数少于 N（最坏 N=25 只有 6 个可达），不是题面说的二叉树。
@@ -166,7 +181,9 @@ CONSTRAINTS = {
     22068: ["the origin string has unique alphanumeric characters", "each query is a permutation of the origin", "pop order is checked by stack simulation"],
     22161: ["characters are distinct English letters", "weights are positive and distinct", "queries are letter strings or binary encodings", "Huffman tie ordering is deterministic"],
     22271: ["1<=N<=100000", "each tree name is an English name", "percentages are printed to four decimal places"],
-    22359: ["the input sum is even and at least 4", "the two output addends must be prime", "the input is one integer"],
+    22359: ["和为正整数且 <= 10000", "和必须能拆成两个素数之和（排除无解的 2）",
+            "题面未限定偶数：奇数和在 sum-2 为素数时合法，此时必有一个加数是 2",
+            "输出取最小的素数 a 及 sum-a，结果唯一"],
     22491: ["6<=h<=10", "1<=m<=10", "s and c are positive real numbers", "each course has a 5-point improvement cap", "each course receives a 0.5-hour base allocation"],
     22508: ["1<=n<=1000", "0<=m<=2000", "team ids are 0..n-1", "the win relation is a DAG"],
     22509: ["10<=y<=100000000", "there are multiple input lines until EOF", "x is rounded to four decimal places"],
