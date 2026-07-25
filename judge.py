@@ -23,16 +23,11 @@ def _limits():
     resource.setrlimit(resource.RLIMIT_FSIZE, (2 * 1024 * 1024, 2 * 1024 * 1024))
     resource.setrlimit(resource.RLIMIT_AS, (768 * 1024 * 1024, 768 * 1024 * 1024))
 
+# 子进程环境固定成这一份：用户代码就跑在里面，多一个目录就是多一片可执行面。
+CHILD_PATH = "/usr/local/bin:/usr/bin:/bin"
+
 def _run(command, stdin=None, cwd=None, timeout=5):
-    # Keep the child environment minimal, but retain the directory of an
-    # installed alternate interpreter (for example ~/.local/bin/pypy3).
-    path = "/usr/local/bin:/usr/bin:/bin"
-    pypy = shutil.which("pypy3") if command and Path(command[0]).name == "pypy3" else None
-    if pypy:
-        pypy_dir = str(Path(pypy).resolve().parent)
-        if pypy_dir not in path.split(":"):
-            path = pypy_dir + ":" + path
-    return subprocess.run(command, input=stdin, cwd=cwd, capture_output=True, timeout=timeout, preexec_fn=_limits, env={"PATH": path, "HOME": str(cwd)})
+    return subprocess.run(command, input=stdin, cwd=cwd, capture_output=True, timeout=timeout, preexec_fn=_limits, env={"PATH": CHILD_PATH, "HOME": str(cwd)})
 
 def judge(book, problem_id, language, source):
     catalog_path = MIRROR / "catalog.json"
@@ -49,7 +44,12 @@ def judge(book, problem_id, language, source):
         source_path = work / ("main" + ext); source_path.write_text(source, encoding="utf-8")
         if ext == ".py":
             interpreter = "pypy3" if language in PYPY_LANGUAGES else "python3"
-            if shutil.which(interpreter) is None:
+            # 必须解析成绝对路径再交给子进程：shutil.which 查的是**本进程**的 PATH，
+            # 而子进程拿的是上面那份受限 PATH，两者不一致时裸名字会 FileNotFoundError
+            # （judge 不接这个异常，服务端就变成 500 而不是给出判定）。
+            # 走绝对路径既修掉这点，又不用往子进程 PATH 里塞目录。
+            interpreter_path = shutil.which(interpreter)
+            if interpreter_path is None:
                 return {"status": "Language Unavailable", "message": f"本机没有安装 {interpreter}，换一种语言提交。"}
             if interpreter == "python3":
                 try:
@@ -59,10 +59,10 @@ def judge(book, problem_id, language, source):
             else:
                 # 不能用宿主 CPython 的 compile() 代劳：PyPy3 是另一个版本的解释器，
                 # 语法判定必须由它自己给出，否则会把 CE 误判成 RE。
-                check = _run([interpreter, "-I", "-c", SYNTAX_CHECK, str(source_path)], cwd=work, timeout=15)
+                check = _run([interpreter_path, "-I", "-c", SYNTAX_CHECK, str(source_path)], cwd=work, timeout=15)
                 if check.returncode:
                     return {"status": "Compile Error", "message": check.stderr.decode(errors="replace")[-4000:]}
-            command = [interpreter, "-I", str(source_path)]
+            command = [interpreter_path, "-I", str(source_path)]
         else:
             executable = work / "main"
             compile_result = _run(["g++" if ext == ".cpp" else "gcc", "-O2", "-std=c++17" if ext == ".cpp" else "-std=c11", str(source_path), "-o", str(executable)], cwd=work, timeout=15)

@@ -5,6 +5,7 @@
 """
 import resource
 import shutil
+import tempfile
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -101,6 +102,53 @@ class SandboxContractTests(unittest.TestCase):
         self.assertEqual(seen[resource.RLIMIT_AS], (768 * 1024 * 1024, 768 * 1024 * 1024))
         self.assertIs(resource.setrlimit, real)
 
+    def test_child_environment_is_the_fixed_minimal_set(self):
+        """子进程环境必须恰好是 {PATH, HOME}，且 PATH 是那份固定的最小集。
+
+        用户代码就跑在这个子进程里，PATH 上多一个目录就是多一片可执行面。
+        2026-07-26 修 pypy3 查找问题时曾有过「把解释器目录塞进子进程 PATH」的写法，
+        改成解析绝对路径后就不必动 PATH 了 —— 这条把结果钉住。
+        """
+        seen = []
+        real_run = judge_module.subprocess.run
+
+        def spy(command, **kwargs):
+            seen.append(kwargs.get("env"))
+            return real_run(command, **kwargs)
+
+        for language in ("python", "pypy3"):
+            if language == "pypy3" and not shutil.which("pypy3"):
+                continue
+            with mock.patch.object(judge_module.subprocess, "run", spy):
+                judge(BOOK, PROBLEM, language, SUM_SOURCE)
+        self.assertTrue(seen)
+        for env in seen:
+            self.assertEqual(sorted(env), ["HOME", "PATH"])
+            self.assertEqual(env["PATH"], "/usr/local/bin:/usr/bin:/bin")
+
+    def test_interpreter_outside_the_child_path_still_runs(self):
+        """解释器装在子进程 PATH 之外（比如 ~/.local/bin/pypy3）时也必须能判题。
+
+        这条钉的是 Codex 在 `1bd4603` 抓到的真 bug：`shutil.which()` 查的是**本进程**的
+        PATH，子进程拿的却是受限 PATH，两者不一致时裸名字会 FileNotFoundError；
+        `judge()` 不接这个异常，服务端就变成 500 而不是给出判定。
+        """
+        real = shutil.which("pypy3") or shutil.which("python3")
+        with tempfile.TemporaryDirectory() as folder:
+            elsewhere = Path(folder) / "opt"
+            elsewhere.mkdir()
+            shim = elsewhere / "pypy3"         # 装在子进程 PATH 之外
+            shim.symlink_to(real)
+            empty = Path(folder) / "empty"
+            empty.mkdir()
+            # 子进程 PATH 里一个解释器都没有：只有把命令解析成绝对路径才跑得起来。
+            # 少了这一层，本机 /usr/bin/pypy3 恰好在标准 PATH 上，裸名字照样能跑，
+            # 这条用例就变成了测不出差别的假覆盖（2026-07-26 变异自检抓到过一次）。
+            with mock.patch.object(judge_module, "CHILD_PATH", str(empty)), \
+                 mock.patch.object(judge_module.shutil, "which", return_value=str(shim)):
+                result = judge(BOOK, PROBLEM, "pypy3", SUM_SOURCE)
+        self.assertEqual(result["status"], "Accepted", result)
+
     def test_run_defaults_to_five_second_wall_clock(self):
         import inspect
         self.assertEqual(inspect.signature(judge_module._run).parameters["timeout"].default, 5)
@@ -173,8 +221,11 @@ class PyPy3Tests(unittest.TestCase):
 
         def spy(command, **kwargs):
             out = real_run(command, **kwargs)
-            if command[0] in ("python3", "pypy3") and "-c" not in command:
-                seen[command[0]] = out.stdout.decode().strip()
+            # command[0] 现在是绝对路径（见 judge.py 里解析 interpreter_path 的注释），
+            # 所以按 basename 归类。
+            name = Path(command[0]).name
+            if name in ("python3", "pypy3") and "-c" not in command:
+                seen[name] = out.stdout.decode().strip()
             return out
 
         for language in ("python", "pypy3"):
