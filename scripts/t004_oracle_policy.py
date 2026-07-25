@@ -10,14 +10,11 @@ from dataclasses import dataclass
 class OracleContract:
     reference_family: str
     oracle_family: str
-    conceptual_bug_independence: bool
     rationale: str
 
     def validate(self):
         if self.reference_family == self.oracle_family:
             raise AssertionError("reference and oracle use the same algorithm family")
-        if not self.conceptual_bug_independence:
-            raise AssertionError("oracle can repeat a conceptual reference bug")
         if not self.rationale.strip():
             raise AssertionError("independence rationale is required")
         return True
@@ -36,7 +33,6 @@ FAMILY_PAIRS = {
 
 def contract(pair, rationale):
     reference_family, oracle_family = FAMILY_PAIRS[pair]
-    value = OracleContract(reference_family, oracle_family, True, rationale)
+    value = OracleContract(reference_family, oracle_family, rationale)
     value.validate()
     return value
-
