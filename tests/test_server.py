@@ -314,7 +314,13 @@ class ServerApiTests(unittest.TestCase):
             'const marks = (highlight("f(x)", "python", [1, 3]).match(/t-match/g) || []).length === 2;\n'
             'const ind = indentFor("    if x:", 9, "python") === "        "\n'
             '         && indentFor("  if (x) {", 10, "cpp") === "      ";\n'
-            'process.exit(checks && boundary && escaped && pair && skip && marks && ind ? 0 : 1);\n')
+            # 括号补全：行尾补全、右括号跳过、退格删空对、右侧是字母则不插手
+            'const p1 = JSON.stringify(pairAction("f", 1, 1, "(")) === \'{"from":1,"to":1,"insert":"()","caret":2}\';\n'
+            'const p2 = pairAction("f()", 2, 2, ")").caret === 3;\n'
+            'const p3 = pairAction("f()", 2, 2, "Backspace").insert === "";\n'
+            'const p4 = pairAction("foo", 1, 1, "(") === null;\n'
+            'process.exit(checks && boundary && escaped && pair && skip && marks && ind'
+            ' && p1 && p2 && p3 && p4 ? 0 : 1);\n')
         with tempfile.NamedTemporaryFile("w", suffix=".mjs", encoding="utf-8", delete=False) as handle:
             handle.write(harness)
             path = handle.name
@@ -323,6 +329,33 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0,
                          "高亮未按预期工作（关键字/注释/字符串/数字、词边界、HTML 转义）："
                          + (result.stderr or result.stdout)[:400])
+
+    def test_history_page_and_limit(self):
+        status, _, body = request(self.port, "GET", "/history/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn("提交记录", text)
+        self.assertIn("/api/submissions", text)
+
+        username = "t006_hist_page"
+        _, headers, _ = request(self.port, "POST", "/api/user/register", {
+            "username": username, "password": "T006-password",
+        })
+        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        for source in ("print(1)", "print(2)", "print(3)"):
+            request(self.port, "POST", "/api/submit", {
+                "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM,
+                "language": "python", "source": source,
+            }, cookie=cookie)
+
+        def count(query):
+            _, _, raw = request(self.port, "GET", "/api/submissions" + query, cookie=cookie)
+            return len(json.loads(raw)["submissions"])
+
+        self.assertEqual(count(""), 3)
+        self.assertEqual(count("?limit=2"), 2)
+        self.assertEqual(count("?limit=abc"), 3)      # 非法值回落默认，不是 500
+        self.assertEqual(count("?limit=99999"), 3)    # 夹到上界，不是拒绝
 
     def test_static_path_cannot_traverse(self):
         for path in ("/../server.py", "/%2e%2e/server.py", "/data/../server.py"):

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>提交记录 · CS101</title>
+<style>
+  :root { --ink:#17221d; --muted:#6b7a72; --line:#d9e0da; --bg:#f7f9f7; --ok:#2f7d55; --bad:#b04f43; }
+  * { box-sizing:border-box; }
+  body { font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink);
+         max-width:980px; margin:0 auto; padding:28px 20px 60px; }
+  h1 { font-size:26px; margin:0 0 4px; }
+  .sub { color:var(--muted); margin:0 0 20px; }
+  .sub a { color:#3d8b68; }
+  .cards { display:flex; gap:10px; flex-wrap:wrap; margin:0 0 18px; }
+  .stat { border:1px solid var(--line); border-radius:8px; padding:10px 14px; background:var(--bg); min-width:104px; }
+  .stat b { display:block; font-size:20px; font-variant-numeric:tabular-nums; }
+  .stat span { color:var(--muted); font-size:13px; }
+  .bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin:0 0 12px; }
+  input[type=search], select { padding:8px 10px; border:1px solid var(--line); border-radius:5px; font:inherit; }
+  input[type=search] { flex:1; min-width:180px; }
+  table { width:100%; border-collapse:collapse; }
+  th,td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); }
+  th { color:var(--muted); font-size:13px; font-weight:600; }
+  tr:hover td { background:var(--bg); }
+  td.num { font-variant-numeric:tabular-nums; white-space:nowrap; }
+  a.pid { color:#3d8b68; text-decoration:none; font-weight:600; }
+  a.pid:hover { text-decoration:underline; }
+  .badge { display:inline-block; padding:1px 9px; border-radius:999px; font-size:12px; font-weight:600; white-space:nowrap; }
+  .b-ac { background:#e7f3ec; color:var(--ok); }
+  .b-wa { background:#fdeceb; color:var(--bad); }
+  .b-other { background:#fdf4e3; color:#8a6d1f; }
+  .b-info { background:#eef1f4; color:#55606b; }
+  .muted { color:var(--muted); }
+  .empty { padding:40px 0; text-align:center; color:var(--muted); }
+</style>
+<h1>提交记录</h1>
+<p class="sub" id="who">读取中…</p>
+
+<div class="cards" id="stats"></div>
+<div class="bar">
+  <input type="search" id="q" placeholder="按题号筛选" autocomplete="off">
+  <select id="verdict"><option value="">全部结果</option></select>
+  <select id="limit">
+    <option value="50">最近 50 条</option>
+    <option value="200">最近 200 条</option>
+    <option value="500">最近 500 条</option>
+  </select>
+</div>
+
+<table>
+  <thead><tr><th>时间</th><th>题号</th><th>题库</th><th>结果</th><th>细节</th><th>语言</th><th></th></tr></thead>
+  <tbody id="rows"></tbody>
+</table>
+<p class="empty" id="empty" hidden>没有符合条件的提交。</p>
+
+<script>
+const CLS = { "Accepted": "b-ac", "Wrong Answer": "b-wa" };
+const INFO = ["No Test Data", "Problem Not Found", "Empty Source", "Source Too Large"];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const badge = s => '<span class="badge ' + (CLS[s] || (INFO.includes(s) ? "b-info" : "b-other")) + '">' + esc(s) + "</span>";
+let all = [];
+
+function detailOf(s) {
+  const d = s.detail || {};
+  if (d.case !== undefined) return "第 " + d.case + " 组出错";
+  if (d.cases !== undefined) return d.cases + " 组全部通过";
+  return "";
+}
+
+function render() {
+  const term = q.value.trim().toLowerCase();
+  const want = verdict.value;
+  const hits = all.filter(s =>
+    (!want || s.result === want) &&
+    (!term || String(s.problem).toLowerCase().includes(term)));
+  empty.hidden = hits.length > 0;
+  rows.innerHTML = hits.map(s => {
+    const path = s.book ? "/" + s.book + "/" + s.problem + "/" : "";
+    return `<tr>
+      <td class="num muted">${esc(s.created)}</td>
+      <td>${path ? `<a class="pid" href="${path}">${esc(s.problem)}</a>` : esc(s.problem)}</td>
+      <td class="muted">${esc(s.book || "")}</td>
+      <td>${badge(s.result)}</td>
+      <td class="muted">${esc(detailOf(s))}</td>
+      <td class="muted">${esc(s.language || "")}</td>
+      <td>${path ? `<a class="muted" href="${path}submit/">再交一次 →</a>` : ""}</td>
+    </tr>`;
+  }).join("");
+}
+
+function paintStats() {
+  const total = all.length;
+  const ac = all.filter(s => s.result === "Accepted").length;
+  const solved = new Set(all.filter(s => s.result === "Accepted").map(s => s.problem)).size;
+  const tried = new Set(all.map(s => s.problem)).size;
+  stats.innerHTML =
+      `<div class="stat"><b>${total}</b><span>提交次数</span></div>`
+    + `<div class="stat"><b>${ac}</b><span>通过次数</span></div>`
+    + `<div class="stat"><b>${solved}/${tried}</b><span>通过题数 / 尝试题数</span></div>`
+    + `<div class="stat"><b>${total ? Math.round(ac / total * 100) : 0}%</b><span>通过率</span></div>`;
+  const kinds = [...new Set(all.map(s => s.result))].sort();
+  const keep = verdict.value;
+  verdict.innerHTML = '<option value="">全部结果</option>'
+    + kinds.map(k => `<option value="${esc(k)}"${k === keep ? " selected" : ""}>${esc(k)}</option>`).join("");
+}
+
+async function load() {
+  const r = await fetch("/api/submissions?limit=" + limit.value, { credentials: "same-origin" });
+  if (r.status === 401) {
+    who.innerHTML = '<a href="/auth/login/">请先登录</a>后查看提交记录。';
+    empty.hidden = false; empty.textContent = "登录后这里会列出你的提交。";
+    return;
+  }
+  const data = await r.json();
+  all = data.submissions || [];
+  who.innerHTML = '登录为 <b>' + esc(data.user) + '</b> · <a href="/problems/">题库目录</a> · <a href="/">首页</a>';
+  paintStats();
+  render();
+}
+
+for (const el of [q, verdict]) el.addEventListener("input", render);
+limit.addEventListener("change", load);
+load();
+</script>
+</html>

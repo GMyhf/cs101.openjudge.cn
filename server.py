@@ -113,7 +113,7 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  .snip-h{color:var(--muted);font-size:13px;margin-bottom:4px}
 </style>
 <h1>__PROBLEM__ 本地提交</h1>
-<p class="sub">题库：__BOOK__ · 判题运行在本机 · <a href="/problems/">题库目录</a> · <a href="/__BOOK__/__PROBLEM__/">看题面</a><span id="adminlink"></span></p>
+<p class="sub">题库：__BOOK__ · 判题运行在本机 · <a href="/problems/">题库目录</a> · <a href="/history/">提交记录</a> · <a href="/__BOOK__/__PROBLEM__/">看题面</a><span id="adminlink"></span></p>
 <p id="auth" class="muted">正在检查登录状态…</p>
 <form id="form">
   <div class="editor">
@@ -237,6 +237,45 @@ function indentFor(code, pos, lang) {
   return base + (opens ? "    " : "");
 }
 
+// ---- 括号/引号自动补全 --------------------------------------------------
+// 纯函数：给定当前文本、选区和按下的键，返回要做的编辑，或 null 表示走浏览器默认行为。
+// 返回 {from, to, insert, caret}，caret 是应用后的绝对光标位置。
+const PAIRS = { "(": ")", "[": "]", "{": "}", '"': '"', "'": "'" };
+const CLOSERS = ")]}";
+
+// 右侧是这些时才自动补全：行尾、空白、右括号。避免把 f|oo 变成 f(|)oo。
+function closeOk(next) {
+  return next === undefined || next === "\n" || /\s/.test(next) || CLOSERS.indexOf(next) >= 0;
+}
+
+function pairAction(value, start, end, key) {
+  const next = value[start];
+
+  if (key === "Backspace" && start === end && start > 0) {
+    const left = value[start - 1];
+    if (PAIRS[left] && PAIRS[left] === next) {          // 空的一对，一次删掉两个
+      return { from: start - 1, to: start + 1, insert: "", caret: start - 1 };
+    }
+    return null;
+  }
+
+  if (start !== end) {                                  // 有选区：用这对把它裹起来
+    if (!PAIRS[key]) return null;
+    const picked = value.slice(start, end);
+    return { from: start, to: end, insert: key + picked + PAIRS[key], caret: end + 2 };
+  }
+
+  // 输入右括号而右边正好就是它：跳过去，不再插一个
+  if ((CLOSERS.indexOf(key) >= 0 || key === '"' || key === "'") && next === key) {
+    return { from: start, to: start, insert: "", caret: start + 1 };
+  }
+
+  if (PAIRS[key] && closeOk(next)) {
+    return { from: start, to: start, insert: key + PAIRS[key], caret: start + 1 };
+  }
+  return null;
+}
+
 function esc2(s) { return esc(s); }
 
 function highlight(code, lang, marks) {
@@ -286,6 +325,13 @@ src.addEventListener("keydown", e => {
     e.preventDefault();
     const indent = indentFor(src.value, src.selectionStart, form.language.value);
     src.setRangeText("\n" + indent, src.selectionStart, src.selectionEnd, "end");
+    paintEditor();
+  } else if (e.key === "Backspace" || PAIRS[e.key] || CLOSERS.indexOf(e.key) >= 0) {
+    const act = pairAction(src.value, src.selectionStart, src.selectionEnd, e.key);
+    if (!act) return;                        // 没命中就走浏览器默认行为（含撤销栈）
+    e.preventDefault();
+    src.setRangeText(act.insert, act.from, act.to, "end");
+    src.selectionStart = src.selectionEnd = act.caret;
     paintEditor();
   }
 });
@@ -568,13 +614,21 @@ class Handler(BaseHTTPRequestHandler):
             user = self.current_user()
             if user is None:
                 self.send_json({"error": "Unauthorized"}, 401); return
+            try:
+                limit = min(max(int(parse_qs(parsed.query).get("limit", ["50"])[0]), 1), 500)
+            except ValueError:
+                limit = 50
             with sqlite3.connect(DB) as db:
                 rows = db.execute("select problem, result, created, book, language, detail from submissions"
-                                  " where user = ? order by id desc limit 50", (user,)).fetchall()
+                                  " where user = ? order by id desc limit ?", (user, limit)).fetchall()
             self.send_json({"user": user, "submissions": [
                 {"problem": r[0], "result": r[1], "created": r[2], "book": r[3], "language": r[4],
                  "detail": json.loads(r[5]) if r[5] else {}} for r in rows]})
             return
+        if path in ("/history", "/history/"):
+            page = ROOT / "history.html"
+            if page.is_file():
+                self.send_html(page.read_text(encoding="utf-8")); return
         if path in ("/problems", "/problems/"):
             page = ROOT / "problems.html"
             if page.is_file():
