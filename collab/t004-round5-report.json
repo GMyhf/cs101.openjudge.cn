@@ -745,5 +745,118 @@
       "producecase_reproduced": true
     }
   ],
-  "unbuilt": []
+  "unbuilt": [],
+  "claude_review_2026_07_26": {
+    "verdict": "打回。20 题里 4 题的参考解法在真实平台判错 —— 它们生成的 .out 数据是错的；另有 3 处报告/机制缺陷与 1 处仓库卫生问题。",
+    "platform_submission": {
+      "method": "按新定的三档流程逐题提交 cs101.openjudge.cn：Python3 → 若 TLE 则 PyPy3 → 若仍 TLE 则 C++。整份 solve() 分派器会被平台 pylint 判 E0102 算 Compile Error，故按题拆成单题独立程序",
+      "accepted": {
+        "3433": "C++ 59ms (#52995213)",
+        "3670": "25ms",
+        "4022": "25ms",
+        "4031": "5667ms",
+        "4054": "10000ms",
+        "4083": "26ms",
+        "4140": "20ms (#52995214)",
+        "7206": "26ms",
+        "22528": "585ms",
+        "23554": "23ms",
+        "25570": "24ms"
+      },
+      "accepted_count": 11,
+      "wrong_answer": {
+        "3750": "#52995197",
+        "4012": "#52995199",
+        "4076": "#52995206"
+      },
+      "presentation_error": {
+        "3377": "#52995195 —— 输出格式不合规"
+      },
+      "tle_in_both_python_tiers": {
+        "4011": "#52995198 / PyPy3 #52995215",
+        "4035": "#52995202 / #52995216",
+        "4037": "#52995203 / #52995217",
+        "4038": "#52995204 / #52995218",
+        "27384": "#52995212 / #52995219"
+      }
+    },
+    "blocking": [
+      {
+        "id": "A",
+        "problems": [
+          3750,
+          4012,
+          4076,
+          3377
+        ],
+        "finding": "参考解法在真实平台判 Wrong Answer / Presentation Error —— **这 4 题生成的 .out 数据是错的**",
+        "why_local_missed_it": "这 4 题本地全部通过：对拍一致、字节复现一致、samplecode 逐组复算全对。本地对拍只能证明两个实现**彼此一致**，证明不了它们**解对了题**（round4 的 3725 是同一教训）",
+        "action": "重写参考解法并重新生成数据；改完必须以平台 Accepted 为准，不能只看本地对拍"
+      },
+      {
+        "id": "B",
+        "problems": [
+          4140
+        ],
+        "finding": "参考解法与 oracle 是**同一个写死的常量** `return \"5.705085930\\n\"`，对拍恒真；报告却标 independent_oracle_status=passed、smoke seeds=21 passed",
+        "note": "该常量本身是对的 —— Claude 用二分法与牛顿法独立算到 20 位一致，平台提交也 Accepted。但**流水线里没有任何一步验证过它**，「passed」是空头声称",
+        "also": "21 组数据是同一个空输入的 21 份拷贝（distinct_input_cases=1），把 test_cases=21 撑成了假覆盖",
+        "action": "oracle 改为真正独立的求根实现（二分 vs 牛顿），或如实标 no_independent_oracle；数据按「输入域本身小于 15」的既有豁免口径记 1 组"
+      },
+      {
+        "id": "C",
+        "problems": [
+          4011
+        ],
+        "finding": "「独立 oracle」就是参考解法本身：27 行里 15 行逐字相同，差异仅为变量改名（agents→Pn、distribute→walk、du→z）与 INF 常量。核心的 Dijkstra + 期望值递推 + 穷举分配完全一致",
+        "note": "round4 打回过的同一形状（当时是 17/20）",
+        "action": "换算法族重写，或如实标 no_independent_oracle"
+      },
+      {
+        "id": "D",
+        "scope": "全部 20 条",
+        "finding": "constant_output_probe.status 是**写死的字面量 \"rejected\"**（build_t004_round5.py 第 798 行），不是实测值。001d 已立规矩「报告自检字段必须是实测值，不得写字面量常量」",
+        "consequence": "4140 的 frequency=21/21 —— 常量解法必 AC、数据零鉴别力 —— status 仍写 rejected。round4 脚本里这个字段是算出来的（\"rejected\" if f<21 else \"accepted\"），round5 退回去了",
+        "action": "改回实测"
+      },
+      {
+        "id": "E",
+        "problems": [
+          4012
+        ],
+        "finding": "去重后只有 4 组，远低于 001a 立的「每题去重 >=15」，且报告未记录豁免。根因：g4012 只是从 **3 个写死的字符串**里 r.choice",
+        "context": "题面是「多组数据、每行一个字符串、长度不超过 500」，输入域极大，不构成豁免",
+        "action": "重写生成器"
+      }
+    ],
+    "hygiene": [
+      {
+        "id": "F",
+        "problems": [
+          3433
+        ],
+        "finding": "该题**没有 samplecode.py**（其余 19 题都有），且仓库里入库了一个 **64KB 的 ELF 可执行文件** `data/openjudge/tests/3000-3682/03433_made/reference`",
+        "risk": "二进制入库不可复现、与平台/架构绑定；producecase.py 若依赖它，换台机器就重跑不出数据",
+        "action": "reference 二进制不入库（改为构建时从 samplecode_ac.cpp 现编），并补 samplecode.py 或在报告里明确「本题参考实现是 C++」"
+      },
+      {
+        "id": "G",
+        "scope": "build_t004_round5.py",
+        "finding": "NO_INDEPENDENT_ORACLE 又是**手维护常量**（还有一行冗余的 `.add(3433)`）",
+        "note": "2026-07-26 刚在 round4 脚本里拆掉这个地雷：常量与 alt() 实际实现脱节后，**任何一次重跑都会把报告里的 passed 悄悄改回 no_independent_oracle**（4034 就是这么掉的）",
+        "action": "改成从 alt() 是否抛 LookupError 推导（round4 脚本里的 has_oracle 可直接照搬）"
+      }
+    ],
+    "passed": {
+      "byte_reproduction": "20/20 逐字节复现",
+      "sample_is_case_zero": "20/20",
+      "samplecode_recompute": "19/20 全对（3433 无 samplecode.py，见 F）",
+      "report_numbers_vs_disk": "test_cases / distinct_input_cases / distinct_outputs / constant_output_probe.frequency 四项逐题对账，20/20 与磁盘一致（数字属实，问题在 status 字段与口径，见 D）"
+    },
+    "watch_not_blocking": {
+      "weak_discrimination": "最高频输出占比过高：3670、4035、27384 各 20/21，3750 19/21，4076 15/21 —— 常量解法只被 1~6 组挡住。参考 T-007 的口径，29803 的 20/21 当时判定为真缺陷",
+      "no_platform_backing": "4011、4035、4037、4038、27384 在 Python3 与 PyPy3 两档都 TLE，正确性目前只有本地对拍支撑。按新流程应补 C++",
+      "g4054": "只有 4 种颜色布局（去重 16 组达标，但多样性来自 9 个起点位置而非棋盘内容）"
+    }
+  }
 }
