@@ -109,7 +109,7 @@ def made_numbers():
 
 def main():
     round_name = sys.argv[1] if len(sys.argv) > 1 else ""
-    suffix = {"--round2": "round2", "--round3": "round3"}.get(round_name)
+    suffix = {"--round2": "round2", "--round3": "round3", "--round4": "round4"}.get(round_name)
     batch_name = f"T-003-002-r{suffix[-1]}" if suffix else "T-003-002"
     out = ROOT / (f"collab/t003-batch-002-{suffix}-manifest.json" if suffix else "collab/t003-batch-002-manifest.json")
     pool_out = ROOT / (f"collab/t003-batch-002-{suffix}-candidates.json" if suffix else "collab/t003-batch-002-candidates.json")
