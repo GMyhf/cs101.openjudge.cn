@@ -717,7 +717,8 @@
         "reason": "no independent oracle implemented"
       },
       "producecase_reproduced": true,
-      "coverage_note": "无查表实测：n=20 样例可在约 8 秒完成，n=21 可在约 16 秒完成；n=22 未在 60 秒限制内完成，因此本批不声称覆盖题面上界 24。"
+      "coverage_note": "判题限额是 5 秒墙钟 / 4 秒 CPU（judge.py），不是 60 秒——原注记用 60 秒作标尺，结论方向对但数字不可比。Claude 实测：Python 参考解法 n<=17 可在限额内完成（3.7s），n=18 起 TLE（8.6s）；case-0 是题面样例（15/16/19/20），Python 跑完需 ~55s，故**用 Python 提交本题无法在判题限额内通过**。同一算法的 C++ 实现跑 case-0 仅 0.71s（可过），跑 n=24 需 10.1s（仍超限）。结论：数据本身正确且可判（C++ 可过），但本题在当前限额下对 Python 提交不可解；题面上界 24 无论 Python 还是 C++ 都覆盖不到，不声称覆盖是对的。",
+      "claude_judge_note": "以 Python 参考解法提交判 TLE（case-0 需 ~55s）；这是语言/算法的限制，不是数据缺陷。C++ 同算法 0.71s 通过 case-0。"
     },
     {
       "local_number": 4010,
