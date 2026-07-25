@@ -1,0 +1,417 @@
+{
+  "batch": "T-003-002-r5",
+  "entries": [
+    {
+      "local_number": 23555,
+      "source_heading": "23555: 节省存储的矩阵乘法",
+      "source_code": "solution collection",
+      "generator": "g23555",
+      "seed": 23555,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "frequency": 1,
+        "total": 21,
+        "status": "rejected"
+      },
+      "max_input_bytes": 151,
+      "constraints": [
+        "matrix dimension is n*n",
+        "stored coordinates are zero-based and unique within each matrix",
+        "stored values are nonzero",
+        "product output is sorted by row then column"
+      ],
+      "structure_checked": true,
+      "structure_check": "each sparse matrix has unique in-range nonzero coordinates",
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 24390,
+      "source_heading": "24390: 黑白棋子",
+      "source_code": "solution collection",
+      "generator": "g24390",
+      "seed": 24390,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 6,
+      "max_output_frequency": 8,
+      "constant_output_probe": {
+        "frequency": 8,
+        "total": 21,
+        "status": "rejected"
+      },
+      "max_input_bytes": 16,
+      "constraints": [
+        "1<=N<=20",
+        "input is a binary string of length N",
+        "the generated state is reachable from a uniform color by legal adjacent flips"
+      ],
+      "structure_checked": true,
+      "structure_check": "the initial bit state is obtained by legal flips from all zero",
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 24677,
+      "source_heading": "24677: 安全位置",
+      "source_code": "solution collection",
+      "generator": "g24677",
+      "seed": 24677,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 6,
+      "max_output_frequency": 9,
+      "constant_output_probe": {
+        "frequency": 9,
+        "total": 21,
+        "status": "rejected"
+      },
+      "max_input_bytes": 25,
+      "constraints": [
+        "0<=len(S)<=30",
+        "the four coordinates are decimal substrings",
+        "safe coordinates are 0..500 without leading zero"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 27237,
+      "source_heading": "27237: 体育游戏跳房子",
+      "source_code": "solution collection",
+      "generator": "g27237",
+      "seed": 27237,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 20,
+      "max_output_frequency": 2,
+      "constant_output_probe": {
+        "frequency": 2,
+        "total": 21,
+        "status": "rejected"
+      },
+      "max_input_bytes": 19,
+      "constraints": [
+        "1<=n,m<=1000",
+        "H maps x to 3x and O maps x to floor(x/2)",
+        "0 0 terminates input",
+        "generated targets have a legal path of at most 25 hops"
+      ],
+      "structure_checked": true,
+      "structure_check": "each target is produced by replaying a legal H/O path",
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 27301,
+      "source_heading": "27301: 给植物浇水",
+      "source_code": "solution collection",
+      "generator": "g27301",
+      "seed": 27301,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 10,
+      "max_output_frequency": 4,
+      "constant_output_probe": {
+        "frequency": 4,
+        "total": 21,
+        "status": "rejected"
+      },
+      "max_input_bytes": 65,
+      "constraints": [
+        "n<=100",
+        "capacities exceed every plant requirement",
+        "Alice proceeds left-to-right and Bob right-to-left",
+        "refill is only allowed when the next plant cannot be fully watered"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 27306,
+      "source_heading": "27306: 植物观察",
+      "source_code": "solution collection",
+      "generator": "g27306",
+      "seed": 27306,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 2,
+      "max_output_frequency": 16,
+      "constant_output_probe": {
+        "frequency": 16,
+        "total": 21,
+        "status": "rejected"
+      },
+      "max_input_bytes": 133,
+      "constraints": [
+        "0<=plant indices<n",
+        "each relation is same/different",
+        "the generated batch includes consistent and contradictory parity systems"
+      ],
+      "structure_checked": true,
+      "structure_check": "relations are generated from a parity assignment, with an explicit contradictory relation for NO cases",
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 27310,
+      "source_heading": "27310: 积木",
+      "source_code": "solution collection",
+      "generator": "g27310",
+      "seed": 27310,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "frequency": 1,
+        "total": 21,
+        "status": "rejected"
+      },
+      "max_input_bytes": 68,
+      "constraints": [
+        "there are four blocks with six uppercase letters each",
+        "each requested word has 1..4 uppercase letters",
+        "a block can be used at most once per word"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 27351,
+      "source_heading": "27351: 01最小生成树",
+      "source_code": "solution collection",
+      "generator": "g27351",
+      "seed": 27351,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 5,
+      "max_output_frequency": 14,
+      "constant_output_probe": {
+        "frequency": 14,
+        "total": 21,
+        "status": "rejected"
+      },
+      "max_input_bytes": 126,
+      "constraints": [
+        "1<=a<b<=n for every distinct weight-1 edge",
+        "m<=n(n-1)/2",
+        "the graph is complete with listed edges having weight 1 and all others weight 0"
+      ],
+      "structure_checked": true,
+      "structure_check": "weight-1 edges are unique, ordered, and in range",
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 27951,
+      "source_heading": "27951: 机器翻译",
+      "source_code": "solution collection",
+      "generator": "g27951",
+      "seed": 27951,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 18,
+      "max_output_frequency": 2,
+      "constant_output_probe": {
+        "frequency": 2,
+        "total": 21,
+        "status": "rejected"
+      },
+      "max_input_bytes": 165,
+      "constraints": [
+        "M<=100 and N<=1000",
+        "word values are nonnegative and at most 1000",
+        "memory is FIFO and starts empty"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28701,
+      "source_heading": "28701: 炸鸡排",
+      "source_code": "solution collection",
+      "generator": "g28701",
+      "seed": 28701,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "frequency": 1,
+        "total": 21,
+        "status": "rejected"
+      },
+      "max_input_bytes": 75,
+      "constraints": [
+        "0<k<=n",
+        "n<=1000",
+        "each frying time is a positive integer at most 1000000",
+        "the fryer always contains exactly k pieces"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28776,
+      "source_heading": "28776: 国王游戏",
+      "source_code": "solution collection",
+      "generator": "g28776",
+      "seed": 28776,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 20,
+      "max_output_frequency": 2,
+      "constant_output_probe": {
+        "frequency": 2,
+        "total": 21,
+        "status": "rejected"
+      },
+      "max_input_bytes": 40,
+      "constraints": [
+        "1<=n<=100",
+        "king and ministers' hand values are 1..10",
+        "each order is evaluated using the product of preceding left hands"
+      ],
+      "structure_checked": false,
+      "structure_check": null,
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 31041,
+      "source_heading": "31041: 牛的选举（数据增强版）",
+      "source_code": "solution collection",
+      "generator": "g31041",
+      "seed": 31041,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 16,
+      "max_output_frequency": 3,
+      "constant_output_probe": {
+        "frequency": 3,
+        "total": 21,
+        "status": "rejected"
+      },
+      "max_input_bytes": 1586,
+      "constraints": [
+        "1<=K<=N<=1000000",
+        "A and B values are positive and have no ties",
+        "the first round selects the top K A values and the second selects the top B among them"
+      ],
+      "structure_checked": true,
+      "structure_check": "A and B are each tie-free, as required by the two voting rounds",
+      "generator_seed_smoke": {
+        "seeds_per_generator": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    }
+  ]
+}
