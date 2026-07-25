@@ -1,22 +1,7 @@
-# Source: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md
+# 2026-07-25 回归扫描替换：题解原文是暴力搜索全部路径，n=18 要 143.5s，超判题 4s 上限；本实现与题解在 n=1..12 每次生成时对拍，n=18 手工核对一致
+# 题解原文见同目录 producecase.py 的 BRUTE_SOURCE。
 n = int(input())
-step = [[1, 0], [-1, 0], [0, 1]]
-num = 1
-
-
-def dfs(x, y, m, visited):
-    global num
-    if m == 0:
-        return
-    visited.append([x, y])
-    num -= 1
-    for j in range(3):
-        if [x+step[j][0], y+step[j][1]] not in visited:
-            num += 1
-            lista = []
-            lista += visited
-            dfs(x+step[j][0], y+step[j][1], m-1, lista)
-
-
-dfs(0, 0, n, [])
-print(num)
+a, b = 1, 3            # f(0)=1, f(1)=3, f(k)=2*f(k-1)+f(k-2)
+for _ in range(max(0, n - 1)):
+    a, b = b, 2 * b + a
+print(b if n >= 1 else a)

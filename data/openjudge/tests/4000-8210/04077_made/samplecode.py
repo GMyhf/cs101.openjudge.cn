@@ -1,26 +1,5 @@
-# Source: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md
-def count_sequences(n):
-    def dfs(push_num, stack, popped):
-        nonlocal count
-        # 如果已经弹出了 n 个数，说明这个出栈序列是合法的
-        if popped == n:
-            count += 1
-            return
-        # 尝试进栈：如果还有数字没进栈
-        if push_num <= n:
-            stack.append(push_num)
-            dfs(push_num + 1, stack, popped)
-            stack.pop()
-        # 尝试出栈：如果栈不空
-        if stack:
-            top = stack.pop()
-            dfs(push_num, stack, popped + 1)
-            stack.append(top)
-
-    count = 0
-    dfs(1, [], 0)
-    return count
-
-# 读取输入
+# 2026-07-25 回归扫描替换：题解原文是暴力 DFS，n=15 要 63.6s，超判题 4s 上限；本实现与题解在 n=1..11 每次生成时对拍，n=15 手工核对一致
+# 题解原文见同目录 producecase.py 的 BRUTE_SOURCE。
+import math
 n = int(input())
-print(count_sequences(n))
+print(math.comb(2 * n, n) // (n + 1))
