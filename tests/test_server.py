@@ -307,7 +307,14 @@ class ServerApiTests(unittest.TestCase):
             'const checks = ["t-kw", "t-com", "t-str", "t-num"].every(c => out.includes(\'class="\' + c + \'"\'));\n'
             'const boundary = !highlight("classic = 1", "python").includes(\'class="t-kw"\');\n'
             'const escaped = !highlight("x = \'<b>\'", "python").includes("<b>");\n'
-            'process.exit(checks && boundary && escaped ? 0 : 1);\n')
+            # 括号匹配必须跳过字符串/注释里的括号；自动缩进要沿用本行缩进并在 : / { 后加一级
+            'const pair = JSON.stringify(bracketMatch("a[b(c)]", 1, "python")) === "[1,6]";\n'
+            # 这个用例必须能区分守卫的有无：串里的 "(" 若不跳过，会跟后面真实的 ")" 错配成 [5,12]
+            'const skip = bracketMatch(\'x = "(" + f()\', 5, "python") === null;\n'
+            'const marks = (highlight("f(x)", "python", [1, 3]).match(/t-match/g) || []).length === 2;\n'
+            'const ind = indentFor("    if x:", 9, "python") === "        "\n'
+            '         && indentFor("  if (x) {", 10, "cpp") === "      ";\n'
+            'process.exit(checks && boundary && escaped && pair && skip && marks && ind ? 0 : 1);\n')
         with tempfile.NamedTemporaryFile("w", suffix=".mjs", encoding="utf-8", delete=False) as handle:
             handle.write(harness)
             path = handle.name

@@ -69,6 +69,28 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  .t-num{color:#8a6d1f}
  .t-kw{color:#9a3d8f;font-weight:600}
  .t-pre{color:#3d6b8b}
+ .t-match{background:#ffe9a8;border-radius:2px;box-shadow:0 0 0 1px #d8b84a}
+ button.ghost{background:#fff;color:var(--ink);border-color:var(--line)}
+ /* 暗色：只改变量与几处硬编码色，结构不动 */
+ :root[data-theme="dark"]{--ink:#e6ece8;--muted:#94a49b;--line:#2f3a34;--bg:#1b211e}
+ :root[data-theme="dark"] body{background:#141917}
+ :root[data-theme="dark"] .editor,
+ :root[data-theme="dark"] .codewrap pre,
+ :root[data-theme="dark"] select,
+ :root[data-theme="dark"] pre.msg{background:#181e1b}
+ :root[data-theme="dark"] .gutter{background:#151a18;color:#5c6a63}
+ :root[data-theme="dark"] button{background:#e6ece8;color:#141917;border-color:#e6ece8}
+ :root[data-theme="dark"] button.ghost{background:#1b211e;color:var(--ink);border-color:var(--line)}
+ :root[data-theme="dark"] .t-com{color:#7f8f86}
+ :root[data-theme="dark"] .t-str{color:#7fc99b}
+ :root[data-theme="dark"] .t-num{color:#d8b667}
+ :root[data-theme="dark"] .t-kw{color:#d78fd0}
+ :root[data-theme="dark"] .t-pre{color:#87b3d8}
+ :root[data-theme="dark"] .t-match{background:#5a4a1a;box-shadow:0 0 0 1px #b8952f}
+ :root[data-theme="dark"] .b-ac{background:#1e3a2a;color:#8fd6ab}
+ :root[data-theme="dark"] .b-wa{background:#3d2320;color:#e59a90}
+ :root[data-theme="dark"] .b-other{background:#39301a;color:#dcc07a}
+ :root[data-theme="dark"] .b-info{background:#242c33;color:#a8b6c2}
  .row{display:flex;gap:10px;align-items:center;margin:12px 0}
  select,button{padding:9px 14px;border:1px solid var(--line);border-radius:5px;font:inherit;background:#fff}
  button{background:#17221d;color:#fff;border-color:#17221d;cursor:pointer}
@@ -107,6 +129,7 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
       <option value="python">Python 3</option><option value="cpp">C++17</option><option value="c">C11</option>
     </select>
     <button id="go">提交并判题</button>
+    <button id="theme" type="button" class="ghost">深色</button>
     <span id="hint" class="muted"></span>
   </div>
 </form>
@@ -128,9 +151,9 @@ fetch("/api/settings", { credentials: "same-origin" }).then(r => r.json()).then(
   if (s.is_admin) adminlink.innerHTML = ' · <a href="/admin/">判题设置</a>';
 });
 
-// ---- 语法高亮 ----------------------------------------------------------
-// 不引外部库：粘性正则按位置扫一遍，命中就包 span，没命中的连续片段整段转义。
-// 顺序要紧：注释和字符串必须排在关键字前面，否则 "# def" 里的 def 会被当关键字。
+// ---- 语法高亮 / 括号匹配 / 自动缩进 -------------------------------------
+// 不引外部库。三件事共用同一次扫描：高亮要知道 token 边界，括号匹配要跳过
+// 字符串和注释里的括号，缺了这层共享就会把 "(" 里的括号也配上。
 const PY_KW = "False|None|True|and|as|assert|async|await|break|class|continue|def|del|elif|else|"
             + "except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|"
             + "return|try|while|with|yield";
@@ -157,10 +180,11 @@ const SPECS = {
 };
 SPECS.cpp = SPECS.c;
 
-function highlight(code, lang) {
+// 一次扫描出所有 token 区间；高亮和括号匹配都基于它，保证两者看到的是同一份切分。
+function scan(code, lang) {
   const specs = SPECS[lang] || SPECS.python;
-  let out = "", i = 0, plain = 0;
-  const flush = () => { if (plain) { out += esc(code.slice(i - plain, i)); plain = 0; } };
+  const tokens = [];
+  let i = 0;
   while (i < code.length) {
     let hit = null;
     for (const spec of specs) {
@@ -168,30 +192,114 @@ function highlight(code, lang) {
       const m = spec[1].exec(code);
       if (m && m.index === i && m[0]) { hit = [spec[0], m[0]]; break; }
     }
-    if (hit) { flush(); out += '<span class="t-' + hit[0] + '">' + esc(hit[1]) + "</span>"; i += hit[1].length; }
-    else { i++; plain++; }
+    if (hit) { tokens.push([hit[0], i, i + hit[1].length]); i += hit[1].length; }
+    else i++;
   }
-  flush();
+  return tokens;
+}
+
+function inToken(tokens, pos) {
+  for (const t of tokens) if (pos >= t[1] && pos < t[2]) return true;
+  return false;
+}
+
+const OPEN = "([{", CLOSE = ")]}";
+
+// 光标处（或其左侧）若是括号，返回它与配对括号的下标。字符串/注释里的括号一律不参与。
+function bracketMatch(code, pos, lang) {
+  const tokens = scan(code, lang);
+  for (const at of [pos, pos - 1]) {
+    if (at < 0 || at >= code.length) continue;
+    const ch = code[at];
+    if (inToken(tokens, at)) continue;
+    const o = OPEN.indexOf(ch), c = CLOSE.indexOf(ch);
+    if (o < 0 && c < 0) continue;
+    const step = o >= 0 ? 1 : -1;
+    const want = o >= 0 ? CLOSE[o] : OPEN[c];
+    let depth = 0;
+    for (let k = at; k >= 0 && k < code.length; k += step) {
+      if (inToken(tokens, k)) continue;
+      if (code[k] === ch) depth++;
+      else if (code[k] === want) { depth--; if (!depth) return [at, k].sort((x, y) => x - y); }
+    }
+    return null;                      // 有括号但没配上：不标，也不去标别的
+  }
+  return null;
+}
+
+// 回车后应插入的缩进：沿用本行缩进；python 行尾是 ":" 或 c 系行尾是 "{" 则多缩一级。
+function indentFor(code, pos, lang) {
+  const lineStart = code.lastIndexOf("\n", pos - 1) + 1;
+  const line = code.slice(lineStart, pos);
+  const base = (line.match(/^[ \t]*/) || [""])[0];
+  const trimmed = line.replace(/\s+$/, "");
+  const opens = lang === "python" ? trimmed.endsWith(":") : trimmed.endsWith("{");
+  return base + (opens ? "    " : "");
+}
+
+function esc2(s) { return esc(s); }
+
+function highlight(code, lang, marks) {
+  const tokens = scan(code, lang);
+  const mark = marks || [];
+  let out = "", i = 0, ti = 0;
+  const wrap = (text, cls) => '<span class="' + cls + '">' + esc2(text) + "</span>";
+  while (i < code.length) {
+    if (ti < tokens.length && tokens[ti][1] === i) {
+      const t = tokens[ti++];
+      out += wrap(code.slice(t[1], t[2]), "t-" + t[0]);
+      i = t[2];
+      continue;
+    }
+    if (mark.indexOf(i) >= 0) { out += wrap(code[i], "t-match"); i++; continue; }
+    // 连续的普通字符整段转义，避免逐字符拼串
+    let j = i;
+    while (j < code.length && !(ti < tokens.length && tokens[ti][1] === j) && mark.indexOf(j) < 0) j++;
+    out += esc2(code.slice(i, j));
+    i = j;
+  }
   return out;
 }
 
 function paintEditor() {
   const code = src.value;
-  // 末尾补一个换行：最后一行为空时，高亮层会比 textarea 少一行高度，滚动就对不齐
-  hl.innerHTML = highlight(code + "\n", form.language.value);
+  const lang = form.language.value;
+  const pair = document.activeElement === src ? bracketMatch(code, src.selectionStart, lang) : null;
+  // 末尾补一个换行：最后一行为空时高亮层会比 textarea 少一行高度，滚动就对不齐
+  hl.innerHTML = highlight(code + "\n", lang, pair);
   gutter.textContent = Array.from({ length: code.split("\n").length }, (_, k) => k + 1).join("\n");
   hl.scrollTop = src.scrollTop; hl.scrollLeft = src.scrollLeft;
 }
 
 src.addEventListener("input", paintEditor);
+src.addEventListener("click", paintEditor);
+src.addEventListener("keyup", paintEditor);
+src.addEventListener("blur", paintEditor);
 src.addEventListener("scroll", () => { hl.scrollTop = src.scrollTop; hl.scrollLeft = src.scrollLeft; });
 form.language.addEventListener("change", paintEditor);
 src.addEventListener("keydown", e => {
-  if (e.key !== "Tab") return;
-  e.preventDefault();
-  src.setRangeText("    ", src.selectionStart, src.selectionEnd, "end");
-  paintEditor();
+  if (e.key === "Tab") {
+    e.preventDefault();
+    src.setRangeText("    ", src.selectionStart, src.selectionEnd, "end");
+    paintEditor();
+  } else if (e.key === "Enter") {
+    e.preventDefault();
+    const indent = indentFor(src.value, src.selectionStart, form.language.value);
+    src.setRangeText("\n" + indent, src.selectionStart, src.selectionEnd, "end");
+    paintEditor();
+  }
 });
+
+// ---- 主题 --------------------------------------------------------------
+const THEME_KEY = "cs101-theme";
+function applyTheme(name) {
+  document.documentElement.dataset.theme = name;
+  theme.textContent = name === "dark" ? "浅色" : "深色";
+  try { localStorage.setItem(THEME_KEY, name); } catch (err) { /* 隐私模式下忽略 */ }
+}
+theme.onclick = () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+applyTheme((() => { try { return localStorage.getItem(THEME_KEY) || "light"; } catch (err) { return "light"; } })());
+
 paintEditor();
 
 function badge(status) {
