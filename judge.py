@@ -24,7 +24,15 @@ def _limits():
     resource.setrlimit(resource.RLIMIT_AS, (768 * 1024 * 1024, 768 * 1024 * 1024))
 
 def _run(command, stdin=None, cwd=None, timeout=5):
-    return subprocess.run(command, input=stdin, cwd=cwd, capture_output=True, timeout=timeout, preexec_fn=_limits, env={"PATH": "/usr/local/bin:/usr/bin:/bin", "HOME": str(cwd)})
+    # Keep the child environment minimal, but retain the directory of an
+    # installed alternate interpreter (for example ~/.local/bin/pypy3).
+    path = "/usr/local/bin:/usr/bin:/bin"
+    pypy = shutil.which("pypy3") if command and Path(command[0]).name == "pypy3" else None
+    if pypy:
+        pypy_dir = str(Path(pypy).resolve().parent)
+        if pypy_dir not in path.split(":"):
+            path = pypy_dir + ":" + path
+    return subprocess.run(command, input=stdin, cwd=cwd, capture_output=True, timeout=timeout, preexec_fn=_limits, env={"PATH": path, "HOME": str(cwd)})
 
 def judge(book, problem_id, language, source):
     catalog_path = MIRROR / "catalog.json"
