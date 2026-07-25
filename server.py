@@ -39,11 +39,132 @@ PROBLEMS = [
     {"id": "A1006", "title": "最大公约数", "chapter": "函数与递归", "difficulty": "进阶", "rate": 69, "solved": 735},
 ]
 
+# 提交页。判题结果不再直接 dump JSON —— 项目的立意是「反馈错在哪组数据」，
+# 所以 WA 要把 case 编号、期望/实际 token 数摆出来，TLE/RE 要把判题器的 message 摆出来。
+SUBMIT_PAGE = """<!doctype html><html lang="zh-CN"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>本地提交 - __PROBLEM__</title>
+<style>
+ :root{--ink:#17221d;--muted:#6b7a72;--line:#d9e0da;--bg:#f7f9f7}
+ *{box-sizing:border-box}
+ body{font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);
+      max-width:900px;margin:0 auto;padding:28px 20px 60px}
+ h1{font-size:24px;margin:0 0 4px}
+ .sub{color:var(--muted);margin:0 0 20px}
+ .sub a{color:#3d8b68}
+ textarea{width:100%;min-height:340px;font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;
+          padding:12px;border:1px solid var(--line);border-radius:6px;resize:vertical;tab-size:4}
+ .row{display:flex;gap:10px;align-items:center;margin:12px 0}
+ select,button{padding:9px 14px;border:1px solid var(--line);border-radius:5px;font:inherit;background:#fff}
+ button{background:#17221d;color:#fff;border-color:#17221d;cursor:pointer}
+ button[disabled]{opacity:.55;cursor:default}
+ .verdict{border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-top:16px;background:var(--bg)}
+ .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-weight:600;font-size:13px}
+ .b-ac{background:#e7f3ec;color:#2f7d55}.b-wa{background:#fdeceb;color:#b04f43}
+ .b-other{background:#fdf4e3;color:#8a6d1f}.b-info{background:#eef1f4;color:#55606b}
+ dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:12px 0 0}
+ dt{color:var(--muted)}dd{margin:0;font-variant-numeric:tabular-nums}
+ pre.msg{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);
+         border-radius:5px;padding:10px;margin:12px 0 0;font:12px/1.5 ui-monospace,monospace;max-height:220px;overflow:auto}
+ h2{font-size:16px;margin:30px 0 8px}
+ table{width:100%;border-collapse:collapse;font-size:14px}
+ th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
+ th{color:var(--muted);font-size:12px;font-weight:600}
+ td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+ .muted{color:var(--muted)}
+</style>
+<h1>__PROBLEM__ 本地提交</h1>
+<p class="sub">题库：__BOOK__ · 判题运行在本机 · <a href="/problems/">题库目录</a> · <a href="/__BOOK__/__PROBLEM__/">看题面</a></p>
+<p id="auth" class="muted">正在检查登录状态…</p>
+<form id="form">
+  <textarea name="source" placeholder="在这里粘贴代码" spellcheck="false"></textarea>
+  <div class="row">
+    <select name="language">
+      <option value="python">Python 3</option><option value="cpp">C++17</option><option value="c">C11</option>
+    </select>
+    <button id="go">提交并判题</button>
+    <span id="hint" class="muted"></span>
+  </div>
+</form>
+<div id="verdict"></div>
+<h2>我的提交记录</h2>
+<div id="histbox" class="muted">…</div>
+<script>
+const BOOK = "__BOOK__", PROBLEM = "__PROBLEM__";
+const CLS = { "Accepted": "b-ac", "Wrong Answer": "b-wa" };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+fetch("/api/me", { credentials: "same-origin" }).then(r => r.json()).then(me => {
+  auth.innerHTML = me.authenticated
+    ? '已登录：<b>' + esc(me.user) + '</b>'
+    : '<a href="/auth/login/">请先登录后提交</a>';
+  loadHistory();
+});
+
+function badge(status) {
+  const cls = CLS[status] || (status === "No Test Data" || status === "Problem Not Found" ? "b-info" : "b-other");
+  return '<span class="badge ' + cls + '">' + esc(status) + "</span>";
+}
+
+function renderVerdict(data) {
+  const rows = [];
+  // 「错在哪组数据」是这个页面存在的理由，所以 case 放第一行
+  if (data.case !== undefined) rows.push(["出错的数据组", "第 " + data.case + " 组"]);
+  if (data.cases !== undefined) rows.push(["通过的数据组", data.cases + " 组全部通过"]);
+  if (data.expected_tokens !== undefined)
+    rows.push(["输出规模", "期望 " + data.expected_tokens + " 个 token，实际 " + data.actual_tokens + " 个"]);
+  verdict.innerHTML = '<div class="verdict">' + badge(data.status)
+    + (rows.length ? "<dl>" + rows.map(r => "<dt>" + r[0] + "</dt><dd>" + esc(r[1]) + "</dd>").join("") + "</dl>" : "")
+    + (data.message ? '<pre class="msg">' + esc(data.message) + "</pre>" : "")
+    + "</div>";
+}
+
+form.onsubmit = async e => {
+  e.preventDefault();
+  go.disabled = true; hint.textContent = "判题中…";
+  verdict.innerHTML = "";
+  const body = Object.fromEntries(new FormData(form));
+  body.book = BOOK; body.problem = PROBLEM;
+  try {
+    const r = await fetch("/api/submit", { method: "POST", credentials: "same-origin",
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const data = await r.json();
+    if (r.status === 401) verdict.innerHTML = '<div class="verdict">' + badge("需要登录")
+      + '<dl><dt>说明</dt><dd><a href="/auth/login/">先登录</a>后再提交</dd></dl></div>';
+    else { renderVerdict(data); loadHistory(); }
+  } catch (err) {
+    verdict.innerHTML = '<div class="verdict">' + badge("提交失败") + '<pre class="msg">' + esc(err) + "</pre></div>";
+  }
+  go.disabled = false; hint.textContent = "";
+};
+
+async function loadHistory() {
+  const r = await fetch("/api/submissions", { credentials: "same-origin" });
+  if (r.status === 401) { histbox.textContent = "登录后可以看到提交记录。"; return; }
+  const mine = (await r.json()).submissions.filter(s => s.problem === PROBLEM);
+  if (!mine.length) { histbox.textContent = "这道题还没有提交记录。"; return; }
+  histbox.innerHTML = "<table><thead><tr><th>时间</th><th>结果</th><th>语言</th><th>细节</th></tr></thead><tbody>"
+    + mine.map(s => {
+        const d = s.detail || {};
+        const note = d.case !== undefined ? "第 " + d.case + " 组"
+                   : d.cases !== undefined ? d.cases + " 组全过" : "";
+        return "<tr><td class='num'>" + esc(s.created) + "</td><td>" + badge(s.result)
+             + "</td><td>" + esc(s.language || "") + "</td><td class='muted'>" + esc(note) + "</td></tr>";
+      }).join("") + "</tbody></table>";
+}
+</script></html>"""
+
+
 def init_db():
     DB.parent.mkdir(exist_ok=True)
     with sqlite3.connect(DB) as db:
         db.execute("create table if not exists submissions (id integer primary key, user text, problem text, result text, created text default current_timestamp)")
         db.execute("create table if not exists users (username text primary key, password_hash text not null, created text default current_timestamp)")
+        # 历史库里没有这几列；用 ALTER 补，已存在则跳过（create table if not exists 加不了列）。
+        existing = {row[1] for row in db.execute("pragma table_info(submissions)")}
+        for column in ("book text", "language text", "detail text"):
+            if column.split()[0] not in existing:
+                db.execute(f"alter table submissions add column {column}")
 
 def password_hash(password):
     return hashlib.pbkdf2_hmac("sha256", password.encode(), b"cs101-local-user", 120000).hex()
@@ -107,10 +228,7 @@ class Handler(BaseHTTPRequestHandler):
         submit_page = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/([^/]+)/submit/", path)
         if submit_page:
             book, problem_id = submit_page.groups()
-            body = (f"<!doctype html><html lang='zh-CN'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
-                    f"<title>本地提交 - {escape(problem_id)}</title><style>body{{font:15px system-ui;max-width:900px;margin:40px auto;padding:0 20px;color:#17221d}}textarea{{width:100%;min-height:360px;font:14px monospace;padding:12px}}select,button{{padding:10px 14px;margin:10px 8px 10px 0}}#result{{white-space:pre-wrap;padding:14px;background:#f2f5f1}}</style>"
-                    f"<h1>{escape(problem_id)} 本地提交</h1><p>题库：{escape(book)} · 判题运行在本机</p><p id='auth'>正在检查登录状态...</p><form id='form'><select name='language'><option value='python'>Python 3</option><option value='cpp'>C++17</option><option value='c'>C11</option></select><textarea name='source' placeholder='在这里粘贴代码'></textarea><br><button>提交并判题</button></form><pre id='result'>等待提交</pre>"
-                    "<script>(async()=>{let me=await fetch('/api/me',{credentials:'same-origin'}).then(r=>r.json());if(!me.authenticated){auth.innerHTML='<a href=\"/auth/login/\">请先登录后提交</a>';}})();form.onsubmit=async e=>{e.preventDefault();result.textContent='判题中...';const body=Object.fromEntries(new FormData(form));body.book='" + escape(book) + "';body.problem='" + escape(problem_id) + "';const r=await fetch('/api/submit',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const data=await r.json();result.textContent=r.status===401?'请先登录后再提交：'+data.error:JSON.stringify(data,null,2)}</script></html>").encode()
+            body = SUBMIT_PAGE.replace("__BOOK__", escape(book)).replace("__PROBLEM__", escape(problem_id)).encode()
             self.send_response(200); self.send_header("Content-Type", "text/html; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
         local_book = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/", path)
         if local_book:
@@ -134,6 +252,21 @@ class Handler(BaseHTTPRequestHandler):
                 count = db.execute("select count(*) from submissions").fetchone()[0]
             self.send_json({"submissions": count, "accepted": 1284, "streak": 12})
             return
+        if path == "/api/submissions":
+            user = self.current_user()
+            if user is None:
+                self.send_json({"error": "Unauthorized"}, 401); return
+            with sqlite3.connect(DB) as db:
+                rows = db.execute("select problem, result, created, book, language, detail from submissions"
+                                  " where user = ? order by id desc limit 50", (user,)).fetchall()
+            self.send_json({"user": user, "submissions": [
+                {"problem": r[0], "result": r[1], "created": r[2], "book": r[3], "language": r[4],
+                 "detail": json.loads(r[5]) if r[5] else {}} for r in rows]})
+            return
+        if path in ("/problems", "/problems/"):
+            page = ROOT / "problems.html"
+            if page.is_file():
+                self.send_html(page.read_text(encoding="utf-8")); return
         if path == "/api/catalog":
             catalog = MIRROR / "catalog.json"
             if catalog.is_file():
@@ -224,8 +357,15 @@ class Handler(BaseHTTPRequestHandler):
             if token: TOKENS.discard(token.value); SESSION_USERS.pop(token.value, None)
             self.send_response(200); self.send_header("Set-Cookie", "session=; Max-Age=0; Path=/"); self.end_headers(); return
         if path in {"/api/submit", "/api/submit/"} and self.authorized():
-            result = judge(data.get("book", ""), data.get("problem", ""), data.get("language", "python"), data.get("source", data.get("code", "")))
-            with sqlite3.connect(DB) as db: db.execute("insert into submissions(user, problem, result) values (?, ?, ?)", (self.current_user() or ADMIN_USER, data.get("problem", ""), result["status"]))
+            book, problem = data.get("book", ""), data.get("problem", "")
+            language = data.get("language", "python")
+            result = judge(book, problem, language, data.get("source", data.get("code", "")))
+            # detail 存判题器返回的全部字段（case / expected_tokens / message…），
+            # 历史页要靠它回答「错在哪组数据」，只存 status 是答不了的。
+            detail = json.dumps({k: v for k, v in result.items() if k != "status"}, ensure_ascii=False)
+            with sqlite3.connect(DB) as db:
+                db.execute("insert into submissions(user, problem, result, book, language, detail) values (?, ?, ?, ?, ?, ?)",
+                           (self.current_user() or ADMIN_USER, problem, result["status"], book, language, detail))
             self.send_json(result); return
         self.send_json({"error": "Unauthorized"}, 401)
 

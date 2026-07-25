@@ -21,6 +21,41 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-25 · Claude → Codex · T-006 第一增量：把「编写 → 提交 → 反馈错在哪组数据」接成闭环
+
+- **背景**：人拍板分工——Claude 转 T-006，Codex 继续 T-004 并**把批次提回 20 题/轮**
+  （前三轮数据零缺陷，抓到的问题全在检查机制侧）。另**修正 T-002 状态**：
+  它在 001d 收口时就已完成（4 批 80 题），此前一直误挂 In progress。
+- **为什么先做这三件**：202 题已经有数据、判题器也能报出 case 编号，但用户侧断在三处——
+  ①**找不到哪些题能判**（只能猜 URL）；②**判题结果是裸 JSON**；③**没有提交历史**。
+  第 203 题数据的边际价值低于把已有的 202 题变得可用。
+- **做了什么**：
+  1. **`/problems/` 题库目录页**（新增 `problems.html`）：按题库分组、可搜索、
+     标注「可判 N 组 / 暂无数据」，直达提交页。数据取自 `/api/catalog` 的 `test_count`。
+     全库 1863 题一次性拼串渲染（逐行 append 会卡），超 600 条提示缩小范围。
+  2. **提交页重做**（`server.py` 的 `SUBMIT_PAGE`）：判题结果从 `JSON.stringify` 换成结构化
+     反馈——**出错的数据组放第一行**，其次期望/实际 token 数，TLE/RE 展开判题器 message。
+  3. **提交历史**：新增 `GET /api/submissions`（需登录，返回本人最近 50 条），
+     提交页底部显示本题的历史记录。
+- **顺带补了库表**：`submissions` 原来只有 `user/problem/result`，
+  **只存 status 回答不了「错在哪组数据」**。已加 `book` / `language` / `detail` 三列，
+  用 `pragma table_info` + `alter table` 做迁移（`create table if not exists` 加不了列），
+  老库直接兼容。
+- **改了哪些文件**：`problems.html`（新增）、`server.py`（`SUBMIT_PAGE`、
+  `/api/submissions`、`/problems/` 路由、库表迁移、提交时记录 book/language/detail）、
+  `tests/test_server.py`（+4 用例）、`collab/PLAN.md`（T-002 改 Done、T-004 记 20 题/轮、
+  T-006 转 In progress）、`collab/HANDOFF.md`、`collab/NOTES-claude.md`。
+  **判题器与测试数据零改动。**
+- **验证**：`--verify` 全绿（unittest **15/15** / py_compile 25 文件 / node --check）｜
+  真起服务端走了一遍闭环冒烟：注册 → `/problems/` → 提交页渲染（无占位符残留）→
+  未登录取历史 401 → 提交判 WA 带 case → 历史含 book/language/detail ｜
+  **新用例做了变异自检 3/3 全抓**（去掉历史字段 / 取消登录校验 / 删 `/problems/` 路由）。
+- **踩到一个坑，记一笔**：提交页 JS 里用 `history` 当元素变量名——`window.history` 是既有全局，
+  元素 id 建立的全局盖不住它，赋值直接失效。已改名 `histbox`。
+- **红线自检**：判题沙箱未动 ✅ ｜ 口令未入库 ✅ ｜ 路径防线未动 ✅
+- **下一步建议**：T-006 还剩「代码编辑器语法高亮」和「WA 时展示更多上下文」（比如给出
+  出错那组的输入片段——**这条要先想清楚会不会等于泄题**，建议人拍板）。
+
 ### 2026-07-25 · Claude → Codex · T-004 第三轮复核：**数据通过；3719 的解读我用题面定了，但那题的 oracle 是转写**
 
 - **数据结论：通过。** AC 10/10、变异 WA 10/10 且 case=1、恒定输出探针 10/10 被拒、

@@ -113,6 +113,52 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body)["status"], "Wrong Answer")
 
+    def test_problem_catalog_page_is_served(self):
+        status, _, body = request(self.port, "GET", "/problems/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn("题库目录", text)
+        self.assertIn("/api/catalog", text)          # 目录页的数据来源
+
+    def test_submit_page_renders_without_placeholders(self):
+        status, _, body = request(self.port, "GET", f"/{SUBMIT_BOOK}/{SUBMIT_PROBLEM}/submit/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn(SUBMIT_PROBLEM, text)
+        self.assertIn("我的提交记录", text)
+        for placeholder in ("__BOOK__", "__PROBLEM__"):
+            self.assertNotIn(placeholder, text)      # 模板占位符必须已被替换
+
+    def test_submissions_require_authentication(self):
+        status, _, body = request(self.port, "GET", "/api/submissions")
+        self.assertEqual(status, 401)
+        self.assertIn(b"Unauthorized", body)
+
+    def test_submission_history_records_book_language_and_detail(self):
+        """历史记录要能回答「错在哪组数据」——只存 status 是答不了的。"""
+        username = "t006_history"
+        _, headers, _ = request(self.port, "POST", "/api/user/register", {
+            "username": username, "password": "T006-password",
+        })
+        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        status, _, body = request(self.port, "POST", "/api/submit", {
+            "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
+            "source": "print('wrong')",
+        }, cookie=cookie)
+        self.assertEqual(status, 200)
+        verdict = json.loads(body)
+
+        status, _, body = request(self.port, "GET", "/api/submissions", cookie=cookie)
+        self.assertEqual(status, 200)
+        entries = json.loads(body)["submissions"]
+        self.assertTrue(entries)
+        latest = entries[0]
+        self.assertEqual(latest["problem"], SUBMIT_PROBLEM)
+        self.assertEqual(latest["result"], "Wrong Answer")
+        self.assertEqual(latest["book"], SUBMIT_BOOK)
+        self.assertEqual(latest["language"], "python")
+        self.assertEqual(latest["detail"]["case"], verdict["case"])
+
     def test_static_path_cannot_traverse(self):
         for path in ("/../server.py", "/%2e%2e/server.py", "/data/../server.py"):
             status, _, body = request(self.port, "GET", path)
