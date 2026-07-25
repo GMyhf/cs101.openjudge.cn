@@ -1,0 +1,1171 @@
+{
+  "batch": "T-004-r4",
+  "entries": [
+    {
+      "local_number": 3723,
+      "title": "围棋的目",
+      "source": "data/openjudge/pages/practice__03723.html",
+      "reference_source": "LLM-written",
+      "generator": "g3723",
+      "seed": 3723,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "N<=19",
+        "grid cells are . B or W",
+        "every empty region is owned by one color"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          7,
+          10,
+          12,
+          13,
+          16,
+          17,
+          18,
+          19
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3725,
+      "title": "集合划分",
+      "source": "data/openjudge/pages/practice__03725.html",
+      "reference_source": "LLM-written",
+      "generator": "g3725",
+      "seed": 3725,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 7,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 8,
+        "total": 21
+      },
+      "constraints": [
+        "K<=1000",
+        "inputs are positive integers",
+        "greedy assigns descending values to a least-loaded group"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3726,
+      "title": "迷宫最短路",
+      "source": "data/openjudge/pages/practice__03726.html",
+      "reference_source": "LLM-written",
+      "generator": "g3726",
+      "seed": 3726,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 10,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 5,
+        "total": 21
+      },
+      "constraints": [
+        "M,N<=20",
+        "@ and * occur in each maze",
+        "# is blocked and 0 0 terminates"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3727,
+      "title": "花生",
+      "source": "data/openjudge/pages/practice__03727.html",
+      "reference_source": "LLM-written",
+      "generator": "g3727",
+      "seed": 3727,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 20,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 2,
+        "total": 21
+      },
+      "constraints": [
+        "T test cases",
+        "moves are only east or south",
+        "R,C and cell values follow the statement"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3728,
+      "title": "集合Ba",
+      "source": "data/openjudge/pages/practice__03728.html",
+      "reference_source": "LLM-written",
+      "generator": "g3728",
+      "seed": 3728,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "1<=a<=50",
+        "1<=N<=1000000",
+        "set values are generated by 2x+1 and 3x+1"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3744,
+      "title": "Baby Blocks",
+      "source": "data/openjudge/pages/practice__03744.html",
+      "reference_source": "LLM-written",
+      "generator": "g3744",
+      "seed": 3744,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "N<=1000",
+        "blocks form an integer cuboid",
+        "area is 2(ab+ac+bc)"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3789,
+      "title": "最长重复模式",
+      "source": "data/openjudge/pages/practice__03789.html",
+      "reference_source": "LLM-written",
+      "generator": "g3789",
+      "seed": 3789,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 4,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 16,
+        "total": 21
+      },
+      "constraints": [
+        "1<=N<=20000",
+        "2<=K<=N",
+        "input guarantees a pattern repeated at least K times"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          1,
+          5,
+          8,
+          10,
+          12,
+          13,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3791,
+      "title": "电话号码一致性",
+      "source": "data/openjudge/pages/practice__03791.html",
+      "reference_source": "LLM-written",
+      "generator": "g3791",
+      "seed": 3791,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 5,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 8,
+        "total": 21
+      },
+      "constraints": [
+        "t<=40",
+        "n<=10000",
+        "phone numbers have at most 10 digits"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3866,
+      "title": "黑色方块",
+      "source": "data/openjudge/pages/routine__03866.html",
+      "reference_source": "LLM-written",
+      "generator": "g3866",
+      "seed": 3866,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 10,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 4,
+        "total": 21
+      },
+      "constraints": [
+        "W,H<=20",
+        ". and @ are traversable",
+        "# is red and 0 0 terminates"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3906,
+      "title": "传纸条",
+      "source": "data/openjudge/pages/practice__03906.html",
+      "reference_source": "LLM-written",
+      "generator": "g3906",
+      "seed": 3906,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 19,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 2,
+        "total": 21
+      },
+      "constraints": [
+        "m,n follow the matrix limits",
+        "two paths share no interior student",
+        "moves are monotone"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4001,
+      "title": "抓住那头牛",
+      "source": "data/openjudge/pages/2024sp_routine__04001.html",
+      "reference_source": "LLM-written",
+      "generator": "g4001",
+      "seed": 4001,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 14,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 3,
+        "total": 21
+      },
+      "constraints": [
+        "0<=N,K<=100000",
+        "moves are -1,+1 and double",
+        "each move costs one minute"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          3,
+          6,
+          14,
+          18,
+          19
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4002,
+      "title": "潜在朋友",
+      "source": "data/openjudge/pages/practice__04002.html",
+      "reference_source": "LLM-written",
+      "generator": "g4002",
+      "seed": 4002,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 18,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 2,
+        "total": 21
+      },
+      "constraints": [
+        "2<=N,M<=200",
+        "each reader chooses one book",
+        "friend count excludes the reader"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          5,
+          6,
+          7,
+          8,
+          11,
+          12,
+          13,
+          15,
+          16,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4006,
+      "title": "螺旋方阵",
+      "source": "data/openjudge/pages/routine__04006.html",
+      "reference_source": "LLM-written",
+      "generator": "g4006",
+      "seed": 4006,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "N<=10000",
+        "1<=K<=25",
+        "coordinates are 1-based in the square"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          7,
+          8,
+          11,
+          12,
+          13,
+          14,
+          18,
+          19
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4007,
+      "title": "字符串距离",
+      "source": "data/openjudge/pages/practice__04007.html",
+      "reference_source": "LLM-written",
+      "generator": "g4007",
+      "seed": 4007,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 19,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 3,
+        "total": 21
+      },
+      "constraints": [
+        "string length<=1000",
+        "operations are insert/delete/replace",
+        "input has n pairs"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4008,
+      "title": "糖果总数",
+      "source": "data/openjudge/pages/practice__04008.html",
+      "reference_source": "LLM-written",
+      "generator": "g4008",
+      "seed": 4008,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 15,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 4,
+        "total": 21
+      },
+      "constraints": [
+        "N products each have <=1000000 candies",
+        "selected sum is divisible by K",
+        "whole products only"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4009,
+      "title": "符号三角形",
+      "source": "data/openjudge/pages/practice__04009.html",
+      "reference_source": "LLM-written",
+      "generator": "g4009",
+      "seed": 4009,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "n<=24",
+        "symbols are + or -",
+        "n=0 terminates and equal counts are required"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4010,
+      "title": "2011的幂",
+      "source": "data/openjudge/pages/practice__04010.html",
+      "reference_source": "LLM-written",
+      "generator": "g4010",
+      "seed": 4010,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "exponent has at most 200 digits",
+        "result is modulo 10000",
+        "input has k cases"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4021,
+      "title": "去掉一个数",
+      "source": "data/openjudge/pages/practice__04021.html",
+      "reference_source": "LLM-written",
+      "generator": "g4021",
+      "seed": 4021,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "array length is at least 3",
+        "remove exactly one integer",
+        "ties choose the earliest input position"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4033,
+      "title": "地毯",
+      "source": "data/openjudge/pages/practice__04033.html",
+      "reference_source": "LLM-written",
+      "generator": "g4033",
+      "seed": 4033,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 7,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 13,
+        "total": 21
+      },
+      "constraints": [
+        "rectangles use lower-left coordinates",
+        "point-on-boundary counts",
+        "topmost covering carpet is returned"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          0,
+          2,
+          6,
+          8,
+          14,
+          15,
+          16,
+          17
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4034,
+      "title": "客栈",
+      "source": "data/openjudge/pages/practice__04034.html",
+      "reference_source": "LLM-written",
+      "generator": "g4034",
+      "seed": 4034,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 12,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 4,
+        "total": 21
+      },
+      "constraints": [
+        "n,k,p are input bounds from the statement",
+        "same color pairs only",
+        "an intervening cafe with cost<=p is required"
+      ],
+      "structure_checked": true,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "data_catches_misreading": true,
+        "data_catching_cases": [
+          1,
+          7,
+          8,
+          11,
+          17
+        ],
+        "status": "caught"
+      },
+      "producecase_reproduced": true
+    }
+  ]
+}

@@ -102,7 +102,7 @@ def oracle_branches(path):
     """把 `oracle(number, content)` 拆成 {题号: 该分支源码}，最后的兜底归为 None。"""
     tree = ast.parse(path.read_text(encoding="utf-8"))
     functions = module_functions(tree)
-    func = next(n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name == "oracle")
+    func = next(n for n in ast.walk(tree) if isinstance(n, ast.FunctionDef) and n.name in {"oracle", "alt"})
     out, tail = {}, []
     for stmt in func.body:
         matched = None
