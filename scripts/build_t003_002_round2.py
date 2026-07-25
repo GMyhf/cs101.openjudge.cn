@@ -7,6 +7,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import types
 from collections import Counter
 from pathlib import Path
 
@@ -101,9 +102,36 @@ def _postfix(r, letters=False, depth=0):
     return _postfix(r, letters, depth + 1) + " " + _postfix(r, letters, depth + 1) + " " + op
 
 
+def _postfix_value(expr):
+    """求值后缀表达式；除数为 0 时返回 None（而不是抛）。"""
+    stack = []
+    for token in expr.split():
+        if token in "+-*/":
+            b = stack.pop(); a = stack.pop()
+            if token == "/":
+                if b == 0: return None
+                stack.append(a / b)
+            elif token == "+": stack.append(a + b)
+            elif token == "-": stack.append(a - b)
+            else: stack.append(a * b)
+        else:
+            stack.append(float(token))
+    return stack[0]
+
+
+# 原断言是 `"/ 0" not in line`，只挡字面量的 0 作除数——挡不住**求值后**为 0 的子表达式，
+# 例如 `30 14 / 20 27 27 - * /` 即 (30/14) / (20*(27-27))。实测 20000 种子里 190 个
+# （0.95%）会让参考解法 ZeroDivisionError 从而崩掉构建，当前固定种子只是没踩到。
 def g24588(r):
-    lines = [_postfix(r) for _ in range(r.randint(3, 8))]
-    assert all("/ 0" not in line for line in lines)
+    lines = []
+    for _ in range(r.randint(3, 8)):
+        for _ in range(200):                       # 拒绝采样：真求值一遍，除零就重摇
+            expr = _postfix(r)
+            if _postfix_value(expr) is not None: break
+        else:
+            expr = str(r.randint(1, 30))
+        lines.append(expr)
+    assert all(_postfix_value(line) is not None for line in lines)
     return str(len(lines)) + "\n" + "\n".join(lines) + "\n"
 
 
@@ -113,9 +141,25 @@ def _infix(r, depth=0):
     return "(" + _infix(r, depth + 1) + r.choice("+-*/") + _infix(r, depth + 1) + ")"
 
 
+def _infix_value(expr):
+    try:
+        return eval(expr, {"__builtins__": {}}, {})    # 表达式由 _infix 用数字和 +-*/() 自造
+    except ZeroDivisionError:
+        return None
+
+
+# 同 g24588：原断言只查「没有空格」，对除零毫无防护。实测 20000 种子里 63 个（0.32%）
+# 会让参考解法除零，例如 (((86-15)/(19-19))*(30*(42*58)))。
 def g24591(r):
-    lines = [_infix(r) for _ in range(r.randint(3, 8))]
-    assert all(line and " " not in line for line in lines)
+    lines = []
+    for _ in range(r.randint(3, 8)):
+        for _ in range(200):
+            expr = _infix(r)
+            if _infix_value(expr) is not None: break
+        else:
+            expr = str(r.randint(1, 99))
+        lines.append(expr)
+    assert all(line and " " not in line and _infix_value(line) is not None for line in lines)
     return str(len(lines)) + "\n" + "\n".join(lines) + "\n"
 
 
@@ -255,6 +299,32 @@ STRUCTURE_CHECKS = {
 }
 
 
+CONST_TYPES = (str, int, float, bool, tuple, list, dict, set, frozenset)
+
+
+def helper_sources(fn):
+    """生成器传递依赖到的模块级函数与常量，按定义顺序返回源码。
+
+    原来是按题号硬写的 if 链（`if number in (24588, 25140): ... _postfix`），
+    加一个新辅助函数就会漏 —— 漏掉的 producecase.py 一跑就 NameError，
+    而它是「重跑后 data/ 逐字节不变」这条自检唯一的载体。
+    """
+    module = sys.modules[__name__]
+    found, consts, stack = {}, {}, [fn]
+    while stack:
+        current = stack.pop()
+        for name in current.__code__.co_names:
+            target = getattr(module, name, None)
+            if isinstance(target, types.FunctionType):
+                if name not in found and target is not fn:
+                    found[name] = target; stack.append(target)
+            elif isinstance(target, CONST_TYPES) and not isinstance(target, type) and name not in consts:
+                consts[name] = target
+    parts = [f"{name} = {value!r}" for name, value in sorted(consts.items())]
+    parts += [inspect.getsource(f).rstrip() for f in sorted(found.values(), key=lambda f: f.__code__.co_firstlineno)]
+    return ("\n\n".join(parts) + "\n\n") if parts else ""
+
+
 def run(code, content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as f:
         f.write(code); f.flush()
@@ -295,9 +365,19 @@ def summarise(number, cases, outputs, heading, target):
 
 
 def main():
+    only = {int(x) for x in sys.argv[1].split(",")} if len(sys.argv) > 1 else None
+    prev = {x["local_number"]: x for x in json.loads(REPORT.read_text(encoding="utf-8"))["entries"]} if REPORT.is_file() else {}
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8")); report = []
     for entry in manifest["entries"]:
-        number = entry["local_number"]; text = find_section(entry["source"], number)
+        number = entry["local_number"]
+        if only is not None and number not in only:
+            target = 20
+            directory = TESTS / bucket(number) / f"{number:05d}_made"
+            cases = [(directory / "data" / f"{i}.in").read_text(encoding="utf-8") for i in range(target)]
+            outputs = [(directory / "data" / f"{i}.out").read_text(encoding="utf-8") for i in range(target)]
+            report.append(summarise(number, cases, outputs, prev.get(number, {}).get("source_heading"), target))
+            continue
+        text = find_section(entry["source"], number)
         for seed in range(20000):
             GENERATORS[number](random.Random(number + seed))
         codes = [c for c in fence_blocks(text) if "import " in c or "def " in c]
@@ -313,10 +393,7 @@ def main():
         outputs = [run(code, value) for value in cases]
         (directory / "samplecode.py").write_text("# Source: " + entry["source"] + "\n" + code, encoding="utf-8")
         source = inspect.getsource(GENERATORS[number]).replace(f"def g{number}", "def generate_case")
-        helpers = ""
-        if number in (24588, 25140): helpers += inspect.getsource(_postfix) + "\n"
-        if number == 24591: helpers += inspect.getsource(_infix) + "\n"
-        if number in (24750, 25145): helpers += inspect.getsource(_tree_pair) + "\n"
+        helpers = helper_sources(GENERATORS[number])
         produce = f'''import random, subprocess, tempfile\nfrom pathlib import Path\nREFERENCE_SOURCE = {code!r}\nSAMPLE_IN = {entry["sample_input"]!r}\nSAMPLE_OUT = {entry["sample_output"]!r}\n{helpers}{source}\nwith tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:\n    handle.write(REFERENCE_SOURCE); handle.flush()\n    root = Path(__file__).parent / "data"\n    seen = [SAMPLE_IN]\n    for index in range({target}):\n        if index == 0:\n            content = SAMPLE_IN\n        else:\n            for attempt in range(100):\n                content = generate_case(random.Random({number} + index + attempt * 1000))\n                if content not in seen: break\n            else: raise AssertionError("insufficient diversity")\n        seen.append(content)\n        result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)\n        (root / f"{{index}}.in").write_text(content, encoding="utf-8")\n        (root / f"{{index}}.out").write_text(result.stdout, encoding="utf-8")\n'''
         (directory / "producecase.py").write_text(produce, encoding="utf-8")
         for old in data.glob("*"): old.unlink()

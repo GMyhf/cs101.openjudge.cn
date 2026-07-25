@@ -8,9 +8,22 @@ def _infix(r, depth=0):
         return str(r.randint(1, 99))
     return "(" + _infix(r, depth + 1) + r.choice("+-*/") + _infix(r, depth + 1) + ")"
 
+def _infix_value(expr):
+    try:
+        return eval(expr, {"__builtins__": {}}, {})    # 表达式由 _infix 用数字和 +-*/() 自造
+    except ZeroDivisionError:
+        return None
+
 def generate_case(r):
-    lines = [_infix(r) for _ in range(r.randint(3, 8))]
-    assert all(line and " " not in line for line in lines)
+    lines = []
+    for _ in range(r.randint(3, 8)):
+        for _ in range(200):
+            expr = _infix(r)
+            if _infix_value(expr) is not None: break
+        else:
+            expr = str(r.randint(1, 99))
+        lines.append(expr)
+    assert all(line and " " not in line and _infix_value(line) is not None for line in lines)
     return str(len(lines)) + "\n" + "\n".join(lines) + "\n"
 
 with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:

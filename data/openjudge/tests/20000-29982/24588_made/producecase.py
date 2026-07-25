@@ -9,9 +9,32 @@ def _postfix(r, letters=False, depth=0):
     op = r.choice("+-*/") if not letters else r.choice("PQRS")
     return _postfix(r, letters, depth + 1) + " " + _postfix(r, letters, depth + 1) + " " + op
 
+def _postfix_value(expr):
+    """求值后缀表达式；除数为 0 时返回 None（而不是抛）。"""
+    stack = []
+    for token in expr.split():
+        if token in "+-*/":
+            b = stack.pop(); a = stack.pop()
+            if token == "/":
+                if b == 0: return None
+                stack.append(a / b)
+            elif token == "+": stack.append(a + b)
+            elif token == "-": stack.append(a - b)
+            else: stack.append(a * b)
+        else:
+            stack.append(float(token))
+    return stack[0]
+
 def generate_case(r):
-    lines = [_postfix(r) for _ in range(r.randint(3, 8))]
-    assert all("/ 0" not in line for line in lines)
+    lines = []
+    for _ in range(r.randint(3, 8)):
+        for _ in range(200):                       # 拒绝采样：真求值一遍，除零就重摇
+            expr = _postfix(r)
+            if _postfix_value(expr) is not None: break
+        else:
+            expr = str(r.randint(1, 30))
+        lines.append(expr)
+    assert all(_postfix_value(line) is not None for line in lines)
     return str(len(lines)) + "\n" + "\n".join(lines) + "\n"
 
 with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
