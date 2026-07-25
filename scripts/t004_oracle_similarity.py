@@ -130,6 +130,8 @@ def main():
     round_number = 1
     if "--round3" in sys.argv:
         round_number = 3
+    if "--round4" in sys.argv:
+        round_number = 4
     manifest = json.loads((ROOT / f"collab/t004-round{round_number}-manifest.json").read_text(encoding="utf-8"))
     numbers = [x["local_number"] for x in manifest["entries"]]
     branches = oracle_branches(ROOT / f"scripts/build_t004_round{round_number}.py")
