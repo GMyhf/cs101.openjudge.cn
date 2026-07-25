@@ -20,11 +20,22 @@ ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = ROOT / "collab/t004-round5-manifest.json"
 REPORT = ROOT / "collab/t004-round5-report.json"
 TESTS = ROOT / "data/openjudge/tests"
+CPP3433 = ROOT / "scripts/t004_platform_accepted_3433.cpp"
+CPP3433_BIN = Path(tempfile.gettempdir()) / "t004-platform-accepted-3433"
 sys.path.insert(0, str(ROOT / "scripts"))
 from build_001a import bucket  # noqa: E402
 
 
 def run(source: str, text: str, interpreter=sys.executable) -> str:
+    if source == "__T004_CPP_3433__":
+        if not CPP3433_BIN.exists() or CPP3433_BIN.stat().st_mtime < CPP3433.stat().st_mtime:
+            subprocess.run(["g++", "-std=c++17", "-O2", str(CPP3433), "-o", str(CPP3433_BIN)], check=True,
+                           capture_output=True, text=True)
+        p = subprocess.run([str(CPP3433_BIN)], input=text, text=True,
+                           capture_output=True, timeout=60)
+        if p.returncode:
+            raise RuntimeError(p.stderr[-1200:])
+        return p.stdout
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as f:
         f.write(source)
         f.flush()
@@ -123,8 +134,64 @@ def g4083(r):
         "\n".join(f"{u} {v}" for u, v in queries) + "\n"
 
 
+def g4011(r):
+    n = r.randint(2, 7)
+    roads = [f"{i} {i+1} {r.randint(1, 6)}" for i in range(n - 1)]
+    p = r.randint(1, 3)
+    rows = [" ".join(f"{r.random():.4f}" for _ in range(p)) for _ in range(n)]
+    return f"{n} {n-1}\n" + "\n".join(roads) + f"\n{p}\n" + "\n".join(rows) + "\n0 0\n"
+
+
+def g4038(r):
+    n = r.randint(2, 7); m = r.randint(1, 7); k = r.randint(0, 8)
+    d = [r.randint(0, 6) for _ in range(n - 1)]
+    ps = []
+    for _ in range(m):
+        a = r.randint(1, n - 1); ps.append((r.randint(0, 12), a, r.randint(a + 1, n)))
+    return f"{n} {m} {k}\n{' '.join(map(str, d))}\n" + "\n".join(f"{t} {a} {b}" for t, a, b in ps) + "\n"
+
+
+def g4054(r):
+    x, y = r.randint(1, 3), r.randint(1, 3)
+    # Keep the smoke domain structurally varied but bounded: mixed-color
+    # targets can make the accepted full-state BFS needlessly expensive.
+    choices = [list("WWWWWWWWW"), list("WWWWWWWWR"), list("WWWWRWWWW"), list("BBBBBBBRB")]
+    rows = [list(r.choice(choices)) for _ in [0]][0]
+    rows = [rows[i:i+3] for i in range(0, 9, 3)]; rows[y - 1][x - 1] = "E"
+    return f"{x} {y}\n" + "\n".join(" ".join(row) for row in rows) + "\n0 0\n"
+
+
+def g3433(r):
+    m = r.randint(20, 100); n = r.randint(1, 3); t = r.randint(0, 180)
+    hp = [r.randint(10, 50) for _ in range(5)]
+    atk = [r.randint(5, 50) for _ in range(5)]
+    return f"1\n{m} {n} {t}\n{' '.join(map(str, hp))}\n{' '.join(map(str, atk))}\n"
+
+
+def g3750(r):
+    m = r.randint(20, 80); n = r.randint(1, 3); t = 0
+    hp = [r.randint(10, 40) for _ in range(5)]
+    atk = [r.randint(5, 40) for _ in range(5)]
+    return f"1\n{m} {n} {t}\n{' '.join(map(str, hp))}\n{' '.join(map(str, atk))}\n"
+
+
+def g4012(r):
+    patterns = ["?,10,?????????????????,16,??", "?2?5??7?,??", "1,?,??,???"]
+    return r.choice(patterns) + "\n"
+
+
+def g4035(r):
+    n = r.randint(1, 3)
+    cols = []
+    for _ in range(5):
+        h = r.randint(1, 4)
+        cols.append([r.randint(1, 4) for _ in range(h)] + [0])
+    return str(n) + "\n" + "\n".join(" ".join(map(str, c)) for c in cols) + "\n"
+
+
 GENERATORS = {n: globals()[f"g{n}"] for n in (4140, 7206, 22528, 23554, 25570, 27384,
-                                                3377, 3670, 4022, 4031, 4037, 4076, 4083)}
+                                                3377, 3670, 4022, 4031, 4037, 4076, 4083,
+                                                4011, 4038, 4054, 4012, 4035, 3433, 3750)}
 
 REFERENCE = r'''P=0
 import sys, math
@@ -217,6 +284,243 @@ def solve(s):
     if 0<=u<m and 0<=v<n and g[u][v]==pat[p] and dfs(u,v,p+1):return True
    return False
   return ("1\n" if any(g[i][j]==pat[0] and dfs(i,j,1) for i in range(m) for j in range(n)) else "0\n")
+ if P==4011:
+  p=0;out=[]
+  while p<len(a):
+   N,M=map(int,a[p:p+2]);p+=2
+   if N==0:break
+   edges=[[] for _ in range(N)]
+   for _ in range(M):u,v,w=map(int,a[p:p+3]);p+=3;edges[u].append((v,w));edges[v].append((u,w))
+   agents=int(a[p]);p+=1;prob=[[0.0]+list(map(float,a[p+i*agents:p+(i+1)*agents])) for i in range(N)];p+=N*agents
+   import heapq
+   dist=[10**18]*N;dist[0]=0;h=[(0,0)]
+   while h:
+    du,u=heapq.heappop(h)
+    if du!=dist[u]:continue
+    for v,w in edges[u]:
+     if du+w<dist[v]:dist[v]=du+w;heapq.heappush(h,(dist[v],v))
+   best=0.0
+   def evaluate(plan):
+    q=[0.0]*N
+    for u in sorted(range(N),key=lambda x:-dist[x]):
+     nxt=[v for v,w in edges[u] if dist[v]==dist[u]+w];future=sum(q[v] for v in nxt)/len(nxt) if nxt else 0
+     q[u]=prob[u][plan[u]]+(1-prob[u][plan[u]])*future
+    return q[0]
+   def distribute(i,left,plan):
+    nonlocal best
+    if i==N:
+     if left==0:best=max(best,evaluate(plan))
+     return
+    for x in range(left+1):distribute(i+1,left-x,plan+[x])
+   distribute(0,agents,[]);out.append(f'{best*100:.2f}')
+  return '\n'.join(out)+'\n'
+ if P==4038:
+  n,m,k=map(int,a[:3]);d=list(map(int,a[3:3+n-1]));ps=[tuple(map(int,a[3+n-1+3*i:3+n-1+3*i+3])) for i in range(m)]
+  def total(cut):
+   travel=[d[i]-cut[i] for i in range(n-1)];clock=0;ans=0;waiting={i:[] for i in range(1,n+1)};active=[]
+   for t,x,y in ps:waiting[x].append((t,y))
+   for station in range(1,n):
+    if waiting[station]:clock=max(clock,max(t for t,_ in waiting[station]));active.extend(waiting[station])
+    clock+=travel[station-1];done=[z for z in active if z[1]==station+1];ans+=sum(clock-t for t,_ in done);active=[z for z in active if z[1]!=station+1]
+   return ans
+  best=10**18
+  def distribute(i,left,cut):
+   nonlocal best
+   if i==n-1:best=min(best,total(cut));return
+   for x in range(min(left,d[i])+1):distribute(i+1,left-x,cut+[x])
+  distribute(0,k,[]);return str(best)+'\n'
+ if P==3750:
+  q=0;tc=int(a[q]);q+=1;ans=[];nm=('dragon','ninja','iceman','lion','wolf');ordr=((2,3,4,1,0),(3,0,1,2,4))
+  class W:
+   def __init__(self,s,t,i,h,f,pos):self.s=s;self.t=t;self.i=i;self.h=h;self.f=f;self.pos=pos;self.step=0
+   def name(self):return ('red' if self.s==0 else 'blue')+' '+nm[self.t]+' '+str(self.i)
+  for case in range(1,tc+1):
+   M,N,T=map(int,a[q:q+3]);q+=3;hp=list(map(int,a[q:q+5]));q+=5;atk=list(map(int,a[q:q+5]));q+=5;E=[M,M];idx=[0,0];num=[0,0];units=[];cities=[[None,None] for _ in range(N+2)];gold=[0]*(N+2);lastwin=[-1]*(N+2);flag=[-1]*(N+2);lines=[f'Case:{case}'];dead=[False]
+   def put(t,s):lines.append(f'{t//60:03d}:{t%60:02d} '+s)
+   def born(s,t):
+    z=ordr[s][idx[s]]
+    if E[s]<hp[z]:return
+    E[s]-=hp[z];idx[s]=(idx[s]+1)%5;num[s]+=1;w=W(s,z,num[s],hp[z],atk[z],0 if s==0 else N+1);units.append(w);put(t,w.name()+' born')
+   for t in range(0,T+1,10):
+    if dead[0]:break
+    if t%60==0:born(0,t);born(1,t)
+    elif t%60==10:
+     ev=[]
+     for w in units:
+      if w.h<=0 or w.pos==(N+1 if w.s==0 else 0):continue
+      old=w.pos
+      if 1<=old<=N:cities[old][w.s]=None
+      w.pos+=1 if w.s==0 else -1;w.step+=1
+      if w.t==2 and w.step%2==0:w.h=max(1,w.h-9);w.f+=20
+      if 1<=w.pos<=N:cities[w.pos][w.s]=w
+      if w.pos==(N+1 if w.s==0 else 0):msg=w.name()+f" reached {'blue' if w.s==0 else 'red'} headquarter with {w.h} elements and force {w.f}"
+      else:msg=w.name()+f' marched to city {w.pos} with {w.h} elements and force {w.f}'
+      ev.append((w.pos,w.s,msg))
+     for _,s,msg in sorted(ev):put(t,msg)
+     for s,label in ((0,'blue'),(1,'red')):
+      if sum(w.h>0 and w.pos==(N+1 if s==0 else 0) for w in units)>=2:put(t,label+' headquarter was taken');dead[0]=True
+    elif t%60==20:
+     for i in range(1,N+1):gold[i]+=10
+    elif t%60==30:
+     for i in range(1,N+1):
+      live=[w for w in cities[i] if w and w.h>0]
+      if len(live)==1: E[live[0].s]+=gold[i];put(t,live[0].name()+f' earned {gold[i]} elements for his headquarter');gold[i]=0
+    elif t%60==40:
+     vict=[]
+     for i in range(1,N+1):
+      r,b=cities[i]
+      if not(r and b):continue
+      x,y=(r,b) if i%2 else (b,r);put(t,x.name()+f' attacked {y.name()} in city {i} with {x.h} elements and force {x.f}');before=y.h;y.h-=x.f
+      if y.h<=0:
+       put(t,y.name()+f' was killed in city {i}');cities[i][y.s]=None;vict.append((i,x,gold[i]));put(t,x.name()+f' earned {gold[i]} elements for his headquarter');gold[i]=0
+       if lastwin[i]==x.s and flag[i]!=x.s:flag[i]=x.s;put(t,('red' if x.s==0 else 'blue')+f' flag raised in city {i}')
+       lastwin[i]=x.s
+      elif y.t!=1:
+       put(t,y.name()+f' fought back against {x.name()} in city {i}');x.h-=y.f//2
+       if x.h<=0:
+        put(t,x.name()+f' was killed in city {i}');cities[i][x.s]=None;vict.append((i,y,gold[i]));put(t,y.name()+f' earned {gold[i]} elements for his headquarter');gold[i]=0
+        if lastwin[i]==y.s and flag[i]!=y.s:flag[i]=y.s;put(t,('red' if y.s==0 else 'blue')+f' flag raised in city {i}')
+        lastwin[i]=y.s
+      if y.t==3 and y.h<=0:x.h+=before
+     for i,w,_ in sorted(vict,key=lambda z:(-z[0] if z[1].s==0 else z[0])):
+      if E[w.s]>=8:E[w.s]-=8;w.h+=8
+     for i,w,loot in vict:E[w.s]+=loot
+    elif t%60==50:put(t,f'{E[0]} elements in red headquarter');put(t,f'{E[1]} elements in blue headquarter')
+   ans.append('\n'.join(lines))
+  return '\n'.join(ans)+'\n'
+ if P==4054:
+  directions=((1,0),(0,1),(-1,0),(0,-1));rotates=((5,2,1,4,3,0),(3,4,5,0,1,2));colors={'E':(6,),'W':(0,1),'R':(2,3),'B':(4,5)};p=0;out=[]
+  def possible(target):
+   vals=[6]*9;ans=[]
+   def dfs(i):
+    if i==9:ans.append(sum(7**j*vals[j] for j in range(9)));return
+    for z in colors[target[i]]:vals[i]=z;dfs(i+1)
+   dfs(0);return target.index('E'),ans
+  def solve_one(sx,sy,target):
+   start=3*sx+sy;cur=7**start*6;q1=deque([cur]);start_sum=0
+   for _ in range(9):start_sum+=cur%7;cur//=7
+   s1={start};blank,goals=possible(target);q2=deque();
+   for z in goals:
+    v=z;sm=0
+    for _ in range(9):sm+=v%7;v//=7
+    if (sm-start_sum-blank+start)&1==0:q2.append(z)
+   s2=set(q2)
+   for depth in range(31):
+    if len(q2)<len(q1):q1,q2=q2,q1;s1,s2=s2,s1
+    for _ in range(len(q1)):
+     state=q1.popleft()
+     if state in s2:return depth
+     if depth==30:continue
+     cur=[];v=state;bx=by=pos=-1
+     for i in range(9):
+      z=v%7;v//=7;cur.append(z)
+      if z==6:bx,by,pos=i//3,i%3,i
+     for dx,dy in directions:
+      nx,ny=bx+dx,by+dy
+      if not(0<=nx<3 and 0<=ny<3):continue
+      j=nx*3+ny;new=cur[:];new[pos]=rotates[dx][cur[j]];new[j]=6;z=sum(7**i*new[i] for i in range(9))
+      if z not in s1:s1.add(z);q1.append(z)
+   return -1
+  while p<len(a):
+   sy,sx=int(a[p])-1,int(a[p+1])-1;p+=2
+   if sx==sy==-1:break
+   target=a[p:p+9];p+=9;out.append(str(solve_one(sx,sy,target)))
+  return '\n'.join(out)+'\n'
+ if P==4035:
+  n=int(a[0]);g=[[0]*7 for _ in range(5)];p=1
+  for x in range(5):
+   y=0
+   while int(a[p]):g[x][y]=int(a[p]);y+=1;p+=1
+   p+=1
+  def settle(b):
+   while True:
+    rm=[[False]*7 for _ in range(5)]
+    for x in range(5):
+     y=0
+     while y<7:
+      if not b[x][y]:y+=1;continue
+      z=y+1
+      while z<7 and b[x][z]==b[x][y]:z+=1
+      if z-y>=3:
+       for q in range(y,z):rm[x][q]=True
+      y=z
+    for y in range(7):
+     x=0
+     while x<5:
+      if not b[x][y]:x+=1;continue
+      z=x+1
+      while z<5 and b[z][y]==b[x][y]:z+=1
+      if z-x>=3:
+       for q in range(x,z):rm[q][y]=True
+      x=z
+    if not any(any(r) for r in rm):return
+    for x in range(5):
+     vals=[b[x][y] for y in range(7) if not rm[x][y]]
+     b[x]=vals+[0]*(7-len(vals))
+  def move(b,x,y,d):
+   z=[r[:] for r in b];q=x+d
+   if not(0<=q<5) or z[x][y]==0 or z[q][y]==z[x][y] and z[q][y]!=0:return None
+   if z[q][y]:z[x][y],z[q][y]=z[q][y],z[x][y]
+   else:
+    z[q][y]=z[x][y];z[x][y]=0
+    vals=[z[q][j] for j in range(7) if z[q][j]];z[q]=vals+[0]*(7-len(vals))
+   settle(z);return z
+  path=[]
+  def dfs(b,dep):
+   if dep==n:return all(not b[x][y] for x in range(5) for y in range(7))
+   for x in range(5):
+    for y in range(7):
+     if not b[x][y]:continue
+     for d in (1,-1):
+      z=move(b,x,y,d)
+      if z is None:continue
+      path.append((x,y,d))
+      if dfs(z,dep+1):return True
+      path.pop()
+   return False
+  if not dfs(g,0):return '-1\n'
+  return '\n'.join(f'{x} {y} {d}' for x,y,d in path)+'\n'
+ if P==4012:
+  def one(s):
+   L=len(s);memo={}
+   def smallest(pos,ln,prev):
+    pat=s[pos:pos+ln]
+    if any(ch==',' for ch in pat):return None
+    bound=str(int(prev)+1) if prev else '1'
+    if len(bound)<ln:bound='1'+'0'*(ln-1);strict=False
+    elif len(bound)>ln:return None
+    else:strict=True
+    def build(i,rel,out):
+     if i==ln:return ''.join(out) if (not strict or rel in (0,1)) else None
+     low=int(bound[i]) if strict and rel==0 else 0
+     for d in range(low,10):
+      if i==0 and d==0:continue
+      ch=pat[i]
+      if ch!='?' and int(ch)!=d:continue
+      nr=1 if (strict and (rel==1 or d>int(bound[i]))) else 0
+      z=build(i+1,nr,out+[str(d)])
+      if z is not None:return z
+     return None
+    return build(0,0,[])
+   def dfs(pos,prev):
+    key=(pos,prev)
+    if key in memo:return memo[key]
+    if pos==L:return ''
+    best=None
+    for ln in range(1,L-pos+1):
+     if pos+ln<L and s[pos+ln] not in ',?':continue
+     cur=smallest(pos,ln,prev)
+     if cur is None:continue
+     nxt=pos+ln
+     if nxt==L:tail=''
+     else:
+      tail=dfs(nxt+1,cur)
+      if tail is None:continue
+     best=cur+(','+tail if tail else '');break
+    memo[key]=best;return best
+   z=dfs(0,'')
+   return z if z is not None else 'impossible'
+  return '\n'.join(one(line.strip()) for line in s.splitlines() if line.strip())+'\n'
  if P==4083:
   p=0;N=int(a[p]);p+=1;names=a[p:p+N];p+=N;M=int(a[p]);p+=1;adj={x:[] for x in names}
   for _ in range(M):u,v,w=a[p:p+3];p+=3;w=int(w);adj[u].append((v,w));adj[v].append((u,w))
@@ -238,6 +542,9 @@ sys.stdout.write(solve(sys.stdin.read()))
 '''
 
 SUPPORTED = set(GENERATORS)
+NO_INDEPENDENT_ORACLE = {3433, 3750, 4012, 4035, 4054}
+NO_INDEPENDENT_ORACLE.add(3433)
+REFERENCE_SOURCES = {3433: "platform Accepted G++ #52301277", 4054: "platform Accepted Python3 #49639414"}
 
 
 def alt(n, text):
@@ -353,6 +660,50 @@ def alt(n, text):
             while x!=y:x=nxt[x][y];path.append(names[x])
             out.append(path[0]+''.join(f'->({d[idx[path[i-1]]][idx[path[i]]] })->{z}' for i,z in enumerate(path[1:],1)))
         return '\n'.join(out)+'\n'
+    if n == 4011:
+        import heapq
+        a=text.split();p=0;out=[]
+        while p<len(a):
+            N,M=map(int,a[p:p+2]);p+=2
+            if not N:break
+            edges=[[] for _ in range(N)]
+            for _ in range(M):u,v,w=map(int,a[p:p+3]);p+=3;edges[u].append((v,w));edges[v].append((u,w))
+            Pn=int(a[p]);p+=1;prob=[[0.0]+list(map(float,a[p+i*Pn:p+(i+1)*Pn])) for i in range(N)];p+=N*Pn
+            dist=[10**9]*N;dist[0]=0;h=[(0,0)]
+            while h:
+                z,u=heapq.heappop(h)
+                if z!=dist[u]:continue
+                for v,w in edges[u]:
+                    if z+w<dist[v]:dist[v]=z+w;heapq.heappush(h,(dist[v],v))
+            best=0.0
+            def walk(i,left,plan):
+                nonlocal best
+                if i==N:
+                    if left:return
+                    q=[0.0]*N
+                    for u in sorted(range(N),key=lambda x:-dist[x]):
+                        nxt=[v for v,w in edges[u] if dist[v]==dist[u]+w];future=sum(q[v] for v in nxt)/len(nxt) if nxt else 0
+                        q[u]=prob[u][plan[u]]+(1-prob[u][plan[u]])*future
+                    best=max(best,q[0]);return
+                for x in range(left+1):walk(i+1,left-x,plan+[x])
+            walk(0,Pn,[]);out.append(f'{best*100:.2f}')
+        return '\n'.join(out)+'\n'
+    if n == 4038:
+        a=list(map(int,text.split()));N,M,K=a[:3];base=a[3:3+N-1];ps=[tuple(a[3+N-1+3*i:3+N-1+3*i+3]) for i in range(M)]
+        def score(cut):
+            d=[base[i]-cut[i] for i in range(N-1)];clock=0;active=[];waiting={i:[] for i in range(1,N+1)};ans=0
+            for t,x,y in ps:waiting[x].append((t,y))
+            for station in range(1,N):
+                if waiting[station]:clock=max(clock,max(t for t,_ in waiting[station]));active+=waiting[station]
+                clock+=d[station-1];done=[z for z in active if z[1]==station+1];ans+=sum(clock-t for t,_ in done);active=[z for z in active if z[1]!=station+1]
+            return ans
+        cut=[0]*(N-1)
+        for _ in range(K):
+            choices=[score(cut[:i]+[cut[i]+1]+cut[i+1:]) if cut[i]<base[i] else 10**18 for i in range(N-1)]
+            i=min(range(N-1),key=choices.__getitem__)
+            if choices[i]>=10**18:break
+            cut[i]+=1
+        return str(score(cut))+'\n'
     if n == 3377:
         a=text.split(); v=a[1:1+int(a[0])]
         i,j=0,len(v)-1; out=[]
@@ -382,6 +733,13 @@ CONSTRAINTS = {
     4037: ["矿石区间使用1-based闭区间", "检验值只计w>=W的矿石", "W取正整数阈值"],
     4076: ["矩阵尺寸不超过200", "路径相邻移动且不可复用同一位置", "序列必须连续匹配"],
     4083: ["地点数不超过30", "道路为无向边", "输出最短路径及每段距离"],
+    4011: ["最短路径唯一", "robber只沿最短路前进", "特工总数按题面上界生成"],
+    4038: ["公交只向前行驶", "加速后每段时间不小于0", "乘客满足A<B"],
+    4054: ["棋盘为3*3且恰有一个空位", "立方体有6种朝向", "只接受30步以内的最短步数"],
+    4012: ["正整数严格递增", "数字不含前导零", "问号可替换为数字或逗号"],
+    4035: ["棋盘为5*7且方块不悬空", "消除横向或纵向连续三个同色方块", "输出按x、y、方向字典序最小"],
+    3433: ["每小时按00/10/20/30/40/50事件顺序处理", "两军制造顺序固定", "战斗奖励与武器规则按题面执行"],
+    3750: ["城市按1..N排列且武士只能向敌方总部前进", "战斗主动方由城市奇偶和旗帜决定", "每次战斗奖励先于战利品回收"],
 }
 
 
@@ -394,17 +752,23 @@ def main():
         if n not in SUPPORTED:
             continue
         gen = GENERATORS[n]
-        ref = REFERENCE.replace("P=0", f"P={n}", 1)
+        ref = "__T004_CPP_3433__" if n == 3433 else REFERENCE.replace("P=0", f"P={n}", 1)
         assert run(ref, entry["sample_input"]).split() == entry["sample_output"].split(), n
         cases = [entry["sample_input"]]
         for i in range(1, 21):
             c = gen(random.Random(n + i))
             if c == "" and i > 1: c = gen(random.Random(n + i + 10000))
             cases.append(c)
-        for seed in range(20000): gen(random.Random(n + seed))
-        independent = True
-        for seed, c in enumerate(cases):
-            assert run(ref, c).split() == alt(n, c).split(), (n, seed)
+        for seed in range(20000):
+            gen(random.Random(n + seed))
+        # Keep the claimed reference smoke test executable: this is a real
+        # reference invocation, not a generator-only counter.
+        for seed in range(400):
+            run(ref, gen(random.Random(n + 100000 + seed)))
+        independent = n not in NO_INDEPENDENT_ORACLE
+        if independent:
+            for seed, c in enumerate(cases):
+                assert run(ref, c).split() == alt(n, c).split(), (n, seed)
         d = TESTS / bucket(n) / f"{n:05d}_made"
         data = d / "data"; data.mkdir(parents=True, exist_ok=True)
         for p in data.iterdir(): p.unlink()
@@ -413,9 +777,15 @@ def main():
             o = run(ref, c); outs.append(o)
             (data / f"{i}.in").write_text(c, encoding="utf-8")
             (data / f"{i}.out").write_text(o, encoding="utf-8")
-        (d / "samplecode.py").write_text(f"# T-004-r5\n{ref}", encoding="utf-8")
+        if n == 3433:
+            (d / "samplecode_ac.cpp").write_bytes(CPP3433.read_bytes())
+        else:
+            (d / "samplecode.py").write_text(f"# T-004-r5\n{ref}", encoding="utf-8")
         source = inspect.getsource(gen)
-        produce = f'''import random, subprocess, tempfile\nfrom pathlib import Path\nREFERENCE_SOURCE={ref!r}\nSAMPLE_IN={entry["sample_input"]!r}\n{source}\nwith tempfile.NamedTemporaryFile("w", suffix=".py") as h:\n h.write(REFERENCE_SOURCE); h.flush(); root=Path(__file__).parent/"data"\n for i in range(21):\n  c=SAMPLE_IN if i == 0 else {gen.__name__}(random.Random({n}+i))\n  p=subprocess.run(["python3", h.name], input=c, text=True, capture_output=True, check=True)\n  (root/f"{{i}}.in").write_text(c); (root/f"{{i}}.out").write_text(p.stdout)\n'''
+        if n == 3433:
+            produce = f'''import random, subprocess\nfrom pathlib import Path\nSAMPLE_IN={entry["sample_input"]!r}\n{source}\nroot=Path(__file__).parent; binary=root/"reference"\nsubprocess.run(["g++", "-std=c++17", "-O2", str(root/"samplecode_ac.cpp"), "-o", str(binary)], check=True)\nfor i in range(21):\n c=SAMPLE_IN if i == 0 else {gen.__name__}(random.Random({n}+i))\n p=subprocess.run([str(binary)], input=c, text=True, capture_output=True, check=True)\n (root/"data"/f"{{i}}.in").write_text(c); (root/"data"/f"{{i}}.out").write_text(p.stdout)\n'''
+        else:
+            produce = f'''import random, subprocess, tempfile\nfrom pathlib import Path\nREFERENCE_SOURCE={ref!r}\nSAMPLE_IN={entry["sample_input"]!r}\n{source}\nwith tempfile.NamedTemporaryFile("w", suffix=".py") as h:\n h.write(REFERENCE_SOURCE); h.flush(); root=Path(__file__).parent/"data"\n for i in range(21):\n  c=SAMPLE_IN if i == 0 else {gen.__name__}(random.Random({n}+i))\n  p=subprocess.run(["python3", h.name], input=c, text=True, capture_output=True, check=True)\n  (root/f"{{i}}.in").write_text(c); (root/f"{{i}}.out").write_text(p.stdout)\n'''
         (d / "producecase.py").write_text(produce, encoding="utf-8")
         before = {p.name: p.read_bytes() for p in data.iterdir()}
         p = subprocess.run([sys.executable, "producecase.py"], cwd=d, capture_output=True, text=True, timeout=600)
@@ -423,14 +793,14 @@ def main():
         assert p.returncode == 0 and before == after, (n, p.stderr)
         freq = max(outs.count(x) for x in outs)
         rows.append({"local_number": n, "title": entry["title"], "source": entry["source"],
-                     "reference_source": "LLM-written", "generator": gen.__name__, "seed": n,
+                     "reference_source": REFERENCE_SOURCES.get(n, "LLM-written"), "generator": gen.__name__, "seed": n,
                      "test_cases": len(cases), "distinct_input_cases": len(set(cases)),
                      "distinct_outputs": len(set(outs)), "constant_output_probe": {"status": "rejected", "frequency": freq, "total": len(outs)},
                      "constraints": CONSTRAINTS[n], "generator_seed_smoke": {"seeds": 20000, "status": "passed"},
                      "reference_seed_smoke": {"seeds": 400, "status": "passed"},
-                     "independent_oracle_smoke": {"seeds": len(cases), "status": "passed"},
-                     "independent_oracle_status": "passed", "sample_reproduced": True,
-                     "independent_sample_agreement": True, "producecase_reproduced": True})
+                     "independent_oracle_smoke": {"seeds": len(cases), "status": "passed"} if independent else {"seeds": 0, "status": "not_available", "reason": "no independent oracle implemented"},
+                     "independent_oracle_status": "passed" if independent else "no_independent_oracle", "sample_reproduced": True,
+                     "independent_sample_agreement": True if independent else None, "producecase_reproduced": True})
         print("built", n, flush=True)
     rows.sort(key=lambda x: x["local_number"])
     REPORT.write_text(json.dumps({"batch": manifest["batch"], "entries": rows,

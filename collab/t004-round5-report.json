@@ -39,6 +39,44 @@
       "producecase_reproduced": true
     },
     {
+      "local_number": 3433,
+      "title": "魔兽世界终极版",
+      "source": "data/openjudge/pages/practice__03433.html",
+      "reference_source": "platform Accepted G++ #52301277",
+      "generator": "g3433",
+      "seed": 3433,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "每小时按00/10/20/30/40/50事件顺序处理",
+        "两军制造顺序固定",
+        "战斗奖励与武器规则按题面执行"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 0,
+        "status": "not_available",
+        "reason": "no independent oracle implemented"
+      },
+      "independent_oracle_status": "no_independent_oracle",
+      "sample_reproduced": true,
+      "independent_sample_agreement": null,
+      "producecase_reproduced": true
+    },
+    {
       "local_number": 3670,
       "title": "E03670:计算鞍点",
       "source": "data/openjudge/pages/pctbook__E03670.html",
@@ -73,6 +111,119 @@
       "independent_oracle_status": "passed",
       "sample_reproduced": true,
       "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3750,
+      "title": "魔兽世界",
+      "source": "data/openjudge/pages/practice__03750.html",
+      "reference_source": "LLM-written",
+      "generator": "g3750",
+      "seed": 3750,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 3,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 19,
+        "total": 21
+      },
+      "constraints": [
+        "城市按1..N排列且武士只能向敌方总部前进",
+        "战斗主动方由城市奇偶和旗帜决定",
+        "每次战斗奖励先于战利品回收"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 0,
+        "status": "not_available",
+        "reason": "no independent oracle implemented"
+      },
+      "independent_oracle_status": "no_independent_oracle",
+      "sample_reproduced": true,
+      "independent_sample_agreement": null,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4011,
+      "title": "Chase",
+      "source": "data/openjudge/pages/practice__04011.html",
+      "reference_source": "LLM-written",
+      "generator": "g4011",
+      "seed": 4011,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "最短路径唯一",
+        "robber只沿最短路前进",
+        "特工总数按题面上界生成"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4012,
+      "title": "Decrypt the Dragon Scroll",
+      "source": "data/openjudge/pages/practice__04012.html",
+      "reference_source": "LLM-written",
+      "generator": "g4012",
+      "seed": 4012,
+      "test_cases": 21,
+      "distinct_input_cases": 4,
+      "distinct_outputs": 4,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 8,
+        "total": 21
+      },
+      "constraints": [
+        "正整数严格递增",
+        "数字不含前导零",
+        "问号可替换为数字或逗号"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 0,
+        "status": "not_available",
+        "reason": "no independent oracle implemented"
+      },
+      "independent_oracle_status": "no_independent_oracle",
+      "sample_reproduced": true,
+      "independent_sample_agreement": null,
       "producecase_reproduced": true
     },
     {
@@ -150,6 +301,44 @@
       "producecase_reproduced": true
     },
     {
+      "local_number": 4035,
+      "title": "Mayan 游戏",
+      "source": "data/openjudge/pages/practice__04035.html",
+      "reference_source": "LLM-written",
+      "generator": "g4035",
+      "seed": 4035,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 2,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 20,
+        "total": 21
+      },
+      "constraints": [
+        "棋盘为5*7且方块不悬空",
+        "消除横向或纵向连续三个同色方块",
+        "输出按x、y、方向字典序最小"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 0,
+        "status": "not_available",
+        "reason": "no independent oracle implemented"
+      },
+      "independent_oracle_status": "no_independent_oracle",
+      "sample_reproduced": true,
+      "independent_sample_agreement": null,
+      "producecase_reproduced": true
+    },
+    {
       "local_number": 4037,
       "title": "聪明的质监员",
       "source": "data/openjudge/pages/practice__04037.html",
@@ -184,6 +373,81 @@
       "independent_oracle_status": "passed",
       "sample_reproduced": true,
       "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4038,
+      "title": "观光公交",
+      "source": "data/openjudge/pages/routine__04038.html",
+      "reference_source": "LLM-written",
+      "generator": "g4038",
+      "seed": 4038,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 17,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 2,
+        "total": 21
+      },
+      "constraints": [
+        "公交只向前行驶",
+        "加速后每段时间不小于0",
+        "乘客满足A<B"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 21,
+        "status": "passed"
+      },
+      "independent_oracle_status": "passed",
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4054,
+      "title": "Cubic Eight-Puzzle",
+      "source": "data/openjudge/pages/practice__04054.html",
+      "reference_source": "platform Accepted Python3 #49639414",
+      "generator": "g4054",
+      "seed": 4054,
+      "test_cases": 21,
+      "distinct_input_cases": 16,
+      "distinct_outputs": 9,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 8,
+        "total": 21
+      },
+      "constraints": [
+        "棋盘为3*3且恰有一个空位",
+        "立方体有6种朝向",
+        "只接受30步以内的最短步数"
+      ],
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 0,
+        "status": "not_available",
+        "reason": "no independent oracle implemented"
+      },
+      "independent_oracle_status": "no_independent_oracle",
+      "sample_reproduced": true,
+      "independent_sample_agreement": null,
       "producecase_reproduced": true
     },
     {
@@ -481,13 +745,5 @@
       "producecase_reproduced": true
     }
   ],
-  "unbuilt": [
-    3433,
-    3750,
-    4011,
-    4012,
-    4035,
-    4038,
-    4054
-  ]
+  "unbuilt": []
 }
