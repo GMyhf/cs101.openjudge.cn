@@ -116,14 +116,16 @@ def go(s):
   for x in map(int,a[2:]):d=[max(d[j],d[(j-x)%k]+x) for j in range(k)]
   return str(d[0])+"\n"
  if P==4009:
+  pc=[bin(x).count("1") for x in range(65536)]
+  def pop(x):return pc[x&65535]+pc[x>>16]
   out=[]
   for n in map(int,a):
    if not n:break
    c=0
    for mask in range(1<<n):
-    row=mask;z=2*bin(mask).count("1")-n
+    row=mask;z=2*pop(mask)-n
     for width in range(n,1,-1):
-     row=(~(row^(row>>1)))&((1<<(width-1))-1);z+=2*bin(row).count("1")-(width-1)
+     row=(~(row^(row>>1)))&((1<<(width-1))-1);z+=2*pop(row)-(width-1)
     c+=z==0
    out.append(f"{n} {c}")
   return "\n".join(out)+"\n"

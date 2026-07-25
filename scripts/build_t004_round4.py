@@ -17,7 +17,33 @@ def run(code, text):
     return p.stdout
 
 def g3723(r):
-    n=r.randint(1,8); a=[[r.choice(".BW") for _ in range(n)] for _ in range(n)]
+    n=r.randint(4,8); a=[["B"]*n for _ in range(n)]
+    # Partition the interior into connected rectangles, then surround every
+    # region with stones of one colour.  Thus every empty component has a
+    # single, defined owner as required by the statement.
+    for i in range(1,n-1):
+        for j in range(1,n-1): a[i][j]="."
+    cuts=[]
+    if n>=6 and r.random()<.7: cuts.append(("v",r.randint(2,n-3)))
+    if n>=6 and r.random()<.5: cuts.append(("h",r.randint(2,n-3)))
+    for kind,k in cuts:
+        if kind=="v":
+            for i in range(1,n-1): a[i][k]="B"
+        else:
+            for j in range(1,n-1): a[k][j]="B"
+    # A structural assertion, rather than a report flag, proves the domain.
+    seen=set()
+    for i in range(n):
+        for j in range(n):
+            if a[i][j]!="." or (i,j) in seen: continue
+            q=[(i,j)];seen.add((i,j));edge=set()
+            while q:
+                x,y=q.pop()
+                for u,v in ((x-1,y),(x+1,y),(x,y-1),(x,y+1)):
+                    if 0<=u<n and 0<=v<n:
+                        if a[u][v]=="." and (u,v) not in seen: seen.add((u,v));q.append((u,v))
+                        elif a[u][v] in "BW": edge.add(a[u][v])
+            assert edge=={"B"}
     return str(n)+"\n"+"\n".join("".join(x) for x in a)+"\n"
 def g3725(r):
     a=[r.randint(1,100) for _ in range(r.randint(1,15))]
@@ -50,7 +76,9 @@ def g3866(r):
     return f"{W} {H}\n"+"\n".join("".join(x) for x in a)+"\n0 0\n"
 def g3906(r):
     m,n=r.randint(2,5),r.randint(2,5)
-    return f"{m} {n}\n"+"\n".join(" ".join(str(r.randint(0,9)) for _ in range(n)) for _ in range(m))+"\n"
+    a=[[r.randint(0,100) for _ in range(n)] for _ in range(m)]
+    a[0][0]=a[-1][-1]=0
+    return f"{m} {n}\n"+"\n".join(" ".join(map(str,row)) for row in a)+"\n"
 def g4001(r): return f"{r.randint(0,30)} {r.randint(0,30)}\n"
 def g4002(r):
     n=r.randint(2,12); return f"{n} 12\n"+"\n".join(str(r.randint(1,12)) for _ in range(n))+"\n"
@@ -213,9 +241,6 @@ def go(s):
   out=[]
   for n in map(int,a):
    if not n:break
-   known={15:1896,16:5160,19:32757,20:59984}
-   if n in known:
-    out.append(f"{n} {known[n]}");continue
    c=0
    for mask in range(1<<n):
     row=mask;z=2*pop(mask)-n
@@ -273,7 +298,9 @@ def alt(n,s):
                 prev=cur
             o.append(str(prev[-1]))
         return "\n".join(o)+"\n"
-    return run(BASE.replace("P=0",f"P={n}"),s)
+    raise LookupError(f"no independent oracle for {n}")
+
+NO_INDEPENDENT_ORACLE={3723,3725,3726,3727,3728,3744,3789,3866,3906,4002,4006,4008,4009,4010,4021,4033,4034}
 
 def main():
     man=json.loads(MANIFEST.read_text(encoding="utf-8")); rows=[]
@@ -284,7 +311,8 @@ def main():
         if only is not None and n != only: continue
         print("start",n,flush=True)
         assert run(ref,e["sample_input"]).split()==e["sample_output"].split(),n
-        assert alt(n,e["sample_input"]).split()==e["sample_output"].split(),n
+        if n not in NO_INDEPENDENT_ORACLE:
+            assert alt(n,e["sample_input"]).split()==e["sample_output"].split(),n
         cases=[e["sample_input"]]
         for i in range(1,21):
             for j in range(100):
@@ -295,14 +323,18 @@ def main():
         badref=ref
         mutations={3723:("len(e)==1","len(e)==0"),3725:("min(q)","max(q)"),3726:("g[u][v]!=\"#\"","g[u][v]==\"#\""),3727:("max(d[j],","min(d[j],"),3728:("3*x+1","3*x+2"),3744:("2*(x*y+x*w+y*w)","2*(x*y+x*w+y*w)+1"),3789:("range(n-L+1)","range(n-L)"),3791:("y.startswith(x)","x.startswith(y)"),3866:("out.append(str(len(seen)))","out.append(str(len(seen)-1))"),3906:("(X,Y)!=(U,W)","(X,Y)==(U,W)"),4001:("2*x","2*x+1"),4002:("v.count(x)>1","v.count(x)>2"),4006:("min(i-1,j-1,n-i,n-j)","min(i-1,j-1,n-i+1,n-j)"),4007:("(c!=y[j])","(c==y[j])"),4008:("return str(d[0])","return str(d[-1])"),4009:("z==0","z==1"),4010:("10000","1000"),4021:("max(z)","min(z)"),4033:("ans=i+1","ans=i"),4034:("<=p","<p")}
         old,new=mutations[n];mut=ref.replace(old,new);assert mut!=ref
-        def differs(c):
-            try: return run(mut,c).split()!=alt(n,c).split()
-            except Exception: return True
-        hits=[i for i,c in enumerate(cases) if differs(c)]
-        assert hits,(n,"mutation not caught")
+        if n in NO_INDEPENDENT_ORACLE:
+            hits=[]
+        else:
+            def differs(c):
+                return run(mut,c).split()!=alt(n,c).split()
+            hits=[i for i,c in enumerate(cases) if differs(c)]
+            assert hits,(n,"mutation not caught")
         for seed in range(20000):gen(random.Random(n+seed))
         for seed in range(400):
-            c=gen(random.Random(n+seed));assert run(ref,c).split()==alt(n,c).split(),(n,seed)
+            c=gen(random.Random(n+seed))
+            if n not in NO_INDEPENDENT_ORACLE:
+                assert run(ref,c).split()==alt(n,c).split(),(n,seed)
         d=TESTS/bucket(n)/f"{n:05d}_made";data=d/"data";data.mkdir(parents=True,exist_ok=True)
         (d/"samplecode.py").write_text("# T-004-r4\n"+ref,encoding="utf-8")
         source=inspect.getsource(gen)
@@ -332,7 +364,10 @@ with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as h:
         p=subprocess.run([sys.executable,"producecase.py"],cwd=d,capture_output=True,text=True,timeout=600)
         after={p.name:p.read_bytes() for p in data.iterdir()};assert p.returncode==0 and before==after,(n,p.stderr)
         f=max(outs.count(x) for x in outs)
-        rows.append({"local_number":n,"title":e["title"],"source":e["source"],"reference_source":"LLM-written","generator":gen.__name__,"seed":n,"test_cases":21,"distinct_input_cases":len(set(cases)),"distinct_outputs":len(set(outs)),"constant_output_probe":{"status":"rejected" if f<21 else "accepted","frequency":f,"total":21},"constraints":CONSTRAINTS[n],"structure_checked":True,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"independent_oracle_smoke":{"seeds":400,"status":"passed"},"sample_reproduced":True,"independent_sample_agreement":True,"misconception_probe":{"data_catches_misreading":True,"data_catching_cases":hits,"status":"caught"},"producecase_reproduced":True})
+        independent=n not in NO_INDEPENDENT_ORACLE
+        row={"local_number":n,"title":e["title"],"source":e["source"],"reference_source":"LLM-written","generator":gen.__name__,"seed":n,"test_cases":21,"distinct_input_cases":len(set(cases)),"distinct_outputs":len(set(outs)),"constant_output_probe":{"status":"rejected" if f<21 else "accepted","frequency":f,"total":21},"constraints":CONSTRAINTS[n],"structure_checked":True,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"independent_oracle_smoke":{"seeds":400,"status":"passed"} if independent else {"seeds":0,"status":"not_available","reason":"no independent oracle implemented"},"independent_oracle_status":"passed" if independent else "no_independent_oracle","sample_reproduced":True,"independent_sample_agreement":True if independent else None,"misconception_probe":{"data_catches_misreading":True,"data_catching_cases":hits,"status":"caught"} if independent else {"status":"not_available","reason":"no independent oracle implemented"},"producecase_reproduced":True}
+        if n==4009: row["coverage_note"]="无查表实测：n=20 样例可在约 8 秒完成，n=21 可在约 16 秒完成；n=22 未在 60 秒限制内完成，因此本批不声称覆盖题面上界 24。"
+        rows.append(row)
         print("built",n,flush=True)
     if only is not None:
         updated={x["local_number"] for x in rows}; rows=[x for x in previous if x["local_number"] not in updated]+rows

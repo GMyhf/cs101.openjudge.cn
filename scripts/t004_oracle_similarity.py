@@ -119,6 +119,16 @@ def oracle_branches(path):
     return out
 
 
+def unavailable_oracles(path):
+    """Read the builder's explicit downgrade list; never score a fake fallback."""
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == "NO_INDEPENDENT_ORACLE" for t in node.targets):
+            if isinstance(node.value, ast.Set):
+                return {x.value for x in node.value.elts if isinstance(x, ast.Constant) and isinstance(x.value, int)}
+    return set()
+
+
 def reference_source(number):
     directory = next(TESTS.glob(f"*/{number:05d}_made"), None)
     if directory is None:
@@ -134,10 +144,15 @@ def main():
         round_number = 4
     manifest = json.loads((ROOT / f"collab/t004-round{round_number}-manifest.json").read_text(encoding="utf-8"))
     numbers = [x["local_number"] for x in manifest["entries"]]
-    branches = oracle_branches(ROOT / f"scripts/build_t004_round{round_number}.py")
+    builder = ROOT / f"scripts/build_t004_round{round_number}.py"
+    branches = oracle_branches(builder)
+    unavailable = unavailable_oracles(builder)
     fallback = branches.get(None)
     rows, over = [], []
     for number in numbers:
+        if number in unavailable:
+            print(f"  {number}: 未提供独立 oracle（不评分）")
+            continue
         oracle_src = branches.get(number, fallback)
         ref_src = reference_source(number)
         if oracle_src is None or ref_src is None:

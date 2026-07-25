@@ -121,9 +121,6 @@ def go(s):
   out=[]
   for n in map(int,a):
    if not n:break
-   known={15:1896,16:5160,19:32757,20:59984}
-   if n in known:
-    out.append(f"{n} {known[n]}");continue
    c=0
    for mask in range(1<<n):
     row=mask;z=2*pop(mask)-n
