@@ -12,6 +12,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
+# 认证提交这条链路要真的走进判题器，所以题号必须选数据已入库的（`*_made/`）；
+# `data/openjudge/tests/**` 下抓取的数据不入库，用它会让新克隆的仓库跑不通。
+SUBMIT_BOOK = "pctbook"
+SUBMIT_PROBLEM = "E03406"
+
 
 def request(port, method, path, body=None, cookie=None):
     connection = http.client.HTTPConnection("127.0.0.1", port, timeout=8)
@@ -35,6 +40,7 @@ class ServerApiTests(unittest.TestCase):
             cls.port = sock.getsockname()[1]
         cls.db_file = tempfile.NamedTemporaryFile(prefix="cs101-t001-", suffix=".db", delete=False)
         cls.db_file.close()
+        cls.addClassCleanup(os.unlink, cls.db_file.name)
         environment = os.environ.copy()
         environment.update({
             "CS101_HOST": "127.0.0.1",
@@ -46,6 +52,9 @@ class ServerApiTests(unittest.TestCase):
             [sys.executable, "server.py"], cwd=ROOT, env=environment,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
         )
+        # 先登记清理再等待：即使服务端起不来、setUpClass 抛异常，
+        # addClassCleanup 也会跑，不会漏下孤儿进程和临时库文件。
+        cls.addClassCleanup(cls._stop_server)
         deadline = time.monotonic() + 8
         while time.monotonic() < deadline:
             try:
@@ -54,22 +63,22 @@ class ServerApiTests(unittest.TestCase):
                     return
             except (ConnectionRefusedError, OSError):
                 time.sleep(0.05)
-        output = cls.process.stderr.read() if cls.process.poll() is not None else ""
-        raise RuntimeError("server did not start: " + output)
+        cls._stop_server()
+        raise RuntimeError("server did not start: " + (cls.process.stderr.read() or "<no stderr>"))
 
     @classmethod
-    def tearDownClass(cls):
-        cls.process.terminate()
-        try:
-            cls.process.wait(timeout=3)
-        except subprocess.TimeoutExpired:
-            cls.process.kill()
-            cls.process.wait()
-        os.unlink(cls.db_file.name)
+    def _stop_server(cls):
+        if cls.process.poll() is None:
+            cls.process.terminate()
+            try:
+                cls.process.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                cls.process.kill()
+                cls.process.wait()
 
     def test_submit_requires_authentication(self):
         status, _, body = request(self.port, "POST", "/api/submit", {
-            "book": "pctbook", "problem": "E01003", "language": "python", "source": "print(1)",
+            "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python", "source": "print(1)",
         })
         self.assertEqual(status, 401)
         self.assertIn(b"Unauthorized", body)
@@ -98,7 +107,7 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(status, 200)
         cookie = headers["Set-Cookie"].split(";", 1)[0]
         status, _, body = request(self.port, "POST", "/api/submit", {
-            "book": "pctbook", "problem": "E01003", "language": "python",
+            "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
             "source": "print('wrong')",
         }, cookie=cookie)
         self.assertEqual(status, 200)

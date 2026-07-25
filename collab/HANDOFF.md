@@ -21,6 +21,39 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-25 · Claude → Codex · T-001 复核：**打回两项、我已直接修好；T-001 收口**
+
+- **做了什么**：复核 `097e4f3`。判题/服务端的**生产代码改动全部认可**（路径穿越是真 bug：
+  实测旧版 `GET /data/../server.py` 会吐出 server.py 源码，因为 `ROOT in file.parents`
+  对 `ROOT/"data/../server.py"` 判 True）。但测试套件有两个问题，已直接修掉：
+  1. **阻断项 · 闸门在新克隆上根本跑不起来**：判题测试全部依赖 `pctbook/E01003` →
+     `data/openjudge/tests/1000-1999/1003/`，而这批抓取数据按人拍板决策被
+     `.gitignore` 排除。实测全新 `git clone` 后 `--verify` 是 **6/9 失败**
+     （5 个判题测试 FileNotFoundError，服务端提交测试把判题线程打崩成 RemoteDisconnected）。
+     现改为 `tests/fixtures/mirror/` **自带入库夹具**（判题测试 patch `judge.MIRROR`），
+     服务端提交测试改用数据已入库的 `pctbook/E03406`。
+  2. **假覆盖 · CPU 限额分支没有任何测试碰到**：`while True: pass` 与 5 秒墙钟是竞争关系，
+     实测总是墙钟先到（返回「超过 5 秒」），删掉 `judge.py` 的 SIGXCPU 那一行测试照样全绿。
+     现拆成两个**确定性**用例：`time.sleep(30)` 钉墙钟分支、自发 `SIGXCPU` 钉信号分支，
+     并各自断言 message。
+- **顺手**：`test_wrong_answer_reports_the_failing_case` 原来在单组夹具上断言 `case == 1`
+  是恒真的；新夹具两组数据、程序只错第 2 组，断言 `case == 2`（这条正是项目要的
+  「反馈错在哪组数据」）。补 `No Test Data` 状态；服务端 `setUpClass` 改用 `addClassCleanup`，
+  起不来时不再漏孤儿进程和临时库文件、并把 stderr 带进报错。
+- **改了哪些文件**：`tests/test_judge.py`, `tests/test_server.py`,
+  `tests/fixtures/mirror/catalog.json`, `tests/fixtures/mirror/tests/sum2/{1,2}.{in,out}`,
+  `collab/HANDOFF.md`, `collab/NOTES-claude.md`, `collab/PLAN.md`
+- **验证**：`--verify` 通过 ｜ unittest **11/11** ｜ py_compile 11 文件 ｜ `node --check` 通过 ｜
+  **全新 `git clone` 里 `--verify` 全绿**（修前同一环境 6/9 失败）｜
+  **变异测试 5/5 全被抓**：删 SIGXCPU 分支、token 比对改整串比对、WA 恒报第 1 组、
+  删 CE 预编译、删 `..` 防线 —— 各自对应的用例都失败。
+- **请重点看**：`SIGKILL → TLE` 会把 cgroup/系统 OOM kill 误报成超时（项目没有 MLE 状态，
+  属设计缺口，我只记录未改）；OLE 检查排在信号检查之前，被 CPU 限额杀死但已输出 >2MB
+  的程序报 OLE 而非 TLE。两条都不阻断，要不要动请人拍板。
+- **红线自检**：判题沙箱未放宽 ✅ ｜ 口令未入库 ✅ ｜ 路径防线未动（codex 加强的那道保留）✅
+- **下一步建议**：T-001 收口，闸门现在可以信；继续 T-002-001d。今后新增测试请先在
+  全新克隆里跑一遍 `--verify`，再对新写的断言做一次变异自检。
+
 ### 2026-07-24 · Codex → Claude · T-001
 
 - **做了什么**：完成测试套件并将其接入交接闸门。判题覆盖 AC/WA/TLE/RE/CE、token 语义、CPU 与输出限制；服务端覆盖注册/登录/会话、未登录 `/api/submit` 401、认证提交和静态路径穿越。
