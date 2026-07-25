@@ -121,9 +121,10 @@
       },
       "max_input_bytes": 2,
       "constraints": [
-        "n is in the finite domain 0..8",
-        "each remaining interval is represented by *",
-        "other unit positions are represented by -"
+        "题面未给出 n 的上界（practice/dsapre/2024sp_routine 三个页面均无）",
+        "输出长度为 3^n，n 每加 1 输出膨胀三倍，判题输出上限 2MB 使 n<=13 才可判",
+        "生成器取 n=0..8 是**工程取舍**（再大数据文件过大），不是题面约束——因此本题的「去重<15 组」属于数据体积权衡，不属于「输入域本身小于 15」的豁免",
+        "每个剩余小区间用 * 表示，其余单位位置用 - 表示"
       ],
       "structure_checked": false,
       "structure_check": null,
@@ -136,7 +137,8 @@
         "status": "passed"
       },
       "sample_reproduced": true,
-      "producecase_reproduced": true
+      "producecase_reproduced": true,
+      "test_cases_note": "9 组：题面无 n 上界，取 0..8 是数据体积取舍，非有限输入域"
     },
     {
       "local_number": 26646,

@@ -149,7 +149,7 @@ CONSTRAINTS = {
     25573: ["n<500000", "each rose is R or B", "operations are single-position or prefix color flips"],
     25655: ["the observation window is days 1..9", "each student has a day-1 record", "each record names an existing student and a valid day", "a student needs one test in every three-day window"],
     25815: ["length is at most 100", "characters are uppercase A-Z", "insert/delete/replace each cost one operation"],
-    26573: ["n is in the finite domain 0..8", "each remaining interval is represented by *", "other unit positions are represented by -"],
+    26573: ["题面未给出 n 的上界（practice/dsapre/2024sp_routine 三个页面均无）", "输出长度为 3^n，n 每加 1 输出膨胀三倍，判题输出上限 2MB 使 n<=13 才可判", "生成器取 n=0..8 是**工程取舍**（再大数据文件过大），不是题面约束——因此本题的「去重<15 组」属于数据体积权衡，不属于「输入域本身小于 15」的豁免", "每个剩余小区间用 * 表示，其余单位位置用 - 表示"],
     26646: ["building intervals are left-closed/right-open", "0<=x<m and 1<=y<=m", "a building containing x has width y", "selected buildings cannot overlap"],
     26999: ["number of cases is positive", "0<len(pattern)<=len(text)<2*10^7", "matches are reported from zero-based positions", "no match is printed as no"],
     27273: ["1<=t<=100", "1<=n<=10^6", "powers of two through n receive a negative sign"],
