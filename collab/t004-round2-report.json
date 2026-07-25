@@ -1,0 +1,535 @@
+{
+  "batch": "T-004-r2",
+  "entries": [
+    {
+      "local_number": 4003,
+      "title": "十六进制转十进制",
+      "source": "data/openjudge/pages/practice__04003.html",
+      "reference_source": "LLM-written",
+      "generator": "g4003",
+      "seed": 4003,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "T>=1",
+        "每个十六进制无符号整数长度<=8",
+        "a-f使用大写字母",
+        "数前无多余0",
+        "十进制结果<2^31"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "case": "1\nA\n",
+        "status": "caught",
+        "mutated_output": [
+          "<runtime error: RuntimeError>"
+        ],
+        "oracle_output": [
+          "10"
+        ],
+        "runtime_error": true
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4004,
+      "title": "数字组合",
+      "source": "data/openjudge/pages/practice__04004.html",
+      "reference_source": "LLM-written",
+      "generator": "g4004",
+      "seed": 4004,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 6,
+      "max_output_frequency": 12,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 12,
+        "total": 21
+      },
+      "constraints": [
+        "1<=n<=20",
+        "1<=t<=1000",
+        "输入为n个正整数",
+        "每个数至多使用一次",
+        "输出和为t的组合数"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "case": "2 3\n1 2\n",
+        "status": "caught",
+        "mutated_output": [
+          "0"
+        ],
+        "oracle_output": [
+          "1"
+        ],
+        "runtime_error": false
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4029,
+      "title": "数字反转",
+      "source": "data/openjudge/pages/practice__04029.html",
+      "reference_source": "LLM-written",
+      "generator": "g4029",
+      "seed": 4029,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "输入一个整数N",
+        "-1000000000<=N<=1000000000",
+        "反转后除零外最高位不为0",
+        "负号保留在最高位"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "case": "-380\n",
+        "status": "caught",
+        "mutated_output": [
+          "-380"
+        ],
+        "oracle_output": [
+          "-83"
+        ],
+        "runtime_error": false
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 4085,
+      "title": "数组去重排序",
+      "source": "data/openjudge/pages/practice__04085.html",
+      "reference_source": "LLM-written",
+      "generator": "g4085",
+      "seed": 4085,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "n<=100000",
+        "整数不超过10000",
+        "输入整数之间可能有若干空格",
+        "输出去重后升序序列"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "case": "4\n1 1 2 3\n",
+        "status": "caught",
+        "mutated_output": [
+          "1",
+          "1",
+          "2",
+          "3"
+        ],
+        "oracle_output": [
+          "1",
+          "2",
+          "3"
+        ],
+        "runtime_error": false
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 3718,
+      "title": "循环左移",
+      "source": "data/openjudge/pages/practice__03718.html",
+      "reference_source": "LLM-written",
+      "generator": "g3718",
+      "seed": 3718,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "0<n<300000",
+        "两个数均为0..65535",
+        "按16位二进制表示循环左移判断"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "case": "1\n1 32768\n",
+        "status": "caught",
+        "mutated_output": [
+          "NO"
+        ],
+        "oracle_output": [
+          "YES"
+        ],
+        "runtime_error": false
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 6645,
+      "title": "十进制数转二进制数",
+      "source": "data/openjudge/pages/practice__06645.html",
+      "reference_source": "LLM-written",
+      "generator": "g6645",
+      "seed": 6645,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "十进制数长度<100",
+        "输入数可能非常大",
+        "输出对应二进制表示"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "case": "2\n",
+        "status": "caught",
+        "mutated_output": [
+          "0"
+        ],
+        "oracle_output": [
+          "10"
+        ],
+        "runtime_error": false
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 7745,
+      "title": "整数奇偶排序",
+      "source": "data/openjudge/pages/2024sp_routine__07745.html",
+      "reference_source": "LLM-written",
+      "generator": "g7745",
+      "seed": 7745,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "固定输入10个整数",
+        "每个整数为0..100",
+        "奇数在前且降序",
+        "偶数在后且升序"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "case": "2 3 4 5 6 7 8 9 10 11\n",
+        "status": "caught",
+        "mutated_output": [
+          "3",
+          "5",
+          "7",
+          "9",
+          "11",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10"
+        ],
+        "oracle_output": [
+          "11",
+          "9",
+          "7",
+          "5",
+          "3",
+          "2",
+          "4",
+          "6",
+          "8",
+          "10"
+        ],
+        "runtime_error": false
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 23007,
+      "title": "版本号排序",
+      "source": "data/openjudge/pages/2024sp_routine__23007.html",
+      "reference_source": "LLM-written",
+      "generator": "g23007",
+      "seed": 23007,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "1<=N<=100",
+        "版本号总长度<=100",
+        "主版本号和每个子版本号<=100",
+        "版本段由点连接",
+        "NULL小于0，短版本优先"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "case": "2\n2.1\n1.10\n",
+        "status": "caught",
+        "mutated_output": [
+          "2.1",
+          "1.10"
+        ],
+        "oracle_output": [
+          "1.10",
+          "2.1"
+        ],
+        "runtime_error": false
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 27706,
+      "title": "逐词倒放",
+      "source": "data/openjudge/pages/practice__27706.html",
+      "reference_source": "LLM-written",
+      "generator": "g27706",
+      "seed": 27706,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "单行句子",
+        "单词数<=50",
+        "每个单词长度<=10",
+        "单词可含字母数字标点",
+        "单词之间一个空格"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "case": "first second third\n",
+        "status": "caught",
+        "mutated_output": [
+          "first",
+          "second",
+          "third"
+        ],
+        "oracle_output": [
+          "third",
+          "second",
+          "first"
+        ],
+        "runtime_error": false
+      },
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28557,
+      "title": "加法的进位",
+      "source": "data/openjudge/pages/practice__28557.html",
+      "reference_source": "LLM-written",
+      "generator": "g28557",
+      "seed": 28557,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
+      "constant_output_probe": {
+        "status": "rejected",
+        "frequency": 1,
+        "total": 21
+      },
+      "constraints": [
+        "1<=t<=10",
+        "1<=a,b<=1000000000",
+        "统计十进制加法产生的进位次数"
+      ],
+      "structure_checked": false,
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "independent_oracle_smoke": {
+        "seeds": 1000,
+        "status": "passed"
+      },
+      "sample_reproduced": true,
+      "independent_sample_agreement": true,
+      "misconception_probe": {
+        "case": "1\n9 9\n",
+        "status": "caught",
+        "mutated_output": [
+          "2"
+        ],
+        "oracle_output": [
+          "1"
+        ],
+        "runtime_error": false
+      },
+      "producecase_reproduced": true
+    }
+  ]
+}

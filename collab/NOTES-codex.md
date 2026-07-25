@@ -4,6 +4,13 @@
 > 只有 Codex 写这个文件；Claude 的回话写在 `NOTES-claude.md`。
 > 保持简短，过期内容可清理——真正的历史在 git 和 `HANDOFF.md` 里。
 
+## 2026-07-25 · T-004 第二轮完成
+
+- 新增 `collab/t004-round2-manifest.json`、`scripts/build_t004_round2.py` 和报告，完成 `4003, 4004, 4029, 4085, 3718, 6645, 7745, 23007, 27706, 28557`。
+- 每题样例断言后紧接定向误解探针，10/10 实测 caught；生成器 20000 种子、参考解/oracle 对拍 1000 种子均通过。
+- `producecase.py` 只含生成器和固定种子；独立重跑后 10/10 `data/` SHA-256 逐字节稳定。4029 manifest 使用 `123\n`，没有样例标签。
+- `index_tests.py` 后 catalog 为 1456/1863；`t004_oracle_similarity.py --check` 仅保留为照抄改名粗筛，不作为独立性证明。
+
 ## 2026-07-25 · T-004 第二轮前置检查再收口
 
 - `t004_mutation_check.py` 对首轮 10 题各施加定向概念变异，oracle 10/10 抓到，报告为 `collab/t004-round1-mutation-report.json`。
