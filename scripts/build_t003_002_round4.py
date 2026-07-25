@@ -67,10 +67,26 @@ def g29646(r):
     return str(len(rows)) + "\n" + "\n".join(f"{a} {b}" for a, b in rows) + "\n"
 
 
+# 题面输出有三个分支：中序遍历 / "Device error."（关系矛盾）/ "Not determined."（信息不足）。
+# 原生成器只出 m=3 的 6 个全序排列，后两个分支 0/6 —— 与 6250 的 -1、20123 的 NO 同形。
+# 「按有效域穷举 6 组」也站不住：有效域不是 6，是被生成器自己限死在 m=3 全序上。
 def g29702(r):
-    labels = [1, 2, 3]; r.shuffle(labels)
-    a, b, c = labels
-    return f"3 3\n{a} > {b}\n{b} > {c}\n{a} > {c}\n"
+    m = r.choice([2, 3, 3, 5, 7, 7, 10, 15, r.randint(2, 15)])
+    order = list(range(1, m + 1)); r.shuffle(order)
+    chain = [(order[i], order[i + 1]) for i in range(m - 1)]
+    kind = r.random()
+    if kind < .38:                                     # 唯一全序 -> 中序遍历
+        edges = list(chain)
+        for _ in range(r.randint(0, m)):               # 冗余传递边，不破坏唯一性
+            i = r.randrange(m); j = r.randrange(m)
+            if i < j: edges.append((order[i], order[j]))
+    elif kind < .69:                                   # 成环 -> Device error.
+        edges = list(chain) + [(order[-1], order[0])]
+    else:                                              # 缺一条关系 -> Not determined.
+        edges = [e for k, e in enumerate(chain) if k != r.randrange(len(chain))] if chain else []
+    r.shuffle(edges)
+    body = "".join(f"{a} > {b}\n" for a, b in edges)
+    return f"{m} {len(edges)}\n" + body
 
 
 def g29741(r):
@@ -160,7 +176,9 @@ CONSTRAINTS = {
     29455: ["strings have equal length", "mapping is one-to-one and position-preserving"],
     29458: ["1<=n", "array values are 1..10^9", "inversion means i<j and a[i]>a[j]"],
     29646: ["each input row is harmful bacteria then beneficial bacteria", "beneficial growth is floor(1.05*m)", "harmful bacteria are capped at one million"],
-    29702: ["relations use distinct node labels", "relations describe a consistent flow ordering"],
+    29702: ["节点编号互不相同", "关系形如 A > B",
+            "输出三分支：可重建则中序遍历；关系矛盾输出 Device error.；信息不足输出 Not determined.",
+            "生成器按 38%/31%/31% 覆盖三个分支，m 取 2..15 而非固定 3"],
     29741: ["2<=N<=10^6", "2<=L<=10^5", "2<=M<=100", "costs are 0..M"],
     29803: ["graph is undirected and may have parallel edges", "edge time is positive and danger is 0..100", "a path within T exists at protection 100"],
     29895: ["n is a composite positive integer at most 10^10", "the answer is the largest proper factor"],
@@ -175,7 +193,7 @@ CONSTRAINTS = {
     30930: ["1<=n<=5*10^5", "speech counts are 0..10^9", "h-index is the largest k with at least k values >=k"],
 }
 STRUCTURE_CHECKS = {
-    29702: "three distinct labels form a consistent transitive flow relation",
+    29702: "chain/cycle/missing-edge 三种构造分别命中中序遍历、Device error.、Not determined.",
     29803: "the generated graph contains a direct 1-to-n path within the time limit",
     30191: "king count is within the N by N board capacity",
     30830: "the chain is a tree and each query distance is divisible by v1+v2",
@@ -211,16 +229,20 @@ def reproduce(number):
 
 
 def main():
+    only = {int(x) for x in sys.argv[1].split(",")} if len(sys.argv) > 1 else None
+    prev = {x["local_number"]: x for x in json.loads(REPORT.read_text(encoding="utf-8"))["entries"]} if REPORT.is_file() else {}
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8")); report = []
     for entry in manifest["entries"]:
         number = entry["local_number"]
+        if only is not None and number not in only:
+            report.append(prev[number]); continue
         text = find_section(entry["source"], number)
         codes = [c for c in fence_blocks(text) if "import " in c or "def " in c]
         code = next((c for c in codes if run(c, entry["sample_input"]).split() == entry["sample_output"].split()), None)
         if code is None: raise AssertionError(f"no sample-passing code {number}")
         for seed in range(20000): GENERATORS[number](random.Random(number + seed))
         for seed in range(400): run(code, GENERATORS[number](random.Random(number + seed)), timeout=10)
-        target = 6 if number == 29702 else 21
+        target = 21
         cases = [entry["sample_input"]]
         for i in range(1, target):
             for attempt in range(100):

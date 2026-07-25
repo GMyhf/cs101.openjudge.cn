@@ -243,22 +243,24 @@
       "source_code": "solution collection",
       "generator": "g29702",
       "seed": 29702,
-      "test_cases": 6,
-      "distinct_input_cases": 6,
-      "distinct_outputs": 6,
-      "max_output_frequency": 1,
+      "test_cases": 21,
+      "distinct_input_cases": 21,
+      "distinct_outputs": 10,
+      "max_output_frequency": 6,
       "constant_output_probe": {
-        "frequency": 1,
-        "total": 6,
+        "frequency": 6,
+        "total": 21,
         "status": "rejected"
       },
-      "max_input_bytes": 22,
+      "max_input_bytes": 108,
       "constraints": [
-        "relations use distinct node labels",
-        "relations describe a consistent flow ordering"
+        "节点编号互不相同",
+        "关系形如 A > B",
+        "输出三分支：可重建则中序遍历；关系矛盾输出 Device error.；信息不足输出 Not determined.",
+        "生成器按 38%/31%/31% 覆盖三个分支，m 取 2..15 而非固定 3"
       ],
       "structure_checked": true,
-      "structure_check": "three distinct labels form a consistent transitive flow relation",
+      "structure_check": "chain/cycle/missing-edge 三种构造分别命中中序遍历、Device error.、Not determined.",
       "generator_seed_smoke": {
         "seeds_per_generator": 20000,
         "status": "passed"
