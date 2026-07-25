@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import inspect
 import json
+import os
 import random
 import subprocess
 import sys
@@ -541,6 +542,7 @@ def solve(s):
      nxt=pos+ln
      if nxt==L:tail=''
      else:
+      if nxt+1>=L:continue
       tail=dfs(nxt+1,cur)
       if tail is None:continue
      best=cur+(','+tail if tail else '');break
@@ -816,10 +818,12 @@ CONSTRAINTS = {
 def main():
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
     previous = json.loads(REPORT.read_text(encoding="utf-8")) if REPORT.exists() else {}
-    rows = [x for x in previous.get("entries", []) if x["local_number"] not in SUPPORTED]
+    only = int(os.environ["T004_ONLY"]) if os.environ.get("T004_ONLY") else None
+    rows = [x for x in previous.get("entries", [])
+            if x["local_number"] not in ({only} if only is not None else SUPPORTED)]
     for entry in manifest["entries"]:
         n = entry["local_number"]
-        if n not in SUPPORTED:
+        if n not in SUPPORTED or (only is not None and n != only):
             continue
         gen = GENERATORS[n]
         ref = "__T004_CPP_3433__" if n == 3433 else REFERENCE.replace("P=0", f"P={n}", 1)

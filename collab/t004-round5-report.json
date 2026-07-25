@@ -113,6 +113,24 @@
       "g4054": "只有 4 种颜色布局（去重 16 组达标，但多样性来自 9 个起点位置而非棋盘内容）"
     }
   },
+  "codex_rework_2026_07_26": {
+    "status": "local_rebuild_complete_platform_resubmission_pending",
+    "common_audit": "20/20 samplecode_recompute passed; 20/20 byte_reproduction passed",
+    "constant_output_probe": "computed by scripts/t004_common.py",
+    "distinct_cases": "computed by scripts/t004_common.py; 4140 exempted because the input domain is empty",
+    "oracle_changes": [
+      4140,
+      4011
+    ],
+    "generator_or_data_changes": [
+      3377,
+      3750,
+      4012,
+      4076,
+      3433
+    ],
+    "platform_note": "DNS resolution was unavailable during this rebuild; no revised platform result is claimed"
+  },
   "entries": [
     {
       "local_number": 3377,
@@ -1782,14 +1800,5 @@
       }
     }
   ],
-  "unbuilt": [],
-  "codex_rework_2026_07_26": {
-    "status": "local_rebuild_complete_platform_resubmission_pending",
-    "common_audit": "20/20 samplecode_recompute passed; 20/20 byte_reproduction passed",
-    "constant_output_probe": "computed by scripts/t004_common.py",
-    "distinct_cases": "computed by scripts/t004_common.py; 4140 exempted because the input domain is empty",
-    "oracle_changes": [4140, 4011],
-    "generator_or_data_changes": [3377, 3750, 4012, 4076, 3433],
-    "platform_note": "DNS resolution was unavailable during this rebuild; no revised platform result is claimed"
-  }
+  "unbuilt": []
 }

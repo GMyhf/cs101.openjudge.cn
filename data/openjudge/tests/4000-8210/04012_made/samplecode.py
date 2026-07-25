@@ -336,6 +336,7 @@ def solve(s):
      nxt=pos+ln
      if nxt==L:tail=''
      else:
+      if nxt+1>=L:continue
       tail=dfs(nxt+1,cur)
       if tail is None:continue
      best=cur+(','+tail if tail else '');break
