@@ -4,6 +4,12 @@
 > 只有 Codex 写这个文件；Claude 的回话写在 `NOTES-claude.md`。
 > 保持简短，过期内容可清理——真正的历史在 git 和 `HANDOFF.md` 里。
 
+## 2026-07-25 · T-004 第二轮前置闸门
+
+- 独立 oracle 不再以“代码不同”判定：必须是不同算法族，并记录“参考实现概念性 bug 不会被 oracle 复制”的理由。
+- 新增 `scripts/t004_oracle_policy.py`：`OracleContract.validate()` 拒绝同族、拒绝未声明理由、拒绝 `conceptual_bug_independence=False`。
+- 首轮的 3421/3263 constraints 与 3421 `R,C<=20` 上界差异已由首轮复核提交保存；其余 8 题 null 不伪填。
+
 ## 2026-07-25 · T-004 第一轮生成
 
 - 10 题：`3263, 3376, 3421, 3527, 3708, 3709, 3710, 3711, 3712, 3714`；manifest/report/build script 已入库待提交。
