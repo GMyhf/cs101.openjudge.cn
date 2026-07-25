@@ -250,15 +250,30 @@ def first_diff(n, source, entry):
         23007: "2\n2.1\n1.10\n", 27706: "first second third\n",
         28557: "1\n9 9\n",
     }
+    def attempt(content):
+        try:
+            return run(source, content).split(), False
+        except (RuntimeError, subprocess.TimeoutExpired) as exc:
+            return [f"<runtime error: {type(exc).__name__}>"], True
+
+    # 第一段：解读锚。误解跑**题面样例输入**，与**题面样例输出**比。
+    # 拿 oracle 当基准是没有意义的——oracle 未变异，任何有效变异都必然与它不同，
+    # 实测把 oracle 换成参考解法本身（零独立性）也是 10/10 全 caught。
+    # 题面样例是这批唯一的外部真值，只有它能回答「样例钉不钉得住这个解读」。
+    sample_bad, sample_err = attempt(entry["sample_input"])
+    sample_good = entry["sample_output"].split()
+    pinned = sample_bad != sample_good
+
+    # 第二段：样例钉不住时，改问「已入库数据挡不挡得住」。
+    # 3718 就是这样：range(16)->range(15) 在样例上与正确解读同输出，
+    # 但 526 对里有 22 对只有 k=15 才成立，数据挡住了。
     case = probes[n]
-    try:
-        bad = run(source, case).split()
-        runtime_error = False
-    except (RuntimeError, subprocess.TimeoutExpired) as exc:
-        bad = [f"<runtime error: {type(exc).__name__}>"]
-        runtime_error = True
+    bad, runtime_error = attempt(case)
     good = oracle(n, case).split()
-    return {"case": case, "status": "caught" if bad != good else "missed",
+    return {"sample_pins_interpretation": pinned,
+            "sample_mutated_output": sample_bad, "sample_expected": sample_good,
+            "sample_runtime_error": sample_err,
+            "case": case, "status": "caught" if bad != good else "missed",
             "mutated_output": bad, "oracle_output": good,
             "runtime_error": runtime_error}
 
@@ -279,6 +294,9 @@ def main():
         assert oracle(n, entry["sample_input"]).split()==entry["sample_output"].split()
         probe=first_diff(n, mutate(n, ref), entry)
         assert probe["status"]=="caught", (n, probe)
+        # 样例钉不住解读的题，必须由已入库数据接住——留给复核方跟进，不在此处硬失败。
+        if not probe["sample_pins_interpretation"]:
+            print(f"  [注意] {n}: 题面样例钉不住该解读，需确认已入库数据能挡住", flush=True)
         generator=GENERATORS[n]
         for seed in range(20000):
             generator(random.Random(n+seed))
