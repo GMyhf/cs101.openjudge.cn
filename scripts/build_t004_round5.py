@@ -408,8 +408,9 @@ def solve(s):
         put(t,x.name()+f' was killed in city {i}');cities[i][x.s]=None
         if x.t==3:y.h+=x_before
         vict.append((i,y,gold[i]));put(t,y.name()+f' earned {gold[i]} elements for his headquarter');gold[i]=0
-        if lastwin[i]==y.s and flag[i]!=y.s:flag[i]=y.s;put(t,('red' if y.s==0 else 'blue')+f' flag raised in city {i}')
-        lastwin[i]=y.s
+       if lastwin[i]==y.s and flag[i]!=y.s:flag[i]=y.s;put(t,('red' if y.s==0 else 'blue')+f' flag raised in city {i}')
+       lastwin[i]=y.s
+      if y.h>0 and x.h>0:lastwin[i]=None
      for i,w,_ in sorted(vict,key=lambda z:(-z[0] if z[1].s==0 else z[0])):
       if E[w.s]>=8:E[w.s]-=8;w.h+=8
      for i,w,loot in vict:E[w.s]+=loot

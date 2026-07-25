@@ -32,7 +32,7 @@
   把末尾 `?` 错当分隔符而丢掉一位的问题；本批 21/21 组去重通过。4076 参考解法和 oracle 都改为
   带路径占用回溯，修复 `(位置,步数)` 假状态。
 - 3377 按题面每行最多 80 个字符换行；3433 删除入库 `reference` ELF，`producecase.py` 改为临时目录编译。
-  3750 补上 dragon/wolf/lion 战斗状态变更并重建数据。
+  3750 按人提供的已 AC 实现核对战斗状态，补上 dragon/wolf/lion 规则及双方存活时清空连续胜利状态，并重建数据。
 - 当前限制：平台 DNS 解析失败，四题返工后的 Python/PyPy/C++ 重新提交尚未完成，不能提前声称平台 Accepted。
 - 改动文件：`scripts/build_t004_round5.py`、`scripts/t004_common.py`、`tests/` 共享模块回归、round5 报告、
   20 个 `_made` 目录及本交接；提交前仍需跑全套 unittest、确认工作树后 SSH push。
