@@ -1,0 +1,62 @@
+{
+  "batch": "T-004-skiplist6",
+  "origin": "原 collab/t002-special-judge-skips.md 的 6 题；2026-07-25 复核确认均不需要 SPJ",
+  "how_to_use": "**独立清单，不与任何在跑的 round 冲突**。请在 round 4 落地后，把这 6 题并入你开的下一批（round 5），并按各条目的 route/note 处理。",
+  "count": 6,
+  "entries": [
+    {
+      "local_number": 4140,
+      "title": "CS101",
+      "source": "data/openjudge/pages/routine__04140.html",
+      "sample_input": "",
+      "sample_output": "5.705085930\n",
+      "note": "题面无输入、无样例；答案由独立高精度二分（Decimal 40 位）验证为 5.705085930，三次方程判别式 -142300<0 故实根唯一。输入域为空 -> 只可能 1 组数据，属「输入域小于 15」的正当例外。合集里 3 段题解输出与之一致。",
+      "route": "solution-backed"
+    },
+    {
+      "local_number": 7206,
+      "title": "CS101",
+      "source": "data/openjudge/pages/pctbook__T07206.html",
+      "sample_input": "0 0\n2 4\n1\n1 1\n",
+      "sample_output": "(0,0)-(1,2)-(2,4)\n",
+      "note": "题面规定「最快路线不唯一时只输出数目 N」，输出确定，不需要 SPJ。",
+      "route": "solution-backed"
+    },
+    {
+      "local_number": 22528,
+      "title": "CS101",
+      "source": "data/openjudge/pages/2025sp_routine__22528.html",
+      "sample_input": "50.5 100.0 40.0\n",
+      "sample_output": "791111236\n",
+      "note": "输出是唯一最小整数 b。内部有 a=b/1e9 的浮点运算，生成数据须避开 b 卡在精度临界的输入，否则两个都正确的实现可能差 1。",
+      "route": "solution-backed"
+    },
+    {
+      "local_number": 23554,
+      "title": "CS101",
+      "source": "data/openjudge/pages/2024fallroutine__23554.html",
+      "sample_input": "10\n2 6 1 8 4 10 33 1000\n",
+      "sample_output": "3 5 7 9\n33 1000\n",
+      "note": "输出两行整数且按升序 -> 唯一。合集里没有可执行题解，须走自写解法 + 独立 oracle；oracle 请换算法族（本题求两集合差集，参考解法若用集合运算，oracle 就用排序双指针）。",
+      "route": "self-written"
+    },
+    {
+      "local_number": 25570,
+      "title": "CS101",
+      "source": "data/openjudge/pages/practice__25570.html",
+      "sample_input": "5\n1 0 1 0 1\n0 1 1 1 0\n0 1 7 1 0\n0 1 1 1 0\n1 0 1 0 1\n",
+      "sample_output": "8\n",
+      "note": "输出单个整数，唯一。样例输出原文粘着「解释：」尾巴，已用 trim_explanation 截断。",
+      "route": "solution-backed"
+    },
+    {
+      "local_number": 27384,
+      "title": "CS101",
+      "source": "data/openjudge/pages/practice__27384.html",
+      "sample_input": "10 2  \n3 1 4 1 5 1 4 3 6 5 8 3 7 5 8 5 9 1 10 5  \n1 5\n",
+      "sample_output": "3\n",
+      "note": "输出单个整数，唯一。",
+      "route": "solution-backed"
+    }
+  ]
+}
