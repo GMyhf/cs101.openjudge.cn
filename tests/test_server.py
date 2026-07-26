@@ -200,6 +200,7 @@ class ServerApiTests(unittest.TestCase):
         entries = json.loads(body)["submissions"]
         self.assertTrue(entries)
         latest = entries[0]
+        self.assertEqual(latest["user"], username)
         self.assertEqual(latest["problem"], SUBMIT_PROBLEM)
         self.assertEqual(latest["result"], "Wrong Answer")
         self.assertEqual(latest["book"], SUBMIT_BOOK)
@@ -215,6 +216,7 @@ class ServerApiTests(unittest.TestCase):
         status, _, body = request(self.port, "GET", "/api/submissions", cookie=admin)
         self.assertEqual(status, 200)
         admin_latest = json.loads(body)["submissions"][0]
+        self.assertEqual(admin_latest["user"], username)
         self.assertEqual(admin_latest["source"], "print('wrong')")
 
     def _admin_cookie(self):

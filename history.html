@@ -97,7 +97,7 @@ function render() {
     const size = d.source_bytes !== undefined ? d.source_bytes + " B" : (s.source ? new TextEncoder().encode(s.source).length + " B" : "");
     const extra = expected + (detailOf(s) ? `<div class="muted">${esc(detailOf(s))}</div>` : "");
     return `<tr>
-      <td>${esc(currentUser)}</td>
+      <td>${esc(s.user || "")}</td>
       <td>${badge(s.result)}</td>
       <td class="num muted">${esc(memory)}</td>
       <td class="num muted">${esc(elapsed)}</td>
