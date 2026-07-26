@@ -11,7 +11,7 @@ import sqlite3
 import urllib.error
 import urllib.request
 import re
-from html import escape
+from html import escape, unescape
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
 from judge import judge
@@ -556,6 +556,29 @@ class Handler(BaseHTTPRequestHandler):
         text = text.replace("https://cs101.openjudge.cn", "/")
         return text
 
+    def modern_problem_page(self, page, book, problem):
+        """Render the mirrored statement without the upstream navigation shell."""
+        text = self.local_page(page)
+        title_match = re.search(r'<div id="pageTitle"><h2>(.*?)</h2>', text, re.S)
+        title_html = title_match.group(1).strip() if title_match else f"{problem} 题目"
+        title = re.sub(r"<[^>]+>", "", unescape(title_html)).strip()
+        params = re.search(r'<dl class="problem-params">(.*?)</dl>', text, re.S)
+        content = re.search(r'<dl class="problem-content">(.*?)</dl>', text, re.S)
+        stats = re.search(r'<div class="problem-statistics[^>]*>.*?<dl>(.*?)</dl>', text, re.S)
+        params_html = params.group(1).strip() if params else ""
+        content_html = content.group(1).strip() if content else "<dt>提示</dt><dd>题面暂未解析。</dd>"
+        stats_html = stats.group(1).strip() if stats else ""
+        return f"""<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{escape(title)} · CS101 本地题库</title>
+<style>
+:root{{--ink:#16231d;--muted:#6c7b73;--line:#dfe7e1;--bg:#f4f7f4;--paper:#fff;--green:#237a50;--green-soft:#e5f3eb;--amber:#c87828}}
+*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 system-ui,-apple-system,"Segoe UI",sans-serif}}
+a{{color:var(--green)}}.shell{{max-width:1120px;margin:auto;padding:0 24px}}.top{{height:72px;display:flex;align-items:center;justify-content:space-between}}.brand{{display:flex;gap:11px;align-items:center;text-decoration:none;color:var(--ink);font-weight:750}}.mark{{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:white;font-size:16px}}.nav{{display:flex;align-items:center;gap:10px}}.nav a{{padding:8px 12px;border-radius:6px;text-decoration:none;color:var(--muted);font-size:14px}}.nav a:hover{{background:var(--green-soft);color:var(--green)}}.nav .primary{{background:var(--ink);color:white;padding:9px 15px}}.crumb{{color:var(--muted);font-size:13px;margin:20px 0 12px}}.crumb a{{text-decoration:none}}.layout{{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:20px;align-items:start}}.article,.aside{{background:var(--paper);border:1px solid var(--line);border-radius:10px}}.article{{padding:34px 38px 42px}}h1{{font-size:clamp(28px,4vw,42px);line-height:1.15;margin:0 0 20px;letter-spacing:-.02em}}.eyebrow{{color:var(--green);font-size:12px;font-weight:750;letter-spacing:.12em;text-transform:uppercase;margin-bottom:9px}}.problem-params{{display:flex;flex-wrap:wrap;gap:7px 24px;padding:13px 16px;margin:0 0 30px;border-left:3px solid var(--amber);background:#fffaf3;color:var(--muted);font-size:13px}}.problem-params dt{{font-weight:650;color:var(--ink)}}.problem-params dd{{margin:0}}.problem-content{{margin:0}}.problem-content dt{{font-size:17px;font-weight:750;margin:28px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}}.problem-content dt:first-child{{margin-top:0}}.problem-content dd{{margin:0;color:#334139}}.problem-content pre{{overflow:auto;margin:10px 0;padding:15px 17px;border:1px solid var(--line);border-radius:7px;background:#f7faf7;color:var(--ink);font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}}.aside{{padding:20px;position:sticky;top:18px}}.aside h2{{font-size:15px;margin:0 0 14px}}.aside dl{{margin:0;display:grid;grid-template-columns:1fr auto;gap:7px 10px;font-size:13px}}.aside dt{{color:var(--muted)}}.aside dd{{margin:0;font-variant-numeric:tabular-nums}}.aside-note{{margin-top:18px;padding-top:15px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}}.footer{{color:var(--muted);font-size:13px;padding:28px 0 40px}}@media(max-width:760px){{.shell{{padding:0 16px}}.top{{height:62px}}.nav a:not(.primary){{display:none}}.layout{{grid-template-columns:1fr}}.article{{padding:25px 20px 32px}}.aside{{position:static}}}}
+</style></head><body>
+<header class="top shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 本地题库</span></a><nav class="nav"><a href="/problems/">全部题目</a><a href="/history/">提交记录</a><a class="primary" href="/{escape(book)}/{escape(problem)}/submit/">提交代码</a></nav></header>
+<main class="shell"><div class="crumb"><a href="/">首页</a> / <a href="/problems/">题库目录</a> / {escape(book)} / {escape(problem)}</div><div class="layout"><article class="article"><div class="eyebrow">Local problem statement</div><h1>{escape(title)}</h1>{params_html}<dl class="problem-content">{content_html}</dl></article><aside class="aside"><h2>题目概览</h2><dl>{stats_html}</dl><div class="aside-note">本题使用本机测试数据判题。<br><a href="/{escape(book)}/{escape(problem)}/submit/">打开本地提交页 →</a></div></aside></div></main><footer class="footer shell">CS101 · 本地镜像题面与判题服务</footer></body></html>"""
+
     def account_page(self, register=False):
         title = "注册 CS101 账号" if register else "登录 CS101"
         endpoint = "/api/user/register" if register else "/api/user/login"
@@ -586,9 +609,10 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_html(self.local_page(page)); return
         local_problem = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/([^/]+)/", path)
         if local_problem:
-            page = MIRROR / "pages" / f"{local_problem.group(1)}__{local_problem.group(2)}.html"
+            book, problem = local_problem.groups()
+            page = MIRROR / "pages" / f"{book}__{problem}.html"
             if page.is_file():
-                self.send_html(self.local_page(page)); return
+                self.send_html(self.modern_problem_page(page, book, problem)); return
         if path == "/api/course":
             self.send_json({"course": COURSE, "problems": PROBLEMS, "authenticated": self.authorized()})
             return
