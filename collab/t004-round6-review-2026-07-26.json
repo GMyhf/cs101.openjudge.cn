@@ -1,0 +1,73 @@
+{
+  "batch": "Claude 复核 T-004 round6（2026-07-26）",
+  "verdict": "部分打回。14/20 平台 Accepted，6 题待返工；另有 3 处结构性问题必须先修。",
+  "measured_by_claude": "所有结论来自我自己重跑判据 / 编译外部实现 / 读题面，不采信报告字段。",
+  "passed": {
+    "byte_reproduction": "20/20",
+    "sample_is_case_zero": "20/20",
+    "report_numbers_vs_disk": "test_cases / distinct_input_cases / distinct_outputs 三项逐题对账 20/20 属实",
+    "platform_honesty": "codex 如实记录 14/20，未把未提交或失败的题标成 Accepted",
+    "external_source_not_committed_to_json": "外部参考记录只存 solution_id / 语言 / 对拍结果，JSON 里没有第三方源码 —— 这个处理是对的"
+  },
+  "blocking": [
+    {
+      "id": "A",
+      "problems": [
+        4087,
+        4088,
+        4090,
+        4091,
+        4114
+      ],
+      "finding": "`samplecode.py` 里装的是 **C++ 源码**（文件名与内容不符）",
+      "evidence": "共享模块 `samplecode_recompute` 这 5 题全部 FAILED —— 它按 `python3 samplecode.py` 跑。把内容当 C++ 编译后跑，21 组全部一致，说明代码本身没问题，纯粹是放错了文件名。",
+      "action": "改名为 `samplecode.cpp`。命名约定见 `t004_common.samplecode_recompute` 的注释：`samplecode.py`（Python 是参考）/ `samplecode.cpp`（C++ 就是参考）/ `samplecode_ac.cpp`（Python 产出数据、C++ 只是额外背书）。"
+    },
+    {
+      "id": "B",
+      "problems": [
+        4087,
+        4088,
+        4090,
+        4091,
+        4114,
+        4120
+      ],
+      "finding": "`producecase.py` 内嵌的仍是**旧的 LLM Python 实现**，与换上的 `samplecode` 不是同一份",
+      "not_a_data_bug": "**数据本身没问题** —— 我把外部 AC 编译后跑全部 21 组，0 组不符。两份实现在我们的数据上输出一致。",
+      "why_it_matters": "「数据是怎么来的」这条记录指向了另一份实现。目前二者恰好等价，但只要旧实现再被改一次就会分叉，而字节复现检查照样通过、发现不了。",
+      "action": "把 producecase.py 的产出方改成实际的参考实现（C++ 的走编译路径，参照 3433/4011 的做法）。"
+    },
+    {
+      "id": "C",
+      "scope": "collab/t004-round6-report.json",
+      "finding": "20 题的 `reference_source` **全部写着 `LLM-written`**，包括那 6 题已经换成平台既有 Accepted 提交的源码",
+      "action": "如实记为外部来源并带上 solution_id；另需人拍板：**这 6 份是其他用户的提交代码，现在以 `samplecode.py` 的名义进了公开仓库**。codex 在 JSON 记录里没存源码是对的，但文件里存了，前后不一致。选项：①保留但注明出处与许可 ②改为构建时按 solution_id 现取、不入库 ③换回自写实现。"
+    },
+    {
+      "id": "D",
+      "problems": [
+        4127
+      ],
+      "finding": "去重只有 1 组（21 份完全相同的输入），报告里没有豁免字段",
+      "codex_claim": "交接散文里写「固定 5x5 迷宫，按题面固定输入域豁免」",
+      "why_wrong": "题面写的是「**输入**：一个 5×5 的二维数组，表示一个迷宫。数据保证有唯一解」——迷宫是从 stdin 读的、可以变化，输入域远不止 1 种。**不构成豁免。**",
+      "also": "即便真要豁免，理由也必须写进报告字段（机器可读），不能只写在交接散文里。",
+      "action": "重写生成器：随机 5×5 迷宫 + 保证左上到右下有唯一最短路。"
+    }
+  ],
+  "platform_failures_to_rework": {
+    "4087": "Memory Limit Exceeded",
+    "4088": "Memory Limit Exceeded",
+    "4090": "Python3 与 PyPy3 两档均 TLE",
+    "4091": "两档均 TLE",
+    "4120": "两档均 TLE",
+    "4114": "Wrong Answer"
+  },
+  "key_finding_4114": {
+    "root_cause": "旧 Python 实现用 `for q in range(7200)` 做**角度离散扫描**近似判定；外部 AC 用精确叉积枚举端点对。角度落在采样缝隙里就会答错。",
+    "why_our_checks_missed_it": "生成器只产出平凡构造（3 条轴对齐段或 3 条共线段），两种实现在这类输入上恰好一致 —— 所以**外部 AC 对拍 21/21 通过**，数据却挡不住平台。",
+    "method_lesson": "**用外部平台 AC 实现做对拍，如果对拍的输入仍是我们自己生成的，那它验证的依然只是「两个实现在我们的数据上一致」。**即使其中一方是平台 AC 的，这个结论也不变 —— 它证明不了我们的数据有鉴别力。这是「本地对拍只能证明两个实现彼此一致」那条的加强版：换个更权威的对手，不改变对拍的边界。",
+    "action": "4114 用精确叉积重写参考；生成器要产出**角度刁钻**的线段组（让存在的公共投影方向落在 7200 分之一的缝隙里），并验证旧实现会被新数据挡住。"
+  }
+}
