@@ -571,8 +571,11 @@ def send_account_email(recipient, subject, body):
     message["To"] = recipient
     message.set_content(body)
     try:
-        with smtplib.SMTP(smtp_host, int(os.environ.get("CS101_SMTP_PORT", "587")), timeout=15) as smtp:
-            smtp.starttls()
+        port = int(os.environ.get("CS101_SMTP_PORT", "465"))
+        smtp_class = smtplib.SMTP_SSL if port == 465 else smtplib.SMTP
+        with smtp_class(smtp_host, port, timeout=15) as smtp:
+            if port != 465:
+                smtp.starttls()
             user, password = os.environ.get("CS101_SMTP_USER"), os.environ.get("CS101_SMTP_PASSWORD")
             if user and password:
                 smtp.login(user, password)
@@ -896,18 +899,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             link = f"{base}/auth/reset/?token={token}"
             smtp_host = os.environ.get("CS101_SMTP_HOST")
             if smtp_host:
-                try:
-                    message = EmailMessage()
-                    message["Subject"] = "CS101 密码重置"
-                    message["From"] = os.environ.get("CS101_SMTP_FROM", os.environ.get("CS101_SMTP_USER", ""))
-                    message["To"] = email
-                    message.set_content(f"请在 30 分钟内打开以下链接重置 CS101 密码：\n{link}\n")
-                    with smtplib.SMTP(smtp_host, int(os.environ.get("CS101_SMTP_PORT", "587")), timeout=15) as smtp:
-                        smtp.starttls()
-                        user, password = os.environ.get("CS101_SMTP_USER"), os.environ.get("CS101_SMTP_PASSWORD")
-                        if user and password: smtp.login(user, password)
-                        smtp.send_message(message)
-                except (OSError, smtplib.SMTPException, ValueError):
+                if not send_account_email(email, "CS101 密码重置", f"请在 30 分钟内打开以下链接重置 CS101 密码：\n{link}\n"):
                     self.send_json({"error": "邮件发送失败，请稍后重试"}, 503); return
                 self.send_json(generic); return
             self.send_json({"ok": True, "reset_link": link}); return
