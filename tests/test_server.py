@@ -113,6 +113,15 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(status, 401)
         self.assertIn(b"Unauthorized", body)
 
+    def test_home_navigation_has_submission_user_link_and_account_menu(self):
+        status, _, body = request(self.port, "GET", "/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn('id="user-menu"', text)
+        self.assertIn('href="/history/" id="account"', text)
+        self.assertIn('href="/account/">账户设置</a>', text)
+        self.assertIn('id="logout"', text)
+
     def test_register_login_session_and_authenticated_submit(self):
         username = "t001_user"
         cookie = self.register_and_login(username, "T001-password")
