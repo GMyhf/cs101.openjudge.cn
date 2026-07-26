@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/07620 statistics, Accepted solution 52536053.
+# Source: http://cs101.openjudge.cn/practice/solution/52536053/
+# Statistics: http://cs101.openjudge.cn/practice/07620/statistics/
+# License: not declared on submission page; no license inferred
 n=int(input())
 intervals=[]
 for i in range(n):

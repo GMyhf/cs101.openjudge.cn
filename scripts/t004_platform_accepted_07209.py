@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/07209 statistics, Accepted solution 51070119.
+# Source: http://cs101.openjudge.cn/practice/solution/51070119/
+# Statistics: http://cs101.openjudge.cn/practice/07209/statistics/
+# License: not declared on submission page; no license inferred
 from collections import deque
 dire = [[-1, 0], [1, 0], [0, -1], [0, 1]]
 def bfs(matrix, start, end, row, col):

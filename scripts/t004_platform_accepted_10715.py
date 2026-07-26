@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/10715 statistics, Accepted solution 48220499.
+# Source: http://cs101.openjudge.cn/practice/solution/48220499/
+# Statistics: http://cs101.openjudge.cn/practice/10715/statistics/
+# License: not declared on submission page; no license inferred
 from itertools import permutations
 
 

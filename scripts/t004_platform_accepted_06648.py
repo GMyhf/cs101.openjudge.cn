@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/06648 statistics, Accepted solution 52710633.
+# Source: http://cs101.openjudge.cn/practice/solution/52710633/
+# Statistics: http://cs101.openjudge.cn/practice/06648/statistics/
+# License: not declared on submission page; no license inferred
 import sys
 import heapq
 def solve():

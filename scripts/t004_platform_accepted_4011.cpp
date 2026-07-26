@@ -1,3 +1,8 @@
+// External reference: 04011 Chase 的 C++ 实现，由人在 2026-07-26 直接提供
+// （不是从统计页抓取的，因此没有原始 submission id —— 报告里如实记为 'submission id not recorded'）。
+// Verified: 由 Claude 提交到 cs101.openjudge.cn 取得 Accepted，提交号 52996057。
+// Statistics: http://cs101.openjudge.cn/practice/04011/statistics/
+// License: 来源页面未声明许可，未擅自推断
 #include <bits/stdc++.h>
 using namespace std;
 

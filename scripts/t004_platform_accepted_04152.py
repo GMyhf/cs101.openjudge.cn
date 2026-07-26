@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/04152 statistics, Accepted solution 52528212.
+# Source: http://cs101.openjudge.cn/practice/solution/52528212/
+# Statistics: http://cs101.openjudge.cn/practice/04152/statistics/
+# License: not declared on submission page; no license inferred
 import sys
 content=sys.stdin.read().split()
 ptr=0

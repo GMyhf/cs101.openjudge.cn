@@ -13,6 +13,48 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 import t004_common as common
 
 
+class ExternalSourceAttributionTests(unittest.TestCase):
+    """入库的第三方源码必须带出处与许可状态。
+
+    2026-07-26 人拍板保留平台既有 Accepted 源码时明确要求注明「统计页 / 提交 ID /
+    源码链接 / 许可状态」。round6 的 6 份做到了，round7/round8 新增的 42 份**一份都没有** ——
+    署名写在流程里管不住，得有一条会红的检查。
+    """
+
+    ROOT = Path(__file__).resolve().parents[1]
+
+    @staticmethod
+    def _is_third_party(path):
+        """判据用 `/solution/<id>/` 链接，不能只看有没有 openjudge.cn。
+
+        T-002/T-003 的 samplecode 头部是 `# Source: /home/rocky/git/...openjudge.cn_problems.md`
+        —— 那是人的本地题解合集路径，不是第三方平台提交。第一版判据把它们也算进来，
+        一口气误报 90 个。**一个乱叫的检查会被整体忽略，比没有更糟。**
+        """
+        head = path.read_text(encoding="utf-8", errors="replace")[:800]
+        return "/solution/" in head or "External reference" in head
+
+    def _external_sources(self):
+        staged = sorted(self.ROOT.glob("scripts/t004_platform_accepted_*"))
+        shipped = [p for p in self.ROOT.glob("data/openjudge/tests/*/*_made/samplecode.*")
+                   if self._is_third_party(p)]
+        return staged + shipped
+
+    def test_every_external_source_carries_provenance_and_license(self):
+        missing = []
+        for path in self._external_sources():
+            head = path.read_text(encoding="utf-8", errors="replace")[:800]
+            if "openjudge.cn" not in head:
+                missing.append(f"{path.name}: 缺来源链接")
+            elif "License" not in head and "许可" not in head:
+                missing.append(f"{path.name}: 缺许可状态")
+        self.assertEqual(missing, [], "入库的第三方源码缺署名：" + "; ".join(missing[:6]))
+
+    def test_the_check_actually_looks_at_something(self):
+        # 防「一个文件都没扫到也算通过」的空转
+        self.assertGreater(len(self._external_sources()), 20)
+
+
 class ConstantOutputProbeTests(unittest.TestCase):
     def test_all_outputs_identical_means_the_probe_accepts(self):
         # 21 组输出一模一样 -> 常量解法能过全部数据 -> 这份数据没有鉴别力。

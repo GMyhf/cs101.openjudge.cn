@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/04151 statistics, Accepted solution 52542931.
+# Source: http://cs101.openjudge.cn/practice/solution/52542931/
+# Statistics: http://cs101.openjudge.cn/practice/04151/statistics/
+# License: not declared on submission page; no license inferred
 while True:
     n=int(input())
     if n==0:

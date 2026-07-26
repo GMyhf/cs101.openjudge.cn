@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/06252 statistics, Accepted solution 52714777.
+# Source: http://cs101.openjudge.cn/practice/solution/52714777/
+# Statistics: http://cs101.openjudge.cn/practice/06252/statistics/
+# License: not declared on submission page; no license inferred
 def is_match(pattern, s):
     m, n = len(pattern), len(s)
     dp = [[False] * (n + 1) for _ in range(m + 1)]

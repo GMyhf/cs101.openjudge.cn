@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/06364 statistics, Accepted solution 52717482.
+# Source: http://cs101.openjudge.cn/practice/solution/52717482/
+# Statistics: http://cs101.openjudge.cn/practice/06364/statistics/
+# License: not declared on submission page; no license inferred
 n, k = map(int, input().split())
 
 round1 = []

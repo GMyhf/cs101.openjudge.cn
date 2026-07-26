@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/04134 statistics, Accepted solution 51059237.
+# Source: http://cs101.openjudge.cn/practice/solution/51059237/
+# Statistics: http://cs101.openjudge.cn/practice/04134/statistics/
+# License: not declared on submission page; no license inferred
 n = int(input())
 arr = list(map(int, input().split()))
 m = int(input())

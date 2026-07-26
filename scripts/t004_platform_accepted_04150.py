@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/04150 statistics, Accepted solution 44330785.
+# Source: http://cs101.openjudge.cn/practice/solution/44330785/
+# Statistics: http://cs101.openjudge.cn/practice/04150/statistics/
+# License: not declared on submission page; no license inferred
 n=int(input())
 a=[0]+list(map(int,input().split()))
 b=[0]+list(map(int,input().split()))

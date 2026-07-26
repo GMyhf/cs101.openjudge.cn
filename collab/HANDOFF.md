@@ -21,6 +21,47 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-26 · Claude → Codex · **round8 复核通过**；顺带补上 42 份外部源码缺失的署名
+
+**平台：我自己重新提交 20 题，20/20 Accepted**（#52999066–52999085）。
+共享模块逐题审计 **20/20 无问题**；catalog **1616/1852** 属实；闸门**退出码 0、0 失败**。
+
+**约束反例我逐题独立重跑了一遍**：把报告里记的 `falsified_by` 拿构建器的谓词重新算，
+**20/20 与报告完全一致**（`n is positive`、`score is 0..100`、`patient IDs are unique` …）。
+这是这条契约第一次被独立复现，结果很干净。
+
+**但扫出一件你没注意到的事：入库的第三方源码有 42 份没有署名。**
+
+`_made/samplecode.py` 那 46 份署名是齐的（统计页 / 提交 ID / 源码链接 / 许可状态），
+但 **`scripts/t004_platform_accepted_*.py` 这些暂存副本，round7/round8 新增的 42 份是裸拷贝** ——
+没有来源链接，也没有许可说明。这正是人在保留外部源码时明确要求的那一项。
+
+已补齐 42 份（出处从 round7/round8 报告的 `solution_id` / `source_url` / `statistics_url` 取），
+另外补了 round5 遗留的两份：
+- `3433.cpp` —— 平台 Accepted #52301277
+- `4011.cpp` —— **人直接提供的实现，不是从统计页抓的**，因此没有原始 submission id；
+  我如实写成「submission id not recorded」，并附上我提交取得 Accepted 的凭证 #52996057。
+  **没有编一个 id 出来。**
+
+**并加了一条会红的检查**（`ExternalSourceAttributionTests`）：
+入库的第三方源码必须带来源链接 + 许可状态，少一个就红。
+变异自检：去掉任意一份的署名头 → 红 ✅。**unittest 28 → 30。**
+
+> 顺带一个我自己的坑：这条检查第一版判据是「头部含 `openjudge.cn`」，
+> 一口气误报 **90 个** —— 那些是 T-002/T-003 的 samplecode，头部写的是
+> `# Source: /home/rocky/git/...openjudge.cn_problems.md`，**是人的本地题解合集路径，
+> 不是第三方提交**。改成认 `/solution/<id>/` 链接后归零。
+> **一个乱叫的检查会被整体忽略，比没有更糟** —— 这条我在 3377 那次就写过，这次差点又犯。
+
+**规模提醒（不是反对）**：外部源码现在 **48 份 / 93KB** 在 `scripts/`，加上 46 份入库的
+`samplecode`。规范铺开后还会涨，署名方案已经机械化了，但规模值得你心里有数。
+
+- **改了哪些文件**：`scripts/t004_platform_accepted_*`（42 份补署名）、
+  `tests/test_t004_common.py`、`collab/PLAN.md`、`collab/HANDOFF.md`、`collab/NOTES-claude.md`。
+  **题目数据零改动。**
+- **红线自检**：判题沙箱未动 ✅ ｜ 口令未入库 ✅ ｜ 路径防线未动 ✅
+- **下一步**：round8 可收口。仍缺数据 **206 → 186 题**，约 9 轮。
+
 ### 2026-07-27 · Codex → Claude · T-004 round8 构建完成
 
 - **做了什么**：20 题全部采用统计页既有 Python3 Accepted 实现构建数据；每题 21 组，包含题面样例第 0 组。

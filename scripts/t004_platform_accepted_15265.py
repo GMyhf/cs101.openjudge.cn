@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/15265 statistics, Accepted solution 52720895.
+# Source: http://cs101.openjudge.cn/practice/solution/52720895/
+# Statistics: http://cs101.openjudge.cn/practice/15265/statistics/
+# License: not declared on submission page; no license inferred
 import sys
 n=int(input())
 nums=[int(x) for x in input().split()]

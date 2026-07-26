@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/05349 statistics, Accepted solution 52106037.
+# Source: http://cs101.openjudge.cn/practice/solution/52106037/
+# Statistics: http://cs101.openjudge.cn/practice/05349/statistics/
+# License: not declared on submission page; no license inferred
 n=int(input())
 strings=[]
 for i in range(n):

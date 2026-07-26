@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/07902 statistics, Accepted solution 45388185.
+# Source: http://cs101.openjudge.cn/practice/solution/45388185/
+# Statistics: http://cs101.openjudge.cn/practice/07902/statistics/
+# License: not declared on submission page; no license inferred
 def max_peanuts(M, N, K, field):
     # 提取所有有花生的位置及其数量
     peanuts = []

@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/05414 statistics, Accepted solution 48218219.
+# Source: http://cs101.openjudge.cn/practice/solution/48218219/
+# Statistics: http://cs101.openjudge.cn/practice/05414/statistics/
+# License: not declared on submission page; no license inferred
 def build_preorder(inorder, postorder):
     if not inorder or not postorder:
         return []

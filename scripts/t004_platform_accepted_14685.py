@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/14685 statistics, Accepted solution 52527643.
+# Source: http://cs101.openjudge.cn/practice/solution/52527643/
+# Statistics: http://cs101.openjudge.cn/practice/14685/statistics/
+# License: not declared on submission page; no license inferred
 k, n = map(int, input().split())
 money = []
 for _ in range(n):

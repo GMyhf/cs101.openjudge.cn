@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/08466 statistics, Accepted solution 51158201.
+# Source: http://cs101.openjudge.cn/practice/solution/51158201/
+# Statistics: http://cs101.openjudge.cn/practice/08466/statistics/
+# License: not declared on submission page; no license inferred
 def calculate(x):
     s_x = str(x)
     count = 0

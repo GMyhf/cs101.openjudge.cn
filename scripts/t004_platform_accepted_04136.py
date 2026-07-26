@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/04136 statistics, Accepted solution 52527332.
+# Source: http://cs101.openjudge.cn/practice/solution/52527332/
+# Statistics: http://cs101.openjudge.cn/practice/04136/statistics/
+# License: not declared on submission page; no license inferred
 r=int(input())
 n=int(input())
 rects=[]

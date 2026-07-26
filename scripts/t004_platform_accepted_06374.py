@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/06374 statistics, Accepted solution 52887441.
+# Source: http://cs101.openjudge.cn/practice/solution/52887441/
+# Statistics: http://cs101.openjudge.cn/practice/06374/statistics/
+# License: not declared on submission page; no license inferred
 n = int(input())
 p = input()
 

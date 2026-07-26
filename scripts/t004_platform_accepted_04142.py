@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/04142 statistics, Accepted solution 51048618.
+# Source: http://cs101.openjudge.cn/practice/solution/51048618/
+# Statistics: http://cs101.openjudge.cn/practice/04142/statistics/
+# License: not declared on submission page; no license inferred
 def fun(x):
     return x**5-15*x**4+85*x**3-225*x**2+274*x-121
 left, right = 1.5, 2.4

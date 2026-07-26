@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/08167 statistics, Accepted solution 51154035.
+# Source: http://cs101.openjudge.cn/practice/solution/51154035/
+# Statistics: http://cs101.openjudge.cn/practice/08167/statistics/
+# License: not declared on submission page; no license inferred
 import copy
 n, m = map(int, input().split())
 matrix = [[int(x) for x in input().split()] for _ in range(n)]

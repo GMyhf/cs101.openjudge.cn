@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/07604 statistics, Accepted solution 52899953.
+# Source: http://cs101.openjudge.cn/practice/solution/52899953/
+# Statistics: http://cs101.openjudge.cn/practice/07604/statistics/
+# License: not declared on submission page; no license inferred
 n = int(input())
 string = input()
 dict_ = {} # 注意用dict()或者{}都可以但是不能用dict

@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/07735 statistics, Accepted solution 52721315.
+# Source: http://cs101.openjudge.cn/practice/solution/52721315/
+# Statistics: http://cs101.openjudge.cn/practice/07735/statistics/
+# License: not declared on submission page; no license inferred
 import heapq
 
 k = int(input())

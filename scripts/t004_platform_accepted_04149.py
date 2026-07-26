@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/04149 statistics, Accepted solution 45229533.
+# Source: http://cs101.openjudge.cn/practice/solution/45229533/
+# Statistics: http://cs101.openjudge.cn/practice/04149/statistics/
+# License: not declared on submission page; no license inferred
 # 熊江凯
 import sys
 

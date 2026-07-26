@@ -1,3 +1,7 @@
+// External reference: cs101.openjudge.cn practice/03433 statistics, Accepted solution 52301277.
+// Source: http://cs101.openjudge.cn/practice/solution/52301277/
+// Statistics: http://cs101.openjudge.cn/practice/03433/statistics/
+// License: not declared on submission page; no license inferred
 #include <iostream>
 #include <cstdio>
 #include <algorithm>

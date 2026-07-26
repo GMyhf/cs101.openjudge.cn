@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/08183 statistics, Accepted solution 51158010.
+# Source: http://cs101.openjudge.cn/practice/solution/51158010/
+# Statistics: http://cs101.openjudge.cn/practice/08183/statistics/
+# License: not declared on submission page; no license inferred
 a, b, c, d = input().split()
 height, width = int(a), int(b)
 kind_1 = [c]*width

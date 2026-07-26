@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/09199 statistics, Accepted solution 51171347.
+# Source: http://cs101.openjudge.cn/practice/solution/51171347/
+# Statistics: http://cs101.openjudge.cn/practice/09199/statistics/
+# License: not declared on submission page; no license inferred
 from collections import deque
 M, N = map(int, input().split())
 words = [int(x) for x in input().split()]

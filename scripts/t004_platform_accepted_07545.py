@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/07545 statistics, Accepted solution 51084173.
+# Source: http://cs101.openjudge.cn/practice/solution/51084173/
+# Statistics: http://cs101.openjudge.cn/practice/07545/statistics/
+# License: not declared on submission page; no license inferred
 row, col = map(int, input().split())
 matrix = [['#']*(col+2)] + [['#']+[int(x) for x in input().split()]+['#'] for _ in range(row)] + [['#']*(col+2)]
 res = []

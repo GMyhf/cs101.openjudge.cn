@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/04143 statistics, Accepted solution 52701344.
+# Source: http://cs101.openjudge.cn/practice/solution/52701344/
+# Statistics: http://cs101.openjudge.cn/practice/04143/statistics/
+# License: not declared on submission page; no license inferred
 a=int(input())
 b=list(map(int, input().split()))
 b.sort()
