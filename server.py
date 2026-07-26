@@ -585,6 +585,10 @@ def catalog_title(item):
 def password_hash(password):
     return hashlib.pbkdf2_hmac("sha256", password.encode(), b"cs101-local-user", 120000).hex()
 
+
+def same_username(left, right):
+    return str(left).strip().casefold() == str(right).strip().casefold()
+
 def valid_password(stored, password):
     return stored == password_hash(password)
 
@@ -783,7 +787,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             self.send_json({REVEAL_KEY: reveal_enabled(), "books": reveal_books(),
                             "windows": reveal_windows(), "active_window": active_window(),
                             "effective": reveal_effective(book) if book else None,
-                            "is_admin": self.current_user() == ADMIN_USER})
+                            "is_admin": same_username(self.current_user() or "", ADMIN_USER)})
             return
         if path in ("/admin", "/admin/"):
             page = ROOT / "admin.html"
@@ -800,7 +804,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             with sqlite3.connect(DB) as db:
                 rows = db.execute("select user, problem, result, created, book, language, detail, source from submissions"
                                   " order by id desc limit ?", (limit,)).fetchall()
-            is_admin = user == ADMIN_USER
+            is_admin = same_username(user, ADMIN_USER)
             self.send_json({"user": user, "submissions": [
                 {"user": r[0], "problem": r[1], "result": r[2], "created": r[3], "book": r[4], "language": r[5],
                  "detail": json.loads(r[6]) if r[6] else {}, "source": (r[7] or "") if (is_admin or r[0] == user) else ""} for r in rows]})
@@ -873,12 +877,12 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                 self.send_json({"error": "两次输入的密码不一致"}, 400); return
             if not valid_captcha(data.get("captcha_token", ""), data.get("captcha_answer", "")):
                 self.send_json({"error": "人机验证失败，请刷新注册页面后重试"}, 400); return
-            if username == ADMIN_USER:
+            if same_username(username, ADMIN_USER):
                 self.send_json({"error": "该用户名不可注册"}, 409); return
             activation_token = secrets.token_urlsafe(32)
             try:
                 with sqlite3.connect(DB) as db:
-                    if db.execute("select 1 from users where username = ? or lower(email) = ?", (username, email)).fetchone():
+                    if db.execute("select 1 from users where lower(username) = lower(?) or lower(email) = ?", (username, email)).fetchone():
                         self.send_json({"error": "用户名或邮箱已存在"}, 409); return
                     db.execute("insert into users(username, password_hash, email, active, activation_token_hash, activation_expires) values (?, ?, ?, 0, ?, ?)",
                                (username, password_hash(password), email, reset_token_hash(activation_token), int(time.time()) + 86400))
@@ -893,24 +897,26 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             self.send_json({"ok": True} if sent else {"ok": True, "activation_link": activation_link}); return
         if path == "/api/user/login":
             username, password = str(data.get("username", "")).strip(), str(data.get("password", ""))
-            accepted = username == ADMIN_USER and password == ADMIN_PASSWORD
+            accepted = same_username(username, ADMIN_USER) and password == ADMIN_PASSWORD
+            session_user = ADMIN_USER if accepted else None
             if not accepted:
                 with sqlite3.connect(DB) as db:
-                    row = db.execute("select password_hash from users where username = ?", (username,)).fetchone()
-                    accepted = row is not None and valid_password(row[0], password)
+                    row = db.execute("select username, password_hash, active from users where lower(username) = lower(?)", (username,)).fetchone()
+                    accepted = row is not None and valid_password(row[1], password)
                     if accepted:
-                        active = db.execute("select active from users where username = ?", (username,)).fetchone()[0]
+                        session_user = row[0]
+                        active = row[2]
                         if not active:
                             self.send_json({"error": "账号尚未激活，请先点击邮箱中的激活链接"}, 403); return
             if not accepted:
                 self.send_json({"error": "用户名或密码不正确"}, 401); return
-            token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = username
+            token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = session_user
             self.send_response(200); self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/"); self.send_header("Content-Type", "application/json; charset=utf-8"); self.end_headers(); self.wfile.write(b'{"ok":true}'); return
         if path == "/api/user/change-password":
             username = self.current_user()
             if username is None:
                 self.send_json({"error": "Unauthorized"}, 401); return
-            if username == ADMIN_USER:
+            if same_username(username, ADMIN_USER):
                 self.send_json({"error": "管理员密码由 CS101_ADMIN_PASSWORD 或密码文件管理"}, 403); return
             current = str(data.get("current_password", ""))
             new_password = str(data.get("new_password", ""))
@@ -962,13 +968,13 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                            (password_hash(password), row[0]))
             self.send_json({"ok": True}); return
         if path == "/api/login":
-            if data.get("username") == ADMIN_USER and data.get("password") == ADMIN_PASSWORD:
+            if same_username(data.get("username", ""), ADMIN_USER) and data.get("password") == ADMIN_PASSWORD:
                 token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = ADMIN_USER
                 self.send_response(200); self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/")
                 self.send_header("Content-Type", "application/json; charset=utf-8"); self.end_headers(); self.wfile.write(b'{"ok":true}'); return
             self.send_json({"error": "账号或口令不正确"}, 401); return
         if path == "/api/auth/login/":
-            if data.get("email") == ADMIN_USER and data.get("password") == ADMIN_PASSWORD:
+            if same_username(data.get("email", ""), ADMIN_USER) and data.get("password") == ADMIN_PASSWORD:
                 token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = ADMIN_USER
                 self.send_response(200)
                 self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/")
@@ -980,7 +986,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             if token: TOKENS.discard(token.value); SESSION_USERS.pop(token.value, None)
             self.send_response(200); self.send_header("Set-Cookie", "session=; Max-Age=0; Path=/"); self.end_headers(); return
         if path == "/api/settings":
-            if self.current_user() != ADMIN_USER:
+            if not same_username(self.current_user() or "", ADMIN_USER):
                 self.send_json({"error": "Forbidden"}, 403); return
             if REVEAL_KEY in data:
                 set_setting(REVEAL_KEY, "on" if data[REVEAL_KEY] else "off")

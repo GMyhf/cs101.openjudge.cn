@@ -128,10 +128,16 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(json.loads(body)["authenticated"], False)
 
         status, headers, _ = request(self.port, "POST", "/api/user/login", {
-            "username": username, "password": "T001-password",
+            "username": username.upper(), "password": "T001-password",
         })
         self.assertEqual(status, 200)
         cookie = headers["Set-Cookie"].split(";", 1)[0]
+        status, _, body = request(self.port, "GET", "/api/me", cookie=cookie)
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body), {"authenticated": True, "user": username})
+        duplicate = self.registration_payload("T001_USER", "T001-other-password")
+        status, _, _ = request(self.port, "POST", "/api/user/register", duplicate)
+        self.assertEqual(status, 409)
         status, _, body = request(self.port, "POST", "/api/submit", {
             "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
             "source": "print('wrong')",
