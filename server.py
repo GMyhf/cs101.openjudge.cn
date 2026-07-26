@@ -25,7 +25,7 @@ DB = Path(os.environ.get("CS101_DB", ROOT / "data" / "course.db"))
 MIRROR = ROOT / "data" / "openjudge"
 SMTP_ENV_FILE = ROOT / "data" / ".smtp.env"
 
-if SMTP_ENV_FILE.is_file():
+if SMTP_ENV_FILE.is_file() and os.environ.get("CS101_LOAD_DOTENV", "1") != "0":
     for line in SMTP_ENV_FILE.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if line and not line.startswith("#") and "=" in line:
@@ -70,15 +70,15 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  .sub a{color:#3d8b68}
  /* 编辑器：透明 textarea 叠在高亮层上。两层的字体/行高/padding 必须逐项一致，
     差一点点光标就会和文字错位。 */
- .editor{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff}
+ .editor{display:flex;height:520px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff}
  .gutter{flex:0 0 auto;padding:12px 8px 12px 12px;text-align:right;color:#aab4ad;background:#fbfcfb;
-         border-right:1px solid var(--line);user-select:none;white-space:pre}
+         border-right:1px solid var(--line);user-select:none;white-space:pre;height:100%;overflow:hidden}
  .codewrap{position:relative;flex:1;min-width:0}
  .gutter,.codewrap pre,.codewrap textarea{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;tab-size:4}
- .codewrap pre,.codewrap textarea{margin:0;padding:12px;border:0;white-space:pre;overflow:auto;width:100%;height:360px}
+ .codewrap pre,.codewrap textarea{margin:0;padding:12px;border:0;white-space:pre;overflow:auto;width:100%;height:100%;min-height:0}
  .codewrap pre{position:absolute;inset:0;pointer-events:none;color:var(--ink)}
  .codewrap textarea{position:relative;background:transparent;color:transparent;caret-color:var(--ink);
-          resize:vertical;outline:none}
+          resize:none;outline:none}
  .t-com{color:#7a8a80;font-style:italic}
  .t-str{color:#2f7d55}
  .t-num{color:#8a6d1f}
@@ -118,6 +118,7 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  dt{color:var(--muted)}dd{margin:0;font-variant-numeric:tabular-nums}
  pre.msg{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);
          border-radius:5px;padding:10px;margin:12px 0 0;font:12px/1.5 ui-monospace,monospace;max-height:220px;overflow:auto}
+ pre.source{white-space:pre;max-height:360px}
  h2{font-size:16px;margin:30px 0 8px}
  table{width:100%;border-collapse:collapse;font-size:14px}
  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
@@ -414,13 +415,14 @@ async function loadHistory() {
   if (r.status === 401) { histbox.textContent = "登录后可以看到提交记录。"; return; }
   const mine = (await r.json()).submissions.filter(s => s.problem === PROBLEM);
   if (!mine.length) { histbox.textContent = "这道题还没有提交记录。"; return; }
-  histbox.innerHTML = "<table><thead><tr><th>时间</th><th>结果</th><th>语言</th><th>细节</th></tr></thead><tbody>"
+  histbox.innerHTML = "<table><thead><tr><th>时间</th><th>结果</th><th>语言</th><th>细节</th><th>代码</th></tr></thead><tbody>"
     + mine.map(s => {
         const d = s.detail || {};
         const note = d.case !== undefined ? "第 " + d.case + " 组"
                    : d.cases !== undefined ? d.cases + " 组全过" : "";
+        const code = s.source ? "<details><summary>查看代码</summary><pre class='msg source'>" + esc(s.source) + "</pre></details>" : "";
         return "<tr><td class='num'>" + esc(s.created) + "</td><td>" + badge(s.result)
-             + "</td><td>" + esc(s.language || "") + "</td><td class='muted'>" + esc(note) + "</td></tr>";
+             + "</td><td>" + esc(s.language || "") + "</td><td class='muted'>" + esc(note) + "</td><td>" + code + "</td></tr>";
       }).join("") + "</tbody></table>";
 }
 </script></html>"""
@@ -434,7 +436,7 @@ def init_db():
         db.execute("create table if not exists settings (key text primary key, value text not null)")
         # 历史库里没有这几列；用 ALTER 补，已存在则跳过（create table if not exists 加不了列）。
         existing = {row[1] for row in db.execute("pragma table_info(submissions)")}
-        for column in ("book text", "language text", "detail text"):
+        for column in ("book text", "language text", "detail text", "source text"):
             if column.split()[0] not in existing:
                 db.execute(f"alter table submissions add column {column}")
         user_columns = {row[1] for row in db.execute("pragma table_info(users)")}
@@ -765,11 +767,11 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             except ValueError:
                 limit = 50
             with sqlite3.connect(DB) as db:
-                rows = db.execute("select problem, result, created, book, language, detail from submissions"
+                rows = db.execute("select problem, result, created, book, language, detail, source from submissions"
                                   " where user = ? order by id desc limit ?", (user, limit)).fetchall()
             self.send_json({"user": user, "submissions": [
                 {"problem": r[0], "result": r[1], "created": r[2], "book": r[3], "language": r[4],
-                 "detail": json.loads(r[5]) if r[5] else {}} for r in rows]})
+                 "detail": json.loads(r[5]) if r[5] else {}, "source": r[6] or ""} for r in rows]})
             return
         if path in ("/history", "/history/"):
             page = ROOT / "history.html"
@@ -985,8 +987,9 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             # 历史页要靠它回答「错在哪组数据」，只存 status 是答不了的。
             detail = json.dumps({k: v for k, v in result.items() if k != "status"}, ensure_ascii=False)
             with sqlite3.connect(DB) as db:
-                db.execute("insert into submissions(user, problem, result, book, language, detail) values (?, ?, ?, ?, ?, ?)",
-                           (self.current_user() or ADMIN_USER, problem, result["status"], book, language, detail))
+                db.execute("insert into submissions(user, problem, result, book, language, detail, source) values (?, ?, ?, ?, ?, ?, ?)",
+                           (self.current_user() or ADMIN_USER, problem, result["status"], book, language, detail,
+                            str(data.get("source", data.get("code", "")))))
             self.send_json(result); return
         self.send_json({"error": "Unauthorized"}, 401)
 

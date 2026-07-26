@@ -74,6 +74,10 @@ class ServerApiTests(unittest.TestCase):
             "CS101_DB": cls.db_file.name,
             "CS101_ADMIN_PASSWORD": "T001-admin-only",
         })
+        for key in ("CS101_SMTP_HOST", "CS101_SMTP_PORT", "CS101_SMTP_USER",
+                    "CS101_SMTP_PASSWORD", "CS101_SMTP_FROM", "CS101_PUBLIC_URL"):
+            environment.pop(key, None)
+        environment["CS101_LOAD_DOTENV"] = "0"
         cls.process = subprocess.Popen(
             [sys.executable, "server.py"], cwd=ROOT, env=environment,
             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
@@ -170,6 +174,8 @@ class ServerApiTests(unittest.TestCase):
         text = body.decode("utf-8", errors="replace")
         self.assertIn(SUBMIT_PROBLEM, text)
         self.assertIn("我的提交记录", text)
+        self.assertIn("height:520px", text)
+        self.assertIn("查看代码", text)
         for placeholder in ("__BOOK__", "__PROBLEM__"):
             self.assertNotIn(placeholder, text)      # 模板占位符必须已被替换
 
@@ -199,6 +205,7 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(latest["book"], SUBMIT_BOOK)
         self.assertEqual(latest["language"], "python")
         self.assertEqual(latest["detail"]["case"], verdict["case"])
+        self.assertEqual(latest["source"], "print('wrong')")
 
     def _admin_cookie(self):
         status, headers, _ = request(self.port, "POST", "/api/login", {
