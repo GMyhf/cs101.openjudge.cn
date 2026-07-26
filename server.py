@@ -30,7 +30,7 @@ COURSE = {
     "title": "计算机科学导论",
     "term": "2026 春季学期",
     "teacher": "GMyhf",
-    "notice": "第 8 周作业已发布，截止时间为周日 23:59。",
+    "notice": "CS101 题库发布",
 }
 PROBLEMS = [
     {"id": "A1001", "title": "求两个整数的和", "chapter": "基础语法", "difficulty": "入门", "rate": 94, "solved": 1284},
