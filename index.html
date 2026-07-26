@@ -21,8 +21,9 @@
     const list=document.querySelector('#list'), empty=document.querySelector('#empty'), search=document.querySelector('#search'); let problems=[];
     const bookNames={pctbook:'计算思维算法实践',practice:'CS101 练习题',routine:'数算每日选做',dsapre:'数算预习题', '2025sp_routine':'数算 2025 Spring', '25dsapre':'数算 2025 Pre', '2024fallroutine':'数算 2024 Fall', '2024sp_routine':'数算 2024 Spring'};
     const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    fetch('/api/catalog').then(r=>r.json()).then(data=>{problems=(data.problems||[]).filter(p=>(p.test_count||0)>0);render();}).catch(()=>{empty.hidden=false;empty.textContent='题库暂时不可用';});
+    fetch('/api/catalog').then(r=>r.json()).then(data=>{problems=(data.problems||[]).filter(p=>(p.test_count||0)>=5);shuffle(problems);render();}).catch(()=>{empty.hidden=false;empty.textContent='题库暂时不可用';});
     fetch('/api/me').then(r=>r.json()).then(data=>{if(data.authenticated)document.querySelector('#account').textContent='已登录';}).catch(()=>{});
+    function shuffle(items){for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]];}}
     function titleOf(p){return (p.title||'').replace(new RegExp('^'+p.id+'\\s*[:：]\\s*','i'),'')||p.id;}
     function render(){const q=search.value.trim().toLowerCase();const groups=new Map();for(const p of problems){if(q&&!p.id.toLowerCase().includes(q)&&!(p.title||'').toLowerCase().includes(q))continue;if(!groups.has(p.book))groups.set(p.book,[]);if(groups.get(p.book).length<5)groups.get(p.book).push(p);}list.innerHTML=[...groups].map(([book,items])=>`<section class="book-block"><h3 class="book-title">${esc(bookNames[book]||book)}<span>${items.length} 题</span></h3><div class="list">${items.map(p=>`<a class="problem" href="${esc(p.path)}"><span class="pid">${esc(p.id)}</span><span class="problem-main"><span class="problem-title">${esc(titleOf(p))}</span><span class="problem-meta">${p.test_count} 组测试数据</span></span><span class="arrow">›</span></a>`).join('')}</div></section>`).join('');empty.hidden=groups.size>0;}
     search.addEventListener('input',render);
