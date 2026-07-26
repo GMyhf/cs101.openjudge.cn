@@ -1,0 +1,273 @@
+{
+  "batch": "T-004-r6",
+  "selection_rule": "从仍缺数据的 250 题里按题号顺序取前 20 题；跳过「与已有数据同题」（正文+时间/内存限制双判据）与「样例抽不出来」的。每题记录平台提交路径 —— 07645 那种非 practice 的题要走自己的 book 路径。",
+  "count": 20,
+  "pool_remaining": 250,
+  "skipped": [
+    {
+      "local_number": 0,
+      "title": "猫猫测效率",
+      "reason": "题面无样例，且**本质是 I/O 速度测试**：输入 3000000 行、输出 3000000 行（约 20MB）。判题器输出上限 2MB（judge.py），任何正确解法都会被判 Output Limit Exceeded。",
+      "recommendation": "**结构上不适合本地镜像，建议永久排除**，不是本轮跳过。若要保留，需人拍板放宽输出上限——那属红线 1。"
+    },
+    {
+      "local_number": 3259,
+      "title": "求满足约束条件的四位数或六位数",
+      "reason": "题面的样例输入/输出字段是空的（round5 也因此跳过）。",
+      "recommendation": "可以做，但没有样例可当锚点 —— 题面把输出规格写死了（「输入4则一行输出全部四位数、空格分隔」），实现方需以题面文字为准并在报告里说明「无样例可锚」，平台提交在这题上就是唯一的外部验证。"
+    }
+  ],
+  "delivery_gate": [
+    "参考实现必须拿到平台 Accepted 才算完成（三档：Python3 → PyPy3 → C++）",
+    "提交前按题拆成单题独立程序，整份分派器会被平台 pylint 判 E0102",
+    "报告字段一律走 scripts/t004_common.py 实测，不得手写字面量",
+    "独立 oracle 换算法族；若题面把过程写死（如 3725），换的是实现不是算法目标",
+    "变异必须真的改变行为；自检前先确认基线是绿的"
+  ],
+  "entries": [
+    {
+      "local_number": 4087,
+      "title": "数据筛选",
+      "source": "data/openjudge/pages/practice__04087.html",
+      "sample_input": "10 5\n1  3  8 20 2 \n9 10 12  8 9\n",
+      "sample_output": "8\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04087/",
+      "statement_chars": 55,
+      "complexity_hint": "low",
+      "route": "solution-backed?",
+      "note": "题解合集里出现过这个题号，实现方先确认能否直接用"
+    },
+    {
+      "local_number": 4088,
+      "title": "集合运算",
+      "source": "data/openjudge/pages/practice__04088.html",
+      "sample_input": "8 1 3 5 6 8 10 12 30\n3 1 3 7\n",
+      "sample_output": "5 6 7 8 10 12 30\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04088/",
+      "statement_chars": 98,
+      "complexity_hint": "low",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4090,
+      "title": "超级备忘录",
+      "source": "data/openjudge/pages/practice__04090.html",
+      "sample_input": "5\n1 \n2 \n3 \n4 \n5\n2\nADD 2 4 1\nMIN 4 5\n",
+      "sample_output": "5\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04090/",
+      "statement_chars": 725,
+      "complexity_hint": "medium",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4091,
+      "title": "最近餐馆",
+      "source": "data/openjudge/pages/practice__04091.html",
+      "sample_input": "3 2\n1 1\n1 3\n3 4\n2\n2 3\n2\n2 3\n1\n",
+      "sample_output": "the closest 2 points are:\n1 3\n3 4\nthe closest 1 points are:\n1 3\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04091/",
+      "statement_chars": 226,
+      "complexity_hint": "low",
+      "route": "solution-backed?",
+      "note": "题解合集里出现过这个题号，实现方先确认能否直接用"
+    },
+    {
+      "local_number": 4092,
+      "title": "牛仔裤",
+      "source": "data/openjudge/pages/practice__04092.html",
+      "sample_input": "3\n2\nGATACCAGATACCAGATACCAGATACCAGATACCAGATACCAGATACCAGATACCAGATA\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n3\nGATACCAGATACCAGATACCAGATACCAGATACCAGATACCAGATACCAGATACCAGATA\nGATACTAGATACTAGATACTAGATACTAAAGGAAAGGGAAAAGGGGAAAAAGGGGGAAAA\nGATACCAGATACCAGATACCAGATACCAAAGGAAAGGGAAAAGGGGAAAAAGGGGGAAAA\n3\nCATCATCATCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC\nACATCATCATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\nAACATCATCATTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT\n",
+      "sample_output": "no significant commonalities\nAGATAC\nCATCATCAT\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04092/",
+      "statement_chars": 233,
+      "complexity_hint": "low",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4104,
+      "title": "单词翻转",
+      "source": "data/openjudge/pages/practice__04104.html",
+      "sample_input": "hello world\n",
+      "sample_output": "olleh dlrow\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04104/",
+      "statement_chars": 27,
+      "complexity_hint": "low",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4105,
+      "title": "拯救公主",
+      "source": "data/openjudge/pages/practice__04105.html",
+      "sample_input": "1\n7 8 2\n........\n..S..#0.\n.##..1..\n.0#.....\n...1#...\n...##E..\n...1....\n",
+      "sample_output": "11\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04105/",
+      "statement_chars": 499,
+      "complexity_hint": "medium",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4106,
+      "title": "出现两次的字符-Characters Appearing twice",
+      "source": "data/openjudge/pages/practice__04106.html",
+      "sample_input": "3\nfarewell\n20150106\nPekingUniversity\n",
+      "sample_output": "e\n1\ne\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04106/",
+      "statement_chars": 26,
+      "complexity_hint": "low",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4108,
+      "title": "羚羊数量-Number Of Antelope",
+      "source": "data/openjudge/pages/practice__04108.html",
+      "sample_input": "3\n1\n3\n4\n",
+      "sample_output": "1\n2\n3\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04108/",
+      "statement_chars": 271,
+      "complexity_hint": "low",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4110,
+      "title": "圣诞老人的礼物-Santa Clau’s Gifts",
+      "source": "data/openjudge/pages/2024fallroutine__04110.html",
+      "sample_input": "4 15\n100 4\n412 8\n266 7\n591 2\n",
+      "sample_output": "1193.0\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04110/",
+      "statement_chars": 107,
+      "complexity_hint": "low",
+      "route": "solution-backed?",
+      "note": "题解合集里出现过这个题号，实现方先确认能否直接用"
+    },
+    {
+      "local_number": 4111,
+      "title": "判断游戏胜者-Who Is the Winner",
+      "source": "data/openjudge/pages/practice__04111.html",
+      "sample_input": "2\n0xfa425 0xab3672\n0x52c6 0xf429\n",
+      "sample_output": "Bob\nTie\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04111/",
+      "statement_chars": 251,
+      "complexity_hint": "low",
+      "route": "solution-backed?",
+      "note": "题解合集里出现过这个题号，实现方先确认能否直接用"
+    },
+    {
+      "local_number": 4112,
+      "title": "情报破译-Cryptanalysis",
+      "source": "data/openjudge/pages/practice__04112.html",
+      "sample_input": "fiU umncv oolz  ioex jhfqu,  zg uh zqI nlaxO  ockl yz kmpzgE.\nfX gxcj , ghlsxffr cxmG K.\nab3cd\n",
+      "sample_output": "The talks will  take place,  at an Air Force  base on Sunday.\nWe have , occupied City F.\naz3ba\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04112/",
+      "statement_chars": 387,
+      "complexity_hint": "low",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4114,
+      "title": "Segments",
+      "source": "data/openjudge/pages/practice__04114.html",
+      "sample_input": "3\n2\n1.0 2.0 3.0 4.0\n4.0 5.0 6.0 7.0\n3\n0.0 0.0 0.0 1.0\n0.0 1.0 0.0 2.0\n1.0 1.0 2.0 1.0\n3\n0.0 0.0 0.0 1.0\n0.0 2.0 0.0 3.0\n1.0 1.0 2.0 1.0\n",
+      "sample_output": "Yes!\nYes!\nNo!\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04114/",
+      "statement_chars": 210,
+      "complexity_hint": "low",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4120,
+      "title": "硬币",
+      "source": "data/openjudge/pages/practice__04120.html",
+      "sample_input": "5 18\n1 2 3 5 10\n",
+      "sample_output": "2\n5 10\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04120/",
+      "statement_chars": 182,
+      "complexity_hint": "low",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4122,
+      "title": "切割回文",
+      "source": "data/openjudge/pages/practice__04122.html",
+      "sample_input": "3\nabaacca\nabcd\nabcba\n",
+      "sample_output": "1\n3\n0\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04122/",
+      "statement_chars": 228,
+      "complexity_hint": "low",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4125,
+      "title": "Tour",
+      "source": "data/openjudge/pages/practice__04125.html",
+      "sample_input": "3\n1 1\n2 3\n3 1\n4\n1 1\n2 3\n3 1\n4 2\n",
+      "sample_output": "6.47\n7.89\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04125/",
+      "statement_chars": 682,
+      "complexity_hint": "medium",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4126,
+      "title": "DNA",
+      "source": "data/openjudge/pages/practice__04126.html",
+      "sample_input": "1\n5\nTCGG\nGCAG\nCCGC\nGATC\nATCG\n",
+      "sample_output": "11\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04126/",
+      "statement_chars": 84,
+      "complexity_hint": "low",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4127,
+      "title": "迷宫问题",
+      "source": "data/openjudge/pages/practice__04127.html",
+      "sample_input": "0 1 0 0 0\n0 1 0 1 0\n0 0 0 0 0\n0 1 1 1 0\n0 0 0 1 0\n",
+      "sample_output": "(0, 0)\n(1, 0)\n(2, 0)\n(2, 1)\n(2, 2)\n(2, 3)\n(2, 4)\n(3, 4)\n(4, 4)\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04127/",
+      "statement_chars": 169,
+      "complexity_hint": "low",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4128,
+      "title": "单词序列",
+      "source": "data/openjudge/pages/2024sp_routine__04128.html",
+      "sample_input": "hit cog\nhot dot dog lot log\n",
+      "sample_output": "5\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04128/",
+      "statement_chars": 283,
+      "complexity_hint": "low",
+      "route": "self-written"
+    },
+    {
+      "local_number": 4131,
+      "title": "Charm Bracelet",
+      "source": "data/openjudge/pages/practice__04131.html",
+      "sample_input": "4 6\n1 4\n2 6\n3 12\n2 7\n",
+      "sample_output": "23\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04131/",
+      "statement_chars": 551,
+      "complexity_hint": "medium",
+      "route": "self-written"
+    }
+  ]
+}
