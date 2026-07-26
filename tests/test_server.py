@@ -191,6 +191,9 @@ class ServerApiTests(unittest.TestCase):
         self.assertIn("我的提交记录", text)
         self.assertIn("height:520px", text)
         self.assertIn("查看代码", text)
+        self.assertIn("G++(", text)
+        self.assertIn("Python3(", text)
+        self.assertIn("PyPy3(", text)
         for placeholder in ("__BOOK__", "__PROBLEM__"):
             self.assertNotIn(placeholder, text)      # 模板占位符必须已被替换
 

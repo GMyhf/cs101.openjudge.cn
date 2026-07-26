@@ -143,7 +143,7 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
   </div>
   <div class="row">
     <select name="language">
-      <option value="python">Python 3</option><option value="pypy3">PyPy3</option><option value="cpp">C++17</option><option value="c">C11</option>
+      __LANGUAGE_OPTIONS__
     </select>
     <button id="go">提交并判题</button>
     <button id="theme" type="button" class="ghost">深色</button>
@@ -757,7 +757,14 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
         submit_page = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/([^/]+)/submit/", path)
         if submit_page:
             book, problem_id = submit_page.groups()
-            body = SUBMIT_PAGE.replace("__BOOK__", escape(book)).replace("__PROBLEM__", escape(problem_id)).encode()
+            language_options = "".join(
+                f'<option value="{key}">{escape(language_version(key))}</option>'
+                for key in ("cpp", "c", "java", "pascal", "python", "pypy3")
+                if key in {"cpp", "c", "python", "pypy3"}
+            )
+            body = (SUBMIT_PAGE.replace("__BOOK__", escape(book))
+                    .replace("__PROBLEM__", escape(problem_id))
+                    .replace("__LANGUAGE_OPTIONS__", language_options).encode())
             self.send_response(200); self.send_header("Content-Type", "text/html; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
         local_book = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/", path)
         if local_book:
