@@ -1,3 +1,7 @@
+# External reference: cs101.openjudge.cn practice/04120 statistics, Accepted solution 52470090.
+# Source: http://cs101.openjudge.cn/practice/solution/52470090/
+# License: no explicit license stated on the submission page; retained as an external platform reference.
+
 n, x = map(int,input().split())
 a = list(map(int, input().split()))
 dp = [set() for i in range(x + 1)]

@@ -1,3 +1,7 @@
+// External reference: cs101.openjudge.cn practice/04091 statistics, Accepted solution 51702184.
+// Source: http://cs101.openjudge.cn/practice/solution/51702184/
+// License: no explicit license stated on the submission page; retained as an external platform reference.
+
 #include <bits/stdc++.h>
 using namespace std;
 

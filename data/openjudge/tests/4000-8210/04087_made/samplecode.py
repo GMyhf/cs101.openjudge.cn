@@ -1,3 +1,7 @@
+// External reference: cs101.openjudge.cn practice/04087 statistics, Accepted solution 52367412.
+// Source: http://cs101.openjudge.cn/practice/solution/52367412/
+// License: no explicit license stated on the submission page; retained as an external platform reference.
+
 #include<iostream>
 #include<queue>
 #include<vector>
