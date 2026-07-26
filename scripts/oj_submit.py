@@ -28,7 +28,8 @@ import time
 import urllib.parse
 import urllib.request
 
-HOST = "http://cs101.openjudge.cn"
+HOST = os.environ.get("OJ_BASE_URL", "http://cs101.openjudge.cn")
+HOST_HEADER = os.environ.get("OJ_HOST_HEADER")
 LANGUAGES = ("Python3", "PyPy3", "G++", "GCC", "Java", "Pascal")
 FINAL_VERDICTS = ("Accepted", "Wrong Answer", "Time Limit Exceeded", "Runtime Error",
                   "Compile Error", "Presentation Error", "Memory Limit Exceeded",
@@ -43,10 +44,16 @@ class Session:
         self._opener.addheaders = [("User-Agent", "Mozilla/5.0")]
         self._retries = retries
 
+    def _request(self, url, data=None):
+        request = urllib.request.Request(url, data=data)
+        if HOST_HEADER:
+            request.add_header("Host", HOST_HEADER)
+        return request
+
     def _get(self, url):
         for attempt in range(self._retries):
             try:
-                with self._opener.open(url, timeout=60) as response:
+                with self._opener.open(self._request(url), timeout=60) as response:
                     return response.read().decode("utf-8", "replace")
             except Exception:
                 if attempt == self._retries - 1:
@@ -55,8 +62,7 @@ class Session:
 
     def _post(self, url, fields):
         data = urllib.parse.urlencode(fields).encode()
-        request = urllib.request.Request(url, data=data)
-        with self._opener.open(request, timeout=60) as response:
+        with self._opener.open(self._request(url, data), timeout=60) as response:
             return response.read().decode("utf-8", "replace")
 
     def login(self):
@@ -69,10 +75,10 @@ class Session:
             raise RuntimeError("登录失败")           # 不回显返回体，避免带出账号信息
         return self
 
-    def submit(self, number, source, language):
+    def submit(self, number, source, language, group="practice"):
         if language not in LANGUAGES:
             raise ValueError(f"语言必须是 {LANGUAGES} 之一，收到 {language!r}")
-        page = self._get(f"{HOST}/practice/{number}/submit/")
+        page = self._get(f"{HOST}/{group}/{number}/submit/")
         contest = re.search(r'name="contestId" value="(\d+)"', page)
         if not contest:
             raise RuntimeError(f"{number}: 拿不到 contestId（是不是没登录或题号不对）")
@@ -97,15 +103,15 @@ class Session:
             time.sleep(interval)
         return {"verdict": "TIMEOUT_POLLING", "ms": None, "solution_id": solution_id}
 
-    def run(self, number, source, language):
-        return self.poll(self.submit(number, source, language))
+    def run(self, number, source, language, group="practice"):
+        return self.poll(self.submit(number, source, language, group))
 
 
-def escalate(session, number, source, tiers=("Python3", "PyPy3")):
+def escalate(session, number, source, tiers=("Python3", "PyPy3"), group="practice"):
     """三档里的前两档：Python3 超时就换 PyPy3。仍超时的返回最后一档结果，交人决定写不写 C++。"""
     attempts = []
     for language in tiers:
-        result = session.run(number, source, language)
+        result = session.run(number, source, language, group)
         attempts.append({"language": language, **result})
         if result["verdict"] != "Time Limit Exceeded":
             break

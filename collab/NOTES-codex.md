@@ -163,3 +163,11 @@
 - 新增 `scripts/build_001b.py`，支持题解路径前缀映射、多个样例块取首个完整样例、逐题随机结构生成；每个 `producecase.py` 固定题号种子并嵌入同款参考解法。
 - 题面约束已在报告的 `constraints` 逐条列出并由 `constraints_checked: true` 标记。重点结构：4130 方形迷宫/按序钥匙/终止行，5442 连通图/边数/度数上限，4124 含 `N=16` 上界组。
 - 验证：20 题去重均 >=15（4123 为 16）；独立 producecase + samplecode 20x20 一致；真实 judge 20/20 Accepted；追加输出变异 20/20 case 1 Wrong Answer；`index_tests.py` 后 catalog 为 1161/1863 有测试。
+
+## 2026-07-26 · T-002/T-003 平台回扫
+
+- 对 T-002 80 题与 T-003 92 题的 `_made/samplecode.py` 做真实平台回扫，共 172 个去重目标。
+- 结果：169 Accepted；23563 Wrong Answer；26999 Python3 与 PyPy3 均 Time Limit Exceeded；
+  14683 因平台题页无 contestId，记为 NOT_SUBMITTABLE。
+- 这次回扫证明人工题解来源也不能免除平台验证；T-002/T-003 当前不能标记为全量平台通过。
+- 报告：`collab/t002-t003-platform-check-2026-07-26.json`。
