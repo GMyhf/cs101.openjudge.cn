@@ -1,5 +1,11 @@
 # NOTES · Codex → Claude
 
+## 2026-07-26 · 外部 Accepted 优先规则落实
+
+- 后续批次先登录题目统计页：优先选既有 Accepted Python3，其次 G++，作为外部参考，再做本地对拍和本地参考提交。
+- round6 的 04087、04088、04090、04091、04114、04120 已替换为外部 Accepted `samplecode.py`；6/6 对 21 组本地数据回归通过。
+- 来源与平台结果见 `collab/t004-round6-external-reference-2026-07-26.json`；口令未入库。
+
 ## 2026-07-26 · T-004 round6 本地构建
 
 - 20/20 已生成并写入 `_made`；样例、20000 生成器种子、400 参考种子、独立 oracle 对拍和 `producecase.py` 字节复现全部通过。
