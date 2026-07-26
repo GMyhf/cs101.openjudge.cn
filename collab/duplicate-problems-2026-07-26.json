@@ -76,6 +76,19 @@
     "submit_path": {
       "7645": "routine（contestId 20380）—— 提交器需按题目所属 book 选路径，不能一律用 practice",
       "others": "practice"
+    },
+    "final_result": {
+      "method": "按题目所属 book 逐路径试；判「不可提交」前复测 3 次、间隔递增",
+      "checked": 250,
+      "not_submittable": 0,
+      "path_distribution": {
+        "practice": 249,
+        "routine": 1
+      },
+      "non_practice": {
+        "7645": "routine（contestId 20380）"
+      },
+      "conclusion": "**仍缺数据的 250 题全部可在平台提交，没有一题拿不到背书。**round6 选批不需要为「平台检查不适用」预留例外。唯一要注意的是 07645 走 `/routine/` 路径 —— 提交器按题目所属 book 选路径即可。"
     }
   }
 }
