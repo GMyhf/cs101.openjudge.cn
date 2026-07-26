@@ -24,6 +24,7 @@ PASSWORD_FILE = ROOT / "data" / ".admin_password"
 ADMIN_PASSWORD = os.environ.get("CS101_ADMIN_PASSWORD") or (PASSWORD_FILE.read_text(encoding="utf-8").strip() if PASSWORD_FILE.is_file() else "")
 TOKENS = set()
 SESSION_USERS = {}
+CATALOG_TITLE_CACHE = {}
 
 COURSE = {
     "title": "计算机科学导论",
@@ -513,6 +514,21 @@ def failing_input_snippet(book, problem_id, case_index):
     return {"text": clipped[:SNIPPET_CHARS], "truncated": truncated,
             "total_lines": len(lines), "total_chars": len(text)}
 
+def catalog_title(item):
+    """Read the real heading from the mirrored statement, once per process."""
+    key = (item.get("book", ""), item.get("id", ""))
+    if key in CATALOG_TITLE_CACHE:
+        return CATALOG_TITLE_CACHE[key]
+    page = MIRROR / "pages" / f"{key[0]}__{key[1]}.html"
+    title = key[1]
+    if page.is_file():
+        text = page.read_text(encoding="utf-8", errors="replace")
+        match = re.search(r'<div id="pageTitle"><h2>(.*?)</h2>', text, re.S)
+        if match:
+            title = re.sub(r"<[^>]+>", "", unescape(match.group(1))).strip() or title
+    CATALOG_TITLE_CACHE[key] = title
+    return title
+
 
 def password_hash(password):
     return hashlib.pbkdf2_hmac("sha256", password.encode(), b"cs101-local-user", 120000).hex()
@@ -662,6 +678,7 @@ a{{color:var(--green)}}.shell{{max-width:1120px;margin:auto;padding:0 24px}}.top
             catalog = MIRROR / "catalog.json"
             if catalog.is_file():
                 payload = json.loads(catalog.read_text(encoding="utf-8"))
+                payload["problems"] = [{**item, "title": catalog_title(item)} for item in payload.get("problems", [])]
                 self.send_json(payload); return
         file = ROOT / ("index.html" if path in ("/", "") else decoded_path.lstrip("/"))
         if file.is_file() and ROOT in file.parents:

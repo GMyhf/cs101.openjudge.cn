@@ -15,7 +15,7 @@
 </head>
 <body>
   <header class="top shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 本地题库</span></a><nav class="topnav"><a href="/problems/">全部题目</a><a href="/history/">提交记录</a><a href="/auth/login/" id="account">登录</a></nav></header>
-  <section class="hero"><div class="shell hero-grid"><div><div class="eyebrow">Local practice workspace</div><h1>把题目、数据和判题<br>放在同一个地方。</h1><p>CS101 题库的本地镜像与判题工作台。打开一道题，阅读题面，直接提交代码并查看真实测试反馈。</p></div><div class="hero-note"><strong id="notice">正在读取题库…</strong><span>数据与判题服务均运行在当前主机</span></div></div></section>
+  <section class="hero"><div class="shell hero-grid"><div><div class="eyebrow">Local practice workspace</div><h1>本地题库，随时开练。</h1><p>CS101 题库的本地镜像与判题工作台。打开一道题，阅读题面，直接提交代码并查看真实测试反馈。</p></div><div class="hero-note"><strong id="notice">正在读取题库…</strong><span>数据与判题服务均运行在当前主机</span></div></div></section>
   <main class="content shell"><div class="stats"><div class="stat"><b id="total">—</b><span>收录题目</span></div><div class="stat"><b id="ready">—</b><span>已有本地测试数据</span></div><div class="stat"><b id="cases">—</b><span>本地测试组数</span></div></div><div class="section-head"><div><h2>最近可练</h2><p>从本地测试数据中挑选题目开始</p></div></div><div class="toolbar"><input id="search" type="search" placeholder="搜索题号或标题" autocomplete="off"><a href="/problems/">浏览完整目录 →</a></div><div id="list" class="list"></div><div id="empty" class="empty" hidden>没有找到匹配题目。</div></main>
   <footer class="footer"><div class="shell">CS101 · 本地课程题库 · Python 3 / PyPy3 / C++17</div></footer>
   <script>
@@ -24,7 +24,8 @@
     fetch('/api/catalog').then(r=>r.json()).then(data=>{problems=(data.problems||[]).filter(p=>(p.test_count||0)>0);const all=data.problems||[];document.querySelector('#total').textContent=all.length.toLocaleString();document.querySelector('#ready').textContent=problems.length.toLocaleString();document.querySelector('#cases').textContent=problems.reduce((n,p)=>n+(p.test_count||0),0).toLocaleString();render();}).catch(()=>{document.querySelector('#notice').textContent='题库暂时不可用';});
     fetch('/api/course').then(r=>r.json()).then(data=>{document.querySelector('#notice').textContent=data.course?.notice||'本地题库已就绪';}).catch(()=>{});
     fetch('/api/me').then(r=>r.json()).then(data=>{if(data.authenticated)document.querySelector('#account').textContent='已登录';}).catch(()=>{});
-    function render(){const q=search.value.trim().toLowerCase();const hits=problems.filter(p=>!q||p.id.toLowerCase().includes(q)||(p.title||'').toLowerCase().includes(q)).slice(0,12);list.innerHTML=hits.map(p=>`<a class="problem" href="${esc(p.path)}"><span class="pid">${esc(p.id)}</span><span class="problem-main"><span class="problem-title">${esc(p.title||'未命名题目')}</span><span class="problem-meta">${esc(p.book)} · ${p.test_count} 组本地测试</span></span><span class="arrow">›</span></a>`).join('');empty.hidden=hits.length>0;}
+    function titleOf(p){return (p.title||'').replace(new RegExp('^'+p.id+'\\s*[:：]\\s*','i'),'')||p.id;}
+    function render(){const q=search.value.trim().toLowerCase();const hits=problems.filter(p=>!q||p.id.toLowerCase().includes(q)||(p.title||'').toLowerCase().includes(q)).slice(0,12);list.innerHTML=hits.map(p=>`<a class="problem" href="${esc(p.path)}"><span class="pid">${esc(p.id)}</span><span class="problem-main"><span class="problem-title">${esc(titleOf(p))}</span><span class="problem-meta">${esc(p.book)} · ${p.test_count} 组本地测试</span></span><span class="arrow">›</span></a>`).join('');empty.hidden=hits.length>0;}
     search.addEventListener('input',render);
   </script>
 </body>
