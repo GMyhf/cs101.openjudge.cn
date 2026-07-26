@@ -159,7 +159,7 @@ def q07622(text):
     return str(answer) + "\n"
 
 
-def q07810(text):
+def q04107(text):
     it = iter(text.split()); out = []
     for _ in range(int(next(it))):
         value = next(it)
@@ -393,7 +393,7 @@ CASES = {
     5455: (q05455, gen_bst_level, "51 45 59 86 45 4 15 76 60 20 61 77 62 30 2 37 13 82 19 74 2 79 79 97 33 90 11 7 29 14 50 1 96 59 91 39 34 6 72 7\n", "51 45 59 4 50 86 2 15 76 97 1 13 20 60 77 90 11 14 19 30 61 82 96 7 29 37 62 79 91 6 33 39 74 34 72\n"),
     6646: (q06646, gen_tree_depth, "3\n2 3\n-1 -1\n-1 -1\n", "2\n"),
     7622: (q07622, gen_permutation, "6\n2 6 3 4 5 1\n", "8\n"),
-    7810: (q07810, gen_prices, "4\n95\n100\n3192\n2913\n", "Yes\nNo\nYes\nNo\n"),
+    4107: (q04107, gen_prices, "4\n95\n100\n3192\n2913\n", "Yes\nNo\nYes\nNo\n"),
     8581: (q08581, gen_extended_tree, "ABD..EF..G..C..\n", "DBFEGAC\nDFGEBCA\n"),
     9267: (q09267, gen_nuclear, "4 3\n", "13\n"),
     19757: (q19757, gen_saruman, "0 3\n10 20 20\n10 7\n70 30 1 7 15 20 50\n-1 -1\n", "2\n4\n"),
