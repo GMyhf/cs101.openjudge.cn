@@ -1,0 +1,409 @@
+{
+  "batch": "T-004-r7",
+  "selection_rule": "从仍缺数据的题里按题号顺序取 20 题；跳过与已有数据同题的（正文 + 时间/内存限制双判据）与题面无样例的。**选批时已逐题查过统计页有没有既有 Accepted**（优先 Python3、其次 G++），结果写在每题的 existing_accepted 字段里。",
+  "count": 20,
+  "route_summary": {
+    "external-accepted": 20,
+    "self-written": 0
+  },
+  "skipped": [
+    {
+      "local_number": 3259,
+      "reason": "题面没有样例（可做，但无样例可锚，须在报告注明）"
+    },
+    {
+      "local_number": 7113,
+      "reason": "与已有数据的 4131 同题（正文+限制一致）"
+    }
+  ],
+  "delivery_gate": [
+    "有既有 Accepted：直接作为题目实现并构建数据；C++ 放 samplecode.cpp，producecase 走 g++ 编译路径",
+    "外部源码必须注明统计页 / 提交 ID / 源码链接 / 许可状态，reference_source 记真实来源",
+    "无既有 Accepted：才写自己的实现 + 本地对拍，并按三档提交 Python3 → PyPy3 → C++",
+    "参考实现必须拿到平台 Accepted 才算完成；提交前按题拆成单题独立程序（整份分派器会被 pylint 判 E0102）",
+    "报告字段一律走 scripts/t004_common.py 实测；constraint_checklist 必须附一个违规输入反例、证明至少一条约束会翻成 False，题面确实无可机械验证约束时给 exemption",
+    "去重不足 15 组必须给豁免理由；恒定输出探针与变异自检照旧（变异要真改变行为、自检前基线先绿）"
+  ],
+  "entries": [
+    {
+      "local_number": 4132,
+      "title": "四则运算表达式求值",
+      "source": "data/openjudge/pages/practice__04132.html",
+      "sample_input": "3.4\n",
+      "sample_output": "输出样例1:\n3.40\n输出样例2:\n15.30\n输出样例3：\n454.75\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04132/",
+      "statement_chars": 22,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52514578",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52514578/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 4134,
+      "title": "查找最接近的元素",
+      "source": "data/openjudge/pages/practice__04134.html",
+      "sample_input": "3\n2 5 8\n2\n10\n5\n",
+      "sample_output": "8\n5\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04134/",
+      "statement_chars": 22,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "51059237",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/51059237/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 4136,
+      "title": "矩形分割",
+      "source": "data/openjudge/pages/dsapre__04136.html",
+      "sample_input": "1000\n2\n1 1 2 1\n5 1 2 1\n",
+      "sample_output": "5\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04136/",
+      "statement_chars": 193,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52527332",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52527332/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 4139,
+      "title": "不定方程求解",
+      "source": "data/openjudge/pages/practice__04139.html",
+      "sample_input": "2 3 18\n",
+      "sample_output": "4\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04139/",
+      "statement_chars": 44,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "51213960",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/51213960/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 4142,
+      "title": "二分法求函数的零点",
+      "source": "data/openjudge/pages/practice__04142.html",
+      "sample_input": "无\n",
+      "sample_output": "不提供\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04142/",
+      "statement_chars": 129,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "51048618",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/51048618/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 4143,
+      "title": "和为给定数",
+      "source": "data/openjudge/pages/2024sp_routine__04143.html",
+      "sample_input": "4\n2 5 1 4\n6\n",
+      "sample_output": "1 5\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04143/",
+      "statement_chars": 27,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52701344",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52701344/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 4149,
+      "title": "课程大作业",
+      "source": "data/openjudge/pages/practice__04149.html",
+      "sample_input": "2 \n3 \nComputer 3 3 \nEnglish 20 1 \nMath 3 2 \n3\nComputer 3 3 \nEnglish 6 3 \nMath 6 3\n",
+      "sample_output": "2 \nComputer \nMath \nEnglish \n3 \nComputer \nEnglish \nMath\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04149/",
+      "statement_chars": 226,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "45229533",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/45229533/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 4150,
+      "title": "上机",
+      "source": "data/openjudge/pages/practice__04150.html",
+      "sample_input": "4\n1 2 2 4\n4 3 3 1\n2 1 1 2\n",
+      "sample_output": "14\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04150/",
+      "statement_chars": 386,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "44330785",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/44330785/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 4151,
+      "title": "电影节",
+      "source": "data/openjudge/pages/practice__04151.html",
+      "sample_input": "8\n3 4\n0 7 \n3 8 \n15 19\n15 20\n10 15\n8 18 \n6 12 \n0\n",
+      "sample_output": "3\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04151/",
+      "statement_chars": 78,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52542931",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52542931/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 4152,
+      "title": "最佳加法表达式",
+      "source": "data/openjudge/pages/practice__04152.html",
+      "sample_input": "2\n123456\n1\n123456\n4\n12345\n",
+      "sample_output": "102\n579\n15\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/04152/",
+      "statement_chars": 91,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52528212",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52528212/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 5349,
+      "title": "合格的字符串",
+      "source": "data/openjudge/pages/practice__05349.html",
+      "sample_input": "4\nAab\na2B\nab\nABB\na[a2b]b\n",
+      "sample_output": "1 Aab\n2 a2B\n4 ABB\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/05349/",
+      "statement_chars": 247,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52106037",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52106037/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 5414,
+      "title": "由中根序列和后根序列重建二叉树",
+      "source": "data/openjudge/pages/practice__05414.html",
+      "sample_input": "9 5 32 67\n9 32 67 5\n",
+      "sample_output": "5 9 67 32\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/05414/",
+      "statement_chars": 202,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "48218219",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/48218219/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 6252,
+      "title": "带通配符的字符串匹配",
+      "source": "data/openjudge/pages/practice__06252.html",
+      "sample_input": "1*456?\n11111114567\n",
+      "sample_output": "matched\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/06252/",
+      "statement_chars": 232,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52714777",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52714777/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 6364,
+      "title": "牛的选举",
+      "source": "data/openjudge/pages/dsapre__06364.html",
+      "sample_input": "5 3\n3 10\n9 2\n5 6\n8 4\n6 5\n",
+      "sample_output": "5\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/06364/",
+      "statement_chars": 220,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52717482",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52717482/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 6374,
+      "title": "文字排版",
+      "source": "data/openjudge/pages/2024fallroutine__06374.html",
+      "sample_input": "84\nOne sweltering day, I was scooping ice cream into cones and told my four children they could \"buy\" a cone from me for a hug. Almost immediately, the kids lined up to make their purchases. The three youngest each gave me a quick hug, grabbed their cones and raced back outside. But when my teenage son at the end of the line finally got his turn to \"buy\" his ice cream, he gave me two hugs. \"Keep the changes,\" he said with a smile.\n",
+      "sample_output": "One sweltering day, I was scooping ice cream into cones and told my four\nchildren they could \"buy\" a cone from me for a hug. Almost immediately, the kids\nlined up to make their purchases. The three youngest each gave me a quick hug,\ngrabbed their cones and raced back outside. But when my teenage son at the end\nof the line finally got his turn to \"buy\" his ice cream, he gave me two hugs.\n\"Keep the changes,\" he said with a smile.\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/06374/",
+      "statement_chars": 101,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52887441",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52887441/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 6648,
+      "title": "Sequence",
+      "source": "data/openjudge/pages/2025sp_routine__06648.html",
+      "sample_input": "1\n2 3\n1 2 3\n2 2 3\n",
+      "sample_output": "3 3 4\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/06648/",
+      "statement_chars": 105,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52710633",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52710633/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 7209,
+      "title": "升级的迷宫寻宝",
+      "source": "data/openjudge/pages/2024sp_routine__07209.html",
+      "sample_input": "5 7\n1R10001\n1010101\n1000011\n101100C\n1Y00011\n",
+      "sample_output": "1 2\n2 2\n3 2\n4 2\n5 2\n5 3\n5 4\n5 5\n4 5\n4 6\n4 7\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/07209/",
+      "statement_chars": 78,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "51070119",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/51070119/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 7544,
+      "title": "矩阵乘法",
+      "source": "data/openjudge/pages/practice__07544.html",
+      "sample_input": "3 2 3\n1 1\n1 1\n1 1\n1 1 1\n1 1 1\n",
+      "sample_output": "2 2 2\n2 2 2\n2 2 2\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/07544/",
+      "statement_chars": 136,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "51070584",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/51070584/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 7545,
+      "title": "二维数组回形遍历",
+      "source": "data/openjudge/pages/practice__07545.html",
+      "sample_input": "4 4\n1 2 3 4\n12 13 14 5\n11 16 15 6\n10 9 8 7\n",
+      "sample_output": "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/07545/",
+      "statement_chars": 66,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "51084173",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/51084173/"
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 7592,
+      "title": "求最大公约数问题",
+      "source": "data/openjudge/pages/practice__07592.html",
+      "sample_input": "6 9\n",
+      "sample_output": "3\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/07592/",
+      "statement_chars": 18,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "51217673",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/51217673/"
+      },
+      "route": "external-accepted"
+    }
+  ]
+}
