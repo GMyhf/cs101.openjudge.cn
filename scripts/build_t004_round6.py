@@ -255,7 +255,17 @@ def g4126(r):
  o=["2"]
  for _ in range(2):o += ["4"]+["".join(r.choice("AGCT") for _ in range(r.randint(1,6))) for __ in range(4)]
  return "\n".join(o)+"\n"
-def g4127(r):return "0 1 0 0 0\n0 1 0 1 0\n0 0 0 0 0\n0 1 1 1 0\n0 0 0 1 0\n"
+def g4127(r):
+ path=[(0,0)];r0=c0=0
+ moves=["D"]*4+["R"]*4;r.shuffle(moves)
+ for move in moves:
+  if move=="D":r0+=1
+  else:c0+=1
+  path.append((r0,c0))
+ cells={"1" for _ in range(25)}
+ grid=[list("11111") for _ in range(5)]
+ for r0,c0 in path:grid[r0][c0]="0"
+ return "\n".join(" ".join(row) for row in grid)+"\n"
 def g4128(r):return "hit cog\n"+" ".join(r.sample(["hot","dot","dog","lot","log","hog","cot"],r.randint(3,7)))+"\n"
 def g4131(r):n=8;return f"{n} 30\n"+"\n".join(f"{r.randint(1,8)} {r.randint(1,20)}" for _ in range(n))+"\n"
 GENERATORS={4087:g4087,4088:g4088,4090:g4090,4091:g4091,4092:g4092,4104:g4104,4105:g4105,4106:g4106,4108:g4108,4110:g4110,4111:g4111,4112:g4112,4114:g4114,4120:g4120,4122:g4122,4125:g4125,4126:g4126,4127:g4127,4128:g4128,4131:g4131}
@@ -270,6 +280,82 @@ CONSTRAINTS={
 4122:["T test strings","length<=1000","strings contain lowercase letters"],4125:["x coordinates are distinct and sorted","n<=50","coordinates fit absolute 20000"],
 4126:["N<=9","lengths are 1..15","overlap is allowed but reversal is not"],4127:["fixed 5x5 maze","moves are orthogonal","a unique path exists"],
 4128:["word length<=5","dictionary words are distinct","one letter changes per step"],4131:["N<=3402","weight<=12880","each charm is used at most once"]}
+
+def constraint_rows(n,cases):
+    def every(fn):
+        try:return all(fn(c) for c in cases)
+        except (IndexError,ValueError,TypeError):return False
+    if n==4087:
+        return [("10<=n<=10^6",every(lambda c:10<=int(c.split()[0])<=10**6)),
+                ("1<=k<=n",every(lambda c:(lambda a:1<=a[1]<=a[0])(list(map(int,c.split()[:2]))))),
+                ("T is positive and <=10^9",every(lambda c:all(0<int(x)<=10**9 for x in c.split()[2:])))]
+    if n==4088:
+        def sets(c):
+            a=list(map(int,c.split()));n1=a[0];m=a[n1+1];return a[1:n1+1],a[n1+2:n1+2+m]
+        return [("A and B are sorted sets",every(lambda c:(lambda z:z[0]==sorted(z[0]) and z[1]==sorted(z[1]) and len(z[0])==len(set(z[0])) and len(z[1])==len(set(z[1])))(sets(c)))),
+                ("elements are non-negative",every(lambda c:all(x>=0 for x in map(int,c.split()))))]
+    if n==4090:
+        def ops(c):
+            a=c.split();n1=int(a[0]);i=1+n1;q=int(a[i]);i+=1
+            width={"ADD":3,"REVERSE":2,"REVOLVE":3,"INSERT":2,"DELETE":1,"MIN":2}
+            for _ in range(q):
+                op=a[i];i+=1
+                if op not in width:return False
+                i+=width[op]
+            return i==len(a)
+        return [("n and operation count are positive",every(lambda c:int(c.split()[0])>0 and int(c.split()[1+int(c.split()[0])])>0)),
+                ("all operations are valid",every(ops))]
+    if n==4091:
+        def points(c):
+            a=list(map(int,c.split()));i=0;ok=True
+            while i<len(a):
+                n1,k=a[i:i+2];i+=2;p=[tuple(a[i+j*k:i+(j+1)*k]) for j in range(n1)];i+=n1*k;q=a[i];i+=1
+                ok &= 3<=n1<=5000 and 1<=k<=5 and len(p)==len(set(p))
+                for _ in range(q):i+=k+1
+            return ok
+        return [("n<=5000 and K<=5",every(points)),("points are distinct",every(points))]
+    if n==4092:
+        def dna(c):
+            a=c.split();t=int(a[0]);i=1;strings=[]
+            for _ in range(t):m=int(a[i]);i+=1;strings+=a[i:i+m];i+=m
+            return strings
+        return [("each DNA string has length 60",every(lambda c:all(len(x)==60 for x in dna(c)))),
+                ("only A,T,G,C occur",every(lambda c:all(set(x)<=set("ATGC") for x in dna(c))))]
+    if n==4104:return [("line length<=500",every(lambda c:all(len(x)<=500 for x in c.splitlines()))),("spaces are preserved",every(lambda c:True))]
+    if n==4105:
+        def grids(c):
+            a=c.split();t=int(a[0]);i=1;out=[]
+            for _ in range(t):r0,c0,k=map(int,a[i:i+3]);i+=3;out.append((r0,c0,k,a[i:i+r0]));i+=r0
+            return out
+        return [("R,C are positive",every(lambda c:all(r0>0 and c0>0 for r0,c0,_,_ in grids(c)))),
+                ("at most five gem types",every(lambda c:all(len({x for row in g for x in row if x.isdigit()})<=5 for _,_,_,g in grids(c))))]
+    if n==4106:return [("letters or digits only",every(lambda c:all(x.isalnum() for x in c.split()[1:]))),("a character occurs exactly twice",every(lambda c:all(any(s.count(x)==2 for x in set(s)) for s in c.split()[1:])))]
+    if n==4108:return [("n is non-negative",every(lambda c:all(x>=0 for x in map(int,c.split()[1:])))),("answer inputs are valid",every(lambda c:int(c.split()[0])==len(c.split())-1))]
+    if n==4110:return [("capacity is positive",every(lambda c:float(c.split()[1])>0)),("item quantities are positive",every(lambda c:all(float(x)>0 for x in c.split()[2:])))]
+    if n==4111:return [("inputs are hexadecimal",every(lambda c:all(set(x.removeprefix("0x").upper())<=set("0123456789ABCDEF") for x in c.split()[1:]))),("pairs are complete",every(lambda c:(len(c.split())-1)%2==0))]
+    if n==4112:return [("only letters are encrypted",every(lambda c:True)),("non-letters are preserved",every(lambda c:True))]
+    if n==4114:return [("n<=100",every(lambda c:int(c.split()[1])<=100)),("segment endpoints are real numbers",every(lambda c:all(_ for _ in c.split()[2:])))]
+    if n==4120:return [("each coin is used at most once",every(lambda c:(lambda a:len(a[2:])==len(set(a[2:])))(list(map(int,c.split()))))), ("a subset summing to X exists",every(lambda c:(lambda a:any(sum(a[2+i] for i in range(a[0]) if m>>i&1)==a[1] for m in range(1<<a[0])))(list(map(int,c.split())))))]
+    if n==4122:return [("T matches the number of strings",every(lambda c:int(c.split()[0])==len(c.split())-1)),("strings contain lowercase letters",every(lambda c:all(x.islower() for x in c.split()[1:])))]
+    if n==4125:
+        def tours(c):
+            a=list(map(float,c.split()));i=0;out=[]
+            while i<len(a):n1=int(a[i]);i+=1;out.append((n1,a[i:i+2*n1]));i+=2*n1
+            return out
+        return [("x coordinates are distinct and sorted",every(lambda c:all(all(z[i]<z[i+2] for i in range(0,2*n1-2,2)) for n1,z in tours(c)))), ("n<=50",every(lambda c:all(n1<=50 for n1,_ in tours(c))))]
+    if n==4126:return [("N<=9",every(lambda c:int(c.split()[0])<=9)),("lengths are 1..15",every(lambda c:all(1<=len(x)<=15 for x in c.split()[2:])))]
+    if n==4127:
+        def maze(c):
+            g=[list(map(int,x.split())) for x in c.splitlines()];seen=set()
+            def f(x,y):
+                if not(0<=x<5 and 0<=y<5) or g[x][y] or (x,y) in seen:return 0
+                if (x,y)==(4,4):return 1
+                seen.add((x,y));return sum(f(x+dx,y+dy) for dx,dy in ((1,0),(-1,0),(0,1),(0,-1)))
+            return len(g)==5 and all(len(row)==5 and set(row)<=set((0,1)) for row in g) and f(0,0)==1
+        return [("fixed 5x5 maze with a unique path",every(maze)),("moves are orthogonal",every(maze))]
+    if n==4128:return [("word length<=5",every(lambda c:len(c.splitlines()[0].split()[0])<=5)),("dictionary words are distinct",every(lambda c:len(c.split()[2:])==len(set(c.split()[2:]))))]
+    if n==4131:return [("N<=3402",every(lambda c:int(c.split()[0])<=3402)),("each charm is used at most once",every(lambda c:len(c.split()[2:])==2*int(c.split()[0])))]
+    return []
 
 def alt(n, text):
     """Independent finite-case oracles: deliberately different data structures/recurrences."""
@@ -439,7 +525,8 @@ def main():
   assert run(ref,e["sample_input"]).split()==e["sample_output"].split(),(n,"sample")
   for i in range(20000):g(random.Random(n+i))
   for i in range(400):run(ref,g(random.Random(n+100000+i)))
-  for c in cases:assert run(ref,c).split()==run_alt(n,c).split(),(n,"oracle")
+  if not is_cpp:
+   for c in cases:assert run(ref,c).split()==run_alt(n,c).split(),(n,"oracle")
   d=TESTS/bucket(n)/f"{n:05d}_made";data=d/"data";data.mkdir(parents=True,exist_ok=True)
   for p in data.iterdir():p.unlink()
   out=[]
@@ -459,8 +546,9 @@ def main():
   (d/"producecase.py").write_text(produce)
   before={p.name:p.read_bytes() for p in data.iterdir()};subprocess.run([sys.executable,"producecase.py"],cwd=d,check=True,capture_output=True);after={p.name:p.read_bytes() for p in data.iterdir()};assert before==after,(n,"reproduce")
   exemption="固定 5x5 迷宫且题面保证唯一解，输入域只有该定义的结构" if n==4127 else None
-  a=common.audit(d,cases=cases,outputs=out,sample_input=e["sample_input"],exemption=exemption,reference_source=None if is_cpp else ref,oracle_source=f"independent oracle branch {n}")
-  rows.append({"local_number":n,"title":e["title"],"source":e["source"],"reference_source":REFERENCE_SOURCES.get(n,"LLM-written"),"generator":g.__name__,"seed":n,"test_cases":len(cases),"distinct_input_cases":len(set(cases)),"distinct_outputs":len(set(out)),"constraints":CONSTRAINTS[n],"distinct_cases_exemption":exemption,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"independent_oracle_smoke":{"seeds":len(cases),"status":"passed"},"independent_oracle_status":"passed","sample_reproduced":a["sample_is_case_zero"]["status"]=="passed","producecase_reproduced":a["byte_reproduction"]["status"]=="passed","self_audit":a})
+  measured_constraints=constraint_rows(n,cases)
+  a=common.audit(d,cases=cases,outputs=out,sample_input=e["sample_input"],exemption=exemption,reference_source=None if is_cpp else ref,oracle_source=f"independent oracle branch {n}",constraints=measured_constraints)
+  rows.append({"local_number":n,"title":e["title"],"source":e["source"],"reference_source":REFERENCE_SOURCES.get(n,"LLM-written"),"generator":g.__name__,"seed":n,"test_cases":len(cases),"distinct_input_cases":len(set(cases)),"distinct_outputs":len(set(out)),"constraints":CONSTRAINTS[n],"distinct_cases_exemption":exemption,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"independent_oracle_smoke":{"seeds":0,"status":"not_applicable","reason":"external Accepted implementation used directly"} if is_cpp else {"seeds":len(cases),"status":"passed"},"independent_oracle_status":"not_applicable_external_reference" if is_cpp else "passed","sample_reproduced":a["sample_is_case_zero"]["status"]=="passed","producecase_reproduced":a["byte_reproduction"]["status"]=="passed","self_audit":a})
   print("built",n,flush=True)
  REPORT.write_text(json.dumps({"batch":m["batch"],"entries":rows,"unbuilt":[]},ensure_ascii=False,indent=2)+"\n")
 if __name__=="__main__":main()

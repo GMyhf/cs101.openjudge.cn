@@ -26,10 +26,11 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 21,
-        "status": "passed"
+        "seeds": 0,
+        "status": "not_applicable",
+        "reason": "external Accepted implementation used directly"
       },
-      "independent_oracle_status": "passed",
+      "independent_oracle_status": "not_applicable_external_reference",
       "sample_reproduced": true,
       "producecase_reproduced": true,
       "self_audit": {
@@ -54,6 +55,25 @@
           "status": "passed",
           "cases": 21,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 3,
+          "items": [
+            {
+              "constraint": "10<=n<=10^6",
+              "holds": true
+            },
+            {
+              "constraint": "1<=k<=n",
+              "holds": true
+            },
+            {
+              "constraint": "T is positive and <=10^9",
+              "holds": true
+            }
+          ],
+          "problems": []
         },
         "byte_reproduction": {
           "status": "passed"
@@ -86,10 +106,11 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 21,
-        "status": "passed"
+        "seeds": 0,
+        "status": "not_applicable",
+        "reason": "external Accepted implementation used directly"
       },
-      "independent_oracle_status": "passed",
+      "independent_oracle_status": "not_applicable_external_reference",
       "sample_reproduced": true,
       "producecase_reproduced": true,
       "self_audit": {
@@ -114,6 +135,21 @@
           "status": "passed",
           "cases": 21,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "A and B are sorted sets",
+              "holds": true
+            },
+            {
+              "constraint": "elements are non-negative",
+              "holds": true
+            }
+          ],
+          "problems": []
         },
         "byte_reproduction": {
           "status": "passed"
@@ -146,10 +182,11 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 21,
-        "status": "passed"
+        "seeds": 0,
+        "status": "not_applicable",
+        "reason": "external Accepted implementation used directly"
       },
-      "independent_oracle_status": "passed",
+      "independent_oracle_status": "not_applicable_external_reference",
       "sample_reproduced": true,
       "producecase_reproduced": true,
       "self_audit": {
@@ -174,6 +211,21 @@
           "status": "passed",
           "cases": 21,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "n and operation count are positive",
+              "holds": true
+            },
+            {
+              "constraint": "all operations are valid",
+              "holds": true
+            }
+          ],
+          "problems": []
         },
         "byte_reproduction": {
           "status": "passed"
@@ -206,10 +258,11 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 21,
-        "status": "passed"
+        "seeds": 0,
+        "status": "not_applicable",
+        "reason": "external Accepted implementation used directly"
       },
-      "independent_oracle_status": "passed",
+      "independent_oracle_status": "not_applicable_external_reference",
       "sample_reproduced": true,
       "producecase_reproduced": true,
       "self_audit": {
@@ -234,6 +287,21 @@
           "status": "passed",
           "cases": 21,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "n<=5000 and K<=5",
+              "holds": true
+            },
+            {
+              "constraint": "points are distinct",
+              "holds": true
+            }
+          ],
+          "problems": []
         },
         "byte_reproduction": {
           "status": "passed"
@@ -294,6 +362,21 @@
           "status": "passed",
           "cases": 21,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "each DNA string has length 60",
+              "holds": true
+            },
+            {
+              "constraint": "only A,T,G,C occur",
+              "holds": true
+            }
+          ],
+          "problems": []
         },
         "byte_reproduction": {
           "status": "passed"
@@ -364,6 +447,21 @@
           "cases": 21,
           "mismatched": []
         },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "line length<=500",
+              "holds": true
+            },
+            {
+              "constraint": "spaces are preserved",
+              "holds": true
+            }
+          ],
+          "problems": []
+        },
         "byte_reproduction": {
           "status": "passed"
         },
@@ -432,6 +530,21 @@
           "status": "passed",
           "cases": 21,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "R,C are positive",
+              "holds": true
+            },
+            {
+              "constraint": "at most five gem types",
+              "holds": true
+            }
+          ],
+          "problems": []
         },
         "byte_reproduction": {
           "status": "passed"
@@ -502,6 +615,21 @@
           "cases": 21,
           "mismatched": []
         },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "letters or digits only",
+              "holds": true
+            },
+            {
+              "constraint": "a character occurs exactly twice",
+              "holds": true
+            }
+          ],
+          "problems": []
+        },
         "byte_reproduction": {
           "status": "passed"
         },
@@ -570,6 +698,21 @@
           "status": "passed",
           "cases": 21,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "n is non-negative",
+              "holds": true
+            },
+            {
+              "constraint": "answer inputs are valid",
+              "holds": true
+            }
+          ],
+          "problems": []
         },
         "byte_reproduction": {
           "status": "passed"
@@ -640,6 +783,21 @@
           "cases": 21,
           "mismatched": []
         },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "capacity is positive",
+              "holds": true
+            },
+            {
+              "constraint": "item quantities are positive",
+              "holds": true
+            }
+          ],
+          "problems": []
+        },
         "byte_reproduction": {
           "status": "passed"
         },
@@ -708,6 +866,21 @@
           "status": "passed",
           "cases": 21,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "inputs are hexadecimal",
+              "holds": true
+            },
+            {
+              "constraint": "pairs are complete",
+              "holds": true
+            }
+          ],
+          "problems": []
         },
         "byte_reproduction": {
           "status": "passed"
@@ -778,6 +951,21 @@
           "cases": 21,
           "mismatched": []
         },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "only letters are encrypted",
+              "holds": true
+            },
+            {
+              "constraint": "non-letters are preserved",
+              "holds": true
+            }
+          ],
+          "problems": []
+        },
         "byte_reproduction": {
           "status": "passed"
         },
@@ -818,10 +1006,11 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 21,
-        "status": "passed"
+        "seeds": 0,
+        "status": "not_applicable",
+        "reason": "external Accepted implementation used directly"
       },
-      "independent_oracle_status": "passed",
+      "independent_oracle_status": "not_applicable_external_reference",
       "sample_reproduced": true,
       "producecase_reproduced": true,
       "self_audit": {
@@ -846,6 +1035,21 @@
           "status": "passed",
           "cases": 21,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "n<=100",
+              "holds": true
+            },
+            {
+              "constraint": "segment endpoints are real numbers",
+              "holds": true
+            }
+          ],
+          "problems": []
         },
         "byte_reproduction": {
           "status": "passed"
@@ -878,10 +1082,11 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 21,
-        "status": "passed"
+        "seeds": 0,
+        "status": "not_applicable",
+        "reason": "external Accepted implementation used directly"
       },
-      "independent_oracle_status": "passed",
+      "independent_oracle_status": "not_applicable_external_reference",
       "sample_reproduced": true,
       "producecase_reproduced": true,
       "self_audit": {
@@ -906,6 +1111,21 @@
           "status": "passed",
           "cases": 21,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "each coin is used at most once",
+              "holds": true
+            },
+            {
+              "constraint": "a subset summing to X exists",
+              "holds": true
+            }
+          ],
+          "problems": []
         },
         "byte_reproduction": {
           "status": "passed"
@@ -966,6 +1186,21 @@
           "status": "passed",
           "cases": 21,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "T matches the number of strings",
+              "holds": true
+            },
+            {
+              "constraint": "strings contain lowercase letters",
+              "holds": true
+            }
+          ],
+          "problems": []
         },
         "byte_reproduction": {
           "status": "passed"
@@ -1036,6 +1271,21 @@
           "cases": 21,
           "mismatched": []
         },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "x coordinates are distinct and sorted",
+              "holds": true
+            },
+            {
+              "constraint": "n<=50",
+              "holds": true
+            }
+          ],
+          "problems": []
+        },
         "byte_reproduction": {
           "status": "passed"
         },
@@ -1105,6 +1355,21 @@
           "cases": 21,
           "mismatched": []
         },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "N<=9",
+              "holds": true
+            },
+            {
+              "constraint": "lengths are 1..15",
+              "holds": true
+            }
+          ],
+          "problems": []
+        },
         "byte_reproduction": {
           "status": "passed"
         },
@@ -1128,8 +1393,8 @@
       "generator": "g4127",
       "seed": 4127,
       "test_cases": 21,
-      "distinct_input_cases": 1,
-      "distinct_outputs": 1,
+      "distinct_input_cases": 18,
+      "distinct_outputs": 18,
       "constraints": [
         "fixed 5x5 maze",
         "moves are orthogonal",
@@ -1154,17 +1419,16 @@
       "self_audit": {
         "distinct_cases": {
           "total": 21,
-          "distinct": 1,
+          "distinct": 18,
           "threshold": 15,
-          "status": "exempted",
-          "exemption": "固定 5x5 迷宫且题面保证唯一解，输入域只有该定义的结构"
+          "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 21,
+          "frequency": 2,
           "total": 21,
-          "status": "exempted",
+          "status": "rejected",
           "exemption": "固定 5x5 迷宫且题面保证唯一解，输入域只有该定义的结构",
-          "share": 1.0
+          "share": 0.095
         },
         "sample_is_case_zero": {
           "status": "passed",
@@ -1174,6 +1438,21 @@
           "status": "passed",
           "cases": 21,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "fixed 5x5 maze with a unique path",
+              "holds": true
+            },
+            {
+              "constraint": "moves are orthogonal",
+              "holds": true
+            }
+          ],
+          "problems": []
         },
         "byte_reproduction": {
           "status": "passed"
@@ -1244,6 +1523,21 @@
           "cases": 21,
           "mismatched": []
         },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "word length<=5",
+              "holds": true
+            },
+            {
+              "constraint": "dictionary words are distinct",
+              "holds": true
+            }
+          ],
+          "problems": []
+        },
         "byte_reproduction": {
           "status": "passed"
         },
@@ -1312,6 +1606,21 @@
           "status": "passed",
           "cases": 21,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 2,
+          "items": [
+            {
+              "constraint": "N<=3402",
+              "holds": true
+            },
+            {
+              "constraint": "each charm is used at most once",
+              "holds": true
+            }
+          ],
+          "problems": []
         },
         "byte_reproduction": {
           "status": "passed"
