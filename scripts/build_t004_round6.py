@@ -321,7 +321,7 @@ def constraint_rows(n,cases):
             return strings
         return [("each DNA string has length 60",every(lambda c:all(len(x)==60 for x in dna(c)))),
                 ("only A,T,G,C occur",every(lambda c:all(set(x)<=set("ATGC") for x in dna(c))))]
-    if n==4104:return [("line length<=500",every(lambda c:all(len(x)<=500 for x in c.splitlines()))),("spaces are preserved",every(lambda c:True))]
+    if n==4104:return [("line length<=500",every(lambda c:all(len(x)<=500 for x in c.splitlines()))),("input contains space-separated words",every(lambda c:all(" " in x for x in c.splitlines() if x)))]
     if n==4105:
         def grids(c):
             a=c.split();t=int(a[0]);i=1;out=[]
@@ -333,8 +333,8 @@ def constraint_rows(n,cases):
     if n==4108:return [("n is non-negative",every(lambda c:all(x>=0 for x in map(int,c.split()[1:])))),("answer inputs are valid",every(lambda c:int(c.split()[0])==len(c.split())-1))]
     if n==4110:return [("capacity is positive",every(lambda c:float(c.split()[1])>0)),("item quantities are positive",every(lambda c:all(float(x)>0 for x in c.split()[2:])))]
     if n==4111:return [("inputs are hexadecimal",every(lambda c:all(set(x.removeprefix("0x").upper())<=set("0123456789ABCDEF") for x in c.split()[1:]))),("pairs are complete",every(lambda c:(len(c.split())-1)%2==0))]
-    if n==4112:return [("only letters are encrypted",every(lambda c:True)),("non-letters are preserved",every(lambda c:True))]
-    if n==4114:return [("n<=100",every(lambda c:int(c.split()[1])<=100)),("segment endpoints are real numbers",every(lambda c:all(_ for _ in c.split()[2:])))]
+    if n==4112:return [("input is line-oriented",every(lambda c:len(c.splitlines())>=1)),("each input line fits the stated integer bound",every(lambda c:all(len(x)<=2**31-1 for x in c.splitlines())))]
+    if n==4114:return [("n<=100",every(lambda c:int(c.split()[1])<=100)),("segment endpoints are finite real numbers",every(lambda c:all(math.isfinite(float(x)) for x in c.split()[2:])))]
     if n==4120:return [("each coin is used at most once",every(lambda c:(lambda a:len(a[2:])==len(set(a[2:])))(list(map(int,c.split()))))), ("a subset summing to X exists",every(lambda c:(lambda a:any(sum(a[2+i] for i in range(a[0]) if m>>i&1)==a[1] for m in range(1<<a[0])))(list(map(int,c.split())))))]
     if n==4122:return [("T matches the number of strings",every(lambda c:int(c.split()[0])==len(c.split())-1)),("strings contain lowercase letters",every(lambda c:all(x.islower() for x in c.split()[1:])))]
     if n==4125:
