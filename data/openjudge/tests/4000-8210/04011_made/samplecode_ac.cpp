@@ -1,7 +1,3 @@
-// 04011 Chase —— 人提供的平台 Accepted 实现（2026-07-26 立为参考实现）。
-// 原自写 Python 参考在平台 Python3/PyPy3 两档都 TLE，无法取得平台背书；
-// 本实现与原 Python 在全部 21 组数据上输出一致，因此数据内容不变、只是换了产出方。
-// 原 Python 实现（穷举分配 vs 本实现的按子树背包合并）保留为独立 oracle 的候选。
 #include <bits/stdc++.h>
 using namespace std;
 

@@ -26,18 +26,21 @@ CPP4011 = ROOT / "scripts/t004_platform_accepted_4011.cpp"
 # 参考实现是 C++ 的题：3433 本来就只有 C++；4011 的 Python 参考在平台
 # Python3 与 PyPy3 两档都 TLE、拿不到背书，2026-07-26 换成人提供的 AC C++。
 CPP_REFERENCE = {3433: CPP3433, 4011: CPP4011}
-CPP3433_BIN = Path(tempfile.gettempdir()) / "t004-platform-accepted-3433"
+CPP_BINS = {n: Path(tempfile.gettempdir()) / f"t004-platform-accepted-{n}" for n in CPP_REFERENCE}
 sys.path.insert(0, str(ROOT / "scripts"))
 from build_001a import bucket  # noqa: E402
 import t004_common as common  # noqa: E402
 
 
 def run(source: str, text: str, interpreter=sys.executable) -> str:
-    if source == "__T004_CPP_3433__":
-        if not CPP3433_BIN.exists() or CPP3433_BIN.stat().st_mtime < CPP3433.stat().st_mtime:
-            subprocess.run(["g++", "-std=c++17", "-O2", str(CPP3433), "-o", str(CPP3433_BIN)], check=True,
+    if source.startswith("__T004_CPP_"):
+        number = int(source.removeprefix("__T004_CPP_").removesuffix("__"))
+        cpp_source = CPP_REFERENCE[number]
+        binary = CPP_BINS[number]
+        if not binary.exists() or binary.stat().st_mtime < cpp_source.stat().st_mtime:
+            subprocess.run(["g++", "-std=c++17", "-O2", str(cpp_source), "-o", str(binary)], check=True,
                            capture_output=True, text=True)
-        p = subprocess.run([str(CPP3433_BIN)], input=text, text=True,
+        p = subprocess.run([str(binary)], input=text, text=True,
                            capture_output=True, timeout=60)
         if p.returncode:
             raise RuntimeError(p.stderr[-1200:])
@@ -309,7 +312,9 @@ def solve(s):
      used.remove((u,v))
    return False
   return ("1\n" if any(dfs(i,j,1,{(i,j)}) for i in range(m) for j in range(n) if g[i][j]==pat[0]) else "0\n")
- if P==4011:
+ # OBSOLETE: 4011 is platform-backed by CPP4011; this legacy Python branch is
+ # retained only as historical text and is never used by the builder.
+ if False and P==4011:
   p=0;out=[]
   while p<len(a):
    N,M=map(int,a[p:p+2]);p+=2
@@ -576,7 +581,8 @@ sys.stdout.write(solve(sys.stdin.read()))
 '''
 
 SUPPORTED = set(GENERATORS)
-REFERENCE_SOURCES = {3433: "platform Accepted G++ #52301277", 4054: "platform Accepted Python3 #49639414"}
+REFERENCE_SOURCES = {3433: "platform Accepted G++ #52301277", 4011: "platform Accepted G++ (codex-provided; submission id not recorded)",
+                     4054: "platform Accepted Python3 #49639414"}
 
 
 def has_oracle(number, sample_input):
@@ -831,7 +837,7 @@ def main():
         if n not in SUPPORTED or (only is not None and n != only):
             continue
         gen = GENERATORS[n]
-        ref = "__T004_CPP_3433__" if n == 3433 else REFERENCE.replace("P=0", f"P={n}", 1)
+        ref = f"__T004_CPP_{n}__" if n in CPP_REFERENCE else REFERENCE.replace("P=0", f"P={n}", 1)
         assert run(ref, entry["sample_input"]).split() == entry["sample_output"].split(), n
         cases = [entry["sample_input"]]
         for i in range(1, 21):
@@ -876,7 +882,7 @@ def main():
         exemption = "题面无输入，输入域只有 1 个取值" if n == 4140 else None
         audit_row = common.audit(d, cases=cases, outputs=outs,
                                  sample_input=entry["sample_input"], exemption=exemption,
-                                 reference_source=None if n == 3433 else ref,
+                                 reference_source=None if n in CPP_REFERENCE else ref,
                                  oracle_source=None)
         rows.append({"local_number": n, "title": entry["title"], "source": entry["source"],
                      "reference_source": REFERENCE_SOURCES.get(n, "LLM-written"), "generator": gen.__name__, "seed": n,

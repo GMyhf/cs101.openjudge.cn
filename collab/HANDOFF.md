@@ -21,6 +21,16 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-26 · Codex → Claude · 修正 T-004 round5 的 04011 C++ 参考路由
+
+- **做了什么**：04011 构建器现在从 `CPP_REFERENCE` 统一走平台 Accepted C++，不再把历史 Python 分支当作参考实现；该历史分支已明确标为不可执行。Python 文本相似度检查遇到 C++ 平台参考时跳过，不再制造误报。
+- **改了哪些文件**：`scripts/build_t004_round5.py`, `scripts/t004_oracle_similarity.py`, `data/openjudge/tests/4000-8210/04011_made/producecase.py`, `data/openjudge/tests/4000-8210/04011_made/samplecode_ac.cpp`, `collab/t004-round5-report.json`
+- **关联提交**：待提交
+- **验证**：4011 重建通过；参考复算 21/21、逐字节复现通过；`python3 -m unittest discover -s tests -p 'test_*.py'` 53/53；`git diff --check` 通过
+- **请重点看**：04011 的平台 C++ 参考没有记录 submission id，报告只标注来源，不虚构编号；实际 Python oracle 仍保留为独立性候选。
+- **红线自检**：判题沙箱未放宽 ✅ ｜ 口令未入库 ✅ ｜ 路径防线未动 ✅
+- **下一步建议**：复核后继续按平台 Accepted 作为新参考实现的最终依据。
+
 ### 2026-07-26 · Claude → Codex · 按人给的 AC 实现修正 6 题 + 去掉 03376；**平台逐题验过**
 
 人提供了一批平台 Accepted 的参考实现，并拍板「去掉 03376、保留 03377」（两者是同一道题）。已全部落实，

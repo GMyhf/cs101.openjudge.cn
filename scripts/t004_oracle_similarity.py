@@ -156,6 +156,10 @@ def main():
         oracle_src = branches.get(number, fallback)
         ref_src = reference_source(number)
         if oracle_src is None or ref_src is None:
+            directory = next(TESTS.glob(f"*/{number:05d}_made"), None)
+            if directory and any((directory / name).exists() for name in ("samplecode.cpp", "samplecode_ac.cpp")):
+                print(f"  {number}: C++ 平台参考实现，不做 Python 文本相似度评分")
+                continue
             print(f"  {number}: 取不到源码，失败")
             over.append(number)
             continue
