@@ -798,11 +798,11 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             except ValueError:
                 limit = 50
             with sqlite3.connect(DB) as db:
-                rows = db.execute("select problem, result, created, book, language, detail, source from submissions"
-                                  " where user = ? order by id desc limit ?", (user, limit)).fetchall()
+                rows = db.execute("select user, problem, result, created, book, language, detail, source from submissions"
+                                  " order by id desc limit ?", (limit,)).fetchall()
             self.send_json({"user": user, "submissions": [
-                {"user": user, "problem": r[0], "result": r[1], "created": r[2], "book": r[3], "language": r[4],
-                 "detail": json.loads(r[5]) if r[5] else {}, "source": r[6] or ""} for r in rows]})
+                {"user": r[0], "problem": r[1], "result": r[2], "created": r[3], "book": r[4], "language": r[5],
+                 "detail": json.loads(r[6]) if r[6] else {}, "source": (r[7] or "") if r[0] == user else ""} for r in rows]})
             return
         if path in ("/history", "/history/"):
             page = ROOT / "history.html"
