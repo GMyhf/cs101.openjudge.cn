@@ -117,8 +117,11 @@ class ServerApiTests(unittest.TestCase):
         status, _, body = request(self.port, "GET", "/")
         self.assertEqual(status, 200)
         text = body.decode("utf-8", errors="replace")
-        self.assertIn('id="user-menu"', text)
-        self.assertIn('href="/history/" id="account"', text)
+        # 2026-07-26：导航重构后容器 id 是 account-control（原 user-menu），
+        # 登录后 #account 的 href 由前端脚本改成 /history/?mine=1。断言跟着改成
+        # **功能仍在**的证据，而不是旧的 DOM 名字。
+        self.assertIn('id="account-control"', text)
+        self.assertIn('id="account"', text)
         self.assertIn('href="/account/">账户设置</a>', text)
         self.assertIn('id="logout"', text)
 
@@ -229,7 +232,12 @@ class ServerApiTests(unittest.TestCase):
         self.assertGreaterEqual(latest["detail"]["time_ms"], 0)
         self.assertGreater(latest["detail"]["memory_kb"], 0)
         self.assertEqual(latest["detail"]["source_bytes"], len("print('wrong')".encode()))
-        self.assertEqual(latest["detail"]["language_version"], "Python3(3.9)")
+        # 不能把版本号写死：这台机器是 3.12、别的机器可能是 3.9，
+        # 写死就等于让闸门依赖运行环境（T-001 立的「闸门必须在全新克隆上成立」）。
+        # 断言改成「形状对且与运行时一致」。
+        from judge import language_version
+        self.assertEqual(latest["detail"]["language_version"], language_version("python"))
+        self.assertRegex(latest["detail"]["language_version"], r"^Python3\(\d+\.\d+\)$")
         admin = self._admin_cookie()
         status, _, body = request(self.port, "GET", "/api/submissions", cookie=admin)
         self.assertEqual(status, 200)
@@ -403,9 +411,18 @@ class ServerApiTests(unittest.TestCase):
                          + (result.stderr or result.stdout)[:400])
 
     def test_submit_page_offers_pypy3(self):
-        # 判题器 2026-07-26 起支持 PyPy3（人拍板），提交页要给得出这个选项。
-        import server
-        self.assertIn('value="pypy3"', server.SUBMIT_PAGE)
+        """判题器 2026-07-26 起支持 PyPy3（人拍板），提交页要给得出这个选项。
+
+        2026-07-26 修：语言选项后来改成渲染时注入（模板里只剩 `__LANGUAGE_OPTIONS__`），
+        原来断言模板字面量含 `value="pypy3"` 就永远失败了 —— 而功能其实一直好好的。
+        断言改成**请求真实页面**，这样以后无论模板怎么改都盯得住同一件事。
+        """
+        status, _, body = request(self.port, "GET", "/practice/04103/submit/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn('value="pypy3"', text)
+        self.assertIn('value="python"', text)
+        self.assertNotIn("__LANGUAGE_OPTIONS__", text)      # 占位符必须被替换掉
 
     @unittest.skipUnless(shutil.which("node"), "需要 node 才能真跑页面里的编辑器代码")
     def test_editor_treats_pypy3_as_python(self):
