@@ -102,7 +102,7 @@ function render() {
       <td class="num muted">${esc(memory)}</td>
       <td class="num muted">${esc(elapsed)}</td>
       <td class="num muted">${esc(size)}</td>
-      <td class="muted">${esc(s.language || "")}</td>
+      <td class="muted">${esc((s.detail && s.detail.language_version) || s.language || "")}</td>
       <td class="num muted" title="${esc(s.created)}">${esc(relativeTime(s.created))}</td>
       <td>${path ? `<a class="pid" href="${path}">${esc(s.problem)}</a>` : esc(s.problem)}</td>
       <td>${code}${extra}</td>

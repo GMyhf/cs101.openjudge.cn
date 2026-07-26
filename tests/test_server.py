@@ -210,6 +210,12 @@ class ServerApiTests(unittest.TestCase):
         self.assertGreaterEqual(latest["detail"]["time_ms"], 0)
         self.assertGreater(latest["detail"]["memory_kb"], 0)
         self.assertEqual(latest["detail"]["source_bytes"], len("print('wrong')".encode()))
+        self.assertEqual(latest["detail"]["language_version"], "Python3(3.9)")
+        admin = self._admin_cookie()
+        status, _, body = request(self.port, "GET", "/api/submissions", cookie=admin)
+        self.assertEqual(status, 200)
+        admin_latest = json.loads(body)["submissions"][0]
+        self.assertEqual(admin_latest["source"], "print('wrong')")
 
     def _admin_cookie(self):
         status, headers, _ = request(self.port, "POST", "/api/login", {

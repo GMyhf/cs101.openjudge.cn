@@ -18,7 +18,7 @@ from email.message import EmailMessage
 from html import escape, unescape
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
-from judge import judge
+from judge import judge, language_version
 
 ROOT = Path(__file__).parent
 DB = Path(os.environ.get("CS101_DB", ROOT / "data" / "course.db"))
@@ -435,7 +435,7 @@ async function loadHistory() {
         const expected = d.expected_output ? "<details><summary>查看期望输出</summary><pre class='msg source'>" + esc(d.expected_output.text || "") + "</pre></details>" : "";
         return "<tr><td>" + esc(s.user || "") + "</td><td>" + badge(s.result)
              + "</td><td class='num muted'>" + esc(memory) + "</td><td class='num muted'>" + esc(elapsed)
-             + "</td><td class='num muted'>" + esc(size) + "</td><td>" + esc(s.language || "")
+             + "</td><td class='num muted'>" + esc((s.detail && s.detail.language_version) || s.language || "")
              + "</td><td class='num' title='" + esc(s.created) + "'>" + esc(relativeTime(s.created)) + "</td><td>" + code + expected + "<div class='muted'>" + esc(note) + "</div></td></tr>";
       }).join("") + "</tbody></table>";
 }
@@ -800,9 +800,10 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             with sqlite3.connect(DB) as db:
                 rows = db.execute("select user, problem, result, created, book, language, detail, source from submissions"
                                   " order by id desc limit ?", (limit,)).fetchall()
+            is_admin = user == ADMIN_USER
             self.send_json({"user": user, "submissions": [
                 {"user": r[0], "problem": r[1], "result": r[2], "created": r[3], "book": r[4], "language": r[5],
-                 "detail": json.loads(r[6]) if r[6] else {}, "source": (r[7] or "") if r[0] == user else ""} for r in rows]})
+                 "detail": json.loads(r[6]) if r[6] else {}, "source": (r[7] or "") if (is_admin or r[0] == user) else ""} for r in rows]})
             return
         if path in ("/history", "/history/"):
             page = ROOT / "history.html"
@@ -1012,6 +1013,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             result = judge(book, problem, language, data.get("source", data.get("code", "")))
             submitted_source = str(data.get("source", data.get("code", "")))
             result["source_bytes"] = len(submitted_source.encode("utf-8"))
+            result["language_version"] = language_version(language)
             # 开关关闭时片段根本不进 response —— 不是前端藏起来，是后端不发。
             if reveal_effective(book) and result.get("case"):
                 snippet = failing_input_snippet(book, problem, result["case"])

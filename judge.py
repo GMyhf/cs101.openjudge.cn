@@ -7,6 +7,7 @@ import signal
 import subprocess
 import tempfile
 import time
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).parent
@@ -26,6 +27,33 @@ def _limits():
 
 # 子进程环境固定成这一份：用户代码就跑在里面，多一个目录就是多一片可执行面。
 CHILD_PATH = "/usr/local/bin:/usr/bin:/bin"
+LANGUAGE_VERSION_CACHE = {}
+
+def language_version(language):
+    """Return the actual toolchain label used for a submission."""
+    key = str(language).lower()
+    if key in LANGUAGE_VERSION_CACHE:
+        return LANGUAGE_VERSION_CACHE[key]
+    if key in CPYTHON_LANGUAGES:
+        value = f"Python3({'.'.join(map(str, __import__('sys').version_info[:2]))})"
+    elif key in PYPY_LANGUAGES:
+        executable = shutil.which("pypy3")
+        version_result = subprocess.run([executable or "pypy3", "--version"], capture_output=True, text=True, timeout=5)
+        raw = version_result.stdout + version_result.stderr
+        match = re.search(r"PyPy\s+(\d+\.\d+(?:\.\d+)?)", raw)
+        value = f"PyPy3({match.group(1) if match else 'unknown'})"
+    elif key == "cpp":
+        raw = subprocess.run(["g++", "--version"], capture_output=True, text=True, timeout=5).stdout
+        match = re.search(r"\b(\d+\.\d+)(?:\.\d+)?\b", raw)
+        value = f"G++({match.group(1) if match else 'unknown'}(with c++17))"
+    elif key == "c":
+        raw = subprocess.run(["gcc", "--version"], capture_output=True, text=True, timeout=5).stdout
+        match = re.search(r"\b(\d+\.\d+)(?:\.\d+)?\b", raw)
+        value = f"GCC({match.group(1) if match else 'unknown'})"
+    else:
+        value = str(language)
+    LANGUAGE_VERSION_CACHE[key] = value
+    return value
 
 def _run(command, stdin=None, cwd=None, timeout=5):
     return subprocess.run(command, input=stdin, cwd=cwd, capture_output=True, timeout=timeout, preexec_fn=_limits, env={"PATH": CHILD_PATH, "HOME": str(cwd)})
