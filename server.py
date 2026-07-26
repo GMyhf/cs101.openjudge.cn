@@ -23,6 +23,15 @@ from judge import judge
 ROOT = Path(__file__).parent
 DB = Path(os.environ.get("CS101_DB", ROOT / "data" / "course.db"))
 MIRROR = ROOT / "data" / "openjudge"
+SMTP_ENV_FILE = ROOT / "data" / ".smtp.env"
+
+if SMTP_ENV_FILE.is_file():
+    for line in SMTP_ENV_FILE.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            key, value = line.split("=", 1)
+            os.environ.setdefault(key.strip(), value.strip())
+
 ADMIN_USER = os.environ.get("CS101_ADMIN_USER", "GMyhf")
 PASSWORD_FILE = ROOT / "data" / ".admin_password"
 ADMIN_PASSWORD = os.environ.get("CS101_ADMIN_PASSWORD") or (PASSWORD_FILE.read_text(encoding="utf-8").strip() if PASSWORD_FILE.is_file() else "")
