@@ -127,7 +127,8 @@ function paintStats() {
 }
 
 async function load() {
-  const r = await fetch("/api/submissions?limit=" + limit.value, { credentials: "same-origin" });
+  const mine = new URLSearchParams(location.search).get("mine") === "1";
+  const r = await fetch("/api/submissions?limit=" + limit.value + (mine ? "&mine=1" : ""), { credentials: "same-origin" });
   if (r.status === 401) {
     who.innerHTML = '<a href="/auth/login/">请先登录</a>后查看提交记录。';
     empty.hidden = false; empty.textContent = "登录后这里会列出你的提交。";

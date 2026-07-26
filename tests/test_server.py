@@ -458,6 +458,11 @@ class ServerApiTests(unittest.TestCase):
 
         total = count("")
         self.assertGreaterEqual(total, 3)
+        mine_status, _, mine_raw = request(self.port, "GET", "/api/submissions?mine=1", cookie=cookie)
+        self.assertEqual(mine_status, 200)
+        mine_entries = json.loads(mine_raw)["submissions"]
+        self.assertGreaterEqual(len(mine_entries), 3)
+        self.assertTrue(all(entry["user"] == username for entry in mine_entries))
         self.assertEqual(count("?limit=2"), 2)
         self.assertEqual(count("?limit=abc"), total)      # 非法值回落默认，不是 500
         self.assertEqual(count("?limit=99999"), total)    # 夹到上界，不是拒绝
