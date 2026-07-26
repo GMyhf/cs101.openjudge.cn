@@ -429,9 +429,10 @@ def init_db():
             if column.split()[0] not in existing:
                 db.execute(f"alter table submissions add column {column}")
         user_columns = {row[1] for row in db.execute("pragma table_info(users)")}
-        for column in ("email text", "reset_token_hash text", "reset_expires integer"):
+        for column in ("email text", "active integer default 1", "activation_token_hash text", "activation_expires integer", "reset_token_hash text", "reset_expires integer"):
             if column.split()[0] not in user_columns:
                 db.execute(f"alter table users add column {column}")
+        db.execute("update users set active = 1 where activation_token_hash is null")
 
 # 「出错那组的输入片段」开关。默认**关**：管理员忘了考前关掉是泄题，
 # 忘了课后打开只是少点帮助——两种疏忽的代价不对称，所以默认取保守的一侧。
@@ -560,6 +561,26 @@ def valid_captcha(token, answer):
 def reset_token_hash(token):
     return hashlib.sha256(token.encode()).hexdigest()
 
+def send_account_email(recipient, subject, body):
+    smtp_host = os.environ.get("CS101_SMTP_HOST")
+    if not smtp_host:
+        return False
+    message = EmailMessage()
+    message["Subject"] = subject
+    message["From"] = os.environ.get("CS101_SMTP_FROM", os.environ.get("CS101_SMTP_USER", ""))
+    message["To"] = recipient
+    message.set_content(body)
+    try:
+        with smtplib.SMTP(smtp_host, int(os.environ.get("CS101_SMTP_PORT", "587")), timeout=15) as smtp:
+            smtp.starttls()
+            user, password = os.environ.get("CS101_SMTP_USER"), os.environ.get("CS101_SMTP_PASSWORD")
+            if user and password:
+                smtp.login(user, password)
+            smtp.send_message(message)
+    except (OSError, smtplib.SMTPException, ValueError):
+        return False
+    return True
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print("%s - %s" % (self.address_string(), fmt % args))
@@ -632,7 +653,18 @@ a{{color:var(--green)}}.shell{{max-width:1120px;margin:auto;padding:0 24px}}.top
         links = "<a href='/auth/login/'>已有账号？登录</a>" if register else "<a href='/auth/forgot/'>忘记密码？</a> · <a href='/register/'>点此注册</a>"
         return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>
 :root{{--ink:#16231d;--muted:#6c7b73;--line:#dfe7e1;--bg:#f4f7f4;--paper:#fff;--green:#237a50;--red:#b04f43}}*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}}.shell{{max-width:460px;margin:0 auto;padding:70px 20px}}.brand{{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:28px}}.mark{{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:#fff;font-size:15px}}.panel{{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}}h1{{font-size:28px;line-height:1.2;margin:0 0 6px}}.intro{{color:var(--muted);margin:0 0 23px}}label{{display:block;margin:16px 0 6px;font-weight:600}}input{{display:block;width:100%;padding:11px 12px;border:1px solid #ccd8cf;border-radius:6px;background:#fff;font:inherit;outline:none}}input:focus{{border-color:var(--green);box-shadow:0 0 0 3px #e5f3eb}}button{{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:#fff;border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}}a{{color:var(--green)}}.links{{margin:19px 0 0;color:var(--muted);font-size:14px;text-align:center}}.error{{min-height:22px;color:var(--red);margin:12px 0 0}}.captcha-question{{display:inline-block;margin-left:5px;color:var(--green);font-family:ui-monospace,monospace}}@media(max-width:520px){{.shell{{padding:35px 16px}}.panel{{padding:24px}}}}
-</style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><h1>{title}</h1><p class="intro">{'创建账号后即可提交代码并查看判题记录。' if register else '登录后继续使用提交与判题功能。'}</p><form id="account">{fields}<p id="error" class="error"></p><button>提交</button></form><p class="links">{links} · <a href="/">返回首页</a></p></section></main><script>const form=document.querySelector('#account'),error=document.querySelector('#error');form.onsubmit=async e=>{{e.preventDefault();error.textContent='';const data=Object.fromEntries(new FormData(form));if(data.confirm_password!==undefined&&data.password!==data.confirm_password){{error.textContent='两次输入的密码不一致';return}}const r=await fetch('{endpoint}',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(data)}});const d=await r.json();if(r.ok)location.href='/';else error.textContent=d.error||'操作失败'}};</script></body></html>"""
+</style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><h1>{title}</h1><p class="intro">{'创建账号后即可提交代码并查看判题记录。' if register else '登录后继续使用提交与判题功能。'}</p><form id="account">{fields}<p id="error" class="error"></p><button>提交</button></form><p class="links">{links} · <a href="/">返回首页</a></p></section></main><script>const form=document.querySelector('#account'),error=document.querySelector('#error');form.onsubmit=async e=>{{e.preventDefault();error.textContent='';const data=Object.fromEntries(new FormData(form));if(data.confirm_password!==undefined&&data.password!==data.confirm_password){{error.textContent='两次输入的密码不一致';return}}const r=await fetch('{endpoint}',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(data)}});const d=await r.json();if(r.ok){{if(d.activation_link){{error.style.color='#237a50';error.innerHTML='注册成功，请点击激活链接：<a href="'+d.activation_link+'">激活账号</a>';form.querySelector('button').disabled=true}}else location.href='/'}}else error.textContent=d.error||'操作失败'}};</script></body></html>"""
+
+    def activation_page(self, token):
+        with sqlite3.connect(DB) as db:
+            row = db.execute("select username from users where activation_token_hash = ? and activation_expires > ? and active = 0",
+                             (reset_token_hash(token), int(time.time()))).fetchone()
+            if row:
+                db.execute("update users set active = 1, activation_token_hash = null, activation_expires = null where username = ?", (row[0],))
+                message, detail = "账号已激活", "现在可以登录 CS101 题库。"
+            else:
+                message, detail = "激活链接无效或已过期", "请重新注册或联系管理员。"
+        return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{message} · CS101</title><style>body{{margin:0;background:#f4f7f4;color:#16231d;font:15px/1.6 system-ui,sans-serif}}main{{max-width:460px;margin:70px auto;padding:0 20px}}section{{background:#fff;border:1px solid #dfe7e1;border-radius:10px;padding:30px}}h1{{margin:0 0 10px}}p{{color:#6c7b73}}a{{color:#237a50}}</style></head><body><main><section><h1>{message}</h1><p>{detail}</p><p><a href="/auth/login/">前往登录</a></p></section></main></body></html>"""
 
     def forgot_page(self):
         return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>找回密码 · CS101</title><style>
@@ -663,6 +695,9 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             self.send_html(self.account_page(register=True)); return
         if path == "/auth/forgot/":
             self.send_html(self.forgot_page()); return
+        if path == "/auth/activate/":
+            token = parse_qs(parsed.query).get("token", [""])[0]
+            self.send_html(self.activation_page(token)); return
         if path == "/auth/reset/":
             token = parse_qs(parsed.query).get("token", [""])[0]
             self.send_html(self.reset_page(token)); return
@@ -794,22 +829,33 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                 self.send_json({"error": "人机验证失败，请刷新注册页面后重试"}, 400); return
             if username == ADMIN_USER:
                 self.send_json({"error": "该用户名不可注册"}, 409); return
+            activation_token = secrets.token_urlsafe(32)
             try:
                 with sqlite3.connect(DB) as db:
                     if db.execute("select 1 from users where username = ? or lower(email) = ?", (username, email)).fetchone():
                         self.send_json({"error": "用户名或邮箱已存在"}, 409); return
-                    db.execute("insert into users(username, password_hash, email) values (?, ?, ?)", (username, password_hash(password), email))
+                    db.execute("insert into users(username, password_hash, email, active, activation_token_hash, activation_expires) values (?, ?, ?, 0, ?, ?)",
+                               (username, password_hash(password), email, reset_token_hash(activation_token), int(time.time()) + 86400))
             except sqlite3.IntegrityError:
                 self.send_json({"error": "用户名或邮箱已存在"}, 409); return
-            token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = username
-            self.send_response(200); self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/"); self.send_header("Content-Type", "application/json; charset=utf-8"); self.end_headers(); self.wfile.write(b'{"ok":true}'); return
+            base = os.environ.get("CS101_PUBLIC_URL", "").rstrip("/")
+            if not base:
+                scheme = "https" if self.headers.get("X-Forwarded-Proto") == "https" else "http"
+                base = f"{scheme}://{self.headers.get('Host', '127.0.0.1:8000')}"
+            activation_link = f"{base}/auth/activate/?token={activation_token}"
+            sent = send_account_email(email, "激活你的 CS101 账号", f"请在 24 小时内点击以下链接激活账号：\n{activation_link}\n")
+            self.send_json({"ok": True} if sent else {"ok": True, "activation_link": activation_link}); return
         if path == "/api/user/login":
             username, password = str(data.get("username", "")).strip(), str(data.get("password", ""))
             accepted = username == ADMIN_USER and password == ADMIN_PASSWORD
             if not accepted:
                 with sqlite3.connect(DB) as db:
                     row = db.execute("select password_hash from users where username = ?", (username,)).fetchone()
-                accepted = row is not None and valid_password(row[0], password)
+                    accepted = row is not None and valid_password(row[0], password)
+                    if accepted:
+                        active = db.execute("select active from users where username = ?", (username,)).fetchone()[0]
+                        if not active:
+                            self.send_json({"error": "账号尚未激活，请先点击邮箱中的激活链接"}, 403); return
             if not accepted:
                 self.send_json({"error": "用户名或密码不正确"}, 401); return
             token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = username

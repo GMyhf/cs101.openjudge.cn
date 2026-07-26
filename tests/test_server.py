@@ -45,6 +45,20 @@ class ServerApiTests(unittest.TestCase):
                 "password": password, "confirm_password": password,
                 "captcha_token": token, "captcha_answer": str(left + right)}
 
+    def register_and_login(self, username, password):
+        status, _, body = request(self.port, "POST", "/api/user/register",
+                                  self.registration_payload(username, password))
+        self.assertEqual(status, 200)
+        result = json.loads(body)
+        if "activation_link" in result:
+            query = result["activation_link"].split("?", 1)[1]
+            status, _, _ = request(self.port, "GET", "/auth/activate/?" + query)
+            self.assertEqual(status, 200)
+        status, headers, _ = request(self.port, "POST", "/api/user/login",
+                                     {"username": username, "password": password})
+        self.assertEqual(status, 200)
+        return headers["Set-Cookie"].split(";", 1)[0]
+
     @classmethod
     def setUpClass(cls):
         with socket.socket() as sock:
@@ -97,10 +111,7 @@ class ServerApiTests(unittest.TestCase):
 
     def test_register_login_session_and_authenticated_submit(self):
         username = "t001_user"
-        status, headers, _ = request(self.port, "POST", "/api/user/register",
-                                     self.registration_payload(username, "T001-password"))
-        self.assertEqual(status, 200)
-        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        cookie = self.register_and_login(username, "T001-password")
 
         status, _, body = request(self.port, "GET", "/api/me", cookie=cookie)
         self.assertEqual(status, 200)
@@ -128,9 +139,7 @@ class ServerApiTests(unittest.TestCase):
         username = "t006_account"
         old_password = "T006-password"
         new_password = "T006-new-password"
-        _, headers, _ = request(self.port, "POST", "/api/user/register",
-                                self.registration_payload(username, old_password))
-        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        cookie = self.register_and_login(username, old_password)
         status, _, _ = request(self.port, "GET", "/account/", cookie=cookie)
         self.assertEqual(status, 200)
         status, _, _ = request(self.port, "POST", "/api/user/change-password", {
@@ -172,9 +181,7 @@ class ServerApiTests(unittest.TestCase):
     def test_submission_history_records_book_language_and_detail(self):
         """历史记录要能回答「错在哪组数据」——只存 status 是答不了的。"""
         username = "t006_history"
-        _, headers, _ = request(self.port, "POST", "/api/user/register",
-                                self.registration_payload(username, "T006-password"))
-        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        cookie = self.register_and_login(username, "T006-password")
         status, _, body = request(self.port, "POST", "/api/submit", {
             "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
             "source": "print('wrong')",
@@ -228,9 +235,7 @@ class ServerApiTests(unittest.TestCase):
 
     def test_reveal_switch_rejects_non_admin(self):
         username = "t006_switch_student"
-        _, headers, _ = request(self.port, "POST", "/api/user/register",
-                                self.registration_payload(username, "T006-password"))
-        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        cookie = self.register_and_login(username, "T006-password")
         status, _, _ = request(self.port, "POST", "/api/settings",
                                {"reveal_failing_input": True}, cookie=cookie)
         self.assertEqual(status, 403)
@@ -242,9 +247,7 @@ class ServerApiTests(unittest.TestCase):
         admin = self._admin_cookie()
         self.addCleanup(self._set_reveal, admin, False)
         username = "t006_switch_user"
-        _, headers, _ = request(self.port, "POST", "/api/user/register",
-                                self.registration_payload(username, "T006-password"))
-        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        cookie = self.register_and_login(username, "T006-password")
         payload = {"book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM,
                    "language": "python", "source": "print('wrong')"}
 
@@ -406,9 +409,7 @@ class ServerApiTests(unittest.TestCase):
         self.assertIn("/api/submissions", text)
 
         username = "t006_hist_page"
-        _, headers, _ = request(self.port, "POST", "/api/user/register",
-                                self.registration_payload(username, "T006-password"))
-        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        cookie = self.register_and_login(username, "T006-password")
         for source in ("print(1)", "print(2)", "print(3)"):
             request(self.port, "POST", "/api/submit", {
                 "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM,
