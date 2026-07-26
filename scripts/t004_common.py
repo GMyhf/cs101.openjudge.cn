@@ -101,6 +101,10 @@ def constraint_checklist(items, counterexample=None, exemption=None):
     值必须是 bool（生成器里 assert 出来的那个），字符串/None 一律判 FAILED。
     """
     if not items:
+        # 无输入题（4140 / 4142）确实没有可检查的输入约束 —— 那就如实给 exemption，
+        # 而不是让这一项从报告里消失。空表 + 无理由才判失败。
+        if exemption:
+            return {"status": "exempted", "checked": 0, "items": [], "exemption": exemption}
         return {"status": "FAILED", "reason": "没有给出题面约束打钩表 —— "
                                               "在「AC 源码直接当实现」的流程下这是唯一承重的检查",
                 "checked": 0}
@@ -315,10 +319,12 @@ def audit(made_dir, *, cases, outputs, sample_input, exemption=None,
         "sample_is_case_zero": sample_is_case_zero(made_dir, sample_input),
         "samplecode_recompute": samplecode_recompute(made_dir),
     }
-    if constraints is not None:
-        row["constraint_checklist"] = constraint_checklist(
-            constraints, counterexample=constraint_counterexample,
-            exemption=constraint_exemption)
+    # constraints 传 None 时**不能悄悄跳过** —— 「这项没出现」和「不适用」在报告里长得一样，
+    # 和「忘了」也长得一样。round7 的 4142 就是这么整条消失的（它确实是无输入题、
+    # 真的没有可检查的输入约束，但那应该记成 exemption，而不是让字段不存在）。
+    row["constraint_checklist"] = constraint_checklist(
+        constraints or [], counterexample=constraint_counterexample,
+        exemption=constraint_exemption)
     if run_byte_reproduction:
         row["byte_reproduction"] = byte_reproduction(made_dir)
     if reference_source is not None and oracle_source is not None:

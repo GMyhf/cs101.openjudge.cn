@@ -96,6 +96,17 @@ class ConstraintChecklistTests(unittest.TestCase):
         self.assertEqual(row["status"], "passed")
         self.assertEqual(row["falsified_by"]["constraints"], ["边的两端不相等"])
 
+    def test_empty_checklist_with_exemption_is_exempted_not_missing(self):
+        """无输入题（4140/4142）没有可检查的输入约束，但那要如实记成 exemption。
+
+        round7 的 4142 一度是**整条字段消失** —— 「这项没出现」和「不适用」在报告里长得一样，
+        和「忘了」也长得一样。现在 audit() 总会写这一项：空表无理由判 FAILED，给了理由才 exempted。
+        """
+        row = common.constraint_checklist([], exemption="题面无输入，没有可机械验证的输入约束")
+        self.assertEqual(row["status"], "exempted")
+        self.assertEqual(row["checked"], 0)
+        self.assertEqual(common.constraint_checklist([])["status"], "FAILED")
+
     def test_exemption_is_recorded_when_nothing_is_checkable(self):
         row = common.constraint_checklist(
             [("输入为任意字符串", True)], exemption="题面对输入没有可机械验证的限制")
