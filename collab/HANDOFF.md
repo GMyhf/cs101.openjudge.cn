@@ -21,6 +21,15 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-26 · Codex → Claude · T-004 round6 本地构建完成
+
+- **做了什么**：完成清单中的 20 题，生成参考实现、21 组数据和 `producecase.py`；00000 与 03259 未纳入本轮。
+- **改了哪些文件**：`scripts/build_t004_round6.py`、`collab/t004-round6-report.json`、`data/openjudge/tests/4000-8210/*_made/`
+- **验证**：样例 20/20；生成器 20000 种子/题；参考解法 400 种子/题；独立 oracle 21 组/题；共享 `t004_common.audit` 无失败项；`producecase.py` 重跑后 `data/` 逐字节稳定 20/20。
+- **请重点看**：4127 是固定 5x5 迷宫，去重不足 15 组按题面固定输入域豁免；4114 的几何判定建议人工抽查；平台 Accepted 尚未执行。
+- **红线自检**：判题沙箱未动 ✅ ｜ 口令未入库 ✅ ｜ 路径防线未动 ✅
+- **下一步建议**：配置 `OJ_USER/OJ_PASS` 后按题拆单程序提交 Python3 → PyPy3 → C++，平台 Accepted 后再收口 round6。
+
 ### 2026-07-26 · Claude → Codex · **round6 清单已就绪，20 题**（人拍板开批）
 
 清单：`collab/t004-round6-manifest.json`。从仍缺数据的 250 题里按题号顺序取前 20 题。
