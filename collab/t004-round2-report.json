@@ -40,6 +40,17 @@
       "sample_reproduced": true,
       "independent_sample_agreement": true,
       "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "<runtime error: RuntimeError>"
+        ],
+        "sample_expected": [
+          "10",
+          "15",
+          "65534",
+          "65537"
+        ],
+        "sample_runtime_error": true,
         "case": "1\nA\n",
         "status": "caught",
         "mutated_output": [
@@ -48,8 +59,7 @@
         "oracle_output": [
           "10"
         ],
-        "runtime_error": true,
-        "sample_pins_interpretation": true
+        "runtime_error": true
       },
       "producecase_reproduced": true
     },
@@ -92,6 +102,14 @@
       "sample_reproduced": true,
       "independent_sample_agreement": true,
       "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "0"
+        ],
+        "sample_expected": [
+          "3"
+        ],
+        "sample_runtime_error": false,
         "case": "2 3\n1 2\n",
         "status": "caught",
         "mutated_output": [
@@ -100,8 +118,7 @@
         "oracle_output": [
           "1"
         ],
-        "runtime_error": false,
-        "sample_pins_interpretation": true
+        "runtime_error": false
       },
       "producecase_reproduced": true
     },
@@ -143,6 +160,14 @@
       "sample_reproduced": true,
       "independent_sample_agreement": true,
       "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "123"
+        ],
+        "sample_expected": [
+          "321"
+        ],
+        "sample_runtime_error": false,
         "case": "-380\n",
         "status": "caught",
         "mutated_output": [
@@ -151,8 +176,7 @@
         "oracle_output": [
           "-83"
         ],
-        "runtime_error": false,
-        "sample_pins_interpretation": true
+        "runtime_error": false
       },
       "producecase_reproduced": true
     },
@@ -194,6 +218,17 @@
       "sample_reproduced": true,
       "independent_sample_agreement": true,
       "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "2",
+          "4",
+          "4"
+        ],
+        "sample_expected": [
+          "2",
+          "4"
+        ],
+        "sample_runtime_error": false,
         "case": "4\n1 1 2 3\n",
         "status": "caught",
         "mutated_output": [
@@ -207,8 +242,7 @@
           "2",
           "3"
         ],
-        "runtime_error": false,
-        "sample_pins_interpretation": true
+        "runtime_error": false
       },
       "producecase_reproduced": true
     },
@@ -249,6 +283,20 @@
       "sample_reproduced": true,
       "independent_sample_agreement": true,
       "misconception_probe": {
+        "sample_pins_interpretation": false,
+        "sample_mutated_output": [
+          "YES",
+          "YES",
+          "YES",
+          "NO"
+        ],
+        "sample_expected": [
+          "YES",
+          "YES",
+          "YES",
+          "NO"
+        ],
+        "sample_runtime_error": false,
         "case": "1\n1 32768\n",
         "status": "caught",
         "mutated_output": [
@@ -257,9 +305,7 @@
         "oracle_output": [
           "YES"
         ],
-        "runtime_error": false,
-        "sample_pins_interpretation": false,
-        "note": "题面样例的 4 对都用不到 k=15，钉不住 range(16) vs range(15)；已入库数据接住了——526 对里 22 对只有 k=15 才成立，该变异实测判 Wrong Answer"
+        "runtime_error": false
       },
       "producecase_reproduced": true
     },
@@ -300,6 +346,14 @@
       "sample_reproduced": true,
       "independent_sample_agreement": true,
       "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "101010101010101010101010101010"
+        ],
+        "sample_expected": [
+          "1100011101110100100001111111101101100001101110011111000001110111001001110001111110000101011010010"
+        ],
+        "sample_runtime_error": false,
         "case": "2\n",
         "status": "caught",
         "mutated_output": [
@@ -308,8 +362,7 @@
         "oracle_output": [
           "10"
         ],
-        "runtime_error": false,
-        "sample_pins_interpretation": true
+        "runtime_error": false
       },
       "producecase_reproduced": true
     },
@@ -351,6 +404,32 @@
       "sample_reproduced": true,
       "independent_sample_agreement": true,
       "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "3",
+          "7",
+          "11",
+          "13",
+          "47",
+          "0",
+          "4",
+          "12",
+          "34",
+          "98"
+        ],
+        "sample_expected": [
+          "47",
+          "13",
+          "11",
+          "7",
+          "3",
+          "0",
+          "4",
+          "12",
+          "34",
+          "98"
+        ],
+        "sample_runtime_error": false,
         "case": "2 3 4 5 6 7 8 9 10 11\n",
         "status": "caught",
         "mutated_output": [
@@ -377,8 +456,7 @@
           "8",
           "10"
         ],
-        "runtime_error": false,
-        "sample_pins_interpretation": true
+        "runtime_error": false
       },
       "producecase_reproduced": true
     },
@@ -421,6 +499,30 @@
       "sample_reproduced": true,
       "independent_sample_agreement": true,
       "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "1.0.0",
+          "1.0",
+          "2",
+          "7.2",
+          "4.8.2",
+          "6.4",
+          "3.4.5",
+          "4.8",
+          "2.96"
+        ],
+        "sample_expected": [
+          "1.0",
+          "1.0.0",
+          "2",
+          "2.96",
+          "3.4.5",
+          "4.8",
+          "4.8.2",
+          "6.4",
+          "7.2"
+        ],
+        "sample_runtime_error": false,
         "case": "2\n2.1\n1.10\n",
         "status": "caught",
         "mutated_output": [
@@ -431,8 +533,7 @@
           "1.10",
           "2.1"
         ],
-        "runtime_error": false,
-        "sample_pins_interpretation": true
+        "runtime_error": false
       },
       "producecase_reproduced": true
     },
@@ -475,6 +576,44 @@
       "sample_reproduced": true,
       "independent_sample_agreement": true,
       "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "123?",
+          "you",
+          "can",
+          "cage",
+          "a",
+          "swallow",
+          "can't",
+          "you",
+          "but",
+          "you",
+          "can't",
+          "swallow",
+          "a",
+          "cage",
+          "can",
+          "you"
+        ],
+        "sample_expected": [
+          "you",
+          "can",
+          "cage",
+          "a",
+          "swallow",
+          "can't",
+          "you",
+          "but",
+          "you",
+          "can't",
+          "swallow",
+          "a",
+          "cage",
+          "can",
+          "you",
+          "123?"
+        ],
+        "sample_runtime_error": false,
         "case": "first second third\n",
         "status": "caught",
         "mutated_output": [
@@ -487,8 +626,7 @@
           "second",
           "first"
         ],
-        "runtime_error": false,
-        "sample_pins_interpretation": true
+        "runtime_error": false
       },
       "producecase_reproduced": true
     },
@@ -529,6 +667,22 @@
       "sample_reproduced": true,
       "independent_sample_agreement": true,
       "misconception_probe": {
+        "sample_pins_interpretation": true,
+        "sample_mutated_output": [
+          "1",
+          "0",
+          "2",
+          "3",
+          "3"
+        ],
+        "sample_expected": [
+          "1",
+          "0",
+          "2",
+          "3",
+          "2"
+        ],
+        "sample_runtime_error": false,
         "case": "1\n9 9\n",
         "status": "caught",
         "mutated_output": [
@@ -537,8 +691,7 @@
         "oracle_output": [
           "1"
         ],
-        "runtime_error": false,
-        "sample_pins_interpretation": true
+        "runtime_error": false
       },
       "producecase_reproduced": true
     }

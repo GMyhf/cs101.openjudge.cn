@@ -37,8 +37,7 @@
       },
       "sample_reproduced": true,
       "independent_sample_agreement": true,
-      "producecase_reproduced": true,
-      "claude_independent_third_implementation": "verified: 21/21 一致（3421 用方向向量+visited，3263 用自底向上迭代 DP）"
+      "producecase_reproduced": true
     },
     {
       "local_number": 3376,
@@ -56,8 +55,13 @@
         "frequency": 1,
         "total": 21
       },
-      "constraints": ["1<=N<=30000", "每行一个 A..Z 初始字母", "每次只能取剩余原序列的首或尾", "输出可形成的字典序最小串"],
-      "structure_checked": false,
+      "constraints": [
+        "1<=N<=30000",
+        "每行一个 A..Z 初始字母",
+        "每次只能取剩余原序列的首或尾",
+        "输出可形成的字典序最小串"
+      ],
+      "structure_checked": true,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -113,8 +117,7 @@
       },
       "sample_reproduced": true,
       "independent_sample_agreement": true,
-      "producecase_reproduced": true,
-      "claude_independent_third_implementation": "verified: 21/21 一致（3421 用方向向量+visited，3263 用自底向上迭代 DP）"
+      "producecase_reproduced": true
     },
     {
       "local_number": 3527,
@@ -132,8 +135,14 @@
         "frequency": 4,
         "total": 21
       },
-      "constraints": ["每个数字为1..9", "每个数字出现次数不超过4", "集合长度不超过14", "长度必须为3n+2且n<=4", "三元组为相等或连续递增，二元组相等"],
-      "structure_checked": false,
+      "constraints": [
+        "每个数字为1..9",
+        "每个数字出现次数不超过4",
+        "集合长度不超过14",
+        "长度必须为3n+2且n<=4",
+        "三元组为相等或连续递增，二元组相等"
+      ],
+      "structure_checked": true,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -166,8 +175,12 @@
         "frequency": 1,
         "total": 21
       },
-      "constraints": ["第一行给测试组数", "每组输入一个十进制整数", "每组输出其二进制表示中的1的个数"],
-      "structure_checked": false,
+      "constraints": [
+        "第一行给测试组数",
+        "每组输入一个十进制整数",
+        "每组输出其二进制表示中的1的个数"
+      ],
+      "structure_checked": true,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -200,8 +213,12 @@
         "frequency": 1,
         "total": 21
       },
-      "constraints": ["测试组数n与输入行数一致", "每个输入是长度1..64的0/1字符串", "输出对应的三进制表示"],
-      "structure_checked": false,
+      "constraints": [
+        "测试组数n与输入行数一致",
+        "每个输入是长度1..64的0/1字符串",
+        "输出对应的三进制表示"
+      ],
+      "structure_checked": true,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -234,8 +251,12 @@
         "frequency": 1,
         "total": 21
       },
-      "constraints": ["A、B为正整数", "每组比较二进制表示并按高位补0", "输出不同位数"],
-      "structure_checked": false,
+      "constraints": [
+        "A、B为正整数",
+        "每组比较二进制表示并按高位补0",
+        "输出不同位数"
+      ],
+      "structure_checked": true,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -268,8 +289,12 @@
         "frequency": 17,
         "total": 21
       },
-      "constraints": ["两个字符串仅含字母和数字", "长度不超过30", "判定循环移位所得字符串是否包含另一字符串"],
-      "structure_checked": false,
+      "constraints": [
+        "两个字符串仅含字母和数字",
+        "长度不超过30",
+        "判定循环移位所得字符串是否包含另一字符串"
+      ],
+      "structure_checked": true,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -295,15 +320,20 @@
       "seed": 3712,
       "test_cases": 21,
       "distinct_input_cases": 21,
-      "distinct_outputs": 17,
+      "distinct_outputs": 13,
       "max_output_frequency": 4,
       "constant_output_probe": {
         "status": "rejected",
         "frequency": 4,
         "total": 21
       },
-      "constraints": ["测试组数n与输入行数一致", "两个字符串长度不超过20且可不同", "电话数字使用2..9键盘映射", "输出Y或N"],
-      "structure_checked": false,
+      "constraints": [
+        "测试组数n与输入行数一致",
+        "两个字符串长度不超过20且可不同",
+        "电话数字使用2..9键盘映射",
+        "输出Y或N"
+      ],
+      "structure_checked": true,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"
@@ -329,15 +359,21 @@
       "seed": 3714,
       "test_cases": 21,
       "distinct_input_cases": 21,
-      "distinct_outputs": 18,
-      "max_output_frequency": 3,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
       "constant_output_probe": {
         "status": "rejected",
-        "frequency": 3,
+        "frequency": 1,
         "total": 21
       },
-      "constraints": ["1<=C<=1000", "1<=N<=100", "每道菜价格和评价均为1..100", "每道菜最多选择一次", "总价格不超过C"],
-      "structure_checked": false,
+      "constraints": [
+        "1<=C<=1000",
+        "1<=N<=100",
+        "每道菜价格和评价均为1..100",
+        "每道菜最多选择一次",
+        "总价格不超过C"
+      ],
+      "structure_checked": true,
       "generator_seed_smoke": {
         "seeds": 20000,
         "status": "passed"

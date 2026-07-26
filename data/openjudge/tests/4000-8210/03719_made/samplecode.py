@@ -1,6 +1,8 @@
 # T-004-r3 reference implementation
 import sys
-lines=sys.stdin.read().splitlines(); n=len(lines)//2; rows=[]
+lines=sys.stdin.read().splitlines()
+while lines and not lines[-1].strip(): lines.pop()
+n=len(lines)//2; rows=[]
 for i in range(n):
     name=lines[2*i]; a=lines[2*i+1].split()
     ident,sex=a[0].split(","); age=a[1]

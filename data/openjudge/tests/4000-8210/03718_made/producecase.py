@@ -1,6 +1,6 @@
 import random,subprocess,tempfile
 from pathlib import Path
-REFERENCE_SOURCE='import sys\na=list(map(int,sys.stdin.read().split())); out=[]\nfor x,y in zip(a[1::2],a[2::2]):\n    out.append("YES" if any(((x<<k)|(x>>(16-k)))&65535==y for k in range(16)) else "NO")\nprint("\\n".join(out))'
+REFERENCE_SOURCE='import sys\na=list(map(int,sys.stdin.buffer.read().split())); n=a[0] if a else 0; out=[]\nfor i in range(min(n,(len(a)-1)//2)):\n    x,y=a[1+2*i],a[2+2*i]\n    bits=f"{x:016b}"\n    out.append("YES" if any(bits[k:]+bits[:k]==f"{y:016b}" for k in range(16)) else "NO")\nprint("\\n".join(out))'
 SAMPLE_IN='4\n2 4\n9 18\n45057 49158\n7 12\n'
 def g3718(r):
     n = r.randint(1, 50)

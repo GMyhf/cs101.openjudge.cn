@@ -1,9 +1,9 @@
 import random,subprocess,tempfile
 from pathlib import Path
-REFERENCE_SOURCE='import sys\na=sys.stdin.read().split(); s="".join(a[1:])\nl,rr,out=0,len(s)-1,[]\nwhile l<=rr:\n if s[l]<s[rr]: out.append(s[l]); l+=1\n elif s[l]>s[rr]: out.append(s[rr]); rr-=1\n else:\n  i,j=l,rr\n  while i<=j and s[i]==s[j]: i+=1; j-=1\n  if i>j or s[i]<=s[j]: out.append(s[l]); l+=1\n  else: out.append(s[rr]); rr-=1\nprint("".join(out))'
+REFERENCE_SOURCE='import sys\na=sys.stdin.read().split(); s="".join(a[1:])\nl,rr,out=0,len(s)-1,[]\nwhile l<=rr:\n if s[l]<s[rr]: out.append(s[l]); l+=1\n elif s[l]>s[rr]: out.append(s[rr]); rr-=1\n else:\n  i,j=l,rr\n  while i<=j and s[i]==s[j]: i+=1; j-=1\n  if i>j or s[i]<=s[j]: out.append(s[l]); l+=1\n  else: out.append(s[rr]); rr-=1\nresult="".join(out)\nprint("\\n".join(result[i:i+80] for i in range(0,len(result),80)))'
 SAMPLE_IN='6\nA\nC\nD\nB\nC\nB\n'
 def g3376(r):
-    n = r.randint(1, 24)
+    n = r.randint(1, 120)
     return str(n) + "\n" + "\n".join(r.choice("ABCXYZ") for _ in range(n)) + "\n"
 
 with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as handle:

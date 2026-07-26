@@ -53,14 +53,14 @@
     },
     {
       "local_number": 3711,
-      "mutation": "a in b+b or b in a+a -> a in b or b in a",
+      "mutation": "if len(a)<len(b): a,b=b,a -> if len(a)>len(b): a,b=b,a",
       "cases_checked_until_first_difference": 1,
       "oracle_caught_mutation": true,
       "status": "passed"
     },
     {
       "local_number": 3712,
-      "mutation": "m[y] -> m.get(str(int(y)+1),\"\")",
+      "mutation": "m.get(y,set()) -> m.get(str(int(y)+1),set())",
       "cases_checked_until_first_difference": 1,
       "oracle_caught_mutation": true,
       "status": "passed"

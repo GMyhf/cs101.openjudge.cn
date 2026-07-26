@@ -61,7 +61,7 @@ def g3715(r):
         if start.year==9999: start=date(9998,12,1)
         end=start+timedelta(days=r.randint(1, 3000))
         rows.append(f"p{i:02d} {start.year} {start.month} {start.day} {end.year} {end.month} {end.day}")
-    return "\n".join(rows)+"\n"
+    return str(len(rows))+"\n"+"\n".join(rows)+"\n"
 
 def g3716(r):
     lines=["# generated config"]
@@ -137,10 +137,10 @@ for line in sys.stdin:
     print(-value if neg else value)'''
 REFERENCE[3715]=r'''import sys
 from datetime import date
-lines=sys.stdin.read().splitlines(); n=len(lines)-1; rows=[]
+lines=sys.stdin.read().splitlines(); n=int(lines[0]); rows=[]
 for i in range(n):
     parts=lines[1+i].split(); name=parts[0]; y,m,d,Y,M,D=map(int,parts[1:])
-    rows.append((name,(date(Y,M,D)-date(y,m,d)).days+1,i,a[p-1-0] if False else ""))
+    rows.append((name,(date(Y,M,D)-date(y,m,d)).days+1,i))
 for row in sorted(rows,key=lambda x:(-x[1],x[2])): print(row[0],row[1])'''
 REFERENCE[3716]=r'''import sys
 out=[]
@@ -155,7 +155,9 @@ for _ in range(m-1):
     for j in range(1,n): dp[j]+=dp[j-1]
 print(dp[n-1])'''
 REFERENCE[3719]=r'''import sys
-lines=sys.stdin.read().splitlines(); n=len(lines)//2; rows=[]
+lines=sys.stdin.read().splitlines()
+while lines and not lines[-1].strip(): lines.pop()
+n=len(lines)//2; rows=[]
 for i in range(n):
     name=lines[2*i]; a=lines[2*i+1].split()
     ident,sex=a[0].split(","); age=a[1]
@@ -249,7 +251,7 @@ def oracle(n,content):
             total=365*before+before//4-before//100+before//400
             for month in range(1,m): total+=month_days[month-1]+(month==2 and (y%400==0 or y%4==0 and y%100!=0))
             return total+d
-        lines=content.splitlines(); n=len(lines)-1; rows=[]
+        lines=content.splitlines(); n=int(lines[0]); rows=[]
         for i in range(n):
             parts=lines[1+i].split(); name=parts[0]; y,m,d,Y,M,D=map(int,parts[1:])
             rows.append((name,serial(Y,M,D)-serial(y,m,d)+1,i))
@@ -268,7 +270,9 @@ def oracle(n,content):
             for j in range(1,n+1): a[i][j]=a[i-1][j]+a[i][j-1]
         return f"{a[m-1][n-1]}\n"
     if n==3719:
-        lines=content.splitlines(); n=len(lines)//2; rows=[]
+        lines=content.splitlines()
+        while lines and not lines[-1].strip(): lines.pop()
+        n=len(lines)//2; rows=[]
         for i in range(n):
             name=lines[2*i]; a=lines[2*i+1].split(); ident,sex=a[0].split(","); age=a[1]
             rows.append((name,i,ident,sex,age))

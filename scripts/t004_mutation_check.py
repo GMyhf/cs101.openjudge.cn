@@ -21,8 +21,8 @@ MUTANTS = {
     3708: ('bin(int(x)).count("1")', 'bin(int(x)).count("0")'),
     3709: ("n%3", "n%2"),
     3710: ("bin(x^y).count(\"1\")", "bin(x|y).count(\"1\")"),
-    3711: ("a in b+b or b in a+a", "a in b or b in a"),
-    3712: ("m[y]", 'm.get(str(int(y)+1),"")'),
+    3711: ("if len(a)<len(b): a,b=b,a", "if len(a)>len(b): a,b=b,a"),
+    3712: ("m.get(y,set())", 'm.get(str(int(y)+1),set())'),
     3714: ("range(cap,p-1,-1)", "range(p,cap+1)"),
 }
 
@@ -75,4 +75,3 @@ def check():
 
 if __name__ == "__main__":
     raise SystemExit(0 if check() else 1)
-

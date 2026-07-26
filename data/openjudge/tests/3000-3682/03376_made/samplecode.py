@@ -10,4 +10,5 @@ while l<=rr:
   while i<=j and s[i]==s[j]: i+=1; j-=1
   if i>j or s[i]<=s[j]: out.append(s[l]); l+=1
   else: out.append(s[rr]); rr-=1
-print("".join(out))
+result="".join(out)
+print("\n".join(result[i:i+80] for i in range(0,len(result),80)))

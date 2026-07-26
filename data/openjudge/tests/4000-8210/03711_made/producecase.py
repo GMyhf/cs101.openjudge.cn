@@ -1,9 +1,11 @@
 import random,subprocess,tempfile
 from pathlib import Path
-REFERENCE_SOURCE='import sys\na,b=sys.stdin.read().split()\nprint("true" if a in b+b or b in a+a else "false")'
+REFERENCE_SOURCE='import sys\na,b=sys.stdin.read().split()\nif len(a)<len(b): a,b=b,a\nprint("true" if b in a+a else "false")'
 SAMPLE_IN='AABCD CDAA\n'
 def g3711(r):
-    return f"{''.join(r.choice('ABCD') for _ in range(r.randint(1, 12)))} {''.join(r.choice('ABCD') for _ in range(r.randint(1, 12)))}\n"
+    long = ''.join(r.choice('ABCD') for _ in range(r.randint(1, 12)))
+    short = ''.join(r.choice('ABCD') for _ in range(r.randint(1, len(long))))
+    return f"{long} {short}\n" if r.random() < .5 else f"{short} {long}\n"
 
 with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as handle:
  handle.write(REFERENCE_SOURCE);handle.flush()

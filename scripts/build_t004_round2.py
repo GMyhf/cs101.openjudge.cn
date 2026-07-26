@@ -109,9 +109,11 @@ REFERENCE[4085] = r'''import sys
 a=list(map(int,sys.stdin.read().split())); n=a[0]
 print(" ".join(map(str,sorted(set(a[1:n+1])))))'''
 REFERENCE[3718] = r'''import sys
-a=list(map(int,sys.stdin.read().split())); out=[]
-for x,y in zip(a[1::2],a[2::2]):
-    out.append("YES" if any(((x<<k)|(x>>(16-k)))&65535==y for k in range(16)) else "NO")
+a=list(map(int,sys.stdin.buffer.read().split())); n=a[0] if a else 0; out=[]
+for i in range(min(n,(len(a)-1)//2)):
+    x,y=a[1+2*i],a[2+2*i]
+    bits=f"{x:016b}"
+    out.append("YES" if any(bits[k:]+bits[:k]==f"{y:016b}" for k in range(16)) else "NO")
 print("\n".join(out))'''
 REFERENCE[6645] = r'''import sys
 s=sys.stdin.read().strip(); bits=[]

@@ -1,6 +1,6 @@
 import random,subprocess,tempfile
 from pathlib import Path
-REFERENCE_SOURCE='import sys\nlines=sys.stdin.read().splitlines(); n=len(lines)//2; rows=[]\nfor i in range(n):\n    name=lines[2*i]; a=lines[2*i+1].split()\n    ident,sex=a[0].split(","); age=a[1]\n    rows.append((name, i, ident, sex, age))\nfor x in sorted(rows,key=lambda z:z[0].lower()):\n    print(x[0]); print(f"{int(x[2]):08d},{x[3]} {x[4]}")\n'
+REFERENCE_SOURCE='import sys\nlines=sys.stdin.read().splitlines()\nwhile lines and not lines[-1].strip(): lines.pop()\nn=len(lines)//2; rows=[]\nfor i in range(n):\n    name=lines[2*i]; a=lines[2*i+1].split()\n    ident,sex=a[0].split(","); age=a[1]\n    rows.append((name, i, ident, sex, age))\nfor x in sorted(rows,key=lambda z:z[0].lower()):\n    print(x[0]); print(f"{int(x[2]):08d},{x[3]} {x[4]}")\n'
 SAMPLE_IN='Tom Hanks\n7863,M 18\nMary Lu\n18343,F 21\nSanta Fe\n27863,M 17\n'
 def g3719(r):
     rows=[]

@@ -1,4 +1,5 @@
 # LLM-written reference implementation
 import sys
 a,b=sys.stdin.read().split()
-print("true" if a in b+b or b in a+a else "false")
+if len(a)<len(b): a,b=b,a
+print("true" if b in a+a else "false")

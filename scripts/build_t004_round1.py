@@ -37,7 +37,7 @@ def g3263(r):
     return "\n".join(lines + ["0"]) + "\n"
 
 def g3376(r):
-    n = r.randint(1, 24)
+    n = r.randint(1, 120)
     return str(n) + "\n" + "\n".join(r.choice("ABCXYZ") for _ in range(n)) + "\n"
 
 def spiral_positions(rows, cols):
@@ -79,22 +79,27 @@ def g3710(r):
     return "5\n" + "\n".join(f"{r.randint(1, 10**6)} {r.randint(1, 10**6)}" for _ in range(5)) + "\n"
 
 def g3711(r):
-    return f"{''.join(r.choice('ABCD') for _ in range(r.randint(1, 12)))} {''.join(r.choice('ABCD') for _ in range(r.randint(1, 12)))}\n"
+    long = ''.join(r.choice('ABCD') for _ in range(r.randint(1, 12)))
+    short = ''.join(r.choice('ABCD') for _ in range(r.randint(1, len(long))))
+    return f"{long} {short}\n" if r.random() < .5 else f"{short} {long}\n"
 
 def g3712(r):
     mp = "abc def ghi jkl mno pqrs tuv wxyz".split()
     cases = []
     for _ in range(r.randint(1, 5)):
-        digits = "".join(r.choice("23456789") for _ in range(r.randint(1, 12)))
-        word = "".join(r.choice(mp[int(d)-2]) for d in digits)
+        digits = "".join(r.choice("0123456789") for _ in range(r.randint(1, 12)))
+        word = "".join(r.choice(mp[int(d)-2]) if d in "23456789" else r.choice("xyz") for d in digits)
         if r.random() < .35: word = word[:-1] + r.choice("xyz")
         cases.append(f"{word} {digits}")
     return str(len(cases)) + "\n" + "\n".join(cases) + "\n"
 
 def g3714(r):
-    n, cap = r.randint(1, 12), r.randint(1, 80)
-    items = [(r.randint(1, 30), r.randint(1, 30)) for _ in range(n)]
-    return f"{cap} {n}\n" + "\n".join(f"{p} {v}" for p, v in items) + "\n"
+    blocks=[]
+    for _ in range(r.randint(1, 3)):
+        n, cap = r.randint(1, 12), r.randint(1, 80)
+        items = [(r.randint(1, 30), r.randint(1, 30)) for _ in range(n)]
+        blocks.append(f"{cap} {n}\n" + "\n".join(f"{p} {v}" for p, v in items))
+    return "\n".join(blocks) + "\n"
 
 GENERATORS = {n: globals()[f"g{n}"] for n in [3263,3376,3421,3527,3708,3709,3710,3711,3712,3714]}
 
@@ -122,7 +127,8 @@ while l<=rr:
   while i<=j and s[i]==s[j]: i+=1; j-=1
   if i>j or s[i]<=s[j]: out.append(s[l]); l+=1
   else: out.append(s[rr]); rr-=1
-print("".join(out))'''
+result="".join(out)
+print("\n".join(result[i:i+80] for i in range(0,len(result),80)))'''
 REFERENCE[3421] = r'''import sys
 def pos(r,c):
  t,l,b,rr=0,0,r-1,c-1
@@ -147,22 +153,22 @@ from collections import Counter
 def ok(v):
  if len(v)<2 or (len(v)-2)%3: return "XIANGGONG"
  def f(c,p):
-  if not sum(c.values()): return p
+  if not sum(c.values()): return p is not None
   x=min(k for k,v in c.items() if v)
   if p is None and c[x]>=2:
    c[x]-=2
-   if f(c,x): return x
+   if f(c,x): return True
    c[x]+=2
   if c[x]>=3:
    c[x]-=3
-   if f(c,p): return p
+   if f(c,p): return True
    c[x]+=3
   if c.get(x+1,0) and c.get(x+2,0):
    for y in (x,x+1,x+2): c[y]-=1
-   if f(c,p): return p
+   if f(c,p): return True
    for y in (x,x+1,x+2): c[y]+=1
   return None
- return "HU" if f(Counter(v),None) is not None else "BUHU"
+ return "HU" if f(Counter(v),None) else "BUHU"
 out=[]
 for line in sys.stdin:
  v=list(map(int,line.split()))
@@ -182,17 +188,24 @@ a=list(map(int,sys.stdin.read().split()))
 print("\n".join(str(bin(x^y).count("1")) for x,y in zip(a[1::2],a[2::2])))'''
 REFERENCE[3711] = r'''import sys
 a,b=sys.stdin.read().split()
-print("true" if a in b+b or b in a+a else "false")'''
+if len(a)<len(b): a,b=b,a
+print("true" if b in a+a else "false")'''
 REFERENCE[3712] = r'''import sys
-m={"2":"abc","3":"def","4":"ghi","5":"jkl","6":"mno","7":"pqrs","8":"tuv","9":"wxyz"}
-a=sys.stdin.read().split(); out=[]
-for w,d in zip(a[1::2],a[2::2]): out.append("Y" if len(w)==len(d) and all(x.lower() in m[y] for x,y in zip(w,d)) else "N")
+m={"2":set("abc"),"3":set("def"),"4":set("ghi"),"5":set("jkl"),"6":set("mno"),"7":set("pqrs"),"8":set("tuv"),"9":set("wxyz")}
+a=sys.stdin.read().split(); n=int(a[0]) if a else 0; out=[]
+for i in range(n):
+ w,d=a[1+2*i],a[2+2*i]
+ out.append("Y" if len(w)==len(d) and all(x.lower() in m.get(y,set()) for x,y in zip(w,d)) else "N")
 print("\n".join(out))'''
 REFERENCE[3714] = r'''import sys
-a=list(map(int,sys.stdin.read().split())); cap,n=a[:2]; dp=[0]*(cap+1)
-for p,v in zip(a[2::2],a[3::2]):
- for x in range(cap,p-1,-1): dp[x]=max(dp[x],dp[x-p]+v)
-print(dp[cap])'''
+a=list(map(int,sys.stdin.read().split())); i=0; out=[]
+while i+1<len(a):
+ cap,n=a[i],a[i+1]; i+=2; dp=[0]*(cap+1)
+ for _ in range(n):
+  p,v=a[i],a[i+1]; i+=2
+  for x in range(cap,p-1,-1): dp[x]=max(dp[x],dp[x-p]+v)
+ out.append(str(dp[cap]))
+print("\n".join(out))'''
 
 # 001b 确立的「题面保证 X -> 生成器保证 X」逐条打钩表。
 # 原来是 10 题共用一个 {"题面":"see source page", ...} 的占位 dict —— 「see source page」
@@ -234,26 +247,27 @@ def oracle(number, content):
             if l>r:return ""
             if (l,r) not in memo: memo[l,r]=min(s[l]+f(l+1,r),s[r]+f(l,r-1))
             return memo[l,r]
-        return f(0,len(s)-1)+"\n"
+        result=f(0,len(s)-1)
+        return "\n".join(result[i:i+80] for i in range(0,len(result),80))+"\n"
     if number == 3421:
         r,c,msg=content.rstrip("\n").split(" ",2); return encode_spiral(int(r),int(c),msg)+"\n"
     if number == 3527:
         def valid(v):
             if len(v)<2 or (len(v)-2)%3:return "XIANGGONG"
             def f(rest,p):
-                if not rest:return p
+                if not rest:return p is not None
                 x=rest[0]
                 if p is None and rest.count(x)>=2:
                     q=rest[:];q.remove(x);q.remove(x)
-                    if f(q,x):return x
+                    if f(q,x):return True
                 if rest.count(x)>=3:
                     q=rest[:];q.remove(x);q.remove(x);q.remove(x)
-                    if f(q,p):return p
+                    if f(q,p):return True
                 if x+1 in rest and x+2 in rest:
                     q=rest[:];q.remove(x);q.remove(x+1);q.remove(x+2)
-                    if f(q,p):return p
+                    if f(q,p):return True
                 return None
-            return "HU" if f(sorted(v),None) is not None else "BUHU"
+            return "HU" if f(sorted(v),None) else "BUHU"
         out=[]
         for line in content.splitlines():
             v=list(map(int,line.split()))
@@ -278,19 +292,25 @@ def oracle(number, content):
         return "\n".join(out)+"\n"
     if number == 3711:
         a,b=content.split()
-        return ("true" if any(a in b[i:]+b[:i]+b[i:]+b[:i] or b in a[i:]+a[:i]+a[i:]+a[:i] for i in range(max(len(a),len(b)))) else "false")+"\n"
+        if len(a)<len(b): a,b=b,a
+        return ("true" if b in a+a else "false")+"\n"
     if number == 3712:
         m={"2":set("abc"),"3":set("def"),"4":set("ghi"),"5":set("jkl"),"6":set("mno"),"7":set("pqrs"),"8":set("tuv"),"9":set("wxyz")}
-        a=content.split(); out=[]
-        for w,d in zip(a[1::2],a[2::2]):out.append("Y" if len(w)==len(d) and all(x.lower() in m[y] for x,y in zip(w,d)) else "N")
-        return "\n".join(out)+"\n"
-    a=list(map(int,content.split())); cap,n=a[:2]; best=0
-    for mask in range(1<<n):
-        cost=value=0
+        a=content.split(); n=int(a[0]); out=[]
         for i in range(n):
-            if mask>>i&1:cost+=a[2+2*i];value+=a[3+2*i]
-        if cost<=cap:best=max(best,value)
-    return str(best)+"\n"
+            w,d=a[1+2*i],a[2+2*i]
+            out.append("Y" if len(w)==len(d) and all(x.lower() in m.get(y,set()) for x,y in zip(w,d)) else "N")
+        return "\n".join(out)+"\n"
+    a=list(map(int,content.split())); i=0; out=[]
+    while i+1<len(a):
+        cap,n=a[i],a[i+1]; i+=2; best=0
+        for mask in range(1<<n):
+            cost=value=0
+            for j in range(n):
+                if mask>>j&1:cost+=a[i+2*j];value+=a[i+2*j+1]
+            if cost<=cap:best=max(best,value)
+        i += 2*n; out.append(str(best))
+    return "\n".join(out)+"\n"
 
 def reproduce(directory):
     data=directory/"data"; before={p.name:p.read_bytes() for p in data.iterdir()}

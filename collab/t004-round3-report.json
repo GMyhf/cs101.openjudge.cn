@@ -163,11 +163,11 @@
       "seed": 3715,
       "test_cases": 21,
       "distinct_input_cases": 21,
-      "distinct_outputs": 19,
-      "max_output_frequency": 3,
+      "distinct_outputs": 21,
+      "max_output_frequency": 1,
       "constant_output_probe": {
         "status": "rejected",
-        "frequency": 3,
+        "frequency": 1,
         "total": 21
       },
       "constraints": [
@@ -217,17 +217,20 @@
           1,
           2,
           3,
+          4,
           5,
           6,
           7,
           8,
           9,
+          10,
           11,
           12,
           13,
           14,
           15,
           16,
+          17,
           18,
           19,
           20
@@ -324,8 +327,7 @@
         ],
         "status": "caught"
       },
-      "producecase_reproduced": true,
-      "claude_oracle_note": "oracle 与参考解法实质同一段代码（同样的 splitlines 循环 / startswith('#') / parts[1:]）"
+      "producecase_reproduced": true
     },
     {
       "local_number": 3717,
@@ -484,9 +486,7 @@
         ],
         "status": "caught"
       },
-      "producecase_reproduced": true,
-      "claude_interpretation_note": "样例钉不住「按名字排序」是 ASCII 序还是不分大小写序；数据有 12 组能区分，但那只证明数据有鉴别力，不证明所选解读正确。定这件事的是题面那句保证：「不会出现两个学生的名字仅大小写有差别的情况」——ASCII 序下 'Tom'/'tom' 严格有序、这句保证是多余的；只有在不分大小写序下二者键相同、会并列，才需要这句排除歧义。故参考解法的 key=z[0].lower() 与题面一致。",
-      "claude_oracle_note": "该题 oracle 与参考解法逐行同构（同样的 key=z[0].lower()），对该解读零贡献"
+      "producecase_reproduced": true
     },
     {
       "local_number": 3721,
