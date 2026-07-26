@@ -1,6 +1,11 @@
-# Source: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md
-# 2022fall-cs101, 楼翔
-import re
-intermedia = input()
-listy = [int(x) for x in re.findall(r".(?<!\+0)n\^(\d+)", intermedia)] + [0]
-print("n^" + str(max(listy)))
+# T-003 参考实现：人提供的平台 Accepted 版本（2026-07-26 替换）
+s=input().split('+')
+a=[]
+for k in s:
+    a.append(list(k.split('n^')))
+n=len(a)
+max_a=float('-inf')
+for i in range(n):
+    if a[i][0]!='0':
+        max_a=max(max_a,int(a[i][1]))
+print(f'n^{max_a}')

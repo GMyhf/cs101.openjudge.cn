@@ -36,10 +36,6 @@ def g3263(r):
         lines += [str(len(rows))] + [" ".join(map(str, x)) for x in rows] + [f"{row} {col}"]
     return "\n".join(lines + ["0"]) + "\n"
 
-def g3376(r):
-    n = r.randint(1, 120)
-    return str(n) + "\n" + "\n".join(r.choice("ABCXYZ") for _ in range(n)) + "\n"
-
 def spiral_positions(rows, cols):
     t, l, b, rr = 0, 0, rows - 1, cols - 1
     while t <= b and l <= rr:
@@ -101,7 +97,7 @@ def g3714(r):
         blocks.append(f"{cap} {n}\n" + "\n".join(f"{p} {v}" for p, v in items))
     return "\n".join(blocks) + "\n"
 
-GENERATORS = {n: globals()[f"g{n}"] for n in [3263,3376,3421,3527,3708,3709,3710,3711,3712,3714]}
+GENERATORS = {n: globals()[f"g{n}"] for n in [3263,3421,3527,3708,3709,3710,3711,3712,3714]}
 
 REFERENCE = {}
 REFERENCE[3263] = r'''import sys
@@ -116,19 +112,6 @@ while True:
   return max(nrows[i][j],f(i+1,j),f(i+1,j+1))
  out.append(str(f(row,col)))
 print("\n".join(out))'''
-REFERENCE[3376] = r'''import sys
-a=sys.stdin.read().split(); s="".join(a[1:])
-l,rr,out=0,len(s)-1,[]
-while l<=rr:
- if s[l]<s[rr]: out.append(s[l]); l+=1
- elif s[l]>s[rr]: out.append(s[rr]); rr-=1
- else:
-  i,j=l,rr
-  while i<=j and s[i]==s[j]: i+=1; j-=1
-  if i>j or s[i]<=s[j]: out.append(s[l]); l+=1
-  else: out.append(s[rr]); rr-=1
-result="".join(out)
-print("\n".join(result[i:i+80] for i in range(0,len(result),80)))'''
 REFERENCE[3421] = r'''import sys
 def pos(r,c):
  t,l,b,rr=0,0,r-1,c-1
@@ -216,7 +199,6 @@ CONSTRAINTS = {
            "生成器目前 R,C 只到 8，未贴题面上界 20"],
     3263: ["每组先给三角形层数 n，n=0 结束", "查询给出起点行列（1-based）",
            "从起点向下相邻两格可达位置中取最大数"],
-    3376: ["1<=N<=30000", "每行一个 A..Z 初始字母", "每次只能取剩余原序列的首或尾", "输出可形成的字典序最小串"],
     3527: ["每个数字为1..9", "每个数字出现次数不超过4", "集合长度不超过14", "长度必须为3n+2且n<=4", "三元组为相等或连续递增，二元组相等"],
     3708: ["第一行给测试组数", "每组输入一个十进制整数", "每组输出其二进制表示中的1的个数"],
     3709: ["测试组数n与输入行数一致", "每个输入是长度1..64的0/1字符串", "输出对应的三进制表示"],
@@ -240,15 +222,6 @@ def oracle(number, content):
                 return max(tri[i][j],f(i+1,j),f(i+1,j+1))
             ans.append(str(f(row,col)))
         return "\n".join(ans)+"\n"
-    if number == 3376:
-        s="".join(content.split()[1:])
-        memo={}
-        def f(l,r):
-            if l>r:return ""
-            if (l,r) not in memo: memo[l,r]=min(s[l]+f(l+1,r),s[r]+f(l,r-1))
-            return memo[l,r]
-        result=f(0,len(s)-1)
-        return "\n".join(result[i:i+80] for i in range(0,len(result),80))+"\n"
     if number == 3421:
         r,c,msg=content.rstrip("\n").split(" ",2); return encode_spiral(int(r),int(c),msg)+"\n"
     if number == 3527:

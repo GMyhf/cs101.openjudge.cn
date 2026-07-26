@@ -10,13 +10,6 @@
       "status": "passed"
     },
     {
-      "local_number": 3376,
-      "mutation": "if i>j or s[i]<=s[j]: -> if i>j or s[i]>=s[j]:",
-      "cases_checked_until_first_difference": 1,
-      "oracle_caught_mutation": true,
-      "status": "passed"
-    },
-    {
       "local_number": 3421,
       "mutation": "for j in range(rr,l-1,-1): yield b,j -> for j in range(l,rr+1): yield b,j",
       "cases_checked_until_first_difference": 1,
@@ -73,5 +66,11 @@
       "status": "passed"
     }
   ],
-  "failed": []
+  "failed": [],
+  "removed": [
+    {
+      "local_number": 3376,
+      "reason": "与 03377 是同一道题（描述/输入/输出/样例逐段完全相同，只是收在不同 book 下），人拍板 2026-07-26：去掉 03376，保留 03377"
+    }
+  ]
 }

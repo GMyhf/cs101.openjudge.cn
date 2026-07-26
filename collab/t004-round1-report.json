@@ -40,45 +40,6 @@
       "producecase_reproduced": true
     },
     {
-      "local_number": 3376,
-      "title": "Best Cow Line, Gold",
-      "source": "data/openjudge/pages/practice__03376.html",
-      "reference_source": "LLM-written",
-      "generator": "g3376",
-      "seed": 3376,
-      "test_cases": 21,
-      "distinct_input_cases": 21,
-      "distinct_outputs": 21,
-      "max_output_frequency": 1,
-      "constant_output_probe": {
-        "status": "rejected",
-        "frequency": 1,
-        "total": 21
-      },
-      "constraints": [
-        "1<=N<=30000",
-        "每行一个 A..Z 初始字母",
-        "每次只能取剩余原序列的首或尾",
-        "输出可形成的字典序最小串"
-      ],
-      "structure_checked": true,
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "reference_seed_smoke": {
-        "seeds": 2000,
-        "status": "passed"
-      },
-      "independent_oracle_smoke": {
-        "seeds": 2000,
-        "status": "passed"
-      },
-      "sample_reproduced": true,
-      "independent_sample_agreement": true,
-      "producecase_reproduced": true
-    },
-    {
       "local_number": 3421,
       "title": "螺旋加密",
       "source": "data/openjudge/pages/practice__03421.html",
@@ -389,6 +350,12 @@
       "sample_reproduced": true,
       "independent_sample_agreement": true,
       "producecase_reproduced": true
+    }
+  ],
+  "removed": [
+    {
+      "local_number": 3376,
+      "reason": "与 03377 是同一道题（描述/输入/输出/样例逐段完全相同，只是收在不同 book 下），人拍板 2026-07-26：去掉 03376，保留 03377"
     }
   ]
 }

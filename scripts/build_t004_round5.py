@@ -22,6 +22,10 @@ MANIFEST = ROOT / "collab/t004-round5-manifest.json"
 REPORT = ROOT / "collab/t004-round5-report.json"
 TESTS = ROOT / "data/openjudge/tests"
 CPP3433 = ROOT / "scripts/t004_platform_accepted_3433.cpp"
+CPP4011 = ROOT / "scripts/t004_platform_accepted_4011.cpp"
+# 参考实现是 C++ 的题：3433 本来就只有 C++；4011 的 Python 参考在平台
+# Python3 与 PyPy3 两档都 TLE、拿不到背书，2026-07-26 换成人提供的 AC C++。
+CPP_REFERENCE = {3433: CPP3433, 4011: CPP4011}
 CPP3433_BIN = Path(tempfile.gettempdir()) / "t004-platform-accepted-3433"
 sys.path.insert(0, str(ROOT / "scripts"))
 from build_001a import bucket  # noqa: E402
@@ -852,15 +856,15 @@ def main():
             o = run(ref, c); outs.append(o)
             (data / f"{i}.in").write_text(c, encoding="utf-8")
             (data / f"{i}.out").write_text(o, encoding="utf-8")
-        if n == 3433:
-            (d / "samplecode_ac.cpp").write_bytes(CPP3433.read_bytes())
+        if n in CPP_REFERENCE:
+            (d / "samplecode_ac.cpp").write_bytes(CPP_REFERENCE[n].read_bytes())
             stale = d / "reference"
             if stale.exists():
                 stale.unlink()
         else:
             (d / "samplecode.py").write_text(f"# T-004-r5\n{ref}", encoding="utf-8")
         source = inspect.getsource(gen)
-        if n == 3433:
+        if n in CPP_REFERENCE:
             produce = f'''import random, subprocess, tempfile\nfrom pathlib import Path\nSAMPLE_IN={entry["sample_input"]!r}\n{source}\nroot=Path(__file__).parent\nwith tempfile.TemporaryDirectory() as folder:\n binary=Path(folder)/"reference"\n subprocess.run(["g++", "-std=c++17", "-O2", str(root/"samplecode_ac.cpp"), "-o", str(binary)], check=True)\n for i in range(21):\n  c=SAMPLE_IN if i == 0 else {gen.__name__}(random.Random({n}+i))\n  p=subprocess.run([str(binary)], input=c, text=True, capture_output=True, check=True)\n  (root/"data"/f"{{i}}.in").write_text(c); (root/"data"/f"{{i}}.out").write_text(p.stdout)\n'''
         else:
             produce = f'''import random, subprocess, tempfile\nfrom pathlib import Path\nREFERENCE_SOURCE={ref!r}\nSAMPLE_IN={entry["sample_input"]!r}\n{source}\nwith tempfile.NamedTemporaryFile("w", suffix=".py") as h:\n h.write(REFERENCE_SOURCE); h.flush(); root=Path(__file__).parent/"data"\n for i in range(21):\n  c=SAMPLE_IN if i == 0 else {gen.__name__}(random.Random({n}+i))\n  p=subprocess.run(["python3", h.name], input=c, text=True, capture_output=True, check=True)\n  (root/f"{{i}}.in").write_text(c); (root/f"{{i}}.out").write_text(p.stdout)\n'''

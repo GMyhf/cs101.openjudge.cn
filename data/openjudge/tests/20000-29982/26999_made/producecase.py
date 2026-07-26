@@ -1,6 +1,6 @@
 import random, subprocess, tempfile
 from pathlib import Path
-REFERENCE_SOURCE = "# https://www.geeksforgeeks.org/naive-algorithm-for-pattern-searching/\n# Naive Pattern Searching algorithm\ndef search(pat, txt):\n    M = len(pat)\n    N = len(txt)\n\n    res = []\n    # A loop to slide pat[] one by one */\n    for i in range(N - M + 1):\n    #i = 0\n    #while i < N - M + 1:\n        j = 0\n\n        # For current index i, check\n        # for pattern match */\n        while(j < M):\n            if (txt[i + j] != pat[j]):\n                #i = i+j + 1\n                break\n            j += 1\n\n        if (j == M):\n            res.append(str(i))\n            #i += M\n\n    return res\n\n\nn = int(input())\nfor _ in range(n):\n    txt, pat = input().split()\n    ans = search(pat, txt)\n    if ans:\n        print(' '.join(ans))\n    else:\n        print('no')\n"
+REFERENCE_SOURCE = "# T-003 参考实现：人提供的平台 Accepted 版本（2026-07-26 替换）\nn=int(input())\nfor _ in range(n):\n    s1,s2=input().split()\n    pos=[]\n    start=0\n    while True:\n        po=s1.find(s2,start)\n        if po==-1:\n            break\n        pos.append(po)\n        start=po+1\n    if pos:\n        for po in pos:\n            print(po,end=' ')\n        print('')\n    else:\n        print('no')\n"
 SAMPLE_IN = '4\nababcdefgabdefab ab\naaaaaaaaa a\naaaaaaaaa aaa \n112123323 a\n'
 SAMPLE_OUT = '0 2 9 14 \n0 1 2 3 4 5 6 7 8 \n0 1 2 3 4 5 6 \nno\n'
 def generate_case(r):

@@ -44,7 +44,7 @@ ORACLE_OVERLAP_ALARM = 0.80
 ORACLE_SHARED_LINES_ALARM = 5
 
 
-def constant_output_probe(outputs):
+def constant_output_probe(outputs, exemption=None):
     """恒定输出探针（001d 立）：把最高频的输出原样当解法提交，会不会 AC。
 
     status **由测量推出**，不接受调用方传入——round5 把它写成了字面量 "rejected"，
@@ -57,7 +57,11 @@ def constant_output_probe(outputs):
         "frequency": freq,
         "total": total,
         # 频次等于总数 = 常量解法能过全部数据 = 这份数据没有鉴别力
-        "status": "accepted" if total and freq == total else "rejected",
+        # 探针 AC = 常量解法能过全部数据 = 没有鉴别力。但「题面无输入、答案唯一」这类题
+        # 天生如此（4140），必须给出豁免理由才算合格，不能默默放过。
+        "status": ("exempted" if exemption else "accepted")
+                  if total and freq == total else "rejected",
+        "exemption": exemption,
         "share": round(freq / total, 3) if total else None,
     }
 
@@ -181,10 +185,18 @@ def samplecode_recompute(made_dir, timeout=60):
     round5 的 3433 就是靠这条露出来的：它根本没有 samplecode.py。
     """
     made_dir = Path(made_dir)
+    # 参考实现可能是 Python 也可能是 C++。命名约定（2026-07-26 理清）：
+    #   samplecode.py      —— Python 是参考实现（绝大多数题）
+    #   samplecode.cpp     —— C++ 就是参考实现（3433 本来只有 C++；4011 的 Python 两档都 TLE）
+    #   samplecode_ac.cpp  —— Python 仍是产出数据的参考，C++ 只是额外的平台背书
+    #                         （3728 / 4009 / 3718 属于这种）
+    # 三种都要认：只认其中一种就会把另一类误报成「没有参考实现」。
     script = made_dir / "samplecode.py"
-    cpp = made_dir / "samplecode_ac.cpp"
+    cpp = next((made_dir / name for name in ("samplecode.cpp", "samplecode_ac.cpp")
+                if (made_dir / name).exists()), made_dir / "samplecode.cpp")
     if not script.exists() and not cpp.exists():
-        return {"status": "FAILED", "reason": "目录里没有 samplecode.py 或 samplecode_ac.cpp",
+        return {"status": "FAILED",
+                "reason": "目录里没有 samplecode.py / samplecode.cpp / samplecode_ac.cpp",
                 "files": sorted(p.name for p in made_dir.iterdir())}
     executable = None
     if cpp.exists():
@@ -193,7 +205,7 @@ def samplecode_recompute(made_dir, timeout=60):
             build = subprocess.run(["g++", "-std=c++17", "-O2", str(cpp), "-o", str(executable)],
                                    capture_output=True, text=True, timeout=timeout)
             if build.returncode:
-                return {"status": "FAILED", "reason": "samplecode_ac.cpp 编译失败",
+                return {"status": "FAILED", "reason": f"{cpp.name} 编译失败",
                         "detail": (build.stderr or build.stdout).strip()[-300:]}
             return _recompute_cases(made_dir, [str(executable)], timeout)
     return _recompute_cases(made_dir, [sys.executable, str(script)], timeout)
@@ -237,7 +249,7 @@ def audit(made_dir, *, cases, outputs, sample_input, exemption=None,
     """
     row = {
         "distinct_cases": distinct_cases(cases, exemption),
-        "constant_output_probe": constant_output_probe(outputs),
+        "constant_output_probe": constant_output_probe(outputs, exemption),
         "sample_is_case_zero": sample_is_case_zero(made_dir, sample_input),
         "samplecode_recompute": samplecode_recompute(made_dir),
     }
