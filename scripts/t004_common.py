@@ -301,6 +301,7 @@ def sample_is_case_zero(made_dir, sample_input):
 
 def audit(made_dir, *, cases, outputs, sample_input, exemption=None,
           reference_source=None, oracle_source=None, constraints=None,
+          constraint_counterexample=None, constraint_exemption=None,
           run_byte_reproduction=True):
     """把上面全部判据跑一遍，返回可直接写进报告的条目。
 
@@ -315,7 +316,9 @@ def audit(made_dir, *, cases, outputs, sample_input, exemption=None,
         "samplecode_recompute": samplecode_recompute(made_dir),
     }
     if constraints is not None:
-        row["constraint_checklist"] = constraint_checklist(constraints)
+        row["constraint_checklist"] = constraint_checklist(
+            constraints, counterexample=constraint_counterexample,
+            exemption=constraint_exemption)
     if run_byte_reproduction:
         row["byte_reproduction"] = byte_reproduction(made_dir)
     if reference_source is not None and oracle_source is not None:

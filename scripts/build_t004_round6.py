@@ -357,6 +357,32 @@ def constraint_rows(n,cases):
     if n==4131:return [("N<=3402",every(lambda c:int(c.split()[0])<=3402)),("each charm is used at most once",every(lambda c:len(c.split()[2:])==2*int(c.split()[0])))]
     return []
 
+def constraint_counterexample(n):
+    bad={
+      4087:"9 1\n1 2 3 4 5 6 7 8 9\n",
+      4088:"2 2 1 1 1\n",
+      4090:"1\n5\n0\n",
+      4091:"2 1 0 0 0 0 0\n",
+      4092:"1\n1\nA\n",
+      4104:"x"*501+"\n",
+      4105:"1\n1 6 1\n012345\n",
+      4106:"1\nabc\n",
+      4108:"1\n-1\n",
+      4110:"1 -1\n1 1\n",
+      4111:"1\n0xGG 0x1\n",
+      4114:"1\n1\nnan 0 0 0\n",
+      4120:"2 100\n1 2\n",
+      4122:"2\nabc\n",
+      4125:"3\n2 0\n1 0\n3 0\n",
+      4126:"10\n",
+      4127:"0 0 0 0 0\n0 0 0 0 0\n0 0 0 0 0\n0 0 0 0 0\n0 0 0 0 0\n",
+      4128:"abcdef abcdef\n",
+      4131:"3403 1\n1 1\n",
+    }
+    if n==4112:
+        return None,"题面仅规定每行是字符串且不超过 int 范围，没有可在小型测试中机械证伪的输入约束"
+    return (f"题面违规探针 for {n}",constraint_rows(n,[bad[n]])),None
+
 def alt(n, text):
     """Independent finite-case oracles: deliberately different data structures/recurrences."""
     if n==4087:
@@ -546,8 +572,8 @@ def main():
   (d/"producecase.py").write_text(produce)
   before={p.name:p.read_bytes() for p in data.iterdir()};subprocess.run([sys.executable,"producecase.py"],cwd=d,check=True,capture_output=True);after={p.name:p.read_bytes() for p in data.iterdir()};assert before==after,(n,"reproduce")
   exemption="固定 5x5 迷宫且题面保证唯一解，输入域只有该定义的结构" if n==4127 else None
-  measured_constraints=constraint_rows(n,cases)
-  a=common.audit(d,cases=cases,outputs=out,sample_input=e["sample_input"],exemption=exemption,reference_source=None if is_cpp else ref,oracle_source=f"independent oracle branch {n}",constraints=measured_constraints)
+  measured_constraints=constraint_rows(n,cases);counterexample,constraint_exemption=constraint_counterexample(n)
+  a=common.audit(d,cases=cases,outputs=out,sample_input=e["sample_input"],exemption=exemption,reference_source=None if is_cpp else ref,oracle_source=f"independent oracle branch {n}",constraints=measured_constraints,constraint_counterexample=counterexample,constraint_exemption=constraint_exemption)
   rows.append({"local_number":n,"title":e["title"],"source":e["source"],"reference_source":REFERENCE_SOURCES.get(n,"LLM-written"),"generator":g.__name__,"seed":n,"test_cases":len(cases),"distinct_input_cases":len(set(cases)),"distinct_outputs":len(set(out)),"constraints":CONSTRAINTS[n],"distinct_cases_exemption":exemption,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"independent_oracle_smoke":{"seeds":0,"status":"not_applicable","reason":"external Accepted implementation used directly"} if is_cpp else {"seeds":len(cases),"status":"passed"},"independent_oracle_status":"not_applicable_external_reference" if is_cpp else "passed","sample_reproduced":a["sample_is_case_zero"]["status"]=="passed","producecase_reproduced":a["byte_reproduction"]["status"]=="passed","self_audit":a})
   print("built",n,flush=True)
  REPORT.write_text(json.dumps({"batch":m["batch"],"entries":rows,"unbuilt":[]},ensure_ascii=False,indent=2)+"\n")
