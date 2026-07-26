@@ -92,6 +92,38 @@ GENERATORS = {n: globals()[f"g{n}"] for n in
               [4003, 4004, 4029, 4085, 3718, 6645, 7745, 23007, 27706, 28557]}
 
 REFERENCE = {}
+CPP_REFERENCE = {
+3718: r'''#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+#include<math.h>
+#include<vector>
+#include<map>
+#include<set>
+#include<queue>
+#include<stack>
+#include<algorithm>
+using namespace std;
+#define INF 0x3f3f3f3f
+#define N 16
+int main() {
+    int n, flag, i;
+    unsigned short int a, b, a1, a2;
+    scanf("%d", &n);
+    while(n--) {
+        scanf("%hd%hd", &a, &b);
+        flag = 0;
+        if(a == b) flag = 1;
+        else for(i=1; i<N; i++) {
+            a1 = a << i;
+            a2 = a >> (N - i);
+            if((a1 | a2) == b) { flag = 1; break; }
+        }
+        printf("%s\\n", flag == 1 ? "YES" : "NO");
+    }
+    return 0;
+}'''
+}
 REFERENCE[4003] = r'''import sys
 a=sys.stdin.read().split(); t=int(a[0])
 print("\n".join(str(int(x,16)) for x in a[1:t+1]))'''
@@ -314,6 +346,8 @@ def main():
         d=TESTS/bucket(n)/f"{n:05d}_made"; data=d/"data"; data.mkdir(parents=True,exist_ok=True)
         outputs=[run(ref,x) for x in cases]
         (d/"samplecode.py").write_text("# T-004-r2 reference implementation\n"+ref,encoding="utf-8")
+        if n in CPP_REFERENCE:
+            (d/"samplecode_ac.cpp").write_text(CPP_REFERENCE[n], encoding="utf-8")
         gsource=inspect.getsource(generator)
         produce=f'''import random,subprocess,tempfile
 from pathlib import Path
@@ -343,7 +377,11 @@ with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as handle:
         freq=Counter(tuple(x.split()) for x in outputs)
         report.append({
             "local_number":n,"title":entry["title"],"source":entry["source"],
-            "reference_source":"LLM-written","generator":generator.__name__,"seed":n,
+            "reference_source":"LLM-written + platform-accepted C++" if n in CPP_REFERENCE else "LLM-written",
+            "platform_reference":{"language":"G++","verdict":"Accepted","solution_id":"52995849","ms":53,
+                                  "source_path":"data/openjudge/tests/4000-8210/03718_made/samplecode_ac.cpp"}
+                              if n in CPP_REFERENCE else None,
+            "generator":generator.__name__,"seed":n,
             "test_cases":len(cases),"distinct_input_cases":len(set(cases)),
             "distinct_outputs":len(freq),"max_output_frequency":max(freq.values()),
             "constant_output_probe":{"status":"rejected" if max(freq.values())<len(cases) else "accepted",
