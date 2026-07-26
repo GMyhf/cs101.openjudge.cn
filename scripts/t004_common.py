@@ -83,6 +83,44 @@ def distinct_cases(cases, exemption=None):
     return row
 
 
+def constraint_checklist(items):
+    """题面约束逐条打钩（001b 立）。**每条的取值必须是生成器实测出来的布尔，不能是字面量。**
+
+    2026-07-26 人拍板「有既有 Accepted 就直接拿来当题目实现、不再另写实现做对拍」之后，
+    这条从「多条检查之一」变成了**唯一承重的那根**：
+
+    平台 Accepted 只保证「在**满足题面约束**的输入上正确」。对越界输入，AC 代码照样会
+    输出某个东西，而我们会把它当成标准答案写进 .out。以前有两份独立实现时，越界输入
+    常会让两者分歧从而暴露；现在只剩一份，**没有任何东西会报警**。
+
+    真实例子：T-007 回扫抓到 9202 的生成器给每张图都造了自环，而题面写明「每行两个
+    **不相等**的整数」。换成新规范，AC 代码会对这些非法图给出输出、数据照样「自洽」，
+    然后学生正确的解法会在本不该存在的数据上挂掉。
+
+    传入形如 [("1<=n<=1000", True), ("边的两端不相等", True), ...] 的列表；
+    值必须是 bool（生成器里 assert 出来的那个），字符串/None 一律判 FAILED。
+    """
+    if not items:
+        return {"status": "FAILED", "reason": "没有给出题面约束打钩表 —— "
+                                              "在「AC 源码直接当实现」的流程下这是唯一承重的检查",
+                "checked": 0}
+    rows, bad = [], []
+    for entry in items:
+        try:
+            text, value = entry
+        except (TypeError, ValueError):
+            bad.append(f"条目格式不对: {entry!r}")
+            continue
+        if not isinstance(value, bool):
+            # 001d 的教训：字段写成字面量常量，看着通过、其实没测
+            bad.append(f"{text!r} 的取值是 {value!r}，不是生成器实测的布尔")
+        elif not value:
+            bad.append(f"{text!r} 未满足")
+        rows.append({"constraint": str(text), "holds": value})
+    return {"status": "passed" if not bad else "FAILED", "checked": len(rows),
+            "items": rows, "problems": bad[:8]}
+
+
 def has_oracle(oracle, number, sample_input):
     """这题到底有没有独立 oracle —— **从实现推导，不查手维护的清单**。
 
@@ -240,7 +278,8 @@ def sample_is_case_zero(made_dir, sample_input):
 
 
 def audit(made_dir, *, cases, outputs, sample_input, exemption=None,
-          reference_source=None, oracle_source=None, run_byte_reproduction=True):
+          reference_source=None, oracle_source=None, constraints=None,
+          run_byte_reproduction=True):
     """把上面全部判据跑一遍，返回可直接写进报告的条目。
 
     调用方**不能**传入任何「实测结果」——只能给原料（数据、源码、豁免理由），
@@ -253,6 +292,8 @@ def audit(made_dir, *, cases, outputs, sample_input, exemption=None,
         "sample_is_case_zero": sample_is_case_zero(made_dir, sample_input),
         "samplecode_recompute": samplecode_recompute(made_dir),
     }
+    if constraints is not None:
+        row["constraint_checklist"] = constraint_checklist(constraints)
     if run_byte_reproduction:
         row["byte_reproduction"] = byte_reproduction(made_dir)
     if reference_source is not None and oracle_source is not None:

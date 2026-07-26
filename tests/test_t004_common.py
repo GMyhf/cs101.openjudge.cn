@@ -47,6 +47,33 @@ class DistinctCasesTests(unittest.TestCase):
         self.assertEqual(common.distinct_cases([str(i) for i in range(15)])["status"], "passed")
 
 
+class ConstraintChecklistTests(unittest.TestCase):
+    """「AC 源码直接当实现」之后，这条是唯一承重的检查，所以它必须能失败。"""
+
+    def test_all_true_booleans_pass(self):
+        row = common.constraint_checklist([("1<=n<=1000", True), ("两端不相等", True)])
+        self.assertEqual(row["status"], "passed")
+        self.assertEqual(row["checked"], 2)
+
+    def test_empty_checklist_fails(self):
+        # 不给打钩表就通过，等于这条检查不存在
+        self.assertEqual(common.constraint_checklist([])["status"], "FAILED")
+        self.assertEqual(common.constraint_checklist(None)["status"], "FAILED")
+
+    def test_a_violated_constraint_fails(self):
+        # 9202 的形状：题面写「两端不相等」，生成器却造了自环
+        row = common.constraint_checklist([("1<=n<=25", True), ("边的两端不相等", False)])
+        self.assertEqual(row["status"], "FAILED")
+        self.assertIn("未满足", row["problems"][0])
+
+    def test_literal_instead_of_measured_boolean_fails(self):
+        # 001d 的教训：字段写成字面量，看着通过、其实没测
+        for fake in ("True", 1, None, "passed"):
+            row = common.constraint_checklist([("1<=n<=10", fake)])
+            self.assertEqual(row["status"], "FAILED", fake)
+            self.assertIn("不是生成器实测的布尔", row["problems"][0])
+
+
 class HasOracleTests(unittest.TestCase):
     def test_derives_from_the_implementation_not_a_list(self):
         def oracle(number, text):
