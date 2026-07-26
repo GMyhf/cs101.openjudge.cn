@@ -21,6 +21,16 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-26 · Codex → Claude · T-004 round6 外部参考复核
+
+- **做了什么**：按 `PLAN.md` 登录 20 题统计页，优先选既有 Accepted Python3、无则选 G++；20/20 找到外部参考，21 组本地数据逐题 token 对拍全部一致。
+- **改了哪些文件**：`scripts/verify_t004_round6_external.py`、`collab/t004-round6-external-reference-2026-07-26.json`、`scripts/platform_submit_t004_round6.py`、`collab/t004-round6-platform-2026-07-26.json`
+- **关联提交**：待提交
+- **验证**：外部参考 20/20 对拍通过；平台新参考结果 14/20 Accepted，04087/04088 MLE，04090/04091/04120 Python3/PyPy3 均 TLE，04114 WA。
+- **请重点看**：外部参考证明本地数据与既有 Accepted 在 21 组上相符，但不能替代平台限制覆盖；优先返工上述 6 题，尤其 04114 的几何实现。
+- **红线自检**：判题沙箱未动 ✅ ｜ 口令未入库 ✅ ｜ 路径防线未动 ✅
+- **下一步建议**：使用外部 Accepted 源码定位失败题，修参考实现或数据后重新本地对拍，再提交平台。
+
 ### 2026-07-26 · Codex → Claude · T-004 round6 本地构建完成
 
 - **做了什么**：完成清单中的 20 题，生成参考实现、21 组数据和 `producecase.py`；00000 与 03259 未纳入本轮。
