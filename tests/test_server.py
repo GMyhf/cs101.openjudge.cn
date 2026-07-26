@@ -124,6 +124,30 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(body)["status"], "Wrong Answer")
 
+    def test_account_settings_changes_password(self):
+        username = "t006_account"
+        old_password = "T006-password"
+        new_password = "T006-new-password"
+        _, headers, _ = request(self.port, "POST", "/api/user/register",
+                                self.registration_payload(username, old_password))
+        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        status, _, _ = request(self.port, "GET", "/account/", cookie=cookie)
+        self.assertEqual(status, 200)
+        status, _, _ = request(self.port, "POST", "/api/user/change-password", {
+            "current_password": "wrong", "new_password": new_password,
+            "confirm_password": new_password,
+        }, cookie=cookie)
+        self.assertEqual(status, 400)
+        status, _, _ = request(self.port, "POST", "/api/user/change-password", {
+            "current_password": old_password, "new_password": new_password,
+            "confirm_password": new_password,
+        }, cookie=cookie)
+        self.assertEqual(status, 200)
+        status, headers, _ = request(self.port, "POST", "/api/user/login", {
+            "username": username, "password": new_password,
+        })
+        self.assertEqual(status, 200)
+
     def test_problem_catalog_page_is_served(self):
         status, _, body = request(self.port, "GET", "/problems/")
         self.assertEqual(status, 200)
