@@ -422,15 +422,21 @@ async function loadHistory() {
   if (r.status === 401) { histbox.textContent = "登录后可以看到提交记录。"; return; }
   const mine = (await r.json()).submissions.filter(s => s.problem === PROBLEM);
   if (!mine.length) { histbox.textContent = "这道题还没有提交记录。"; return; }
-  histbox.innerHTML = "<table><thead><tr><th>时间</th><th>结果</th><th>语言</th><th>细节</th><th>代码</th></tr></thead><tbody>"
+  const relativeTime = value => { const then = Date.parse(String(value).replace(" ", "T") + "Z"); if (Number.isNaN(then)) return value; const minutes = Math.max(0, Math.floor((Date.now() - then) / 60000)); if (minutes < 1) return "刚刚"; if (minutes < 60) return minutes + "分钟前"; const hours = Math.floor(minutes / 60); return hours < 24 ? hours + "小时前" : Math.floor(hours / 24) + "天前"; };
+  histbox.innerHTML = "<table><thead><tr><th>提交人</th><th>结果</th><th>内存</th><th>时间</th><th>代码长度</th><th>语言</th><th>提交时间</th><th>代码/详情</th></tr></thead><tbody>"
     + mine.map(s => {
         const d = s.detail || {};
         const note = d.case !== undefined ? "第 " + d.case + " 组"
                    : d.cases !== undefined ? d.cases + " 组全过" : "";
+        const memory = d.memory_kb !== undefined ? d.memory_kb + "kB" : "";
+        const elapsed = d.time_ms !== undefined ? d.time_ms + "ms" : "";
+        const size = d.source_bytes !== undefined ? d.source_bytes + " B" : (s.source ? new TextEncoder().encode(s.source).length + " B" : "");
         const code = s.source ? "<details><summary>查看代码</summary><pre class='msg source'>" + esc(s.source) + "</pre></details>" : "";
         const expected = d.expected_output ? "<details><summary>查看期望输出</summary><pre class='msg source'>" + esc(d.expected_output.text || "") + "</pre></details>" : "";
-        return "<tr><td class='num'>" + esc(s.created) + "</td><td>" + badge(s.result)
-             + "</td><td>" + esc(s.language || "") + "</td><td class='muted'>" + esc(note) + "</td><td>" + code + expected + "</td></tr>";
+        return "<tr><td>" + esc(s.user || "") + "</td><td>" + badge(s.result)
+             + "</td><td class='num muted'>" + esc(memory) + "</td><td class='num muted'>" + esc(elapsed)
+             + "</td><td class='num muted'>" + esc(size) + "</td><td>" + esc(s.language || "")
+             + "</td><td class='num' title='" + esc(s.created) + "'>" + esc(relativeTime(s.created)) + "</td><td>" + code + expected + "<div class='muted'>" + esc(note) + "</div></td></tr>";
       }).join("") + "</tbody></table>";
 }
 </script></html>"""
@@ -795,7 +801,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                 rows = db.execute("select problem, result, created, book, language, detail, source from submissions"
                                   " where user = ? order by id desc limit ?", (user, limit)).fetchall()
             self.send_json({"user": user, "submissions": [
-                {"problem": r[0], "result": r[1], "created": r[2], "book": r[3], "language": r[4],
+                {"user": user, "problem": r[0], "result": r[1], "created": r[2], "book": r[3], "language": r[4],
                  "detail": json.loads(r[5]) if r[5] else {}, "source": r[6] or ""} for r in rows]})
             return
         if path in ("/history", "/history/"):
@@ -1004,6 +1010,8 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             book, problem = data.get("book", ""), data.get("problem", "")
             language = data.get("language", "python")
             result = judge(book, problem, language, data.get("source", data.get("code", "")))
+            submitted_source = str(data.get("source", data.get("code", "")))
+            result["source_bytes"] = len(submitted_source.encode("utf-8"))
             # 开关关闭时片段根本不进 response —— 不是前端藏起来，是后端不发。
             if reveal_effective(book) and result.get("case"):
                 snippet = failing_input_snippet(book, problem, result["case"])
@@ -1017,7 +1025,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             with sqlite3.connect(DB) as db:
                 db.execute("insert into submissions(user, problem, result, book, language, detail, source) values (?, ?, ?, ?, ?, ?, ?)",
                            (self.current_user() or ADMIN_USER, problem, result["status"], book, language, detail,
-                            str(data.get("source", data.get("code", "")))))
+                            submitted_source))
             self.send_json(result); return
         self.send_json({"error": "Unauthorized"}, 401)
 

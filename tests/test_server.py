@@ -207,6 +207,9 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(latest["detail"]["case"], verdict["case"])
         self.assertEqual(latest["source"], "print('wrong')")
         self.assertTrue(latest["detail"]["expected_output"]["text"])
+        self.assertGreaterEqual(latest["detail"]["time_ms"], 0)
+        self.assertGreater(latest["detail"]["memory_kb"], 0)
+        self.assertEqual(latest["detail"]["source_bytes"], len("print('wrong')".encode()))
 
     def _admin_cookie(self):
         status, headers, _ = request(self.port, "POST", "/api/login", {

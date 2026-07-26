@@ -6,6 +6,7 @@ import shutil
 import signal
 import subprocess
 import tempfile
+import time
 from pathlib import Path
 
 ROOT = Path(__file__).parent
@@ -68,14 +69,24 @@ def judge(book, problem_id, language, source):
             compile_result = _run(["g++" if ext == ".cpp" else "gcc", "-O2", "-std=c++17" if ext == ".cpp" else "-std=c11", str(source_path), "-o", str(executable)], cwd=work, timeout=15)
             if compile_result.returncode: return {"status": "Compile Error", "message": compile_result.stderr.decode(errors="replace")[-4000:]}
             command = [str(executable)]
+        overall_started = time.perf_counter()
+        peak_memory = 0
+        last_metrics = {}
         for index, case in enumerate(cases, 1):
             input_data = (MIRROR / case["input"]).read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
             expected = (MIRROR / case["output"]).read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
             try: result = _run(command, stdin=input_data, cwd=work)
-            except subprocess.TimeoutExpired: return {"status": "Time Limit Exceeded", "case": index, "message": "单组测试超过 5 秒。"}
+            except subprocess.TimeoutExpired:
+                return {"status": "Time Limit Exceeded", "case": index, "time_ms": round((time.perf_counter() - overall_started) * 1000),
+                        "memory_kb": int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss),
+                        "message": "单组测试超过 5 秒。"}
+            memory_kb = int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss)
+            peak_memory = max(peak_memory, memory_kb)
+            last_metrics = {"time_ms": round((time.perf_counter() - overall_started) * 1000), "memory_kb": peak_memory}
             actual = result.stdout.decode(errors="replace")
-            if len(actual.encode()) > 2 * 1024 * 1024: return {"status": "Output Limit Exceeded", "case": index}
-            if result.returncode in {-signal.SIGXCPU, -signal.SIGKILL}: return {"status": "Time Limit Exceeded", "case": index, "message": "单组测试超过 CPU 限制。"}
-            if result.returncode != 0: return {"status": "Runtime Error", "case": index, "message": result.stderr.decode(errors="replace")[-4000:]}
-            if actual.split() != expected.split(): return {"status": "Wrong Answer", "case": index, "expected_tokens": len(expected.split()), "actual_tokens": len(actual.split())}
-    return {"status": "Accepted", "cases": len(cases)}
+            metrics = {"time_ms": round((time.perf_counter() - overall_started) * 1000), "memory_kb": peak_memory}
+            if len(actual.encode()) > 2 * 1024 * 1024: return {"status": "Output Limit Exceeded", "case": index, **metrics}
+            if result.returncode in {-signal.SIGXCPU, -signal.SIGKILL}: return {"status": "Time Limit Exceeded", "case": index, **metrics, "message": "单组测试超过 CPU 限制。"}
+            if result.returncode != 0: return {"status": "Runtime Error", "case": index, **metrics, "message": result.stderr.decode(errors="replace")[-4000:]}
+            if actual.split() != expected.split(): return {"status": "Wrong Answer", "case": index, **metrics, "expected_tokens": len(expected.split()), "actual_tokens": len(actual.split())}
+    return {"status": "Accepted", "cases": len(cases), **last_metrics}
