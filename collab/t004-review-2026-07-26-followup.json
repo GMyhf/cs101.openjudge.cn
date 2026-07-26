@@ -1,0 +1,86 @@
+{
+  "batch": "Claude 复核 · codex 返工与回扫的验证（2026-07-26）",
+  "scope": "验证 codex 的三件交付：①T-004 前三轮 8 题返工 ②T-002/T-003 平台回扫 ③round5 部分打回项修复。全部结论以**我自己重新提交平台 / 重跑判据**为准，不采信报告字段。",
+  "round1to3_rework": {
+    "verdict": "通过。8 题平台全部 Accepted",
+    "platform": {
+      "3527": "Accepted 20ms",
+      "3711": "Accepted 21ms",
+      "3712": "Accepted 23ms",
+      "3714": "Accepted 20ms",
+      "3715": "Accepted 23ms",
+      "3719": "Accepted 23ms",
+      "3718": "Accepted 55ms（C++，Python 版仍不行）",
+      "3376": "Python3 档仍 TLE；**PyPy3 档 Accepted 1232ms**"
+    },
+    "local": "共享模块逐题审计：8 题的去重、恒定输出探针、字节复现、samplecode 复算、样例即第 0 组，全部通过"
+  },
+  "t002_t003_rescan": {
+    "verdict": "属实。169/172 Accepted",
+    "claude_reverified": {
+      "23563": "Wrong Answer #52995945（我独立重提确认）",
+      "26999": "Time Limit Exceeded #52995946（我独立重提确认）"
+    },
+    "not_applicable": {
+      "14683": "cs101 上无提交表单，记为平台检查不适用"
+    },
+    "contrast": "**题解-backed 批次的平台失败率 1/172 ≈ 0.6%，LLM 自写批次 20~30%。**这组对比第一次把「参考解法的来源」量化成了风险差异：人工验证过的题解，比自写实现可靠两个数量级。"
+  },
+  "round5_fixed": {
+    "4012": "Accepted 4302ms（原 WA），且去重从 4 组修到 21 组",
+    "4076": "Accepted 157ms（原 WA）",
+    "script": "恒定输出探针不再是写死字面量、手维护的 NO_INDEPENDENT_ORACLE 已删、脚本已 import 共享模块",
+    "hygiene": "3433 的 64KB ELF 二进制已从仓库移除",
+    "data_consistency": "3750/4012/4076 三题参考解法改动后，数据确已重新生成 —— samplecode 逐组复算与字节复现均通过"
+  },
+  "still_open": [
+    {
+      "id": 1,
+      "problem": 3750,
+      "batch": "round5",
+      "state": "平台仍 Wrong Answer #52995934（codex 已改过一次）"
+    },
+    {
+      "id": 2,
+      "problem": 3377,
+      "batch": "round5",
+      "state": "平台 Presentation Error，尚未处理",
+      "hint": "**3377 与 3376 是同一道题** —— 描述/输入/输出/样例输入/样例输出逐段完全相同，而 3376 返工后已平台 Accepted（PyPy3 1232ms）。直接把 3376 的实现搬过去即可，不必重新解题。注意 3377 上一轮就是 PE，题目要求每 80 字符换行"
+    },
+    {
+      "id": 3,
+      "problem": 23563,
+      "batch": "T-003",
+      "state": "平台 Wrong Answer，我已独立复验"
+    },
+    {
+      "id": 4,
+      "problem": 26999,
+      "batch": "T-003",
+      "state": "Python3 与 PyPy3 两档均 TLE，我已独立复验"
+    },
+    {
+      "id": 5,
+      "problem": 4140,
+      "batch": "round5",
+      "state": "oracle 仍是与参考解法逐字相同的写死常量，报告却标 independent_oracle_status=passed；去重 1 组、无豁免记录",
+      "note": "探针字段现在如实标 accepted（21/21，零鉴别力）——这一半已修好",
+      "action": "oracle 改成真正独立的求根实现（二分 vs 牛顿），或如实标 no_independent_oracle；去重按「题面无输入、输入域只有 1 个取值」记豁免"
+    },
+    {
+      "id": 6,
+      "problem": 4011,
+      "batch": "round5",
+      "state": "oracle 与参考解法逐字重合触发共享模块报警，报告仍标 passed",
+      "action": "换算法族重写，或如实标 no_independent_oracle"
+    },
+    {
+      "id": 7,
+      "problem": 3433,
+      "batch": "round5",
+      "state": "ELF 已删，但目录里仍无 samplecode.py（参考实现是 samplecode_ac.cpp）",
+      "action": "只要报告里明确写清「本题参考实现是 C++」即可；否则任何假设 samplecode.py 存在的工具都会在这题上失败（共享模块的 samplecode_recompute 就是这样报出来的）"
+    }
+  ],
+  "method_note": "本轮所有结论都来自重新提交平台或重跑判据，没有采信任何报告字段 —— 这正是 001d 立「报告字段必须实测」那条规矩的复核侧对应做法。"
+}
