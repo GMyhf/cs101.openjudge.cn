@@ -10,7 +10,26 @@ sys.path.insert(0,str(ROOT/"scripts"))
 from build_001a import bucket
 import t004_common as common
 
+CPP_REFERENCE={n:ROOT/f"scripts/t004_platform_accepted_{n}.cpp" for n in (4087,4088,4090,4091,4114,4120)}
+CPP_BINS={n:Path(tempfile.gettempdir())/f"t004-platform-accepted-r6-{n}" for n in CPP_REFERENCE}
+REFERENCE_SOURCES={
+ 4087:"platform Accepted G++ #52367412",
+ 4088:"platform Accepted G++ #51702169",
+ 4090:"platform Accepted G++ #51702178",
+ 4091:"platform Accepted G++ #51702184",
+ 4114:"platform Accepted G++ #52510171",
+ 4120:"platform Accepted G++ #52493018",
+}
+
 def run(src,text):
+    if src.startswith("__T004_CPP_"):
+        number=int(src.removeprefix("__T004_CPP_").removesuffix("__"))
+        cpp=CPP_REFERENCE[number]; binary=CPP_BINS[number]
+        if not binary.exists() or binary.stat().st_mtime < cpp.stat().st_mtime:
+            subprocess.run(["g++","-std=c++17","-O2",str(cpp),"-o",str(binary)],check=True,capture_output=True,text=True)
+        p=subprocess.run([str(binary)],input=text,text=True,capture_output=True,timeout=60)
+        if p.returncode: raise RuntimeError(p.stderr[-1000:])
+        return p.stdout
     with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as f:
         f.write(src); f.flush()
         p=subprocess.run([sys.executable,f.name],input=text,text=True,capture_output=True,timeout=60)
@@ -416,7 +435,7 @@ def main():
  for e in m["entries"]:
   n=e["local_number"]
   if only is not None and n!=only:continue
-  g=GENERATORS[n];ref=REFERENCE.replace("P=0",f"P={n}",1);cases=[e["sample_input"]]+[g(random.Random(n+i)) for i in range(1,21)]
+  g=GENERATORS[n];is_cpp=n in CPP_REFERENCE;ref=f"__T004_CPP_{n}__" if is_cpp else REFERENCE.replace("P=0",f"P={n}",1);cases=[e["sample_input"]]+[g(random.Random(n+i)) for i in range(1,21)]
   assert run(ref,e["sample_input"]).split()==e["sample_output"].split(),(n,"sample")
   for i in range(20000):g(random.Random(n+i))
   for i in range(400):run(ref,g(random.Random(n+100000+i)))
@@ -426,13 +445,22 @@ def main():
   out=[]
   for i,c in enumerate(cases):
    z=run(ref,c);out.append(z);(data/f"{i}.in").write_text(c);(data/f"{i}.out").write_text(z)
-  (d/"samplecode.py").write_text(f"# T-004-r6\n{ref}")
-  src=inspect.getsource(g);produce=f'''import random,subprocess,tempfile\nfrom pathlib import Path\nS={ref!r}\nI={e["sample_input"]!r}\n{src}\nwith tempfile.NamedTemporaryFile("w") as f:\n f.write(S);f.flush();d=Path(__file__).parent/"data"\n for i in range(21):\n  c=I if i==0 else {g.__name__}(random.Random({n}+i));p=subprocess.run(["python3",f.name],input=c,text=True,capture_output=True,check=True);(d/f"{{i}}.in").write_text(c);(d/f"{{i}}.out").write_text(p.stdout)\n'''
+  if is_cpp:
+   (d/"samplecode.cpp").write_bytes(CPP_REFERENCE[n].read_bytes())
+   stale=d/"samplecode.py"
+   if stale.exists():stale.unlink()
+  else:
+   (d/"samplecode.py").write_text(f"# T-004-r6\n{ref}")
+  src=inspect.getsource(g)
+  if is_cpp:
+   produce=f'''import random,subprocess\nfrom pathlib import Path\nI={e["sample_input"]!r}\n{src}\nroot=Path(__file__).parent; binary=root/"reference"\nsubprocess.run(["g++","-std=c++17","-O2",str(root/"samplecode.cpp"),"-o",str(binary)],check=True)\nfor i in range(21):\n c=I if i==0 else {g.__name__}(random.Random({n}+i));p=subprocess.run([str(binary)],input=c,text=True,capture_output=True,check=True);(root/"data"/f"{{i}}.in").write_text(c);(root/"data"/f"{{i}}.out").write_text(p.stdout)\nbinary.unlink()\n'''
+  else:
+   produce=f'''import random,subprocess,tempfile\nfrom pathlib import Path\nS={ref!r}\nI={e["sample_input"]!r}\n{src}\nwith tempfile.NamedTemporaryFile("w") as f:\n f.write(S);f.flush();d=Path(__file__).parent/"data"\n for i in range(21):\n  c=I if i==0 else {g.__name__}(random.Random({n}+i));p=subprocess.run(["python3",f.name],input=c,text=True,capture_output=True,check=True);(d/f"{{i}}.in").write_text(c);(d/f"{{i}}.out").write_text(p.stdout)\n'''
   (d/"producecase.py").write_text(produce)
   before={p.name:p.read_bytes() for p in data.iterdir()};subprocess.run([sys.executable,"producecase.py"],cwd=d,check=True,capture_output=True);after={p.name:p.read_bytes() for p in data.iterdir()};assert before==after,(n,"reproduce")
   exemption="固定 5x5 迷宫且题面保证唯一解，输入域只有该定义的结构" if n==4127 else None
-  a=common.audit(d,cases=cases,outputs=out,sample_input=e["sample_input"],exemption=exemption,reference_source=ref,oracle_source=f"independent oracle branch {n}")
-  rows.append({"local_number":n,"title":e["title"],"source":e["source"],"reference_source":"LLM-written","generator":g.__name__,"seed":n,"test_cases":len(cases),"distinct_input_cases":len(set(cases)),"distinct_outputs":len(set(out)),"constraints":CONSTRAINTS[n],"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"independent_oracle_smoke":{"seeds":len(cases),"status":"passed"},"independent_oracle_status":"passed","sample_reproduced":a["sample_is_case_zero"]["status"]=="passed","producecase_reproduced":a["byte_reproduction"]["status"]=="passed","self_audit":a})
+  a=common.audit(d,cases=cases,outputs=out,sample_input=e["sample_input"],exemption=exemption,reference_source=None if is_cpp else ref,oracle_source=f"independent oracle branch {n}")
+  rows.append({"local_number":n,"title":e["title"],"source":e["source"],"reference_source":REFERENCE_SOURCES.get(n,"LLM-written"),"generator":g.__name__,"seed":n,"test_cases":len(cases),"distinct_input_cases":len(set(cases)),"distinct_outputs":len(set(out)),"constraints":CONSTRAINTS[n],"distinct_cases_exemption":exemption,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"independent_oracle_smoke":{"seeds":len(cases),"status":"passed"},"independent_oracle_status":"passed","sample_reproduced":a["sample_is_case_zero"]["status"]=="passed","producecase_reproduced":a["byte_reproduction"]["status"]=="passed","self_audit":a})
   print("built",n,flush=True)
  REPORT.write_text(json.dumps({"batch":m["batch"],"entries":rows,"unbuilt":[]},ensure_ascii=False,indent=2)+"\n")
 if __name__=="__main__":main()

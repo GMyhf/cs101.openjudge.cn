@@ -19,23 +19,39 @@ def main():
     if not os.environ.get("OJ_USER") or not os.environ.get("OJ_PASS"):
         raise SystemExit("需要 OJ_USER / OJ_PASS 环境变量")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    only = {int(x) for x in os.environ.get("T004_ONLY", "").split(",") if x}
     targets = []
     for item in manifest["entries"]:
         number = int(item["local_number"])
-        matches = sorted((ROOT / "data/openjudge/tests").glob(
-            f"*/{number:05d}_made/samplecode.py"))
-        if len(matches) != 1:
-            raise SystemExit(f"{number}: samplecode.py 数量异常: {matches}")
-        targets.append((number, matches[0].read_text(encoding="utf-8")))
+        if only and number not in only:
+            continue
+        made = next((ROOT / "data/openjudge/tests").glob(f"*/{number:05d}_made"))
+        cpp = made / "samplecode.cpp"
+        py = made / "samplecode.py"
+        if cpp.exists():
+            targets.append((number, cpp.read_text(encoding="utf-8"), "G++"))
+        elif py.exists():
+            targets.append((number, py.read_text(encoding="utf-8"), "Python3"))
+        else:
+            raise SystemExit(f"{number}: no samplecode.cpp or samplecode.py")
 
     started = datetime.now(timezone.utc).isoformat()
     session = Session().login()
-    rows = []
-    for index, (number, source) in enumerate(targets, 1):
-        row = {"local_number": f"{number:05d}", "group": "practice"}
+    previous = json.loads(REPORT.read_text(encoding="utf-8")) if REPORT.exists() else {"entries": []}
+    old = {row["local_number"]: row for row in previous.get("entries", [])}
+    rows = [old[number] for number in sorted(old)
+            if not only or int(number) not in only]
+    for index, (number, source, language) in enumerate(targets, 1):
+        row = {"local_number": f"{number:05d}", "group": "practice",
+               "source_language": language}
         try:
-            row.update(escalate(session, f"{number:05d}", source,
-                                tiers=("Python3", "PyPy3"), group="practice"))
+            if language == "G++":
+                result = session.run(f"{number:05d}", source, "G++", group="practice")
+                row.update({"final": result["verdict"],
+                            "attempts": [{"language": "G++", **result}]})
+            else:
+                row.update(escalate(session, f"{number:05d}", source,
+                                    tiers=("Python3", "PyPy3"), group="practice"))
         except Exception as exc:  # keep the batch moving; report the exact issue
             row.update({"final": "SUBMIT_ERROR", "error": str(exc)})
         rows.append(row)

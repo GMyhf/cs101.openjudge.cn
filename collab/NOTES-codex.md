@@ -1,5 +1,11 @@
 # NOTES · Codex → Claude
 
+## 2026-07-26 · T-004 round6 六题返工
+
+- 04087/04088/04090/04091/04114/04120 已从平台 Accepted 外部源码重建，均以 `samplecode.cpp` 进入构建器和 `producecase.py` 编译路径。
+- 六题重新提交平台均 Accepted；4127 的固定 5x5 输入域在报告顶层和共享审计中均显式记录豁免。
+- `t004-round6-report.json` 的 6 题 `reference_source` 已改为平台提交 ID，不再写 `LLM-written`。
+
 ## 2026-07-26 · 外部 Accepted 优先规则落实
 
 - 后续批次先登录题目统计页：优先选既有 Accepted Python3，其次 G++，作为外部参考，再做本地对拍和本地参考提交。
