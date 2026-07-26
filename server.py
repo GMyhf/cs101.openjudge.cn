@@ -5,12 +5,16 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import hashlib
+import hmac
 import os
 import secrets
+import smtplib
 import sqlite3
+import time
 import urllib.error
 import urllib.request
 import re
+from email.message import EmailMessage
 from html import escape, unescape
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
@@ -25,6 +29,7 @@ ADMIN_PASSWORD = os.environ.get("CS101_ADMIN_PASSWORD") or (PASSWORD_FILE.read_t
 TOKENS = set()
 SESSION_USERS = {}
 CATALOG_TITLE_CACHE = {}
+CAPTCHA_CHALLENGES = {}
 
 COURSE = {
     "title": "计算机科学导论",
@@ -423,6 +428,10 @@ def init_db():
         for column in ("book text", "language text", "detail text"):
             if column.split()[0] not in existing:
                 db.execute(f"alter table submissions add column {column}")
+        user_columns = {row[1] for row in db.execute("pragma table_info(users)")}
+        for column in ("email text", "reset_token_hash text", "reset_expires integer"):
+            if column.split()[0] not in user_columns:
+                db.execute(f"alter table users add column {column}")
 
 # 「出错那组的输入片段」开关。默认**关**：管理员忘了考前关掉是泄题，
 # 忘了课后打开只是少点帮助——两种疏忽的代价不对称，所以默认取保守的一侧。
@@ -536,6 +545,21 @@ def password_hash(password):
 def valid_password(stored, password):
     return stored == password_hash(password)
 
+def new_captcha():
+    left, right = secrets.randbelow(8) + 2, secrets.randbelow(8) + 2
+    token = secrets.token_urlsafe(18)
+    CAPTCHA_CHALLENGES[token] = (str(left + right), time.time() + 600)
+    return token, f"{left} + {right} = ?"
+
+def valid_captcha(token, answer):
+    challenge = CAPTCHA_CHALLENGES.pop(str(token), None)
+    if not challenge or challenge[1] < time.time():
+        return False
+    return hmac.compare_digest(challenge[0], str(answer).strip())
+
+def reset_token_hash(token):
+    return hashlib.sha256(token.encode()).hexdigest()
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print("%s - %s" % (self.address_string(), fmt % args))
@@ -597,10 +621,26 @@ a{{color:var(--green)}}.shell{{max-width:1120px;margin:auto;padding:0 24px}}.top
 
     def account_page(self, register=False):
         title = "注册 CS101 账号" if register else "登录 CS101"
+        captcha_token, captcha_question = new_captcha() if register else ("", "")
+        fields = f"""<label>邮箱地址<input name="email" type="email" required autocomplete="email" placeholder="name@example.com"></label>
+<label>用户名<input name="username" required minlength="2" maxlength="32" autocomplete="username"></label>
+<label>密码<input name="password" type="password" required minlength="8" autocomplete="new-password"></label>
+<label>确认密码<input name="confirm_password" type="password" required minlength="8" autocomplete="new-password"></label>
+<label>人机验证 <span class="captcha-question">{escape(captcha_question)}</span><input name="captcha_answer" inputmode="numeric" required placeholder="请输入计算结果"><input type="hidden" name="captcha_token" value="{captcha_token}"></label>""" if register else """<label>用户名<input name="username" required autocomplete="username"></label>
+<label>密码<input name="password" type="password" required autocomplete="current-password"></label>"""
         endpoint = "/api/user/register" if register else "/api/user/login"
-        switch = "已有账号？登录" if register else "还没有账号？注册"
-        switch_url = "/auth/login/" if register else "/register/"
-        return f"""<!doctype html><html lang='zh-CN'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>{title}</title><style>body{{font:15px system-ui;max-width:430px;margin:70px auto;padding:0 20px;color:#17221d}}h1{{font-size:28px}}label{{display:block;margin:18px 0 6px}}input{{width:100%;padding:12px;box-sizing:border-box;border:1px solid #ccd5cc;border-radius:4px}}button{{margin-top:22px;padding:12px 18px;background:#17221d;color:white;border:0;border-radius:4px;cursor:pointer}}a{{color:#3d8b68}}#error{{color:#b04f43;min-height:20px}}</style><h1>{title}</h1><p>本地 CS101 账户系统</p><form id='account'><label>用户名<input name='username' required minlength='2' maxlength='32' autocomplete='username'></label><label>密码<input name='password' type='password' required minlength='6' autocomplete='current-password'></label><p id='error'></p><button>提交</button></form><p><a href='{switch_url}'>{switch}</a> · <a href='/'>返回 CS101 首页</a></p><script>account.onsubmit=async e=>{{e.preventDefault();error.textContent='';let r=await fetch('{endpoint}',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(Object.fromEntries(new FormData(account)))}});let d=await r.json();if(r.ok)location.href='/';else error.textContent=d.error||'操作失败'}}</script></html>"""
+        links = "<a href='/auth/login/'>已有账号？登录</a>" if register else "<a href='/auth/forgot/'>忘记密码？</a> · <a href='/register/'>点此注册</a>"
+        return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>
+:root{{--ink:#16231d;--muted:#6c7b73;--line:#dfe7e1;--bg:#f4f7f4;--paper:#fff;--green:#237a50;--red:#b04f43}}*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}}.shell{{max-width:460px;margin:0 auto;padding:70px 20px}}.brand{{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:28px}}.mark{{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:#fff;font-size:15px}}.panel{{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}}h1{{font-size:28px;line-height:1.2;margin:0 0 6px}}.intro{{color:var(--muted);margin:0 0 23px}}label{{display:block;margin:16px 0 6px;font-weight:600}}input{{display:block;width:100%;padding:11px 12px;border:1px solid #ccd8cf;border-radius:6px;background:#fff;font:inherit;outline:none}}input:focus{{border-color:var(--green);box-shadow:0 0 0 3px #e5f3eb}}button{{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:#fff;border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}}a{{color:var(--green)}}.links{{margin:19px 0 0;color:var(--muted);font-size:14px;text-align:center}}.error{{min-height:22px;color:var(--red);margin:12px 0 0}}.captcha-question{{display:inline-block;margin-left:5px;color:var(--green);font-family:ui-monospace,monospace}}@media(max-width:520px){{.shell{{padding:35px 16px}}.panel{{padding:24px}}}}
+</style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><h1>{title}</h1><p class="intro">{'创建账号后即可提交代码并查看判题记录。' if register else '登录后继续使用提交与判题功能。'}</p><form id="account">{fields}<p id="error" class="error"></p><button>提交</button></form><p class="links">{links} · <a href="/">返回首页</a></p></section></main><script>const form=document.querySelector('#account'),error=document.querySelector('#error');form.onsubmit=async e=>{{e.preventDefault();error.textContent='';const data=Object.fromEntries(new FormData(form));if(data.confirm_password!==undefined&&data.password!==data.confirm_password){{error.textContent='两次输入的密码不一致';return}}const r=await fetch('{endpoint}',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(data)}});const d=await r.json();if(r.ok)location.href='/';else error.textContent=d.error||'操作失败'}};</script></body></html>"""
+
+    def forgot_page(self):
+        return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>找回密码 · CS101</title><style>
+:root{--ink:#16231d;--muted:#6c7b73;--line:#dfe7e1;--bg:#f4f7f4;--paper:#fff;--green:#237a50;--red:#b04f43}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:460px;margin:0 auto;padding:70px 20px}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:28px}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:#fff;font-size:15px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}h1{font-size:28px;line-height:1.2;margin:0 0 6px}.intro{color:var(--muted);margin:0 0 23px}label{display:block;margin:16px 0 6px;font-weight:600}input{display:block;width:100%;padding:11px 12px;border:1px solid #ccd8cf;border-radius:6px;font:inherit;outline:none}button{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:#fff;border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}a{color:var(--green)}.message{color:var(--muted);margin-top:15px;word-break:break-word}@media(max-width:520px){.shell{padding:35px 16px}.panel{padding:24px}}
+</style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><h1>忘记密码？</h1><p class="intro">输入注册邮箱，我们会生成一次性密码重置链接。</p><form id="forgot"><label>邮箱地址<input name="email" type="email" required autocomplete="email"></label><button>发送重置链接</button></form><p id="message" class="message"></p><p><a href="/auth/login/">返回登录</a> · <a href="/register/">点此注册</a></p></section></main><script>forgot.onsubmit=async e=>{e.preventDefault();message.textContent='正在处理…';const r=await fetch('/api/user/forgot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(forgot)))});const d=await r.json();message.innerHTML=d.reset_link?'邮件服务尚未配置，请使用本机重置链接：<a href="'+d.reset_link+'">立即重置密码</a>':'如果该邮箱已注册，重置链接已发送或正在等待管理员配置邮件服务。';}</script></body></html>"""
+
+    def reset_page(self, token):
+        return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>重置密码 · CS101</title><style>body{{margin:0;background:#f4f7f4;color:#16231d;font:15px/1.6 system-ui,sans-serif}}main{{max-width:460px;margin:70px auto;padding:0 20px}}section{{background:#fff;border:1px solid #dfe7e1;border-radius:10px;padding:30px}}h1{{margin:0 0 20px}}label{{display:block;margin:14px 0 6px;font-weight:600}}input{{width:100%;padding:11px;box-sizing:border-box;border:1px solid #ccd8cf;border-radius:6px;font:inherit}}button{{width:100%;margin-top:20px;padding:11px;background:#16231d;color:white;border:0;border-radius:6px;font:inherit}}a{{color:#237a50}}#message{{color:#b04f43}}</style></head><body><main><section><h1>设置新密码</h1><form id="reset"><label>新密码<input name="password" type="password" minlength="8" required autocomplete="new-password"></label><label>确认密码<input name="confirm_password" type="password" minlength="8" required autocomplete="new-password"></label><p id="message"></p><button>保存新密码</button></form><p><a href="/auth/login/">返回登录</a></p></section></main><script>reset.onsubmit=async e=>{{e.preventDefault();message.textContent='';const d=Object.fromEntries(new FormData(reset));if(d.password!==d.confirm_password){{message.textContent='两次输入的密码不一致';return}}d.token={json.dumps(token)};const r=await fetch('/api/user/reset',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(d)}});const x=await r.json();if(r.ok){{message.style.color='#237a50';message.textContent='密码已更新，请返回登录。';reset.querySelector('button').disabled=true}}else message.textContent=x.error||'重置失败'}};</script></body></html>"""
 
     def do_GET(self):
         parsed = urlparse(self.path)
@@ -612,6 +652,11 @@ a{{color:var(--green)}}.shell{{max-width:1120px;margin:auto;padding:0 24px}}.top
             self.send_html(self.account_page()); return
         if path == "/register/":
             self.send_html(self.account_page(register=True)); return
+        if path == "/auth/forgot/":
+            self.send_html(self.forgot_page()); return
+        if path == "/auth/reset/":
+            token = parse_qs(parsed.query).get("token", [""])[0]
+            self.send_html(self.reset_page(token)); return
         submit_page = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/([^/]+)/submit/", path)
         if submit_page:
             book, problem_id = submit_page.groups()
@@ -722,17 +767,27 @@ a{{color:var(--green)}}.shell{{max-width:1120px;margin:auto;padding:0 24px}}.top
             try: data = json.loads(raw or b"{}")
             except json.JSONDecodeError: self.send_json({"error": "Invalid JSON"}, 400); return
         if path == "/api/user/register":
+            email = str(data.get("email", "")).strip().lower()
             username, password = str(data.get("username", "")).strip(), str(data.get("password", ""))
+            if not re.fullmatch(r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+", email):
+                self.send_json({"error": "请输入有效的邮箱地址"}, 400); return
             if len(username) < 2 or len(username) > 32 or not re.fullmatch(r"[\w\u4e00-\u9fff-]+", username):
                 self.send_json({"error": "用户名需为 2-32 个字母、数字、下划线、中文或短横线"}, 400); return
-            if len(password) < 6:
-                self.send_json({"error": "密码至少需要 6 位"}, 400); return
+            if len(password) < 8:
+                self.send_json({"error": "密码至少需要 8 位"}, 400); return
+            if password != str(data.get("confirm_password", "")):
+                self.send_json({"error": "两次输入的密码不一致"}, 400); return
+            if not valid_captcha(data.get("captcha_token", ""), data.get("captcha_answer", "")):
+                self.send_json({"error": "人机验证失败，请刷新注册页面后重试"}, 400); return
             if username == ADMIN_USER:
                 self.send_json({"error": "该用户名不可注册"}, 409); return
             try:
-                with sqlite3.connect(DB) as db: db.execute("insert into users(username, password_hash) values (?, ?)", (username, password_hash(password)))
+                with sqlite3.connect(DB) as db:
+                    if db.execute("select 1 from users where username = ? or lower(email) = ?", (username, email)).fetchone():
+                        self.send_json({"error": "用户名或邮箱已存在"}, 409); return
+                    db.execute("insert into users(username, password_hash, email) values (?, ?, ?)", (username, password_hash(password), email))
             except sqlite3.IntegrityError:
-                self.send_json({"error": "用户名已存在"}, 409); return
+                self.send_json({"error": "用户名或邮箱已存在"}, 409); return
             token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = username
             self.send_response(200); self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/"); self.send_header("Content-Type", "application/json; charset=utf-8"); self.end_headers(); self.wfile.write(b'{"ok":true}'); return
         if path == "/api/user/login":
@@ -746,6 +801,54 @@ a{{color:var(--green)}}.shell{{max-width:1120px;margin:auto;padding:0 24px}}.top
                 self.send_json({"error": "用户名或密码不正确"}, 401); return
             token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = username
             self.send_response(200); self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/"); self.send_header("Content-Type", "application/json; charset=utf-8"); self.end_headers(); self.wfile.write(b'{"ok":true}'); return
+        if path == "/api/user/forgot":
+            email = str(data.get("email", "")).strip().lower()
+            generic = {"ok": True}
+            with sqlite3.connect(DB) as db:
+                row = db.execute("select username from users where email = ?", (email,)).fetchone()
+                if row:
+                    token = secrets.token_urlsafe(32)
+                    db.execute("update users set reset_token_hash = ?, reset_expires = ? where email = ?",
+                               (reset_token_hash(token), int(time.time()) + 1800, email))
+            if not row:
+                self.send_json(generic); return
+            base = os.environ.get("CS101_PUBLIC_URL", "").rstrip("/")
+            if not base:
+                scheme = "https" if self.headers.get("X-Forwarded-Proto") == "https" else "http"
+                base = f"{scheme}://{self.headers.get('Host', '127.0.0.1:8000')}"
+            link = f"{base}/auth/reset/?token={token}"
+            smtp_host = os.environ.get("CS101_SMTP_HOST")
+            if smtp_host:
+                try:
+                    message = EmailMessage()
+                    message["Subject"] = "CS101 密码重置"
+                    message["From"] = os.environ.get("CS101_SMTP_FROM", os.environ.get("CS101_SMTP_USER", ""))
+                    message["To"] = email
+                    message.set_content(f"请在 30 分钟内打开以下链接重置 CS101 密码：\n{link}\n")
+                    with smtplib.SMTP(smtp_host, int(os.environ.get("CS101_SMTP_PORT", "587")), timeout=15) as smtp:
+                        smtp.starttls()
+                        user, password = os.environ.get("CS101_SMTP_USER"), os.environ.get("CS101_SMTP_PASSWORD")
+                        if user and password: smtp.login(user, password)
+                        smtp.send_message(message)
+                except (OSError, smtplib.SMTPException, ValueError):
+                    self.send_json({"error": "邮件发送失败，请稍后重试"}, 503); return
+                self.send_json(generic); return
+            self.send_json({"ok": True, "reset_link": link}); return
+        if path == "/api/user/reset":
+            token = str(data.get("token", ""))
+            password, confirmation = str(data.get("password", "")), str(data.get("confirm_password", ""))
+            if len(password) < 8:
+                self.send_json({"error": "密码至少需要 8 位"}, 400); return
+            if password != confirmation:
+                self.send_json({"error": "两次输入的密码不一致"}, 400); return
+            with sqlite3.connect(DB) as db:
+                row = db.execute("select username from users where reset_token_hash = ? and reset_expires > ?",
+                                 (reset_token_hash(token), int(time.time()))).fetchone()
+                if not row:
+                    self.send_json({"error": "重置链接无效或已过期"}, 400); return
+                db.execute("update users set password_hash = ?, reset_token_hash = null, reset_expires = null where username = ?",
+                           (password_hash(password), row[0]))
+            self.send_json({"ok": True}); return
         if path == "/api/login":
             if data.get("username") == ADMIN_USER and data.get("password") == ADMIN_PASSWORD:
                 token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = ADMIN_USER

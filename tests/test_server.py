@@ -1,6 +1,7 @@
 import http.client
 import json
 import os
+import re
 import shutil
 import socket
 import sqlite3
@@ -35,6 +36,15 @@ def request(port, method, path, body=None, cookie=None):
 
 
 class ServerApiTests(unittest.TestCase):
+    def registration_payload(self, username, password):
+        _, _, page = request(self.port, "GET", "/register/")
+        html = page.decode("utf-8")
+        token = re.search(r'name="captcha_token" value="([^"]+)"', html).group(1)
+        left, right = map(int, re.search(r'class="captcha-question">(\d+) \+ (\d+)', html).groups())
+        return {"email": username + "@example.com", "username": username,
+                "password": password, "confirm_password": password,
+                "captcha_token": token, "captcha_answer": str(left + right)}
+
     @classmethod
     def setUpClass(cls):
         with socket.socket() as sock:
@@ -87,9 +97,8 @@ class ServerApiTests(unittest.TestCase):
 
     def test_register_login_session_and_authenticated_submit(self):
         username = "t001_user"
-        status, headers, _ = request(self.port, "POST", "/api/user/register", {
-            "username": username, "password": "T001-password",
-        })
+        status, headers, _ = request(self.port, "POST", "/api/user/register",
+                                     self.registration_payload(username, "T001-password"))
         self.assertEqual(status, 200)
         cookie = headers["Set-Cookie"].split(";", 1)[0]
 
@@ -139,9 +148,8 @@ class ServerApiTests(unittest.TestCase):
     def test_submission_history_records_book_language_and_detail(self):
         """历史记录要能回答「错在哪组数据」——只存 status 是答不了的。"""
         username = "t006_history"
-        _, headers, _ = request(self.port, "POST", "/api/user/register", {
-            "username": username, "password": "T006-password",
-        })
+        _, headers, _ = request(self.port, "POST", "/api/user/register",
+                                self.registration_payload(username, "T006-password"))
         cookie = headers["Set-Cookie"].split(";", 1)[0]
         status, _, body = request(self.port, "POST", "/api/submit", {
             "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
@@ -196,9 +204,8 @@ class ServerApiTests(unittest.TestCase):
 
     def test_reveal_switch_rejects_non_admin(self):
         username = "t006_switch_student"
-        _, headers, _ = request(self.port, "POST", "/api/user/register", {
-            "username": username, "password": "T006-password",
-        })
+        _, headers, _ = request(self.port, "POST", "/api/user/register",
+                                self.registration_payload(username, "T006-password"))
         cookie = headers["Set-Cookie"].split(";", 1)[0]
         status, _, _ = request(self.port, "POST", "/api/settings",
                                {"reveal_failing_input": True}, cookie=cookie)
@@ -211,9 +218,8 @@ class ServerApiTests(unittest.TestCase):
         admin = self._admin_cookie()
         self.addCleanup(self._set_reveal, admin, False)
         username = "t006_switch_user"
-        _, headers, _ = request(self.port, "POST", "/api/user/register", {
-            "username": username, "password": "T006-password",
-        })
+        _, headers, _ = request(self.port, "POST", "/api/user/register",
+                                self.registration_payload(username, "T006-password"))
         cookie = headers["Set-Cookie"].split(";", 1)[0]
         payload = {"book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM,
                    "language": "python", "source": "print('wrong')"}
@@ -376,9 +382,8 @@ class ServerApiTests(unittest.TestCase):
         self.assertIn("/api/submissions", text)
 
         username = "t006_hist_page"
-        _, headers, _ = request(self.port, "POST", "/api/user/register", {
-            "username": username, "password": "T006-password",
-        })
+        _, headers, _ = request(self.port, "POST", "/api/user/register",
+                                self.registration_payload(username, "T006-password"))
         cookie = headers["Set-Cookie"].split(";", 1)[0]
         for source in ("print(1)", "print(2)", "print(3)"):
             request(self.port, "POST", "/api/submit", {
