@@ -50,10 +50,19 @@ class DistinctCasesTests(unittest.TestCase):
 class ConstraintChecklistTests(unittest.TestCase):
     """「AC 源码直接当实现」之后，这条是唯一承重的检查，所以它必须能失败。"""
 
-    def test_all_true_booleans_pass(self):
+    def test_all_true_booleans_alone_are_not_enough(self):
+        """契约 2026-07-26 收紧：每条都 True 只是必要条件，不是充分条件。
+
+        round6 出现过三种「看着在测、其实测不出」的写法，其中两种静态扫不出来，
+        所以还要求交付方给一个刻意违规的输入、证明这套谓词至少有一条会翻成 False。
+        """
         row = common.constraint_checklist([("1<=n<=1000", True), ("两端不相等", True)])
-        self.assertEqual(row["status"], "passed")
+        self.assertEqual(row["status"], "FAILED")
         self.assertEqual(row["checked"], 2)
+        row = common.constraint_checklist(
+            [("1<=n<=1000", True), ("两端不相等", True)],
+            counterexample=("n=0 的输入", [("1<=n<=1000", False), ("两端不相等", True)]))
+        self.assertEqual(row["status"], "passed")
 
     def test_empty_checklist_fails(self):
         # 不给打钩表就通过，等于这条检查不存在
@@ -65,6 +74,33 @@ class ConstraintChecklistTests(unittest.TestCase):
         row = common.constraint_checklist([("1<=n<=25", True), ("边的两端不相等", False)])
         self.assertEqual(row["status"], "FAILED")
         self.assertIn("未满足", row["problems"][0])
+
+    def test_without_a_counterexample_it_fails(self):
+        # 每条都 True 说明不了什么——必须证明这套谓词能失败
+        row = common.constraint_checklist([("1<=n<=1000", True)])
+        self.assertEqual(row["status"], "FAILED")
+        self.assertIn("反例", row["problems"][0])
+
+    def test_counterexample_that_flips_nothing_fails(self):
+        # round6 的 4112：len(x)<=2**31-1 真在计算，但要 2GB 一行才为假
+        row = common.constraint_checklist(
+            [("每行长度不超过 int 范围", True)],
+            counterexample=("一行 900 字符", [("每行长度不超过 int 范围", True)]))
+        self.assertEqual(row["status"], "FAILED")
+        self.assertIn("装饰", row["problems"][0])
+
+    def test_counterexample_that_flips_one_passes(self):
+        row = common.constraint_checklist(
+            [("边的两端不相等", True), ("1<=n<=25", True)],
+            counterexample=("含自环的图", [("边的两端不相等", False), ("1<=n<=25", True)]))
+        self.assertEqual(row["status"], "passed")
+        self.assertEqual(row["falsified_by"]["constraints"], ["边的两端不相等"])
+
+    def test_exemption_is_recorded_when_nothing_is_checkable(self):
+        row = common.constraint_checklist(
+            [("输入为任意字符串", True)], exemption="题面对输入没有可机械验证的限制")
+        self.assertEqual(row["status"], "exempted")
+        self.assertIn("可机械验证", row["exemption"])
 
     def test_literal_instead_of_measured_boolean_fails(self):
         # 001d 的教训：字段写成字面量，看着通过、其实没测

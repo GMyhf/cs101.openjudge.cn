@@ -83,7 +83,7 @@ def distinct_cases(cases, exemption=None):
     return row
 
 
-def constraint_checklist(items):
+def constraint_checklist(items, counterexample=None, exemption=None):
     """题面约束逐条打钩（001b 立）。**每条的取值必须是生成器实测出来的布尔，不能是字面量。**
 
     2026-07-26 人拍板「有既有 Accepted 就直接拿来当题目实现、不再另写实现做对拍」之后，
@@ -117,8 +117,30 @@ def constraint_checklist(items):
         elif not value:
             bad.append(f"{text!r} 未满足")
         rows.append({"constraint": str(text), "holds": value})
-    return {"status": "passed" if not bad else "FAILED", "checked": len(rows),
-            "items": rows, "problems": bad[:8]}
+    if bad:
+        return {"status": "FAILED", "checked": len(rows), "items": rows, "problems": bad[:8]}
+
+    # ---- 打钩表本身必须被证明「能失败」----------------------------------
+    # 光看每条都是 True 说明不了什么：round6 出现过三种「看着在测、其实测不出」的写法——
+    #   ① every(lambda c: True)                     恒真，静态一眼可见
+    #   ② len(x) <= 2**31-1                         真在计算，但要 2GB 一行才为假
+    #   ③ len(c.splitlines()) >= 1                  只有空输入能证伪，而生成器不产空输入
+    # ②③ 静态扫不出来。所以要求交付方**同时给一个刻意违规的输入**，
+    # 并证明这套谓词在它上面至少有一条翻成 False。做不到就说明这份打钩表是装饰。
+    if counterexample is None:
+        if exemption:
+            return {"status": "exempted", "checked": len(rows), "items": rows,
+                    "exemption": exemption}
+        return {"status": "FAILED", "checked": len(rows), "items": rows,
+                "problems": ["没有给出反例输入 —— 无法证明这份打钩表能失败。"
+                             "题面确实没有可机械验证的输入约束时，请给 exemption 说明理由"]}
+    label, counter_rows = counterexample
+    flipped = [str(text) for text, value in counter_rows if value is False]
+    if not flipped:
+        return {"status": "FAILED", "checked": len(rows), "items": rows,
+                "problems": [f"反例输入 {label!r} 下没有任何约束翻成 False —— 这份打钩表是装饰"]}
+    return {"status": "passed", "checked": len(rows), "items": rows,
+            "falsified_by": {"input": str(label), "constraints": flipped}}
 
 
 def has_oracle(oracle, number, sample_input):
