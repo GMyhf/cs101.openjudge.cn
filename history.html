@@ -79,6 +79,7 @@ function render() {
   rows.innerHTML = hits.map(s => {
     const path = s.book ? "/" + s.book + "/" + s.problem + "/" : "";
     const code = s.source ? `<details><summary>查看代码</summary><pre class="source">${esc(s.source)}</pre></details>` : "";
+    const expected = s.detail && s.detail.expected_output ? `<details><summary>查看期望输出</summary><pre class="source">${esc(s.detail.expected_output.text || "")}</pre></details>` : "";
     return `<tr>
       <td class="num muted">${esc(s.created)}</td>
       <td>${path ? `<a class="pid" href="${path}">${esc(s.problem)}</a>` : esc(s.problem)}</td>
@@ -86,7 +87,7 @@ function render() {
       <td>${badge(s.result)}</td>
       <td class="muted">${esc(detailOf(s))}</td>
       <td class="muted">${esc(s.language || "")}</td>
-      <td>${code}</td>
+      <td>${code}${expected}</td>
       <td>${path ? `<a class="muted" href="${path}submit/">再交一次 →</a>` : ""}</td>
     </tr>`;
   }).join("");

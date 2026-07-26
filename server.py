@@ -119,6 +119,7 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  pre.msg{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);
          border-radius:5px;padding:10px;margin:12px 0 0;font:12px/1.5 ui-monospace,monospace;max-height:220px;overflow:auto}
  pre.source{white-space:pre;max-height:360px}
+ .expected{margin-top:12px}
  h2{font-size:16px;margin:30px 0 8px}
  table{width:100%;border-collapse:collapse;font-size:14px}
  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
@@ -385,6 +386,12 @@ function renderVerdict(data) {
     snippet = '<div class="snip"><div class="snip-h">第 ' + data.case + ' 组的输入 ' + tail
             + '</div><pre class="msg">' + esc(f.text) + "</pre></div>";
   }
+  if (data.expected_output) {
+    const o = data.expected_output;
+    const tail = o.truncated ? "（内容过长，已截断）" : "";
+    snippet += '<div class="snip expected"><div class="snip-h">第 ' + data.case + ' 组对应 .out 期望输出 ' + tail
+            + '</div><pre class="msg source">' + esc(o.text) + "</pre></div>";
+  }
   verdict.innerHTML = '<div class="verdict">' + badge(data.status)
     + (rows.length ? "<dl>" + rows.map(r => "<dt>" + r[0] + "</dt><dd>" + esc(r[1]) + "</dd>").join("") + "</dl>" : "")
     + (data.message ? '<pre class="msg">' + esc(data.message) + "</pre>" : "")
@@ -421,8 +428,9 @@ async function loadHistory() {
         const note = d.case !== undefined ? "第 " + d.case + " 组"
                    : d.cases !== undefined ? d.cases + " 组全过" : "";
         const code = s.source ? "<details><summary>查看代码</summary><pre class='msg source'>" + esc(s.source) + "</pre></details>" : "";
+        const expected = d.expected_output ? "<details><summary>查看期望输出</summary><pre class='msg source'>" + esc(d.expected_output.text || "") + "</pre></details>" : "";
         return "<tr><td class='num'>" + esc(s.created) + "</td><td>" + badge(s.result)
-             + "</td><td>" + esc(s.language || "") + "</td><td class='muted'>" + esc(note) + "</td><td>" + code + "</td></tr>";
+             + "</td><td>" + esc(s.language || "") + "</td><td class='muted'>" + esc(note) + "</td><td>" + code + expected + "</td></tr>";
       }).join("") + "</tbody></table>";
 }
 </script></html>"""
@@ -534,6 +542,23 @@ def failing_input_snippet(book, problem_id, case_index):
     truncated = len(lines) > SNIPPET_LINES or len(clipped) > SNIPPET_CHARS
     return {"text": clipped[:SNIPPET_CHARS], "truncated": truncated,
             "total_lines": len(lines), "total_chars": len(text)}
+
+def failing_output_snippet(book, problem_id, case_index):
+    """Read the expected .out for the failing case and cap only the UI payload."""
+    catalog_path = MIRROR / "catalog.json"
+    if not catalog_path.is_file():
+        return None
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    item = next((p for p in catalog["problems"] if p["book"] == book and p["id"] == problem_id), None)
+    cases = (item or {}).get("test_cases") or []
+    if not 1 <= case_index <= len(cases):
+        return None
+    path = MIRROR / cases[case_index - 1]["output"]
+    if not path.is_file():
+        return None
+    text = path.read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
+    return {"text": text[:4000], "truncated": len(text) > 4000,
+            "total_lines": len(text.splitlines()), "total_chars": len(text)}
 
 def catalog_title(item):
     """Read the real heading from the mirrored statement, once per process."""
@@ -983,6 +1008,9 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             if reveal_effective(book) and result.get("case"):
                 snippet = failing_input_snippet(book, problem, result["case"])
                 if snippet: result["failing_input"] = snippet
+            if result.get("case"):
+                output = failing_output_snippet(book, problem, result["case"])
+                if output: result["expected_output"] = output
             # detail 存判题器返回的全部字段（case / expected_tokens / message…），
             # 历史页要靠它回答「错在哪组数据」，只存 status 是答不了的。
             detail = json.dumps({k: v for k, v in result.items() if k != "status"}, ensure_ascii=False)

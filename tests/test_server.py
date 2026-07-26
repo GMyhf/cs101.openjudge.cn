@@ -206,6 +206,7 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(latest["language"], "python")
         self.assertEqual(latest["detail"]["case"], verdict["case"])
         self.assertEqual(latest["source"], "print('wrong')")
+        self.assertTrue(latest["detail"]["expected_output"]["text"])
 
     def _admin_cookie(self):
         status, headers, _ = request(self.port, "POST", "/api/login", {
@@ -260,7 +261,9 @@ class ServerApiTests(unittest.TestCase):
 
         self._set_reveal(admin, False)
         _, _, body = request(self.port, "POST", "/api/submit", payload, cookie=cookie)
-        self.assertNotIn("failing_input", json.loads(body))
+        verdict = json.loads(body)
+        self.assertNotIn("failing_input", verdict)
+        self.assertTrue(verdict["expected_output"]["text"])
 
         self.assertIs(self._set_reveal(admin, True), True)
         _, _, body = request(self.port, "POST", "/api/submit", payload, cookie=cookie)
@@ -268,7 +271,7 @@ class ServerApiTests(unittest.TestCase):
         snippet = verdict.get("failing_input")
         self.assertIsNotNone(snippet)
         self.assertTrue(snippet["text"])
-        # 只给输入。期望输出是答案，任何情况下都不能出现在返回里。
+        # 输入仍受泄题开关控制，期望 .out 用于解释错误结果。
         self.assertEqual(set(snippet), {"text", "truncated", "total_lines", "total_chars"})
 
         self._set_reveal(admin, False)
