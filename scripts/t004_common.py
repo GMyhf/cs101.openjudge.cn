@@ -293,17 +293,59 @@ def _recompute_cases(made_dir, command, timeout):
             "mismatched": bad[:8]}
 
 
-def sample_is_case_zero(made_dir, sample_input):
-    """第 0 组必须是题面样例——数据与题面之间唯一的锚。"""
+def sample_is_case_zero(made_dir, sample_input, sample_output=None,
+                        sample_output_exemption=None):
+    """第 0 组必须是题面样例——数据与题面之间唯一的锚。
+
+    **输入和输出都要比。** round11 的 21006 是这条的由来：那题平台上唯一一份
+    Accepted 源码，在题面自己的样例上就算错（`7 3` 应为 8，它输出 5）。若照
+    「有既有 Accepted 就直接采纳」的规矩把它当参考实现，它生成的 .out 与它自己
+    复算当然处处自洽 —— distinct_cases、constant_output_probe、samplecode_recompute、
+    byte_reproduction、constraint_checklist 会全绿，而整份数据固化的是错答案。
+
+    题面样例输出是这条流水线里**唯一不由我们自己产生的真值**。不比它，六项检查
+    就全都在拿被检查的东西当基准。
+    """
     first = sorted((Path(made_dir) / "data").glob("*.in"), key=lambda p: int(p.stem))
     if not first:
         return {"status": "FAILED", "reason": "没有任何 .in"}
     same = first[0].read_text(errors="replace").split() == str(sample_input).split()
-    return {"status": "passed" if same else "FAILED",
-            "reason": None if same else "第 0 组不是题面样例"}
+    row = {"input_matches": "passed" if same else "FAILED"}
+    if not same:
+        row["reason"] = "第 0 组不是题面样例"
+
+    # 不传样例输出**不能悄悄放过**：缺这一项，与「题面确实没给输出」在报告里长得
+    # 一样，也与「忘了」长得一样（4142 那条教训的同一形状）。
+    if sample_output is None or not str(sample_output).strip():
+        if sample_output_exemption:
+            row["output_matches"] = "exempted"
+            row["output_exemption"] = sample_output_exemption
+        else:
+            row["output_matches"] = "FAILED"
+            row["output_reason"] = ("未提供题面样例输出——它是流水线里唯一的外部真值，"
+                                    "不比它就等于没检查过参考实现对不对；"
+                                    "题面确实没给输出时请写 sample_output_exemption")
+    else:
+        expected = sorted((Path(made_dir) / "data").glob("*.out"), key=lambda p: int(p.stem))
+        if not expected:
+            row["output_matches"] = "FAILED"
+            row["output_reason"] = "没有任何 .out"
+        else:
+            got = expected[0].read_text(errors="replace").split()
+            want = str(sample_output).split()
+            if got == want:
+                row["output_matches"] = "passed"
+            else:
+                row["output_matches"] = "FAILED"
+                row["output_reason"] = (f"第 0 组输出与题面样例不符："
+                                        f"题面 {want[:8]} ｜ 数据 {got[:8]}")
+    row["status"] = ("passed" if row["input_matches"] == "passed"
+                     and row["output_matches"] in ("passed", "exempted") else "FAILED")
+    return row
 
 
-def audit(made_dir, *, cases, outputs, sample_input, exemption=None,
+def audit(made_dir, *, cases, outputs, sample_input, sample_output=None,
+          sample_output_exemption=None, exemption=None,
           reference_source=None, oracle_source=None, constraints=None,
           constraint_counterexample=None, constraint_exemption=None,
           run_byte_reproduction=True):
@@ -316,7 +358,8 @@ def audit(made_dir, *, cases, outputs, sample_input, exemption=None,
     row = {
         "distinct_cases": distinct_cases(cases, exemption),
         "constant_output_probe": constant_output_probe(outputs, exemption),
-        "sample_is_case_zero": sample_is_case_zero(made_dir, sample_input),
+        "sample_is_case_zero": sample_is_case_zero(
+            made_dir, sample_input, sample_output, sample_output_exemption),
         "samplecode_recompute": samplecode_recompute(made_dir),
     }
     # constraints 传 None 时**不能悄悄跳过** —— 「这项没出现」和「不适用」在报告里长得一样，

@@ -262,9 +262,48 @@ def _make_fixture(folder, *, cases, sample="1 2\n", broken_reference=False):
 class DiskCheckTests(unittest.TestCase):
     def test_sample_must_be_case_zero(self):
         with tempfile.TemporaryDirectory() as folder:
+            made = _make_fixture(folder, cases=["1 2\n", "3 4\n"])  # 0.out == "3\n"
+            self.assertEqual(
+                common.sample_is_case_zero(made, "1 2\n", "3\n")["status"], "passed")
+            self.assertEqual(
+                common.sample_is_case_zero(made, "9 9\n", "18\n")["status"], "FAILED")
+
+    def test_sample_output_must_match_the_statement(self):
+        """21006 的形状：输入对得上，但参考实现算错，输出与题面样例不符。
+
+        这是六项检查里唯一拿**外部真值**做基准的一条 —— 其余五项都在拿数据自己
+        跟自己比，参考实现错了它们照样全绿。
+        """
+        with tempfile.TemporaryDirectory() as folder:
             made = _make_fixture(folder, cases=["1 2\n", "3 4\n"])
-            self.assertEqual(common.sample_is_case_zero(made, "1 2\n")["status"], "passed")
-            self.assertEqual(common.sample_is_case_zero(made, "9 9\n")["status"], "FAILED")
+            row = common.sample_is_case_zero(made, "1 2\n", "8\n")   # 题面说 8，数据是 3
+            self.assertEqual(row["status"], "FAILED")
+            self.assertEqual(row["input_matches"], "passed")          # 输入是对的
+            self.assertEqual(row["output_matches"], "FAILED")         # 错在输出
+            self.assertIn("与题面样例不符", row["output_reason"])
+
+    def test_missing_sample_output_is_not_silently_skipped(self):
+        """不传样例输出必须记 FAILED —— 「没给」不能和「不适用」「忘了」长得一样。"""
+        with tempfile.TemporaryDirectory() as folder:
+            made = _make_fixture(folder, cases=["1 2\n"])
+            row = common.sample_is_case_zero(made, "1 2\n")
+            self.assertEqual(row["status"], "FAILED")
+            self.assertEqual(row["output_matches"], "FAILED")
+            # 题面确实没给输出时，走豁免、并且理由要留在报告里
+            ok = common.sample_is_case_zero(made, "1 2\n", None,
+                                            sample_output_exemption="题面未给样例输出")
+            self.assertEqual(ok["status"], "passed")
+            self.assertEqual(ok["output_matches"], "exempted")
+            self.assertEqual(ok["output_exemption"], "题面未给样例输出")
+
+    def test_audit_always_carries_the_sample_output_verdict(self):
+        """audit() 不能有「不传就没这个字段」的口子（4142 那条教训的同一形状）。"""
+        with tempfile.TemporaryDirectory() as folder:
+            made = _make_fixture(folder, cases=["1 2\n", "3 4\n"])
+            row = common.audit(made, cases=["1 2\n", "3 4\n"], outputs=["3\n", "7\n"],
+                               sample_input="1 2\n", run_byte_reproduction=False)
+            self.assertIn("output_matches", row["sample_is_case_zero"])
+            self.assertIn("sample_is_case_zero", row["failed"])
 
     def test_samplecode_recompute_catches_wrong_expected_output(self):
         with tempfile.TemporaryDirectory() as folder:
