@@ -101,6 +101,24 @@ def _limits(cpu_seconds=CASE_FLOOR_S, address_space_bytes=768 * 1024 * 1024,
 CHILD_PATH = "/usr/local/bin:/usr/bin:/bin"
 LANGUAGE_VERSION_CACHE = {}
 
+def _toolchain_probe(executable, *args, timeout=5):
+    """探测工具链版本；**本机没装或探测失败就返回 None，绝不抛异常。**
+
+    2026-07-27 的教训：`language_version` 里直接 `subprocess.run(["swiftc", "--version"])`，
+    本机没装 Swift 就抛 FileNotFoundError，把**整个提交页**打成连接直接断。
+    一个「查版本号显示给用户看」的辅助功能，没有理由让页面打不开。
+    g++/gcc/clang 当时是同样的写法，只是本机恰好装了才没暴露。
+    """
+    path = shutil.which(executable)
+    if path is None:
+        return None
+    try:
+        result = subprocess.run([path, *args], capture_output=True, text=True, timeout=timeout)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    return (result.stdout or "") + (result.stderr or "")
+
+
 def language_version(language):
     """Return the actual toolchain label used for a submission."""
     key = str(language).lower()
@@ -109,30 +127,28 @@ def language_version(language):
     if key in CPYTHON_LANGUAGES:
         value = f"Python3({'.'.join(map(str, __import__('sys').version_info[:2]))})"
     elif key in PYPY_LANGUAGES:
-        executable = shutil.which("pypy3")
-        version_result = subprocess.run([executable or "pypy3", "--version"], capture_output=True, text=True, timeout=5)
-        raw = version_result.stdout + version_result.stderr
-        match = re.search(r"PyPy\s+(\d+\.\d+(?:\.\d+)?)", raw)
-        value = f"PyPy3({match.group(1) if match else 'unknown'})"
+        raw = _toolchain_probe("pypy3", "--version")
+        match = re.search(r"PyPy\s+(\d+\.\d+(?:\.\d+)?)", raw) if raw else None
+        value = f"PyPy3({match.group(1) if match else ('unknown' if raw else '未安装')})"
     elif key == "cpp":
-        raw = subprocess.run(["g++", "--version"], capture_output=True, text=True, timeout=5).stdout
-        match = re.search(r"\b(\d+\.\d+)(?:\.\d+)?\b", raw)
-        value = f"G++({match.group(1) if match else 'unknown'}(with c++17))"
+        raw = _toolchain_probe("g++", "--version")
+        match = re.search(r"\b(\d+\.\d+)(?:\.\d+)?\b", raw) if raw else None
+        value = f"G++({match.group(1) if match else ('unknown' if raw else '未安装')}(with c++17))"
     elif key == "c":
-        raw = subprocess.run(["gcc", "--version"], capture_output=True, text=True, timeout=5).stdout
-        match = re.search(r"\b(\d+\.\d+)(?:\.\d+)?\b", raw)
-        value = f"GCC({match.group(1) if match else 'unknown'})"
+        raw = _toolchain_probe("gcc", "--version")
+        match = re.search(r"\b(\d+\.\d+)(?:\.\d+)?\b", raw) if raw else None
+        value = f"GCC({match.group(1) if match else ('unknown' if raw else '未安装')})"
     elif key in DOTNET_LANGUAGES:
         labels = {"csharp": "C#", "fsharp": "F#", "vbnet": "VB.NET"}
         value = f"{labels.get(key, '.NET')} (.NET SDK 10)"
     elif key in SWIFT_LANGUAGES:
-        result = subprocess.run(["swiftc", "--version"], capture_output=True, text=True, timeout=5)
-        match = re.search(r"Swift version\s+([\d.]+)", result.stdout + result.stderr)
-        value = f"Swift({match.group(1) if match else 'unknown'})"
+        raw = _toolchain_probe("swiftc", "--version")
+        match = re.search(r"Swift version\s+([\d.]+)", raw) if raw else None
+        value = f"Swift({match.group(1) if match else ('unknown' if raw else '未安装')})"
     elif key in OBJC_LANGUAGES:
-        raw = subprocess.run(["clang", "--version"], capture_output=True, text=True, timeout=5).stdout
-        match = re.search(r"clang version\s+([\d.]+)", raw)
-        value = f"Objective-C(Clang {match.group(1) if match else 'unknown'})"
+        raw = _toolchain_probe("clang", "--version")
+        match = re.search(r"clang version\s+([\d.]+)", raw) if raw else None
+        value = f"Objective-C(Clang {match.group(1) if match else ('unknown' if raw else '未安装')})"
     else:
         value = str(language)
     LANGUAGE_VERSION_CACHE[key] = value

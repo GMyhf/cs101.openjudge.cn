@@ -290,6 +290,43 @@ class SandboxContractTests(unittest.TestCase):
 CPP_SOURCE = "#include <cstdio>\nint main(){int a,b;scanf(\"%d %d\",&a,&b);printf(\"%d\\n\",a+b);}\n"
 
 
+class ToolchainProbeTests(unittest.TestCase):
+    """查版本号不能把页面打崩。
+
+    2026-07-27：`language_version("swift")` 直接 `subprocess.run(["swiftc", "--version"])`，
+    本机没装 Swift 就抛 FileNotFoundError —— 提交页整个连接断掉（`RemoteDisconnected`），
+    交接闸门连红三个提交没人发现。g++/gcc/clang 当时是同样的写法，只是本机恰好装了。
+    """
+
+    def test_missing_toolchain_never_raises(self):
+        for language in ("python", "pypy3", "cpp", "c", "swift", "objc",
+                         "csharp", "fsharp", "vbnet", "no-such-language"):
+            judge_module.LANGUAGE_VERSION_CACHE.pop(language, None)
+            with mock.patch.object(judge_module.shutil, "which", lambda _: None):
+                try:
+                    label = judge_module.language_version(language)
+                except Exception as error:  # noqa: BLE001
+                    self.fail(f"{language} 抛了 {type(error).__name__}：查版本号不该让页面打不开")
+            self.assertIsInstance(label, str)
+            self.assertTrue(label)
+            judge_module.LANGUAGE_VERSION_CACHE.pop(language, None)
+
+    def test_missing_toolchain_says_so(self):
+        """标签要如实说「未安装」，不能装作探到了一个版本号。"""
+        judge_module.LANGUAGE_VERSION_CACHE.pop("swift", None)
+        with mock.patch.object(judge_module.shutil, "which", lambda _: None):
+            self.assertIn("未安装", judge_module.language_version("swift"))
+        judge_module.LANGUAGE_VERSION_CACHE.pop("swift", None)
+
+    def test_probe_survives_a_toolchain_that_blows_up(self):
+        """工具链在但跑起来就炸（权限、损坏）也不能把页面带走。"""
+        def boom(*args, **kwargs):
+            raise OSError("boom")
+        with mock.patch.object(judge_module.shutil, "which", lambda x: "/usr/bin/" + x), \
+             mock.patch.object(judge_module.subprocess, "run", boom):
+            self.assertIsNone(judge_module._toolchain_probe("g++", "--version"))
+
+
 class PyPy3Tests(unittest.TestCase):
     """PyPy3 档（人拍板 2026-07-26 加入；红线 1 已获签字）。"""
 
