@@ -48,6 +48,11 @@ PASSWORD_FILE = ROOT / "data" / ".admin_password"
 ADMIN_PASSWORD = os.environ.get("CS101_ADMIN_PASSWORD") or (PASSWORD_FILE.read_text(encoding="utf-8").strip() if PASSWORD_FILE.is_file() else "")
 TOKENS = set()
 SESSION_USERS = {}
+# token -> 最近一次带着有效会话发请求的时间戳。
+# 「在线」必须有时效：TOKENS 只在登出时才缩小，拿它当在线数会把「三天前登录过、
+# 浏览器一直没关」也算进去 —— 那不是在线，是从没登出。
+SESSION_SEEN = {}
+ONLINE_WINDOW_SECONDS = 300
 CATALOG_TITLE_CACHE = {}
 CATALOG_RAW_CACHE = None
 CATALOG_RAW_MTIME = None
@@ -502,6 +507,40 @@ BOOKS_KEY = "reveal_books"        # {book: "on"/"off"}，覆盖全局
 WINDOWS_KEY = "reveal_windows"    # [{start, end, note}]，命中即强制关闭
 
 
+def online_users(now=None):
+    """最近 ONLINE_WINDOW_SECONDS 秒内有过请求的**不同用户数**。
+
+    按用户名去重，不是按会话：同一个人开两个标签页是一个人。
+    过期的打点顺手清掉，免得字典无限长。
+    """
+    now = time.time() if now is None else now
+    for token, seen in list(SESSION_SEEN.items()):
+        if token not in TOKENS or now - seen > ONLINE_WINDOW_SECONDS:
+            SESSION_SEEN.pop(token, None)
+    return len({SESSION_USERS.get(token) for token in SESSION_SEEN
+                if SESSION_USERS.get(token)})
+
+
+def site_stats():
+    """站点统计。**每一个数都由数据算出来。**
+
+    这里原来写着 `"accepted": 1284, "streak": 12` —— 两个凭空编的数字。
+    当时没有任何页面调用 /api/stats，所以没人看见；但只要有人把它接上去，
+    站上就会对学生显示编造的成绩。假数字不会因为暂时没人看就变得无害。
+    `streak` 已删掉：没有任何数据能算出它，与其编一个不如不给。
+    """
+    with sqlite3.connect(DB) as db:
+        submissions = db.execute("select count(*) from submissions").fetchone()[0]
+        accepted = db.execute(
+            "select count(*) from submissions where result = 'Accepted'").fetchone()[0]
+        solved = db.execute(
+            "select count(distinct problem) from submissions where result = 'Accepted'").fetchone()[0]
+        users = db.execute("select count(*) from users").fetchone()[0]
+    return {"submissions": submissions, "accepted": accepted, "solved_problems": solved,
+            "users": users, "online": online_users(),
+            "online_window_seconds": ONLINE_WINDOW_SECONDS}
+
+
 def reveal_enabled():
     """全局默认：**展示失败那组的输入片段**（人拍板 2026-07-27，选了「帮助最大」这一档）。
 
@@ -725,16 +764,27 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _touch(self, token_value):
+        """记一次「这个会话此刻还活着」。在线数只认这个，不认 TOKENS 的大小。"""
+        if token_value in TOKENS:
+            SESSION_SEEN[token_value] = time.time()
+
     def authorized(self):
         raw = self.headers.get("Cookie", "")
         jar = cookies.SimpleCookie(raw)
         token = jar.get("session")
-        return token is not None and token.value in TOKENS
+        if token is None or token.value not in TOKENS:
+            return False
+        self._touch(token.value)
+        return True
 
     def current_user(self):
         raw = self.headers.get("Cookie", "")
         token = cookies.SimpleCookie(raw).get("session")
-        return SESSION_USERS.get(token.value) if token and token.value in TOKENS else None
+        if not token or token.value not in TOKENS:
+            return None
+        self._touch(token.value)
+        return SESSION_USERS.get(token.value)
 
     def send_html(self, body):
         if isinstance(body, str): body = body.encode("utf-8")
@@ -867,9 +917,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             self.send_json({"authenticated": self.authorized(), "user": self.current_user()})
             return
         if path == "/api/stats":
-            with sqlite3.connect(DB) as db:
-                count = db.execute("select count(*) from submissions").fetchone()[0]
-            self.send_json({"submissions": count, "accepted": 1284, "streak": 12})
+            self.send_json(site_stats())
             return
         if path == "/api/settings":
             book = parse_qs(parsed.query).get("book", [""])[0]

@@ -14,18 +14,30 @@
   </style>
 </head>
 <body>
-  <header class="top shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><nav class="topnav"><a href="/auth/login/" id="account">登录</a><span class="account-control" id="account-control" hidden><button class="account-trigger" type="button">账号</button><span class="account-menu"><span class="account-menu-inner"><a href="/account/">账户设置</a><button id="logout" type="button">退出登录</button></span></span></span></nav></header>
-  <main class="content shell"><div class="section-head"><div><h2>全部题库 <span>（1,863 收录题目，<b id="tested-count">1,803</b> 有测试数据）</span></h2><p>每个题库展示 5 道可直接判题的题目</p></div><a class="solution-link" href="https://fuynaloft.github.io/sol101/" target="_blank" rel="noopener" onclick="window.open(this.href,'sol101-explanations','noopener,width=1280,height=900');return false;">题解 ↗</a></div><div class="toolbar"><input id="search" type="search" placeholder="搜索题号或标题" autocomplete="off"><a href="/problems/">浏览完整目录 →</a></div><div id="list" class="catalog-grid"></div><div id="empty" class="empty" hidden>没有找到匹配题目。</div></main>
+  <header class="top shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><nav class="topnav"><span class="online" id="online" hidden></span><a href="/auth/login/" id="account">登录</a><span class="account-control" id="account-control" hidden><button class="account-trigger" type="button">账号</button><span class="account-menu"><span class="account-menu-inner"><a href="/account/">账户设置</a><button id="logout" type="button">退出登录</button></span></span></span></nav></header>
+  <main class="content shell"><div class="section-head"><div><h2>全部题库 <span>（<b id="total-count">—</b> 收录题目，<b id="tested-count">—</b> 有测试数据）</span></h2><p>每个题库展示 5 道可直接判题的题目</p></div><a class="solution-link" href="https://fuynaloft.github.io/sol101/" target="_blank" rel="noopener" onclick="window.open(this.href,'sol101-explanations','noopener,width=1280,height=900');return false;">题解 ↗</a></div><div class="toolbar"><input id="search" type="search" placeholder="搜索题号或标题" autocomplete="off"><a href="/problems/">浏览完整目录 →</a></div><div id="list" class="catalog-grid"></div><div id="empty" class="empty" hidden>没有找到匹配题目。</div></main>
   <footer class="footer"><div class="shell">仓库地址：<a href="https://github.com/GMyhf/cs101.openjudge.cn" target="_blank" rel="noopener">https://github.com/GMyhf/cs101.openjudge.cn</a></div></footer>
   <script>
     const list=document.querySelector('#list'), empty=document.querySelector('#empty'), search=document.querySelector('#search'); let problems=[],bookMeta={};
     const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    fetch('/api/catalog?summary=1').then(r=>r.json()).then(data=>{const all=data.problems||[];document.querySelector('#tested-count').textContent=(data.tested_count||0).toLocaleString('en-US');problems=all;bookMeta=data.book_meta||{};shuffle(problems);render();}).catch(()=>{empty.hidden=false;empty.textContent='题库暂时不可用';});
+    fetch('/api/catalog?summary=1').then(r=>r.json()).then(data=>{const all=data.problems||[];document.querySelector('#tested-count').textContent=(data.tested_count||0).toLocaleString('en-US');document.querySelector('#total-count').textContent=(data.total||0).toLocaleString('en-US');problems=all;bookMeta=data.book_meta||{};shuffle(problems);render();}).catch(()=>{empty.hidden=false;empty.textContent='题库暂时不可用';});
     fetch('/api/me').then(r=>r.json()).then(data=>{const account=document.querySelector('#account'),control=document.querySelector('#account-control');if(data.authenticated){account.textContent=data.user;account.href='/history/?mine=1';control.hidden=false;}}).catch(()=>{});
     document.querySelector('#logout').addEventListener('click',async()=>{await fetch('/api/logout',{method:'POST',credentials:'same-origin'});location.reload();});
     function shuffle(items){for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]];}}
     function titleOf(p){return (p.title||'').replace(new RegExp('^'+p.id+'\\s*[:：]\\s*','i'),'')||p.id;}
     function render(){const q=search.value.trim().toLowerCase();const groups=new Map();for(const p of problems){if(q&&!p.id.toLowerCase().includes(q)&&!(p.title||'').toLowerCase().includes(q))continue;if(!groups.has(p.book))groups.set(p.book,[]);if(groups.get(p.book).length<5)groups.get(p.book).push(p);}list.innerHTML=[...groups].map(([book,items])=>{const meta=bookMeta[book]||{};return `<section class="book-block"><h3 class="book-title">${esc(meta.name||book)}<span>${meta.count||0} 题</span></h3><div class="list">${items.map(p=>`<a class="problem" href="${esc(p.path)}"><span class="pid">${esc(p.id)}</span><span class="problem-main"><span class="problem-title">${esc(titleOf(p))}</span><span class="problem-meta">${p.test_count} 组测试数据</span></span><span class="arrow">›</span></a>`).join('')}</div></section>`;}).join('');empty.hidden=groups.size>0;}
+    // 在线人数。每一个数都来自 /api/stats，页面上不写死任何统计数字 ——
+    // 这里原来的「1,863 收录题目」就是写死的，catalog 早已变成 1849，差了 14。
+    const onlineEl=document.querySelector('#online');
+    function refreshOnline(){
+      fetch('/api/stats',{credentials:'same-origin'}).then(r=>r.json()).then(s=>{
+        const n=s.online||0;
+        onlineEl.textContent='在线 '+n;
+        onlineEl.title=Math.round((s.online_window_seconds||300)/60)+' 分钟内有活动的登录用户';
+        onlineEl.hidden=n===0;
+      }).catch(()=>{onlineEl.hidden=true;});
+    }
+    refreshOnline(); setInterval(refreshOnline,60000);
     search.addEventListener('input',render);
   </script>
 </body>

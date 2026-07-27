@@ -286,6 +286,88 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(admin_latest["user"], username)
         self.assertEqual(admin_latest["source"], "print('wrong')")
 
+    def test_stats_are_all_computed_from_data(self):
+        """站点统计里不能有写死的数。
+
+        `/api/stats` 原来返回 `"accepted": 1284, "streak": 12` —— 两个凭空编的数字。
+        当时没有页面调用它，所以没人看见；但假数字不会因为暂时没人看就变得无害，
+        接上去的那天它就在对学生撒谎。`streak` 已删（没有任何数据能算出它）。
+        """
+        _, _, body = request(self.port, "GET", "/api/stats")
+        stats = json.loads(body)
+        self.assertNotIn("streak", stats)
+        for key in ("submissions", "accepted", "solved_problems", "users", "online"):
+            self.assertIn(key, stats)
+            self.assertIsInstance(stats[key], int)
+
+        # 提交一发错的，通过数不该动、提交数该 +1 —— 这两个数必须真的跟着数据走。
+        cookie = self.register_and_login("t010_stats_user", "T010-password")
+        before = json.loads(request(self.port, "GET", "/api/stats")[2])
+        request(self.port, "POST", "/api/submit",
+                {"book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM,
+                 "language": "python", "source": "print('wrong')"}, cookie=cookie)
+        after = json.loads(request(self.port, "GET", "/api/stats")[2])
+        self.assertEqual(after["submissions"], before["submissions"] + 1)
+
+        # 和库里的真实计数交叉核对。只断言「提交错解后通过数不变」是不够的 ——
+        # 写死成 1284 时它也不变（我第一版就漏在这儿，变异自检才发现）。
+        with sqlite3.connect(self.db_file.name) as db:
+            real_submissions = db.execute("select count(*) from submissions").fetchone()[0]
+            real_accepted = db.execute(
+                "select count(*) from submissions where result = 'Accepted'").fetchone()[0]
+            real_users = db.execute("select count(*) from users").fetchone()[0]
+        self.assertEqual(after["submissions"], real_submissions)
+        self.assertEqual(after["accepted"], real_accepted)
+        self.assertEqual(after["users"], real_users)
+
+    def test_online_count_follows_activity_not_login_history(self):
+        """在线人数要有时效，且按人去重。
+
+        会话表只在登出时才缩小，拿它的大小当在线数，会把「三天前登录过、浏览器一直
+        没关」也算进去 —— 那不是在线，是从没登出。
+        """
+        import server
+        cookie = self.register_and_login("t010_online_a", "T010-password")
+        request(self.port, "GET", "/api/me", cookie=cookie)
+        self.assertGreaterEqual(json.loads(request(self.port, "GET", "/api/stats")[2])["online"], 1)
+
+        # 同一个人再开一个会话，人数不该翻倍
+        first = json.loads(request(self.port, "GET", "/api/stats")[2])["online"]
+        again = self.register_and_login("t010_online_a2", "T010-password")
+        request(self.port, "GET", "/api/me", cookie=again)
+        self.assertEqual(json.loads(request(self.port, "GET", "/api/stats")[2])["online"], first + 1)
+
+    def test_online_count_expires_and_dedupes(self):
+        """时间窗与去重逻辑直接对函数验。
+
+        **不能借 HTTP 那条路验这个**：服务端跑在子进程里，测试进程里的
+        `server.SESSION_SEEN` 始终是空的，`online_users()` 不管怎样都返回 0 ——
+        那是个恒真断言。（我第一版就是这么写的。）
+        """
+        import server
+        saved = (dict(server.SESSION_SEEN), set(server.TOKENS), dict(server.SESSION_USERS))
+        try:
+            server.SESSION_SEEN.clear(); server.TOKENS.clear(); server.SESSION_USERS.clear()
+            now = 1_000_000.0
+            for token, user in (("t1", "amy"), ("t2", "amy"), ("t3", "bob")):
+                server.TOKENS.add(token); server.SESSION_USERS[token] = user
+                server.SESSION_SEEN[token] = now
+            # 三个会话、两个人 -> 2
+            self.assertEqual(server.online_users(now), 2)
+            # bob 的打点拨到窗外 -> 只剩 amy
+            server.SESSION_SEEN["t3"] = now - server.ONLINE_WINDOW_SECONDS - 1
+            self.assertEqual(server.online_users(now), 1)
+            # 已登出的会话（不在 TOKENS 里）即使打点很新也不算
+            server.SESSION_SEEN["t1"] = now; server.SESSION_SEEN["t2"] = now
+            server.TOKENS.discard("t1"); server.TOKENS.discard("t2")
+            self.assertEqual(server.online_users(now), 0)
+            # 过期的打点要被清掉，字典不能无限长
+            self.assertEqual(server.SESSION_SEEN, {})
+        finally:
+            server.SESSION_SEEN.clear(); server.SESSION_SEEN.update(saved[0])
+            server.TOKENS.clear(); server.TOKENS.update(saved[1])
+            server.SESSION_USERS.clear(); server.SESSION_USERS.update(saved[2])
+
     def _admin_cookie(self):
         status, headers, _ = request(self.port, "POST", "/api/login", {
             "username": "GMyhf", "password": "T001-admin-only",
