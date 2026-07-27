@@ -105,7 +105,7 @@ function render() {
       <td class="num"><a class="pid" href="${p.path}">${p.id}</a></td>
       <td><a class="pid" href="${p.path}">${titleOf(p)}</a></td>
       <td class="num">${p.pass_rate || '—'}</td>
-      <td class="num">${p.accepted_count || '—'}</td>
+      <td class="num">${p.accepted_count ? `<a class="pid" href="/history/?book=${encodeURIComponent(p.book)}&problem=${encodeURIComponent(p.id)}">${p.accepted_count}</a>` : '—'}</td>
       <td class="num">${p.attempt_count || '—'}</td>
       <td><span class="tag ${has ? 'ok' : 'none'}">${has ? '可判' : '暂无数据'}</span></td>
       <td class="num">${has ? p.test_count : '—'}</td>

@@ -1042,17 +1042,25 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             if user is None:
                 self.send_json({"error": "Unauthorized"}, 401); return
             mine = parse_qs(parsed.query).get("mine", [""])[0] == "1"
+            query_book = parse_qs(parsed.query).get("book", [""])[0]
+            query_problem = parse_qs(parsed.query).get("problem", [""])[0]
             try:
                 limit = min(max(int(parse_qs(parsed.query).get("limit", ["50"])[0]), 1), 500)
             except ValueError:
                 limit = 50
             with sqlite3.connect(DB) as db:
+                filters, values = [], []
+                if query_book:
+                    filters.append("book = ?"); values.append(query_book)
+                if query_problem:
+                    filters.append("problem = ?"); values.append(query_problem)
                 if mine:
-                    rows = db.execute("select user, problem, result, created, book, language, detail, source from submissions"
-                                      " where lower(user) = lower(?) order by id desc limit ?", (user, limit)).fetchall()
+                    filters.append("lower(user) = lower(?)"); values.append(user)
                 else:
-                    rows = db.execute("select user, problem, result, created, book, language, detail, source from submissions"
-                                      " order by id desc limit ?", (limit,)).fetchall()
+                    pass
+                where = (" where " + " and ".join(filters)) if filters else ""
+                rows = db.execute("select user, problem, result, created, book, language, detail, source from submissions"
+                                  + where + " order by id desc limit ?", (*values, limit)).fetchall()
             is_admin = same_username(user, ADMIN_USER)
             self.send_json({"user": user, "submissions": [
                 {"user": r[0], "problem": r[1], "result": r[2], "created": r[3], "book": r[4], "language": r[5],

@@ -61,6 +61,9 @@ const INFO = ["No Test Data", "Problem Not Found", "Empty Source", "Source Too L
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const badge = s => '<span class="badge ' + (CLS[s] || (INFO.includes(s) ? "b-info" : "b-other")) + '">' + esc(s) + "</span>";
 let all = [], currentUser = "";
+const query = new URLSearchParams(location.search);
+const queryBook = query.get("book") || "";
+const queryProblem = query.get("problem") || "";
 
 function detailOf(s) {
   const d = s.detail || {};
@@ -140,7 +143,11 @@ function paintStats() {
 
 async function load() {
   const mine = new URLSearchParams(location.search).get("mine") === "1";
-  const r = await fetch("/api/submissions?limit=" + limit.value + (mine ? "&mine=1" : ""), { credentials: "same-origin" });
+  const params = new URLSearchParams({ limit: limit.value });
+  if (mine) params.set("mine", "1");
+  if (queryBook) params.set("book", queryBook);
+  if (queryProblem) params.set("problem", queryProblem);
+  const r = await fetch("/api/submissions?" + params, { credentials: "same-origin" });
   if (r.status === 401) {
     who.innerHTML = '<a href="/auth/login/">请先登录</a>后查看提交记录。';
     empty.hidden = false; empty.textContent = "登录后这里会列出你的提交。";
@@ -149,7 +156,8 @@ async function load() {
   const data = await r.json();
   all = data.submissions || [];
   currentUser = data.user || "";
-  who.innerHTML = '登录为 <b>' + esc(data.user) + '</b> · <a href="/problems/">题库目录</a> · <a href="/">首页</a>';
+  const scope = queryProblem ? ' · 当前题目：<b>' + esc(queryProblem) + '</b>' : '';
+  who.innerHTML = '登录为 <b>' + esc(data.user) + '</b>' + scope + ' · <a href="/problems/">题库目录</a> · <a href="/">首页</a>';
   paintStats();
   render();
 }
