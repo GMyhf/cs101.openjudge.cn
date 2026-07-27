@@ -93,11 +93,14 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  .sub a:hover{text-decoration:underline}
  .head-mark{min-width:132px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--muted);font-size:12px;text-align:right}
  .head-mark strong{display:block;color:var(--ink);font-size:14px;margin-bottom:2px}
- .workspace-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(520px,1fr);gap:18px;align-items:start}
+ .workspace-layout{display:grid;grid-template-columns:minmax(360px,1fr) 8px minmax(520px,1fr);gap:0;align-items:start}
+ .splitter{align-self:stretch;min-height:520px;cursor:col-resize;position:relative;touch-action:none}
+ .splitter::before{content:"";position:absolute;top:0;bottom:0;left:3px;width:2px;background:var(--line);transition:background .15s,width .15s,left .15s}
+ .splitter:hover::before,.splitter.dragging::before{left:2px;width:4px;background:var(--accent)}
  .statement-panel,.workspace{border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:0 8px 24px rgba(34,58,44,.06);overflow:hidden}
  .statement-panel{padding:27px 30px;max-height:calc(100vh - 155px);overflow:auto;position:sticky;top:18px}
  .statement-panel h2{font-size:24px;line-height:1.3;margin:0 0 18px}
- .statement-panel .problem-params{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 20px;padding:12px 14px;margin:0 0 25px;border-left:3px solid #c87828;background:#fffaf3;color:var(--muted);font-size:13px}
+ .statement-panel .problem-params{display:grid;grid-template-columns:repeat(6,max-content);gap:7px 12px;align-items:baseline;padding:12px 14px;margin:0 0 25px;border-left:3px solid #c87828;background:#fffaf3;color:var(--muted);font-size:13px;overflow:auto}
  .statement-panel .problem-params dt{font-weight:650;color:var(--ink)}
  .statement-panel .problem-params dd{margin:0}
  .statement-panel .problem-content{margin:0}
@@ -172,8 +175,8 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  .snip-h{color:var(--muted);font-size:13px;margin-bottom:4px}
  .history-panel{border:1px solid var(--line);border-radius:10px;background:var(--panel);overflow:auto}
  .history-panel table{min-width:700px}
- @media(max-width:900px){body{padding:22px 14px 48px}.page-head{display:block}.head-mark{display:none}.workspace-layout{grid-template-columns:1fr}.statement-panel{position:static;max-height:none;order:2}.workspace{order:1}}
- @media(max-width:700px){.editor{height:440px}.submit-bar{display:block}.controls{margin-bottom:10px}.sub{line-height:1.8}.statement-panel .problem-params{grid-template-columns:1fr}}
+ @media(max-width:900px){body{padding:22px 14px 48px}.page-head{display:block}.head-mark{display:none}.workspace-layout{display:grid;grid-template-columns:1fr}.splitter{display:none}.statement-panel{position:static;max-height:none;order:2}.workspace{order:1}}
+ @media(max-width:700px){.editor{height:440px}.submit-bar{display:block}.controls{margin-bottom:10px}.sub{line-height:1.8}.statement-panel .problem-params{grid-template-columns:repeat(2,max-content)}}
 </style>
 <header class="page-head">
   <div><p class="eyebrow">CS101 · 提交中心</p><h1><span class="problem-id">__PROBLEM__</span> 提交代码</h1>
@@ -181,7 +184,8 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
   <div class="head-mark"><strong>在线判题</strong><span id="auth">正在检查登录状态…</span></div>
 </header>
 <main class="workspace-layout">
-<article class="statement-panel"><div class="eyebrow">Problem statement</div><h2>__STATEMENT_TITLE__</h2>__STATEMENT_PARAMS__<dl class="problem-content">__STATEMENT_CONTENT__</dl></article>
+<article class="statement-panel"><div class="eyebrow">Problem statement</div><h2>__STATEMENT_TITLE__</h2><dl class="problem-params">__STATEMENT_PARAMS__</dl><dl class="problem-content">__STATEMENT_CONTENT__</dl></article>
+<div class="splitter" id="splitter" role="separator" aria-label="调整题面和编辑器宽度" tabindex="0"></div>
 <section class="workspace">
 <form id="form">
   <div class="editor-bar"><span class="editor-label">代码编辑器</span><span class="editor-state">准备提交</span></div>
@@ -210,6 +214,20 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
 const BOOK = "__BOOK__", PROBLEM = "__PROBLEM__";
 const CLS = { "Accepted": "b-ac", "Wrong Answer": "b-wa" };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// 题面与编辑器之间的拖拽分隔条，宽度只保存在当前浏览器。
+const splitLayout = document.querySelector('.workspace-layout');
+const splitBar = document.querySelector('#splitter');
+function setSplit(clientX) {
+  const rect = splitLayout.getBoundingClientRect();
+  const left = Math.max(360, Math.min(rect.width - 540, clientX - rect.left));
+  splitLayout.style.gridTemplateColumns = left + 'px 8px minmax(520px,1fr)';
+  try { localStorage.setItem('cs101-split-ratio', String(left / rect.width)); } catch (err) {}
+}
+splitBar.addEventListener('pointerdown', e => { splitBar.classList.add('dragging'); splitBar.setPointerCapture(e.pointerId); setSplit(e.clientX); });
+splitBar.addEventListener('pointermove', e => { if (splitBar.hasPointerCapture(e.pointerId)) setSplit(e.clientX); });
+splitBar.addEventListener('pointerup', e => { splitBar.releasePointerCapture(e.pointerId); splitBar.classList.remove('dragging'); });
+try { const ratio = Number(localStorage.getItem('cs101-split-ratio')); if (ratio > 0 && ratio < 1) requestAnimationFrame(() => { const r = splitLayout.getBoundingClientRect(); setSplit(r.left + r.width * ratio); }); } catch (err) {}
 
 fetch("/api/me", { credentials: "same-origin" }).then(r => r.json()).then(me => {
   auth.innerHTML = me.authenticated
@@ -888,7 +906,7 @@ a{{color:var(--green)}}.shell{{max-width:1120px;margin:auto;padding:0 24px}}.top
                 .replace("__STATEMENT_CONTENT__", content_html))
 
     def help_page(self):
-        return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>帮助/说明 · CS101</title><style>
+        return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>说明 · CS101</title><style>
 :root{--ink:#16231d;--muted:#6c7b73;--line:#dfe7e1;--bg:#f4f7f4;--paper:#fff;--green:#237a50}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:820px;margin:auto;padding:0 24px}.top{height:72px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;gap:11px;align-items:center;text-decoration:none;color:var(--ink);font-weight:750}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:white}.back{color:var(--green);text-decoration:none}.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:30px 34px;box-shadow:0 12px 34px rgba(34,63,45,.06)}h1{font-size:30px;margin:0 0 7px}h2{font-size:18px;margin:28px 0 8px;padding-top:20px;border-top:1px solid var(--line)}p{color:var(--muted)}.rule{padding:14px 16px;border-left:3px solid #c87828;background:#fffaf3;color:var(--ink)}code{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;background:#eef4ef;padding:2px 5px;border-radius:4px}@media(max-width:600px){.shell{padding:0 16px}.panel{padding:24px 20px}.top{height:62px}}
 </style></head><body><header class="top shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><a class="back" href="/">返回首页</a></header><main class="shell"><section class="panel"><h1>帮助/说明</h1><p>这里使用本机测试数据判题，提交页右侧选择语言后即可提交代码并查看每组数据的结果。</p><h2>时间与内存倍率</h2><div class="rule">Python ×10 · PyPy3 ×3 · C/C++/Swift/Objective-C ×1 · C#/F#/VB.NET ×2<br>C#/F#/VB.NET 内存 ×2</div><h2>题面限制的含义</h2><p>题面显示的时限按 C/C++ 计算，是全部测试点限时之和。其他语言按照上面的倍率执行；内存限制仅对 C#、F#、VB.NET 按 2 倍计算。</p><h2>提交结果</h2><p>提交记录会保留提交人、结果、语言、运行时间、内存和代码。出现错误时，判题详情会标出出错的数据组，并展示对应的输入、期望输出和实际输出。</p></section></main></body></html>"""
 
