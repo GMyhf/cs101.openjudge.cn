@@ -1107,7 +1107,8 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             is_admin = same_username(user, ADMIN_USER)
             self.send_json({"user": user, "submissions": [
                 {"user": r[0], "problem": r[1], "result": r[2], "created": r[3], "book": r[4], "language": r[5],
-                 "detail": json.loads(r[6]) if r[6] else {}, "source": (r[7] or "") if (is_admin or r[0] == user) else ""} for r in rows]})
+                 "detail": json.loads(r[6]) if r[6] and (is_admin or same_username(r[0] or "", user)) else {},
+                 "source": (r[7] or "") if (is_admin or same_username(r[0] or "", user)) else ""} for r in rows]})
             return
         if path in ("/history", "/history/"):
             page = ROOT / "history.html"

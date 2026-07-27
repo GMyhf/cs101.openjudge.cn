@@ -291,6 +291,9 @@ class ServerApiTests(unittest.TestCase):
         from judge import language_version
         self.assertEqual(latest["detail"]["language_version"], language_version("python"))
         self.assertRegex(latest["detail"]["language_version"], r"^Python3\(\d+\.\d+\)$")
+        other_entries = [entry for entry in entries if entry["user"] != username]
+        if other_entries:
+            self.assertTrue(all(entry["source"] == "" and entry["detail"] == {} for entry in other_entries))
         admin = self._admin_cookie()
         status, _, body = request(self.port, "GET", "/api/submissions", cookie=admin)
         self.assertEqual(status, 200)
