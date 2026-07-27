@@ -169,6 +169,9 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  pre.source{white-space:pre;max-height:360px}
  .expected{margin-top:12px}
  h2{font-size:18px;margin:30px 0 10px}
+ .history-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+ .history-toggle{padding:6px 10px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--muted);font:13px inherit;cursor:pointer}
+ .history-toggle:hover{border-color:var(--accent);color:var(--accent);background:var(--soft)}
  table{width:100%;border-collapse:collapse;font-size:14px}
  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
  th{color:var(--muted);font-size:12px;font-weight:600}
@@ -208,7 +211,7 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
   </div></div>
 </form>
 <div id="verdict"></div>
-<h2>我的提交记录</h2>
+<div class="history-heading"><h2>我的提交记录</h2><button id="historyToggle" class="history-toggle" type="button">统计</button></div>
 <div id="histbox" class="history-panel muted">…</div>
 </section>
 </main>
@@ -531,11 +534,14 @@ form.onsubmit = async e => {
   go.disabled = false; document.querySelector(".editor-state").textContent = "准备提交";
 };
 
-async function loadHistory() {
-  const r = await fetch("/api/submissions", { credentials: "same-origin" });
+let historyAll = false;
+async function loadHistory(showAll = false) {
+  const params = new URLSearchParams({ book: BOOK, problem: PROBLEM });
+  if (!showAll) params.set("mine", "1");
+  const r = await fetch("/api/submissions?" + params, { credentials: "same-origin" });
   if (r.status === 401) { histbox.textContent = "登录后可以看到提交记录。"; return; }
-  const mine = (await r.json()).submissions.filter(s => s.problem === PROBLEM);
-  if (!mine.length) { histbox.textContent = "这道题还没有提交记录。"; return; }
+  const mine = (await r.json()).submissions;
+  if (!mine.length) { histbox.textContent = showAll ? "这道题还没有提交记录。" : "你还没有提交这道题。"; return; }
   const relativeTime = value => { const then = Date.parse(String(value).replace(" ", "T") + "Z"); if (Number.isNaN(then)) return value; const minutes = Math.max(0, Math.floor((Date.now() - then) / 60000)); if (minutes < 1) return "刚刚"; if (minutes < 60) return minutes + "分钟前"; const hours = Math.floor(minutes / 60); return hours < 24 ? hours + "小时前" : Math.floor(hours / 24) + "天前"; };
   histbox.innerHTML = "<table><thead><tr><th>提交人</th><th>结果</th><th>内存</th><th>时间</th><th>代码长度</th><th>语言</th><th>提交时间</th><th>代码/详情</th></tr></thead><tbody>"
     + mine.map(s => {
@@ -559,6 +565,11 @@ async function loadHistory() {
              + "</td><td class='num' title='" + esc(s.created) + "'>" + esc(relativeTime(s.created)) + "</td><td>" + code + detail + "<div class='muted'>" + esc(note) + "</div></td></tr>";
       }).join("") + "</tbody></table>";
 }
+historyToggle.addEventListener('click', () => {
+  historyAll = !historyAll;
+  historyToggle.textContent = historyAll ? '我的提交' : '统计';
+  loadHistory(historyAll);
+});
 </script></html>"""
 
 
