@@ -1,0 +1,94 @@
+{
+  "batch": "T-004 round18",
+  "updated_at": "2026-07-27T14:22:55.206721+00:00",
+  "judge_fidelity_warning": {
+    "issue": "**我们的判题器对这道题会漏判。**判题器按 token 比对（`actual.split() != expected.split()`），而这题用**行首空格**表示「未修改的行」。一个把未修改行的行首空格漏掉的错误实现，其输出在 token 比对下与正确输出**完全相同**，本站会判 Accepted，平台会判 Wrong Answer。我已实测确认。",
+    "impact": "数据仍然有用——内容错的解法照样会被抓住，漏的只有「行首空格」这一种错法。",
+    "for_codex": "照常构建，不必为这条做任何特殊处理。**但报告里请如实记下这条局限**——它是被接受的、不是被忽略的，两者的区别只在有没有写下来。",
+    "decision": "**人已拍板（2026-07-27）：按「影响有限」处理，判题器不改。**",
+    "rationale": "token 比对是判题器的核心语义、当初为有意设计（学生输出裹上多余空白不该算错），改它会影响全部 505 份已交付数据。而本题受影响的只有「行首空格」这一种错法，内容错的解法照样被抓住。用一处已知的宽松，换 505 份数据的判定语义不变，值得。",
+    "status": "closed"
+  },
+  "entries": [
+    {
+      "local_number": 31042,
+      "title": "简化版 Git Diff 引擎",
+      "reference_source": "platform Accepted Python3 #52824909",
+      "statistics_url": "http://cs101.openjudge.cn/practice/31042/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52824909/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g31042",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "input has exactly N old lines and M new lines",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "2\nold only\n1\n",
+        [
+          [
+            "input has exactly N old lines and M new lines",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "input has exactly N old lines and M new lines",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "2\nold only\n1\n",
+            "constraints": [
+              "input has exactly N old lines and M new lines"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    }
+  ]
+}
