@@ -117,7 +117,7 @@ function paint() {
   books_el().innerHTML = books.map(b => {
     const o = state.books[b.book] || "";
     const eff = effectiveFor(b.book);
-    return `<tr><td>${esc(b.book)}</td><td class="muted">${b.ok}/${b.total}</td>
+    return `<tr><td>${esc((state.book_meta && state.book_meta[b.book] || {}).name || b.book)}</td><td class="muted">${b.ok}/${b.total}</td>
       <td><select data-book="${esc(b.book)}" ${isAdmin ? "" : "disabled"}>
         <option value=""${o === "" ? " selected" : ""}>跟随全局</option>
         <option value="on"${o === "on" ? " selected" : ""}>开</option>
@@ -160,7 +160,7 @@ Promise.all([
   fetch("/api/settings", { credentials: "same-origin" }).then(r => r.json()),
   fetch("/api/catalog", { credentials: "same-origin" }).then(r => r.json()).catch(() => ({ problems: [] })),
 ]).then(([s, cat]) => {
-  state = s; isAdmin = s.is_admin; gate.hidden = isAdmin;
+  state = s; state.book_meta = cat.book_meta || {}; isAdmin = s.is_admin; gate.hidden = isAdmin;
   const agg = {};
   for (const p of cat.problems || []) {
     agg[p.book] = agg[p.book] || { book: p.book, ok: 0, total: 0 };
