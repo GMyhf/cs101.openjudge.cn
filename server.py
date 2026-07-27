@@ -78,18 +78,27 @@ PROBLEMS = [
 # 所以 WA 要把 case 编号、期望/实际 token 数摆出来，TLE/RE 要把判题器的 message 摆出来。
 SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>本地提交 - __PROBLEM__</title>
+<title>提交代码 - __PROBLEM__</title>
 <style>
- :root{--ink:#17221d;--muted:#6b7a72;--line:#d9e0da;--bg:#f7f9f7}
+ :root{--ink:#17221d;--muted:#6b7a72;--line:#d9e0da;--bg:#f7f9f7;--panel:#fff;--soft:#f1f5f2;--accent:#2f7d55}
  *{box-sizing:border-box}
  body{font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);
-      max-width:900px;margin:0 auto;padding:28px 20px 60px}
- h1{font-size:24px;margin:0 0 4px}
- .sub{color:var(--muted);margin:0 0 20px}
- .sub a{color:#3d8b68}
+      max-width:1120px;margin:0 auto;padding:34px 24px 70px;background:var(--bg)}
+ .page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:24px}
+ .eyebrow{color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:0 0 5px}
+ h1{font-size:28px;line-height:1.25;letter-spacing:0;margin:0 0 7px}
+ .problem-id{color:var(--accent)}
+ .sub{color:var(--muted);margin:0}
+ .sub a{color:var(--accent);text-decoration:none}
+ .sub a:hover{text-decoration:underline}
+ .head-mark{min-width:132px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--muted);font-size:12px;text-align:right}
+ .head-mark strong{display:block;color:var(--ink);font-size:14px;margin-bottom:2px}
+ .workspace{border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:0 8px 24px rgba(34,58,44,.06);overflow:hidden}
+ .editor-bar{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border-bottom:1px solid var(--line);background:var(--soft);font-size:13px}
+ .editor-label{font-weight:700}.editor-state{color:var(--muted)}
  /* 编辑器：透明 textarea 叠在高亮层上。两层的字体/行高/padding 必须逐项一致，
     差一点点光标就会和文字错位。 */
- .editor{display:flex;height:520px;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:#fff}
+ .editor{display:flex;height:520px;overflow:hidden;background:var(--panel)}
  .gutter{flex:0 0 auto;padding:12px 8px 12px 12px;text-align:right;color:#aab4ad;background:#fbfcfb;
          border-right:1px solid var(--line);user-select:none;white-space:pre;height:100%;overflow:hidden}
  .codewrap{position:relative;flex:1;min-width:0}
@@ -106,9 +115,9 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  .t-match{background:#ffe9a8;border-radius:2px;box-shadow:0 0 0 1px #d8b84a}
  button.ghost{background:#fff;color:var(--ink);border-color:var(--line)}
  /* 暗色：只改变量与几处硬编码色，结构不动 */
- :root[data-theme="dark"]{--ink:#e6ece8;--muted:#94a49b;--line:#2f3a34;--bg:#1b211e}
+ :root[data-theme="dark"]{--ink:#e6ece8;--muted:#94a49b;--line:#2f3a34;--bg:#1b211e;--panel:#181e1b;--soft:#202923;--accent:#8fd6ab}
  :root[data-theme="dark"] body{background:#141917}
- :root[data-theme="dark"] .editor,
+ :root[data-theme="dark"] .workspace,
  :root[data-theme="dark"] .codewrap pre,
  :root[data-theme="dark"] select,
  :root[data-theme="dark"] pre.msg{background:#181e1b}
@@ -125,11 +134,14 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  :root[data-theme="dark"] .b-wa{background:#3d2320;color:#e59a90}
  :root[data-theme="dark"] .b-other{background:#39301a;color:#dcc07a}
  :root[data-theme="dark"] .b-info{background:#242c33;color:#a8b6c2}
+ .submit-bar{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px 15px;border-top:1px solid var(--line);background:var(--soft)}
+ .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
  .row{display:flex;gap:10px;align-items:center;margin:12px 0}
- select,button{padding:9px 14px;border:1px solid var(--line);border-radius:5px;font:inherit;background:#fff}
+ select,button{padding:9px 14px;border:1px solid var(--line);border-radius:7px;font:inherit;background:var(--panel)}
+ select{min-width:190px;color:var(--ink)}
  button{background:#17221d;color:#fff;border-color:#17221d;cursor:pointer}
  button[disabled]{opacity:.55;cursor:default}
- .verdict{border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin-top:16px;background:var(--bg)}
+ .verdict{border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:22px;background:var(--panel);box-shadow:0 5px 18px rgba(34,58,44,.04)}
  .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-weight:600;font-size:13px}
  .b-ac{background:#e7f3ec;color:#2f7d55}.b-wa{background:#fdeceb;color:#b04f43}
  .b-other{background:#fdf4e3;color:#8a6d1f}.b-info{background:#eef1f4;color:#55606b}
@@ -139,7 +151,7 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
          border-radius:5px;padding:10px;margin:12px 0 0;font:12px/1.5 ui-monospace,monospace;max-height:220px;overflow:auto}
  pre.source{white-space:pre;max-height:360px}
  .expected{margin-top:12px}
- h2{font-size:16px;margin:30px 0 8px}
+ h2{font-size:18px;margin:30px 0 10px}
  table{width:100%;border-collapse:collapse;font-size:14px}
  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
  th{color:var(--muted);font-size:12px;font-weight:600}
@@ -147,11 +159,18 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  .muted{color:var(--muted)}
  .snip{margin-top:12px}
  .snip-h{color:var(--muted);font-size:13px;margin-bottom:4px}
+ .history-panel{border:1px solid var(--line);border-radius:10px;background:var(--panel);overflow:auto}
+ .history-panel table{min-width:700px}
+ @media(max-width:700px){body{padding:22px 14px 48px}.page-head{display:block}.head-mark{display:none}.editor{height:440px}.submit-bar{display:block}.controls{margin-bottom:10px}.hint{display:block}.sub{line-height:1.8}}
 </style>
-<h1>__PROBLEM__ 本地提交</h1>
-<p class="sub">题库：__BOOK__ · 判题运行在本机 · <a href="/problems/">题库目录</a> · <a href="/history/">提交记录</a> · <a href="/__BOOK__/__PROBLEM__/">看题面</a><span id="adminlink"></span></p>
-<p id="auth" class="muted">正在检查登录状态…</p>
+<header class="page-head">
+  <div><p class="eyebrow">CS101 · 提交中心</p><h1><span class="problem-id">__PROBLEM__</span> 提交代码</h1>
+  <p class="sub">题库：__BOOK_NAME__ · <a href="/problems/">题库目录</a> · <a href="/history/">提交记录</a> · <a href="/__BOOK__/__PROBLEM__/">查看题面</a><span id="adminlink"></span></p></div>
+  <div class="head-mark"><strong>在线判题</strong><span id="auth">正在检查登录状态…</span></div>
+</header>
 <form id="form">
+  <section class="workspace">
+  <div class="editor-bar"><span class="editor-label">代码编辑器</span><span class="editor-state">准备提交</span></div>
   <div class="editor">
     <div class="gutter" id="gutter">1</div>
     <div class="codewrap">
@@ -160,18 +179,18 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
                 autocomplete="off" autocapitalize="off"></textarea>
     </div>
   </div>
-  <div class="row">
+  <div class="submit-bar"><div class="controls">
     <select name="language">
       __LANGUAGE_OPTIONS__
     </select>
     <button id="go">提交并判题</button>
     <button id="theme" type="button" class="ghost">深色</button>
-    <span id="hint" class="muted">时间倍率：Python ×10 · PyPy3 ×3 · C/C++/Swift/Objective-C ×1 · C#/F#/VB.NET ×2；C#/F#/VB.NET 内存 ×2。题面时限按 C/C++ 计算，为全部测试点限时之和。</span>
-  </div>
+  </div><span id="hint" class="muted hint">时间倍率：Python ×10 · PyPy3 ×3 · C/C++/Swift/Objective-C ×1 · C#/F#/VB.NET ×2；C#/F#/VB.NET 内存 ×2。题面时限按 C/C++ 计算，为全部测试点限时之和。</span></div>
+  </section>
 </form>
 <div id="verdict"></div>
 <h2>我的提交记录</h2>
-<div id="histbox" class="muted">…</div>
+<div id="histbox" class="history-panel muted">…</div>
 <script>
 const BOOK = "__BOOK__", PROBLEM = "__PROBLEM__";
 const CLS = { "Accepted": "b-ac", "Wrong Answer": "b-wa" };
@@ -897,9 +916,10 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             book, problem_id = submit_page.groups()
             language_options = "".join(
                 f'<option value="{key}">{escape(language_version(key))}</option>'
-                for key in ("cpp", "c", "python", "pypy3", "csharp", "fsharp", "vbnet", "swift", "objc")
+                for key in ("python", "pypy3", "cpp", "c", "csharp", "fsharp", "vbnet", "swift", "objc")
             )
             body = (SUBMIT_PAGE.replace("__BOOK__", escape(book))
+                    .replace("__BOOK_NAME__", escape(BOOK_META.get(book, {}).get("name", book)))
                     .replace("__PROBLEM__", escape(problem_id))
                     .replace("__LANGUAGE_OPTIONS__", language_options).encode())
             self.send_response(200); self.send_header("Content-Type", "text/html; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
