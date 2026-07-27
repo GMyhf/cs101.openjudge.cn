@@ -6,6 +6,7 @@ import concurrent.futures
 import inspect
 import io
 import json
+import os
 import random
 import subprocess
 import sys
@@ -119,7 +120,23 @@ def g24510(r):
 
 
 def g24607(r):
-    n=r.randint(1,100); k=r.randint(1,n); return f"{n} {k}\n"+"".join(r.choice("HG") for _ in range(n))+"\n"
+    n=r.randint(1,1000); k=r.randint(1,n); return f"{n} {k}\n"+"".join(r.choice("HG") for _ in range(n))+"\n"
+
+
+def extra_cases(n):
+    if n == 24607:
+        return [f"{size} {max(1, size // 3)}\n" + ("HG" * ((size + 1) // 2))[:size] + "\n"
+                for size in (10000, 30000, 50000)]
+    if n == 23997:
+        return ["100\n"]
+    if n == 23163:
+        n, m = 110, 9900
+        edges = [(i, (i + 1) % n) for i in range(n)]
+        edges += [(i, ((i * 37 + j * 13 + 7) % n) if ((i * 37 + j * 13 + 7) % n) != i else (i + 1) % n)
+                  for j in range((m - len(edges)) // n + 1) for i in range(n)]
+        edges = edges[:m]
+        return [f"{n} {m}\n" + "\n".join(f"{a} {b}" for a, b in edges) + "\n"]
+    return []
 
 
 GENERATORS = {n: globals()[f"g{n}"] for n in (
@@ -196,46 +213,55 @@ def constraint_rows(n, cases):
     raise AssertionError(n)
 
 
-def write_producecase(made, source, generator, sample, language="python"):
+def write_producecase(made, source, generator, sample, extra, language="python"):
     if language == "cpp":
         text = ("import random, subprocess, tempfile\nfrom pathlib import Path\n"
-                f"REFERENCE={source!r}\nSAMPLE={sample!r}\nGENERATOR_NAME={generator.__name__!r}\n"
+                f"REFERENCE={source!r}\nSAMPLE={sample!r}\nEXTRA_CASES={extra!r}\nGENERATOR_NAME={generator.__name__!r}\n"
                 + inspect.getsource(generator) + "\n"
                 + "def run(text):\n    with tempfile.TemporaryDirectory(prefix='producecase-') as d:\n"
                 + "        d=Path(d); p=d/'main.cpp'; exe=d/'main'; p.write_text(REFERENCE)\n        c=subprocess.run(['g++','-std=c++17','-O2',str(p),'-o',str(exe)],capture_output=True,text=True,timeout=60)\n        if c.returncode: raise SystemExit(c.stderr)\n        x=subprocess.run([str(exe)],input=text,text=True,capture_output=True,timeout=30)\n        if x.returncode: raise SystemExit(x.stderr)\n        return x.stdout\n"
-                + "def main():\n    d=Path('data'); d.mkdir(exist_ok=True)\n    cases=[SAMPLE]+(['8\\n','9\\n'] if GENERATOR_NAME == 'g22007' else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]\n    for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))\nif __name__=='__main__': main()\n")
+                + "def main():\n    d=Path('data'); d.mkdir(exist_ok=True)\n    cases=[SAMPLE]+EXTRA_CASES+(['8\\n','9\\n'] if GENERATOR_NAME == 'g22007' else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]\n    for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))\nif __name__=='__main__': main()\n")
         (made / "producecase.py").write_text(text)
         return
     text = ("import random, subprocess, sys, tempfile\nfrom pathlib import Path\n"
-            f"REFERENCE={source!r}\nSAMPLE={sample!r}\nGENERATOR_NAME={generator.__name__!r}\n"
+            f"REFERENCE={source!r}\nSAMPLE={sample!r}\nEXTRA_CASES={extra!r}\nGENERATOR_NAME={generator.__name__!r}\n"
             + inspect.getsource(generator) + "\n"
             + "def run(text):\n    with tempfile.TemporaryDirectory(prefix='producecase-') as d:\n"
             + "        p=Path(d)/'main.py'; p.write_text(REFERENCE)\n        x=subprocess.run([sys.executable,str(p)],input=text,text=True,capture_output=True,timeout=30)\n        if x.returncode: raise SystemExit(x.stderr)\n        return x.stdout\n"
-            + "def main():\n    d=Path('data'); d.mkdir(exist_ok=True)\n    cases=[SAMPLE]+(['8\\n','9\\n'] if GENERATOR_NAME == 'g22007' else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]\n    for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))\nif __name__=='__main__': main()\n")
+            + "def main():\n    d=Path('data'); d.mkdir(exist_ok=True)\n    cases=[SAMPLE]+EXTRA_CASES+(['8\\n','9\\n'] if GENERATOR_NAME == 'g22007' else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]\n    for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))\nif __name__=='__main__': main()\n")
     (made / "producecase.py").write_text(text)
 
 
 def main():
     manifest = json.loads(MANIFEST.read_text()); report = []
+    selected = {int(x) for x in os.environ.get("T004_ONLY", "").split(",") if x}
+    if selected and REPORT.exists():
+        old = json.loads(REPORT.read_text()).get("entries", [])
+        report.extend(entry for entry in old if int(entry["local_number"]) not in selected)
     for entry in manifest["entries"]:
         n = int(entry["local_number"]); gen = GENERATORS[n]; sample = entry["sample_input"]
+        if selected and n not in selected:
+            continue
         source = (ROOT / f"scripts/t004_platform_accepted_{n:05d}.py").read_text()
         a=entry["existing_accepted"]; reference_kind=f"platform Accepted Python3 #{a['solution_id']}"
         made = TESTS / bucket(n) / f"{n:05d}_made"; data = made / "data"; data.mkdir(parents=True, exist_ok=True)
         for p in data.glob("*"): p.unlink()
-        cases = [sample]
+        extra = extra_cases(n)
+        cases = [sample] + extra
         cases += [gen(random.Random(s)) for s in range(1,21)]
         outputs = [run_source(source,c) for c in cases]
         for i,c in enumerate(cases): (data/f"{i}.in").write_text(c); (data/f"{i}.out").write_text(outputs[i])
         header=(f"# External reference: statistics page /practice/{n:05d}/\n# Accepted submission: {a['solution_id']}\n# Source: {a['source_url']}\n# License: not declared on the submission page; no license is inferred.\n\n")
         (made/"samplecode.py").write_text(header+source)
-        write_producecase(made,source,gen,sample,"python")
+        write_producecase(made,source,gen,sample,extra,"python")
         rows, counter = constraint_rows(n,cases[1:])
         audit = common.audit(made,cases=cases[1:],outputs=outputs[1:],sample_input=sample,sample_output=entry.get("sample_output"),constraints=rows,constraint_counterexample=counter)
         for s in range(20000): gen(random.Random(s))
         run_python_many(source, [gen(random.Random(100000+s)) for s in range(400)])
         report.append({"local_number":n,"title":entry["title"],"reference_source":reference_kind,"statistics_url":f"http://cs101.openjudge.cn{entry['submit_path']}statistics/","source_url":a["source_url"],"license_status":"not declared on the submission page; no license is inferred","generator":gen.__name__,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"test_cases":len(cases),"constraints":rows,"constraint_counterexample":counter,"self_audit":audit,"sample_reproduced":audit["sample_is_case_zero"]["status"]=="passed","producecase_reproduced":audit["byte_reproduction"]["status"]=="passed"})
         print(n,"built",flush=True)
+    order = {int(e["local_number"]): i for i, e in enumerate(manifest["entries"])}
+    report.sort(key=lambda e: order[int(e["local_number"])])
     REPORT.write_text(json.dumps({"batch":"T-004 round12","updated_at":datetime.now(timezone.utc).isoformat(),"entries":report},ensure_ascii=False,indent=2)+"\n")
 
 if __name__ == "__main__": main()

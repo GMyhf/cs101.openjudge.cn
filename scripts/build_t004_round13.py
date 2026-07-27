@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import inspect
 import json
+import os
 import random
 import subprocess
 import sys
@@ -137,6 +138,10 @@ GENERATORS = {n: globals()[f"g{n}"] for n in (24755, 24830, 24837, 25139, 25274,
 
 
 def scale_case(n):
+    if n == 24755:
+        return "8\n"
+    if n == 26144:
+        return "7\n"
     if n == 26267:
         return "A" * 1000000 + "\n" + "A" * 1000 + "\n"
     if n == 26273:
@@ -187,20 +192,26 @@ def constraint_rows(n, cases):
     raise KeyError(n)
 
 
-def write_producecase(made, source, generator, sample):
+def write_producecase(made, source, generator, sample, extra):
     text = ("import random, subprocess, sys, tempfile\nfrom pathlib import Path\n"
-            f"REFERENCE={source!r}\nSAMPLE={sample!r}\nGENERATOR_NAME={generator.__name__!r}\n"
+            f"REFERENCE={source!r}\nSAMPLE={sample!r}\nEXTRA_CASE={extra!r}\nGENERATOR_NAME={generator.__name__!r}\n"
             + inspect.getsource(generator) + "\n"
             + "def run(text):\n    with tempfile.TemporaryDirectory(prefix='producecase-') as d:\n        p=Path(d)/'main.py'; p.write_text(REFERENCE)\n        x=subprocess.run([sys.executable,str(p)],input=text,text=True,capture_output=True,timeout=60)\n        if x.returncode: raise SystemExit(x.stderr)\n        return x.stdout\n"
-            + "def scale_case():\n    if GENERATOR_NAME == 'g26267': return 'A'*1000000+'\\n'+'A'*1000+'\\n'\n    if GENERATOR_NAME == 'g26273': return ('abcdefghij'*10000)+'\\n'\n    if GENERATOR_NAME == 'g26835':\n        e=[(i-1,i,float(i)) for i in range(1,99)]\n        for i in range(99):\n            for j in range(i+2,min(99,i+12)): e.append((i,j,float(10000+i*99+j)))\n        return '99 %d\\n'%len(e)+'\\n'.join(f'{a} {b} {w:.3f}' for a,b,w in e)+'\\n'\n    if GENERATOR_NAME == 'g27311': return '100000\\n'+' '.join(str(i%10001) for i in range(100000))+'\\n'+' '.join(str((i*7)%10001) for i in range(100000))+'\\n'\n    return None\n"
+            + "def scale_case():\n    if EXTRA_CASE is not None: return EXTRA_CASE\n    if GENERATOR_NAME == 'g26267': return 'A'*1000000+'\\n'+'A'*1000+'\\n'\n    if GENERATOR_NAME == 'g26273': return ('abcdefghij'*10000)+'\\n'\n    if GENERATOR_NAME == 'g26835':\n        e=[(i-1,i,float(i)) for i in range(1,99)]\n        for i in range(99):\n            for j in range(i+2,min(99,i+12)): e.append((i,j,float(10000+i*99+j)))\n        return '99 %d\\n'%len(e)+'\\n'.join(f'{a} {b} {w:.3f}' for a,b,w in e)+'\\n'\n    if GENERATOR_NAME == 'g27311': return '100000\\n'+' '.join(str(i%10001) for i in range(100000))+'\\n'+' '.join(str((i*7)%10001) for i in range(100000))+'\\n'\n    return None\n"
             + "def main():\n    d=Path('data'); d.mkdir(exist_ok=True)\n    extra=scale_case(); cases=[SAMPLE]+([extra] if extra else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]\n    for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))\nif __name__=='__main__': main()\n")
     (made / "producecase.py").write_text(text)
 
 
 def main():
     manifest = json.loads(MANIFEST.read_text()); report = []
+    selected = {int(x) for x in os.environ.get("T004_ONLY", "").split(",") if x}
+    if selected and REPORT.exists():
+        old = json.loads(REPORT.read_text()).get("entries", [])
+        report.extend(entry for entry in old if int(entry["local_number"]) not in selected)
     for entry in manifest["entries"]:
         n = int(entry["local_number"]); gen = GENERATORS[n]; sample = entry["sample_input"]
+        if selected and n not in selected:
+            continue
         source = (ROOT / f"scripts/t004_platform_accepted_{n:05d}.py").read_text()
         a = entry["existing_accepted"]; reference_kind = f"platform Accepted Python3 #{a['solution_id']}"
         made = TESTS / bucket(n) / f"{n:05d}_made"; data = made / "data"; data.mkdir(parents=True, exist_ok=True)
@@ -211,7 +222,7 @@ def main():
         for i, c in enumerate(cases): (data/f"{i}.in").write_text(c); (data/f"{i}.out").write_text(outputs[i])
         header = (f"# External reference: statistics page /practice/{n:05d}/\n# Accepted submission: {a['solution_id']}\n# Source: {a['source_url']}\n# License: not declared on the submission page; no license is inferred.\n\n")
         (made / "samplecode.py").write_text(source if source.startswith("# External reference:") else header + source)
-        write_producecase(made, source, gen, sample)
+        write_producecase(made, source, gen, sample, extra)
         rows, counter = constraint_rows(n, cases[1:])
         fixed = n == 25274
         domain_exemption = ("题面输入是固定字面量，输入域只有一种，去重低于15不适用" if fixed else
@@ -235,7 +246,9 @@ def main():
             "self_audit": audit, "sample_reproduced": audit["sample_is_case_zero"]["status"] == "passed",
             "producecase_reproduced": audit["byte_reproduction"]["status"] == "passed"})
         print(n, "built", flush=True)
-    REPORT.write_text(json.dumps({"batch":"T-004 round13", "updated_at":datetime.now(timezone.utc).isoformat(), "entries":report}, ensure_ascii=False, indent=2)+"\n")
+    pending = common.pending_rework_status(manifest.get("pending_rework", []), TESTS)
+    REPORT.write_text(json.dumps({"batch":"T-004 round13", "updated_at":datetime.now(timezone.utc).isoformat(),
+                                  "pending_rework_status": pending, "entries":report}, ensure_ascii=False, indent=2)+"\n")
 
 
 if __name__ == "__main__": main()

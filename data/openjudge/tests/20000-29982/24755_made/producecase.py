@@ -1,7 +1,8 @@
 import random, subprocess, sys, tempfile
 from pathlib import Path
-REFERENCE='import math\n\nn = int(input())\n# 卡特兰数 C(2n, n) / (n+1)\nprint(math.comb(2 * n, n) // (n + 1))'
+REFERENCE='# External reference: statistics page /practice/24755/\n# Accepted submission: 52682226\n# Source: http://cs101.openjudge.cn/practice/solution/52682226/\n# License: not declared on the submission page; no license is inferred.\n\nimport math\n\nn = int(input())\n# 卡特兰数 C(2n, n) / (n+1)\nprint(math.comb(2 * n, n) // (n + 1))'
 SAMPLE='3\n'
+EXTRA_CASE='8\n'
 GENERATOR_NAME='g24755'
 def g24755(r): return f"{r.randint(2, 12)}\n"
 
@@ -12,6 +13,7 @@ def run(text):
         if x.returncode: raise SystemExit(x.stderr)
         return x.stdout
 def scale_case():
+    if EXTRA_CASE is not None: return EXTRA_CASE
     if GENERATOR_NAME == 'g26267': return 'A'*1000000+'\n'+'A'*1000+'\n'
     if GENERATOR_NAME == 'g26273': return ('abcdefghij'*10000)+'\n'
     if GENERATOR_NAME == 'g26835':

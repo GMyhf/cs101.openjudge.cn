@@ -1,7 +1,8 @@
 import random, subprocess, sys, tempfile
 from pathlib import Path
-REFERENCE="n = int(input())\ntemp = []\nfor i in range(1, n+1):\n    for j in range(1, i+1):\n        temp.append(f'{j}x{i}={i*j}')\n    print(*temp)\n    temp = []"
+REFERENCE="# External reference: statistics page /practice/26144/\n# Accepted submission: 51527404\n# Source: http://cs101.openjudge.cn/practice/solution/51527404/\n# License: not declared on the submission page; no license is inferred.\n\nn = int(input())\ntemp = []\nfor i in range(1, n+1):\n    for j in range(1, i+1):\n        temp.append(f'{j}x{i}={i*j}')\n    print(*temp)\n    temp = []"
 SAMPLE='6\n'
+EXTRA_CASE='7\n'
 GENERATOR_NAME='g26144'
 def g26144(r): return f"{r.randint(1, 9)}\n"
 
@@ -12,6 +13,7 @@ def run(text):
         if x.returncode: raise SystemExit(x.stderr)
         return x.stdout
 def scale_case():
+    if EXTRA_CASE is not None: return EXTRA_CASE
     if GENERATOR_NAME == 'g26267': return 'A'*1000000+'\n'+'A'*1000+'\n'
     if GENERATOR_NAME == 'g26273': return ('abcdefghij'*10000)+'\n'
     if GENERATOR_NAME == 'g26835':

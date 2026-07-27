@@ -1,92 +1,36 @@
 {
   "batch": "T-004 round13",
-  "updated_at": "2026-07-27T07:40:32.157878+00:00",
+  "updated_at": "2026-07-27T08:02:02.386419+00:00",
+  "pending_rework_status": {
+    "status": "passed",
+    "items": [
+      {
+        "local_number": 24607,
+        "metric": "N",
+        "target_minimum": 10000,
+        "actual_maximum": 50000,
+        "status": "passed",
+        "reason": null
+      },
+      {
+        "local_number": 23997,
+        "metric": "N",
+        "target_minimum": 100,
+        "actual_maximum": 100,
+        "status": "passed",
+        "reason": null
+      },
+      {
+        "local_number": 23163,
+        "metric": "n",
+        "target_minimum": 110,
+        "actual_maximum": 110,
+        "status": "passed",
+        "reason": null
+      }
+    ]
+  },
   "entries": [
-    {
-      "local_number": 24755,
-      "title": "有多少种二叉树",
-      "reference_source": "platform Accepted Python3 #52682226",
-      "statistics_url": "http://cs101.openjudge.cn/practice/24755/statistics/",
-      "source_url": "http://cs101.openjudge.cn/practice/solution/52682226/",
-      "license_status": "not declared on the submission page; no license is inferred.",
-      "generator": "g24755",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "reference_seed_smoke": {
-        "seeds": 400,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "constraints": [
-        [
-          "1 < n < 13",
-          true
-        ]
-      ],
-      "constraint_counterexample": [
-        "13\n",
-        [
-          [
-            "1 < n < 13",
-            false
-          ]
-        ]
-      ],
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 10,
-          "threshold": 15,
-          "status": "exempted",
-          "exemption": "题面 n 的合法取值只有 2..12，共 11 种"
-        },
-        "constant_output_probe": {
-          "frequency": 4,
-          "total": 20,
-          "status": "rejected",
-          "exemption": "题面 n 的合法取值只有 2..12，共 11 种",
-          "share": 0.2
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "1 < n < 13",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "13\n",
-            "constraints": [
-              "1 < n < 13"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": [],
-        "scale_summary": {
-          "max_case_chars": 3,
-          "max_generated_seed": 20
-        }
-      },
-      "sample_reproduced": true,
-      "producecase_reproduced": true
-    },
     {
       "local_number": 24830,
       "title": "最长下坡",
@@ -819,91 +763,6 @@
         "failed": [],
         "scale_summary": {
           "max_case_chars": 1980,
-          "max_generated_seed": 20
-        }
-      },
-      "sample_reproduced": true,
-      "producecase_reproduced": true
-    },
-    {
-      "local_number": 26144,
-      "title": "打印出n*n乘法表",
-      "reference_source": "platform Accepted Python3 #51527404",
-      "statistics_url": "http://cs101.openjudge.cn/practice/26144/statistics/",
-      "source_url": "http://cs101.openjudge.cn/practice/solution/51527404/",
-      "license_status": "not declared on the submission page; no license is inferred.",
-      "generator": "g26144",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "reference_seed_smoke": {
-        "seeds": 400,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "constraints": [
-        [
-          "1 <= n <= 9",
-          true
-        ]
-      ],
-      "constraint_counterexample": [
-        "10\n",
-        [
-          [
-            "1 <= n <= 9",
-            false
-          ]
-        ]
-      ],
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 8,
-          "threshold": 15,
-          "status": "exempted",
-          "exemption": "题面 n 的合法取值只有 1..9，共 9 种"
-        },
-        "constant_output_probe": {
-          "frequency": 4,
-          "total": 20,
-          "status": "rejected",
-          "exemption": "题面 n 的合法取值只有 1..9，共 9 种",
-          "share": 0.2
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "1 <= n <= 9",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "10\n",
-            "constraints": [
-              "1 <= n <= 9"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": [],
-        "scale_summary": {
-          "max_case_chars": 2,
           "max_generated_seed": 20
         }
       },
@@ -1665,6 +1524,177 @@
       },
       "sample_reproduced": true,
       "producecase_reproduced": true
+    },
+    {
+      "local_number": 24755,
+      "title": "有多少种二叉树",
+      "reference_source": "platform Accepted Python3 #52682226",
+      "statistics_url": "http://cs101.openjudge.cn/practice/24755/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52682226/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g24755",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 22,
+      "constraints": [
+        [
+          "1 < n < 13",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "13\n",
+        [
+          [
+            "1 < n < 13",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 21,
+          "distinct": 11,
+          "threshold": 15,
+          "status": "exempted",
+          "exemption": "题面 n 的合法取值只有 2..12，共 11 种"
+        },
+        "constant_output_probe": {
+          "frequency": 4,
+          "total": 21,
+          "status": "rejected",
+          "exemption": "题面 n 的合法取值只有 2..12，共 11 种",
+          "share": 0.19
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 22,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "1 < n < 13",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "13\n",
+            "constraints": [
+              "1 < n < 13"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": [],
+        "scale_summary": {
+          "max_case_chars": 3,
+          "max_generated_seed": 20
+        }
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 26144,
+      "title": "打印出n*n乘法表",
+      "reference_source": "platform Accepted Python3 #51527404",
+      "statistics_url": "http://cs101.openjudge.cn/practice/26144/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/51527404/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g26144",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 22,
+      "constraints": [
+        [
+          "1 <= n <= 9",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "10\n",
+        [
+          [
+            "1 <= n <= 9",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 21,
+          "distinct": 9,
+          "threshold": 15,
+          "status": "exempted",
+          "exemption": "题面 n 的合法取值只有 1..9，共 9 种"
+        },
+        "constant_output_probe": {
+          "frequency": 4,
+          "total": 21,
+          "status": "rejected",
+          "exemption": "题面 n 的合法取值只有 1..9，共 9 种",
+          "share": 0.19
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 22,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "1 <= n <= 9",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "10\n",
+            "constraints": [
+              "1 <= n <= 9"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": [],
+        "scale_summary": {
+          "max_case_chars": 2,
+          "max_generated_seed": 20
+        }
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
     }
-  ]
+  ],
+  "pending_rework_checked_at": "2026-07-27T08:04:30.793550+00:00"
 }

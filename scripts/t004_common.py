@@ -375,3 +375,41 @@ def audit(made_dir, *, cases, outputs, sample_input, sample_output=None,
     row["failed"] = sorted(k for k, v in row.items()
                            if isinstance(v, dict) and v.get("status") in ("FAILED", "ALARM", "accepted"))
     return row
+
+
+def pending_rework_status(pending_rework, test_root):
+    """机械核对跨批次返工目标，避免当前批次的绿灯遮住旧欠账。
+
+    清单中的 ``machine_gate`` 描述从入库 `.in` 文件读取哪个字段及其最低值；
+    结果只由实际数据计算，不接受调用方传入「已完成」标志。
+    """
+    root = Path(test_root)
+    statuses = []
+    for item in pending_rework:
+        number = int(item["local_number"])
+        gate = item.get("machine_gate", {})
+        files = sorted(root.glob(f"**/{number:05d}_made/data/*.in"))
+        values = []
+        for path in files:
+            tokens = path.read_text(errors="replace").split()
+            try:
+                if gate["metric"] == "max_input_field":
+                    values.append(int(tokens[int(gate["field_index"])]))
+            except (KeyError, IndexError, ValueError):
+                values = []
+                break
+        actual = max(values) if values else None
+        target = int(gate["minimum"])
+        passed = actual is not None and actual >= target
+        statuses.append({
+            "local_number": number,
+            "metric": gate.get("field", "input field"),
+            "target_minimum": target,
+            "actual_maximum": actual,
+            "status": "passed" if passed else "FAILED",
+            "reason": None if passed else "产物实测值低于返工目标或没有数据",
+        })
+    return {
+        "status": "passed" if all(x["status"] == "passed" for x in statuses) else "FAILED",
+        "items": statuses,
+    }

@@ -343,5 +343,21 @@ class DiskCheckTests(unittest.TestCase):
             self.assertIn("constant_output_probe", row["failed"])   # 常量解法必 AC
 
 
+class PendingReworkStatusTests(unittest.TestCase):
+    def test_status_is_derived_from_data_and_can_fail(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder) / "tests" / "20000-29982" / "24607_made" / "data"
+            root.mkdir(parents=True)
+            (root / "0.in").write_text("93 1\nH\n", encoding="utf-8")
+            item = [{"local_number": 24607,
+                     "machine_gate": {"metric": "max_input_field", "field": "N",
+                                       "field_index": 0, "minimum": 10000}}]
+            row = common.pending_rework_status(item, Path(folder) / "tests")
+            self.assertEqual(row["status"], "FAILED")
+            self.assertEqual(row["items"][0]["actual_maximum"], 93)
+            (root / "1.in").write_text("10000 1\nH\n", encoding="utf-8")
+            self.assertEqual(common.pending_rework_status(item, Path(folder) / "tests")["status"], "passed")
+
+
 if __name__ == "__main__":
     unittest.main()

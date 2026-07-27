@@ -65,21 +65,24 @@
       "round": "r12",
       "issue": "数据 N≤60，题面 N≤3×10⁵",
       "evidence": "从参考派生的 O(N·K) 慢变体（递推照抄，只把堆换成窗口线性扫）在现有 21 组全对、2.89s 跑完，却在 N=5000 要 17.3s、N=30000 超 45s。参考自身 N=100000 只要 2.86s",
-      "ask": "数据做到 N=1 万～5 万；另 samplecode.py 的归属头重复了两遍，请去重"
+      "ask": "数据做到 N=1 万～5 万；另 samplecode.py 的归属头重复了两遍，请去重",
+      "machine_gate": {"metric": "max_input_field", "field": "N", "field_index": 0, "minimum": 10000}
     },
     {
       "local_number": 23997,
       "round": "r12",
       "issue": "数据 N≤34，题面 N≤100",
       "evidence": "参考跑 N=100 只要 0.86s",
-      "ask": "铺满到 100"
+      "ask": "铺满到 100",
+      "machine_gate": {"metric": "max_input_field", "field": "N", "field_index": 0, "minimum": 100}
     },
     {
       "local_number": 23163,
       "round": "r12",
       "issue": "数据 n≤20/m≤30，题面 n≤110/m≤10000",
       "evidence": "参考跑满上界只要 0.36s",
-      "ask": "铺到 n=110、m 接近 10000"
+      "ask": "铺到 n=110、m 接近 10000",
+      "machine_gate": {"metric": "max_input_field", "field": "n", "field_index": 0, "minimum": 110}
     }
   ],
   "entries": [
