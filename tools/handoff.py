@@ -121,6 +121,11 @@ def run_verify():
     # 因为 self_audit.failed 管的是当轮，管不到跨轮欠账。
     if (ROOT / "tools" / "check_pending_rework.py").is_file():
         steps.append(["python3", "tools/check_pending_rework.py"])
+    # 全库横扫：每轮复核问的是「这一轮怎么样」，而缺陷的范围是「这个仓库」。
+    # 2026-07-27 收官时临时扫了一遍，捞出两条挂了很久的（4140、15291）——
+    # 那次是碰巧想起来做的，不是流程的一部分。现在是了。
+    if (ROOT / "tools" / "full_sweep.py").is_file():
+        steps.append(["python3", "tools/full_sweep.py"])
     if (ROOT / "app.js").is_file() and shutil.which("node"):
         steps.append(["node", "--check", "app.js"])
     outputs, ok = [], True

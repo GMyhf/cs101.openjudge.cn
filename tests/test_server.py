@@ -299,14 +299,18 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(status, 200)
         return json.loads(body)["reveal_failing_input"]
 
-    def test_reveal_switch_defaults_to_off(self):
-        """必须在**没有任何设置记录**的全新库上验，否则测的是上一个用例写进去的值。
+    def test_reveal_switch_defaults_to_on(self):
+        """全局默认是**开**（人拍板 2026-07-27）——但考试时段必须仍然一票否决。
 
+        必须在**没有任何设置记录**的全新库上验，否则测的是上一个用例写进去的值：
         本类的用例按字母序执行，`test_failing_input_...` 排在前面并会把开关显式写成 off；
-        若在共享库上读 `/api/settings`，读到的是那行记录，默认值这条分支根本走不到
-        （改默认为 on 也照样通过）。所以这里另开一个干净的库直接问 `reveal_enabled()`。
+        若在共享库上读 `/api/settings`，读到的是那行记录，默认值这条分支根本走不到。
+
+        两条一起断言才有意义：只钉「默认开」，等于把「考试时段一票否决」这条防线让出去；
+        只钉「考试时段关」，又管不住默认值被人悄悄改回 off。
         """
         import server
+        from datetime import datetime, timedelta
         with tempfile.TemporaryDirectory() as folder:
             fresh = Path(folder) / "fresh.db"
             saved = server.DB
@@ -315,18 +319,31 @@ class ServerApiTests(unittest.TestCase):
                 server.init_db()
                 with sqlite3.connect(fresh) as db:
                     self.assertEqual(db.execute("select count(*) from settings").fetchone()[0], 0)
-                self.assertIs(server.reveal_enabled(), False)
+                self.assertIs(server.reveal_enabled(), True)
+                self.assertIs(server.reveal_effective(SUBMIT_BOOK), True)
+
+                # 考试时段内：无论全局默认是什么，都必须关。
+                now = datetime.now()
+                window = {"start": (now - timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M"),
+                          "end": (now + timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M"),
+                          "note": "单元测试用"}
+                server.set_setting(server.WINDOWS_KEY, json.dumps([window]))
+                self.assertIsNotNone(server.active_window())
+                self.assertIs(server.reveal_effective(SUBMIT_BOOK), False)
             finally:
                 server.DB = saved
 
     def test_reveal_switch_rejects_non_admin(self):
         username = "t006_switch_student"
         cookie = self.register_and_login(username, "T006-password")
+        _, _, before = request(self.port, "GET", "/api/settings")
+        was = json.loads(before)["reveal_failing_input"]
         status, _, _ = request(self.port, "POST", "/api/settings",
-                               {"reveal_failing_input": True}, cookie=cookie)
+                               {"reveal_failing_input": not was}, cookie=cookie)
         self.assertEqual(status, 403)
-        _, _, body = request(self.port, "GET", "/api/settings")
-        self.assertIs(json.loads(body)["reveal_failing_input"], False)
+        _, _, after = request(self.port, "GET", "/api/settings")
+        # 断言的是「非管理员改不动」，不是某个具体值 —— 默认值一改，写死的值就成了假断言。
+        self.assertIs(json.loads(after)["reveal_failing_input"], was)
 
     def test_failing_input_snippet_follows_the_switch(self):
         """开关关着时片段不能出现在接口返回里——是服务端不下发，不是前端隐藏。"""
@@ -387,7 +404,10 @@ class ServerApiTests(unittest.TestCase):
             try:
                 server.init_db()
                 now = datetime(2026, 7, 26, 10, 0)
-                self.assertFalse(server.reveal_effective("practice", now))     # 默认关
+                # 这条验的是**层次**，所以两个方向的全局默认都要走一遍；
+                # 只验一个方向的话，默认值一改这条就会跟着倒（2026-07-27 改成 on 时就是这样）。
+                server.set_setting(server.REVEAL_KEY, "off")
+                self.assertFalse(server.reveal_effective("practice", now))
 
                 server.set_setting(server.REVEAL_KEY, "on")
                 self.assertTrue(server.reveal_effective("practice", now))

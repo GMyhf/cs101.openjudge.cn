@@ -10,15 +10,34 @@ def generate_case(r):
 with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
     handle.write(REFERENCE_SOURCE); handle.flush()
     root = Path(__file__).parent / "data"
+    def terminating(stdout):
+        """所有概率的小数位都要能终止（<=6 位），不能是循环小数四舍五入出来的。
+
+        题面写的是「绝对误差不超过 10^-6，保留九位小数」——也就是说它**本来就该用容差判**。
+        我们的判题器只有 token 精确比对（改它属红线 1，且会影响全部已交付数据），
+        于是像 1/6 = 0.166666667 这种值，另一个同样正确、只是累加顺序不同的实现
+        可能给出 0.166666666，在本站被误判成 Wrong Answer。
+
+        从数据这头绕开：只留下概率能被 10^-6 精确表示的局面，歧义就不存在了。
+        实测随机局面里约 72% 满足，过滤代价很小。
+        """
+        for value in stdout.split():
+            if len(value.split(".")[1].rstrip("0")) > 6:
+                return False
+        return True
+
     seen = [SAMPLE_IN]
     for index in range(20):
-        if index == 0: content = SAMPLE_IN
+        if index == 0:
+            content = SAMPLE_IN
+            result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
         else:
-            for attempt in range(100):
+            for attempt in range(400):
                 content = generate_case(random.Random(28748 + index + attempt * 1000))
-                if content not in seen: break
+                if content in seen: continue
+                result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
+                if terminating(result.stdout): break
             else: raise AssertionError("insufficient diversity")
         seen.append(content)
-        result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
         (root / f"{index}.in").write_text(content, encoding="utf-8")
         (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")

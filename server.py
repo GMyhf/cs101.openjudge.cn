@@ -503,7 +503,16 @@ WINDOWS_KEY = "reveal_windows"    # [{start, end, note}]，命中即强制关闭
 
 
 def reveal_enabled():
-    return get_setting(REVEAL_KEY, "off") == "on"
+    """全局默认：**展示失败那组的输入片段**（人拍板 2026-07-27，选了「帮助最大」这一档）。
+
+    取舍是清楚的：露出输入，学生就可能照着硬编码；不露，WA 时他只看得到
+    「第 N 组错了、期望 1 个 token、实际 1 个 token」，等于没有反馈——
+    而这个项目的本意就是「编写→提交→**反馈错在哪组数据**」。
+
+    两道闸没变，仍然管用：**考试时段内一票否决**（`active_window`），
+    以及**按题库覆盖**。想临时关掉某个题库或整场考试，都不用改这里。
+    """
+    return get_setting(REVEAL_KEY, "on") == "on"
 
 
 def _json_setting(key, fallback):
