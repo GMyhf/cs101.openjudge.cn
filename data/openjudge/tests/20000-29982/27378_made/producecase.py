@@ -6,7 +6,8 @@ EXTRA_CASE=None
 GENERATOR_NAME='g27378'
 def g27378(r):
     key = r.choice("abcdefghijklmnopqrstuvwxyz")
-    text = "".join(r.choice("abcdefghijklmnopqrstuvwxyz .") for _ in range(r.randint(1, 180)))
+    alphabet = "".join(c for c in "abcdefghijklmnopqrstuvwxyz" if c != key) + " ."
+    text = "".join(r.choice(alphabet) for _ in range(r.randint(1, 180)))
     text = text.rstrip() or "."
     return f"{key}\n{text}\n"
 

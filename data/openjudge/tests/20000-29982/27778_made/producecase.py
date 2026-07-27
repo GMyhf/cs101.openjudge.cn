@@ -5,7 +5,7 @@ SAMPLE='2\nhelloworld\nworldhello\nhelloworld\nhelloworld\n'
 EXTRA_CASE=None
 GENERATOR_NAME='g27778'
 def g27778(r):
-    t = r.randint(1, 20); rows = [str(t)]
+    t = r.randint(1, 10); rows = [str(t)]
     for _ in range(t):
         a = "".join(r.choice("abcXYZ012") for _ in range(r.randint(0, 80)))
         b = a if r.random() < .35 else a + r.choice("xY9")

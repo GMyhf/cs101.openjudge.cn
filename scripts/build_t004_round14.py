@@ -56,7 +56,8 @@ def g27367(r):
 
 def g27378(r):
     key = r.choice("abcdefghijklmnopqrstuvwxyz")
-    text = "".join(r.choice("abcdefghijklmnopqrstuvwxyz .") for _ in range(r.randint(1, 180)))
+    alphabet = "".join(c for c in "abcdefghijklmnopqrstuvwxyz" if c != key) + " ."
+    text = "".join(r.choice(alphabet) for _ in range(r.randint(1, 180)))
     text = text.rstrip() or "."
     return f"{key}\n{text}\n"
 
@@ -95,7 +96,7 @@ def g27442(r):
 
 
 def g27778(r):
-    t = r.randint(1, 20); rows = [str(t)]
+    t = r.randint(1, 10); rows = [str(t)]
     for _ in range(t):
         a = "".join(r.choice("abcXYZ012") for _ in range(r.randint(0, 80)))
         b = a if r.random() < .35 else a + r.choice("xY9")
@@ -215,12 +216,15 @@ def constraint_rows(n, cases):
         return [(label, all(pred(x) for x in cases))], (bad, [(label, bool(pred(bad)))])
     if n == 27312: return check("N is even and 2..200000; string is G/H of length N", lambda x: (lambda a: 2 <= int(a[0]) <= 200000 and int(a[0]) % 2 == 0 and len(a[1]) == int(a[0]) and set(a[1]) <= set("GH"))(x.split()), "3\nGGG\n")
     if n == 27313: return check("N is 2..50 and p is a permutation of 0..N-1", lambda x: (lambda a: 2 <= int(a[0]) <= 50 and sorted(map(int, a[1:])) == list(range(int(a[0]))))(x.split()), "3\n0 1 3\n")
+    if n == 27314: return check("text uses letters, spaces and .,:; replacement line has two words", lambda x: (lambda a: len(a) >= 2 and all(ch.isalpha() or ch in ' .,:' for ch in a[0]) and len(a[1].split()) == 2 and all(w.isalpha() for w in a[1].split()))(x.splitlines()), "hello 123\nold new\n")
     if n == 27318: return check("1<=n<=1000 and 0<=k<=1000", lambda x: 1 <= int(x.split()[0]) <= 1000 and 0 <= int(x.split()[1]) <= 1000, "1001 0\n")
     if n == 27367: return check("scores are integers in 60..100", lambda x: all(60 <= int(v) <= 100 for line in x.splitlines()[1:] for v in line.split()[1:]), "1 1\n1001 101\n")
+    if n == 27378: return check("bad key is lowercase and absent from the text; text uses remaining letters, spaces and dots", lambda x: (lambda a: len(a) >= 2 and len(a[0]) == 1 and a[0].islower() and a[0] not in a[1] and all(ch.islower() or ch in ' .' for ch in a[1]))(x.splitlines()), "b\nabc\n")
     if n == 27385: return check("k is 0..17 and array/indices fit 2^k", lambda x: 0 <= int(x.split()[0]) <= 17, "18\n0\n1\n1 0 0\n")
     if n == 27421: return check("matrix dimensions are positive and cells are nonnegative", lambda x: all(int(v) >= 0 for v in x.split()[2:]), "1 1\n-1\n")
     if n == 27441: return check("target, prices and stock counts are nonnegative integers", lambda x: all(int(v) >= 0 for v in x.split()), "-1 1\n1\n1\n")
     if n == 27442: return check("course weights and grades are numeric", lambda x: (lambda a: all(v.replace('.', '', 1).isdigit() for v in a[2:2+2*int(a[0])] if not v.startswith('C')) and all(v.isdigit() for v in a[2+2*int(a[0]):][2::3]))(x.split()), "1 1\nC -1\nS C 50\n")
+    if n == 27778: return check("T is 1..10 and exactly 2T text lines follow", lambda x: (lambda a: 1 <= int(a[0]) <= 10 and len(a[1:]) == 2 * int(a[0]))(x.splitlines()), "11\n" + "a\nb\n" * 11)
     if n == 27832: return check("array values are 0..65535", lambda x: all(0 <= int(v) <= 65535 for v in x.splitlines()[1].split()), "1 1\n65536\nQ 0\n")
     if n == 27932: return check("1<=k<=n and ai are 1..1e9", lambda x: (lambda a: 1 <= int(a[0]) and 0 <= int(a[1]) <= int(a[0]) and all(1 <= int(v) <= 10**9 for v in a[2:]))(x.split()), "1 0\n0\n")
     if n == 27933: return check("n is 1..10000", lambda x: 1 <= int(x.split()[0]) <= 10000, "10001\n")
