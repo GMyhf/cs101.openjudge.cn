@@ -77,6 +77,7 @@ class ServerApiTests(unittest.TestCase):
         for key in ("CS101_SMTP_HOST", "CS101_SMTP_PORT", "CS101_SMTP_USER",
                     "CS101_SMTP_PASSWORD", "CS101_SMTP_FROM", "CS101_PUBLIC_URL"):
             environment.pop(key, None)
+        environment["CS101_PUBLIC_URL"] = "http://10.129.81.235:8000"
         environment["CS101_LOAD_DOTENV"] = "0"
         cls.process = subprocess.Popen(
             [sys.executable, "server.py"], cwd=ROOT, env=environment,
@@ -112,6 +113,13 @@ class ServerApiTests(unittest.TestCase):
         })
         self.assertEqual(status, 401)
         self.assertIn(b"Unauthorized", body)
+
+    def test_activation_link_uses_configured_public_url(self):
+        result = self.registration_payload("LanLinkUser", "T001-password")
+        status, _, body = request(self.port, "POST", "/api/user/register", result)
+        self.assertEqual(status, 200)
+        payload = json.loads(body)
+        self.assertTrue(payload["activation_link"].startswith("http://10.129.81.235:8000/auth/activate/"))
 
     def test_home_navigation_has_submission_user_link_and_account_menu(self):
         status, _, body = request(self.port, "GET", "/")

@@ -34,6 +34,7 @@ BOOK_META = {
     "2024sp_routine": {"name": "数算 2024Spring每日选作", "count": 154},
 }
 SMTP_ENV_FILE = ROOT / "data" / ".smtp.env"
+DEFAULT_PUBLIC_URL = "http://10.129.81.235:8000"
 
 if SMTP_ENV_FILE.is_file() and os.environ.get("CS101_LOAD_DOTENV", "1") != "0":
     for line in SMTP_ENV_FILE.read_text(encoding="utf-8").splitlines():
@@ -640,6 +641,11 @@ def send_account_email(recipient, subject, body):
         return False
     return True
 
+
+def public_base_url():
+    """Return the address users on the LAN can open from emailed links."""
+    return os.environ.get("CS101_PUBLIC_URL", DEFAULT_PUBLIC_URL).rstrip("/")
+
 class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print("%s - %s" % (self.address_string(), fmt % args))
@@ -910,10 +916,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                                (username, password_hash(password), email, reset_token_hash(activation_token), int(time.time()) + 86400))
             except sqlite3.IntegrityError:
                 self.send_json({"error": "用户名或邮箱已存在"}, 409); return
-            base = os.environ.get("CS101_PUBLIC_URL", "").rstrip("/")
-            if not base:
-                scheme = "https" if self.headers.get("X-Forwarded-Proto") == "https" else "http"
-                base = f"{scheme}://{self.headers.get('Host', '127.0.0.1:8000')}"
+            base = public_base_url()
             activation_link = f"{base}/auth/activate/?token={activation_token}"
             sent = send_account_email(email, "激活你的 CS101 账号", f"请在 24 小时内点击以下链接激活账号：\n{activation_link}\n")
             self.send_json({"ok": True} if sent else {"ok": True, "activation_link": activation_link}); return
@@ -963,10 +966,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                                (reset_token_hash(token), int(time.time()) + 1800, email))
             if not row:
                 self.send_json(generic); return
-            base = os.environ.get("CS101_PUBLIC_URL", "").rstrip("/")
-            if not base:
-                scheme = "https" if self.headers.get("X-Forwarded-Proto") == "https" else "http"
-                base = f"{scheme}://{self.headers.get('Host', '127.0.0.1:8000')}"
+            base = public_base_url()
             link = f"{base}/auth/reset/?token={token}"
             smtp_host = os.environ.get("CS101_SMTP_HOST")
             if smtp_host:
