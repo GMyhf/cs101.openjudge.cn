@@ -1,0 +1,1610 @@
+{
+  "batch": "T-004 round16",
+  "updated_at": "2026-07-27T13:35:51.220120+00:00",
+  "pending_rework_status": {
+    "status": "passed",
+    "items": []
+  },
+  "entries": [
+    {
+      "local_number": 29647,
+      "title": "没有上司的宴会",
+      "reference_source": "platform Accepted Python3 #52829529",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29647/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52829529/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29647",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "n>=2 and n-1 relations",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "2\n0\n",
+        [
+          [
+            "n>=2 and n-1 relations",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "n>=2 and n-1 relations",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "2\n0\n",
+            "constraints": [
+              "n>=2 and n-1 relations"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 29656,
+      "title": "迷宫点灯",
+      "reference_source": "platform Accepted Python3 #52686108",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29656/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52686108/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29656",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "binary-tree child ids are in 0..n",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "1\n2 0\n",
+        [
+          [
+            "binary-tree child ids are in 0..n",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 2,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.1
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "binary-tree child ids are in 0..n",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "1\n2 0\n",
+            "constraints": [
+              "binary-tree child ids are in 0..n"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 29657,
+      "title": "机器人排队",
+      "reference_source": "platform Accepted Python3 #52733740",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29657/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52733740/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29657",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "array lengths are positive",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "0 1 1 0\n0\n1\n1\n",
+        [
+          [
+            "array lengths are positive",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 3,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.15
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "array lengths are positive",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "0 1 1 0\n0\n1\n1\n",
+            "constraints": [
+              "array lengths are positive"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 29662,
+      "title": "沉没孤岛",
+      "reference_source": "platform Accepted Python3 #52727805",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29662/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52727805/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29662",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "grid cells are binary",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "1 1\n2\n",
+        [
+          [
+            "grid cells are binary",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "grid cells are binary",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "1 1\n2\n",
+            "constraints": [
+              "grid cells are binary"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 29677,
+      "title": "藏宝图",
+      "reference_source": "platform Accepted Python3 #52733700",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29677/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52733700/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29677",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "target positions are in 1..N",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "1\n2\n0 3\n0 0\n",
+        [
+          [
+            "target positions are in 1..N",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 5,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.25
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "target positions are in 1..N",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "1\n2\n0 3\n0 0\n",
+            "constraints": [
+              "target positions are in 1..N"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 29694,
+      "title": "萨卡班甲鱼",
+      "reference_source": "platform Accepted Python3 #52824892",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29694/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52824892/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29694",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "syllable numbers are 1..6",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "0\n",
+        [
+          [
+            "syllable numbers are 1..6",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "syllable numbers are 1..6",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "0\n",
+            "constraints": [
+              "syllable numbers are 1..6"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 29739,
+      "title": "P 大 LLM 驯龙赛 · 脉冲密语对齐",
+      "reference_source": "platform Accepted Python3 #52298393",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29739/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52298393/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29739",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "S is lowercase and T is binary",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "A\n2\n",
+        [
+          [
+            "S is lowercase and T is binary",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "S is lowercase and T is binary",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "A\n2\n",
+            "constraints": [
+              "S is lowercase and T is binary"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 29742,
+      "title": "what's the POPIPA?",
+      "reference_source": "platform Accepted Python3 #52733624",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29742/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52733624/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29742",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "sentence consists of PO/PI/PA syllables",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "PX\n",
+        [
+          [
+            "sentence consists of PO/PI/PA syllables",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 2,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.1
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "sentence consists of PO/PI/PA syllables",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "PX\n",
+            "constraints": [
+              "sentence consists of PO/PI/PA syllables"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 29750,
+      "title": "困难河内塔",
+      "reference_source": "platform Accepted Python3 #52710073",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29750/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52710073/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29750",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "disk states are binary",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "1\n2\n",
+        [
+          [
+            "disk states are binary",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "disk states are binary",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "1\n2\n",
+            "constraints": [
+              "disk states are binary"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 29778,
+      "title": "2025蚂蚁王国的越野跑",
+      "reference_source": "platform Accepted Python3 #52682233",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29778/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52682233/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29778",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "n equals the number of values",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "2\n1\n",
+        [
+          [
+            "n equals the number of values",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "n equals the number of values",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "2\n1\n",
+            "constraints": [
+              "n equals the number of values"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 29853,
+      "title": "小蓝和小桥",
+      "reference_source": "platform Accepted Python3 #52288129",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29853/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52288129/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29853",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "both arrays have n values",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "2\n1\n1\n1\n",
+        [
+          [
+            "both arrays have n values",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 2,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.1
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "both arrays have n values",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "2\n1\n1\n1\n",
+            "constraints": [
+              "both arrays have n values"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 29940,
+      "title": "机器猫斗恶龙",
+      "reference_source": "platform Accepted Python3 #52265911",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29940/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52265911/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29940",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "n equals the number of scores",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "2\n1\n",
+        [
+          [
+            "n equals the number of scores",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "n equals the number of scores",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "2\n1\n",
+            "constraints": [
+              "n equals the number of scores"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 29945,
+      "title": "神秘数字的宇宙旅行",
+      "reference_source": "platform Accepted Python3 #52733426",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29945/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52733426/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29945",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "n is positive",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "0\n",
+        [
+          [
+            "n is positive",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "n is positive",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "0\n",
+            "constraints": [
+              "n is positive"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 29946,
+      "title": "删数问题",
+      "reference_source": "platform Accepted Python3 #52733385",
+      "statistics_url": "http://cs101.openjudge.cn/practice/29946/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52733385/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g29946",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "k is in 0..number length-1",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "12\n2\n",
+        [
+          [
+            "k is in 0..number length-1",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 2,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.1
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "k is in 0..number length-1",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "12\n2\n",
+            "constraints": [
+              "k is in 0..number length-1"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 30022,
+      "title": "坐地铁",
+      "reference_source": "platform Accepted Python3 #52733303",
+      "statistics_url": "http://cs101.openjudge.cn/practice/30022/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52733303/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g30022",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "adjacency matrix is n by n",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "2 0 1\n0 1\n",
+        [
+          [
+            "adjacency matrix is n by n",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 18,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.9
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "adjacency matrix is n by n",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "2 0 1\n0 1\n",
+            "constraints": [
+              "adjacency matrix is n by n"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 30023,
+      "title": "化学分子式",
+      "reference_source": "platform Accepted Python3 #52824900",
+      "statistics_url": "http://cs101.openjudge.cn/practice/30023/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52824900/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g30023",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "formula count matches n",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "1 2\nH 1\nH\n",
+        [
+          [
+            "formula count matches n",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "formula count matches n",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "1 2\nH 1\nH\n",
+            "constraints": [
+              "formula count matches n"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 30041,
+      "title": "不降数组数量",
+      "reference_source": "platform Accepted Python3 #52212520",
+      "statistics_url": "http://cs101.openjudge.cn/practice/30041/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52212520/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g30041",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "rows and columns match n,m",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "2 2\n1\n",
+        [
+          [
+            "rows and columns match n,m",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 6,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.3
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "rows and columns match n,m",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "2 2\n1\n",
+            "constraints": [
+              "rows and columns match n,m"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 30044,
+      "title": "双生",
+      "reference_source": "platform Accepted Python3 #52732985",
+      "statistics_url": "http://cs101.openjudge.cn/practice/30044/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52732985/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g30044",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "index is in 0..1000",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "1001\n",
+        [
+          [
+            "index is in 0..1000",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "index is in 0..1000",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "1001\n",
+            "constraints": [
+              "index is in 0..1000"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 30061,
+      "title": "春游集合",
+      "reference_source": "platform Accepted Python3 #52831600",
+      "statistics_url": "http://cs101.openjudge.cn/practice/30061/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52831600/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g30061",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "reported ids are in 0..N-1",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "2 1\n2\n",
+        [
+          [
+            "reported ids are in 0..N-1",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "reported ids are in 0..N-1",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "2 1\n2\n",
+            "constraints": [
+              "reported ids are in 0..N-1"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 30085,
+      "title": "纪念品分组",
+      "reference_source": "platform Accepted Python3 #52831605",
+      "statistics_url": "http://cs101.openjudge.cn/practice/30085/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52831605/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g30085",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "prices are positive and at most W",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "10\n1\n11\n",
+        [
+          [
+            "prices are positive and at most W",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 2,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.1
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "prices are positive and at most W",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "10\n1\n11\n",
+            "constraints": [
+              "prices are positive and at most W"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    }
+  ]
+}

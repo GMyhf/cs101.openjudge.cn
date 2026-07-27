@@ -71,7 +71,7 @@ def g30935(r):
     n=r.randint(1,50); return f"{n}\n"+"\n".join(f"{r.randint(1,50)} {r.randint(1,1000)}" for _ in range(n))+"\n"
 def g30936(r): return f"{r.randint(1,1000)}\n"
 def g31002(r):
-    s="".join(r.choice("abcde") for _ in range(r.randint(1,100))); t="".join(r.choice("abcde") for _ in range(r.randint(1,8)))
+    s_len=r.randint(8,100); s="".join(r.choice("abcde") for _ in range(s_len)); t="".join(r.choice("abcde") for _ in range(r.randint(1,min(8,s_len))))
     return f"{s}\n{t}\n"
 
 GENERATORS={n:globals()[f"g{n}"] for n in (30062,30086,30091,30110,30160,30192,30216,30217,30222,30370,30497,30547,30917,30918,30931,30932,30934,30935,30936,31002)}
@@ -123,13 +123,17 @@ def constraint(n, cases):
       30934:("test count is positive",lambda x:int(x.split()[0])>0,"0\n"),
       30935:("job count is positive",lambda x:int(x.split()[0])>0,"0\n"),
       30936:("N is positive",lambda x:int(x.strip())>0,"0\n"),
-      31002:("map and treasure strings are nonempty",lambda x:all(x.splitlines()),"\n\n")}
+      31002:("two lowercase lines with treasure no longer than map",lambda x:(lambda lines:len(lines)==2 and all(line.isalpha() and line.islower() for line in lines) and len(lines[1])<=len(lines[0]))(x.splitlines()),"abc\nabcd\n")}
     label,pred,bad=checks[n]
     if n==30497: return [], (None, [])
     return [(label, all(pred(c) for c in cases))], (bad, [(label, bool(pred(bad)))])
 
 def write_producecase(made, source, gen, sample, cpp):
     runner = """\nfrom pathlib import Path\nimport subprocess, sys, tempfile\ndef run(text):\n    with tempfile.TemporaryDirectory(prefix='producecase-run-') as d:\n        p=Path(d)/('main.cpp' if CPP else 'main.py'); p.write_text(REFERENCE)\n        if CPP:\n            exe=Path(d)/'main'; c=subprocess.run(['g++','-O2','-std=c++17',str(p),'-o',str(exe)],capture_output=True,text=True,timeout=30)\n            if c.returncode: raise SystemExit(c.stderr)\n            cmd=[str(exe)]\n        else: cmd=[sys.executable,str(p)]\n        x=subprocess.run(cmd,input=text,text=True,capture_output=True,timeout=120)\n        if x.returncode: raise SystemExit(x.stderr)\n        return x.stdout\ndef main():\n    data=Path('data'); data.mkdir(exist_ok=True)\n    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]\n    for i,c in enumerate(cases): (data/f'{i}.in').write_text(c); (data/f'{i}.out').write_text(run(c))\nif __name__=='__main__': main()\n"""
+    runner = runner.replace(
+        "    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]",
+        "    if GENERATOR_NAME == 'g30216':\n        cases=[SAMPLE]+[f'{n}\\n' for n in range(1,11)]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,11)]\n    else:\n        cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]",
+    )
     text = "import random\n" + f"REFERENCE={source!r}\nSAMPLE={sample!r}\nGENERATOR_NAME={gen.__name__!r}\nCPP={cpp!r}\n" + inspect.getsource(gen) + runner
     (made/"producecase.py").write_text(text)
 
@@ -143,7 +147,10 @@ def main():
         if selected and n not in selected: continue
         ext="cpp" if cpp else "py"; source=(ROOT/f"scripts/t004_platform_accepted_{n}.{ext}").read_text(); gen=GENERATORS[n]
         sample=entry["sample_input"]
-        cases=[sample]+[gen(random.Random(s)) for s in range(1,21)]
+        if n == 30216:
+            cases=[sample]+[f"{value}\n" for value in range(1,11)]+[gen(random.Random(s)) for s in range(1,11)]
+        else:
+            cases=[sample]+[gen(random.Random(s)) for s in range(1,21)]
         outputs=run_many(source,cases,cpp)
         made=TESTS/bucket(n)/f"{n:05d}_made"; data=made/"data"; data.mkdir(parents=True,exist_ok=True)
         for p in data.glob("*"): p.unlink()

@@ -4,7 +4,7 @@ SAMPLE='abababa\naba\n'
 GENERATOR_NAME='g31002'
 CPP=False
 def g31002(r):
-    s="".join(r.choice("abcde") for _ in range(r.randint(1,100))); t="".join(r.choice("abcde") for _ in range(r.randint(1,8)))
+    s_len=r.randint(8,100); s="".join(r.choice("abcde") for _ in range(s_len)); t="".join(r.choice("abcde") for _ in range(r.randint(1,min(8,s_len))))
     return f"{s}\n{t}\n"
 
 from pathlib import Path
@@ -22,6 +22,9 @@ def run(text):
         return x.stdout
 def main():
     data=Path('data'); data.mkdir(exist_ok=True)
-    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]
+    if GENERATOR_NAME == 'g30216':
+        cases=[SAMPLE]+[f'{n}\n' for n in range(1,11)]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,11)]
+    else:
+        cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]
     for i,c in enumerate(cases): (data/f'{i}.in').write_text(c); (data/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

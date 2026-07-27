@@ -1,6 +1,6 @@
 {
   "batch": "T-004 round17",
-  "updated_at": "2026-07-27T12:26:27.069531+00:00",
+  "updated_at": "2026-07-27T13:37:33.491980+00:00",
   "pending_rework_status": {
     "status": "passed",
     "items": []
@@ -1190,86 +1190,6 @@
       "producecase_reproduced": true
     },
     {
-      "local_number": 31002,
-      "title": "寻找宝藏的探险游戏",
-      "reference_source": "platform Accepted Python3 #52760512",
-      "statistics_url": "http://cs101.openjudge.cn/practice/31002/statistics/",
-      "source_url": "http://cs101.openjudge.cn/practice/solution/52760512/",
-      "license_status": "not declared on the submission page; no license is inferred.",
-      "generator": "g31002",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "reference_seed_smoke": {
-        "seeds": 400,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "constraints": [
-        [
-          "map and treasure strings are nonempty",
-          true
-        ]
-      ],
-      "constraint_counterexample": [
-        "\n\n",
-        [
-          [
-            "map and treasure strings are nonempty",
-            false
-          ]
-        ]
-      ],
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "map and treasure strings are nonempty",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "\n\n",
-            "constraints": [
-              "map and treasure strings are nonempty"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      },
-      "sample_reproduced": true,
-      "producecase_reproduced": true
-    },
-    {
       "local_number": 30160,
       "title": "数织（Nonogram）简版",
       "reference_source": "platform Accepted Python3 #50848044",
@@ -1430,87 +1350,6 @@
       "producecase_reproduced": true
     },
     {
-      "local_number": 30216,
-      "title": "赦免战俘",
-      "reference_source": "platform Accepted Python3 #52831634",
-      "statistics_url": "http://cs101.openjudge.cn/practice/30216/statistics/",
-      "source_url": "http://cs101.openjudge.cn/practice/solution/52831634/",
-      "license_status": "not declared on the submission page; no license is inferred.",
-      "generator": "g30216",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "reference_seed_smoke": {
-        "seeds": 400,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "constraints": [
-        [
-          "n is in 1..10",
-          true
-        ]
-      ],
-      "constraint_counterexample": [
-        "11\n",
-        [
-          [
-            "n is in 1..10",
-            false
-          ]
-        ]
-      ],
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 9,
-          "threshold": 15,
-          "status": "exempted",
-          "exemption": "题面 n 仅有 10 个合法取值（1..10）"
-        },
-        "constant_output_probe": {
-          "frequency": 4,
-          "total": 20,
-          "status": "rejected",
-          "exemption": "题面 n 仅有 10 个合法取值（1..10）",
-          "share": 0.2
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "n is in 1..10",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "11\n",
-            "constraints": [
-              "n is in 1..10"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      },
-      "sample_reproduced": true,
-      "producecase_reproduced": true
-    },
-    {
       "local_number": 30931,
       "title": "括号匹配与最大嵌套深度",
       "reference_source": "platform Accepted Python3 #52760575",
@@ -1579,6 +1418,167 @@
             "input": "a\n",
             "constraints": [
               "input contains only brackets"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 30216,
+      "title": "赦免战俘",
+      "reference_source": "platform Accepted Python3 #52831634",
+      "statistics_url": "http://cs101.openjudge.cn/practice/30216/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52831634/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g30216",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "n is in 1..10",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "11\n",
+        [
+          [
+            "n is in 1..10",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 10,
+          "threshold": 15,
+          "status": "exempted",
+          "exemption": "题面 n 仅有 10 个合法取值（1..10）"
+        },
+        "constant_output_probe": {
+          "frequency": 4,
+          "total": 20,
+          "status": "rejected",
+          "exemption": "题面 n 仅有 10 个合法取值（1..10）",
+          "share": 0.2
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "n is in 1..10",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "11\n",
+            "constraints": [
+              "n is in 1..10"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 31002,
+      "title": "寻找宝藏的探险游戏",
+      "reference_source": "platform Accepted Python3 #52760512",
+      "statistics_url": "http://cs101.openjudge.cn/practice/31002/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52760512/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g31002",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 21,
+      "constraints": [
+        [
+          "two lowercase lines with treasure no longer than map",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "abc\nabcd\n",
+        [
+          [
+            "two lowercase lines with treasure no longer than map",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "two lowercase lines with treasure no longer than map",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "abc\nabcd\n",
+            "constraints": [
+              "two lowercase lines with treasure no longer than map"
             ]
           }
         },
