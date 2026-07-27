@@ -102,6 +102,70 @@ class SandboxContractTests(unittest.TestCase):
         self.assertEqual(seen[resource.RLIMIT_AS], (768 * 1024 * 1024, 768 * 1024 * 1024))
         self.assertIs(resource.setrlimit, real)
 
+    def test_per_problem_time_limit_moves_only_the_cpu_dial(self):
+        """按题限时（2026-07-27 人已拍板）只准动 CPU 那一项。
+
+        文件大小和地址空间是另外两条防线，跟「这道题该给多少时间」无关；
+        把它们一起放宽就是借着一次授权改动扩大了三倍的面。
+        """
+        seen = {}
+        with mock.patch.object(resource, "setrlimit", lambda k, v: seen.__setitem__(k, v)):
+            judge_module._limits(12)
+        self.assertEqual(seen[resource.RLIMIT_CPU], (12, 12))
+        self.assertEqual(seen[resource.RLIMIT_FSIZE], (2 * 1024 * 1024, 2 * 1024 * 1024))
+        self.assertEqual(seen[resource.RLIMIT_AS], (768 * 1024 * 1024, 768 * 1024 * 1024))
+
+    def test_per_problem_limit_is_never_stricter_than_the_old_flat_four_seconds(self):
+        """下限：题目限时再短，也不能比改动前更严。
+
+        改动前一律 4s。若照搬题面（很多题只给 1000ms），今天能过的提交明天会突然挂 ——
+        我们的机器和语言组合本来就比平台慢，题面那个数字不是给我们这套环境定的。
+        """
+        for stated_ms in (60, 500, 1000, 2000, 3000, 4000):
+            with mock.patch.object(judge_module, "LIMITS_CACHE",
+                                   {"1": {"total_ms": stated_ms, "case_ms": None}}):
+                self.assertEqual(judge_module.case_seconds(1), 4, f"{stated_ms}ms 被判严了")
+
+    def test_per_problem_limit_is_capped(self):
+        """上限：65536ms 那种题不能真给 65 秒，否则一次提交就能占住服务器。"""
+        with mock.patch.object(judge_module, "LIMITS_CACHE",
+                               {"1": {"total_ms": 65536, "case_ms": None}}):
+            self.assertEqual(judge_module.case_seconds(1), judge_module.CASE_CAP_S)
+        with mock.patch.object(judge_module, "LIMITS_CACHE",
+                               {"1": {"total_ms": 10000, "case_ms": None}}):
+            self.assertEqual(judge_module.case_seconds(1), 10)
+
+    def test_unknown_problem_falls_back_to_the_floor_not_to_zero(self):
+        """查不到限时必须退回 4s，不能因为查不到就变严 —— 缺数据不该罚提交者。"""
+        with mock.patch.object(judge_module, "LIMITS_CACHE", {"__missing__": True}):
+            self.assertEqual(judge_module.case_seconds(99999), 4)
+        with mock.patch.object(judge_module, "LIMITS_CACHE", {"1": {"total_ms": None, "case_ms": None}}):
+            self.assertEqual(judge_module.case_seconds(1), 4)
+
+    def test_per_case_limit_wins_over_the_total(self):
+        """页面上「总时间限制」是整次的量，「单个测试点时间限制」才是每组的。
+
+        判题器逐组跑，两者都给时必须用单点值（203 道题两者都给，如 30313 是 10000/1000）。
+        用错会把每组放宽到整次的额度。
+        """
+        with mock.patch.object(judge_module, "LIMITS_CACHE",
+                               {"1": {"total_ms": 10000, "case_ms": 6000}}):
+            self.assertEqual(judge_module.case_seconds(1), 6)
+
+    def test_whole_submission_has_a_wall_clock_budget(self):
+        """新加的总预算：放宽单组的同时，整次提交必须收住。
+
+        改动前这一项实际上是无界的 —— 组数最多的一题有 150 组，150 × 5s = 750 秒。
+        """
+        self.assertLessEqual(judge_module.TOTAL_BUDGET_S, 120)
+        slow = "import time\na, b = map(int, input().split())\ntime.sleep(0.2)\nprint(a + b)\n"
+        with mock.patch.object(judge_module, "TOTAL_BUDGET_S", 0):
+            result = judge(BOOK, PROBLEM, "python", slow)
+        self.assertEqual(result["status"], "Time Limit Exceeded")
+        self.assertIn("总预算", result["message"])
+        # 预算够用时，同一份代码必须能过 —— 否则这条断言证明不了是预算起的作用
+        self.assertEqual(judge(BOOK, PROBLEM, "python", slow)["status"], "Accepted")
+
     def test_child_environment_is_the_fixed_minimal_set(self):
         """子进程环境必须恰好是 {PATH, HOME}，且 PATH 是那份固定的最小集。
 
@@ -171,7 +235,19 @@ class SandboxContractTests(unittest.TestCase):
                       SUM_SOURCE if language != "cpp" else CPP_SOURCE)
             self.assertTrue(calls, language)
             for fn in calls:
-                self.assertIs(fn, judge_module._limits, language)
+                self.assertIsNotNone(fn, language)
+                # 按题限时之后 preexec_fn 是个闭包，不再是 _limits 本身，所以不能比身份。
+                # 改成**验行为**：把它调起来，三条限制必须一条不少地设上 —— 这比原来的
+                # 身份断言更强，因为「叫 _limits」不等于「真的设了限制」。
+                seen = {}
+                with mock.patch.object(resource, "setrlimit", lambda k, v: seen.__setitem__(k, v)):
+                    fn()
+                self.assertEqual(sorted(seen), sorted([resource.RLIMIT_CPU, resource.RLIMIT_FSIZE,
+                                                       resource.RLIMIT_AS]), language)
+                self.assertEqual(seen[resource.RLIMIT_FSIZE], (2 * 1024 * 1024, 2 * 1024 * 1024))
+                self.assertEqual(seen[resource.RLIMIT_AS], (768 * 1024 * 1024, 768 * 1024 * 1024))
+                self.assertGreaterEqual(seen[resource.RLIMIT_CPU][0], judge_module.CASE_FLOOR_S)
+                self.assertLessEqual(seen[resource.RLIMIT_CPU][0], judge_module.CASE_CAP_S)
 
 
 CPP_SOURCE = "#include <cstdio>\nint main(){int a,b;scanf(\"%d %d\",&a,&b);printf(\"%d\\n\",a+b);}\n"

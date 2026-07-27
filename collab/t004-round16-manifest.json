@@ -19,6 +19,7 @@
   ],
   "delivery_gate": [
     "**先看本题的平台限时**：>4000ms 的题，数据强度按我们判题器的 4s CPU 来定，并在报告里记下最大一组的实测耗时（单独跑、不要在批量里测——批量并发会把耗时抬高一倍以上）",
+    "**交付前跑 `python3 scripts/t004_judge_round.py 16`**：把参考实现丢进**我们自己的判题器**，看它过不过自己的数据。这和平台复验不是一回事——平台验「实现对不对」（用平台的数据），本站判题器验「这份数据在本站可不可用」。2026-07-27 实测有 4 题两者分开红：平台 Accepted，本站 TLE。一份连自己参考实现都跑不过的数据，学生交上来只会看到莫名其妙的 TLE，正好毁掉本项目要给的那个反馈闭环",
     "有既有 Accepted：直接作为题目实现并构建数据；C++ 放 samplecode.cpp，producecase 走 g++ 编译路径",
     "外部源码必须注明统计页 / 提交 ID / 源码链接 / 许可状态，reference_source 记真实来源",
     "无既有 Accepted：才写自己的实现 + 本地对拍，并按三档提交 Python3 → PyPy3 → C++",
@@ -36,7 +37,40 @@
     "**往后每条 pending_rework 都必须带 `machine_gate`**（描述从入库 .in 读哪个字段、最低值多少）：`tools/check_pending_rework.py` 已接进 `--verify`，从清单读要求、从产物读现实、每次现算；没有 machine_gate 的返工项不在这道闸门管辖内，又会退回「靠人记得去查」",
     "**交接摘要里凡涉及具体数值与规模的句子，一律从产物里读出来再写**：round11 摘要称「加入 50×50、100×100」，数据里最大只有一组 50×50。规模这类话直接贴一张实测直方图，就不可能说错"
   ],
-  "pending_rework": [],
+  "pending_rework": [
+    {
+      "local_number": 28321,
+      "round": "r15",
+      "issue": "参考实现在**我们自己的判题器**上过不了自己的数据",
+      "evidence": "每组 4s，第 2 组 TLE（静置后两次复现）。参考跑完全部组要 11.8s",
+      "ask": "压低那几组的规模，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
+      "machine_gate_note": "这条的机械判据是 scripts/t004_judge_round.py（跑本站判题器），不是 pending_rework_status 的 max_input_field"
+    },
+    {
+      "local_number": 28405,
+      "round": "r15",
+      "issue": "参考实现在**我们自己的判题器**上过不了自己的数据",
+      "evidence": "每组 4s，第 2 组 TLE（静置后两次复现）。参考跑完全部组要 8.8s",
+      "ask": "压低那几组的规模，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
+      "machine_gate_note": "这条的机械判据是 scripts/t004_judge_round.py（跑本站判题器），不是 pending_rework_status 的 max_input_field"
+    },
+    {
+      "local_number": 29340,
+      "round": "r15",
+      "issue": "参考实现在**我们自己的判题器**上过不了自己的数据",
+      "evidence": "每组 4s，第 2 组 TLE（静置后两次复现）",
+      "ask": "压低那几组的规模，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
+      "machine_gate_note": "这条的机械判据是 scripts/t004_judge_round.py（跑本站判题器），不是 pending_rework_status 的 max_input_field"
+    },
+    {
+      "local_number": 18250,
+      "round": "T-002 期",
+      "issue": "参考实现在**我们自己的判题器**上过不了自己的数据",
+      "evidence": "**每组已放宽到 10s 仍 TLE**，第 9 组。第 8 组单组不加限制要 13.7 秒，而题面给这道题的总时间限制是 10000ms —— 是数据太重，不是判题器太严",
+      "ask": "压低那几组的规模，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
+      "machine_gate_note": "这条的机械判据是 scripts/t004_judge_round.py（跑本站判题器），不是 pending_rework_status 的 max_input_field"
+    }
+  ],
   "entries": [
     {
       "local_number": 29647,
