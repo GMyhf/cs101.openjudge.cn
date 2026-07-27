@@ -73,6 +73,20 @@ class JudgeCoreTests(unittest.TestCase):
         result = judge(BOOK, "NODATA", "python", SUM_SOURCE)
         self.assertEqual(result["status"], "No Test Data")
 
+    @unittest.skipUnless(shutil.which("dotnet"), "本机没有 .NET SDK")
+    def test_csharp_uses_dotnet_file_based_app(self):
+        source = "using System; class Program { static void Main() { var p = Console.ReadLine().Split(); Console.WriteLine(int.Parse(p[0]) + int.Parse(p[1])); } }"
+        result = judge(BOOK, PROBLEM, "csharp", source)
+        self.assertEqual(result["status"], "Accepted", result)
+        self.assertEqual(result["cases"], 2)
+
+    @unittest.skipUnless(shutil.which("dotnet"), "本机没有 .NET SDK")
+    def test_csharp_runtime_error_is_not_hidden_by_file_build(self):
+        source = "using System; class Program { static void Main() { throw new Exception(\"T001\"); } }"
+        result = judge(BOOK, PROBLEM, "csharp", source)
+        self.assertEqual(result["status"], "Runtime Error", result)
+        self.assertEqual(result["case"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -18,6 +18,7 @@ MIRROR = ROOT / "data" / "openjudge"
 CPYTHON_LANGUAGES = {"python", "py", "python3"}
 PYPY_LANGUAGES = {"pypy", "pypy3"}
 DOTNET_LANGUAGES = {"dotnet", "dotnet10", "csharp", "fsharp", "vbnet"}
+FILE_BASED_DOTNET_LANGUAGES = {"dotnet", "dotnet10", "csharp"}
 SWIFT_LANGUAGES = {"swift"}
 OBJC_LANGUAGES = {"objc", "objective-c", "objectivec"}
 # 只做语法检查、不执行用户代码；compile() 本身不运行被编译的源码。
@@ -160,37 +161,49 @@ def judge(book, problem_id, language, source):
             dotnet = shutil.which("dotnet")
             if dotnet is None:
                 return {"status": "Language Unavailable", "message": ".NET SDK 10 未安装，换一种语言提交。"}
-            source_names = {"fsharp": "Program.fs", "vbnet": "Program.vb"}
-            source_path = work / source_names.get(language, "Program.cs")
-            source_path.write_text(source, encoding="utf-8")
-            project_suffix = {"fsharp": ".fsproj", "vbnet": ".vbproj"}.get(language, ".csproj")
-            project = work / ("Judge" + project_suffix)
-            explicit_compile = ""
-            if language in {"fsharp", "vbnet"}:
-                explicit_compile = (f'    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>\n')
-            project.write_text(
-                '<Project Sdk="Microsoft.NET.Sdk">\n'
-                '  <PropertyGroup>\n'
-                '    <OutputType>Exe</OutputType>\n'
-                '    <TargetFramework>net10.0</TargetFramework>\n'
-                '    <ImplicitUsings>disable</ImplicitUsings>\n'
-                '    <Nullable>disable</Nullable>\n'
-                + explicit_compile +
-                '  </PropertyGroup>\n'
-                + (f'  <ItemGroup><Compile Include="{source_path.name}" /></ItemGroup>\n'
-                   if language in {"fsharp", "vbnet"} else '') +
-                '</Project>\n', encoding="utf-8")
-            # dotnet build 启动 CoreCLR 时会预留一块运行时地址空间；它只编译
-            # 我们刚写入的固定项目，不执行提交程序，因此不放进运行时沙箱。
-            # 生成的可执行文件随后仍逐组经过 _run/_limits。
-            compile_result = subprocess.run(
-                [dotnet, "build", str(project), "--nologo", "-c", "Release", "-o", str(work / "out")],
-                cwd=work, capture_output=True, timeout=30,
-                env={"PATH": CHILD_PATH, "HOME": str(work), "DOTNET_GCHeapHardLimit": "268435456"})
-            if compile_result.returncode:
-                message = (compile_result.stderr + compile_result.stdout).decode(errors="replace")[-4000:]
-                return {"status": "Compile Error", "message": message}
-            command = [str(work / "out" / "Judge")]
+            if language in FILE_BASED_DOTNET_LANGUAGES:
+                # .NET SDK 10 file-based apps need no generated project. The first
+                # run creates the build cache; execute its DLL afterwards so the
+                # SDK CLI itself never runs inside the user-code address limit.
+                source_path = work / "Program.cs"
+                source_path.write_text(source, encoding="utf-8")
+                first_input = (MIRROR / cases[0]["input"]).read_bytes()
+                compile_result = subprocess.run(
+                    [dotnet, "run", "--file", str(source_path), "--nologo"],
+                    cwd=work, input=first_input, capture_output=True, timeout=30,
+                    env={"PATH": CHILD_PATH, "HOME": str(work), "DOTNET_GCHeapHardLimit": "268435456"})
+                artifacts = list((work / ".local" / "share" / "dotnet" / "runfile").glob(
+                    "*/bin/debug/Program.dll"))
+                if not artifacts:
+                    message = (compile_result.stderr + compile_result.stdout).decode(errors="replace")[-4000:]
+                    return {"status": "Compile Error", "message": message}
+                command = [dotnet, str(artifacts[0])]
+            else:
+                source_names = {"fsharp": "Program.fs", "vbnet": "Program.vb"}
+                source_path = work / source_names[language]
+                source_path.write_text(source, encoding="utf-8")
+                project_suffix = {"fsharp": ".fsproj", "vbnet": ".vbproj"}[language]
+                project = work / ("Judge" + project_suffix)
+                explicit_compile = '    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>\n'
+                project.write_text(
+                    '<Project Sdk="Microsoft.NET.Sdk">\n'
+                    '  <PropertyGroup>\n'
+                    '    <OutputType>Exe</OutputType>\n'
+                    '    <TargetFramework>net10.0</TargetFramework>\n'
+                    '    <ImplicitUsings>disable</ImplicitUsings>\n'
+                    '    <Nullable>disable</Nullable>\n'
+                    + explicit_compile +
+                    '  </PropertyGroup>\n'
+                    f'  <ItemGroup><Compile Include="{source_path.name}" /></ItemGroup>\n'
+                    '</Project>\n', encoding="utf-8")
+                compile_result = subprocess.run(
+                    [dotnet, "build", str(project), "--nologo", "-c", "Release", "-o", str(work / "out")],
+                    cwd=work, capture_output=True, timeout=30,
+                    env={"PATH": CHILD_PATH, "HOME": str(work), "DOTNET_GCHeapHardLimit": "268435456"})
+                if compile_result.returncode:
+                    message = (compile_result.stderr + compile_result.stdout).decode(errors="replace")[-4000:]
+                    return {"status": "Compile Error", "message": message}
+                command = [str(work / "out" / "Judge")]
         elif language in SWIFT_LANGUAGES | OBJC_LANGUAGES:
             ext = ".swift" if language in SWIFT_LANGUAGES else ".m"
             source_path = work / ("main" + ext)
