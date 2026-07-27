@@ -1,6 +1,6 @@
 {
   "batch": "T-004 round9",
-  "updated_at": "2026-07-26T18:56:04.477298+00:00",
+  "updated_at": "2026-07-27T02:28:42.473882+00:00",
   "entries": [
     {
       "local_number": 15291,
@@ -266,13 +266,13 @@
       },
       "reference_seed_smoke": {
         "seeds": 400,
-        "distinct_inputs": 49,
+        "distinct_inputs": 146,
         "status": "passed"
       },
       "test_cases": 21,
       "constraints": [
         [
-          "atom records have four fields",
+          "two groups have sequential four-field atom records",
           true
         ],
         [
@@ -284,16 +284,16 @@
       "self_audit": {
         "distinct_cases": {
           "total": 20,
-          "distinct": 17,
+          "distinct": 19,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 20,
+          "frequency": 11,
           "total": 20,
-          "status": "accepted",
+          "status": "rejected",
           "exemption": null,
-          "share": 1.0
+          "share": 0.55
         },
         "sample_is_case_zero": {
           "status": "passed",
@@ -309,7 +309,7 @@
           "checked": 2,
           "items": [
             {
-              "constraint": "atom records have four fields",
+              "constraint": "two groups have sequential four-field atom records",
               "holds": true
             },
             {
@@ -320,16 +320,14 @@
           "falsified_by": {
             "input": "deliberate invalid input",
             "constraints": [
-              "atom records have four fields"
+              "two groups have sequential four-field atom records"
             ]
           }
         },
         "byte_reproduction": {
           "status": "passed"
         },
-        "failed": [
-          "constant_output_probe"
-        ]
+        "failed": []
       },
       "sample_reproduced": true,
       "producecase_reproduced": true

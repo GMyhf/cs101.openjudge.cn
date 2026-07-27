@@ -5,14 +5,22 @@ LANGUAGE='Python3'
 SAMPLE='4 4\n0 -1 6 1\n1 0 1 1\n2 0 1 1\n3 0 1 1\n0 -1 6 1\n1 0 1 1\n2 0 1 1\n3 0 9 1\n'
 GENERATOR_NAME='g18076'
 def g18076(r):
-    n,m=r.randint(2,8),r.randint(2,8)
-    def mol(size,carbon):
-        rows=[f"0 -1 {carbon} 1"]
-        for i in range(1,size): rows.append(f"{i} {i-1} {1 if i%2 else carbon} 1")
+    n,m=r.randint(8,16),r.randint(8,16)
+    def mol(size,branch_atom,force_last=None):
+        rows=["0 -1 6 1"]
+        for i in range(1,size):
+            parent=i-1
+            bond=1
+            z=force_last if i==size-1 and force_last is not None else (1 if i%2 else branch_atom)
+            rows.append(f"{i} {parent} {z} {bond}")
         return rows
-    # Keep the two generated molecules different; the accepted submission's
-    # traversal assumes the problem's non-identical-molecule precondition.
-    return f"{n} {m}\n"+"\n".join(mol(n,6)+mol(m,8))+"\n"
+    # Keep the root equal so later branch/atom comparisons determine the
+    # answer, while forcing a difference at the final atom avoids the
+    # platform submission's non-terminating identical-molecule case.
+    first_atom=r.choice([6,7])
+    first=mol(n,first_atom)
+    second=mol(m,13-first_atom,force_last=1)
+    return f"{n} {m}\n"+"\n".join(first+second)+"\n"
 
 def run(text):
     with tempfile.TemporaryDirectory(prefix="producecase-") as d:

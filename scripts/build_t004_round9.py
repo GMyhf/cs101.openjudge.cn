@@ -25,14 +25,22 @@ def g18071(r):
             for j in range(2): g[i][j]=1
     return f"{m} {n}\n"+"\n".join(" ".join(map(str,x)) for x in g)+"\n"
 def g18076(r):
-    n,m=r.randint(2,8),r.randint(2,8)
-    def mol(size,carbon):
-        rows=[f"0 -1 {carbon} 1"]
-        for i in range(1,size): rows.append(f"{i} {i-1} {1 if i%2 else carbon} 1")
+    n,m=r.randint(8,16),r.randint(8,16)
+    def mol(size,branch_atom,force_last=None):
+        rows=["0 -1 6 1"]
+        for i in range(1,size):
+            parent=i-1
+            bond=1
+            z=force_last if i==size-1 and force_last is not None else (1 if i%2 else branch_atom)
+            rows.append(f"{i} {parent} {z} {bond}")
         return rows
-    # Keep the two generated molecules different; the accepted submission's
-    # traversal assumes the problem's non-identical-molecule precondition.
-    return f"{n} {m}\n"+"\n".join(mol(n,6)+mol(m,8))+"\n"
+    # Keep the root equal so later branch/atom comparisons determine the
+    # answer, while forcing a difference at the final atom avoids the
+    # platform submission's non-terminating identical-molecule case.
+    first_atom=r.choice([6,7])
+    first=mol(n,first_atom)
+    second=mol(m,13-first_atom,force_last=1)
+    return f"{n} {m}\n"+"\n".join(first+second)+"\n"
 def g18189(r): return f"{r.randint(1,600)} {r.randint(1,20)}\n"
 def g18209(r):
     n=r.randint(3,10); cuts=sorted(r.sample(range(1,100),n-1)); vals=[]; last=0
@@ -122,7 +130,17 @@ def constraint_rows(n,cases):
     if n==15291: rows=every("coordinates are 0..9",lambda x:all(0<=int(v)<=9 for v in x.split()))+every("terminator is present",lambda x:x.strip().endswith("0 0 0"))
     elif n==17746: rows=every("n,m,c are in range",lambda x:(lambda v:1<=v[1]<=10000 and 0<=v[2]<=10000 and v[0]>=v[1])(list(map(int,x.splitlines()[0].split()))))+every("samples are 0..1000000",lambda x:all(0<=int(v)<=1000000 for v in x.splitlines()[1].split()))
     elif n==18071: rows=every("matrix cells are binary",lambda x:all(int(v) in (0,1) for v in "\n".join(x.splitlines()[1:]).split()))+every("dimensions are at most 30",lambda x:all(0<int(v)<=30 for v in x.splitlines()[0].split()))
-    elif n==18076: rows=every("atom records have four fields",lambda x:all(len(v.split())==4 for v in x.splitlines()[1:]))+every("atom indices are non-negative",lambda x:all(int(v.split()[0])>=0 for v in x.splitlines()[1:]))
+    elif n==18076:
+        def valid_groups(x):
+            first=x.splitlines()[0].split(); a,b=map(int,first); records=x.splitlines()[1:]
+            if len(records)!=a+b: return False
+            for offset,size in ((0,a),(a,b)):
+                group=[list(map(int,v.split())) for v in records[offset:offset+size]]
+                if [v[0] for v in group] != list(range(size)) or group[0][1] != -1: return False
+                if any(len(v)!=4 or v[3] not in (1,2,3) for v in group): return False
+                if any(v[1] >= i or v[1] < 0 for i,v in enumerate(group[1:],1)): return False
+            return True
+        rows=every("two groups have sequential four-field atom records",valid_groups)+every("atom indices are non-negative",lambda x:all(int(v.split()[0])>=0 for v in x.splitlines()[1:]))
     elif n==18189: rows=every("training minutes are positive",lambda x:int(x.split()[0])>0)+every("p is positive",lambda x:int(x.split()[1])>0)
     elif n==18209: rows=every("probabilities are non-negative",lambda x:all(float(v)>=0 for v in x.splitlines()[1].split()))+every("probabilities sum to one",lambda x:abs(sum(map(float,x.splitlines()[1].split()))-1)<1e-5)
     elif n==18252: rows=every("vertices are positive",lambda x:all(int(v)>0 for v in x.split()))+every("edge weights are positive",lambda x:all(int(v.split()[2])>0 for v in x.splitlines()[2:]))
