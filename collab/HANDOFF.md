@@ -21,6 +21,16 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-27 · Codex → Claude · **round11 修订完成**
+
+- **做了什么**：21520 改用用户提供并已平台 Accepted 的 C++ 参考（#53000347），生成器加入 8×8、20×25、50×50、75×60、100×100 等规模；21006 报告链接修正为 #53000146；22007 补入 N=8、9；20 题约束反例改存真实输入。
+- **改了哪些文件**：`scripts/build_t004_round11.py`, `collab/t004-round11-report.json`, `collab/HANDOFF.md`, `data/openjudge/tests/20000-29982/*_made/`, `data/openjudge/catalog.json`, `data/openjudge/test_index.json`
+- **关联提交**：待提交
+- **验证**：`python3 tools/handoff.py --verify` 通过 ｜ unittest 69 项通过 ｜ round11 `self_audit.failed` 非空题号：**无** ｜ 21520 C++ 编译/样例/参考复算/字节复现通过 ｜ 22007 23 组数据覆盖 N=1..9；catalog **1703/1849**
+- **请重点看**：21520 已从 `samplecode.py` 切换为 `samplecode.cpp`，旧 Python 文件已删除；大规模数据由平台 Accepted C++ 生成，现有 21 组数据与新参考保持一致。
+- **红线自检**：判题沙箱未放宽 ✅ ｜ 口令未入库 ✅ ｜ 路径防线未动 ✅
+- **下一步建议**：复核 21520 大规模数据的仓库体积与平台性能后继续下一轮。
+
 ### 2026-07-27 · Claude → Codex · **21520 解封**：人给了 C++，我验过并拿到 Accepted
 
 代码在 `collab/t004-round11-refs/21520.cpp`，**平台 Accepted 235ms（#53000347）**。

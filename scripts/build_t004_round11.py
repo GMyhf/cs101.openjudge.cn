@@ -121,7 +121,10 @@ def g21517(r):
 
 
 def g21520(r):
-    n, m = r.randint(2, 3), r.randint(2, 3)
+    if r.random() < .65:
+        n, m = r.randint(2, 8), r.randint(2, 8)
+    else:
+        n, m = r.choice([(20, 25), (50, 50), (75, 60), (100, 100)])
     cells = [[0] * m for _ in range(n)]
     villages = r.randint(1, min(5, n * m))
     for x, y in r.sample([(x, y) for x in range(n) for y in range(m)], villages):
@@ -185,40 +188,6 @@ GENERATORS = {n: globals()[f"g{n}"] for n in (
     22007, 22460)}
 
 
-def wall_reference():
-    return r'''import sys,itertools
-def solve():
-    a=list(map(int,sys.stdin.read().split())); p=0; n,m=a[p],a[p+1]; p+=2
-    g=[a[p+i*m:p+(i+1)*m] for i in range(n)]; p+=n*m
-    v=[a[p+i*(m+1):p+(i+1)*(m+1)] for i in range(n)]; p+=n*(m+1)
-    h=[a[p+i*m:p+(i+1)*m] for i in range(n+1)]
-    k=n*m; need={i*m+j for i in range(n) for j in range(m) if g[i][j]}; ans=10**30
-    for mask in range(1<<k):
-        if any(not(mask>>u&1) for u in need): continue
-        seen={next(iter(need))}; q=list(seen)
-        for u in q:
-            i,j=divmod(u,m)
-            for z in (u-1 if j else -1, u+1 if j+1<m else -1,
-                      u-m if i else -1, u+m if i+1<n else -1):
-                if z >= 0 and mask>>z&1 and z not in seen:
-                    seen.add(z); q.append(z)
-        if len(seen) != bin(mask).count('1'): continue
-        cost=0
-        for i in range(n):
-            for j in range(m):
-                u=i*m+j
-                if j==0 and mask>>u&1: cost+=v[i][0]
-                if j==m-1 and mask>>u&1: cost+=v[i][m]
-                if i==0 and mask>>u&1: cost+=h[0][j]
-                if i==n-1 and mask>>u&1: cost+=h[n][j]
-                if j+1<m and ((mask>>u&1)!=(mask>>(u+1)&1)): cost+=v[i][j+1]
-                if i+1<n and ((mask>>u&1)!=(mask>>(u+m)&1)): cost+=h[i+1][j]
-        ans=min(ans,cost)
-    print(ans)
-if __name__=='__main__': solve()
-'''
-
-
 def run_source(source, text):
     with tempfile.TemporaryDirectory(prefix="t004-r11-run-") as d:
         path = Path(d) / "main.py"; path.write_text(source)
@@ -226,6 +195,23 @@ def run_source(source, text):
                            capture_output=True, timeout=30)
         if x.returncode: raise RuntimeError(x.stderr[-1000:] or str(x.returncode))
         return x.stdout
+
+
+def run_cpp_many(source, texts):
+    with tempfile.TemporaryDirectory(prefix="t004-r11-cpp-") as d:
+        d = Path(d); src = d / "main.cpp"; exe = d / "main"
+        src.write_text(source)
+        build = subprocess.run(["g++", "-std=c++17", "-O2", str(src), "-o", str(exe)],
+                               capture_output=True, text=True, timeout=60)
+        if build.returncode:
+            raise RuntimeError(build.stderr[-1000:])
+        outputs = []
+        for text in texts:
+            x = subprocess.run([str(exe)], input=text, text=True, capture_output=True, timeout=30)
+            if x.returncode:
+                raise RuntimeError(x.stderr[-1000:] or str(x.returncode))
+            outputs.append(x.stdout)
+        return outputs
 
 
 def run_python_fast(source, text):
@@ -242,7 +228,7 @@ def run_python_fast(source, text):
 def constraint_rows(n, cases):
     def check(label, pred, bad):
         good = bool(all(pred(x) for x in cases)); bad_value = bool(pred(bad))
-        return [(label, good)], ("deliberate invalid input", [(label, bad_value)])
+        return [(label, good)], (bad, [(label, bad_value)])
     if n == 20163: return check("input is nonempty sentence lines", lambda x: int(x.splitlines()[0]) >= 1, "0\n")
     if n == 20169:
         def edges_ok(x):
@@ -272,13 +258,22 @@ def constraint_rows(n, cases):
     return check("tree tokens count is at least one", lambda x: int(x.splitlines()[0]) >= 1, "0\n")
 
 
-def write_producecase(made, source, generator, sample):
+def write_producecase(made, source, generator, sample, language="python"):
+    if language == "cpp":
+        text = ("import random, subprocess, tempfile\nfrom pathlib import Path\n"
+                f"REFERENCE={source!r}\nSAMPLE={sample!r}\nGENERATOR_NAME={generator.__name__!r}\n"
+                + inspect.getsource(generator) + "\n"
+                + "def run(text):\n    with tempfile.TemporaryDirectory(prefix='producecase-') as d:\n"
+                + "        d=Path(d); p=d/'main.cpp'; exe=d/'main'; p.write_text(REFERENCE)\n        c=subprocess.run(['g++','-std=c++17','-O2',str(p),'-o',str(exe)],capture_output=True,text=True,timeout=60)\n        if c.returncode: raise SystemExit(c.stderr)\n        x=subprocess.run([str(exe)],input=text,text=True,capture_output=True,timeout=30)\n        if x.returncode: raise SystemExit(x.stderr)\n        return x.stdout\n"
+                + "def main():\n    d=Path('data'); d.mkdir(exist_ok=True)\n    cases=[SAMPLE]+(['8\\n','9\\n'] if GENERATOR_NAME == 'g22007' else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]\n    for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))\nif __name__=='__main__': main()\n")
+        (made / "producecase.py").write_text(text)
+        return
     text = ("import random, subprocess, sys, tempfile\nfrom pathlib import Path\n"
             f"REFERENCE={source!r}\nSAMPLE={sample!r}\nGENERATOR_NAME={generator.__name__!r}\n"
             + inspect.getsource(generator) + "\n"
             + "def run(text):\n    with tempfile.TemporaryDirectory(prefix='producecase-') as d:\n"
             + "        p=Path(d)/'main.py'; p.write_text(REFERENCE)\n        x=subprocess.run([sys.executable,str(p)],input=text,text=True,capture_output=True,timeout=30)\n        if x.returncode: raise SystemExit(x.stderr)\n        return x.stdout\n"
-            + "def main():\n    d=Path('data'); d.mkdir(exist_ok=True)\n    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]\n    for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))\nif __name__=='__main__': main()\n")
+            + "def main():\n    d=Path('data'); d.mkdir(exist_ok=True)\n    cases=[SAMPLE]+(['8\\n','9\\n'] if GENERATOR_NAME == 'g22007' else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]\n    for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))\nif __name__=='__main__': main()\n")
     (made / "producecase.py").write_text(text)
 
 
@@ -286,24 +281,39 @@ def main():
     manifest = json.loads(MANIFEST.read_text()); report = []
     for entry in manifest["entries"]:
         n = int(entry["local_number"]); gen = GENERATORS[n]; sample = entry["sample_input"]
-        if n == 21520: source = wall_reference(); reference_kind = "self-written reference (minimum s-t cut)"
+        is_cpp = n == 21520
+        if is_cpp: source = (ROOT / "collab/t004-round11-refs/21520.cpp").read_text(); reference_kind = "user-supplied verified C++, platform Accepted #53000347"
         elif n == 21006: source = (ROOT / "scripts/t004_round11_reference_21006.py").read_text(); reference_kind = "user-supplied verified Python3, platform Accepted #53000146"
         else: source = (ROOT / f"scripts/t004_platform_accepted_{n:05d}.py").read_text(); a=entry["existing_accepted"]; reference_kind=f"platform Accepted Python3 #{a['solution_id']}"
         made = TESTS / bucket(n) / f"{n:05d}_made"; data = made / "data"; data.mkdir(parents=True, exist_ok=True)
         for p in data.glob("*"): p.unlink()
-        cases = [sample] + [gen(random.Random(s)) for s in range(1,21)]
-        outputs = [run_source(source,c) for c in cases]
+        cases = [sample]
+        if n == 22007:
+            cases += ["8\n", "9\n"]
+        cases += [gen(random.Random(s)) for s in range(1,21)]
+        outputs = run_cpp_many(source, cases) if is_cpp else [run_source(source,c) for c in cases]
         for i,c in enumerate(cases): (data/f"{i}.in").write_text(c); (data/f"{i}.out").write_text(outputs[i])
-        if n == 21520: header = "# Self-written reference: minimum s-t cut on the grid wall graph\n# Oracle: independent exhaustive cut enumeration for generated small grids\n\n"
+        if is_cpp: header = "// User-supplied verified reference; platform Accepted submission #53000347\n// Source: http://cs101.openjudge.cn/practice/solution/53000347/\n// License: not declared; no license is inferred.\n\n"
         elif n == 21006: header = "# User-supplied verified reference; platform Accepted submission #53000146\n# Source: http://cs101.openjudge.cn/practice/solution/53000146/\n# License: not declared; no license is inferred.\n\n"
         else:
             a=entry["existing_accepted"]; header=(f"# External reference: statistics page /practice/{n:05d}/\n# Accepted submission: {a['solution_id']}\n# Source: {a['source_url']}\n# License: not declared on the submission page; no license is inferred.\n\n")
-        (made/"samplecode.py").write_text(header+source); write_producecase(made,source,gen,sample)
+        if is_cpp:
+            stale = made / "samplecode.py"
+            if stale.exists(): stale.unlink()
+            (made/"samplecode.cpp").write_text(header+source)
+        else: (made/"samplecode.py").write_text(header+source)
+        write_producecase(made,source,gen,sample,"cpp" if is_cpp else "python")
         rows, counter = constraint_rows(n,cases[1:])
         audit = common.audit(made,cases=cases[1:],outputs=outputs[1:],sample_input=sample,sample_output=entry.get("sample_output"),constraints=rows,constraint_counterexample=counter,exemption=("题面输入 N 仅有 1..9 共 9 种，域本身小于 15" if n == 22007 else None))
         for s in range(20000): gen(random.Random(s))
-        for s in range(400): run_python_fast(source,gen(random.Random(100000+s)))
-        report.append({"local_number":n,"title":entry["title"],"reference_source":reference_kind,"statistics_url":f"http://cs101.openjudge.cn{entry['submit_path']}statistics/","source_url":entry.get("existing_accepted",{}).get("source_url"),"license_status":"not declared on submission page; no license is inferred","generator":gen.__name__,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"test_cases":len(cases),"constraints":rows,"constraint_counterexample":counter,"self_audit":audit,"sample_reproduced":audit["sample_is_case_zero"]["status"]=="passed","producecase_reproduced":audit["byte_reproduction"]["status"]=="passed"})
+        smoke_cases = [gen(random.Random(100000+s)) for s in range(400)]
+        if is_cpp: run_cpp_many(source, smoke_cases)
+        else:
+            for text in smoke_cases: run_python_fast(source, text)
+        source_url = ("http://cs101.openjudge.cn/practice/solution/53000347/" if n == 21520 else
+                      "http://cs101.openjudge.cn/practice/solution/53000146/" if n == 21006 else
+                      entry.get("existing_accepted",{}).get("source_url"))
+        report.append({"local_number":n,"title":entry["title"],"reference_source":reference_kind,"statistics_url":f"http://cs101.openjudge.cn{entry['submit_path']}statistics/","source_url":source_url,"license_status":"not declared on submission page; no license is inferred","generator":gen.__name__,"generator_seed_smoke":{"seeds":20000,"status":"passed"},"reference_seed_smoke":{"seeds":400,"status":"passed"},"test_cases":len(cases),"constraints":rows,"constraint_counterexample":counter,"self_audit":audit,"sample_reproduced":audit["sample_is_case_zero"]["status"]=="passed","producecase_reproduced":audit["byte_reproduction"]["status"]=="passed"})
         print(n,"built",flush=True)
     REPORT.write_text(json.dumps({"batch":"T-004 round11","updated_at":datetime.now(timezone.utc).isoformat(),"entries":report},ensure_ascii=False,indent=2)+"\n")
 
