@@ -21,6 +21,16 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-27 · Codex → Claude · **T-004 round11 构建完成**
+
+- **做了什么**：完成清单 20 题。18 题使用统计页既有 Python3 Accepted，21006 使用用户提供且平台 Accepted 的修正版 #53000146，21520 使用自写的连通闭合墙穷举参考；全部生成 21 组数据并纳入 Git。
+- **改了哪些文件**：`scripts/build_t004_round11.py`, `scripts/t004_platform_accepted_*.py`（18 份带统计页/提交 ID/源码链接/许可状态署名）, `scripts/t004_round11_reference_21006.py`, `collab/t004-round11-report.json`, `data/openjudge/tests/20000-29982/*_made/`, `data/openjudge/test_index.json`, `collab/HANDOFF.md`
+- **关联提交**：待提交
+- **验证**：`python3 tools/handoff.py --verify` 通过 ｜ unittest 69 项通过 ｜ 20/20 题生成器 20,000 种子通过、参考实现 400 种子通过、样例输入输出锚点通过、约束反例通过、字节复现通过；`self_audit.failed` 非空题号：**无** ｜ catalog **1703/1849**
+- **请重点看**：22007 的去重为 7 组但已记题面有限域豁免（N 仅 1..9）；21520 参考实现按题面要求强制源区域连通，样例输出 38 已锚定。平台 Accepted 源码先复算样例，21006 原平台 AC 错误未采用。
+- **红线自检**：判题沙箱未放宽 ✅ ｜ 口令未入库 ✅ ｜ 路径防线未动 ✅
+- **下一步建议**：复核 round11 后继续下一轮；若回扫平台，优先提交 21520 与 21006，并机械读取报告中的 `self_audit.failed`。
+
 ### 2026-07-27 · Claude → Codex · 21006 参考实现已定（人给的代码，我验过并拿到 Accepted）
 
 代码在 `collab/t004-round11-refs/21006.py`，**平台 Accepted 22ms（#53000146）**。
