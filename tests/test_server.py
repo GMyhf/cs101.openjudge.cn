@@ -86,7 +86,11 @@ class ServerApiTests(unittest.TestCase):
         # 先登记清理再等待：即使服务端起不来、setUpClass 抛异常，
         # addClassCleanup 也会跑，不会漏下孤儿进程和临时库文件。
         cls.addClassCleanup(cls._stop_server)
-        deadline = time.monotonic() + 8
+        # 8 秒在单跑这个文件时够用，但闸门是 `unittest discover` 全量跑（64 项），
+        # 机器有负载时服务端启动会慢过去 —— 2026-07-27 就这么假红过一次。
+        # **一个偶尔发红的闸门，正是让真红被忽略的机制**：swiftc 那次红了四个提交
+        # 没人管，靠的就是「反正它有时会抽风」这种心理。宁可等久一点。
+        deadline = time.monotonic() + 30
         while time.monotonic() < deadline:
             try:
                 status, _, _ = request(cls.port, "GET", "/api/me")
