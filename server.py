@@ -99,7 +99,10 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  .splitter:hover::before,.splitter.dragging::before{left:2px;width:4px;background:var(--accent)}
  .statement-panel,.workspace{border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:0 8px 24px rgba(34,58,44,.06);overflow:hidden}
  .statement-panel{padding:27px 30px;max-height:calc(100vh - 155px);overflow:auto;position:sticky;top:18px}
- .statement-panel h2{font-size:24px;line-height:1.3;margin:0 0 18px}
+ .statement-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin:0 0 18px}
+ .statement-panel h2{font-size:24px;line-height:1.3;margin:0}
+ .copy-statement{flex:0 0 auto;padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--muted);font:13px inherit;cursor:pointer}
+ .copy-statement:hover{border-color:var(--accent);color:var(--accent);background:var(--soft)}
  .statement-panel .problem-params{display:grid;grid-template-columns:repeat(6,max-content);gap:7px 12px;align-items:baseline;padding:12px 14px;margin:0 0 25px;border-left:3px solid #c87828;background:#fffaf3;color:var(--muted);font-size:13px;overflow:auto}
  .statement-panel .problem-params dt{font-weight:650;color:var(--ink)}
  .statement-panel .problem-params dd{margin:0}
@@ -179,12 +182,11 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  @media(max-width:700px){.editor{height:440px}.submit-bar{display:block}.controls{margin-bottom:10px}.sub{line-height:1.8}.statement-panel .problem-params{grid-template-columns:repeat(2,max-content)}}
 </style>
 <header class="page-head">
-  <div><p class="eyebrow">CS101 · 提交中心</p><h1><span class="problem-id">__PROBLEM__</span> 提交代码</h1>
-  <p class="sub">题库：__BOOK_NAME__ · <a href="/problems/">题库目录</a> · <a href="/history/">提交记录</a></p></div>
+  <div><p class="sub">题库：__BOOK_NAME__ · <a href="/problems/">题库目录</a> · <a href="/history/">提交记录</a></p></div>
   <div class="head-mark"><strong>在线判题</strong><span id="auth">正在检查登录状态…</span></div>
 </header>
 <main class="workspace-layout">
-<article class="statement-panel"><div class="eyebrow">Problem statement</div><h2>__STATEMENT_TITLE__</h2><dl class="problem-params">__STATEMENT_PARAMS__</dl><dl class="problem-content">__STATEMENT_CONTENT__</dl></article>
+<article class="statement-panel"><div class="statement-head"><h2>__STATEMENT_TITLE__</h2><button id="copyStatement" class="copy-statement" type="button">复制 Markdown</button></div><dl class="problem-params">__STATEMENT_PARAMS__</dl><dl class="problem-content">__STATEMENT_CONTENT__</dl></article>
 <div class="splitter" id="splitter" role="separator" aria-label="调整题面和编辑器宽度" tabindex="0"></div>
 <section class="workspace">
 <form id="form">
@@ -228,6 +230,51 @@ splitBar.addEventListener('pointerdown', e => { splitBar.classList.add('dragging
 splitBar.addEventListener('pointermove', e => { if (splitBar.hasPointerCapture(e.pointerId)) setSplit(e.clientX); });
 splitBar.addEventListener('pointerup', e => { splitBar.releasePointerCapture(e.pointerId); splitBar.classList.remove('dragging'); });
 try { const ratio = Number(localStorage.getItem('cs101-split-ratio')); if (ratio > 0 && ratio < 1) requestAnimationFrame(() => { const r = splitLayout.getBoundingClientRect(); setSplit(r.left + r.width * ratio); }); } catch (err) {}
+
+function markdownInline(node) {
+  if (node.nodeType === Node.TEXT_NODE) return node.nodeValue.replace(/[ \t]+/g, ' ');
+  if (node.nodeType !== Node.ELEMENT_NODE) return '';
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'br') return '\n';
+  if (tag === 'pre') return '\n```\n' + node.innerText.trimEnd() + '\n```\n';
+  const inner = Array.from(node.childNodes).map(markdownInline).join('');
+  if (tag === 'strong' || tag === 'b') return '**' + inner.trim() + '**';
+  if (tag === 'em' || tag === 'i') return '*' + inner.trim() + '*';
+  if (tag === 'code') return '`' + inner.trim() + '`';
+  if (tag === 'a') return '[' + inner.trim() + '](' + node.getAttribute('href') + ')';
+  return inner;
+}
+function statementMarkdown() {
+  const root = document.querySelector('.statement-panel');
+  const title = root.querySelector('h2').innerText.trim();
+  const params = [];
+  const paramNodes = root.querySelector('.problem-params');
+  if (paramNodes) {
+    const children = Array.from(paramNodes.children);
+    for (let i = 0; i < children.length; i += 2) {
+      if (children[i + 1]) params.push('- **' + children[i].innerText.trim() + '** ' + children[i + 1].innerText.trim());
+    }
+  }
+  const sections = [];
+  const content = root.querySelector('.problem-content');
+  for (const node of content.children) {
+    if (node.tagName.toLowerCase() === 'dt') sections.push('## ' + node.innerText.trim());
+    if (node.tagName.toLowerCase() === 'dd') {
+      const value = markdownInline(node).replace(/\n{3,}/g, '\n\n').trim();
+      if (value) sections.push(value);
+    }
+  }
+  return ['# ' + title, params.join('\n'), sections.join('\n\n')].filter(Boolean).join('\n\n') + '\n';
+}
+copyStatement.addEventListener('click', async () => {
+  const text = statementMarkdown();
+  try {
+    if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
+    else { const box = document.createElement('textarea'); box.value = text; box.style.position = 'fixed'; box.style.opacity = '0'; document.body.appendChild(box); box.select(); document.execCommand('copy'); box.remove(); }
+    copyStatement.textContent = '已复制';
+    setTimeout(() => { copyStatement.textContent = '复制 Markdown'; }, 1400);
+  } catch (err) { copyStatement.textContent = '复制失败'; }
+});
 
 fetch("/api/me", { credentials: "same-origin" }).then(r => r.json()).then(me => {
   auth.innerHTML = me.authenticated
