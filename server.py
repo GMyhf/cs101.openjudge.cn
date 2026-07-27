@@ -25,7 +25,7 @@ DB = Path(os.environ.get("CS101_DB", ROOT / "data" / "course.db"))
 MIRROR = ROOT / "data" / "openjudge"
 BOOK_META = {
     "practice": {"name": "题库（包括计概、数算题目）", "count": 985},
-    "pctbook": {"name": "计算思维算法实践", "count": 216},
+    "pctbook": {"name": "计算思维算法实践", "count": 215},
     "routine": {"name": "数算 2025Spring每日选作", "count": 203},
     "2025sp_routine": {"name": "数算 2025Spring每日选作", "count": 73},
     "dsapre": {"name": "数算预习题", "count": 101},

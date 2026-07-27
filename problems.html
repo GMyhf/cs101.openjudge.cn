@@ -48,7 +48,7 @@
 
   <p class="count" id="count">加载中…</p>
   <table>
-    <thead><tr><th>题目ID</th><th>标题</th><th>通过率</th><th>通过人数</th><th>尝试人数</th><th>本地数据</th><th>组数</th></tr></thead>
+    <thead><tr><th>题目ID</th><th>标题</th><th>通过率</th><th>通过人数</th><th>尝试人数</th><th>本地数据</th></tr></thead>
     <tbody id="rows"></tbody>
   </table>
   <div class="pagination"><button id="prev" type="button">上一页</button><span id="pageInfo"></span><button id="next" type="button">下一页</button></div>
@@ -108,7 +108,6 @@ function render() {
       <td class="num">${p.accepted_count ? `<a class="pid" href="/history/?book=${encodeURIComponent(p.book)}&problem=${encodeURIComponent(p.id)}">${p.accepted_count}</a>` : '—'}</td>
       <td class="num">${p.attempt_count ? `<a class="pid" href="/history/?book=${encodeURIComponent(p.book)}&problem=${encodeURIComponent(p.id)}">${p.attempt_count}</a>` : '—'}</td>
       <td><span class="tag ${has ? 'ok' : 'none'}">${has ? '可判' : '暂无数据'}</span></td>
-      <td class="num">${has ? p.test_count : '—'}</td>
     </tr>`;
   }).join('');
   pageInfo.textContent = `第 ${pageNumber} / ${pages} 页`;
