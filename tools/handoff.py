@@ -116,6 +116,11 @@ def run_verify():
     )
     steps = [["python3", "-m", "unittest", "discover", "-s", "tests", "-p", "test_*.py"]]
     steps.append(["python3", "-m", "py_compile", *py_files])
+    # 跨批次返工欠账：单元测试只验函数本身，验不了「这个仓库里还欠着谁」。
+    # round13 的教训——当轮 20 题自检全绿，而上一轮留下的三条返工一组没动，
+    # 因为 self_audit.failed 管的是当轮，管不到跨轮欠账。
+    if (ROOT / "tools" / "check_pending_rework.py").is_file():
+        steps.append(["python3", "tools/check_pending_rework.py"])
     if (ROOT / "app.js").is_file() and shutil.which("node"):
         steps.append(["node", "--check", "app.js"])
     outputs, ok = [], True
