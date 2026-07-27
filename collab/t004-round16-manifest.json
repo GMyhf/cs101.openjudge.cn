@@ -1,0 +1,578 @@
+{
+  "batch": "T-004-r16",
+  "sample_verification": {
+    "method": "选批时就用每题的平台 Accepted 源码复算清单样例，并探测标签残留",
+    "why": "样例是流水线里唯一不由我们自己产生的真值；round11 事后补做这一步，20 题里查出 5 题有问题（含一题「平台 AC 本身算错」）",
+    "flagged": []
+  },
+  "selection_rule": "从仍缺数据的题里按题号顺序取 20 题；跳过与已有数据同题的（正文 + 时间/内存限制双判据）与题面无样例的。**选批时已逐题查过统计页有没有既有 Accepted**（优先 Python3、其次 G++），结果写在每题的 existing_accepted 字段里。",
+  "count": 20,
+  "route_summary": {
+    "external-accepted": 20,
+    "self-written": 0
+  },
+  "skipped": [
+    {
+      "local_number": 3259,
+      "reason": "题面没有样例（可做，但无样例可锚，须在报告注明）"
+    }
+  ],
+  "delivery_gate": [
+    "**先看本题的平台限时**：>4000ms 的题，数据强度按我们判题器的 4s CPU 来定，并在报告里记下最大一组的实测耗时（单独跑、不要在批量里测——批量并发会把耗时抬高一倍以上）",
+    "有既有 Accepted：直接作为题目实现并构建数据；C++ 放 samplecode.cpp，producecase 走 g++ 编译路径",
+    "外部源码必须注明统计页 / 提交 ID / 源码链接 / 许可状态，reference_source 记真实来源",
+    "无既有 Accepted：才写自己的实现 + 本地对拍，并按三档提交 Python3 → PyPy3 → C++",
+    "参考实现必须拿到平台 Accepted 才算完成；提交前按题拆成单题独立程序（整份分派器会被 pylint 判 E0102）",
+    "报告字段一律走 scripts/t004_common.py 实测；constraint_checklist 必须附一个违规输入反例、证明至少一条约束会翻成 False，题面确实无可机械验证约束时给 exemption",
+    "去重不足 15 组必须给豁免理由，且**先分清是「输入域本身小」还是「生成器太窄」**：域无穷或结构可变的（如 20026 的 2^a·3^b、20136 的任意图），不给豁免，扩生成器",
+    "输入是图/树/矩阵等结构时，**不能所有组都是同一种形状**（20136 的 21 组全是环，而其参考实现对星形/链/完全图/分离子图都跑得好好的）",
+    "**交接摘要必须直接列出 self_audit.failed 非空的题号**——round9 的 18076、round10 的 20026/20136 都是机器字段诚实、散文摘要写「全部通过」",
+    "恒定输出探针与变异自检照旧（变异要真改变行为、自检前基线先绿）",
+    "**constraint_counterexample 必须记真实的违规输入本身，不能写占位串**：round11 全 20 题记成 \"deliberate invalid input\"，检查其实是好的，但证据没留下，复核方「独立重跑记录在案的反例」这个动作就静默失效了",
+    "**参考实现拿不到平台 Accepted，必须标 blocked 并写清卡在哪**，不得静默交付（round11 的 21520 平台 TLE 19967ms 却照常入库）",
+    "**约束不能写成「永远不会红」的形态**：round14 有三题写的是 `input is present`、反例是空字符串——生成的每一组都非空，这条在任何真实数据上都不可能红。**而它恰好盖住了真缺陷**：27378 有 16/21 组的文本含着本该消失的坏键、27778 有 9/21 组 T 达 11~20 而题面明写 T≤10。约束请写题面里那条**能被生成器违反**的规格（取值范围、结构、字符集），并给一个**看起来像真输入、只是违反了那条规格**的反例",
+    "**每题记下该题的平台限时，并确认参考实现在我们判题器的 4s CPU 内跑得完最大那组**：我们的判题器是 CPU 4s / 墙钟 5s，而已交付的 465 题里有 63 题的平台限时超过 4000ms（最高 65536ms）。18250 第 8 组就是这么踩线的——数据完全合规，但参考实现在我们判题器下要 4.8s，学生同等水平的解法在本站必然 TLE。平台限时 >4000ms 的题，数据强度要按**我们**的 4s 来定，并在报告里记下最大组的实测耗时",
+    "**数据必须冲到题面上界附近**：每题清单里给了 stated_bounds（启发式抽取，以题面为准）。round12 的 24607 题面 N≤3×10⁵、数据只到 60，我从参考派生的慢变体在现有数据上全对、却在 N=5000 就要 17.3 秒——**数据完全不检验复杂度**。若参考实现跑不动上界，记下实测耗时并说明取到了多大，不要默默缩到几十",
+    "**往后每条 pending_rework 都必须带 `machine_gate`**（描述从入库 .in 读哪个字段、最低值多少）：`tools/check_pending_rework.py` 已接进 `--verify`，从清单读要求、从产物读现实、每次现算；没有 machine_gate 的返工项不在这道闸门管辖内，又会退回「靠人记得去查」",
+    "**交接摘要里凡涉及具体数值与规模的句子，一律从产物里读出来再写**：round11 摘要称「加入 50×50、100×100」，数据里最大只有一组 50×50。规模这类话直接贴一张实测直方图，就不可能说错"
+  ],
+  "pending_rework": [],
+  "entries": [
+    {
+      "local_number": 29647,
+      "title": "没有上司的宴会",
+      "source": "data/openjudge/pages/practice__29647.html",
+      "sample_input": "7\n1\n1\n1\n1\n1\n1\n1\n1 3\n2 3\n6 4\n7 4\n4 5\n3 5\n",
+      "sample_output": "5\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29647/",
+      "statement_chars": 184,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52829529",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52829529/",
+        "accepted_total": 85,
+        "statistics_pages_scanned": 7
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29656,
+      "title": "迷宫点灯",
+      "source": "data/openjudge/pages/practice__29656.html",
+      "sample_input": "10\n2 3\n4 5\n0 0\n0 0\n6 7\n8 9\n0 0\n10 0\n0 0\n0 0\n",
+      "sample_output": "5 6\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29656/",
+      "statement_chars": 186,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52686108",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52686108/",
+        "accepted_total": 6,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29657,
+      "title": "机器人排队",
+      "source": "data/openjudge/pages/practice__29657.html",
+      "sample_input": "2 2 3 25\n142 176\n160 145 \n160 170 180\n",
+      "sample_output": "4\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29657/",
+      "statement_chars": 152,
+      "complexity_hint": "low",
+      "stated_bounds": {
+        "N3": 50
+      },
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52733740",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52733740/",
+        "accepted_total": 9,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29662,
+      "title": "沉没孤岛",
+      "source": "data/openjudge/pages/practice__29662.html",
+      "sample_input": "4 5\n1 1 0 0 0\n1 1 0 0 0\n0 0 1 0 0\n0 0 0 1 1\n",
+      "sample_output": "1 1 0 0 0\n1 1 0 0 0\n0 0 0 0 0\n0 0 0 1 1\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29662/",
+      "statement_chars": 151,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52727805",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52727805/",
+        "accepted_total": 83,
+        "statistics_pages_scanned": 8
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29677,
+      "title": "藏宝图",
+      "source": "data/openjudge/pages/practice__29677.html",
+      "sample_input": "3\n5\n5 4 3 2 1\n1 1 1 1 1\n7\n4 3 5 1 2 7 6\n4 6 6 1 6 6 1\n7\n4 2 5 1 3 7 6\n4 6 6 1 6 6 1\n",
+      "sample_output": "YES\nNO\nYES\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29677/",
+      "statement_chars": 571,
+      "complexity_hint": "medium",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52733700",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52733700/",
+        "accepted_total": 4,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29694,
+      "title": "萨卡班甲鱼",
+      "source": "data/openjudge/pages/practice__29694.html",
+      "sample_input": "1 2 1 2 1 2 1 3 3 4\n",
+      "sample_output": "1 2 1 3 4\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29694/",
+      "statement_chars": 413,
+      "complexity_hint": "medium",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52824892",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52824892/",
+        "accepted_total": 1,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29739,
+      "title": "P 大 LLM 驯龙赛 · 脉冲密语对齐",
+      "source": "data/openjudge/pages/practice__29739.html",
+      "sample_input": "baaababaab\n0001010000\n",
+      "sample_output": "aba\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29739/",
+      "statement_chars": 499,
+      "complexity_hint": "medium",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52298393",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52298393/",
+        "accepted_total": 10,
+        "statistics_pages_scanned": 3
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29742,
+      "title": "what's the POPIPA?",
+      "source": "data/openjudge/pages/practice__29742.html",
+      "sample_input": "POPIPA\nPOPOPIPIPAPA\nPOPIPA PIPOPA POPIPAPAPIPOPA\n",
+      "sample_output": "1\n8\n21\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29742/",
+      "statement_chars": 503,
+      "complexity_hint": "medium",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52733624",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52733624/",
+        "accepted_total": 7,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29750,
+      "title": "困难河内塔",
+      "source": "data/openjudge/pages/practice__29750.html",
+      "sample_input": "2\n0 1\n",
+      "sample_output": "moving disk 1 from A to C\nmoving disk 2 from A to B\nmoving disk 1 from C to A\nmoving disk 2 from B to C\nmoving disk 1 from A to C\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29750/",
+      "statement_chars": 286,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52710073",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52710073/",
+        "accepted_total": 6,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29778,
+      "title": "2025蚂蚁王国的越野跑",
+      "source": "data/openjudge/pages/practice__29778.html",
+      "sample_input": "10\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n",
+      "sample_output": "20\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29778/",
+      "statement_chars": 302,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52682233",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52682233/",
+        "accepted_total": 7,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed",
+        "detail": "手工修正后复算"
+      },
+      "sample_extraction_note": "题面写「第2…N+1行：N个非负整数」即每行一个，网页样例却把 10 个数压在一行。平台 AC 的读法是 [int(input()) for i in range(int(input()))]，按每行一个喂进去输出正是题面的 20 —— 题面文字为准，网页样例显示有误。"
+    },
+    {
+      "local_number": 29853,
+      "title": "小蓝和小桥",
+      "source": "data/openjudge/pages/pctbook__M29853.html",
+      "sample_input": "2\n1 10\n2 20\n",
+      "sample_output": "10\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29853/",
+      "statement_chars": 276,
+      "complexity_hint": "low",
+      "stated_bounds": {
+        "Ai": 1000,
+        "Bi": 1000
+      },
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52288129",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52288129/",
+        "accepted_total": 27,
+        "statistics_pages_scanned": 3
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29940,
+      "title": "机器猫斗恶龙",
+      "source": "data/openjudge/pages/pctbook__E29940.html",
+      "sample_input": "3\n-100 -200 -300\n",
+      "sample_output": "601\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29940/",
+      "statement_chars": 119,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52265911",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52265911/",
+        "accepted_total": 111,
+        "statistics_pages_scanned": 8
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29945,
+      "title": "神秘数字的宇宙旅行",
+      "source": "data/openjudge/pages/practice__29945.html",
+      "sample_input": "5\n",
+      "sample_output": "5*3+1=16\n16/2=8\n8/2=4\n4/2=2\n2/2=1\nEnd\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29945/",
+      "statement_chars": 170,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52733426",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52733426/",
+        "accepted_total": 110,
+        "statistics_pages_scanned": 8
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29946,
+      "title": "删数问题",
+      "source": "data/openjudge/pages/practice__29946.html",
+      "sample_input": "175438 \n4\n",
+      "sample_output": "13\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29946/",
+      "statement_chars": 97,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52733385",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52733385/",
+        "accepted_total": 65,
+        "statistics_pages_scanned": 8
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 30022,
+      "title": "坐地铁",
+      "source": "data/openjudge/pages/practice__30022.html",
+      "sample_input": "5 0 4\n0 1 0 0 1\n1 0 1 0 0\n0 1 0 1 0\n0 0 1 0 1\n1 0 0 1 0\n",
+      "sample_output": "2\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/30022/",
+      "statement_chars": 325,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52733303",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52733303/",
+        "accepted_total": 30,
+        "statistics_pages_scanned": 4
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed",
+        "detail": "手工修正后复算"
+      },
+      "additional_samples": [
+        {
+          "input": "2 0 1\n0 1\n1 0\n",
+          "output": "-1\n"
+        },
+        {
+          "input": "2 1 1\n0 1\n1 0\n",
+          "output": "0\n"
+        }
+      ],
+      "sample_extraction_note": "三组样例（标签 #样例N），输出段里还夹着「#样例N解释：」。已切分并剔除解释。"
+    },
+    {
+      "local_number": 30023,
+      "title": "化学分子式",
+      "source": "data/openjudge/pages/practice__30023.html",
+      "sample_input": "8 4\nH 1\nHe 4\nC 12\nO 16\nF 19\nNa 23\nAl 27\nCu 64\n(H2C)He\nCu(OH)2\nH((CO)2F)99\nNa1(Al)1O4H4\n",
+      "sample_output": "18\n98\n7426\n118\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/30023/",
+      "statement_chars": 315,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52824900",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52824900/",
+        "accepted_total": 1,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 30041,
+      "title": "不降数组数量",
+      "source": "data/openjudge/pages/practice__30041.html",
+      "sample_input": "3 3\n1 2 3\n2 3 4\n3 4 4\n",
+      "sample_output": "21\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/30041/",
+      "statement_chars": 135,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52212520",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52212520/",
+        "accepted_total": 36,
+        "statistics_pages_scanned": 6
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 30044,
+      "title": "双生",
+      "source": "data/openjudge/pages/practice__30044.html",
+      "sample_input": "5\n",
+      "sample_output": "23 29\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/30044/",
+      "statement_chars": 144,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52732985",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52732985/",
+        "accepted_total": 25,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 30061,
+      "title": "春游集合",
+      "source": "data/openjudge/pages/practice__30061.html",
+      "sample_input": "3 3\n0 2 1\n",
+      "sample_output": "3\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/30061/",
+      "statement_chars": 140,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52831600",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52831600/",
+        "accepted_total": 15,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 30085,
+      "title": "纪念品分组",
+      "source": "data/openjudge/pages/practice__30085.html",
+      "sample_input": "100 \n9 \n90 \n20 \n20 \n30 \n50 \n60 \n70 \n80 \n90\n",
+      "sample_output": "6\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/30085/",
+      "statement_chars": 181,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "stated_bounds_hint": "抽取器未命中，请自行读题面确认上界",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52831605",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52831605/",
+        "accepted_total": 13,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed",
+        "detail": "候补入选时即用平台 AC 复算确认"
+      },
+      "added_as_replacement_for": 29986
+    }
+  ],
+  "excluded": [
+    {
+      "local_number": 29986,
+      "title": "猜数",
+      "reason": "**交互题**：题面写「你不需要也不应该从stdin获取任何信息」，解法要调用 query(i) 由测评代码应答。本项目的数据是静态 .in/.out，**结构上无法为这道题构建测试数据**，与 00000（I/O 速度测试题，输出约 20MB 超判题器 2MB 上限）同属应永久排除的一类",
+      "evidence": "题面样例输入是「#假设猜测的数是3，则可能会发生的过程：#调用query(0)，返回-1…」，样例输出是一段示例代码，二者都不是可喂给程序的数据"
+    }
+  ],
+  "judge_limit_note": {
+    "finding": "我们的判题器是 CPU 4s / 墙钟 5s，而已交付的 465 题里 **63 题的平台限时超过 4000ms**（分布：5000ms 15 题、6000ms 4、9000ms 2、9999ms 1、10000ms 29、15000ms 1、20000ms 4、25000ms 1、50000ms 3、60000ms 2、65536ms 1）",
+    "already_biting": "18250「冰阔落 I」第 8 组（n=50000，2257KB）在判题器限制下实测 4.46/6.00/5.02 秒，**稳定超 4s**。数据完全合规（题面 n,m≤50000），平台给这题 10000ms —— 是我们的判题器比题目本身严 2.5 倍",
+    "consequence": "对这 63 题，我们没法把数据做到题目本意的强度：做到了，学生同等水平的正确解法在本站必然 TLE",
+    "decision_pending": "放宽判题器限时属红线 1，须人拍板。在拍板之前，这 63 题的数据强度按**我们的 4s** 来定"
+  }
+}
