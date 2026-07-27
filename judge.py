@@ -18,6 +18,8 @@ MIRROR = ROOT / "data" / "openjudge"
 CPYTHON_LANGUAGES = {"python", "py", "python3"}
 PYPY_LANGUAGES = {"pypy", "pypy3"}
 DOTNET_LANGUAGES = {"dotnet", "dotnet10"}
+SWIFT_LANGUAGES = {"swift"}
+OBJC_LANGUAGES = {"objc", "objective-c", "objectivec"}
 # 只做语法检查、不执行用户代码；compile() 本身不运行被编译的源码。
 SYNTAX_CHECK = "import sys;compile(open(sys.argv[1],encoding='utf-8').read(),sys.argv[1],'exec')"
 
@@ -30,11 +32,14 @@ SYNTAX_CHECK = "import sys;compile(open(sys.argv[1],encoding='utf-8').read(),sys
 # 漏掉倍率就会把 Python 提交按 C++ 的尺子量 —— 18250 的 Python 时限本该是
 # 10000ms × 10 = 100 秒，我第一版只给了 10 秒，于是把「实现慢」误判成了「数据太重」。
 LANGUAGE_TIME_MULTIPLIER = {"python": 10, "py": 10, "python3": 10, "pypy": 3, "pypy3": 3,
-                            "c": 1, "cpp": 1, "c++": 1, "dotnet": 1, "dotnet10": 1}
+                            "c": 1, "cpp": 1, "c++": 1, "dotnet": 1, "dotnet10": 1,
+                            "swift": 1, "objc": 1, "objective-c": 1, "objectivec": 1}
 CASE_FLOOR_S = 4
 CASE_CAP_S = 20
 # 整次提交的墙钟硬顶。改动前这一项无界：组数最多的一题有 150 组，150 × 5s = 750 秒。
 TOTAL_HARD_CAP_S = 300
+DOTNET_ADDRESS_SPACE = 2 * 1024 * 1024 * 1024
+DOTNET_FILE_SIZE = 16 * 1024 * 1024
 LIMITS_CACHE = {}
 
 
@@ -84,10 +89,11 @@ def case_seconds(number, language="python", case_count=1):
     return int(max(CASE_FLOOR_S, min(CASE_CAP_S, stated * multiplier / 1000)))
 
 
-def _limits(cpu_seconds=CASE_FLOOR_S):
+def _limits(cpu_seconds=CASE_FLOOR_S, address_space_bytes=768 * 1024 * 1024,
+            file_size_bytes=2 * 1024 * 1024):
     resource.setrlimit(resource.RLIMIT_CPU, (cpu_seconds, cpu_seconds))
-    resource.setrlimit(resource.RLIMIT_FSIZE, (2 * 1024 * 1024, 2 * 1024 * 1024))
-    resource.setrlimit(resource.RLIMIT_AS, (768 * 1024 * 1024, 768 * 1024 * 1024))
+    resource.setrlimit(resource.RLIMIT_FSIZE, (file_size_bytes, file_size_bytes))
+    resource.setrlimit(resource.RLIMIT_AS, (address_space_bytes, address_space_bytes))
 
 # 子进程环境固定成这一份：用户代码就跑在里面，多一个目录就是多一片可执行面。
 CHILD_PATH = "/usr/local/bin:/usr/bin:/bin"
@@ -116,15 +122,24 @@ def language_version(language):
         value = f"GCC({match.group(1) if match else 'unknown'})"
     elif key in DOTNET_LANGUAGES:
         value = ".NET SDK 10"
+    elif key in SWIFT_LANGUAGES:
+        result = subprocess.run(["swiftc", "--version"], capture_output=True, text=True, timeout=5)
+        match = re.search(r"Swift version\s+([\d.]+)", result.stdout + result.stderr)
+        value = f"Swift({match.group(1) if match else 'unknown'})"
+    elif key in OBJC_LANGUAGES:
+        raw = subprocess.run(["clang", "--version"], capture_output=True, text=True, timeout=5).stdout
+        match = re.search(r"clang version\s+([\d.]+)", raw)
+        value = f"Objective-C(Clang {match.group(1) if match else 'unknown'})"
     else:
         value = str(language)
     LANGUAGE_VERSION_CACHE[key] = value
     return value
 
-def _run(command, stdin=None, cwd=None, timeout=5, cpu_seconds=CASE_FLOOR_S):
+def _run(command, stdin=None, cwd=None, timeout=5, cpu_seconds=CASE_FLOOR_S,
+         address_space_bytes=768 * 1024 * 1024, file_size_bytes=2 * 1024 * 1024):
     # 墙钟比 CPU 多给 1 秒，和原来 (CPU 4 / 墙钟 5) 的关系保持一致。
     return subprocess.run(command, input=stdin, cwd=cwd, capture_output=True, timeout=timeout,
-                          preexec_fn=lambda: _limits(cpu_seconds),
+                          preexec_fn=lambda: _limits(cpu_seconds, address_space_bytes, file_size_bytes),
                           env={"PATH": CHILD_PATH, "HOME": str(cwd)})
 
 def judge(book, problem_id, language, source):
@@ -155,15 +170,33 @@ def judge(book, problem_id, language, source):
                 '    <Nullable>disable</Nullable>\n'
                 '  </PropertyGroup>\n'
                 '</Project>\n', encoding="utf-8")
-            compile_result = _run([dotnet, "build", str(project), "--nologo", "-c", "Release", "-o", str(work / "out")],
-                                  cwd=work, timeout=30)
+            # dotnet build 启动 CoreCLR 时会预留一块运行时地址空间；它只编译
+            # 我们刚写入的固定项目，不执行提交程序，因此不放进运行时沙箱。
+            # 生成的可执行文件随后仍逐组经过 _run/_limits。
+            compile_result = subprocess.run(
+                [dotnet, "build", str(project), "--nologo", "-c", "Release", "-o", str(work / "out")],
+                cwd=work, capture_output=True, timeout=30,
+                env={"PATH": CHILD_PATH, "HOME": str(work), "DOTNET_GCHeapHardLimit": "268435456"})
             if compile_result.returncode:
                 return {"status": "Compile Error", "message": compile_result.stderr.decode(errors="replace")[-4000:]}
             command = [str(work / "out" / "Judge")]
+        elif language in SWIFT_LANGUAGES | OBJC_LANGUAGES:
+            ext = ".swift" if language in SWIFT_LANGUAGES else ".m"
+            source_path = work / ("main" + ext)
+            source_path.write_text(source, encoding="utf-8")
+            compiler = shutil.which("swiftc" if language in SWIFT_LANGUAGES else "clang")
+            if compiler is None:
+                return {"status": "Language Unavailable", "message": "本机没有安装对应的 Swift/Objective-C 编译器。"}
+            executable = work / "main"
+            flags = ["-O"] if language in SWIFT_LANGUAGES else ["-O2", "-fobjc-runtime=gnustep-1.9"]
+            compile_result = _run([compiler, *flags, str(source_path), "-o", str(executable)], cwd=work, timeout=30)
+            if compile_result.returncode:
+                return {"status": "Compile Error", "message": compile_result.stderr.decode(errors="replace")[-4000:]}
+            command = [str(executable)]
         else:
             ext = ".py" if language in CPYTHON_LANGUAGES | PYPY_LANGUAGES else ".c" if language == "c" else ".cpp"
             source_path = work / ("main" + ext); source_path.write_text(source, encoding="utf-8")
-        if language in DOTNET_LANGUAGES:
+        if language in DOTNET_LANGUAGES | SWIFT_LANGUAGES | OBJC_LANGUAGES:
             pass
         elif ext == ".py":
             interpreter = "pypy3" if language in PYPY_LANGUAGES else "python3"
@@ -209,7 +242,11 @@ def judge(book, problem_id, language, source):
                                    f"（{language} 倍率 ×{LANGUAGE_TIME_MULTIPLIER.get(language, 1)}）。"}
             input_data = (MIRROR / case["input"]).read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
             expected = (MIRROR / case["output"]).read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
-            try: result = _run(command, stdin=input_data, cwd=work, timeout=cpu_seconds + 1, cpu_seconds=cpu_seconds)
+            run_address_space = DOTNET_ADDRESS_SPACE if language in DOTNET_LANGUAGES else 768 * 1024 * 1024
+            run_file_size = DOTNET_FILE_SIZE if language in DOTNET_LANGUAGES else 2 * 1024 * 1024
+            try: result = _run(command, stdin=input_data, cwd=work, timeout=cpu_seconds + 1,
+                               cpu_seconds=cpu_seconds, address_space_bytes=run_address_space,
+                               file_size_bytes=run_file_size)
             except subprocess.TimeoutExpired:
                 return {"status": "Time Limit Exceeded", "case": index, "time_ms": round((time.perf_counter() - overall_started) * 1000),
                         "memory_kb": int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss),

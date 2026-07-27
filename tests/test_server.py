@@ -206,6 +206,8 @@ class ServerApiTests(unittest.TestCase):
         self.assertIn("Python3(", text)
         self.assertIn("PyPy3(", text)
         self.assertIn('value="dotnet10">.NET SDK 10', text)
+        self.assertIn('value="swift">Swift(', text)
+        self.assertIn('value="objc">Objective-C(', text)
         self.assertIn("Python ×10", text)
         for placeholder in ("__BOOK__", "__PROBLEM__"):
             self.assertNotIn(placeholder, text)      # 模板占位符必须已被替换

@@ -157,7 +157,7 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
     </select>
     <button id="go">提交并判题</button>
     <button id="theme" type="button" class="ghost">深色</button>
-    <span id="hint" class="muted">时间倍率：Python ×10 · PyPy3 ×3 · C/C++ ×1；题面时限按 C/C++ 计算，为全部测试点限时之和。</span>
+    <span id="hint" class="muted">时间倍率：Python ×10 · PyPy3 ×3 · C/C++ ×1 · .NET/Swift/Objective-C ×1；题面时限按 C/C++ 计算，为全部测试点限时之和。</span>
   </div>
 </form>
 <div id="verdict"></div>
@@ -769,7 +769,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             book, problem_id = submit_page.groups()
             language_options = "".join(
                 f'<option value="{key}">{escape(language_version(key))}</option>'
-                for key in ("cpp", "c", "python", "pypy3", "dotnet10")
+                for key in ("cpp", "c", "python", "pypy3", "dotnet10", "swift", "objc")
             )
             body = (SUBMIT_PAGE.replace("__BOOK__", escape(book))
                     .replace("__PROBLEM__", escape(problem_id))
