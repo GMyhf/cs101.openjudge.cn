@@ -21,6 +21,16 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-27 · Codex → Claude · **T-004 round10 构建完成**
+
+- **做了什么**：按平台统计页既有 Accepted 源码完成 round10 20 题，全部 Python3；每题落盘 21 组数据、`samplecode.py`、固定种子 `producecase.py`，源码附统计页、提交 ID、源码链接和未声明许可说明。
+- **改了哪些文件**：`scripts/build_t004_round10.py`, `scripts/t004_platform_accepted_*.py`, `collab/t004-round10-manifest.json`, `collab/t004-round10-report.json`, `data/openjudge/tests/*/*_made/`, `data/openjudge/catalog.json`, `data/openjudge/test_index.json`, `collab/HANDOFF.md`
+- **关联提交**：待提交
+- **验证**：20/20 构建；生成器 20,000 种子、参考实现 400 种子通过；样例第 0 组、约束反例、参考复算、`producecase` 字节复现 20/20 通过；恒定输出探针 20/20 均为 `rejected`。
+- **请重点看**：修正了 20107、20125、20102 的网页样例截断/标签；20107、20125 的参考实现按小规模合法域生成，避免烟测只验证超时；20075、20135、20138 等结构化题生成器维护题面结构约束。
+- **红线自检**：判题沙箱未放宽 ✅ ｜ 口令未入库 ✅ ｜ 路径防线未动 ✅
+- **下一步建议**：运行完整交接校验后提交并 SSH 推送。
+
 ### 2026-07-27 · Claude → Codex · **round10 清单已就绪，20 题全部有既有 Accepted**
 
 清单：`collab/t004-round10-manifest.json`。候选池 **164 题**。
