@@ -1,6 +1,6 @@
 {
   "batch": "T-004 round9",
-  "updated_at": "2026-07-27T02:28:42.473882+00:00",
+  "updated_at": "2026-07-27T14:49:17.423187+00:00",
   "entries": [
     {
       "local_number": 15291,
@@ -18,7 +18,7 @@
       },
       "reference_seed_smoke": {
         "seeds": 400,
-        "distinct_inputs": 64,
+        "distinct_inputs": 134,
         "status": "passed"
       },
       "test_cases": 21,
@@ -32,24 +32,25 @@
           true
         ]
       ],
-      "constraint_counterexample": "deliberate invalid input",
+      "constraint_counterexample": "1 1 1\n10 10\n10 10\n10 10\n0 0 0\n",
       "self_audit": {
         "distinct_cases": {
           "total": 20,
-          "distinct": 18,
+          "distinct": 19,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 20,
+          "frequency": 11,
           "total": 20,
-          "status": "accepted",
+          "status": "rejected",
           "exemption": null,
-          "share": 1.0
+          "share": 0.55
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -70,7 +71,7 @@
             }
           ],
           "falsified_by": {
-            "input": "deliberate invalid input",
+            "input": "1 1 1\n10 10\n10 10\n10 10\n0 0 0\n",
             "constraints": [
               "coordinates are 0..9"
             ]
@@ -79,9 +80,7 @@
         "byte_reproduction": {
           "status": "passed"
         },
-        "failed": [
-          "constant_output_probe"
-        ]
+        "failed": []
       },
       "sample_reproduced": true,
       "producecase_reproduced": true
@@ -132,8 +131,9 @@
           "share": 0.7
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -214,8 +214,9 @@
           "share": 0.7
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -296,8 +297,9 @@
           "share": 0.55
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -378,8 +380,9 @@
           "share": 0.05
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -460,8 +463,9 @@
           "share": 0.05
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -542,8 +546,9 @@
           "share": 0.05
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -624,8 +629,9 @@
           "share": 0.05
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -706,8 +712,9 @@
           "share": 0.05
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -788,8 +795,9 @@
           "share": 0.05
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -870,8 +878,9 @@
           "share": 0.25
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -952,8 +961,9 @@
           "share": 0.65
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -1034,8 +1044,9 @@
           "share": 0.1
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -1116,8 +1127,9 @@
           "share": 0.15
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -1198,8 +1210,9 @@
           "share": 0.05
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -1280,8 +1293,9 @@
           "share": 0.05
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -1358,8 +1372,9 @@
           "share": 0.05
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -1436,8 +1451,9 @@
           "share": 0.2
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -1518,8 +1534,9 @@
           "share": 0.05
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
@@ -1600,8 +1617,9 @@
           "share": 0.1
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",

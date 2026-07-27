@@ -1,6 +1,6 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
-REFERENCE='# External reference: cs101.openjudge.cn practice/19965 statistics, Accepted solution 43122751.\n# Source: http://cs101.openjudge.cn/practice/solution/43122751/\n# Statistics: http://cs101.openjudge.cn/practice/19965/statistics/\n# License: not declared on submission page; no license inferred\ndef f(a,b):\n    if a%b==0:\n        return a//b\n    else:\n        return a//b+1\na,b,c=map(int,input().split())\nwhile b<=a and c>=f(a,b):\n    c-=f(a, b)\n    b+=a//b\nprint(b)    \n'
+REFERENCE='# External reference: cs101.openjudge.cn practice/19965 statistics, Accepted solution 43122751.\n# Source: http://cs101.openjudge.cn/practice/solution/43122751/\n# Statistics: http://cs101.openjudge.cn/practice/19965/statistics/\n# License: not declared on submission page; no license inferred\ndef f(a,b):\n    if a%b==0:\n        return a//b\n    else:\n        return a//b+1\na,b,c=map(int,input().split())\nwhile b<=a and c>=f(a,b):\n    c-=f(a, b)\n    b+=a//b\nprint(b)\n'
 LANGUAGE='Python3'
 SAMPLE='5 2 10\n'
 GENERATOR_NAME='g19965'

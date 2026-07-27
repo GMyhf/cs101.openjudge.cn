@@ -1,0 +1,100 @@
+{
+  "batch": "T-004 round19 (historical cleanup)",
+  "updated_at": "2026-07-27T14:50:22.480171+00:00",
+  "count": 2,
+  "entries": [
+    {
+      "local_number": 4140,
+      "source_round": 5,
+      "status": "passed",
+      "test_cases": 1,
+      "constant_output_probe": {
+        "frequency": 1,
+        "total": 1,
+        "status": "exempted",
+        "exemption": "题面无输入，输入域只有 1 个取值",
+        "share": 1.0
+      },
+      "distinct_cases": {
+        "total": 1,
+        "distinct": 1,
+        "threshold": 15,
+        "status": "exempted",
+        "exemption": "题面无输入，输入域只有 1 个取值"
+      },
+      "constraint_checklist": {
+        "status": "exempted",
+        "checked": 0,
+        "items": [],
+        "exemption": "题面无输入，输入域只有 1 个取值"
+      },
+      "sample_is_case_zero": {
+        "input_matches": "passed",
+        "output_matches": "passed",
+        "status": "passed"
+      },
+      "samplecode_recompute": {
+        "status": "passed",
+        "cases": 1,
+        "mismatched": []
+      },
+      "byte_reproduction": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 15291,
+      "source_round": 9,
+      "status": "passed",
+      "test_cases": 21,
+      "nonzero_generated_outputs": 16,
+      "constant_output_probe": {
+        "frequency": 11,
+        "total": 20,
+        "status": "rejected",
+        "exemption": null,
+        "share": 0.55
+      },
+      "distinct_cases": {
+        "total": 20,
+        "distinct": 19,
+        "threshold": 15,
+        "status": "passed"
+      },
+      "constraint_checklist": {
+        "status": "passed",
+        "checked": 2,
+        "items": [
+          {
+            "constraint": "coordinates are 0..9",
+            "holds": true
+          },
+          {
+            "constraint": "terminator is present",
+            "holds": true
+          }
+        ],
+        "falsified_by": {
+          "input": "1 1 1\n10 10\n10 10\n10 10\n0 0 0\n",
+          "constraints": [
+            "coordinates are 0..9"
+          ]
+        }
+      },
+      "sample_is_case_zero": {
+        "input_matches": "passed",
+        "output_matches": "passed",
+        "status": "passed"
+      },
+      "samplecode_recompute": {
+        "status": "passed",
+        "cases": 21,
+        "mismatched": []
+      },
+      "byte_reproduction": {
+        "status": "passed"
+      }
+    }
+  ],
+  "failed": []
+}

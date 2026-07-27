@@ -16,4 +16,4 @@ a,b,c=map(int,input().split())
 while b<=a and c>=f(a,b):
     c-=f(a, b)
     b+=a//b
-print(b)    
+print(b)

@@ -1308,17 +1308,18 @@
       "reference_source": "LLM-written",
       "generator": "g4140",
       "seed": 4140,
-      "test_cases": 21,
+      "test_cases": 1,
       "distinct_input_cases": 1,
       "distinct_outputs": 1,
       "constant_output_probe": {
-        "frequency": 21,
-        "total": 21,
-        "status": "accepted",
+        "frequency": 1,
+        "total": 1,
+        "status": "exempted",
+        "exemption": "题面无输入，输入域只有 1 个取值",
         "share": 1.0
       },
       "distinct_cases": {
-        "total": 21,
+        "total": 1,
         "distinct": 1,
         "threshold": 15,
         "status": "exempted",
@@ -1337,7 +1338,7 @@
         "status": "passed"
       },
       "independent_oracle_smoke": {
-        "seeds": 21,
+        "seeds": 1,
         "status": "passed"
       },
       "independent_oracle_status": "passed",
@@ -1345,12 +1346,13 @@
       "independent_sample_agreement": true,
       "producecase_reproduced": true,
       "sample_is_case_zero": {
-        "status": "passed",
-        "reason": null
+        "input_matches": "passed",
+        "output_matches": "passed",
+        "status": "passed"
       },
       "samplecode_recompute": {
         "status": "passed",
-        "cases": 21,
+        "cases": 1,
         "mismatched": []
       },
       "byte_reproduction": {
@@ -1358,33 +1360,39 @@
       },
       "self_audit": {
         "distinct_cases": {
-          "total": 21,
+          "total": 1,
           "distinct": 1,
           "threshold": 15,
           "status": "exempted",
           "exemption": "题面无输入，输入域只有 1 个取值"
         },
         "constant_output_probe": {
-          "frequency": 21,
-          "total": 21,
-          "status": "accepted",
+          "frequency": 1,
+          "total": 1,
+          "status": "exempted",
+          "exemption": "题面无输入，输入域只有 1 个取值",
           "share": 1.0
         },
         "sample_is_case_zero": {
-          "status": "passed",
-          "reason": null
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 1,
           "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "exempted",
+          "checked": 0,
+          "items": [],
+          "exemption": "题面无输入，输入域只有 1 个取值"
         },
         "byte_reproduction": {
           "status": "passed"
         },
-        "failed": [
-          "constant_output_probe"
-        ]
+        "failed": []
       }
     },
     {

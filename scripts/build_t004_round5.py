@@ -849,7 +849,8 @@ def main():
         ref = f"__T004_CPP_{n}__" if n in CPP_REFERENCE else REFERENCE.replace("P=0", f"P={n}", 1)
         assert run(ref, entry["sample_input"]).split() == entry["sample_output"].split(), n
         cases = [entry["sample_input"]]
-        for i in range(1, 21):
+        case_count = 1 if n == 4140 else 21
+        for i in range(1, case_count):
             c = gen(random.Random(n + i))
             if c == "" and i > 1: c = gen(random.Random(n + i + 10000))
             cases.append(c)
@@ -869,8 +870,9 @@ def main():
         outs = []
         for i, c in enumerate(cases):
             o = run(ref, c); outs.append(o)
-            (data / f"{i}.in").write_text(c, encoding="utf-8")
-            (data / f"{i}.out").write_text(o, encoding="utf-8")
+            file_index = i + 1 if n == 4140 else i
+            (data / f"{file_index}.in").write_text(c, encoding="utf-8")
+            (data / f"{file_index}.out").write_text(o, encoding="utf-8")
         if n in CPP_REFERENCE:
             (d / "samplecode_ac.cpp").write_bytes(CPP_REFERENCE[n].read_bytes())
             stale = d / "reference"
@@ -883,6 +885,14 @@ def main():
             produce = f'''import random, subprocess, tempfile\nfrom pathlib import Path\nSAMPLE_IN={entry["sample_input"]!r}\n{source}\nroot=Path(__file__).parent\nwith tempfile.TemporaryDirectory() as folder:\n binary=Path(folder)/"reference"\n subprocess.run(["g++", "-std=c++17", "-O2", str(root/"samplecode_ac.cpp"), "-o", str(binary)], check=True)\n for i in range(21):\n  c=SAMPLE_IN if i == 0 else {gen.__name__}(random.Random({n}+i))\n  p=subprocess.run([str(binary)], input=c, text=True, capture_output=True, check=True)\n  (root/"data"/f"{{i}}.in").write_text(c); (root/"data"/f"{{i}}.out").write_text(p.stdout)\n'''
         else:
             produce = f'''import random, subprocess, tempfile\nfrom pathlib import Path\nREFERENCE_SOURCE={ref!r}\nSAMPLE_IN={entry["sample_input"]!r}\n{source}\nwith tempfile.NamedTemporaryFile("w", suffix=".py") as h:\n h.write(REFERENCE_SOURCE); h.flush(); root=Path(__file__).parent/"data"\n for i in range(21):\n  c=SAMPLE_IN if i == 0 else {gen.__name__}(random.Random({n}+i))\n  p=subprocess.run(["python3", h.name], input=c, text=True, capture_output=True, check=True)\n  (root/f"{{i}}.in").write_text(c); (root/f"{{i}}.out").write_text(p.stdout)\n'''
+        produce = produce.replace("for i in range(21):", f"for i in range({case_count}):")
+        if n == 4140:
+            produce = produce.replace(
+                "for i in range(1):\n  c=SAMPLE_IN if i == 0 else",
+                "for i in range(1, 2):\n  c=SAMPLE_IN if i == 1 else",
+            ).replace(
+                "(root/f\"{i}.in\")", "(root/f\"{i}.in\")"
+            )
         (d / "producecase.py").write_text(produce, encoding="utf-8")
         before = {p.name: p.read_bytes() for p in data.iterdir()}
         p = subprocess.run([sys.executable, "producecase.py"], cwd=d, capture_output=True, text=True, timeout=600)
@@ -890,7 +900,10 @@ def main():
         assert p.returncode == 0 and before == after, (n, p.stderr)
         exemption = "题面无输入，输入域只有 1 个取值" if n == 4140 else None
         audit_row = common.audit(d, cases=cases, outputs=outs,
-                                 sample_input=entry["sample_input"], exemption=exemption,
+                                 sample_input=entry["sample_input"], sample_output=entry.get("sample_output"),
+                                 exemption=exemption,
+                                 constraints=[] if n == 4140 else None,
+                                 constraint_exemption=exemption if n == 4140 else None,
                                  reference_source=None if n in CPP_REFERENCE else ref,
                                  oracle_source=None)
         rows.append({"local_number": n, "title": entry["title"], "source": entry["source"],

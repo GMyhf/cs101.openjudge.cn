@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import contextlib,inspect,io,json,random,subprocess,sys,tempfile
+import contextlib,inspect,io,json,os,random,subprocess,sys,tempfile
 from datetime import datetime,timezone
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]; MANIFEST=ROOT/"collab/t004-round9-manifest.json"; REPORT=ROOT/"collab/t004-round9-report.json"; TESTS=ROOT/"data/openjudge/tests"
@@ -9,9 +9,21 @@ from build_001a import bucket
 import t004_common as common
 
 def g15291(r):
-    # Three connected one-cell blocks plus the required terminator.
-    x=r.randint(0,7); y=r.randint(0,7)
-    return f"1 1 1\n{x} {y}\n{x+1} {y}\n{x+2} {y}\n0 0 0\n"
+    # Keep the blocks inside the 0..9 board, but deliberately include overlap
+    # so that the answer is not almost always the trivial 0.
+    x, y = r.randint(2, 7), r.randint(2, 7)
+    mode = r.randrange(4)
+    if mode == 0:
+        blocks = [[(x, y)], [(x, y)], [(x, y)]]
+    elif mode == 1:
+        blocks = [[(x, y)], [(x, y)], [(x + 1, y)]]
+    elif mode == 2:
+        blocks = [[(x, y)], [(x + 1, y)], [(x + 2, y)]]
+    else:
+        blocks = [[(x, y), (x, y + 1)], [(x, y), (x, y + 1)], [(x + 1, y), (x + 1, y + 1)]]
+    rows = [f"{len(block)}\n" + "\n".join(f"{a} {b}" for a, b in block) for block in blocks]
+    return f"{len(blocks[0])} {len(blocks[1])} {len(blocks[2])}\n" + "\n".join(
+        f"{a} {b}" for block in blocks for a, b in block) + "\n0 0 0\n"
 def g17746(r):
     n=r.randint(5,60); m=r.randint(1,min(10,n)); c=r.randint(0,20)
     return f"{n} {m} {c}\n"+" ".join(str(r.randint(0,100)) for _ in range(n))+"\n"
@@ -188,8 +200,11 @@ if __name__=="__main__": main()
     (made/"producecase.py").write_text(text)
 def main():
     manifest=json.loads(MANIFEST.read_text()); report=[]
+    only = int(os.environ["T004_ONLY"]) if os.environ.get("T004_ONLY") else None
     for e in manifest["entries"]:
         n=int(e["local_number"]); a=e["existing_accepted"]; lang=a["language"]; ext="cpp" if lang=="G++" else "py"
+        if only is not None and n != only:
+            continue
         src=(ROOT/f"scripts/t004_platform_accepted_{n:05d}.{ext}").read_text(); g=GENERATORS[n]; sample=e["sample_input"]
         made=TESTS/bucket(n)/f"{n:05d}_made"; data=made/"data"; data.mkdir(parents=True,exist_ok=True)
         for p in data.glob("*"): p.unlink()
@@ -199,7 +214,18 @@ def main():
         marker = "//" if lang == "G++" else "#"
         h=f"{marker} External reference: statistics page /practice/{n:05d}/\n{marker} Accepted submission: {a['solution_id']}\n{marker} Source: {a['source_url']}\n{marker} License: not declared on the submission page; no license is inferred.\n\n"
         (made/f"samplecode.{ext}").write_text(h+src); write_producecase(made,src,g,sample,lang)
-        rows,counter=constraint_rows(n,cases[1:]); audit=common.audit(made,cases=cases[1:],outputs=outputs[1:],sample_input=sample,constraints=rows,constraint_counterexample=counter)
+        rows,counter=constraint_rows(n,cases[1:])
+        if n == 15291:
+            counter = ("1 1 1\n10 10\n10 10\n10 10\n0 0 0\n", [(rows[0][0], False)])
+        sample_output = e.get("sample_output")
+        sample_output_exemption = None if sample_output is not None else (
+            "round9 historical manifest has no recorded sample_output anchor"
+        )
+        audit=common.audit(made,cases=cases[1:],outputs=outputs[1:],sample_input=sample,
+                            sample_output=sample_output,
+                            sample_output_exemption=sample_output_exemption,
+                            constraints=rows,
+                            constraint_counterexample=counter)
         for seed in range(20000): g(random.Random(seed))
         seen=set()
         smoke_inputs=[]

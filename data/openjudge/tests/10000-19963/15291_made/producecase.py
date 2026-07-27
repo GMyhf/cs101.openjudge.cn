@@ -5,9 +5,21 @@ LANGUAGE='Python3'
 SAMPLE='3 12 5\n2 1\n2 2\n1 2\n0 0\n0 1\n0 2\n0 3\n0 4\n1 0\n1 4\n2 0\n2 4\n3 0\n3 1\n3 4\n2 3\n3 3\n4 3\n4 4\n4 2\n1 1 1\n0 0\n1 1\n2 2\n0 0 0\n'
 GENERATOR_NAME='g15291'
 def g15291(r):
-    # Three connected one-cell blocks plus the required terminator.
-    x=r.randint(0,7); y=r.randint(0,7)
-    return f"1 1 1\n{x} {y}\n{x+1} {y}\n{x+2} {y}\n0 0 0\n"
+    # Keep the blocks inside the 0..9 board, but deliberately include overlap
+    # so that the answer is not almost always the trivial 0.
+    x, y = r.randint(2, 7), r.randint(2, 7)
+    mode = r.randrange(4)
+    if mode == 0:
+        blocks = [[(x, y)], [(x, y)], [(x, y)]]
+    elif mode == 1:
+        blocks = [[(x, y)], [(x, y)], [(x + 1, y)]]
+    elif mode == 2:
+        blocks = [[(x, y)], [(x + 1, y)], [(x + 2, y)]]
+    else:
+        blocks = [[(x, y), (x, y + 1)], [(x, y), (x, y + 1)], [(x + 1, y), (x + 1, y + 1)]]
+    rows = [f"{len(block)}\n" + "\n".join(f"{a} {b}" for a, b in block) for block in blocks]
+    return f"{len(blocks[0])} {len(blocks[1])} {len(blocks[2])}\n" + "\n".join(
+        f"{a} {b}" for block in blocks for a, b in block) + "\n0 0 0\n"
 
 def run(text):
     with tempfile.TemporaryDirectory(prefix="producecase-") as d:
