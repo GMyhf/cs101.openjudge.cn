@@ -17,7 +17,7 @@ MIRROR = ROOT / "data" / "openjudge"
 # 宿主 CPython 是 3.12，语法能力并不一致，所以 PyPy 的语法检查必须交给它自己做。
 CPYTHON_LANGUAGES = {"python", "py", "python3"}
 PYPY_LANGUAGES = {"pypy", "pypy3"}
-DOTNET_LANGUAGES = {"dotnet", "dotnet10"}
+DOTNET_LANGUAGES = {"dotnet", "dotnet10", "csharp", "fsharp", "vbnet"}
 SWIFT_LANGUAGES = {"swift"}
 OBJC_LANGUAGES = {"objc", "objective-c", "objectivec"}
 # 只做语法检查、不执行用户代码；compile() 本身不运行被编译的源码。
@@ -33,12 +33,13 @@ SYNTAX_CHECK = "import sys;compile(open(sys.argv[1],encoding='utf-8').read(),sys
 # 10000ms × 10 = 100 秒，我第一版只给了 10 秒，于是把「实现慢」误判成了「数据太重」。
 LANGUAGE_TIME_MULTIPLIER = {"python": 10, "py": 10, "python3": 10, "pypy": 3, "pypy3": 3,
                             "c": 1, "cpp": 1, "c++": 1, "dotnet": 1, "dotnet10": 1,
+                            "csharp": 2, "fsharp": 2, "vbnet": 2,
                             "swift": 1, "objc": 1, "objective-c": 1, "objectivec": 1}
 CASE_FLOOR_S = 4
 CASE_CAP_S = 20
 # 整次提交的墙钟硬顶。改动前这一项无界：组数最多的一题有 150 组，150 × 5s = 750 秒。
 TOTAL_HARD_CAP_S = 300
-DOTNET_ADDRESS_SPACE = 2 * 1024 * 1024 * 1024
+DOTNET_ADDRESS_SPACE = 2 * 768 * 1024 * 1024
 DOTNET_FILE_SIZE = 16 * 1024 * 1024
 LIMITS_CACHE = {}
 
@@ -121,7 +122,8 @@ def language_version(language):
         match = re.search(r"\b(\d+\.\d+)(?:\.\d+)?\b", raw)
         value = f"GCC({match.group(1) if match else 'unknown'})"
     elif key in DOTNET_LANGUAGES:
-        value = ".NET SDK 10"
+        labels = {"csharp": "C#", "fsharp": "F#", "vbnet": "VB.NET"}
+        value = f"{labels.get(key, '.NET')} (.NET SDK 10)"
     elif key in SWIFT_LANGUAGES:
         result = subprocess.run(["swiftc", "--version"], capture_output=True, text=True, timeout=5)
         match = re.search(r"Swift version\s+([\d.]+)", result.stdout + result.stderr)
@@ -158,9 +160,14 @@ def judge(book, problem_id, language, source):
             dotnet = shutil.which("dotnet")
             if dotnet is None:
                 return {"status": "Language Unavailable", "message": ".NET SDK 10 未安装，换一种语言提交。"}
-            source_path = work / "Program.cs"
+            source_names = {"fsharp": "Program.fs", "vbnet": "Program.vb"}
+            source_path = work / source_names.get(language, "Program.cs")
             source_path.write_text(source, encoding="utf-8")
-            project = work / "Judge.csproj"
+            project_suffix = {"fsharp": ".fsproj", "vbnet": ".vbproj"}.get(language, ".csproj")
+            project = work / ("Judge" + project_suffix)
+            explicit_compile = ""
+            if language in {"fsharp", "vbnet"}:
+                explicit_compile = (f'    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>\n')
             project.write_text(
                 '<Project Sdk="Microsoft.NET.Sdk">\n'
                 '  <PropertyGroup>\n'
@@ -168,7 +175,10 @@ def judge(book, problem_id, language, source):
                 '    <TargetFramework>net10.0</TargetFramework>\n'
                 '    <ImplicitUsings>disable</ImplicitUsings>\n'
                 '    <Nullable>disable</Nullable>\n'
+                + explicit_compile +
                 '  </PropertyGroup>\n'
+                + (f'  <ItemGroup><Compile Include="{source_path.name}" /></ItemGroup>\n'
+                   if language in {"fsharp", "vbnet"} else '') +
                 '</Project>\n', encoding="utf-8")
             # dotnet build 启动 CoreCLR 时会预留一块运行时地址空间；它只编译
             # 我们刚写入的固定项目，不执行提交程序，因此不放进运行时沙箱。
@@ -178,7 +188,8 @@ def judge(book, problem_id, language, source):
                 cwd=work, capture_output=True, timeout=30,
                 env={"PATH": CHILD_PATH, "HOME": str(work), "DOTNET_GCHeapHardLimit": "268435456"})
             if compile_result.returncode:
-                return {"status": "Compile Error", "message": compile_result.stderr.decode(errors="replace")[-4000:]}
+                message = (compile_result.stderr + compile_result.stdout).decode(errors="replace")[-4000:]
+                return {"status": "Compile Error", "message": message}
             command = [str(work / "out" / "Judge")]
         elif language in SWIFT_LANGUAGES | OBJC_LANGUAGES:
             ext = ".swift" if language in SWIFT_LANGUAGES else ".m"
