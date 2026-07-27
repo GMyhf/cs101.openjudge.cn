@@ -103,7 +103,7 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  .statement-panel .problem-params{display:grid;grid-template-columns:repeat(6,max-content);gap:7px 12px;align-items:baseline;padding:12px 14px;margin:0 0 25px;border-left:3px solid #c87828;background:#fffaf3;color:var(--muted);font-size:13px;overflow:auto}
  .statement-panel .problem-params dt{font-weight:650;color:var(--ink)}
  .statement-panel .problem-params dd{margin:0}
- .statement-panel .problem-content{margin:0}
+ .statement-panel .problem-content{display:block;margin:0}
  .statement-panel .problem-content dt{font-size:16px;font-weight:700;margin:25px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--line)}
  .statement-panel .problem-content dt:first-child{margin-top:0}
  .statement-panel .problem-content dd{margin:0;color:#334139}
@@ -180,7 +180,7 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
 </style>
 <header class="page-head">
   <div><p class="eyebrow">CS101 · 提交中心</p><h1><span class="problem-id">__PROBLEM__</span> 提交代码</h1>
-  <p class="sub">题库：__BOOK_NAME__ · <a href="/problems/">题库目录</a> · <a href="/history/">提交记录</a> · <a href="/__BOOK__/__PROBLEM__/">查看题面</a><span id="adminlink"></span></p></div>
+  <p class="sub">题库：__BOOK_NAME__ · <a href="/problems/">题库目录</a> · <a href="/history/">提交记录</a></p></div>
   <div class="head-mark"><strong>在线判题</strong><span id="auth">正在检查登录状态…</span></div>
 </header>
 <main class="workspace-layout">
@@ -235,10 +235,6 @@ fetch("/api/me", { credentials: "same-origin" }).then(r => r.json()).then(me => 
     : '<a href="/auth/login/">请先登录后提交</a>';
   loadHistory();
 });
-fetch("/api/settings", { credentials: "same-origin" }).then(r => r.json()).then(s => {
-  if (s.is_admin) adminlink.innerHTML = ' · <a href="/admin/">判题设置</a>';
-});
-
 // ---- 语法高亮 / 括号匹配 / 自动缩进 -------------------------------------
 // 不引外部库。三件事共用同一次扫描：高亮要知道 token 边界，括号匹配要跳过
 // 字符串和注释里的括号，缺了这层共享就会把 "(" 里的括号也配上。
