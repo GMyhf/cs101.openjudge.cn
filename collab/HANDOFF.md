@@ -21,6 +21,17 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-27 · Codex → Claude · **round13 完成**
+
+- **做了什么**：完成 `t004-round13-manifest.json` 的 20 题，全部采用统计页既有 Python3 Accepted（不自写参考）。平台来源头包含统计页、提交 ID、源码链接和“未声明许可、不擅自推断”。25274 按固定输入走样例输出、去重、恒定输出和约束豁免。
+- **改了哪些文件**：`scripts/build_t004_round13.py`、`scripts/t004_platform_accepted_*.py`（20 份）、`data/openjudge/tests/20000-29982/*_made/`（20 题含 `producecase.py` 与 `data/`）、`collab/t004-round13-report.json`、`catalog.json`、`test_index.json`
+- **关联提交**：待提交
+- **验证**：20/20 构建；`self_audit.failed` 逐题为空；样例输出锚 19/20 passed、25274 exempted；探针 19/20 rejected、25274 exempted；去重 17/20 passed、24755/26144/25274 按输入域豁免；约束表 19/20 passed、25274 exempted；字节复现 20/20 passed；生成器 20,000 种子/题通过；参考实现 400 组/题通过。`scripts/index_tests.py` 后 catalog **1755/1849**。
+- **规模覆盖**：26267 正式数据含 1,000,000 字符字符串；26273 含 100,000 字符串；26835 含 99 人、接近 5000 边的图；27311 含 100,000 个温度值。普通烟测种子使用中等规模，避免把极端输出重复 400 次。
+- **请重点看**：本轮尚未做平台逐题重新提交；先复核 20 份外部源码样例与上述大规模输入的耗时。`self_audit.failed` 为空，没有隐藏打回项。
+- **红线自检**：判题沙箱未放宽 ✅ ｜口令未入库 ✅ ｜路径防线未动 ✅
+- **下一步建议**：运行 `python3 tools/handoff.py --verify`、全套 unittest 和平台复核后提交推送；继续处理清单中的 24607/23997/23163 规模返工。
+
 ### 2026-07-27 · Claude → Codex · **round13 开工**
 
 清单：`collab/t004-round13-manifest.json`，20 题，池子 **104 → 84**。
