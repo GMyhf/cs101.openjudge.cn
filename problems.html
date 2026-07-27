@@ -31,6 +31,9 @@
   .go { color:var(--muted); text-decoration:none; }
   .go:hover { color:#3d8b68; }
   .empty { padding:40px 0; text-align:center; color:var(--muted); }
+  .pagination { display:flex; justify-content:center; align-items:center; gap:12px; padding:18px 0; }
+  .pagination button { padding:6px 12px; border:1px solid var(--line); border-radius:5px; background:#fff; font:inherit; cursor:pointer; }
+  .pagination button:disabled { opacity:.45; cursor:default; }
   @media (max-width:620px) { th:nth-child(4), td:nth-child(4) { display:none; } }
 </style>
 <div class="wrap">
@@ -45,15 +48,17 @@
 
   <p class="count" id="count">加载中…</p>
   <table>
-    <thead><tr><th>题目ID</th><th>标题</th><th>通过率</th><th>通过人数</th><th>尝试人数</th><th>本地数据</th><th>组数</th><th></th></tr></thead>
+    <thead><tr><th>题目ID</th><th>标题</th><th>通过率</th><th>通过人数</th><th>尝试人数</th><th>本地数据</th><th>组数</th></tr></thead>
     <tbody id="rows"></tbody>
   </table>
+  <div class="pagination"><button id="prev" type="button">上一页</button><span id="pageInfo"></span><button id="next" type="button">下一页</button></div>
   <p class="empty" id="empty" hidden>没有符合条件的题目。</p>
 </div>
 
 <script>
 const els = { q: q, book: book, only: only, rows: rows, count: count, empty: empty };
-let all = [], bookMeta = {};
+let all = [], bookMeta = {}, pageNumber = 1;
+const pageSize = 50;
 const requestedBook = new URLSearchParams(location.search).get('book') || '';
 
 fetch('/api/catalog', { credentials: 'same-origin' })
@@ -74,6 +79,7 @@ fetch('/api/catalog', { credentials: 'same-origin' })
   .catch(() => { els.count.textContent = '题库加载失败。'; });
 
 function judgeable(p) { return (p.test_count || 0) > 0; }
+function titleOf(p) { return (p.title || p.id).replace(new RegExp('^' + p.id + '\\s*[:：]\\s*', 'i'), '') || p.id; }
 
 function render() {
   const term = els.q.value.trim().toLowerCase();
@@ -85,29 +91,33 @@ function render() {
     (!term || p.id.toLowerCase().includes(term)));
 
   const total = all.length, ok = all.filter(judgeable).length;
+  const pages = Math.max(1, Math.ceil(hits.length / pageSize));
+  pageNumber = Math.min(pageNumber, pages);
+  const visible = hits.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
   els.count.textContent = `显示 ${hits.length} 题 · 全库 ${ok}/${total} 有本地数据`;
   els.empty.hidden = hits.length > 0;
   // 一次性拼串再写入：全库 1800+ 行，逐行 append 会明显卡顿
-  els.rows.innerHTML = hits.slice(0, 600).map(p => {
+  els.rows.innerHTML = visible.map(p => {
     const has = judgeable(p);
     return `<tr>
       <td class="num"><a class="pid" href="${p.path}">${p.id}</a></td>
-      <td><a class="pid" href="${p.path}">${p.title || p.id}</a></td>
+      <td><a class="pid" href="${p.path}">${titleOf(p)}</a></td>
       <td class="num">${p.pass_rate || '—'}</td>
       <td class="num">${p.accepted_count || '—'}</td>
       <td class="num">${p.attempt_count || '—'}</td>
       <td><span class="tag ${has ? 'ok' : 'none'}">${has ? '可判' : '暂无数据'}</span></td>
       <td class="num">${has ? p.test_count : '—'}</td>
-      <td><a class="go" href="${p.path}submit/">${has ? '去提交 →' : ''}</a></td>
     </tr>`;
   }).join('');
-  if (hits.length > 600) {
-    els.count.textContent += `（只列出前 600 条，请用搜索缩小范围）`;
-  }
+  pageInfo.textContent = `第 ${pageNumber} / ${pages} 页`;
+  prev.disabled = pageNumber <= 1;
+  next.disabled = pageNumber >= pages;
 }
 
 for (const el of [els.q, els.book, els.only]) {
-  el.addEventListener('input', render);
+  el.addEventListener('input', () => { pageNumber = 1; render(); });
 }
+prev.addEventListener('click', () => { pageNumber -= 1; render(); });
+next.addEventListener('click', () => { pageNumber += 1; render(); });
 </script>
 </html>

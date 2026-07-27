@@ -1047,7 +1047,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                             self.send_json({"error": "账号尚未激活，请先点击邮箱中的激活链接"}, 403); return
             if not accepted:
                 self.send_json({"error": "用户名或密码不正确"}, 401); return
-            token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = session_user
+            token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = session_user; SESSION_SEEN[token] = time.time()
             self.send_response(200); self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/"); self.send_header("Content-Type", "application/json; charset=utf-8"); self.end_headers(); self.wfile.write(b'{"ok":true}'); return
         if path == "/api/user/change-password":
             username = self.current_user()
@@ -1103,13 +1103,13 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             self.send_json({"ok": True}); return
         if path == "/api/login":
             if same_username(data.get("username", ""), ADMIN_USER) and data.get("password") == ADMIN_PASSWORD:
-                token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = ADMIN_USER
+                token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = ADMIN_USER; SESSION_SEEN[token] = time.time()
                 self.send_response(200); self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/")
                 self.send_header("Content-Type", "application/json; charset=utf-8"); self.end_headers(); self.wfile.write(b'{"ok":true}'); return
             self.send_json({"error": "账号或口令不正确"}, 401); return
         if path == "/api/auth/login/":
             if same_username(data.get("email", ""), ADMIN_USER) and data.get("password") == ADMIN_PASSWORD:
-                token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = ADMIN_USER
+                token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = ADMIN_USER; SESSION_SEEN[token] = time.time()
                 self.send_response(200)
                 self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/")
                 self.send_header("Content-Type", "application/json; charset=utf-8")
