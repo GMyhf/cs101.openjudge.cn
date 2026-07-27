@@ -54,6 +54,7 @@
 <script>
 const els = { q: q, book: book, only: only, rows: rows, count: count, empty: empty };
 let all = [], bookMeta = {};
+const requestedBook = new URLSearchParams(location.search).get('book') || '';
 
 fetch('/api/catalog', { credentials: 'same-origin' })
   .then(r => r.json())
@@ -62,6 +63,10 @@ fetch('/api/catalog', { credentials: 'same-origin' })
     bookMeta = data.book_meta || {};
     for (const b of [...new Set(all.map(p => p.book))].sort()) {
       els.book.insertAdjacentHTML('beforeend', `<option value="${b}">${(bookMeta[b] || {}).name || b}</option>`);
+    }
+    if ([...els.book.options].some(option => option.value === requestedBook)) {
+      els.book.value = requestedBook;
+      els.only.checked = false;
     }
     render();
   })
