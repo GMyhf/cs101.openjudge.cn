@@ -1,0 +1,613 @@
+{
+  "batch": "T-004-r15",
+  "sample_verification": {
+    "method": "选批时就用每题的平台 Accepted 源码复算清单样例，并探测标签残留",
+    "why": "样例是流水线里唯一不由我们自己产生的真值；round11 事后补做这一步，20 题里查出 5 题有问题（含一题「平台 AC 本身算错」）",
+    "flagged": [],
+    "resolved": [
+      {
+        "local_number": 28321,
+        "issue": "网页在测试用例之间插了空行，AC 逐行读会崩",
+        "fix": "剔除空行后复算确认"
+      },
+      {
+        "local_number": 28327,
+        "issue": "三组样例混存",
+        "fix": "切分后逐组复算确认"
+      },
+      {
+        "local_number": 28416,
+        "issue": "题面输入格式与样例三栏均写「同上」，指向 28413",
+        "fix": "样例取自 28413，用本题自己的平台 AC 复算确认"
+      }
+    ]
+  },
+  "selection_rule": "从仍缺数据的题里按题号顺序取 20 题；跳过与已有数据同题的（正文 + 时间/内存限制双判据）与题面无样例的。**选批时已逐题查过统计页有没有既有 Accepted**（优先 Python3、其次 G++），结果写在每题的 existing_accepted 字段里。",
+  "count": 20,
+  "route_summary": {
+    "external-accepted": 20,
+    "self-written": 0
+  },
+  "skipped": [
+    {
+      "local_number": 3259,
+      "reason": "题面没有样例（可做，但无样例可锚，须在报告注明）"
+    }
+  ],
+  "delivery_gate": [
+    "有既有 Accepted：直接作为题目实现并构建数据；C++ 放 samplecode.cpp，producecase 走 g++ 编译路径",
+    "外部源码必须注明统计页 / 提交 ID / 源码链接 / 许可状态，reference_source 记真实来源",
+    "无既有 Accepted：才写自己的实现 + 本地对拍，并按三档提交 Python3 → PyPy3 → C++",
+    "参考实现必须拿到平台 Accepted 才算完成；提交前按题拆成单题独立程序（整份分派器会被 pylint 判 E0102）",
+    "报告字段一律走 scripts/t004_common.py 实测；constraint_checklist 必须附一个违规输入反例、证明至少一条约束会翻成 False，题面确实无可机械验证约束时给 exemption",
+    "**28416 是 28413 的数据强化版，两题的全部区别就是规模**（题面原话「唯一的区别是增强了数据的强度，现在T=20，n<=3000」）。28416 必须有 T=20、n 接近 3000 的组，否则这道题白立；已给 machine_gate，`tools/check_pending_rework.py` 管不到本轮清单，请在报告里自证",
+    "去重不足 15 组必须给豁免理由，且**先分清是「输入域本身小」还是「生成器太窄」**：域无穷或结构可变的（如 20026 的 2^a·3^b、20136 的任意图），不给豁免，扩生成器",
+    "输入是图/树/矩阵等结构时，**不能所有组都是同一种形状**（20136 的 21 组全是环，而其参考实现对星形/链/完全图/分离子图都跑得好好的）",
+    "**交接摘要必须直接列出 self_audit.failed 非空的题号**——round9 的 18076、round10 的 20026/20136 都是机器字段诚实、散文摘要写「全部通过」",
+    "恒定输出探针与变异自检照旧（变异要真改变行为、自检前基线先绿）",
+    "**constraint_counterexample 必须记真实的违规输入本身，不能写占位串**：round11 全 20 题记成 \"deliberate invalid input\"，检查其实是好的，但证据没留下，复核方「独立重跑记录在案的反例」这个动作就静默失效了",
+    "**参考实现拿不到平台 Accepted，必须标 blocked 并写清卡在哪**，不得静默交付（round11 的 21520 平台 TLE 19967ms 却照常入库）",
+    "**约束不能写成「永远不会红」的形态**：round14 有三题写的是 `input is present`、反例是空字符串——生成的每一组都非空，这条在任何真实数据上都不可能红。**而它恰好盖住了真缺陷**：27378 有 16/21 组的文本含着本该消失的坏键、27778 有 9/21 组 T 达 11~20 而题面明写 T≤10。约束请写题面里那条**能被生成器违反**的规格（取值范围、结构、字符集），并给一个**看起来像真输入、只是违反了那条规格**的反例",
+    "**数据必须冲到题面上界附近**：每题清单里给了 stated_bounds（启发式抽取，以题面为准）。round12 的 24607 题面 N≤3×10⁵、数据只到 60，我从参考派生的慢变体在现有数据上全对、却在 N=5000 就要 17.3 秒——**数据完全不检验复杂度**。若参考实现跑不动上界，记下实测耗时并说明取到了多大，不要默默缩到几十",
+    "**往后每条 pending_rework 都必须带 `machine_gate`**（描述从入库 .in 读哪个字段、最低值多少）：`tools/check_pending_rework.py` 已接进 `--verify`，从清单读要求、从产物读现实、每次现算；没有 machine_gate 的返工项不在这道闸门管辖内，又会退回「靠人记得去查」",
+    "**交接摘要里凡涉及具体数值与规模的句子，一律从产物里读出来再写**：round11 摘要称「加入 50×50、100×100」，数据里最大只有一组 50×50。规模这类话直接贴一张实测直方图，就不可能说错"
+  ],
+  "pending_rework": [],
+  "entries": [
+    {
+      "local_number": 28307,
+      "title": "老鼠和奶酪",
+      "source": "data/openjudge/pages/practice__28307.html",
+      "sample_input": "4\n1 1 3 4\n4 4 1 1\n2\n",
+      "sample_output": "15\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28307/",
+      "statement_chars": 197,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52726248",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52726248/",
+        "accepted_total": 15,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 28321,
+      "title": "电影排片",
+      "source": "data/openjudge/pages/practice__28321.html",
+      "sample_input": "2\n6\n10 20 30 40 50 60\n8 21 35 35 55 65\n6\n9 9 9 30 40 50\n10 20 30 40 50 60\n",
+      "sample_output": "1\n3\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28321/",
+      "statement_chars": 328,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52459418",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52459418/",
+        "accepted_total": 14,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed",
+        "detail": "手工修正后复算"
+      },
+      "sample_extraction_note": "网页在两组测试用例之间插了空行以便阅读，实际输入格式没有空行（AC 逐行读会崩在空行上）。已剔除空行。"
+    },
+    {
+      "local_number": 28322,
+      "title": "小明的加密算法",
+      "source": "data/openjudge/pages/practice__28322.html",
+      "sample_input": "2\nencrypt\nabcde\ndecrypt\nbadc\n",
+      "sample_output": "badc0e\nabcd\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28322/",
+      "statement_chars": 372,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52484649",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52484649/",
+        "accepted_total": 11,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 28327,
+      "title": "相遇地点",
+      "source": "data/openjudge/pages/practice__28327.html",
+      "sample_input": "4\n1 2\n2 3\n2 4\n1\n1 2\n",
+      "sample_output": "Road 1 2\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28327/",
+      "statement_chars": 276,
+      "complexity_hint": "low",
+      "stated_bounds": {
+        "N": 2000,
+        "Q": 2000
+      },
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52825181",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52825181/",
+        "accepted_total": 1,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed",
+        "detail": "手工修正后复算"
+      },
+      "additional_samples": [
+        {
+          "input": "5\n1 2\n2 3\n3 4\n4 5\n2\n1 3\n1 5\n",
+          "output": "City 2\nCity 3\n"
+        },
+        {
+          "input": "9\n2 3\n5 6\n4 8\n8 9\n4 5\n3 4\n1 9\n3 7\n9\n7 9\n2 5\n2 6\n4 6\n2 4\n5 8\n7 8\n3 6\n5 6\n",
+          "output": "City 4\nRoad 3 4\nCity 4\nCity 5\nCity 3\nCity 4\nRoad 3 4\nRoad 4 5\nRoad 5 6\n"
+        }
+      ],
+      "sample_extraction_note": "三组样例，标签「样例输入N/样例输出N」，原抽取整块吞下。已切分。"
+    },
+    {
+      "local_number": 28332,
+      "title": "收集金币达成成就",
+      "source": "data/openjudge/pages/practice__28332.html",
+      "sample_input": "xyy xxz\nzz z\nswsw sweet ttuu sswwwtt ttt\na bccba\n",
+      "sample_output": "3 YXZ\n1 Z\n2 WT\n0\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28332/",
+      "statement_chars": 344,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52377415",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52377415/",
+        "accepted_total": 4,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 28336,
+      "title": "消消乐",
+      "source": "data/openjudge/pages/pctbook__E28336.html",
+      "sample_input": "abbaca\n",
+      "sample_output": "ca\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28336/",
+      "statement_chars": 150,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52734521",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52734521/",
+        "accepted_total": 13,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 28404,
+      "title": "餐厅订单页面设计",
+      "source": "data/openjudge/pages/practice__28404.html",
+      "sample_input": "6\nDavid,3,Ceviche\nCorina,10,Beef-Burrito\nDavid,3,Fried-Chicken\nCarla,5,Water\nCarla,5,Ceviche\nRous,3,Ceviche\n",
+      "sample_output": "Table   Beef-Burrito    Ceviche Fried-Chicken   Water\n\n3       0       2       1       0\n\n5       0       1       0       1\n\n10      1       0       0       0\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28404/",
+      "statement_chars": 362,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52363840",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52363840/",
+        "accepted_total": 11,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 28405,
+      "title": "小明的刷题计划",
+      "source": "data/openjudge/pages/practice__28405.html",
+      "sample_input": "4\n1\n2\n3\n3\n2\n",
+      "sample_output": "3\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28405/",
+      "statement_chars": 259,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52736793",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52736793/",
+        "accepted_total": 20,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 28413,
+      "title": "Taki的乐队梦想",
+      "source": "data/openjudge/pages/practice__28413.html",
+      "sample_input": "3\n3\nA\nB 1\nC 2 1\n4\nA\nB 1\nC 2\nD 3\n5\nTakamatsu\nKaname\nShiina 2\nChihaya 1\nNagasaki 1 4\n",
+      "sample_output": "7\nA B A C A B A\n10\nA B A C B A D C B A\n10\nTakamatsu Kaname Shiina Kaname Chihaya Takamatsu Nagasaki Takamatsu Chihaya Takamatsu\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28413/",
+      "statement_chars": 439,
+      "complexity_hint": "medium",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52720583",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52720583/",
+        "accepted_total": 11,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      },
+      "related_problem": {
+        "number": 28416,
+        "relation": "本题的数据强化版",
+        "note": "见 28416 的说明"
+      },
+      "scale_requirement": {
+        "note": "本题是基础版；规模要求见 28416"
+      }
+    },
+    {
+      "local_number": 28416,
+      "title": "Taki的乐队梦想（数据强化版）",
+      "source": "data/openjudge/pages/practice__28416.html",
+      "sample_input": "3\n3\nA\nB 1\nC 2 1\n4\nA\nB 1\nC 2\nD 3\n5\nTakamatsu\nKaname\nShiina 2\nChihaya 1\nNagasaki 1 4\n",
+      "sample_output": "7\nA B A C A B A\n10\nA B A C B A D C B A\n10\nTakamatsu Kaname Shiina Kaname Chihaya Takamatsu Nagasaki Takamatsu Chihaya Takamatsu\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28416/",
+      "statement_chars": 56,
+      "complexity_hint": "low",
+      "stated_bounds": {
+        "n": 3000
+      },
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52720590",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52720590/",
+        "accepted_total": 11,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed",
+        "detail": "手工修正后复算"
+      },
+      "sample_source": "28413",
+      "sample_extraction_note": "本题「输入格式/样例」三栏题面写的都是「同上」，字面指向 28413（Taki的乐队梦想，本题是其数据强化版）。样例取自 28413，已用本题自己的平台 AC 复算确认。",
+      "related_problem": {
+        "number": 28413,
+        "relation": "同一道题的数据强化版；本题题面「输入格式/样例」三栏均写「同上」",
+        "note": "去重判据（正文+限制）识别不出这种「正文写同上」的关联，两题都该有数据；但 **28416 的数据规模必须比 28413 大**，否则「强化版」名不副实——这正是它单独立题的理由"
+      },
+      "scale_requirement": {
+        "statement": "题面原话：「现在T=20，n<=3000，保证输出总长度不超过500kB」",
+        "target": "至少要有若干组做到 T=20 且 n 接近 3000",
+        "why": "28413 与 28416 的**全部区别就是数据规模**——题面自己说「题目描述全部同上，唯一的区别是增强了数据的强度」。若 28416 的数据不比 28413 大，这道题就白立了",
+        "machine_gate": {
+          "metric": "max_input_field",
+          "field_index": 0,
+          "field": "T",
+          "minimum": 20
+        }
+      }
+    },
+    {
+      "local_number": 28681,
+      "title": "奖学金",
+      "source": "data/openjudge/pages/pctbook__E28681.html",
+      "sample_input": "6\n90 67 80\n87 66 91\n78 89 91\n88 99 77\n67 89 64\n78 89 98\n",
+      "sample_output": "6 265\n4 264\n3 258\n2 244\n1 237\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28681/",
+      "statement_chars": 431,
+      "complexity_hint": "medium",
+      "stated_bounds": {
+        "n": 300
+      },
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52734455",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52734455/",
+        "accepted_total": 90,
+        "statistics_pages_scanned": 7
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 28699,
+      "title": "买水果",
+      "source": "data/openjudge/pages/pctbook__M28699.html",
+      "sample_input": "5 3\n4 2 1 10 5\napple\norange\nmango\n",
+      "sample_output": "7 19\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28699/",
+      "statement_chars": 228,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52832114",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52832114/",
+        "accepted_total": 89,
+        "statistics_pages_scanned": 6
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 28750,
+      "title": "倾斜方块",
+      "source": "data/openjudge/pages/practice__28750.html",
+      "sample_input": "4 4\n.r..\nrgyb\n.b..\n.yr.\n\nyrbr\n..yr\n...g\n...b\n",
+      "sample_output": "yes\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28750/",
+      "statement_chars": 264,
+      "complexity_hint": "low",
+      "stated_bounds": {
+        "w": 500
+      },
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "51077576",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/51077576/",
+        "accepted_total": 19,
+        "statistics_pages_scanned": 8
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 28908,
+      "title": "PASCAL代码",
+      "source": "data/openjudge/pages/practice__28908.html",
+      "sample_input": "a:=3;b:=4;c:=5;\n",
+      "sample_output": "3 4 5\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28908/",
+      "statement_chars": 126,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52734356",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52734356/",
+        "accepted_total": 109,
+        "statistics_pages_scanned": 8
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 28969,
+      "title": "解密",
+      "source": "data/openjudge/pages/practice__28969.html",
+      "sample_input": "123456789\n",
+      "sample_output": "324517689\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28969/",
+      "statement_chars": 595,
+      "complexity_hint": "medium",
+      "stated_bounds": {
+        "n": 50000
+      },
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52842137",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52842137/",
+        "accepted_total": 26,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 28973,
+      "title": "蛇入迷宫",
+      "source": "data/openjudge/pages/pctbook__M28973.html",
+      "sample_input": "6\n0 0 0 0 0 1\n1 1 0 0 1 0\n0 0 0 0 1 1\n0 0 1 0 1 0\n0 1 1 0 0 0\n0 1 1 0 0 0\n",
+      "sample_output": "11\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/28973/",
+      "statement_chars": 399,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52832149",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52832149/",
+        "accepted_total": 58,
+        "statistics_pages_scanned": 8
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29178,
+      "title": "寻找波峰",
+      "source": "data/openjudge/pages/practice__29178.html",
+      "sample_input": "5\n8 12 7 3 6\n",
+      "sample_output": "2\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29178/",
+      "statement_chars": 122,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52734219",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52734219/",
+        "accepted_total": 11,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29334,
+      "title": "Excel表列序号",
+      "source": "data/openjudge/pages/practice__29334.html",
+      "sample_input": "A\n",
+      "sample_output": "1\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29334/",
+      "statement_chars": 195,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52829500",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52829500/",
+        "accepted_total": 89,
+        "statistics_pages_scanned": 5
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29340,
+      "title": "极差不小于K",
+      "source": "data/openjudge/pages/practice__29340.html",
+      "sample_input": "5\n1 3 2 4 1\n3\n",
+      "sample_output": "2\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29340/",
+      "statement_chars": 129,
+      "complexity_hint": "low",
+      "stated_bounds": {},
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52734019",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52734019/",
+        "accepted_total": 22,
+        "statistics_pages_scanned": 3
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    },
+    {
+      "local_number": 29622,
+      "title": "清北学术走廊规划",
+      "source": "data/openjudge/pages/practice__29622.html",
+      "sample_input": "8 9\n8 7 76180\n1 5 22163\n7 5 60935\n2 5 71327\n7 4 42618\n4 2 83686\n4 8 30226\n6 6 79423\n6 3 4709\n",
+      "sample_output": "orz\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/29622/",
+      "statement_chars": 203,
+      "complexity_hint": "low",
+      "stated_bounds": {
+        "M": 1000,
+        "w": 100000
+      },
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52829508",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52829508/",
+        "accepted_total": 107,
+        "statistics_pages_scanned": 8
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed"
+      }
+    }
+  ]
+}
