@@ -161,6 +161,11 @@ def _run(command, stdin=None, cwd=None, timeout=5, cpu_seconds=CASE_FLOOR_S,
                           preexec_fn=lambda: _limits(cpu_seconds, address_space_bytes, file_size_bytes),
                           env={"PATH": CHILD_PATH, "HOME": str(cwd)})
 
+def _compile_run(command, cwd, timeout=30):
+    """Run a trusted compiler without applying limits intended for student code."""
+    return subprocess.run(command, cwd=cwd, capture_output=True, timeout=timeout,
+                          env={"PATH": CHILD_PATH, "HOME": str(cwd)})
+
 def judge(book, problem_id, language, source):
     catalog_path = MIRROR / "catalog.json"
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
@@ -229,7 +234,7 @@ def judge(book, problem_id, language, source):
                 return {"status": "Language Unavailable", "message": "本机没有安装对应的 Swift/Objective-C 编译器。"}
             executable = work / "main"
             flags = ["-O"] if language in SWIFT_LANGUAGES else ["-O2", "-fobjc-runtime=gnustep-1.9"]
-            compile_result = _run([compiler, *flags, str(source_path), "-o", str(executable)], cwd=work, timeout=30)
+            compile_result = _compile_run([compiler, *flags, str(source_path), "-o", str(executable)], cwd=work)
             if compile_result.returncode:
                 return {"status": "Compile Error", "message": compile_result.stderr.decode(errors="replace")[-4000:]}
             command = [str(executable)]

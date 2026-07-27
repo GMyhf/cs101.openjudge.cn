@@ -87,6 +87,17 @@ class JudgeCoreTests(unittest.TestCase):
         self.assertEqual(result["status"], "Runtime Error", result)
         self.assertEqual(result["case"], 1)
 
+    @unittest.skipUnless(shutil.which("swiftc"), "本机没有 Swift")
+    def test_swift_foundation_filehandle_is_available(self):
+        source = '''import Foundation
+let data = FileHandle.standardInput.readDataToEndOfFile()
+let values = String(data: data, encoding: .utf8)!.split { $0 == " " || $0 == "\\n" }.map { Int($0)! }
+print(values[0] + values[1])
+'''
+        result = judge(BOOK, PROBLEM, "swift", source)
+        self.assertEqual(result["status"], "Accepted", result)
+        self.assertEqual(result["cases"], 2)
+
 
 if __name__ == "__main__":
     unittest.main()
