@@ -202,6 +202,16 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(meta["practice"]["count"], 985)
         self.assertEqual(meta["pctbook"]["name"], "计算思维算法实践")
 
+    def test_catalog_summary_is_small_and_contains_judgeable_titles(self):
+        status, headers, body = request(self.port, "GET", "/api/catalog?summary=1")
+        self.assertEqual(status, 200)
+        payload = json.loads(body)
+        self.assertGreater(payload["tested_count"], 0)
+        self.assertTrue(payload["problems"])
+        self.assertTrue(all(item["test_count"] >= 5 for item in payload["problems"]))
+        self.assertTrue(any(item["title"] for item in payload["problems"]))
+        self.assertLess(int(headers["Content-Length"]), 500_000)
+
     def test_submit_page_renders_without_placeholders(self):
         status, _, body = request(self.port, "GET", f"/{SUBMIT_BOOK}/{SUBMIT_PROBLEM}/submit/")
         self.assertEqual(status, 200)

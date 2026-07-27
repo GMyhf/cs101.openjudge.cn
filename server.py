@@ -49,6 +49,9 @@ ADMIN_PASSWORD = os.environ.get("CS101_ADMIN_PASSWORD") or (PASSWORD_FILE.read_t
 TOKENS = set()
 SESSION_USERS = {}
 CATALOG_TITLE_CACHE = {}
+CATALOG_RAW_CACHE = None
+CATALOG_RAW_MTIME = None
+CATALOG_FULL_CACHE = None
 CAPTCHA_CHALLENGES = {}
 
 COURSE = {
@@ -593,6 +596,55 @@ def catalog_title(item):
     return title
 
 
+def catalog_raw():
+    """Read the catalog once per file version instead of once per request."""
+    global CATALOG_RAW_CACHE, CATALOG_RAW_MTIME, CATALOG_FULL_CACHE
+    catalog_path = MIRROR / "catalog.json"
+    if not catalog_path.is_file():
+        return {"problems": []}
+    mtime = catalog_path.stat().st_mtime_ns
+    if CATALOG_RAW_CACHE is None or CATALOG_RAW_MTIME != mtime:
+        CATALOG_RAW_CACHE = json.loads(catalog_path.read_text(encoding="utf-8"))
+        CATALOG_RAW_MTIME = mtime
+        CATALOG_FULL_CACHE = None
+    return CATALOG_RAW_CACHE
+
+
+def catalog_full_payload():
+    """Build the complete directory response only once per catalog version."""
+    global CATALOG_FULL_CACHE
+    if CATALOG_FULL_CACHE is None:
+        raw = catalog_raw()
+        CATALOG_FULL_CACHE = {
+            **raw,
+            "problems": [{**item, "title": catalog_title(item)} for item in raw.get("problems", [])],
+            "book_meta": BOOK_META,
+        }
+    return CATALOG_FULL_CACHE
+
+
+def catalog_summary_payload():
+    """Return only the fields needed by the fast homepage catalog."""
+    raw = catalog_raw()
+    problems = raw.get("problems", [])
+    tested_count = sum(1 for item in problems if (item.get("test_count") or 0) > 0)
+    return {
+        "total": len(problems),
+        "tested_count": tested_count,
+        "problems": [
+            {
+                "book": item.get("book", ""),
+                "id": item.get("id", ""),
+                "path": item.get("path", ""),
+                "test_count": item.get("test_count", 0),
+                "title": catalog_title(item),
+            }
+            for item in problems if (item.get("test_count") or 0) >= 5
+        ],
+        "book_meta": BOOK_META,
+    }
+
+
 def password_hash(password):
     return hashlib.pbkdf2_hmac("sha256", password.encode(), b"cs101-local-user", 120000).hex()
 
@@ -845,12 +897,9 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             if page.is_file():
                 self.send_html(page.read_text(encoding="utf-8")); return
         if path == "/api/catalog":
-            catalog = MIRROR / "catalog.json"
-            if catalog.is_file():
-                payload = json.loads(catalog.read_text(encoding="utf-8"))
-                payload["problems"] = [{**item, "title": catalog_title(item)} for item in payload.get("problems", [])]
-                payload["book_meta"] = BOOK_META
-                self.send_json(payload); return
+            if parse_qs(parsed.query).get("summary") == ["1"]:
+                self.send_json(catalog_summary_payload()); return
+            self.send_json(catalog_full_payload()); return
         file = ROOT / ("index.html" if path in ("/", "") else decoded_path.lstrip("/"))
         if file.is_file() and ROOT in file.parents:
             content_type = "text/html; charset=utf-8" if file.suffix == ".html" else "text/css; charset=utf-8" if file.suffix == ".css" else "text/javascript; charset=utf-8"
