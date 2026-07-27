@@ -83,7 +83,7 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  :root{--ink:#17221d;--muted:#6b7a72;--line:#d9e0da;--bg:#f7f9f7;--panel:#fff;--soft:#f1f5f2;--accent:#2f7d55}
  *{box-sizing:border-box}
  body{font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);
-      max-width:1120px;margin:0 auto;padding:34px 24px 70px;background:var(--bg)}
+      max-width:1440px;margin:0 auto;padding:28px 24px 54px;background:var(--bg)}
  .page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:24px}
  .eyebrow{color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:0 0 5px}
  h1{font-size:28px;line-height:1.25;letter-spacing:0;margin:0 0 7px}
@@ -93,7 +93,18 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  .sub a:hover{text-decoration:underline}
  .head-mark{min-width:132px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--muted);font-size:12px;text-align:right}
  .head-mark strong{display:block;color:var(--ink);font-size:14px;margin-bottom:2px}
- .workspace{border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:0 8px 24px rgba(34,58,44,.06);overflow:hidden}
+ .workspace-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(520px,1fr);gap:18px;align-items:start}
+ .statement-panel,.workspace{border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:0 8px 24px rgba(34,58,44,.06);overflow:hidden}
+ .statement-panel{padding:27px 30px;max-height:calc(100vh - 155px);overflow:auto;position:sticky;top:18px}
+ .statement-panel h2{font-size:24px;line-height:1.3;margin:0 0 18px}
+ .statement-panel .problem-params{display:flex;flex-wrap:wrap;gap:7px 20px;padding:12px 14px;margin:0 0 25px;border-left:3px solid #c87828;background:#fffaf3;color:var(--muted);font-size:13px}
+ .statement-panel .problem-params dt{font-weight:650;color:var(--ink)}
+ .statement-panel .problem-params dd{margin:0}
+ .statement-panel .problem-content{margin:0}
+ .statement-panel .problem-content dt{font-size:16px;font-weight:700;margin:25px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+ .statement-panel .problem-content dt:first-child{margin-top:0}
+ .statement-panel .problem-content dd{margin:0;color:#334139}
+ .statement-panel .problem-content pre{overflow:auto;margin:9px 0;padding:13px 15px;border:1px solid var(--line);border-radius:7px;background:var(--soft);color:var(--ink);font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
  .editor-bar{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border-bottom:1px solid var(--line);background:var(--soft);font-size:13px}
  .editor-label{font-weight:700}.editor-state{color:var(--muted)}
  /* 编辑器：透明 textarea 叠在高亮层上。两层的字体/行高/padding 必须逐项一致，
@@ -161,15 +172,18 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
  .snip-h{color:var(--muted);font-size:13px;margin-bottom:4px}
  .history-panel{border:1px solid var(--line);border-radius:10px;background:var(--panel);overflow:auto}
  .history-panel table{min-width:700px}
- @media(max-width:700px){body{padding:22px 14px 48px}.page-head{display:block}.head-mark{display:none}.editor{height:440px}.submit-bar{display:block}.controls{margin-bottom:10px}.hint{display:block}.sub{line-height:1.8}}
+ @media(max-width:900px){body{padding:22px 14px 48px}.page-head{display:block}.head-mark{display:none}.workspace-layout{grid-template-columns:1fr}.statement-panel{position:static;max-height:none;order:2}.workspace{order:1}}
+ @media(max-width:700px){.editor{height:440px}.submit-bar{display:block}.controls{margin-bottom:10px}.hint{display:block}.sub{line-height:1.8}}
 </style>
 <header class="page-head">
   <div><p class="eyebrow">CS101 · 提交中心</p><h1><span class="problem-id">__PROBLEM__</span> 提交代码</h1>
   <p class="sub">题库：__BOOK_NAME__ · <a href="/problems/">题库目录</a> · <a href="/history/">提交记录</a> · <a href="/__BOOK__/__PROBLEM__/">查看题面</a><span id="adminlink"></span></p></div>
   <div class="head-mark"><strong>在线判题</strong><span id="auth">正在检查登录状态…</span></div>
 </header>
+<main class="workspace-layout">
+<article class="statement-panel"><div class="eyebrow">Problem statement</div><h2>__STATEMENT_TITLE__</h2>__STATEMENT_PARAMS__<dl class="problem-content">__STATEMENT_CONTENT__</dl></article>
+<section class="workspace">
 <form id="form">
-  <section class="workspace">
   <div class="editor-bar"><span class="editor-label">代码编辑器</span><span class="editor-state">准备提交</span></div>
   <div class="editor">
     <div class="gutter" id="gutter">1</div>
@@ -186,11 +200,12 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
     <button id="go">提交并判题</button>
     <button id="theme" type="button" class="ghost">深色</button>
   </div><span id="hint" class="muted hint">时间倍率：Python ×10 · PyPy3 ×3 · C/C++/Swift/Objective-C ×1 · C#/F#/VB.NET ×2；C#/F#/VB.NET 内存 ×2。题面时限按 C/C++ 计算，为全部测试点限时之和。</span></div>
-  </section>
 </form>
 <div id="verdict"></div>
 <h2>我的提交记录</h2>
 <div id="histbox" class="history-panel muted">…</div>
+</section>
+</main>
 <script>
 const BOOK = "__BOOK__", PROBLEM = "__PROBLEM__";
 const CLS = { "Accepted": "b-ac", "Wrong Answer": "b-wa" };
@@ -823,8 +838,7 @@ class Handler(BaseHTTPRequestHandler):
         text = text.replace("https://cs101.openjudge.cn", "/")
         return text
 
-    def modern_problem_page(self, page, book, problem):
-        """Render the mirrored statement without the upstream navigation shell."""
+    def problem_parts(self, page, book, problem):
         text = self.local_page(page)
         title_match = re.search(r'<div id="pageTitle"><h2>(.*?)</h2>', text, re.S)
         title_html = title_match.group(1).strip() if title_match else f"{problem} 题目"
@@ -835,6 +849,11 @@ class Handler(BaseHTTPRequestHandler):
         params_html = params.group(1).strip() if params else ""
         content_html = content.group(1).strip() if content else "<dt>提示</dt><dd>题面暂未解析。</dd>"
         stats_html = stats.group(1).strip() if stats else ""
+        return title, params_html, content_html, stats_html
+
+    def modern_problem_page(self, page, book, problem):
+        """Render the mirrored statement without the upstream navigation shell."""
+        title, params_html, content_html, stats_html = self.problem_parts(page, book, problem)
         return f"""<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{escape(title)} · CS101 本机判题</title>
@@ -845,6 +864,20 @@ a{{color:var(--green)}}.shell{{max-width:1120px;margin:auto;padding:0 24px}}.top
 </style><style>.account-control{{position:relative}}.account-trigger{{border:0;background:transparent;color:var(--muted);font:inherit;cursor:pointer;padding:8px 12px}}.account-trigger:hover{{background:var(--green-soft);color:var(--green)}}.account-menu{{display:none}}.account-control:hover .account-menu,.account-control:focus-within .account-menu{{display:block}}</style></head><body>
 <header class="top shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><nav class="nav"><a id="account" href="/auth/login/">登录</a><span class="account-control" id="account-control" hidden><button class="account-trigger" type="button">账号</button><span class="account-menu"><span class="account-menu-inner"><a href="/account/">账户设置</a><button id="logout" type="button">退出登录</button></span></span></span><a class="primary" href="/{escape(book)}/{escape(problem)}/submit/">提交代码</a></nav></header>
 <main class="shell"><div class="crumb"><a href="/">首页</a> / <a href="/problems/">题库目录</a> / {escape(book)} / {escape(problem)}</div><div class="layout"><article class="article"><div class="eyebrow">Problem statement</div><h1>{escape(title)}</h1>{params_html}<dl class="problem-content">{content_html}</dl></article><aside class="aside"><h2>题目概览</h2><dl>{stats_html}</dl><div class="aside-note">本题使用测试数据判题。<br><a href="/{escape(book)}/{escape(problem)}/submit/">打开提交页 →</a></div></aside></div></main><footer class="footer shell">CS101 · 题面与判题服务</footer><script>fetch('/api/me').then(r=>r.json()).then(d=>{{const control=document.querySelector('#account-control');if(d.authenticated){{account.textContent=d.user;account.href='/history/?mine=1';control.hidden=false;}}}});document.querySelector('#logout').addEventListener('click',async()=>{{await fetch('/api/logout',{{method:'POST',credentials:'same-origin'}});location.reload();}});</script></body></html>"""
+
+    def submission_page(self, page, book, problem):
+        title, params_html, content_html, _ = self.problem_parts(page, book, problem)
+        language_options = "".join(
+            f'<option value="{key}">{escape(language_version(key))}</option>'
+            for key in ("python", "pypy3", "cpp", "c", "csharp", "fsharp", "vbnet", "swift", "objc")
+        )
+        return (SUBMIT_PAGE.replace("__BOOK__", escape(book))
+                .replace("__BOOK_NAME__", escape(BOOK_META.get(book, {}).get("name", book)))
+                .replace("__PROBLEM__", escape(problem))
+                .replace("__LANGUAGE_OPTIONS__", language_options)
+                .replace("__STATEMENT_TITLE__", escape(title))
+                .replace("__STATEMENT_PARAMS__", params_html)
+                .replace("__STATEMENT_CONTENT__", content_html))
 
     def account_page(self, register=False):
         title = "注册 CS101 账号" if register else "登录 CS101"
@@ -914,15 +947,9 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
         submit_page = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/([^/]+)/submit/", path)
         if submit_page:
             book, problem_id = submit_page.groups()
-            language_options = "".join(
-                f'<option value="{key}">{escape(language_version(key))}</option>'
-                for key in ("python", "pypy3", "cpp", "c", "csharp", "fsharp", "vbnet", "swift", "objc")
-            )
-            body = (SUBMIT_PAGE.replace("__BOOK__", escape(book))
-                    .replace("__BOOK_NAME__", escape(BOOK_META.get(book, {}).get("name", book)))
-                    .replace("__PROBLEM__", escape(problem_id))
-                    .replace("__LANGUAGE_OPTIONS__", language_options).encode())
-            self.send_response(200); self.send_header("Content-Type", "text/html; charset=utf-8"); self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body); return
+            page = MIRROR / "pages" / f"{book}__{problem_id}.html"
+            if page.is_file():
+                self.send_html(self.submission_page(page, book, problem_id)); return
         local_book = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/", path)
         if local_book:
             page_number = parse_qs(parsed.query).get("page", ["1"])[0]
@@ -934,7 +961,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             book, problem = local_problem.groups()
             page = MIRROR / "pages" / f"{book}__{problem}.html"
             if page.is_file():
-                self.send_html(self.modern_problem_page(page, book, problem)); return
+                self.send_html(self.submission_page(page, book, problem)); return
         if path == "/api/course":
             self.send_json({"course": COURSE, "problems": PROBLEMS, "authenticated": self.authorized()})
             return
