@@ -39,36 +39,28 @@
   ],
   "pending_rework": [
     {
+      "local_number": 29340,
+      "round": "r15",
+      "issue": "参考实现在**本站判题器**上过不了自己的数据（已计入语言倍率）",
+      "evidence": "最慢一组（第1组）不加限制需 12.2 秒；该题总限时 1000ms，Python ×10 = 10 秒单组预算",
+      "ask": "压低最慢那一组，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
+      "machine_gate_note": "机械判据是 scripts/t004_judge_round.py（跑本站判题器）"
+    },
+    {
       "local_number": 28321,
       "round": "r15",
-      "issue": "参考实现在**我们自己的判题器**上过不了自己的数据",
-      "evidence": "每组 4s，第 2 组 TLE（静置后两次复现）。参考跑完全部组要 11.8s",
-      "ask": "压低那几组的规模，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
-      "machine_gate_note": "这条的机械判据是 scripts/t004_judge_round.py（跑本站判题器），不是 pending_rework_status 的 max_input_field"
+      "issue": "参考实现在**本站判题器**上过不了自己的数据（已计入语言倍率）",
+      "evidence": "最慢一组（第1组）需 9.1 秒；该题**单个测试点**限时 300ms，Python ×10 = 3 秒，判题器已按下限给到 4 秒仍不够",
+      "ask": "压低最慢那一组，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
+      "machine_gate_note": "机械判据是 scripts/t004_judge_round.py（跑本站判题器）"
     },
     {
       "local_number": 28405,
       "round": "r15",
-      "issue": "参考实现在**我们自己的判题器**上过不了自己的数据",
-      "evidence": "每组 4s，第 2 组 TLE（静置后两次复现）。参考跑完全部组要 8.8s",
-      "ask": "压低那几组的规模，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
-      "machine_gate_note": "这条的机械判据是 scripts/t004_judge_round.py（跑本站判题器），不是 pending_rework_status 的 max_input_field"
-    },
-    {
-      "local_number": 29340,
-      "round": "r15",
-      "issue": "参考实现在**我们自己的判题器**上过不了自己的数据",
-      "evidence": "每组 4s，第 2 组 TLE（静置后两次复现）",
-      "ask": "压低那几组的规模，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
-      "machine_gate_note": "这条的机械判据是 scripts/t004_judge_round.py（跑本站判题器），不是 pending_rework_status 的 max_input_field"
-    },
-    {
-      "local_number": 18250,
-      "round": "T-002 期",
-      "issue": "参考实现在**我们自己的判题器**上过不了自己的数据",
-      "evidence": "**每组已放宽到 10s 仍 TLE**，第 9 组。第 8 组单组不加限制要 13.7 秒，而题面给这道题的总时间限制是 10000ms —— 是数据太重，不是判题器太严",
-      "ask": "压低那几组的规模，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
-      "machine_gate_note": "这条的机械判据是 scripts/t004_judge_round.py（跑本站判题器），不是 pending_rework_status 的 max_input_field"
+      "issue": "参考实现在**本站判题器**上过不了自己的数据（已计入语言倍率）",
+      "evidence": "最慢一组（第1组）需 9.6 秒；该题**单个测试点**限时 100ms，Python ×10 = 1 秒，判题器已按下限给到 4 秒仍不够",
+      "ask": "压低最慢那一组，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
+      "machine_gate_note": "机械判据是 scripts/t004_judge_round.py（跑本站判题器）"
     }
   ],
   "entries": [
@@ -604,9 +596,7 @@
     }
   ],
   "judge_limit_note": {
-    "finding": "我们的判题器是 CPU 4s / 墙钟 5s，而已交付的 465 题里 **63 题的平台限时超过 4000ms**（分布：5000ms 15 题、6000ms 4、9000ms 2、9999ms 1、10000ms 29、15000ms 1、20000ms 4、25000ms 1、50000ms 3、60000ms 2、65536ms 1）",
-    "already_biting": "18250「冰阔落 I」第 8 组（n=50000，2257KB）在判题器限制下实测 4.46/6.00/5.02 秒，**稳定超 4s**。数据完全合规（题面 n,m≤50000），平台给这题 10000ms —— 是我们的判题器比题目本身严 2.5 倍",
-    "consequence": "对这 63 题，我们没法把数据做到题目本意的强度：做到了，学生同等水平的正确解法在本站必然 TLE",
-    "decision_pending": "放宽判题器限时属红线 1，须人拍板。在拍板之前，这 63 题的数据强度按**我们的 4s** 来定"
+    "resolved": "判题器已按题限时并计入语言倍率（Python ×10、PyPy3 ×3、C/C++ ×1），人已拍板",
+    "correction": "我此前把 18250 判成「数据太重」是**错的**——那是我漏了语言倍率。加上倍率后它的 Python 单组预算是 20 秒（题面 10000ms），实测 Accepted"
   }
 }

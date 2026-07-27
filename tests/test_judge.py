@@ -124,23 +124,26 @@ class SandboxContractTests(unittest.TestCase):
         for stated_ms in (60, 500, 1000, 2000, 3000, 4000):
             with mock.patch.object(judge_module, "LIMITS_CACHE",
                                    {"1": {"total_ms": stated_ms, "case_ms": None}}):
-                self.assertEqual(judge_module.case_seconds(1), 4, f"{stated_ms}ms 被判严了")
+                self.assertGreaterEqual(judge_module.case_seconds(1, "cpp", 1), 4,
+                                        f"{stated_ms}ms 被判严了")
+                # 整次预算也不能比改动前（每组 4s、整次无上限）更严
+                self.assertGreaterEqual(
+                    judge_module.total_budget_seconds(1, "cpp", 21), 21 * 4, f"{stated_ms}ms")
 
     def test_per_problem_limit_is_capped(self):
         """上限：65536ms 那种题不能真给 65 秒，否则一次提交就能占住服务器。"""
         with mock.patch.object(judge_module, "LIMITS_CACHE",
                                {"1": {"total_ms": 65536, "case_ms": None}}):
-            self.assertEqual(judge_module.case_seconds(1), judge_module.CASE_CAP_S)
-        with mock.patch.object(judge_module, "LIMITS_CACHE",
-                               {"1": {"total_ms": 10000, "case_ms": None}}):
-            self.assertEqual(judge_module.case_seconds(1), 10)
+            self.assertEqual(judge_module.case_seconds(1, "python", 21), judge_module.CASE_CAP_S)
+            self.assertLessEqual(judge_module.total_budget_seconds(1, "python", 21),
+                                 judge_module.TOTAL_HARD_CAP_S)
 
     def test_unknown_problem_falls_back_to_the_floor_not_to_zero(self):
         """查不到限时必须退回 4s，不能因为查不到就变严 —— 缺数据不该罚提交者。"""
         with mock.patch.object(judge_module, "LIMITS_CACHE", {"__missing__": True}):
-            self.assertEqual(judge_module.case_seconds(99999), 4)
+            self.assertEqual(judge_module.case_seconds(99999, "python", 1), 4)
         with mock.patch.object(judge_module, "LIMITS_CACHE", {"1": {"total_ms": None, "case_ms": None}}):
-            self.assertEqual(judge_module.case_seconds(1), 4)
+            self.assertEqual(judge_module.case_seconds(1, "python", 1), 4)
 
     def test_per_case_limit_wins_over_the_total(self):
         """页面上「总时间限制」是整次的量，「单个测试点时间限制」才是每组的。
@@ -150,16 +153,36 @@ class SandboxContractTests(unittest.TestCase):
         """
         with mock.patch.object(judge_module, "LIMITS_CACHE",
                                {"1": {"total_ms": 10000, "case_ms": 6000}}):
-            self.assertEqual(judge_module.case_seconds(1), 6)
+            # 单点 6000ms × C++ 倍率 1 = 6 秒；若误用总限时会变成 10 秒
+            self.assertEqual(judge_module.case_seconds(1, "cpp", 1), 6)
+
+    def test_interpreted_languages_get_their_multiplier(self):
+        """题面那个数字是给 C/C++ 的：Python ×10、PyPy3 ×3（人 2026-07-27 给出）。
+
+        漏掉倍率就是拿 C++ 的尺子量 Python —— 我第一版漏了，于是把 18250「实现慢」
+        误判成了「数据太重」，还据此写了一份打回。
+        """
+        with mock.patch.object(judge_module, "LIMITS_CACHE",
+                               {"1": {"total_ms": 10000, "case_ms": None}}):
+            cpp = judge_module.total_budget_seconds(1, "cpp", 1)
+            pypy = judge_module.total_budget_seconds(1, "pypy3", 1)
+            python = judge_module.total_budget_seconds(1, "python", 1)
+        self.assertEqual(cpp, 10)
+        self.assertEqual(pypy, 30)
+        self.assertEqual(python, 100)
+        # 未知语言不得凭空获得倍率
+        with mock.patch.object(judge_module, "LIMITS_CACHE",
+                               {"1": {"total_ms": 10000, "case_ms": None}}):
+            self.assertEqual(judge_module.total_budget_seconds(1, "rust", 1), 10)
 
     def test_whole_submission_has_a_wall_clock_budget(self):
         """新加的总预算：放宽单组的同时，整次提交必须收住。
 
         改动前这一项实际上是无界的 —— 组数最多的一题有 150 组，150 × 5s = 750 秒。
         """
-        self.assertLessEqual(judge_module.TOTAL_BUDGET_S, 120)
+        self.assertLessEqual(judge_module.TOTAL_HARD_CAP_S, 600)
         slow = "import time\na, b = map(int, input().split())\ntime.sleep(0.2)\nprint(a + b)\n"
-        with mock.patch.object(judge_module, "TOTAL_BUDGET_S", 0):
+        with mock.patch.object(judge_module, "TOTAL_HARD_CAP_S", 0):
             result = judge(BOOK, PROBLEM, "python", slow)
         self.assertEqual(result["status"], "Time Limit Exceeded")
         self.assertIn("总预算", result["message"])

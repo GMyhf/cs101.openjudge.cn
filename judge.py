@@ -22,20 +22,18 @@ SYNTAX_CHECK = "import sys;compile(open(sys.argv[1],encoding='utf-8').read(),sys
 
 # —— 按题限时（2026-07-27，人已拍板）——
 #
-# 原来对所有题一律 CPU 4s。但题目本身的限时差得很远：已交付的 465 题里 63 题的平台限时
-# 超过 4000ms（最高 65536ms）。18250「冰阔落 I」第 8 组就卡在这上面——数据完全合规
-# （题面 n,m ≤ 50000），平台给 10000ms，我们只给 4s，学生同等水平的正确解法必然 TLE。
+# 原来对所有题一律 CPU 4s、整次无上限。现在按题读限时。
 #
-# 三条边界，缺一不可：
-#   · CASE_FLOOR_S —— **绝不比今天更严**。题目限时低于 4s 的一律仍按 4s 判，
-#     否则今天能过的提交明天会突然挂掉（我们的机器和语言组合本来就比平台慢）。
-#   · CASE_CAP_S —— 单组上限。不能让 65536ms 那种题把服务器占住。
-#   · TOTAL_BUDGET_S —— **新加的**整次提交墙钟总预算。今天这一项实际上是无界的：
-#     最多的一题有 150 组，150 × 5s = 750 秒。加了预算之后，放宽单组的同时，
-#     整体暴露面反而从 750s 收到 60s。
+# 题面写的那个数字是**给 C/C++ 的**，而且是**所有测试点的时间限制总和**。
+# 解释型语言另有倍率（人 2026-07-27 给出）：Python ×10、PyPy3 ×3、C/C++ ×1。
+# 漏掉倍率就会把 Python 提交按 C++ 的尺子量 —— 18250 的 Python 时限本该是
+# 10000ms × 10 = 100 秒，我第一版只给了 10 秒，于是把「实现慢」误判成了「数据太重」。
+LANGUAGE_TIME_MULTIPLIER = {"python": 10, "py": 10, "python3": 10, "pypy": 3, "pypy3": 3,
+                            "c": 1, "cpp": 1}
 CASE_FLOOR_S = 4
-CASE_CAP_S = 15
-TOTAL_BUDGET_S = 60
+CASE_CAP_S = 20
+# 整次提交的墙钟硬顶。改动前这一项无界：组数最多的一题有 150 组，150 × 5s = 750 秒。
+TOTAL_HARD_CAP_S = 300
 LIMITS_CACHE = {}
 
 
@@ -44,7 +42,7 @@ def problem_limits(number):
 
     「总时间限制」是整次提交的总量，「单个测试点时间限制」才是每组的；判题器逐组跑，
     所以有单点限时就用单点，只有总限时就用总限时（偏宽松，宁可放过不误杀，
-    总量另有 TOTAL_BUDGET_S 兜底）。
+    总量另有预算兜底）。
     """
     if not LIMITS_CACHE:
         path = MIRROR / "limits.json"
@@ -53,17 +51,36 @@ def problem_limits(number):
         except (OSError, ValueError, KeyError):
             LIMITS_CACHE["__missing__"] = True
     row = LIMITS_CACHE.get(str(number))
-    if not isinstance(row, dict):
-        return None
-    return row.get("case_ms") or row.get("total_ms")
+    return row if isinstance(row, dict) else None
 
 
-def case_seconds(number):
-    """该题每组的 CPU 秒数，夹在 [CASE_FLOOR_S, CASE_CAP_S] 之间。"""
-    stated = problem_limits(number)
+def total_budget_seconds(number, language, case_count):
+    """整次提交的墙钟预算（秒）。
+
+    用**总时间限制**（所有测试点之和），乘语言倍率。只给了单点限时的，按
+    `单点 × 组数` 折算。下限取 `case_count × CASE_FLOOR_S` —— 改动前是每组 4s、
+    整次无上限，这条保证新预算**绝不比改动前更严**。
+    """
+    row = problem_limits(number) or {}
+    multiplier = LANGUAGE_TIME_MULTIPLIER.get(str(language).lower(), 1)
+    stated = row.get("total_ms") or ((row.get("case_ms") or 0) * max(1, case_count))
+    scaled = stated * multiplier / 1000
+    floor = max(1, case_count) * CASE_FLOOR_S
+    return min(TOTAL_HARD_CAP_S, max(floor, scaled))
+
+
+def case_seconds(number, language="python", case_count=1):
+    """单组的 CPU 秒数。
+
+    用**单个测试点时间限制**；只给了总限时的，退回总限时（一组不可能比整次还久）。
+    **查不到就保持改动前的 4s** —— 没有信息的时候不该放宽。
+    """
+    row = problem_limits(number) or {}
+    stated = row.get("case_ms") or row.get("total_ms")
     if not stated:
         return CASE_FLOOR_S
-    return max(CASE_FLOOR_S, min(CASE_CAP_S, -(-int(stated) // 1000)))
+    multiplier = LANGUAGE_TIME_MULTIPLIER.get(str(language).lower(), 1)
+    return int(max(CASE_FLOOR_S, min(CASE_CAP_S, stated * multiplier / 1000)))
 
 
 def _limits(cpu_seconds=CASE_FLOOR_S):
@@ -150,15 +167,18 @@ def judge(book, problem_id, language, source):
         peak_memory = 0
         last_metrics = {}
         digits = re.search(r"(\d+)$", str(problem_id))
-        cpu_seconds = case_seconds(int(digits.group(1))) if digits else CASE_FLOOR_S
+        number = int(digits.group(1)) if digits else None
+        budget_seconds = total_budget_seconds(number, language, len(cases))
+        cpu_seconds = case_seconds(number, language, len(cases))
         for index, case in enumerate(cases, 1):
-            # 整次提交的墙钟总预算。放宽单组的同时必须把总量收住：最多的一题有 150 组，
-            # 按单组上限算就是 150 × 16s，那是把服务器交出去。
-            if time.perf_counter() - overall_started > TOTAL_BUDGET_S:
+            # 题面的限时语义是「所有测试点之和」，所以总量这一层必须真的存在；
+            # 同时它也是服务器的护栏 —— 改动前整次提交是无界的（150 组 × 5s = 750 秒）。
+            if time.perf_counter() - overall_started > budget_seconds:
                 return {"status": "Time Limit Exceeded", "case": index,
                         "time_ms": round((time.perf_counter() - overall_started) * 1000),
                         "memory_kb": peak_memory,
-                        "message": f"整次提交超过 {TOTAL_BUDGET_S} 秒总预算。"}
+                        "message": f"整次提交超过 {budget_seconds:.0f} 秒总预算"
+                                   f"（{language} 倍率 ×{LANGUAGE_TIME_MULTIPLIER.get(language, 1)}）。"}
             input_data = (MIRROR / case["input"]).read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
             expected = (MIRROR / case["output"]).read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
             try: result = _run(command, stdin=input_data, cwd=work, timeout=cpu_seconds + 1, cpu_seconds=cpu_seconds)
