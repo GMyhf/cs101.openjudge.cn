@@ -681,10 +681,15 @@ def catalog_summary_payload():
     """Return only the fields needed by the fast homepage catalog."""
     raw = catalog_raw()
     problems = raw.get("problems", [])
-    tested_count = sum(1 for item in problems if (item.get("test_count") or 0) > 0)
+    def problem_key(item):
+        match = re.search(r"(\d+)$", item.get("id", ""))
+        return int(match.group(1)) if match else (item.get("book", ""), item.get("id", ""))
+
+    all_keys = {problem_key(item) for item in problems}
+    tested_keys = {problem_key(item) for item in problems if (item.get("test_count") or 0) > 0}
     return {
-        "total": len(problems),
-        "tested_count": tested_count,
+        "total": len(all_keys),
+        "tested_count": len(tested_keys),
         "problems": [
             {
                 "book": item.get("book", ""),
