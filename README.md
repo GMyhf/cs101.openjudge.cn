@@ -31,8 +31,8 @@ python3 scripts/index_tests.py
 测试数据按题库和题号放置，存在测试目录的题目即可进入判题队列：
 
 ```text
-data/openjudge/tests/pctbook/M20134/01.in
-data/openjudge/tests/pctbook/M20134/01.out
+data/openjudge/tests/20000-29982/29647_made/data/0.in
+data/openjudge/tests/20000-29982/29647_made/data/0.out
 ```
 
 缺数据题目的 `_made` 目录包含 `samplecode.py`、`producecase.py` 和 `data/*.in|*.out`。数据构建批次、来源、样例锚点、约束检查、平台复验记录保存在 `collab/`；所有 `_made` 数据目录纳入 Git。
