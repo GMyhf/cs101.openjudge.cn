@@ -213,9 +213,33 @@
         "statistics_pages_scanned": 1,
         "rejected": true,
         "original_solution_id": "52997570",
-        "rejected_reason": "平台上唯一一份 Accepted（#52997570）在题面自己的样例上算错：输入 7 3、题面答案 8，它输出 5——其 dp 在 j>i 时从未填充、留在 0。（正确的 8 组：7｜6+1｜5+2｜4+3｜5+1+1｜4+2+1｜3+3+1｜3+2+2）说明平台自己的测试数据挡不住这个错，**必须自写实现**。"
+        "rejected_reason": "平台上唯一一份 Accepted（#52997570）在题面自己的样例上算错：输入 7 3、题面答案 8，它输出 5——其 dp 在 j>i 时从未填充、留在 0。（正确的 8 组：7｜6+1｜5+2｜4+3｜5+1+1｜4+2+1｜3+3+1｜3+2+2）说明平台自己的测试数据挡不住这个错，**必须自写实现**。",
+        "note": "平台数据很弱：它既放过了错的 #52997570，也放过了这份对的 #53000146（22ms）"
       },
-      "route": "self-written"
+      "route": "user-provided-verified",
+      "reference_implementation": {
+        "path": "collab/t004-round11-refs/21006.py",
+        "origin": "用户在 2026-07-27 直接提供（非平台抓取，无许可问题）",
+        "platform_submission": {
+          "solution_id": "53000146",
+          "verdict": "Accepted",
+          "time_ms": 22,
+          "language": "Python3",
+          "path": "/practice/21006/"
+        },
+        "correctness_check": {
+          "sample": "7 3 -> 8，与题面一致",
+          "independent_oracle": "直接枚举不增划分（与递推不同算法族），m 0..40 × n 1..10 共 410 组，全部一致",
+          "note": "与平台那份被否掉的 #52997570 相反，这份是对的"
+        },
+        "measured_limits": {
+          "recursion_depth": "无记忆化，f(m,n)->f(m-n,n) 链深约 m/n；**m≈2000 且 n=2 时 RecursionError**",
+          "runtime": "耗时正比于答案本身（递归树节点数≈答案值）。实测 n=10：m=100 → 0.82s；**m=120 → 9.15s；m=160 → 49s；m=180 → >90s**",
+          "binding_constraint": "平台限时 65536ms 很宽松，但**我们自己的判题器是 CPU 4s / 墙钟 5s**——卡住的是我们这边",
+          "data_generation_rule": "**生成数据时 n=10 的 m 请控制在 100 以内**（0.82s，安全）；n 小的时候 m 可以大些，但要避开 m/n≳1000 的递归深度墙。若要出更大的 m，先给参考实现加 lru_cache 再生成",
+          "input_robustness": "只有一个 token 时 IndexError（我们生成的数据总是「m n」，不受影响）；多余空白、换行、额外 token 都能正确处理"
+        }
+      }
     },
     {
       "local_number": 21459,
