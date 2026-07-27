@@ -69,6 +69,19 @@ function detailOf(s) {
   return "";
 }
 
+function detailMarkup(s) {
+  const d = s.detail || {};
+  const blocks = [];
+  if (d.case !== undefined) blocks.push("<div><b>出错的数据组：</b>第 " + esc(d.case) + " 组</div>");
+  if (d.expected_tokens !== undefined) blocks.push("<div><b>输出规模：</b>期望 " + esc(d.expected_tokens) + " 个 token，实际 " + esc(d.actual_tokens) + " 个</div>");
+  if (d.message) blocks.push("<pre class='source result-message'>" + esc(d.message) + "</pre>");
+  if (d.failing_input) blocks.push("<pre class='source'>" + esc(d.failing_input.text || "") + "</pre>");
+  if (d.expected_output) blocks.push("<pre class='source'>" + esc(d.expected_output.text || "") + "</pre>");
+  if (!blocks.length) return "";
+  const open = s.result === "Accepted" ? "" : " open";
+  return "<details class='result-detail'" + open + "><summary>查看判题详情</summary>" + blocks.join("") + "</details>";
+}
+
 function relativeTime(value) {
   const then = Date.parse(String(value).replace(" ", "T") + "Z");
   if (Number.isNaN(then)) return value;
@@ -90,12 +103,11 @@ function render() {
   rows.innerHTML = hits.map(s => {
     const path = s.book ? "/" + s.book + "/" + s.problem + "/" : "";
     const code = s.source ? `<details><summary>查看代码</summary><pre class="source">${esc(s.source)}</pre></details>` : "";
-    const expected = s.detail && s.detail.expected_output ? `<details><summary>查看期望输出</summary><pre class="source">${esc(s.detail.expected_output.text || "")}</pre></details>` : "";
     const d = s.detail || {};
     const memory = d.memory_kb !== undefined ? d.memory_kb + "kB" : "";
     const elapsed = d.time_ms !== undefined ? d.time_ms + "ms" : "";
     const size = d.source_bytes !== undefined ? d.source_bytes + " B" : (s.source ? new TextEncoder().encode(s.source).length + " B" : "");
-    const extra = expected + (detailOf(s) ? `<div class="muted">${esc(detailOf(s))}</div>` : "");
+    const extra = detailMarkup(s) || (detailOf(s) ? `<div class="muted">${esc(detailOf(s))}</div>` : "");
     return `<tr>
       <td>${esc(s.user || "")}</td>
       <td>${badge(s.result)}</td>

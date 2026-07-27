@@ -223,6 +223,8 @@ class ServerApiTests(unittest.TestCase):
         self.assertIn("G++(", text)
         self.assertIn("Python3(", text)
         self.assertIn("PyPy3(", text)
+        self.assertIn("查看判题详情", text)
+
         self.assertIn('value="csharp">C# (.NET SDK 10)', text)
         self.assertIn('value="fsharp">F# (.NET SDK 10)', text)
         self.assertIn('value="vbnet">VB.NET (.NET SDK 10)', text)
@@ -231,6 +233,13 @@ class ServerApiTests(unittest.TestCase):
         self.assertIn("Python ×10", text)
         for placeholder in ("__BOOK__", "__PROBLEM__"):
             self.assertNotIn(placeholder, text)      # 模板占位符必须已被替换
+
+    def test_history_page_exposes_error_details(self):
+        status, _, body = request(self.port, "GET", "/history/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn("查看判题详情", text)
+        self.assertIn("result-message", text)
 
     def test_submissions_require_authentication(self):
         status, _, body = request(self.port, "GET", "/api/submissions")

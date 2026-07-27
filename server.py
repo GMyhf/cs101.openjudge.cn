@@ -446,11 +446,17 @@ async function loadHistory() {
         const elapsed = d.time_ms !== undefined ? d.time_ms + "ms" : "";
         const size = d.source_bytes !== undefined ? d.source_bytes + " B" : (s.source ? new TextEncoder().encode(s.source).length + " B" : "");
         const code = s.source ? "<details><summary>查看代码</summary><pre class='msg source'>" + esc(s.source) + "</pre></details>" : "";
-        const expected = d.expected_output ? "<details><summary>查看期望输出</summary><pre class='msg source'>" + esc(d.expected_output.text || "") + "</pre></details>" : "";
+        const blocks = [];
+        if (d.case !== undefined) blocks.push("<div><b>出错的数据组：</b>第 " + esc(d.case) + " 组</div>");
+        if (d.expected_tokens !== undefined) blocks.push("<div><b>输出规模：</b>期望 " + esc(d.expected_tokens) + " 个 token，实际 " + esc(d.actual_tokens) + " 个</div>");
+        if (d.message) blocks.push("<pre class='msg source'>" + esc(d.message) + "</pre>");
+        if (d.failing_input) blocks.push("<pre class='msg source'>" + esc(d.failing_input.text || "") + "</pre>");
+        if (d.expected_output) blocks.push("<pre class='msg source'>" + esc(d.expected_output.text || "") + "</pre>");
+        const detail = blocks.length ? "<details" + (s.result === "Accepted" ? "" : " open") + "><summary>查看判题详情</summary>" + blocks.join("") + "</details>" : "";
         return "<tr><td>" + esc(s.user || "") + "</td><td>" + badge(s.result)
              + "</td><td class='num muted'>" + esc(memory) + "</td><td class='num muted'>" + esc(elapsed)
              + "</td><td class='num muted'>" + esc((s.detail && s.detail.language_version) || s.language || "")
-             + "</td><td class='num' title='" + esc(s.created) + "'>" + esc(relativeTime(s.created)) + "</td><td>" + code + expected + "<div class='muted'>" + esc(note) + "</div></td></tr>";
+             + "</td><td class='num' title='" + esc(s.created) + "'>" + esc(relativeTime(s.created)) + "</td><td>" + code + detail + "<div class='muted'>" + esc(note) + "</div></td></tr>";
       }).join("") + "</tbody></table>";
 }
 </script></html>"""
