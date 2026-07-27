@@ -1,0 +1,67 @@
+{
+  "batch": "T-004-r18",
+  "selection_rule": "池子里最后一题。00000（输出约 20MB 超判题器 2MB 上限）、3259（题面无样例）、29986（交互题）三题永久排除，见各轮清单的 excluded。",
+  "count": 1,
+  "route_summary": {
+    "external-accepted": 1,
+    "self-written": 0
+  },
+  "sample_verification": {
+    "method": "用平台 Python3 Accepted #52824909 复算题面样例",
+    "result": "**逐字符相等**（不只是 token 相等）——这题的行首空格有语义，字节级一致才算数"
+  },
+  "judge_fidelity_warning": {
+    "issue": "**我们的判题器对这道题会漏判。**判题器按 token 比对（`actual.split() != expected.split()`），而这题用**行首空格**表示「未修改的行」。一个把未修改行的行首空格漏掉的错误实现，其输出在 token 比对下与正确输出**完全相同**，本站会判 Accepted，平台会判 Wrong Answer。我已实测确认。",
+    "why_not_fixed": "token 比对是判题器的核心语义、是当初有意的设计（「输出裹上多余空白应判 AC」），改它会影响全部 505 份已交付数据。**这属于要人拍板的改动，我没动。**",
+    "impact": "数据仍然有用——内容错的解法照样会被抓住，漏的只有「行首空格」这一种错法。",
+    "for_codex": "照常构建即可，不必为这条做特殊处理；但**报告里请如实记下这条局限**。"
+  },
+  "delivery_gate": [
+    "直接用平台既有 Accepted（Python3 #52824909）作参考实现；G++ #52971305 备用",
+    "交付前跑 `python3 scripts/t004_submit_round.py 18` 与 `python3 scripts/t004_judge_round.py 18`",
+    "**题面有两个上界，两个一起看**：LCS 是 O(N·M)，题面总限时 1000ms（C++）→ Python ×10 = 10 秒。先按输入规模起，再用 t004_judge_round.py 压到过为止，取预算的一半左右",
+    "**内存限制 1000kB 极紧**（我们判题器给 768MB，宽松得多），生成数据时不必迁就，但要知道平台上很紧",
+    "constraint_counterexample 必须是真实的违规输入，不能写占位串或空串",
+    "**输出唯一性**：题面给了「状态序列权重字典序最小」的平局打破规则，输出是唯一的——这是好事，意味着不必担心多解；但生成器要确保参考实现和题面规则一致",
+    "交接摘要里凡涉及数值与规模的句子，一律从产物里读出来再写；**并请写明交接闸门的退出码**"
+  ],
+  "entries": [
+    {
+      "local_number": 31042,
+      "title": "简化版 Git Diff 引擎",
+      "source": "data/openjudge/pages/practice__31042.html",
+      "sample_input": "3\ndef main():\n    print('Hello')\n    return True\n4\ndef main():\n    # 打印问候\n    print('Hello World')\n    return True\n",
+      "sample_output": " def main():\n-    print('Hello')\n+    # 打印问候\n+    print('Hello World')\n     return True\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/31042/",
+      "statement_chars": 447,
+      "complexity_hint": "medium",
+      "complexity_reason": "LCS + 明确的平局打破规则，实现要小心；通过人数仅 2",
+      "stated_bounds": {},
+      "stated_bounds_hint": "题面未给 N、M 的数值上界，请自行读题面确认",
+      "platform_limits": {
+        "total_ms": 1000,
+        "memory_kb": 1000,
+        "accepted_total": 2
+      },
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52824909",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52824909/",
+        "alternate": {
+          "language": "G++",
+          "solution_id": "52971305"
+        },
+        "accepted_total": 2,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted",
+      "sample_check": {
+        "status": "passed",
+        "detail": "平台 AC 逐字符复现题面样例"
+      }
+    }
+  ]
+}
