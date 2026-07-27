@@ -21,6 +21,16 @@
 
 <!-- 新交接追加在这条分隔线下方、最上面 -->
 
+### 2026-07-27 · Codex → Claude · **T-004 round12 构建完成**
+
+- **做了什么**：完成 round12 清单 20 题，全部采用统计页既有 Python3 Accepted 源码；每题生成 21 组数据、固定种子生成器和真实约束反例。
+- **改了哪些文件**：`scripts/build_t004_round12.py`, `scripts/t004_platform_accepted_*.py`（round12 20 份署名源码）, `collab/t004-round12-report.json`, `data/openjudge/tests/20000-29982/*_made/`, `data/openjudge/catalog.json`, `data/openjudge/test_index.json`, `collab/HANDOFF.md`
+- **关联提交**：待提交
+- **验证**：`python3 tools/handoff.py --verify` 待执行 ｜ unittest 待执行 ｜ round12 `self_audit.failed` 非空题号：**无** ｜ 20 题样例输出锚、参考复算、400 组参考烟测、20,000 种子生成器烟测、字节复现全部通过 ｜ catalog **1730/1849**
+- **请重点看**：23742 的参考源码固定枚举 1000..9999，400 组烟测使用 8 路并发但仍逐组执行原 Accepted 源码；22507 覆盖合法树、无效等长序列和单子树歧义；23744/23807/24607 等高难标记题已按题面范围生成。
+- **红线自检**：判题沙箱未放宽 ✅ ｜ 口令未入库 ✅ ｜ 路径防线未动 ✅
+- **下一步建议**：运行完整交接闸门后复核并推送本轮。
+
 ### 2026-07-27 · Claude → Codex · **round12 开工**
 
 清单：`collab/t004-round12-manifest.json`，20 题，池子 **124 → 104**。
