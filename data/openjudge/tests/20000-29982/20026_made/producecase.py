@@ -4,7 +4,8 @@ REFERENCE='# External reference: cs101.openjudge.cn practice/20026 statistics, A
 SAMPLE='1\n'
 GENERATOR_NAME='g20026'
 def g20026(r):
-    return f"{r.choice([1, 2, 3, 4, 6, 8, 9, 12, 18, 24])}\n"
+    a, b = r.randint(0, 8), r.randint(0, 6)
+    return f"{2 ** a * 3 ** b}\n"
 
 def run(text):
     with tempfile.TemporaryDirectory(prefix='producecase-') as d:

@@ -4,12 +4,28 @@ REFERENCE="# External reference: cs101.openjudge.cn practice/20136 statistics, A
 SAMPLE='7 15\n0 1\n1 0 2 6\n2 1 3 7 14\n3 2 4\n4 3 5\n5 4 6\n6 1 5\n7 2 8\n8 7 9\n9 8 10\n10 9 11\n11 10 12\n12 11 13\n13 12 14\n14 2 13\n'
 GENERATOR_NAME='g20136'
 def g20136(r):
-    t = r.randint(4, 12)
-    police = r.choice([1, 2])
-    rows = []
-    for i in range(t):
-        rows.append(f"{i} {(i - 1) % t} {(i + 1) % t}")
-    return f"{police} {t}\n" + "\n".join(rows) + "\n"
+    kind = r.randrange(6)
+    if kind == 0:
+        t = r.randint(4, 12); edges = {(i, (i + 1) % t) for i in range(t)}
+    elif kind == 1:
+        t = r.randint(4, 12); edges = {(i, i + 1) for i in range(t - 1)}
+    elif kind == 2:
+        t = r.randint(5, 12); edges = {(0, i) for i in range(1, t)}
+    elif kind == 3:
+        t = 4; edges = {(i, j) for i in range(t) for j in range(i + 1, t)}
+    elif kind == 4:
+        t = 6; edges = {(0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3)}
+    else:
+        t = r.randint(5, 12); edges = {(i, i + 1) for i in range(t - 1)}
+        for _ in range(r.randint(1, t)):
+            a, b = r.sample(range(t), 2); edges.add((min(a, b), max(a, b)))
+    adj = [[] for _ in range(t)]
+    for a, b in edges:
+        adj[a].append(b); adj[b].append(a)
+    police = 1 if r.random() < .5 else 2
+    return f"{police} {t}\n" + "\n".join(
+        f"{i} " + " ".join(map(str, sorted(adj[i]))) for i in range(t)
+    ) + "\n"
 
 def run(text):
     with tempfile.TemporaryDirectory(prefix='producecase-') as d:

@@ -1,6 +1,6 @@
 {
   "batch": "T-004 round10",
-  "updated_at": "2026-07-27T03:20:45.234796+00:00",
+  "updated_at": "2026-07-27T03:41:26.234282+00:00",
   "entries": [
     {
       "local_number": 19984,
@@ -282,17 +282,16 @@
       "self_audit": {
         "distinct_cases": {
           "total": 20,
-          "distinct": 9,
+          "distinct": 19,
           "threshold": 15,
-          "status": "FAILED",
-          "reason": "去重后只有 9 组，低于 15，且没有给出豁免理由（输入域本身小于 15 才算豁免）"
+          "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 5,
+          "frequency": 3,
           "total": 20,
           "status": "rejected",
           "exemption": null,
-          "share": 0.25
+          "share": 0.15
         },
         "sample_is_case_zero": {
           "status": "passed",
@@ -322,9 +321,7 @@
         "byte_reproduction": {
           "status": "passed"
         },
-        "failed": [
-          "distinct_cases"
-        ]
+        "failed": []
       },
       "sample_reproduced": true,
       "producecase_reproduced": true
@@ -1338,17 +1335,16 @@
       "self_audit": {
         "distinct_cases": {
           "total": 20,
-          "distinct": 13,
+          "distinct": 17,
           "threshold": 15,
-          "status": "FAILED",
-          "reason": "去重后只有 13 组，低于 15，且没有给出豁免理由（输入域本身小于 15 才算豁免）"
+          "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 12,
+          "frequency": 14,
           "total": 20,
           "status": "rejected",
           "exemption": null,
-          "share": 0.6
+          "share": 0.7
         },
         "sample_is_case_zero": {
           "status": "passed",
@@ -1378,9 +1374,7 @@
         "byte_reproduction": {
           "status": "passed"
         },
-        "failed": [
-          "distinct_cases"
-        ]
+        "failed": []
       },
       "sample_reproduced": true,
       "producecase_reproduced": true
