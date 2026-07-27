@@ -11,7 +11,7 @@ def solve():
     if not input_data:
         return
     n = int(input_data[0])
-    
+
     # 边界情况处理
     if n == 1:
         print(1)
@@ -19,12 +19,12 @@ def solve():
     if n == 2:
         print(2)
         return
-    
+
     # 使用滚动变量优化空间复杂度到 O(1)
     a, b = 1, 2
     for _ in range(3, n + 1):
         a, b = b, a + b
-        
+
     print(b)
 
 if __name__ == '__main__':

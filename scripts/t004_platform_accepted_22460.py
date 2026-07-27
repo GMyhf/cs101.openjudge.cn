@@ -16,10 +16,10 @@ def valid(n,ls):
             if stack:
                 stack[-1] -= 1
             stack.append(2)
-        
+
         while stack and stack[-1] == 0:
             stack.pop()
-    
+
     return not stack
 
 while True:
@@ -27,5 +27,5 @@ while True:
     if n == 0:
         break
     ls = input().split()
-    
+
     print('T' if valid(n,ls) else 'F')

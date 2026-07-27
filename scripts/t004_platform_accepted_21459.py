@@ -11,7 +11,7 @@ def solve():
     if not input_data:
         return
     x = int(input_data[0])
-    
+
     # 当 x 大于 1 时，持续进行变换
     while x > 1:
         if x % 2 == 1:

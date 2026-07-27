@@ -13,10 +13,10 @@ def build_preorder(inorder, postorder):
     left_preorder = build_preorder(inorder[:root_index], postorder[:root_index])
     right_preorder = build_preorder(inorder[root_index + 1:], postorder[root_index:-1])
 
-    return [root] + left_preorder + right_preorder 
+    return [root] + left_preorder + right_preorder
 
 
-inorder = list(map(int, input().split())) 
-postorder = list(map(int, input().split()))  
+inorder = list(map(int, input().split()))
+postorder = list(map(int, input().split()))
 preorder = build_preorder(inorder, postorder)
 print(*preorder)

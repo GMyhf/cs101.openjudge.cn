@@ -11,7 +11,7 @@ for i in range(n):
     z[times[i][0]][times[i][1]]=i+1
     times[i].remove(times[i][0])
     times[i].remove(times[i][0])
-    
+
 def take(x1,x2,y1,y2,t):
     s=0
     if(x1<0):

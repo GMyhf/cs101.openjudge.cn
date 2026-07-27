@@ -27,7 +27,7 @@ def can(x):
         else:
             free += 1
     return all(done[1:])
-lo, hi = 1, n 
+lo, hi = 1, n
 ans = -1
 while lo <= hi:
     mid = (lo + hi) // 2

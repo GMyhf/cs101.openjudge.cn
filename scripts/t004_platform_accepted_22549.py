@@ -28,7 +28,7 @@ def main():
         if char_count[char] == 1:
             print(index)
             return
-            
+
     # 若无符合条件的字符，输出 -1
     print(-1)
 

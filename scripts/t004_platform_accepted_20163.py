@@ -19,7 +19,7 @@ for j in range(len(s)):
                 word += " " + s[j]
             else:
                 word = s[j]
-            
+
     else:
         if word and (j != 0 and s[j-2] != ".") and word not in output:
             output.append(word)

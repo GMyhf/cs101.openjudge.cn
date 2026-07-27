@@ -19,7 +19,7 @@ cun=0
 if n==0:
     print(1)
 else:
-    
+
     tem=0
     def ans(i):
         global cun

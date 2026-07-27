@@ -47,5 +47,5 @@ while True:
         left=mid
     else:
         right=mid
-    
+
 print(fans)

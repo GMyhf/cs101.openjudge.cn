@@ -16,7 +16,7 @@ class Node:
         self.ind=ind
         self.val=val
         self.de=de
-    
+
     def __lt__(self,other):
         if self.val==other.val:
             return self.de<other.de
