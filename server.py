@@ -734,7 +734,29 @@ def catalog_full_payload():
             "unique_tested_count": len(tested_keys),
             "book_meta": BOOK_META,
         }
-    return CATALOG_FULL_CACHE
+    with sqlite3.connect(DB) as db:
+        local_stats = {
+            (row[0] or "", row[1] or ""): {
+                "accepted_count": row[3],
+                "attempt_count": row[2],
+                "pass_rate": f"{row[3] / row[2] * 100:.1f}%" if row[2] else "—",
+            }
+            for row in db.execute(
+                """select book, problem,
+                          count(distinct lower(user)),
+                          count(distinct case when result = 'Accepted' then lower(user) end)
+                     from submissions group by book, problem"""
+            )
+        }
+    return {
+        **CATALOG_FULL_CACHE,
+        "problems": [
+            {**item, **local_stats.get((item.get("book", ""), item.get("id", "")), {
+                "pass_rate": "—", "accepted_count": 0, "attempt_count": 0,
+            })}
+            for item in CATALOG_FULL_CACHE["problems"]
+        ],
+    }
 
 
 def catalog_summary_payload():
