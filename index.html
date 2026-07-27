@@ -22,7 +22,7 @@
     const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     fetch('/api/catalog?summary=1').then(r=>r.json()).then(data=>{const all=data.problems||[];document.querySelector('#tested-count').textContent=(data.tested_count||0).toLocaleString('en-US');document.querySelector('#total-count').textContent=(data.total||0).toLocaleString('en-US');problems=all;bookMeta=data.book_meta||{};shuffle(problems);render();}).catch(()=>{empty.hidden=false;empty.textContent='题库暂时不可用';});
     fetch('/api/me').then(r=>r.json()).then(data=>{const account=document.querySelector('#account'),control=document.querySelector('#account-control');if(data.authenticated){account.textContent=data.user;account.href='/history/?mine=1';control.hidden=false;}}).catch(()=>{});
-    fetch('/api/settings').then(r=>{if(r.ok)document.querySelector('#admin-link').hidden=false;}).catch(()=>{});
+    fetch('/api/settings').then(r=>r.json()).then(data=>{if(data.is_admin)document.querySelector('#admin-link').hidden=false;}).catch(()=>{});
     document.querySelector('#logout').addEventListener('click',async()=>{await fetch('/api/logout',{method:'POST',credentials:'same-origin'});location.reload();});
     function shuffle(items){for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]];}}
     function titleOf(p){return (p.title||'').replace(new RegExp('^'+p.id+'\\s*[:：]\\s*','i'),'')||p.id;}
