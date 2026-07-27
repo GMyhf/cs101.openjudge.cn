@@ -1,0 +1,32 @@
+{
+  "batch": "T-004-r19（收尾）",
+  "note": "不是新一批题。这是我在 T-004 收官时把**全部 319 条报告记录**扫了一遍，捞出的两条陈年遗留（round5 与 round9 各一）。它们的 self_audit.failed 一直非空，只是当轮没被处理、之后每轮的复核又只看当轮，就一直挂着。",
+  "count": 0,
+  "entries": [],
+  "pending_rework": [
+    {
+      "local_number": 4140,
+      "round": "r5",
+      "title": "方程求解",
+      "issue": "constant_output_probe = accepted（探针判定输出过于一致）",
+      "finding": "**这是道无输入题**：21 组的 .in 全是空的，.out 全是 5.705085930 —— 等于同一组抄了 21 遍。输出恒定是题目本身决定的，不是数据缺陷。",
+      "ask": "**记 exemption，不要改数据**：constant_output_probe 与 distinct_cases 都写豁免、说明「题面输入格式为「-」，本题无输入，输出恒定」。可参考 25274（固定字面量输入）与 30497（不可判定的恶作剧题）的写法。另建议把 21 组压成 1 组——21 份空文件没有意义。",
+      "machine_gate_note": "这条的判据是报告里 constant_output_probe 的 status 变成 exempted 且带理由，pending_rework_status 的 max_input_field 表达不了"
+    },
+    {
+      "local_number": 15291,
+      "round": "r9",
+      "title": "华容道",
+      "issue": "constant_output_probe = accepted",
+      "finding": "**这是真缺陷**：输入有 19 种不同，但 **20/21 组的答案都是 `0`**，只有一组是 `5\\n0`。生成器产出的三块拼图几乎从来拼不上，于是**数据挡不住一个「永远输出 0」的程序**——这正是恒定输出探针存在的意义。",
+      "ask": "改生成器，让答案有分布：至少让一半的组拼得上、答案非零。改完 constant_output_probe 必须变成 rejected（不是豁免）。",
+      "machine_gate_note": "判据是报告里 constant_output_probe 的 status 变成 rejected"
+    }
+  ],
+  "delivery_gate": [
+    "4140 走豁免、15291 改生成器 —— 两者的处理方式不同，别混",
+    "改完重建后跑 `python3 scripts/t004_judge_round.py`（对应轮次）与平台复验",
+    "字节复现必须仍然通过：改生成器、不要手改数据文件",
+    "摘要里请写明交接闸门的退出码"
+  ]
+}
