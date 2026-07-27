@@ -1,6 +1,6 @@
 {
   "batch": "T-004 round15",
-  "updated_at": "2026-07-27T09:37:39.719226+00:00",
+  "updated_at": "2026-07-27T10:59:08.731486+00:00",
   "pending_rework_status": {
     "status": "passed",
     "items": []
@@ -84,90 +84,6 @@
         "failed": [],
         "scale_summary": {
           "max_case_chars": 70011,
-          "max_generated_seed": 20
-        }
-      },
-      "sample_reproduced": true,
-      "producecase_reproduced": true
-    },
-    {
-      "local_number": 28321,
-      "title": "电影排片",
-      "reference_source": "platform Accepted Python3 #52459418",
-      "statistics_url": "http://cs101.openjudge.cn/practice/28321/statistics/",
-      "source_url": "http://cs101.openjudge.cn/practice/solution/52459418/",
-      "license_status": "not declared on the submission page; no license is inferred.",
-      "generator": "g28321",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "reference_seed_smoke": {
-        "seeds": 400,
-        "status": "passed"
-      },
-      "test_cases": 22,
-      "constraints": [
-        [
-          "t 1..10000, n 1..100 and arrays sorted in 0..100",
-          true
-        ]
-      ],
-      "constraint_counterexample": [
-        "1\n101\n0\n0\n",
-        [
-          [
-            "t 1..10000, n 1..100 and arrays sorted in 0..100",
-            false
-          ]
-        ]
-      ],
-      "self_audit": {
-        "distinct_cases": {
-          "total": 21,
-          "distinct": 21,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 2,
-          "total": 21,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.095
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 22,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "t 1..10000, n 1..100 and arrays sorted in 0..100",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "1\n101\n0\n0\n",
-            "constraints": [
-              "t 1..10000, n 1..100 and arrays sorted in 0..100"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": [],
-        "scale_summary": {
-          "max_case_chars": 6040006,
           "max_generated_seed": 20
         }
       },
@@ -420,90 +336,6 @@
         "failed": [],
         "scale_summary": {
           "max_case_chars": 1253096,
-          "max_generated_seed": 20
-        }
-      },
-      "sample_reproduced": true,
-      "producecase_reproduced": true
-    },
-    {
-      "local_number": 28405,
-      "title": "小明的刷题计划",
-      "reference_source": "platform Accepted Python3 #52736793",
-      "statistics_url": "http://cs101.openjudge.cn/practice/28405/statistics/",
-      "source_url": "http://cs101.openjudge.cn/practice/solution/52736793/",
-      "license_status": "not declared on the submission page; no license is inferred.",
-      "generator": "g28405",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "reference_seed_smoke": {
-        "seeds": 400,
-        "status": "passed"
-      },
-      "test_cases": 22,
-      "constraints": [
-        [
-          "n<=100000, times 1..9999 and m 1..1000",
-          true
-        ]
-      ],
-      "constraint_counterexample": [
-        "1\n10000\n1\n",
-        [
-          [
-            "n<=100000, times 1..9999 and m 1..1000",
-            false
-          ]
-        ]
-      ],
-      "self_audit": {
-        "distinct_cases": {
-          "total": 21,
-          "distinct": 21,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 21,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.048
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 22,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "n<=100000, times 1..9999 and m 1..1000",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "1\n10000\n1\n",
-            "constraints": [
-              "n<=100000, times 1..9999 and m 1..1000"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": [],
-        "scale_summary": {
-          "max_case_chars": 500012,
           "max_generated_seed": 20
         }
       },
@@ -1610,6 +1442,174 @@
       "producecase_reproduced": true
     },
     {
+      "local_number": 28321,
+      "title": "电影排片",
+      "reference_source": "platform Accepted Python3 #52459418",
+      "statistics_url": "http://cs101.openjudge.cn/practice/28321/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52459418/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g28321",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 22,
+      "constraints": [
+        [
+          "t 1..10000, n 1..100 and arrays sorted in 0..100",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "1\n101\n0\n0\n",
+        [
+          [
+            "t 1..10000, n 1..100 and arrays sorted in 0..100",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 21,
+          "distinct": 21,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 2,
+          "total": 21,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.095
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 22,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "t 1..10000, n 1..100 and arrays sorted in 0..100",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "1\n101\n0\n0\n",
+            "constraints": [
+              "t 1..10000, n 1..100 and arrays sorted in 0..100"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": [],
+        "scale_summary": {
+          "max_case_chars": 1208005,
+          "max_generated_seed": 20
+        }
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
+      "local_number": 28405,
+      "title": "小明的刷题计划",
+      "reference_source": "platform Accepted Python3 #52736793",
+      "statistics_url": "http://cs101.openjudge.cn/practice/28405/statistics/",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52736793/",
+      "license_status": "not declared on the submission page; no license is inferred.",
+      "generator": "g28405",
+      "generator_seed_smoke": {
+        "seeds": 20000,
+        "status": "passed"
+      },
+      "reference_seed_smoke": {
+        "seeds": 400,
+        "status": "passed"
+      },
+      "test_cases": 22,
+      "constraints": [
+        [
+          "n<=100000, times 1..9999 and m 1..1000",
+          true
+        ]
+      ],
+      "constraint_counterexample": [
+        "1\n10000\n1\n",
+        [
+          [
+            "n<=100000, times 1..9999 and m 1..1000",
+            false
+          ]
+        ]
+      ],
+      "self_audit": {
+        "distinct_cases": {
+          "total": 21,
+          "distinct": 21,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 21,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.048
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 22,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "n<=100000, times 1..9999 and m 1..1000",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "1\n10000\n1\n",
+            "constraints": [
+              "n<=100000, times 1..9999 and m 1..1000"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": [],
+        "scale_summary": {
+          "max_case_chars": 100011,
+          "max_generated_seed": 20
+        }
+      },
+      "sample_reproduced": true,
+      "producecase_reproduced": true
+    },
+    {
       "local_number": 29340,
       "title": "极差不小于K",
       "reference_source": "platform Accepted Python3 #52734019",
@@ -1686,7 +1686,7 @@
         },
         "failed": [],
         "scale_summary": {
-          "max_case_chars": 38910,
+          "max_case_chars": 15569,
           "max_generated_seed": 20
         }
       },

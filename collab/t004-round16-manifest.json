@@ -37,32 +37,7 @@
     "**往后每条 pending_rework 都必须带 `machine_gate`**（描述从入库 .in 读哪个字段、最低值多少）：`tools/check_pending_rework.py` 已接进 `--verify`，从清单读要求、从产物读现实、每次现算；没有 machine_gate 的返工项不在这道闸门管辖内，又会退回「靠人记得去查」",
     "**交接摘要里凡涉及具体数值与规模的句子，一律从产物里读出来再写**：round11 摘要称「加入 50×50、100×100」，数据里最大只有一组 50×50。规模这类话直接贴一张实测直方图，就不可能说错"
   ],
-  "pending_rework": [
-    {
-      "local_number": 29340,
-      "round": "r15",
-      "issue": "参考实现在**本站判题器**上过不了自己的数据（已计入语言倍率）",
-      "evidence": "最慢一组（第1组）不加限制需 12.2 秒；该题总限时 1000ms，Python ×10 = 10 秒单组预算",
-      "ask": "压低最慢那一组，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
-      "machine_gate_note": "机械判据是 scripts/t004_judge_round.py（跑本站判题器）"
-    },
-    {
-      "local_number": 28321,
-      "round": "r15",
-      "issue": "参考实现在**本站判题器**上过不了自己的数据（已计入语言倍率）",
-      "evidence": "最慢一组（第1组）需 9.1 秒；该题**单个测试点**限时 300ms，Python ×10 = 3 秒，判题器已按下限给到 4 秒仍不够",
-      "ask": "压低最慢那一组，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
-      "machine_gate_note": "机械判据是 scripts/t004_judge_round.py（跑本站判题器）"
-    },
-    {
-      "local_number": 28405,
-      "round": "r15",
-      "issue": "参考实现在**本站判题器**上过不了自己的数据（已计入语言倍率）",
-      "evidence": "最慢一组（第1组）需 9.6 秒；该题**单个测试点**限时 100ms，Python ×10 = 1 秒，判题器已按下限给到 4 秒仍不够",
-      "ask": "压低最慢那一组，直到 `python3 scripts/t004_judge_round.py <轮次>` 对该题变绿；若判断只能这样，在报告里写清理由",
-      "machine_gate_note": "机械判据是 scripts/t004_judge_round.py（跑本站判题器）"
-    }
-  ],
+  "pending_rework": [],
   "entries": [
     {
       "local_number": 29647,
@@ -597,6 +572,7 @@
   ],
   "judge_limit_note": {
     "resolved": "判题器已按题限时并计入语言倍率（Python ×10、PyPy3 ×3、C/C++ ×1），人已拍板",
-    "correction": "我此前把 18250 判成「数据太重」是**错的**——那是我漏了语言倍率。加上倍率后它的 Python 单组预算是 20 秒（题面 10000ms），实测 Accepted"
+    "correction": "我此前把 18250 判成「数据太重」是**错的**——那是我漏了语言倍率。加上倍率后它的 Python 单组预算是 20 秒（题面 10000ms），实测 Accepted",
+    "resolved_rework": "29340/28321/28405 的最慢一组已压低并重建（改的是 build_t004_round15.py 的 scale_case，不是手改数据，字节复现仍 passed）：28321 t 10000→2000（10.4s→1.8s）、28405 n 100000→20000（8.4s→1.8s）、29340 n 10000→4000（10.6s→4.5s）。本站判题器 20/20 Accepted，平台三题复验 3/3 Accepted"
   }
 }

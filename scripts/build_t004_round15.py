@@ -167,7 +167,10 @@ def scale_case(n):
     if n == 28307:
         k = 5000; return f"10000\n" + " ".join(["1000"] * 10000) + "\n" + " ".join(["1"] * 10000) + f"\n{k}\n"
     if n == 28321:
-        return "10000\n" + "\n".join("100\n" + " ".join(["0"] * 100) + "\n" + " ".join(["100"] * 100) for _ in range(10000)) + "\n"
+        # t 的题面上界是 10000，但**单个测试点**只给 300ms（C++），换算 Python ×10 = 3 秒。
+        # t=10000 时参考要 10.4 秒，本站必然 TLE —— 数据强度要按题目自己的时间预算定，
+        # 不能只看输入上界。t=2000 实测 1.8 秒，约为单组预算的一半。
+        return "2000\n" + "\n".join("100\n" + " ".join(["0"] * 100) + "\n" + " ".join(["100"] * 100) for _ in range(2000)) + "\n"
     if n == 28322: return "100\n" + "\n".join(["encrypt", "abcdefghijklmnopqrstuvwxyz" * 3] * 100) + "\n"
     if n == 28327:
         n, q = 2000, 2000; edges = "\n".join(f"{i} {i+1}" for i in range(1, n)); queries = "\n".join(f"1 {i % (n - 1) + 2}" for i in range(q))
@@ -176,7 +179,9 @@ def scale_case(n):
     if n == 28336: return "ab" * 4999 + "a\n"
     if n == 28404:
         rows = [f"Customer{i},{i % 500 + 1},Food-{i % 20}" for i in range(50000)]; return "50000\n" + "\n".join(rows) + "\n"
-    if n == 28405: return "100000\n" + "\n".join(["9999"] * 100000) + "\n1000\n"
+    # 单个测试点 100ms（C++）→ Python 1 秒，判题器按下限给 4 秒。n=100000 时参考要 8.4 秒。
+    # n=20000 实测 1.8 秒。
+    if n == 28405: return "20000\n" + "\n".join(["9999"] * 20000) + "\n1000\n"
     if n == 28413: return None
     if n == 28416:
         rows = ["20"]
@@ -189,7 +194,9 @@ def scale_case(n):
     if n == 28750: return "500 500\n" + "\n".join("." * 500 for _ in range(500)) + "\n\n" + "\n".join("." * 500 for _ in range(500)) + "\n"
     if n == 28969: return ("0123456789" * 5000) + "\n"
     if n == 28973: return "100\n" + "\n".join(" ".join(["0"] * 100) for _ in range(100)) + "\n"
-    if n == 29340: return "10000\n" + " ".join(str(i % 1000) for i in range(10000)) + "\n500\n"
+    # 总限时 1000ms（C++）→ Python 10 秒。n=10000 时参考要 10.6 秒，正好越线。
+    # n=4000 实测 4.5 秒，约为预算的一半 —— 耗时这个量波动大，余量要留够。
+    if n == 29340: return "4000\n" + " ".join(str(i % 1000) for i in range(4000)) + "\n500\n"
     if n == 29622:
         n, m = 100, 1000; edges = [(i, i + 1, i) for i in range(1, n)] + [(i % n + 1, (i * 17) % n + 1, i + 100) for i in range(m - n + 1)]
         return f"{n} {m}\n" + "\n".join(f"{a} {b} {w}" for a, b, w in edges) + "\n"
