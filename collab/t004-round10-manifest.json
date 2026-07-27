@@ -1,0 +1,447 @@
+{
+  "batch": "T-004-r10",
+  "selection_rule": "从仍缺数据的题里按题号顺序取 20 题；跳过与已有数据同题的（正文 + 时间/内存限制双判据）与题面无样例的。**选批时已逐题查过统计页有没有既有 Accepted**（优先 Python3、其次 G++），结果写在每题的 existing_accepted 字段里。",
+  "count": 20,
+  "route_summary": {
+    "external-accepted": 20,
+    "self-written": 0
+  },
+  "skipped": [
+    {
+      "local_number": 3259,
+      "reason": "题面没有样例（可做，但无样例可锚，须在报告注明）"
+    }
+  ],
+  "delivery_gate": [
+    "有既有 Accepted：直接作为题目实现并构建数据；C++ 放 samplecode.cpp，producecase 走 g++ 编译路径",
+    "外部源码必须注明统计页 / 提交 ID / 源码链接 / 许可状态，reference_source 记真实来源",
+    "无既有 Accepted：才写自己的实现 + 本地对拍，并按三档提交 Python3 → PyPy3 → C++",
+    "参考实现必须拿到平台 Accepted 才算完成；提交前按题拆成单题独立程序（整份分派器会被 pylint 判 E0102）",
+    "报告字段一律走 scripts/t004_common.py 实测；constraint_checklist 必须附一个违规输入反例、证明至少一条约束会翻成 False，题面确实无可机械验证约束时给 exemption",
+    "去重不足 15 组必须给豁免理由；恒定输出探针与变异自检照旧（变异要真改变行为、自检前基线先绿）",
+    "**恒定输出探针是这条流水线上唯一验「数据有没有用」的检查**——round9 的 18076 是活例：生成器为了避开参考实现会崩/会挂的输入形状，收敛到了让算法在第一步就短路的形状，21 组输出全相同；去重/字节复现/复算/约束表五项全部 passed，只有探针喊了。若探针判 accepted，先别急着记豁免——多半是生成器收窄过头了。"
+  ],
+  "entries": [
+    {
+      "local_number": 19984,
+      "title": "合成路线",
+      "source": "data/openjudge/pages/practice__19984.html",
+      "sample_input": "2\n100\n1\n0.8 0.95\n",
+      "sample_output": "0 0\n600.00\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/19984/",
+      "statement_chars": 204,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "22475453",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/22475453/",
+        "accepted_total": 2,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 19998,
+      "title": "教科书般的亵渎",
+      "source": "data/openjudge/pages/practice__19998.html",
+      "sample_input": "2 10\n3 3 5 2 2 6 4 \n1 1 4 8 8 3 7\n",
+      "sample_output": "YES\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/19998/",
+      "statement_chars": 114,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52529434",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52529434/",
+        "accepted_total": 48,
+        "statistics_pages_scanned": 6
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20004,
+      "title": "最大回撤率Biggest Drawdown",
+      "source": "data/openjudge/pages/practice__20004.html",
+      "sample_input": "3.5407% -7.1619% -6.8417% -5.6495% 9.0260% 7.7859% -0.6648% -0.8765% -0.5759% -7.8740%\n",
+      "sample_output": "-18.4% 3\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20004/",
+      "statement_chars": 709,
+      "complexity_hint": "medium",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "43218123",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/43218123/",
+        "accepted_total": 6,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20026,
+      "title": "正交向量族",
+      "source": "data/openjudge/pages/practice__20026.html",
+      "sample_input": "1\n",
+      "sample_output": "1\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20026/",
+      "statement_chars": 183,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52332704",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52332704/",
+        "accepted_total": 14,
+        "statistics_pages_scanned": 3
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20074,
+      "title": "BMI指数",
+      "source": "data/openjudge/pages/practice__20074.html",
+      "sample_input": "2\n170 75 M \n165 45 F\n",
+      "sample_output": "1 1\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20074/",
+      "statement_chars": 172,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "51318992",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/51318992/",
+        "accepted_total": 32,
+        "statistics_pages_scanned": 3
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20075,
+      "title": "寻宝2.0.v0.3",
+      "source": "data/openjudge/pages/practice__20075.html",
+      "sample_input": "3 4 1\n0 0 2 0\n0 2 1 0\n0 0 0 0\n1 1\n",
+      "sample_output": "5\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20075/",
+      "statement_chars": 170,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "51319354",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/51319354/",
+        "accepted_total": 34,
+        "statistics_pages_scanned": 5
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20090,
+      "title": "求个位数",
+      "source": "data/openjudge/pages/practice__20090.html",
+      "sample_input": "1\n2\n",
+      "sample_output": "7\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20090/",
+      "statement_chars": 49,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "42650453",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/42650453/",
+        "accepted_total": 13,
+        "statistics_pages_scanned": 3
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20091,
+      "title": "民主开锁v0.2",
+      "source": "data/openjudge/pages/practice__20091.html",
+      "sample_input": "1\n3\n",
+      "sample_output": "3\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20091/",
+      "statement_chars": 236,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "42729047",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/42729047/",
+        "accepted_total": 6,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20100,
+      "title": "冬泳v0.2",
+      "source": "data/openjudge/pages/practice__20100.html",
+      "sample_input": "4\n6 6 6\n3 4 5\n1 4 6\n",
+      "sample_output": "1\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20100/",
+      "statement_chars": 427,
+      "complexity_hint": "medium",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "43253417",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/43253417/",
+        "accepted_total": 11,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20102,
+      "title": "分圆问题",
+      "source": "data/openjudge/pages/practice__20102.html",
+      "sample_input": "5\n1\n2\n3\n4\n",
+      "sample_output": "1\n2\n4\n8\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20102/",
+      "statement_chars": 85,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52482499",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52482499/",
+        "accepted_total": 9,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20103,
+      "title": "繁荣的步行街v0.2",
+      "source": "data/openjudge/pages/practice__20103.html",
+      "sample_input": "2\n1 3\n3 1\n",
+      "sample_output": "1\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20103/",
+      "statement_chars": 230,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "43490046",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/43490046/",
+        "accepted_total": 7,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20107,
+      "title": "BOOM",
+      "source": "data/openjudge/pages/practice__20107.html",
+      "sample_input": "【样例输入1】\n1\n2 1\n4 4 10\n6 6 20\n【样例输出1】\n1 0 30\n",
+      "sample_output": "【样例输入2】\n4\n3 3\n100 100 30 21 29\n108 108 20 20 20\n50 50 50 10 10\n【样例输出2】\n82 0 50\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20107/",
+      "statement_chars": 437,
+      "complexity_hint": "medium",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "22600399",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/22600399/",
+        "accepted_total": 3,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20121,
+      "title": "解梦人kk",
+      "source": "data/openjudge/pages/practice__20121.html",
+      "sample_input": "3\n2 5 7\n3 9 1\n8 6 4\n",
+      "sample_output": "257146839\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20121/",
+      "statement_chars": 321,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52495947",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52495947/",
+        "accepted_total": 21,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20122,
+      "title": "财报发布日期",
+      "source": "data/openjudge/pages/practice__20122.html",
+      "sample_input": "1 0626\n0320 0418 0816 1024\n",
+      "sample_output": "1\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20122/",
+      "statement_chars": 164,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "42258230",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/42258230/",
+        "accepted_total": 9,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20125,
+      "title": "心理健康",
+      "source": "data/openjudge/pages/practice__20125.html",
+      "sample_input": "input：\n2\n100 100\n\noutput:\n101\n",
+      "sample_output": "input:\n1\n100\n\noutput:\n1\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20125/",
+      "statement_chars": 175,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "41484284",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/41484284/",
+        "accepted_total": 2,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20135,
+      "title": "鹅腿阿姨找纸条",
+      "source": "data/openjudge/pages/practice__20135.html",
+      "sample_input": "4 5\nsdadd\nerahh\nwDave\nqqqqe\ndave\n",
+      "sample_output": "1 2\n1 1\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20135/",
+      "statement_chars": 273,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52789538",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52789538/",
+        "accepted_total": 7,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20136,
+      "title": "Rick's Adventure v0.2",
+      "source": "data/openjudge/pages/practice__20136.html",
+      "sample_input": "7 15\n0 1\n1 0 2 6\n2 1 3 7 14\n3 2 4\n4 3 5\n5 4 6\n6 1 5\n7 2 8\n8 7 9\n9 8 10\n10 9 11\n11 10 12\n12 11 13\n13 12 14\n14 2 13\n",
+      "sample_output": "YES!\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20136/",
+      "statement_chars": 352,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "22633121",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/22633121/",
+        "accepted_total": 2,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20137,
+      "title": "贪吃蛇custom v0.2",
+      "source": "data/openjudge/pages/practice__20137.html",
+      "sample_input": "5 7\n0 1\n1 1\n",
+      "sample_output": "7\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20137/",
+      "statement_chars": 302,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "32302039",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/32302039/",
+        "accepted_total": 5,
+        "statistics_pages_scanned": 1
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20138,
+      "title": "求解多元一次方程组",
+      "source": "data/openjudge/pages/practice__20138.html",
+      "sample_input": "3\n2 3 1 6\n1 -1 2 -1\n1 2 -1 5\n",
+      "sample_output": "x1 = 2.00\nx2 = 1.00\nx3 = -1.00\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20138/",
+      "statement_chars": 72,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "52543271",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/52543271/",
+        "accepted_total": 14,
+        "statistics_pages_scanned": 3
+      },
+      "route": "external-accepted"
+    },
+    {
+      "local_number": 20162,
+      "title": "失联",
+      "source": "data/openjudge/pages/practice__20162.html",
+      "sample_input": "9\n1 10 7 1\n3 3 3 0\n8 2 10 4\n8 2 10 100\n-10 20 -17 2\n-3 2 2 0\n-3 1 2 0\n2 3 2 3\n-1 3 -2 2\n",
+      "sample_output": "7\n0\n4\n0\n30\n5\n4\n0\n3\n",
+      "submit_group": "practice",
+      "submit_path": "/practice/20162/",
+      "statement_chars": 169,
+      "complexity_hint": "low",
+      "existing_accepted": {
+        "looked_up": true,
+        "found": true,
+        "language": "Python3",
+        "solution_id": "51463351",
+        "source_url": "http://cs101.openjudge.cn/practice/solution/51463351/",
+        "accepted_total": 15,
+        "statistics_pages_scanned": 2
+      },
+      "route": "external-accepted"
+    }
+  ],
+  "note_on_external_reference": "平台 Accepted 只保证在**平台自己的数据**上正确。在我们生成的输入上它可能崩溃、可能挂起（18076 的参考在「两分子相同」时 KeyError、在某些长度不等的链上 >30s）。遇到这种情况，正确做法是**把输入调到既合法又能压到算法的形状**，而不是退到参考实现最舒服的那个形状——后者往往就是退化数据。"
+}
