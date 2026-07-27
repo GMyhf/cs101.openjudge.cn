@@ -23,6 +23,16 @@ from judge import judge, language_version
 ROOT = Path(__file__).parent
 DB = Path(os.environ.get("CS101_DB", ROOT / "data" / "course.db"))
 MIRROR = ROOT / "data" / "openjudge"
+BOOK_META = {
+    "practice": {"name": "题库（包括计概、数算题目）", "count": 985},
+    "pctbook": {"name": "计算思维算法实践", "count": 216},
+    "routine": {"name": "数算 2025Spring每日选作", "count": 203},
+    "2025sp_routine": {"name": "数算 2025Spring每日选作", "count": 73},
+    "dsapre": {"name": "数算预习题", "count": 101},
+    "25dsapre": {"name": "数算 2025Spring预习题", "count": 35},
+    "2024fallroutine": {"name": "数算 2024Fall每日选作", "count": 93},
+    "2024sp_routine": {"name": "数算 2024Spring每日选作", "count": 154},
+}
 SMTP_ENV_FILE = ROOT / "data" / ".smtp.env"
 
 if SMTP_ENV_FILE.is_file() and os.environ.get("CS101_LOAD_DOTENV", "1") != "0":
@@ -147,7 +157,7 @@ SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
     </select>
     <button id="go">提交并判题</button>
     <button id="theme" type="button" class="ghost">深色</button>
-    <span id="hint" class="muted"></span>
+    <span id="hint" class="muted">时间倍率：Python ×10 · PyPy3 ×3 · C/C++ ×1；题面时限按 C/C++ 计算，为全部测试点限时之和。</span>
   </div>
 </form>
 <div id="verdict"></div>
@@ -680,7 +690,7 @@ class Handler(BaseHTTPRequestHandler):
         stats_html = stats.group(1).strip() if stats else ""
         return f"""<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{escape(title)} · CS101 本地题库</title>
+<title>{escape(title)} · CS101 本机判题</title>
 <style>
 :root{{--ink:#16231d;--muted:#6c7b73;--line:#dfe7e1;--bg:#f4f7f4;--paper:#fff;--green:#237a50;--green-soft:#e5f3eb;--amber:#c87828}}
 *{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 system-ui,-apple-system,"Segoe UI",sans-serif}}
@@ -759,8 +769,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             book, problem_id = submit_page.groups()
             language_options = "".join(
                 f'<option value="{key}">{escape(language_version(key))}</option>'
-                for key in ("cpp", "c", "java", "pascal", "python", "pypy3")
-                if key in {"cpp", "c", "python", "pypy3"}
+                for key in ("cpp", "c", "python", "pypy3", "dotnet10")
             )
             body = (SUBMIT_PAGE.replace("__BOOK__", escape(book))
                     .replace("__PROBLEM__", escape(problem_id))
@@ -834,6 +843,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             if catalog.is_file():
                 payload = json.loads(catalog.read_text(encoding="utf-8"))
                 payload["problems"] = [{**item, "title": catalog_title(item)} for item in payload.get("problems", [])]
+                payload["book_meta"] = BOOK_META
                 self.send_json(payload); return
         file = ROOT / ("index.html" if path in ("/", "") else decoded_path.lstrip("/"))
         if file.is_file() and ROOT in file.parents:

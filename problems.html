@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>题库目录 · CS101</title>
+<title>题库目录 · CS101 本机判题</title>
 <style>
   :root { --ink:#17221d; --muted:#6b7a72; --line:#d9e0da; --ok:#2f7d55; --none:#a8b2ab; --bg:#f7f9f7; }
   * { box-sizing: border-box; }
@@ -53,14 +53,15 @@
 
 <script>
 const els = { q: q, book: book, only: only, rows: rows, count: count, empty: empty };
-let all = [];
+let all = [], bookMeta = {};
 
 fetch('/api/catalog', { credentials: 'same-origin' })
   .then(r => r.json())
   .then(data => {
     all = data.problems || [];
+    bookMeta = data.book_meta || {};
     for (const b of [...new Set(all.map(p => p.book))].sort()) {
-      els.book.insertAdjacentHTML('beforeend', `<option value="${b}">${b}</option>`);
+      els.book.insertAdjacentHTML('beforeend', `<option value="${b}">${(bookMeta[b] || {}).name || b}</option>`);
     }
     render();
   })
@@ -85,7 +86,7 @@ function render() {
     const has = judgeable(p);
     return `<tr>
       <td class="num"><a class="pid" href="${p.path}">${p.id}</a></td>
-      <td>${p.book}</td>
+      <td>${(bookMeta[p.book] || {}).name || p.book}</td>
       <td><span class="tag ${has ? 'ok' : 'none'}">${has ? '可判' : '暂无数据'}</span></td>
       <td class="num">${has ? p.test_count : '—'}</td>
       <td><a class="go" href="${p.path}submit/">${has ? '去提交 →' : ''}</a></td>

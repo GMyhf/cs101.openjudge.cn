@@ -186,6 +186,14 @@ class ServerApiTests(unittest.TestCase):
         self.assertIn("题库目录", text)
         self.assertIn("/api/catalog", text)          # 目录页的数据来源
 
+    def test_catalog_exposes_display_book_names(self):
+        status, _, body = request(self.port, "GET", "/api/catalog")
+        self.assertEqual(status, 200)
+        meta = json.loads(body)["book_meta"]
+        self.assertEqual(meta["practice"]["name"], "题库（包括计概、数算题目）")
+        self.assertEqual(meta["practice"]["count"], 985)
+        self.assertEqual(meta["pctbook"]["name"], "计算思维算法实践")
+
     def test_submit_page_renders_without_placeholders(self):
         status, _, body = request(self.port, "GET", f"/{SUBMIT_BOOK}/{SUBMIT_PROBLEM}/submit/")
         self.assertEqual(status, 200)
@@ -197,6 +205,8 @@ class ServerApiTests(unittest.TestCase):
         self.assertIn("G++(", text)
         self.assertIn("Python3(", text)
         self.assertIn("PyPy3(", text)
+        self.assertIn('value="dotnet10">.NET SDK 10', text)
+        self.assertIn("Python ×10", text)
         for placeholder in ("__BOOK__", "__PROBLEM__"):
             self.assertNotIn(placeholder, text)      # 模板占位符必须已被替换
 

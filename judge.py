@@ -17,6 +17,7 @@ MIRROR = ROOT / "data" / "openjudge"
 # 宿主 CPython 是 3.12，语法能力并不一致，所以 PyPy 的语法检查必须交给它自己做。
 CPYTHON_LANGUAGES = {"python", "py", "python3"}
 PYPY_LANGUAGES = {"pypy", "pypy3"}
+DOTNET_LANGUAGES = {"dotnet", "dotnet10"}
 # 只做语法检查、不执行用户代码；compile() 本身不运行被编译的源码。
 SYNTAX_CHECK = "import sys;compile(open(sys.argv[1],encoding='utf-8').read(),sys.argv[1],'exec')"
 
@@ -29,7 +30,7 @@ SYNTAX_CHECK = "import sys;compile(open(sys.argv[1],encoding='utf-8').read(),sys
 # 漏掉倍率就会把 Python 提交按 C++ 的尺子量 —— 18250 的 Python 时限本该是
 # 10000ms × 10 = 100 秒，我第一版只给了 10 秒，于是把「实现慢」误判成了「数据太重」。
 LANGUAGE_TIME_MULTIPLIER = {"python": 10, "py": 10, "python3": 10, "pypy": 3, "pypy3": 3,
-                            "c": 1, "cpp": 1}
+                            "c": 1, "cpp": 1, "c++": 1, "dotnet": 1, "dotnet10": 1}
 CASE_FLOOR_S = 4
 CASE_CAP_S = 20
 # 整次提交的墙钟硬顶。改动前这一项无界：组数最多的一题有 150 组，150 × 5s = 750 秒。
@@ -113,6 +114,8 @@ def language_version(language):
         raw = subprocess.run(["gcc", "--version"], capture_output=True, text=True, timeout=5).stdout
         match = re.search(r"\b(\d+\.\d+)(?:\.\d+)?\b", raw)
         value = f"GCC({match.group(1) if match else 'unknown'})"
+    elif key in DOTNET_LANGUAGES:
+        value = ".NET SDK 10"
     else:
         value = str(language)
     LANGUAGE_VERSION_CACHE[key] = value
@@ -135,9 +138,34 @@ def judge(book, problem_id, language, source):
     if len(source.encode()) > 512 * 1024: return {"status": "Source Too Large", "message": "代码不能超过 512 KiB。"}
     language = language.lower()
     with tempfile.TemporaryDirectory(prefix="cs101-judge-") as temp:
-        work = Path(temp); ext = ".py" if language in CPYTHON_LANGUAGES | PYPY_LANGUAGES else ".c" if language == "c" else ".cpp"
-        source_path = work / ("main" + ext); source_path.write_text(source, encoding="utf-8")
-        if ext == ".py":
+        work = Path(temp)
+        if language in DOTNET_LANGUAGES:
+            dotnet = shutil.which("dotnet")
+            if dotnet is None:
+                return {"status": "Language Unavailable", "message": ".NET SDK 10 未安装，换一种语言提交。"}
+            source_path = work / "Program.cs"
+            source_path.write_text(source, encoding="utf-8")
+            project = work / "Judge.csproj"
+            project.write_text(
+                '<Project Sdk="Microsoft.NET.Sdk">\n'
+                '  <PropertyGroup>\n'
+                '    <OutputType>Exe</OutputType>\n'
+                '    <TargetFramework>net10.0</TargetFramework>\n'
+                '    <ImplicitUsings>disable</ImplicitUsings>\n'
+                '    <Nullable>disable</Nullable>\n'
+                '  </PropertyGroup>\n'
+                '</Project>\n', encoding="utf-8")
+            compile_result = _run([dotnet, "build", str(project), "--nologo", "-c", "Release", "-o", str(work / "out")],
+                                  cwd=work, timeout=30)
+            if compile_result.returncode:
+                return {"status": "Compile Error", "message": compile_result.stderr.decode(errors="replace")[-4000:]}
+            command = [str(work / "out" / "Judge")]
+        else:
+            ext = ".py" if language in CPYTHON_LANGUAGES | PYPY_LANGUAGES else ".c" if language == "c" else ".cpp"
+            source_path = work / ("main" + ext); source_path.write_text(source, encoding="utf-8")
+        if language in DOTNET_LANGUAGES:
+            pass
+        elif ext == ".py":
             interpreter = "pypy3" if language in PYPY_LANGUAGES else "python3"
             # 必须解析成绝对路径再交给子进程：shutil.which 查的是**本进程**的 PATH，
             # 而子进程拿的是上面那份受限 PATH，两者不一致时裸名字会 FileNotFoundError
