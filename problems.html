@@ -57,7 +57,7 @@
 
 <script>
 const els = { q: q, book: book, only: only, rows: rows, count: count, empty: empty };
-let all = [], bookMeta = {}, pageNumber = 1;
+let all = [], bookMeta = {}, pageNumber = 1, dataUniqueTotal = 0, dataUniqueTested = 0;
 const pageSize = 50;
 const requestedBook = new URLSearchParams(location.search).get('book') || '';
 
@@ -66,6 +66,8 @@ fetch('/api/catalog', { credentials: 'same-origin' })
   .then(data => {
     all = data.problems || [];
     bookMeta = data.book_meta || {};
+    dataUniqueTotal = data.unique_total || 0;
+    dataUniqueTested = data.unique_tested_count || 0;
     for (const b of [...new Set(all.map(p => p.book))].sort()) {
       els.book.insertAdjacentHTML('beforeend', `<option value="${b}">${(bookMeta[b] || {}).name || b}</option>`);
     }
@@ -90,11 +92,11 @@ function render() {
     (!onlyOk || judgeable(p)) &&
     (!term || p.id.toLowerCase().includes(term)));
 
-  const total = all.length, ok = all.filter(judgeable).length;
+  const total = dataUniqueTotal, ok = dataUniqueTested;
   const pages = Math.max(1, Math.ceil(hits.length / pageSize));
   pageNumber = Math.min(pageNumber, pages);
   const visible = hits.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
-  els.count.textContent = `显示 ${hits.length} 题 · 全库 ${ok}/${total} 有本地数据`;
+  els.count.textContent = `显示 ${hits.length} 题 · 全库 ${ok}/${total} 个唯一题目有本地数据`;
   els.empty.hidden = hits.length > 0;
   // 一次性拼串再写入：全库 1800+ 行，逐行 append 会明显卡顿
   els.rows.innerHTML = visible.map(p => {

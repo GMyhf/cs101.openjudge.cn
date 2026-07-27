@@ -234,9 +234,17 @@ class ServerApiTests(unittest.TestCase):
         self.assertIn('value="vbnet">VB.NET (.NET SDK 10)', text)
         self.assertIn('value="swift">Swift(', text)
         self.assertIn('value="objc">Objective-C(', text)
-        self.assertIn("Python ×10", text)
+        self.assertIn("workspace-layout", text)
+        self.assertNotIn("Python ×10", text)
         for placeholder in ("__BOOK__", "__PROBLEM__"):
             self.assertNotIn(placeholder, text)      # 模板占位符必须已被替换
+
+    def test_help_page_exposes_runtime_rules(self):
+        status, _, body = request(self.port, "GET", "/help/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn("Python ×10", text)
+        self.assertIn("C#/F#/VB.NET 内存 ×2", text)
 
     def test_history_page_exposes_error_details(self):
         status, _, body = request(self.port, "GET", "/history/")
