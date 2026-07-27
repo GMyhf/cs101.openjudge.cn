@@ -96,7 +96,7 @@ function render() {
   const pages = Math.max(1, Math.ceil(hits.length / pageSize));
   pageNumber = Math.min(pageNumber, pages);
   const visible = hits.slice((pageNumber - 1) * pageSize, pageNumber * pageSize);
-  els.count.textContent = `显示 ${hits.length} 题 · 全库 ${ok}/${total} 个唯一题目有本地数据`;
+  els.count.textContent = `显示 ${hits.length} 题`;
   els.empty.hidden = hits.length > 0;
   // 一次性拼串再写入：全库 1800+ 行，逐行 append 会明显卡顿
   els.rows.innerHTML = visible.map(p => {
@@ -106,7 +106,7 @@ function render() {
       <td><a class="pid" href="${p.path}">${titleOf(p)}</a></td>
       <td class="num">${p.pass_rate || '—'}</td>
       <td class="num">${p.accepted_count ? `<a class="pid" href="/history/?book=${encodeURIComponent(p.book)}&problem=${encodeURIComponent(p.id)}">${p.accepted_count}</a>` : '—'}</td>
-      <td class="num">${p.attempt_count || '—'}</td>
+      <td class="num">${p.attempt_count ? `<a class="pid" href="/history/?book=${encodeURIComponent(p.book)}&problem=${encodeURIComponent(p.id)}">${p.attempt_count}</a>` : '—'}</td>
       <td><span class="tag ${has ? 'ok' : 'none'}">${has ? '可判' : '暂无数据'}</span></td>
       <td class="num">${has ? p.test_count : '—'}</td>
     </tr>`;
