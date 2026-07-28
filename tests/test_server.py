@@ -23,7 +23,11 @@ SUBMIT_PROBLEM = "E03406"
 
 
 def request(port, method, path, body=None, cookie=None):
-    connection = http.client.HTTPConnection("127.0.0.1", port, timeout=8)
+    # 8 秒对判题类请求太紧：一次提交要真的跑完全部测试点，编译型语言还要先编译，
+    # 而闸门是全量跑（`full_sweep` 之后机器正忙）。2026-07-28 就这么假红过一次。
+    # 服务端启动等待早已因同样的原因从 8 秒放宽到 30 秒，这里一直没跟上。
+    # **一个偶尔发红的闸门，正是让真红被忽略的机制** —— 宁可等久一点。
+    connection = http.client.HTTPConnection("127.0.0.1", port, timeout=60)
     headers = {"Content-Type": "application/json"}
     if cookie:
         headers["Cookie"] = cookie
@@ -765,6 +769,58 @@ class ServerApiTests(unittest.TestCase):
         }, cookie=cookie)
         self.assertEqual(status, 404)
         self.assertEqual(json.loads(raw)["status"], "Problem Not Found")
+
+    def test_run_endpoint_enforces_a_per_user_quota(self):
+        """互斥只挡「同时」，挡不住「一直」：一个登录用户可以串行地无限次跑任意代码。
+
+        用不存在的题号把额度耗完 —— 配额在题号校验之前记账，所以这 30 次不会真的
+        执行代码，测试跑得快；随后对**合法**题号也必须被挡下，才说明限的是运行本身。
+        """
+        import server
+        cookie = self.register_and_login("t013_quota", "T013-password")
+        bogus = {"book": SUBMIT_BOOK, "problem": "NOT-IN-CATALOG", "language": "python",
+                 "source": "print(1)", "stdin": ""}
+        codes = [request(self.port, "POST", "/api/run", bogus, cookie=cookie)[0]
+                 for _ in range(server.RUN_QUOTA_MAX)]
+        self.assertEqual(set(codes), {404}, "额度用完之前应当只是题号不存在")
+
+        status, _, raw = request(self.port, "POST", "/api/run", {
+            "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
+            "source": "print(1)", "stdin": "",
+        }, cookie=cookie)
+        self.assertEqual(status, 429)
+        payload = json.loads(raw)
+        self.assertEqual(payload["status"], "Rate Limited")
+        self.assertGreater(payload["retry_after"], 0)
+
+        # 配额是按用户算的：另一个人不受影响
+        other = self.register_and_login("t013_quota_other", "T013-password")
+        status, _, _ = request(self.port, "POST", "/api/run", {
+            "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
+            "source": "print(1)", "stdin": "",
+        }, cookie=other)
+        self.assertEqual(status, 200)
+
+    def test_run_quota_window_actually_expires(self):
+        """滑动窗口必须真的滑动 —— 不清旧记录的话，用满一次就被永久挡住。
+
+        上一条测不到这件事（它跑不了 5 分钟），所以直接对纯函数验，
+        临时把窗口缩到 1 秒。变异自检里「窗口永不过期」正是靠这条才会红。
+        """
+        import server
+        original = server.RUN_QUOTA_WINDOW_SECONDS
+        server.RUN_HISTORY.clear()
+        server.RUN_QUOTA_WINDOW_SECONDS = 1
+        try:
+            for _ in range(server.RUN_QUOTA_MAX):
+                self.assertEqual(server.run_quota_retry_after("window_user"), 0)
+            self.assertGreater(server.run_quota_retry_after("window_user"), 0, "额度应已用尽")
+            time.sleep(1.2)
+            self.assertEqual(server.run_quota_retry_after("window_user"), 0,
+                             "窗口过去之后额度必须恢复")
+        finally:
+            server.RUN_QUOTA_WINDOW_SECONDS = original
+            server.RUN_HISTORY.clear()
 
     def test_run_endpoint_rejects_oversized_stdin(self):
         cookie = self.register_and_login("t010_runner_big", "T010-password")

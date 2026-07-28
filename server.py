@@ -106,6 +106,32 @@ def parse_sample_sections(text, truncate_explanations=True):
 JUDGE_SLOTS = set()
 JUDGE_SLOTS_LOCK = threading.Lock()
 
+RUN_QUOTA_WINDOW_SECONDS = 300
+RUN_QUOTA_MAX = 30
+RUN_HISTORY = {}
+RUN_QUOTA_LOCK = threading.Lock()
+
+
+def run_quota_retry_after(user):
+    """「运行样例」的每用户配额：滑动 5 分钟窗口内最多 30 次。
+
+    互斥只挡住「同时」，挡不住「一直」—— 一个登录用户可以串行地无限次调用它跑任意代码。
+    额度定得比调试节奏宽：改一版跑一次，5 分钟 30 次远够用；持续滥用则被压到 6 次/分钟。
+    计数按用户名，与登录限速同一个理由：一个班常共用出口 IP，按 IP 会把整班一起限住。
+
+    返回还需等待的秒数；0 表示放行（并已记账）。
+    """
+    key = (user or "").lower()
+    now = time.time()
+    with RUN_QUOTA_LOCK:
+        stamps = [t for t in RUN_HISTORY.get(key, []) if now - t < RUN_QUOTA_WINDOW_SECONDS]
+        if len(stamps) >= RUN_QUOTA_MAX:
+            RUN_HISTORY[key] = stamps
+            return max(1, round(RUN_QUOTA_WINDOW_SECONDS - (now - stamps[0])))
+        stamps.append(now)
+        RUN_HISTORY[key] = stamps
+        return 0
+
 
 @contextlib.contextmanager
 def judging_slot(user):
@@ -1804,6 +1830,11 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
         if path in {"/api/run", "/api/run/"} and self.authorized():
             # 「运行样例」：和提交走同一套沙箱，但不写 submissions 表、不计入统计。
             book, problem = data.get("book", ""), data.get("problem", "")
+            # 配额放在题号校验之前：超额的请求不该再去解析 4.1MB 的 catalog。
+            retry_after = run_quota_retry_after(self.current_user() or ADMIN_USER)
+            if retry_after:
+                self.send_json({"status": "Rate Limited", "retry_after": retry_after,
+                                "message": f"运行样例太频繁了，请 {retry_after} 秒后再试。"}, 429); return
             if not problem_exists(book, problem):
                 self.send_json({"status": "Problem Not Found", "message": "本地题库中没有这道题。"}, 404); return
             with judging_slot(self.current_user() or ADMIN_USER) as got_slot:
