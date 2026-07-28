@@ -108,28 +108,32 @@ JUDGE_SLOTS_LOCK = threading.Lock()
 
 RUN_QUOTA_WINDOW_SECONDS = 300
 RUN_QUOTA_MAX = 30
-RUN_HISTORY = {}
-RUN_QUOTA_LOCK = threading.Lock()
+# 提交比运行样例重得多：一次要跑完全部测试点（最长 300 秒），还会入库留痕。
+# 所以窗口更长、次数更少 —— 2 次/分钟的持续上限，对「改一版交一版」绰绰有余。
+SUBMIT_QUOTA_WINDOW_SECONDS = 600
+SUBMIT_QUOTA_MAX = 20
+QUOTA_HISTORY = {}
+QUOTA_LOCK = threading.Lock()
 
 
-def run_quota_retry_after(user):
-    """「运行样例」的每用户配额：滑动 5 分钟窗口内最多 30 次。
+def quota_retry_after(bucket, user, window, limit):
+    """每用户滑动窗口配额。返回还需等待的秒数；0 表示放行（并已记账）。
 
-    互斥只挡住「同时」，挡不住「一直」—— 一个登录用户可以串行地无限次调用它跑任意代码。
-    额度定得比调试节奏宽：改一版跑一次，5 分钟 30 次远够用；持续滥用则被压到 6 次/分钟。
-    计数按用户名，与登录限速同一个理由：一个班常共用出口 IP，按 IP 会把整班一起限住。
+    互斥只挡「同时」，挡不住「一直」—— 一个登录用户可以串行地无限次要求我们执行代码。
+    计数按用户名而非 IP，与登录限速同一理由：一个班常共用出口 IP，按 IP 会把整班一起限住。
 
-    返回还需等待的秒数；0 表示放行（并已记账）。
+    限的是**请求我们执行**这件事，不是「成功执行」：题号不存在、编译失败一样计数，
+    否则拿无效请求刷同样能把机器占满。
     """
-    key = (user or "").lower()
+    key = (bucket, (user or "").lower())
     now = time.time()
-    with RUN_QUOTA_LOCK:
-        stamps = [t for t in RUN_HISTORY.get(key, []) if now - t < RUN_QUOTA_WINDOW_SECONDS]
-        if len(stamps) >= RUN_QUOTA_MAX:
-            RUN_HISTORY[key] = stamps
-            return max(1, round(RUN_QUOTA_WINDOW_SECONDS - (now - stamps[0])))
+    with QUOTA_LOCK:
+        stamps = [t for t in QUOTA_HISTORY.get(key, []) if now - t < window]
+        if len(stamps) >= limit:
+            QUOTA_HISTORY[key] = stamps
+            return max(1, round(window - (now - stamps[0])))
         stamps.append(now)
-        RUN_HISTORY[key] = stamps
+        QUOTA_HISTORY[key] = stamps
         return 0
 
 
@@ -1831,7 +1835,8 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             # 「运行样例」：和提交走同一套沙箱，但不写 submissions 表、不计入统计。
             book, problem = data.get("book", ""), data.get("problem", "")
             # 配额放在题号校验之前：超额的请求不该再去解析 4.1MB 的 catalog。
-            retry_after = run_quota_retry_after(self.current_user() or ADMIN_USER)
+            retry_after = quota_retry_after("run", self.current_user() or ADMIN_USER,
+                                            RUN_QUOTA_WINDOW_SECONDS, RUN_QUOTA_MAX)
             if retry_after:
                 self.send_json({"status": "Rate Limited", "retry_after": retry_after,
                                 "message": f"运行样例太频繁了，请 {retry_after} 秒后再试。"}, 429); return
@@ -1846,6 +1851,11 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
         if path in {"/api/submit", "/api/submit/"} and self.authorized():
             book, problem = data.get("book", ""), data.get("problem", "")
             language = data.get("language", "python")
+            retry_after = quota_retry_after("submit", self.current_user() or ADMIN_USER,
+                                            SUBMIT_QUOTA_WINDOW_SECONDS, SUBMIT_QUOTA_MAX)
+            if retry_after:
+                self.send_json({"status": "Rate Limited", "retry_after": retry_after,
+                                "message": f"提交太频繁了，请 {retry_after} 秒后再试。"}, 429); return
             with judging_slot(self.current_user() or ADMIN_USER) as got_slot:
                 if not got_slot:
                     self.send_json({"status": "Busy", "message": "上一次判题还在跑，等它结束再试。"}, 429); return

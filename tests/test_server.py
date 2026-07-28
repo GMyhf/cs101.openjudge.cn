@@ -809,18 +809,60 @@ class ServerApiTests(unittest.TestCase):
         """
         import server
         original = server.RUN_QUOTA_WINDOW_SECONDS
-        server.RUN_HISTORY.clear()
+        server.QUOTA_HISTORY.clear()
         server.RUN_QUOTA_WINDOW_SECONDS = 1
         try:
             for _ in range(server.RUN_QUOTA_MAX):
-                self.assertEqual(server.run_quota_retry_after("window_user"), 0)
-            self.assertGreater(server.run_quota_retry_after("window_user"), 0, "额度应已用尽")
+                self.assertEqual(server.quota_retry_after("run", "window_user", 1, server.RUN_QUOTA_MAX), 0)
+            self.assertGreater(server.quota_retry_after("run", "window_user", 1, server.RUN_QUOTA_MAX), 0, "额度应已用尽")
             time.sleep(1.2)
-            self.assertEqual(server.run_quota_retry_after("window_user"), 0,
+            self.assertEqual(server.quota_retry_after("run", "window_user", 1, server.RUN_QUOTA_MAX), 0,
                              "窗口过去之后额度必须恢复")
         finally:
             server.RUN_QUOTA_WINDOW_SECONDS = original
-            server.RUN_HISTORY.clear()
+            server.QUOTA_HISTORY.clear()
+
+    def test_submit_endpoint_enforces_a_per_user_quota(self):
+        """提交也要有配额：互斥只挡「同时」，一个人串行刷提交照样能把判题机占满。
+
+        额度比运行样例更紧（提交要跑完全部测试点、最长 300 秒，还会入库）。
+        为了不真的判 20 次，先把窗口和额度临时调小 —— 改的是服务端进程里的模块常量，
+        所以这里直接对纯函数验额度语义，再用一次真实请求确认端点确实接了这个闸。
+        """
+        import server
+        server.QUOTA_HISTORY.clear()
+        try:
+            for _ in range(server.SUBMIT_QUOTA_MAX):
+                self.assertEqual(server.quota_retry_after(
+                    "submit", "quota_user", server.SUBMIT_QUOTA_WINDOW_SECONDS,
+                    server.SUBMIT_QUOTA_MAX), 0)
+            self.assertGreater(server.quota_retry_after(
+                "submit", "quota_user", server.SUBMIT_QUOTA_WINDOW_SECONDS,
+                server.SUBMIT_QUOTA_MAX), 0, "提交额度用尽后必须开始拒绝")
+            # run 与 submit 是两个独立的桶，不该互相消耗。
+            # 要把整整一份 run 额度用满才验得出来：只试一次的话，共用一个桶时
+            # 剩余空间仍然够那一次，测试照样绿 —— 变异自检就是这么发现这条太松的。
+            for attempt in range(server.RUN_QUOTA_MAX):
+                self.assertEqual(server.quota_retry_after(
+                    "run", "quota_user", server.RUN_QUOTA_WINDOW_SECONDS,
+                    server.RUN_QUOTA_MAX), 0,
+                    f"运行样例的额度不该被提交吃掉（第 {attempt + 1} 次就被挡了）")
+        finally:
+            server.QUOTA_HISTORY.clear()
+
+        # 端点真的接上了这个闸：额度耗尽后连合法提交也被挡下
+        cookie = self.register_and_login("t014_submit_quota", "T014-password")
+        codes = []
+        for _ in range(server.SUBMIT_QUOTA_MAX + 1):
+            status, _, raw = request(self.port, "POST", "/api/submit", {
+                "book": SUBMIT_BOOK, "problem": "NOT-IN-CATALOG",
+                "language": "python", "source": "print(1)",
+            }, cookie=cookie)
+            codes.append(status)
+            if status == 429:
+                self.assertEqual(json.loads(raw)["status"], "Rate Limited")
+                break
+        self.assertIn(429, codes, f"提交应在第 {server.SUBMIT_QUOTA_MAX + 1} 次被挡下，实际 {codes}")
 
     def test_run_endpoint_rejects_oversized_stdin(self):
         cookie = self.register_and_login("t010_runner_big", "T010-password")
