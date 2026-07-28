@@ -1612,9 +1612,12 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                     body = response.read()
                     content_type = response.headers.get("Content-Type", "text/html; charset=UTF-8")
             except urllib.error.HTTPError as upstream_error:
-                # 改动前这里不分状态一律回 200，于是打错的 URL 也会拿到 200 +
-                # 上游首页。副作用不止是难看：任何针对本站的测试都没法拿状态码当判据
-                # （T-010 的静态白名单测试就因此只能断言响应内容）。
+                # 改动前这里不分状态一律写死 200。但要说清楚：**光改这里并不能让
+                # 状态码变得可信** —— 实测上游 cs101.openjudge.cn 对不存在的路径
+                # 自己就返回 200（软 404），所以打错的 URL 依然是 200 + 上游页面。
+                # 这里只保证「上游真的报错时不再被我们粉饰成 200」。
+                # 也因此，T-010 的静态白名单测试必须断言响应内容而不是状态码 ——
+                # 那不是我们的实现问题，是上游行为决定的，改不掉。
                 status = upstream_error.code
                 body = upstream_error.read()
                 content_type = upstream_error.headers.get("Content-Type", "text/html; charset=UTF-8")
