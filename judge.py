@@ -315,6 +315,16 @@ def run_sample(book, problem_id, language, source, stdin):
         return {"status": "OK", **metrics, "stdout": stdout, "stderr": stderr}
 
 
+def problem_exists(book, problem_id):
+    """Return whether a requested run/submit target is in the local catalog."""
+    try:
+        catalog = json.loads((MIRROR / "catalog.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    return any(p.get("book") == book and p.get("id") == problem_id
+               for p in catalog.get("problems", []))
+
+
 def judge(book, problem_id, language, source):
     catalog_path = MIRROR / "catalog.json"
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))

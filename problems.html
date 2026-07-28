@@ -8,7 +8,7 @@
 <style>
   * { box-sizing: border-box; }
   body { font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink);
-         margin:0; padding:28px 20px 60px; background:var(--panel); }
+         margin:0; padding:0 0 60px; background:var(--panel); }
   .wrap { max-width:980px; margin:0 auto; }
   h1 { font-size:26px; margin:0 0 4px; }
   .sub { color:var(--muted); margin:0 0 22px; }
@@ -37,6 +37,7 @@
   .pagination button:disabled { opacity:.45; cursor:default; }
   @media (max-width:620px) { th:nth-child(4), td:nth-child(4) { display:none; } }
 </style>
+<header class="topbar"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><nav class="topnav"><a href="/problems/">题库</a><a href="/history/">提交记录</a><a href="/help/">说明</a><button id="theme" type="button" class="ghost theme-toggle">深色</button><a id="account" href="/auth/login/">登录</a></nav></header>
 <div class="wrap">
   <h1 id="pageTitle">题库目录</h1>
   <p class="sub">标注每道题在本地是否有测试数据可判。<a href="/history/">提交记录</a> · <a href="/">返回首页</a></p>
@@ -122,4 +123,5 @@ for (const el of [els.q, els.book, els.only]) {
 prev.addEventListener('click', () => { pageNumber -= 1; render(); });
 next.addEventListener('click', () => { pageNumber += 1; render(); });
 </script>
+<script>const themeBtn=document.querySelector('#theme');function applyTheme(n){document.documentElement.dataset.theme=n;themeBtn.textContent=n==='dark'?'浅色':'深色';try{localStorage.setItem('cs101-theme',n)}catch(e){}}applyTheme(document.documentElement.dataset.theme==='dark'?'dark':'light');themeBtn.onclick=()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');fetch('/api/me').then(r=>r.json()).then(d=>{if(d.authenticated){account.textContent=d.user;account.href='/history/?mine=1'}}).catch(()=>{});</script>
 </html>

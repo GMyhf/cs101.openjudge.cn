@@ -8,7 +8,7 @@
 <style>
   * { box-sizing:border-box; }
   body { font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink);
-         max-width:820px; margin:0 auto; padding:28px 20px 80px; }
+         margin:0; padding:0 0 80px; }
   h1 { font-size:24px; margin:0 0 4px; }
   h2 { font-size:16px; margin:28px 0 10px; }
   .sub { color:var(--muted); margin:0 0 20px; }
@@ -37,6 +37,8 @@
   #gate { color:var(--warn); margin-bottom:16px; }
   .muted { color:var(--muted); }
 </style>
+<header class="topbar"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><nav class="topnav"><a href="/problems/">题库</a><a href="/history/">提交记录</a><a href="/help/">说明</a><button id="theme" type="button" class="ghost theme-toggle">深色</button><a id="account" href="/auth/login/">登录</a></nav></header>
+<main style="max-width:820px;margin:0 auto;padding:28px 20px 0">
 <h1>判题设置</h1>
 <p class="sub">仅管理员可改。<a href="/problems/">题库目录</a></p>
 
@@ -171,4 +173,6 @@ Promise.all([
   paint();
 });
 </script>
+ </main>
+<script>const themeBtn=document.querySelector('#theme');function applyTheme(n){document.documentElement.dataset.theme=n;themeBtn.textContent=n==='dark'?'浅色':'深色';try{localStorage.setItem('cs101-theme',n)}catch(e){}}applyTheme(document.documentElement.dataset.theme==='dark'?'dark':'light');themeBtn.onclick=()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');fetch('/api/me').then(r=>r.json()).then(d=>{if(d.authenticated){account.textContent=d.user;account.href='/history/?mine=1'}}).catch(()=>{});</script>
 </html>

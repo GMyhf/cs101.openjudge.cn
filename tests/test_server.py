@@ -743,6 +743,15 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(raw)["status"], "Runtime Error")
 
+    def test_run_endpoint_rejects_unknown_problem(self):
+        cookie = self.register_and_login("t010_unknown_run", "T010-password")
+        status, _, raw = request(self.port, "POST", "/api/run", {
+            "book": SUBMIT_BOOK, "problem": "NOT-IN-CATALOG", "language": "python",
+            "source": "print('should not execute')", "stdin": "",
+        }, cookie=cookie)
+        self.assertEqual(status, 404)
+        self.assertEqual(json.loads(raw)["status"], "Problem Not Found")
+
     def test_run_endpoint_rejects_oversized_stdin(self):
         cookie = self.register_and_login("t010_runner_big", "T010-password")
         status, _, raw = request(self.port, "POST", "/api/run", {

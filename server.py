@@ -20,7 +20,7 @@ from email.message import EmailMessage
 from html import escape, unescape
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
-from judge import judge, language_version, run_sample
+from judge import judge, language_version, problem_exists, run_sample
 
 ROOT = Path(__file__).parent
 DB = Path(os.environ.get("CS101_DB", ROOT / "data" / "course.db"))
@@ -1679,6 +1679,8 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
         if path in {"/api/run", "/api/run/"} and self.authorized():
             # 「运行样例」：和提交走同一套沙箱，但不写 submissions 表、不计入统计。
             book, problem = data.get("book", ""), data.get("problem", "")
+            if not problem_exists(book, problem):
+                self.send_json({"status": "Problem Not Found", "message": "本地题库中没有这道题。"}, 404); return
             with judging_slot(self.current_user() or ADMIN_USER) as got_slot:
                 if not got_slot:
                     self.send_json({"status": "Busy", "message": "上一次判题还在跑，等它结束再试。"}, 429); return

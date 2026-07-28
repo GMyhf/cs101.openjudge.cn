@@ -30,6 +30,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 TESTS = ROOT / "data" / "openjudge" / "tests"
 FSIZE_LIMIT = 2 * 1024 * 1024          # judge.py 的 RLIMIT_FSIZE
 DEGENERATE = re.compile(r"is present|nonempty|non-?empty", re.I)
@@ -127,8 +129,42 @@ def check_repeating_decimals():
     return "浮点输出里的循环小数（token 精确比对会误杀）", bad
 
 
+def check_annotated_sample_outputs():
+    """Guard the parser's # truncation precondition for every mirrored statement."""
+    from html import unescape
+    from server import SAMPLE_ANY, parse_sample_sections
+
+    catalog_path = ROOT / "data" / "openjudge" / "catalog.json"
+    try:
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return "标记式样例输出的首行安全前提", ["catalog.json 不可读"]
+    bad = []
+    marked = 0
+    for item in catalog.get("problems", []):
+        page = ROOT / "data" / "openjudge" / "pages" / f"{item['book']}__{item['id']}.html"
+        try:
+            text = page.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        match = re.search(r'<dt>样例输入</dt>\s*<dd>(.*?)</dd>\s*<dt>样例输出</dt>\s*<dd>(.*?)</dd>', text, re.S)
+        if not match:
+            continue
+        plain = lambda chunk: unescape(re.sub(r"</?pre[^>]*>|<[^>]+>", "", chunk.strip())).strip("\n")
+        raw_input, raw_output = plain(match.group(1)), plain(match.group(2))
+        if not (SAMPLE_ANY.search(raw_input) or SAMPLE_ANY.search(raw_output)):
+            continue
+        marked += 1
+        sections = parse_sample_sections(raw_input + "\n" + raw_output)
+        for index, case in enumerate(sections, 1):
+            first = next((line.strip() for line in case["output"].splitlines() if line.strip()), "")
+            if first.startswith("#"):
+                bad.append(f"{item['book']}__{item['id']} 样例 {index}: 输出首行 {first!r}")
+    return f"标记式样例输出的首行安全前提（已扫描 {marked} 题）", bad
+
+
 CHECKS = (check_reported_failures, check_degenerate_constraints,
-          check_output_size, check_repeating_decimals)
+          check_output_size, check_repeating_decimals, check_annotated_sample_outputs)
 
 
 def main():
