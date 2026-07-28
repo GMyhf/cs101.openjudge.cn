@@ -29,8 +29,10 @@ echo "==> 重启服务"
 sudo systemctl restart cs101
 
 echo "==> 等待健康"
+# 轮询期间用 -s（不带 -S）：还没起来是意料之中的，不该往屏幕上喷 Connection refused，
+# 那会让一次正常的发版看起来像出了事。真失败由下面那次带 -S 的检查报出来。
 for _ in $(seq 1 30); do
-  if curl -fsS -o /dev/null --max-time 5 "$BASE/api/me"; then
+  if curl -fs -o /dev/null --max-time 5 "$BASE/api/me"; then
     echo "    起来了"
     break
   fi

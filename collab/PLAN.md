@@ -39,6 +39,8 @@
 
 | T-017 | **全语言端到端冒烟 + 修 systemd 迁移导致的 PyPy3 失效**：新增 `scripts/smoke_languages.py`，9 种语言各跑一份正确解与一份坏代码 | Done | Claude | 动机：T-010 抽 `prepare_program` 改动了**每一条语言分支**，但此后真正验过的只有 python/pypy3/c/cpp，而 .NET / Swift / ObjC 三条**一次都没跑过** —— 且那正是唯一已知 bug （C/C++ 编译错误 500）所在的同类领域。`tests/test_judge.py` 里这三种的用例都是 `@skipUnless(shutil.which(...))`，在没装工具链的机器上**静默跳过**，闸门全绿不代表验过。**首次运行就抓到一个线上回归，而且是我自己 T-011 引入的**：systemd 不继承登录 shell 的 PATH，而 pypy3 装在 `~/.local/bin`，服务进程 `shutil.which("pypy3")` 返回 None —— **学生选 PyPy3 得到 Language Unavailable**。改用 systemd 托管之前它是从 tmux 登录 shell 起的，PATH 完整所以正常。PyPy3 是 Python 超时唯一的补救档（倍率 ×3 对 ×10），这条失效影响真实。已在单元里补 `Environment=PATH=`。**放宽这里不扩大沙箱**：判题器用服务进程 PATH 找到解释器后，交给子进程的是绝对路径，子进程 env 仍是固定的 `CHILD_PATH`（T-008 的设计）。脚本另加 `--require-all`：工具链缺失算失败而不是跳过 —— **「静默跳过」正是这次回归能藏住的方式**，单元测试和冒烟两处都跳过，就没有任何地方会报告某种语言停止工作了。修复后部署机 `--require-all` **9/9 全部通过**（正确解输出正确、坏代码均得 Compile Error）|
 
+| T-018 | **冒烟纳入发版例行 + 闸门假红排查（未定位，已留现场）** | Done | Claude | ①`tools/release.sh`：拉代码 → 单元有变化则同步并 daemon-reload → 重启 → 等健康 → **全语言冒烟 `--require-all`**，任一步失败即非零退出。冒烟脚本改为像服务端一样从 `data/.admin_password` 读口令，**省掉传口令这一步** —— 有摩擦的例行动作不会被执行。手册另列「代码没变但能力可能变了」的场景（改单元 / 换机器 / 装卸工具链）必须跑冒烟。②闸门假红**根因未定位，但排除了两个假设**：**管道写满被实测证伪**（`log_message` 走 `print` 进 stdout，而测试用 `subprocess.PIPE` 从不排空，写满约 64 KiB 服务端就会阻塞 —— 实测一轮仅约 14 KiB、占 22%，余量充足）；启动等待不足也已排除（早已 30 秒）。连跑 6 轮 + 闸门 1 轮均未复现。**改为把服务端日志写到固定路径 `/tmp/cs101-test-server.log`**：此前是 PIPE，只在启动失败时被读，跑到一半出错则服务端当时在做什么永远丢失 —— 前两次假红正是这么查不下去的（我 `tail -8` 截掉了现场）。顺带也免掉了管道写满这颗雷（今天余量够，但用例只会更多）|
+
 ## Decision Log
 
 > **服务改由 systemd 托管（2026-07-28，人拍板）**：此前是孤儿进程 + 手工 `pkill`/`nohup`，

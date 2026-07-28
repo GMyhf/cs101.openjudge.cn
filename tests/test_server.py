@@ -84,9 +84,18 @@ class ServerApiTests(unittest.TestCase):
             environment.pop(key, None)
         environment["CS101_PUBLIC_URL"] = "http://10.129.81.235:8000"
         environment["CS101_LOAD_DOTENV"] = "0"
+        # 服务端日志写文件而不是 PIPE，有两个理由：
+        # ①**留现场**。闸门偶发 `errors=1`，而 PIPE 里的内容只在启动失败时被读，
+        #   跑到一半出错的话服务端当时在做什么就永远丢了 —— 前两次假红都是这么查不下去的。
+        #   路径固定，跑完还在，下次红了直接看它。
+        # ②不占管道缓冲区。PIPE 从不排空，写满（约 64 KiB）服务端就会阻塞在 write 上。
+        #   实测当前一轮约 14 KiB、余量还够，但用例只会越来越多，没必要留这颗雷。
+        cls.log_path = Path(tempfile.gettempdir()) / "cs101-test-server.log"
+        cls.log_file = cls.log_path.open("w", encoding="utf-8")
+        cls.addClassCleanup(cls.log_file.close)
         cls.process = subprocess.Popen(
             [sys.executable, "server.py"], cwd=ROOT, env=environment,
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+            stdout=cls.log_file, stderr=subprocess.STDOUT, text=True,
         )
         # 先登记清理再等待：即使服务端起不来、setUpClass 抛异常，
         # addClassCleanup 也会跑，不会漏下孤儿进程和临时库文件。
@@ -105,7 +114,9 @@ class ServerApiTests(unittest.TestCase):
             except (ConnectionRefusedError, OSError):
                 time.sleep(0.05)
         cls._stop_server()
-        raise RuntimeError("server did not start: " + (cls.process.stderr.read() or "<no stderr>"))
+        cls.log_file.flush()
+        tail = cls.log_path.read_text(encoding="utf-8", errors="replace")[-2000:]
+        raise RuntimeError(f"server did not start；日志见 {cls.log_path}\n{tail or '<空>'}")
 
     @classmethod
     def _unthrottle_registration(cls):
