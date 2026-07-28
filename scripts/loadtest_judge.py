@@ -86,9 +86,16 @@ def make_account(base, index):
 
 def submit(opener, base, book, problem, source):
     started = time.perf_counter()
-    status, body = call(opener, base, "/api/submit",
-                        {"book": book, "problem": problem, "language": "python",
-                         "source": source})
+    try:
+        status, body = call(opener, base, "/api/submit",
+                            {"book": book, "problem": problem, "language": "python",
+                             "source": source})
+    except (OSError, urllib.error.URLError) as error:
+        # 连接被重置 / 超时也算失败：学生看到的是「提交没反应」，
+        # 跟判错一样是坏结果，不能因为它没返回 JSON 就不计入。
+        name = type(getattr(error, "reason", error)).__name__
+        return {"http": None, "status": f"连接失败({name})",
+                "judge_ms": None, "wall_s": time.perf_counter() - started}
     return {"http": status, "status": body.get("status"),
             "judge_ms": body.get("time_ms"), "wall_s": time.perf_counter() - started}
 
