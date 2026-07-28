@@ -25,7 +25,14 @@
 | T-009 | **共享自检模块**：把 001a→round5 一路立起来的判据实现一次，供各轮 build 脚本 import，并把平台提交做成可复用客户端（口令只走环境变量）。人拍板，下一轮从 round4 脚本派生 | Done | Claude | `scripts/t004_common.py`（去重>=15 且不足必须记豁免、恒定输出探针**由测量推出 status**、oracle 独立性分诊、变异必须真的改变行为、字节复现、samplecode 逐组复算、样例即第 0 组）+ `scripts/oj_submit.py`（Python3→PyPy3→C++ 三档；提醒按题拆单题程序，整份分派器会被平台 pylint 判 E0102）+ `tests/test_t004_common.py` **19 条，每条判据都成对写通过/失败路径**。**验收标准：拿模块回扫历史批次** —— round4 报警 0 题（无误报）、round5 精确报出手工复核发现的 3433/4011/4012/4140 四条。round4 脚本已改为 import 共享模块。**副产品：模块上线当天照出一处潜伏回归** —— 3789、3906 的 oracle 在 `6f45e36` 被 Claude 自己误删（重写 3725 时用了「按文本区间整段替换」，两者正好夹在区间里），而报告一直写着它们 passed；已从 `1cb07c9` 找回并重验（题面样例一致、400 种子各 0 不一致）。 |
 | T-010 | **提交页力扣化改造**：把 `/practice/<id>/` 改成力扣题目页那种全屏工作台（整页不滚动、左右独立卡片、提交记录移入左侧标签页、编辑器/结果上下分栏且双向可拖），新增「运行样例」（用题面样例先跑一遍再提交），并把设计 token 推广到全站其余 10 个页面。规格与交付门槛见 `collab/t010-manifest.md` | Done | Claude | P1-P4 与本轮 Codex 复核收口：`/api/run` 现在要求题号存在于本地 catalog；`tools/full_sweep.py` 机械扫描 253 道标记式题目的输出首行 `#` 前提；problems/history/admin 已统一顶栏和主题切换。完整闸门通过，见最新 HANDOFF。 |
 
+| T-011 | **服务常驻化**：`deploy/cs101.service` + README 部署段。改动前服务是**孤儿进程**（`setsid nohup` 起、所在 tmux 会话早已死亡、父进程 PID 1），无开机自启、无任何托管 | Done | Claude | 起因：2026-07-28 手工重启**静默失败过一次** —— `pgrep -f "python3 -u server.py"` 会匹配到**执行这条命令的 shell 自己**（命令串里就含这段文字），`kill` 把 shell 一起杀掉、链条断在启动新进程之前，结果老进程活得好好的、看起来却像重启过了；靠「未知题号 `/api/run` 是否返回 404」这个决定性判据才发现。现在发版是 `git pull && sudo systemctl restart cs101`。**踩到并记录的坑**：jensen 的 SELinux 是 Enforcing，`StandardOutput=append:` 指向 home 下的文件会被拒（systemd 以 `init_t` 打开），服务以 `209/STDOUT` 反复重启起不来 —— 已改走 journal，unit 与 README 都写明不要改回去。`KillMode=control-group` 保证停止时带走判题拉起的子进程树；`TimeoutStopSec=20` 不等满 300 秒的判题预算。只加 `PrivateTmp`/`NoNewPrivileges` 两条加固，**不加 `ProtectHome`**（工作目录就在 /home 下，加了起不来）；判题沙箱仍由 `judge.py` 的 `_limits()` 负责，一条未动。**装完实测**：Python 运行样例、C++ 编译运行、完整多测试点判题（Accepted 5 组）全部通过 |
+
 ## Decision Log
+
+> **服务改由 systemd 托管（2026-07-28，人拍板）**：此前是孤儿进程 + 手工 `pkill`/`nohup`，
+> 且那条手工命令有自匹配缺陷、当天静默失败过一次。现在 `deploy/cs101.service` 入库，
+> 发版收敛成 `git pull && sudo systemctl restart cs101`。日志走 journal 而非 home 下的文件 ——
+> SELinux Enforcing 下 systemd 打不开它，这一条已写进 unit 注释与 README，避免有人改回去。
 
 > **T-010 三个拍板点（2026-07-28，人拍板）**：①**红线 6 让路一次**——准许新增 `static/theme.css`。
 > 判据是红线 6 的字面禁止对象为「框架或依赖」，一个静态 CSS 文件两者都不是；而不让路的代价是

@@ -26,7 +26,10 @@ sudo systemctl enable --now cs101
 git pull && sudo systemctl restart cs101
 ```
 
-`systemctl status cs101` 看状态，日志仍写在 `server.log`。
+`systemctl status cs101` 看状态，日志用 `journalctl -u cs101 -f`。
+
+> 日志不要改成 `StandardOutput=append:.../server.log`：jensen 的 SELinux 是 Enforcing，
+> systemd 以 `init_t` 打开 home 目录下的文件会被拒，服务会以 `209/STDOUT` 反复重启起不来。
 
 > 不要再用 `pkill` + `nohup` 手工重启。`pgrep -f "python3 -u server.py"` 会匹配到
 > **执行这条命令的 shell 自己**（命令串里就含这段文字），把自己杀掉、链条断在启动新进程之前——

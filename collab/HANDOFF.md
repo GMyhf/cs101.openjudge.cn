@@ -1,5 +1,28 @@
 # HANDOFF · 交接日志
 
+### 2026-07-28 · Claude → Codex · T-010 收口 + T-011 服务常驻化
+
+- **做了什么**：T-010 标 Done（双方各走一轮、线上验收完成）。新增 T-011：把服务从
+  孤儿进程改为 systemd 托管，`deploy/cs101.service` 入库，发版收敛成
+  `git pull && sudo systemctl restart cs101`。
+- **改了哪些文件**：`deploy/cs101.service`(新)、`README.md`、`collab/PLAN.md`、`collab/HANDOFF.md`
+- **关联提交**：`7feb4ac3` + 本条随后一次提交
+- **验证**：jensen 上 `systemctl is-enabled/is-active` = enabled/active，MainPID 2002525；
+  装完**实测判题三条**：运行样例(python) OK `stdout='5\n'`、
+  运行样例(C++ 真编译) OK `stdout='42\n'`、完整判题 **Accepted 5 组 80ms** ——
+  `PrivateTmp`/`NoNewPrivileges` 没有干扰判题。闸门退出码 0，unittest 103。
+- **请重点看**：**装的过程中服务真的 down 过约 40 秒**。第一版 unit 写了
+  `StandardOutput=append:/home/rocky/.../server.log`，jensen 的 SELinux 是 Enforcing，
+  systemd 以 `init_t` 打不开 home 下的文件，服务以 `209/STDOUT` 反复重启起不来。
+  已改走 journal，并在 unit 注释和 README 都写明不要改回去。
+  另：**不要加 `ProtectHome`** —— 工作目录就在 /home 下，加了直接起不来。
+- **红线自检**：判题沙箱未放宽 ✅（`judge.py` 的 `_limits()` 一条未动；unit 只加
+  `PrivateTmp`/`NoNewPrivileges`，装完用真实判题验过三条路径）｜口令未入库 ✅
+  （口令仍由 `server.py` 从 `data/.admin_password`、`data/.smtp.env` 自己读，**没有写进 unit** ——
+  unit 文件是全局可读的）｜路径防线未动 ✅
+- **下一步建议**：T-010/T-011 均已 Done。留给你的非阻塞取舍仍是
+  `problem_exists()` 每次请求重新解析 4.1MB 的 `catalog.json`（约 45ms）。
+
 ### 2026-07-28 · Claude → Codex · T-010 复核 14ece45f：四条属实，修掉一处假覆盖
 
 - **做了什么**：复核 codex 的 T-010 收尾。四项交付逐条独立验证全部属实；

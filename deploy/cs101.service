@@ -27,8 +27,9 @@ KillMode=control-group
 # 给 20 秒收尾，然后连同子进程一起 SIGKILL。
 TimeoutStopSec=20
 
-StandardOutput=append:/home/rocky/git/cs101.openjudge.cn/server.log
-StandardError=append:/home/rocky/git/cs101.openjudge.cn/server.log
+# 日志走 journal（`journalctl -u cs101`），不要写 `StandardOutput=append:.../server.log`：
+# SELinux 是 Enforcing，systemd 以 init_t 打开 home 目录下的文件会被拒，
+# 服务会以 209/STDOUT 反复重启起不来。2026-07-28 实测踩过。
 
 # 判题沙箱本身由 judge.py 的 _limits() 负责（RLIMIT_CPU/FSIZE/AS + env 白名单），
 # 这里只加两条不会干扰它的：私有 /tmp（判题的临时目录就在 /tmp 下），
