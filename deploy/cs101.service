@@ -13,6 +13,15 @@ WorkingDirectory=/home/rocky/git/cs101.openjudge.cn
 
 Environment=CS101_HOST=0.0.0.0
 Environment=CS101_PORT=8000
+# systemd 不继承登录 shell 的 PATH，默认只有 /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin。
+# 而 pypy3 装在 ~/.local/bin —— 改用 systemd 托管之后，判题器 `shutil.which("pypy3")`
+# 就找不到它了，学生选 PyPy3 会得到 Language Unavailable。PyPy3 正是 Python 超时时
+# 唯一的补救档（倍率 ×3 对 ×10），这条不能少。
+#
+# 放宽这里**不会扩大判题沙箱**：判题器用服务进程的 PATH 找到解释器后，
+# 交给子进程的是**绝对路径**，子进程自己的 env 仍然是固定的
+# {PATH=/usr/local/bin:/usr/bin:/bin, HOME=临时目录}（judge.py 的 CHILD_PATH）。
+Environment=PATH=/home/rocky/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 # 管理员口令与 SMTP 由 server.py 自己从 data/.admin_password、data/.smtp.env 读，
 # 不要写进这里 —— unit 文件是全局可读的。
 ExecStart=/usr/bin/python3 -u server.py

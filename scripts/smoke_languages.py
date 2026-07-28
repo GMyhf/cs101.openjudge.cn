@@ -84,6 +84,9 @@ def main():
     parser.add_argument("--base", default="http://127.0.0.1:8000")
     parser.add_argument("--book", default="practice")
     parser.add_argument("--problem", default="02942")
+    parser.add_argument("--require-all", action="store_true",
+                        help="工具链缺失也算失败。部署机上应当加这个 —— "
+                             "「静默跳过」正是 PyPy3 那次回归藏身的方式")
     options = parser.parse_args()
 
     user = os.environ.get("CS101_SMOKE_USER")
@@ -123,7 +126,10 @@ def main():
 
         good_status, produced = good.get("status"), (good.get("stdout") or "").strip()
         if good_status == "Language Unavailable":
-            good_note, good_ok = "工具链未安装（跳过）", None
+            if options.require_all:
+                good_note, good_ok = "✗ 工具链不可用", False
+            else:
+                good_note, good_ok = "工具链未安装（跳过）", None
         elif good_status == "OK" and produced == EXPECTED:
             good_note, good_ok = f"OK  输出 {produced}", True
         else:
@@ -138,7 +144,9 @@ def main():
             bad_note, bad_ok = f"✗ 期望 Compile Error，得到 {bad_status}", False
 
         print(f"{language:<9} {good_note:<26} {bad_note:<26}")
-        if good_ok is False:
+        if good_ok is False and good_status == "Language Unavailable":
+            failures.append(f"{language}：服务进程看不到工具链（检查 systemd 单元里的 PATH）")
+        elif good_ok is False:
             failures.append(f"{language} 正确解：{good_status} 输出 {produced!r}")
         if bad_ok is False:
             failures.append(f"{language} 坏代码：期望 Compile Error，得到 {bad_status}")
