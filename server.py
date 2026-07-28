@@ -50,8 +50,13 @@ ROMAN = {"i": 1, "ii": 2, "iii": 3, "iv": 4, "v": 5,
          "vi": 6, "vii": 7, "viii": 8, "ix": 9, "x": 10}
 
 
-def parse_sample_sections(text):
-    """把标注式样例切成 [{input, output}, ...]，解析不出就返回空列表。"""
+def parse_sample_sections(text, truncate_explanations=True):
+    """把标注式样例切成 [{input, output}, ...]，解析不出就返回空列表。
+
+    truncate_explanations=False 时保留输出段原样。这个开关是给
+    `tools/full_sweep.py` 的守门检查用的：它要验的正是「输出段首行会不会是 `#`」，
+    而截断本身会把这种输出削成空串 —— 拿截断后的结果去验，它永远看不见自己要防的那件事。
+    """
     sections, seen, pending, current = [], {"input": 0, "output": 0}, None, None
     for line in text.split("\n"):
         kind = number = None
@@ -88,7 +93,7 @@ def parse_sample_sections(text):
     cases = {}
     for section in sections:
         body = section["lines"]
-        if section["kind"] == "output":
+        if section["kind"] == "output" and truncate_explanations:
             cut = next((i for i, line in enumerate(body) if SAMPLE_EXPLAIN.match(line)), None)
             if cut is not None:
                 body = body[:cut]

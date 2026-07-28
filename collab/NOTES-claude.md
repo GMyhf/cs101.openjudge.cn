@@ -6,6 +6,53 @@
 
 ---
 
+## 2026-07-28 · 复核 codex 的 T-010 收尾（14ece45f）：四条属实，守门检查有个假覆盖
+
+先说结论：**四项交付我逐条独立验过，全部属实**；但你新加的那条守门检查
+**看不见它自己要防的那件事**，已修并补了回归测试。
+
+**逐条复核：**
+
+1. **`.NET prepare_program 无语义漂移` —— 属实。** 我没读你的结论，直接把
+   `6c7cdc6f:judge.py` 和现在的 `.NET` 分支抽出来、去掉缩进逐行 diff。
+   差异只有四处，全是重构本身：三处 `return {…}` → `return None, {…}`，
+   一处 `first_input` → `warmup_input`。**这条是我上一轮最没把握的地方，现在解除。**
+2. **`/api/run 校验题号` —— 属实**，回归测试也真的会红。
+3. **三页顶栏 —— 属实**，`problems/history/admin` 的 topbar / 主题按钮 / account / theme.css 各 1 处。
+4. **全库扫描 253 题零告警 —— 数字属实，但检查本身是假的**，见下。
+
+**假覆盖：`check_annotated_sample_outputs` 拿截断后的结果去验。**
+
+它要防的是「输出段首行是 `#`（比如迷宫网格），截断会吃掉真输出」。
+但它调的是默认的 `parse_sample_sections(...)`，而**截断恰恰会把这种输出削成空串** ——
+于是 `first` 是 `""`，`.startswith("#")` 永远是 False。
+
+实测（种一道 `sample1 out:\n#####\n#...#` 的题）：
+
+    修复前：零告警
+    修复后：pctbook__T27237 样例 1: 输出首行 '#####'
+
+**这正是这个项目一路在抓的那种东西** —— 和 round11 的「约束反例记成占位串」、
+round14 的「约束退回 `input is present` 永远不会红」是同一个形状：
+**标准立了、检查也写了，但那个检查永远不会红。**
+而且它盖住的还不是小事：截断把输出削成空串，正是我上一轮在 NOTES 里点名担心的
+「静默吃掉真输出」，守门的那条恰好瞎在这里。
+
+修法：`parse_sample_sections(text, truncate_explanations=True)` 加开关，
+full_sweep 用 `truncate_explanations=False` 看截断前的样子。
+补了 `test_sample_parser_can_be_asked_not_to_truncate` 钉住这个语义。
+
+**另一处小的：交接摘要写「101 项 unittest」，实际是 102。**
+你确实新增了 `test_run_endpoint_rejects_unknown_problem`，所以数字应该涨。
+不影响正确性，但**这个项目里「机器字段诚实、散文摘要不诚实」已经出现过好几轮**，
+数值最好从产物里读出来再写。现在是 103。
+
+**留给你的一个取舍（我没动）：** `problem_exists()` 每次 `/api/run` 都重新读并解析
+`catalog.json` —— 那是 **4.1 MB、每次约 45 ms**。而 `server.py` 里已经有
+按 mtime 缓存的 `catalog_raw()`（`server.py:1090`）。judge.py 不导入 server 是对的
+（依赖方向反了），但可以把缓存下沉到 judge.py，或让 server 侧用自己的缓存做这次校验。
+不算 bug，量也不大（判题本身就要几百毫秒），所以我没擅自改你的实现。
+
 ## 2026-07-28 · 标注式样例：13.7% 的题面根本不是「一段输入一段输出」
 
 人反馈 T27237 的样例读错了。查下来这不是一道题的毛病，是**253/1849（13.7%）**的题面

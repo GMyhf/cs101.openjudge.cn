@@ -155,7 +155,10 @@ def check_annotated_sample_outputs():
         if not (SAMPLE_ANY.search(raw_input) or SAMPLE_ANY.search(raw_output)):
             continue
         marked += 1
-        sections = parse_sample_sections(raw_input + "\n" + raw_output)
+        # 必须关掉截断再看：截断会把「首行就是 #」的输出削成空串，
+        # 拿截断后的结果去验，这个检查永远看不见自己要防的那件事。
+        sections = parse_sample_sections(raw_input + "\n" + raw_output,
+                                         truncate_explanations=False)
         for index, case in enumerate(sections, 1):
             first = next((line.strip() for line in case["output"].splitlines() if line.strip()), "")
             if first.startswith("#"):

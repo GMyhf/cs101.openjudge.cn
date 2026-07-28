@@ -708,6 +708,20 @@ class ServerApiTests(unittest.TestCase):
         # 没有标记就交回空列表，由调用方回落到「输入 dd / 输出 dd」的老行为
         self.assertEqual(one("1 6\n0 0"), [])
 
+    def test_sample_parser_can_be_asked_not_to_truncate(self):
+        """守门检查要验的是「输出段首行会不会是 #」，必须看得到截断前的样子。
+
+        截断会把这种输出削成空串。`tools/full_sweep.py` 的检查一旦拿截断后的结果去验，
+        就永远看不见自己要防的那件事 —— 一个永远不会红的检查，等于没有检查。
+        """
+        import server
+        grid = "sample1 in:\n3\nsample1 out:\n#####\n#...#"
+        # 默认截断：输出被削空，首行是空的，守门检查看不到任何异常
+        self.assertEqual(server.parse_sample_sections(grid)[0]["output"], "")
+        # 关掉截断：原样保留，守门检查才能发现首行是 #
+        raw = server.parse_sample_sections(grid, truncate_explanations=False)
+        self.assertEqual(raw[0]["output"], "#####\n#...#")
+
     def test_run_endpoint_requires_authentication(self):
         status, _, _ = request(self.port, "POST", "/api/run", {
             "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM,
