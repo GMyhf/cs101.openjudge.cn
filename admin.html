@@ -2,26 +2,27 @@
 <html lang="zh-CN">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/static/theme.css">
+<script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script>
 <title>判题设置 · CS101</title>
 <style>
-  :root { --ink:#17221d; --muted:#6b7a72; --line:#d9e0da; --bg:#f7f9f7; --warn:#b04f43; --ok:#2f7d55; }
   * { box-sizing:border-box; }
   body { font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink);
          max-width:820px; margin:0 auto; padding:28px 20px 80px; }
   h1 { font-size:24px; margin:0 0 4px; }
   h2 { font-size:16px; margin:28px 0 10px; }
   .sub { color:var(--muted); margin:0 0 20px; }
-  .sub a { color:#3d8b68; }
+  .sub a { color:var(--accent); }
   .card { border:1px solid var(--line); border-radius:8px; padding:16px 18px; background:var(--bg); }
   .head { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
   .title { font-weight:600; }
   .desc { color:var(--muted); font-size:14px; margin:6px 0 0; }
   .state { display:inline-block; padding:2px 10px; border-radius:999px; font-size:13px; font-weight:600; }
-  .on { background:#e7f3ec; color:var(--ok); } .off { background:#eef1f4; color:#55606b; }
-  .alarm { background:#fdeceb; color:var(--warn); }
+  .on { background:var(--badge-ac-bg); color:var(--ok); } .off { background:var(--badge-info-bg); color:var(--badge-info-fg); }
+  .alarm { background:var(--badge-wa-bg); color:var(--warn); }
   button { padding:8px 14px; border:1px solid #17221d; border-radius:5px; font:inherit;
-           background:#17221d; color:#fff; cursor:pointer; white-space:nowrap; }
-  button.ghost { background:#fff; color:var(--ink); }
+           background:var(--ink); color:var(--bg); cursor:pointer; white-space:nowrap; }
+  button.ghost { background:var(--panel); color:var(--ink); }
   button[disabled] { opacity:.5; cursor:default; }
   .note { border-left:3px solid var(--warn); padding:2px 0 2px 12px; margin:16px 0 0;
           color:var(--muted); font-size:14px; }
@@ -29,10 +30,10 @@
   th,td { text-align:left; padding:7px 8px; border-bottom:1px solid var(--line); }
   th { color:var(--muted); font-size:12px; font-weight:600; }
   select, input[type=datetime-local], input[type=text] {
-    padding:6px 8px; border:1px solid var(--line); border-radius:5px; font:inherit; background:#fff; }
+    padding:6px 8px; border:1px solid var(--line); border-radius:5px; font:inherit; background:var(--panel); }
   .banner { border-radius:8px; padding:12px 16px; margin:0 0 18px; font-weight:600; }
-  .banner.exam { background:#fdeceb; color:var(--warn); }
-  .banner.free { background:#e7f3ec; color:var(--ok); }
+  .banner.exam { background:var(--badge-wa-bg); color:var(--warn); }
+  .banner.free { background:var(--badge-ac-bg); color:var(--ok); }
   #gate { color:var(--warn); margin-bottom:16px; }
   .muted { color:var(--muted); }
 </style>

@@ -2,37 +2,38 @@
 <html lang="zh-CN">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/static/theme.css">
+<script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script>
 <title>题库目录 · CS101 本机判题</title>
 <style>
-  :root { --ink:#17221d; --muted:#6b7a72; --line:#d9e0da; --ok:#2f7d55; --none:#a8b2ab; --bg:#f7f9f7; }
   * { box-sizing: border-box; }
   body { font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink);
-         margin:0; padding:28px 20px 60px; background:#fff; }
+         margin:0; padding:28px 20px 60px; background:var(--panel); }
   .wrap { max-width:980px; margin:0 auto; }
   h1 { font-size:26px; margin:0 0 4px; }
   .sub { color:var(--muted); margin:0 0 22px; }
-  .sub a { color:#3d8b68; }
+  .sub a { color:var(--accent); }
   .bar { display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-         position:sticky; top:0; background:#fff; padding:12px 0; border-bottom:1px solid var(--line); z-index:2; }
+         position:sticky; top:0; background:var(--panel); padding:12px 0; border-bottom:1px solid var(--line); z-index:2; }
   input[type=search], select { padding:9px 11px; border:1px solid var(--line); border-radius:5px; font:inherit; }
   input[type=search] { flex:1; min-width:200px; }
   label.chk { display:flex; align-items:center; gap:6px; color:var(--muted); cursor:pointer; }
   .count { color:var(--muted); margin:14px 0 6px; }
   table { width:100%; border-collapse:collapse; }
   th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); }
-  th { font-weight:600; color:var(--muted); font-size:13px; position:sticky; top:57px; background:#fff; }
+  th { font-weight:600; color:var(--muted); font-size:13px; position:sticky; top:57px; background:var(--panel); }
   tr:hover td { background:var(--bg); }
   td.num { font-variant-numeric:tabular-nums; white-space:nowrap; }
-  a.pid { color:#3d8b68; text-decoration:none; font-weight:600; }
+  a.pid { color:var(--accent); text-decoration:none; font-weight:600; }
   a.pid:hover { text-decoration:underline; }
   .tag { display:inline-block; padding:1px 8px; border-radius:999px; font-size:12px; white-space:nowrap; }
-  .tag.ok { background:#e7f3ec; color:var(--ok); }
-  .tag.none { background:#f0f2f0; color:var(--none); }
+  .tag.ok { background:var(--badge-ac-bg); color:var(--ok); }
+  .tag.none { background:var(--soft); color:var(--none); }
   .go { color:var(--muted); text-decoration:none; }
-  .go:hover { color:#3d8b68; }
+  .go:hover { color:var(--accent); }
   .empty { padding:40px 0; text-align:center; color:var(--muted); }
   .pagination { display:flex; justify-content:center; align-items:center; gap:12px; padding:18px 0; }
-  .pagination button { padding:6px 12px; border:1px solid var(--line); border-radius:5px; background:#fff; font:inherit; cursor:pointer; }
+  .pagination button { padding:6px 12px; border:1px solid var(--line); border-radius:5px; background:var(--panel); font:inherit; cursor:pointer; }
   .pagination button:disabled { opacity:.45; cursor:default; }
   @media (max-width:620px) { th:nth-child(4), td:nth-child(4) { display:none; } }
 </style>

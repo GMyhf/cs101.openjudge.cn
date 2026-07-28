@@ -3,6 +3,8 @@
 from http import cookies
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+import contextlib
+import threading
 import json
 import hashlib
 import hmac
@@ -18,11 +20,45 @@ from email.message import EmailMessage
 from html import escape, unescape
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
-from judge import judge, language_version
+from judge import judge, language_version, run_sample
 
 ROOT = Path(__file__).parent
 DB = Path(os.environ.get("CS101_DB", ROOT / "data" / "course.db"))
 MIRROR = ROOT / "data" / "openjudge"
+# 唯一对外分发的目录。白名单是后缀而不是「除了 xx 以外」——
+# 排除法每加一种新文件就要记得再排一次，迟早漏掉一个。
+JUDGE_SLOTS = set()
+JUDGE_SLOTS_LOCK = threading.Lock()
+
+
+@contextlib.contextmanager
+def judging_slot(user):
+    """同一用户同时只允许一个判题/运行在跑。
+
+    ThreadingHTTPServer 每个并发请求都直接在 HTTP 线程上拉起编译器/解释器，
+    改动前这里没有任何节流 —— 连点提交就能把机器打满。「运行样例」按钮
+    把这个暴露面放大了，所以随本轮一起收口（人拍板，见 PLAN Decision Log）。
+    锁只护 set 本身，判题过程不持锁：判一次最长 300 秒，持锁会把整台机器串起来。
+    """
+    key = (user or "").lower()
+    with JUDGE_SLOTS_LOCK:
+        busy = key in JUDGE_SLOTS
+        if not busy:
+            JUDGE_SLOTS.add(key)
+    if busy:
+        yield False
+        return
+    try:
+        yield True
+    finally:
+        with JUDGE_SLOTS_LOCK:
+            JUDGE_SLOTS.discard(key)
+
+
+STATIC_DIR = (ROOT / "static").resolve()
+STATIC_TYPES = {".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8",
+                ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon",
+                ".woff2": "font/woff2"}
 BOOK_META = {
     "practice": {"name": "题库（包括计概、数算题目）", "count": 985},
     "pctbook": {"name": "计算思维算法实践", "count": 215},
@@ -78,161 +114,261 @@ PROBLEMS = [
 # 所以 WA 要把 case 编号、期望/实际 token 数摆出来，TLE/RE 要把判题器的 message 摆出来。
 SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>提交代码 - __PROBLEM__</title>
+<title>__PROBLEM__ 提交代码 · CS101</title>
+<link rel="stylesheet" href="/static/theme.css">
+<script>
+// 主题引导必须在首屏绘制前跑完，否则深色用户会先看到一帧白。
+// 也因为这里总会写上 data-theme，theme.css 里的深色才只需要一个块。
+(function(){try{var t=localStorage.getItem('cs101-theme');
+if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();
+</script>
 <style>
- :root{--ink:#17221d;--muted:#6b7a72;--line:#d9e0da;--bg:#f7f9f7;--panel:#fff;--soft:#f1f5f2;--accent:#2f7d55}
- *{box-sizing:border-box}
- body{font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);
-      max-width:1440px;margin:0 auto;padding:28px 24px 54px;background:var(--bg)}
- .page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:24px}
- .eyebrow{color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin:0 0 5px}
- h1{font-size:28px;line-height:1.25;letter-spacing:0;margin:0 0 7px}
- .problem-id{color:var(--accent)}
- .sub{color:var(--muted);margin:0}
- .sub a{color:var(--accent);text-decoration:none}
- .sub a:hover{text-decoration:underline}
- .head-mark{min-width:132px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--muted);font-size:12px;text-align:right}
- .head-mark strong{display:block;color:var(--ink);font-size:14px;margin-bottom:2px}
- .workspace-layout{display:grid;grid-template-columns:minmax(360px,1fr) 8px minmax(520px,1fr);gap:0;align-items:start}
- .splitter{align-self:stretch;min-height:520px;cursor:col-resize;position:relative;touch-action:none}
- .splitter::before{content:"";position:absolute;top:0;bottom:0;left:3px;width:2px;background:var(--line);transition:background .15s,width .15s,left .15s}
- .splitter:hover::before,.splitter.dragging::before{left:2px;width:4px;background:var(--accent)}
- .statement-panel,.workspace{border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:0 8px 24px rgba(34,58,44,.06);overflow:hidden}
- .statement-panel{padding:27px 30px;max-height:calc(100vh - 155px);overflow:auto;position:sticky;top:18px}
- .statement-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin:0 0 18px}
- .statement-panel h2{font-size:24px;line-height:1.3;margin:0}
- .copy-statement{flex:0 0 auto;padding:7px 10px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--muted);font:13px inherit;cursor:pointer}
- .copy-statement:hover{border-color:var(--accent);color:var(--accent);background:var(--soft)}
- .statement-panel .problem-params{display:grid;grid-template-columns:repeat(6,max-content);gap:7px 12px;align-items:baseline;padding:12px 14px;margin:0 0 25px;border-left:3px solid #c87828;background:#fffaf3;color:var(--muted);font-size:13px;overflow:auto}
- .statement-panel .problem-params dt{font-weight:650;color:var(--ink)}
- .statement-panel .problem-params dd{margin:0}
+ /* 全屏工作台：页面本身永不滚动，滚动只发生在 .pane-body 里。
+    每一层 flex/grid 子项都要 min-height:0，少一处内容就会把面板撑破。 */
+ html,body{height:100%}
+ body.app{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+ .crumb{display:flex;align-items:baseline;gap:8px;min-width:0;color:var(--muted);font-size:13px}
+ .crumb-id{font:700 13px var(--font-mono);color:var(--accent)}
+ .crumb-title{color:var(--ink);font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .auth-chip{font-size:13px;white-space:nowrap}
+ .theme-toggle{padding:5px 10px;font-size:13px}
+
+ .workspace-layout{flex:1;min-height:0;display:grid;
+   grid-template-columns:minmax(320px,1fr) 10px minmax(420px,1.1fr);padding:var(--pane-gap)}
+ .pane-col{display:grid;grid-template-rows:minmax(140px,1fr) 10px minmax(96px,220px) auto;
+   min-height:0;min-width:0}
+
+ /* ---- 题面 ---- */
+ .statement-panel h2{font-size:21px;line-height:1.3;margin:0 0 14px}
+ .statement-panel .problem-params{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 4px;
+   margin:0 0 20px;padding:9px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);
+   background:var(--soft);font-size:12.5px;color:var(--muted)}
+ .statement-panel .problem-params dt{font-weight:600}
+ .statement-panel .problem-params dd{margin:0 16px 0 0;color:var(--ink);font-variant-numeric:tabular-nums}
  .statement-panel .problem-content{display:block;margin:0}
- .statement-panel .problem-content dt{font-size:16px;font-weight:700;margin:25px 0 7px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+ .statement-panel .problem-content dt{font-size:15px;font-weight:700;margin:22px 0 8px;
+   padding-bottom:5px;border-bottom:1px solid var(--line)}
  .statement-panel .problem-content dt:first-child{margin-top:0}
- .statement-panel .problem-content dd{margin:0;color:#334139}
- .statement-panel .problem-content pre{overflow:auto;margin:9px 0;padding:13px 15px;border:1px solid var(--line);border-radius:7px;background:var(--soft);color:var(--ink);font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
- .editor-bar{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border-bottom:1px solid var(--line);background:var(--soft);font-size:13px}
- .editor-label{font-weight:700}.editor-state{color:var(--muted)}
- /* 编辑器：透明 textarea 叠在高亮层上。两层的字体/行高/padding 必须逐项一致，
-    差一点点光标就会和文字错位。 */
- .editor{display:flex;height:520px;overflow:hidden;background:var(--panel)}
- .gutter{flex:0 0 auto;padding:12px 8px 12px 12px;text-align:right;color:#aab4ad;background:#fbfcfb;
-         border-right:1px solid var(--line);user-select:none;white-space:pre;height:100%;overflow:hidden}
+ .statement-panel .problem-content dd{margin:0}
+ .statement-panel .problem-content pre{overflow:auto;margin:9px 0;padding:12px 14px;
+   border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--soft);
+   font:12.5px/1.6 var(--font-mono)}
+
+ /* ---- 编辑器 ---- */
+ /* 透明 textarea 叠在高亮层上。两层的字体/行高/padding 必须逐项一致，
+    差一点点光标就会和文字错位；字号由 --code-size 同时驱动两层。 */
+ .editor{flex:1;min-height:0;display:flex;overflow:hidden;background:var(--panel)}
+ .gutter{flex:0 0 auto;padding:12px 8px 12px 12px;text-align:right;color:var(--gutter-fg);
+   background:var(--gutter-bg);border-right:1px solid var(--line);user-select:none;
+   white-space:pre;overflow:hidden}
  .codewrap{position:relative;flex:1;min-width:0}
- .gutter,.codewrap pre,.codewrap textarea{font:13px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;tab-size:4}
- .codewrap pre,.codewrap textarea{margin:0;padding:12px;border:0;white-space:pre;overflow:auto;width:100%;height:100%;min-height:0}
- .codewrap pre{position:absolute;inset:0;pointer-events:none;color:var(--ink)}
+ .gutter,.codewrap pre,.codewrap textarea{font:var(--code-size)/1.5 var(--font-mono);tab-size:4}
+ .codewrap pre,.codewrap textarea{margin:0;padding:12px;border:0;white-space:pre;overflow:auto;
+   width:100%;height:100%;min-height:0}
+ .codewrap pre{position:absolute;inset:0;pointer-events:none;color:var(--ink);background:transparent}
  .codewrap textarea{position:relative;background:transparent;color:transparent;caret-color:var(--ink);
-          resize:none;outline:none}
- .t-com{color:#7a8a80;font-style:italic}
- .t-str{color:#2f7d55}
- .t-num{color:#8a6d1f}
- .t-kw{color:#9a3d8f;font-weight:600}
- .t-pre{color:#3d6b8b}
- .t-match{background:#ffe9a8;border-radius:2px;box-shadow:0 0 0 1px #d8b84a}
- button.ghost{background:#fff;color:var(--ink);border-color:var(--line)}
- /* 暗色：只改变量与几处硬编码色，结构不动 */
- :root[data-theme="dark"]{--ink:#e6ece8;--muted:#94a49b;--line:#2f3a34;--bg:#1b211e;--panel:#181e1b;--soft:#202923;--accent:#8fd6ab}
- :root[data-theme="dark"] body{background:#141917}
- :root[data-theme="dark"] .workspace,
- :root[data-theme="dark"] .codewrap pre,
- :root[data-theme="dark"] select,
- :root[data-theme="dark"] pre.msg{background:#181e1b}
- :root[data-theme="dark"] .gutter{background:#151a18;color:#5c6a63}
- :root[data-theme="dark"] button{background:#e6ece8;color:#141917;border-color:#e6ece8}
- :root[data-theme="dark"] button.ghost{background:#1b211e;color:var(--ink);border-color:var(--line)}
- :root[data-theme="dark"] .t-com{color:#7f8f86}
- :root[data-theme="dark"] .t-str{color:#7fc99b}
- :root[data-theme="dark"] .t-num{color:#d8b667}
- :root[data-theme="dark"] .t-kw{color:#d78fd0}
- :root[data-theme="dark"] .t-pre{color:#87b3d8}
- :root[data-theme="dark"] .t-match{background:#5a4a1a;box-shadow:0 0 0 1px #b8952f}
- :root[data-theme="dark"] .b-ac{background:#1e3a2a;color:#8fd6ab}
- :root[data-theme="dark"] .b-wa{background:#3d2320;color:#e59a90}
- :root[data-theme="dark"] .b-other{background:#39301a;color:#dcc07a}
- :root[data-theme="dark"] .b-info{background:#242c33;color:#a8b6c2}
- .submit-bar{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px 15px;border-top:1px solid var(--line);background:var(--soft)}
- .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
- .row{display:flex;gap:10px;align-items:center;margin:12px 0}
- select,button{padding:9px 14px;border:1px solid var(--line);border-radius:7px;font:inherit;background:var(--panel)}
- select{min-width:190px;color:var(--ink)}
- button{background:#17221d;color:#fff;border-color:#17221d;cursor:pointer}
- button[disabled]{opacity:.55;cursor:default}
- .verdict{border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-top:22px;background:var(--panel);box-shadow:0 5px 18px rgba(34,58,44,.04)}
- .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-weight:600;font-size:13px}
- .b-ac{background:#e7f3ec;color:#2f7d55}.b-wa{background:#fdeceb;color:#b04f43}
- .b-other{background:#fdf4e3;color:#8a6d1f}.b-info{background:#eef1f4;color:#55606b}
- dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:12px 0 0}
- dt{color:var(--muted)}dd{margin:0;font-variant-numeric:tabular-nums}
- pre.msg{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid var(--line);
-         border-radius:5px;padding:10px;margin:12px 0 0;font:12px/1.5 ui-monospace,monospace;max-height:220px;overflow:auto}
- pre.source{white-space:pre;max-height:360px}
- .expected{margin-top:12px}
- h2{font-size:18px;margin:30px 0 10px}
- .history-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
- .history-toggle{padding:6px 10px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--muted);font:13px inherit;cursor:pointer}
- .history-toggle:hover{border-color:var(--accent);color:var(--accent);background:var(--soft)}
- table{width:100%;border-collapse:collapse;font-size:14px}
- th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--line)}
- th{color:var(--muted);font-size:12px;font-weight:600}
- td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
- .muted{color:var(--muted)}
- .snip{margin-top:12px}
- .snip-h{color:var(--muted);font-size:13px;margin-bottom:4px}
- .history-panel{border:1px solid var(--line);border-radius:10px;background:var(--panel);overflow:auto}
- .history-panel table{min-width:700px}
- @media(max-width:900px){body{padding:22px 14px 48px}.page-head{display:block}.head-mark{display:none}.workspace-layout{display:grid;grid-template-columns:1fr}.splitter{display:none}.statement-panel{position:static;max-height:none;order:2}.workspace{order:1}}
- @media(max-width:700px){.editor{height:440px}.submit-bar{display:block}.controls{margin-bottom:10px}.sub{line-height:1.8}.statement-panel .problem-params{grid-template-columns:repeat(2,max-content)}}
+   resize:none;outline:none}
+ .t-com{color:var(--tok-com);font-style:italic}
+ .t-str{color:var(--tok-str)}
+ .t-num{color:var(--tok-num)}
+ .t-kw{color:var(--tok-kw);font-weight:600}
+ .t-pre{color:var(--tok-pre)}
+ .t-match{background:var(--tok-match-bg);border-radius:2px;box-shadow:0 0 0 1px var(--tok-match-ring)}
+ .pane-editor select{min-width:186px;padding:5px 9px;font-size:13px}
+ .pane-editor .pane-tools button{padding:5px 9px;font-size:12px}
+
+ /* ---- 判题结果 ---- */
+ .verdict-head{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+ .verdict-title{font-size:18px;font-weight:700;margin:0}
+ .metrics{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}
+ .snip{margin-top:13px}
+ .snip-h{color:var(--muted);font-size:12.5px;margin-bottom:4px}
+ .editor-state{font-size:12.5px;color:var(--muted)}
+ .placeholder{color:var(--muted);font-size:13.5px}
+
+ /* ---- 样例 ---- */
+ .sample-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+ .sample-h{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);margin-bottom:5px}
+ .sample-box{margin:0;height:148px;overflow:auto;padding:10px;border:1px solid var(--line);
+   border-radius:var(--radius-sm);background:var(--soft);font:12.5px/1.55 var(--font-mono);
+   white-space:pre;width:100%;color:var(--ink)}
+ textarea.sample-box{resize:none;outline:none}
+ textarea.sample-box:focus{border-color:var(--accent)}
+
+ /* ---- 底部动作条 ---- */
+ .action-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 2px 0}
+ .action-buttons{display:flex;gap:10px}
+
+ /* ---- 提交记录 ---- */
+ .history-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+ .history-heading h2{font-size:16px;margin:0}
+ .history-heading button{padding:5px 10px;font-size:12.5px}
+ .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px}
+ .stat-card{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--soft);padding:12px 14px}
+ .stat-card b{display:block;font-size:22px;line-height:1.15;font-variant-numeric:tabular-nums}
+ .stat-card span{color:var(--muted);font-size:12px}
+
+ @media(max-width:900px){
+   body.app{height:auto;overflow:auto}
+   .workspace-layout{grid-template-columns:1fr;gap:var(--pane-gap)}
+   .splitter{display:none}
+   .pane-col{grid-template-rows:none;gap:var(--pane-gap);order:1}
+   .pane-left{order:2}
+   .editor{flex:none;height:56vh}
+   .pane-body{max-height:72vh}
+   .crumb{display:none}
+   .sample-grid{grid-template-columns:1fr}
+ }
 </style>
-<header class="page-head">
-  <div><p class="sub">题库：__BOOK_NAME__ · <a href="/problems/">题库目录</a> · <a href="/history/">提交记录</a></p></div>
-  <div class="head-mark"><strong>在线判题</strong><span id="auth">正在检查登录状态…</span></div>
+<body class="app">
+<header class="topbar">
+  <a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a>
+  <div class="crumb"><span class="crumb-id">__PROBLEM__</span><span>·</span><span class="crumb-title">__BOOK_NAME__</span></div>
+  <nav class="topnav">
+    <a href="/problems/">题库目录</a>
+    <a href="/history/">提交记录</a>
+    <a href="/help/">说明</a>
+    <button id="theme" type="button" class="ghost theme-toggle">深色</button>
+    <span id="auth" class="auth-chip muted">正在检查登录状态…</span>
+  </nav>
 </header>
-<main class="workspace-layout">
-<article class="statement-panel"><div class="statement-head"><h2>__STATEMENT_TITLE__</h2><button id="copyStatement" class="copy-statement" type="button">复制 Markdown</button></div><dl class="problem-params">__STATEMENT_PARAMS__</dl><dl class="problem-content">__STATEMENT_CONTENT__</dl></article>
-<div class="splitter" id="splitter" role="separator" aria-label="调整题面和编辑器宽度" tabindex="0"></div>
-<section class="workspace">
-<form id="form">
-  <div class="editor-bar"><span class="editor-label">代码编辑器</span><span class="editor-state">准备提交</span></div>
-  <div class="editor">
-    <div class="gutter" id="gutter">1</div>
-    <div class="codewrap">
-      <pre id="hl" aria-hidden="true"></pre>
-      <textarea name="source" id="src" placeholder="在这里粘贴代码" spellcheck="false"
-                autocomplete="off" autocapitalize="off"></textarea>
+<main class="workspace-layout" id="workspace">
+  <section class="pane pane-left">
+    <nav class="pane-tabs" role="tablist">
+      <button class="pane-tab" type="button" role="tab" aria-selected="true" data-panel="paneStatement">题目描述</button>
+      <button class="pane-tab" type="button" role="tab" aria-selected="false" data-panel="paneHistory">提交记录</button>
+      <button class="pane-tab" type="button" role="tab" aria-selected="false" data-panel="paneStats">统计</button>
+      <span class="pane-tools"><button id="copyStatement" class="ghost" type="button">复制 Markdown</button></span>
+    </nav>
+    <div class="pane-body statement-panel" id="paneStatement" role="tabpanel">
+      <h2>__STATEMENT_TITLE__</h2>
+      <dl class="problem-params">__STATEMENT_PARAMS__</dl>
+      <dl class="problem-content">__STATEMENT_CONTENT__</dl>
     </div>
-  </div>
-  <div class="submit-bar"><div class="controls">
-    <select name="language">
-      __LANGUAGE_OPTIONS__
-    </select>
-    <button id="go">提交并判题</button>
-    <button id="theme" type="button" class="ghost">深色</button>
-  </div></div>
-</form>
-<div id="verdict"></div>
-<div class="history-heading"><h2>我的提交记录</h2><button id="historyToggle" class="history-toggle" type="button">统计</button></div>
-<div id="histbox" class="history-panel muted">…</div>
-</section>
+    <div class="pane-body" id="paneHistory" role="tabpanel" hidden>
+      <div class="history-heading"><h2>我的提交记录</h2><button id="historyToggle" class="ghost" type="button">看全部</button></div>
+      <div id="histbox" class="muted">…</div>
+    </div>
+    <div class="pane-body" id="paneStats" role="tabpanel" hidden>
+      <div id="statsbox" class="muted">…</div>
+    </div>
+  </section>
+  <div class="splitter splitter-v" id="splitter" role="separator" aria-orientation="vertical" aria-label="调整题面和编辑器宽度" tabindex="0"></div>
+  <form id="form" class="pane-col">
+    <section class="pane pane-editor">
+      <div class="pane-tabs">
+        <span class="pane-tab" aria-selected="true">代码</span>
+        <span class="pane-tools">
+          <select name="language" aria-label="选择语言">
+            __LANGUAGE_OPTIONS__
+          </select>
+          <button id="fontDown" class="ghost" type="button" title="缩小字号">A-</button>
+          <button id="fontUp" class="ghost" type="button" title="放大字号">A+</button>
+          <button id="resetCode" class="ghost" type="button" title="清空代码">清空</button>
+        </span>
+      </div>
+      <div class="editor">
+        <div class="gutter" id="gutter">1</div>
+        <div class="codewrap">
+          <pre id="hl" aria-hidden="true"></pre>
+          <textarea name="source" id="src" placeholder="在这里粘贴代码" spellcheck="false"
+                    autocomplete="off" autocapitalize="off"></textarea>
+        </div>
+      </div>
+    </section>
+    <div class="splitter splitter-h" id="splitterH" role="separator" aria-orientation="horizontal" aria-label="调整编辑器和结果高度" tabindex="0"></div>
+    <section class="pane pane-result">
+      <nav class="pane-tabs" role="tablist">
+        <button class="pane-tab" type="button" role="tab" aria-selected="true" data-panel="verdict">判题结果</button>
+        <button class="pane-tab" type="button" role="tab" aria-selected="false" data-panel="samples">样例</button>
+        <span class="pane-tools"><span class="editor-state">准备提交</span></span>
+      </nav>
+      <div class="pane-body" id="verdict" role="tabpanel"><div class="placeholder">提交后在这里显示判题结果。</div></div>
+      <div class="pane-body" id="samples" role="tabpanel" hidden>
+        <div class="sample-grid">
+          <div><div class="sample-h">输入<span class="muted">（可改）</span></div><textarea id="sampleIn" class="sample-box" spellcheck="false" autocomplete="off"></textarea></div>
+          <div><div class="sample-h">预期输出</div><pre id="sampleExp" class="sample-box"></pre></div>
+          <div><div class="sample-h">实际输出<span id="sampleVerdict"></span></div><pre id="sampleGot" class="sample-box muted">点「运行样例」后显示。</pre></div>
+        </div>
+      </div>
+    </section>
+    <div class="action-bar">
+      <span class="editor-state" id="runState"></span>
+      <span class="action-buttons">
+        <button id="run" type="button" class="ghost">运行样例</button>
+        <button id="go" type="submit" class="primary">提交并判题</button>
+      </span>
+    </div>
+  </form>
 </main>
 <script>
 const BOOK = "__BOOK__", PROBLEM = "__PROBLEM__";
+const SAMPLES = __SAMPLE_JSON__;
 const CLS = { "Accepted": "b-ac", "Wrong Answer": "b-wa" };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-// 题面与编辑器之间的拖拽分隔条，宽度只保存在当前浏览器。
-const splitLayout = document.querySelector('.workspace-layout');
-const splitBar = document.querySelector('#splitter');
-function setSplit(clientX) {
-  const rect = splitLayout.getBoundingClientRect();
-  const left = Math.max(360, Math.min(rect.width - 540, clientX - rect.left));
-  splitLayout.style.gridTemplateColumns = left + 'px 8px minmax(520px,1fr)';
-  try { localStorage.setItem('cs101-split-ratio', String(left / rect.width)); } catch (err) {}
+// ---- 面板拖拽 ----------------------------------------------------------
+// 横竖两条共用一套逻辑：差别只在读哪个坐标、写哪个 grid 轴。
+// 位置只存在本浏览器，存的是比例而不是像素，换个窗口大小才不会跑偏。
+function makeSplitter(bar, opts) {
+  const apply = value => {
+    const span = opts.span();
+    const size = Math.max(opts.min, Math.min(span - opts.minOther, value));
+    opts.write(size);
+    try { localStorage.setItem(opts.key, String(size / span)); } catch (err) {}
+    return size;
+  };
+  bar.addEventListener('pointerdown', e => {
+    bar.classList.add('dragging'); bar.setPointerCapture(e.pointerId); apply(opts.read(e));
+  });
+  bar.addEventListener('pointermove', e => { if (bar.hasPointerCapture(e.pointerId)) apply(opts.read(e)); });
+  bar.addEventListener('pointerup', e => { bar.releasePointerCapture(e.pointerId); bar.classList.remove('dragging'); });
+  // 元素本来就有 role="separator" 和 tabindex="0"，却一直没有键盘处理 —— 补上
+  bar.addEventListener('keydown', e => {
+    const step = { ArrowLeft: -16, ArrowRight: 16, ArrowUp: -16, ArrowDown: 16 }[e.key];
+    if (step === undefined && e.key !== 'Home') return;
+    e.preventDefault();
+    apply(e.key === 'Home' ? opts.span() * opts.home : opts.current() + step);
+  });
+  const saved = (() => { try { return Number(localStorage.getItem(opts.key)); } catch (err) { return NaN; } })();
+  requestAnimationFrame(() => apply(opts.span() * (saved > 0 && saved < 1 ? saved : opts.home)));
 }
-splitBar.addEventListener('pointerdown', e => { splitBar.classList.add('dragging'); splitBar.setPointerCapture(e.pointerId); setSplit(e.clientX); });
-splitBar.addEventListener('pointermove', e => { if (splitBar.hasPointerCapture(e.pointerId)) setSplit(e.clientX); });
-splitBar.addEventListener('pointerup', e => { splitBar.releasePointerCapture(e.pointerId); splitBar.classList.remove('dragging'); });
-try { const ratio = Number(localStorage.getItem('cs101-split-ratio')); if (ratio > 0 && ratio < 1) requestAnimationFrame(() => { const r = splitLayout.getBoundingClientRect(); setSplit(r.left + r.width * ratio); }); } catch (err) {}
+
+const workspace = document.querySelector('#workspace');
+const paneCol = document.querySelector('#form');
+const actionBar = document.querySelector('.action-bar');
+makeSplitter(document.querySelector('#splitter'), {
+  key: 'cs101-split-ratio', home: 0.44, min: 320, minOther: 430,
+  span: () => workspace.clientWidth,
+  read: e => e.clientX - workspace.getBoundingClientRect().left,
+  current: () => document.querySelector('.pane-left').getBoundingClientRect().width,
+  write: size => { workspace.style.gridTemplateColumns = size + 'px 10px minmax(0,1fr)'; },
+});
+makeSplitter(document.querySelector('#splitterH'), {
+  key: 'cs101-split-v', home: 0.3, min: 96, minOther: 190,
+  span: () => paneCol.clientHeight - actionBar.offsetHeight,
+  read: e => paneCol.getBoundingClientRect().bottom - actionBar.offsetHeight - e.clientY,
+  current: () => document.querySelector('.pane-result').getBoundingClientRect().height,
+  write: size => { paneCol.style.gridTemplateRows = 'minmax(0,1fr) 10px ' + size + 'px auto'; },
+});
+
+// ---- 标签页 ------------------------------------------------------------
+for (const group of document.querySelectorAll('.pane-tabs[role="tablist"]')) {
+  const tabs = group.querySelectorAll('.pane-tab[data-panel]');
+  for (const tab of tabs) tab.addEventListener('click', () => {
+    for (const other of tabs) {
+      const on = other === tab;
+      other.setAttribute('aria-selected', String(on));
+      document.querySelector('#' + other.dataset.panel).hidden = !on;
+    }
+    if (tab.dataset.panel === 'paneStats') loadStats();
+  });
+}
+function showTab(panel) {
+  const tab = document.querySelector('.pane-tab[data-panel="' + panel + '"]');
+  if (tab) tab.click();
+}
 
 function markdownInline(node) {
   if (node.nodeType === Node.TEXT_NODE) return node.nodeValue.replace(/[ \t]+/g, ' ');
@@ -471,7 +607,21 @@ src.addEventListener("keydown", e => {
   }
 });
 
+// ---- 字号 / 清空 --------------------------------------------------------
+const SIZE_KEY = "cs101-code-size";
+function applySize(px) {
+  const size = Math.max(11, Math.min(20, px));
+  document.documentElement.style.setProperty('--code-size', size + 'px');
+  try { localStorage.setItem(SIZE_KEY, String(size)); } catch (err) {}
+  paintEditor();
+}
+fontUp.onclick = () => applySize(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--code-size')) + 1);
+fontDown.onclick = () => applySize(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--code-size')) - 1);
+resetCode.onclick = () => { src.value = ""; paintEditor(); src.focus(); };
+try { const saved = Number(localStorage.getItem(SIZE_KEY)); if (saved) applySize(saved); } catch (err) {}
+
 // ---- 主题 --------------------------------------------------------------
+// 首屏那段引导脚本已经写好 data-theme，这里只负责切换和记住。
 const THEME_KEY = "cs101-theme";
 function applyTheme(name) {
   document.documentElement.dataset.theme = name;
@@ -479,7 +629,7 @@ function applyTheme(name) {
   try { localStorage.setItem(THEME_KEY, name); } catch (err) { /* 隐私模式下忽略 */ }
 }
 theme.onclick = () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
-applyTheme((() => { try { return localStorage.getItem(THEME_KEY) || "light"; } catch (err) { return "light"; } })());
+applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
 
 paintEditor();
 
@@ -487,14 +637,21 @@ function badge(status) {
   const cls = CLS[status] || (status === "No Test Data" || status === "Problem Not Found" ? "b-info" : "b-other");
   return '<span class="badge ' + cls + '">' + esc(status) + "</span>";
 }
+function chip(label, value) {
+  return '<span class="chip">' + esc(label) + '<b>' + esc(value) + '</b></span>';
+}
 
 function renderVerdict(data) {
-  const rows = [];
-  // 「错在哪组数据」是这个页面存在的理由，所以 case 放第一行
-  if (data.case !== undefined) rows.push(["出错的数据组", "第 " + data.case + " 组"]);
-  if (data.cases !== undefined) rows.push(["通过的数据组", data.cases + " 组全部通过"]);
+  const metrics = [];
+  // 「错在哪组数据」是这个页面存在的理由，所以它排第一个
+  if (data.case !== undefined) metrics.push(chip("出错的数据组", "第 " + data.case + " 组"));
+  if (data.cases !== undefined) metrics.push(chip("通过", data.cases + " 组全过"));
+  if (data.time_ms !== undefined) metrics.push(chip("用时", data.time_ms + " ms"));
+  if (data.memory_kb !== undefined) metrics.push(chip("内存", data.memory_kb + " kB"));
   if (data.expected_tokens !== undefined)
-    rows.push(["输出规模", "期望 " + data.expected_tokens + " 个 token，实际 " + data.actual_tokens + " 个"]);
+    metrics.push(chip("输出规模", "期望 " + data.expected_tokens + " / 实际 " + data.actual_tokens + " token"));
+  if (data.source_bytes !== undefined) metrics.push(chip("代码长度", data.source_bytes + " B"));
+  if (data.language_version) metrics.push(chip("语言", data.language_version));
   // failing_input 只在管理员打开开关时才由服务端下发；关着时这里根本收不到。
   let snippet = "";
   if (data.failing_input) {
@@ -506,45 +663,94 @@ function renderVerdict(data) {
   if (data.expected_output) {
     const o = data.expected_output;
     const tail = o.truncated ? "（内容过长，已截断）" : "";
-    snippet += '<div class="snip expected"><div class="snip-h">第 ' + data.case + ' 组对应 .out 期望输出 ' + tail
+    snippet += '<div class="snip"><div class="snip-h">第 ' + data.case + ' 组对应 .out 期望输出 ' + tail
             + '</div><pre class="msg source">' + esc(o.text) + "</pre></div>";
   }
-  verdict.innerHTML = '<div class="verdict">' + badge(data.status)
-    + (rows.length ? "<dl>" + rows.map(r => "<dt>" + r[0] + "</dt><dd>" + esc(r[1]) + "</dd>").join("") + "</dl>" : "")
+  verdict.innerHTML = '<div class="verdict-head">' + badge(data.status)
+    + '<span class="verdict-title">' + esc(data.status === "Accepted" ? "通过" : data.status) + '</span></div>'
+    + (metrics.length ? '<div class="metrics">' + metrics.join("") + "</div>" : "")
     + (data.message ? '<pre class="msg">' + esc(data.message) + "</pre>" : "")
-    + snippet + "</div>";
+    + snippet;
+  showTab('verdict');
 }
+
+// ---- 运行样例 ----------------------------------------------------------
+// 与提交走同一套沙箱，但不写 submissions 表、不计入统计。
+sampleIn.value = SAMPLES.input || "";
+sampleExp.textContent = SAMPLES.output || "";
+let busy = false;
+function setBusy(on, note) {
+  busy = on;
+  go.disabled = on; run.disabled = on;
+  for (const el of document.querySelectorAll('.editor-state')) el.textContent = note;
+}
+run.addEventListener('click', async () => {
+  if (busy) return;
+  showTab('samples');
+  setBusy(true, "运行中…");
+  sampleVerdict.innerHTML = "";
+  sampleGot.textContent = "";
+  sampleGot.classList.add("muted");
+  try {
+    const r = await fetch("/api/run", { method: "POST", credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ book: BOOK, problem: PROBLEM, language: form.language.value,
+                             source: src.value, stdin: sampleIn.value }) });
+    const data = await r.json();
+    if (r.status === 401) { sampleGot.textContent = "请先登录后再运行。"; }
+    else if (data.status !== "OK") {
+      sampleGot.classList.remove("muted");
+      sampleGot.textContent = data.message || data.status;
+      sampleVerdict.innerHTML = badge(data.status);
+    } else {
+      sampleGot.classList.remove("muted");
+      sampleGot.textContent = data.stdout || (data.stderr ? "" : "（没有输出）");
+      if (data.stderr) sampleGot.textContent += "\n--- stderr ---\n" + data.stderr;
+      // 与判题器同一条比对规则：按 token 比，不计空白差异
+      const same = data.stdout.trim().split(/\s+/).join(" ") === (SAMPLES.output || "").trim().split(/\s+/).join(" ");
+      sampleVerdict.innerHTML = '<span class="badge ' + (same ? "b-ac" : "b-wa") + '">'
+        + (same ? "与样例一致" : "与样例不一致") + "</span>";
+    }
+  } catch (err) {
+    sampleGot.classList.remove("muted");
+    sampleGot.textContent = String(err);
+  }
+  setBusy(false, "准备提交");
+});
 
 form.onsubmit = async e => {
   e.preventDefault();
-  go.disabled = true; document.querySelector(".editor-state").textContent = "判题中…";
-  verdict.innerHTML = "";
+  if (busy) return;
+  setBusy(true, "判题中…");
+  verdict.innerHTML = '<div class="placeholder">判题中，请稍候…</div>';
+  showTab('verdict');
   const body = Object.fromEntries(new FormData(form));
   body.book = BOOK; body.problem = PROBLEM;
   try {
     const r = await fetch("/api/submit", { method: "POST", credentials: "same-origin",
       headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     const data = await r.json();
-    if (r.status === 401) verdict.innerHTML = '<div class="verdict">' + badge("需要登录")
-      + '<dl><dt>说明</dt><dd><a href="/auth/login/">先登录</a>后再提交</dd></dl></div>';
-    else { renderVerdict(data); loadHistory(); }
+    if (r.status === 401) verdict.innerHTML = '<div class="verdict-head">' + badge("需要登录")
+      + '</div><p class="placeholder"><a href="/auth/login/">先登录</a>后再提交。</p>';
+    else { renderVerdict(data); loadHistory(historyAll); }
   } catch (err) {
-    verdict.innerHTML = '<div class="verdict">' + badge("提交失败") + '<pre class="msg">' + esc(err) + "</pre></div>";
+    verdict.innerHTML = '<div class="verdict-head">' + badge("提交失败") + '</div><pre class="msg">' + esc(err) + "</pre>";
   }
-  go.disabled = false; document.querySelector(".editor-state").textContent = "准备提交";
+  setBusy(false, "准备提交");
 };
 
 let historyAll = false;
+let lastRows = [];
 async function loadHistory(showAll = false) {
   const params = new URLSearchParams({ book: BOOK, problem: PROBLEM });
   if (!showAll) params.set("mine", "1");
   const r = await fetch("/api/submissions?" + params, { credentials: "same-origin" });
   if (r.status === 401) { histbox.textContent = "登录后可以看到提交记录。"; return; }
-  const mine = (await r.json()).submissions;
-  if (!mine.length) { histbox.textContent = showAll ? "这道题还没有提交记录。" : "你还没有提交这道题。"; return; }
+  lastRows = (await r.json()).submissions;
+  if (!lastRows.length) { histbox.textContent = showAll ? "这道题还没有提交记录。" : "你还没有提交这道题。"; return; }
   const relativeTime = value => { const then = Date.parse(String(value).replace(" ", "T") + "Z"); if (Number.isNaN(then)) return value; const minutes = Math.max(0, Math.floor((Date.now() - then) / 60000)); if (minutes < 1) return "刚刚"; if (minutes < 60) return minutes + "分钟前"; const hours = Math.floor(minutes / 60); return hours < 24 ? hours + "小时前" : Math.floor(hours / 24) + "天前"; };
   histbox.innerHTML = "<table><thead><tr><th>提交人</th><th>结果</th><th>内存</th><th>时间</th><th>代码长度</th><th>语言</th><th>提交时间</th><th>代码/详情</th></tr></thead><tbody>"
-    + mine.map(s => {
+    + lastRows.map(s => {
         const d = s.detail || {};
         const note = d.case !== undefined ? "第 " + d.case + " 组"
                    : d.cases !== undefined ? d.cases + " 组全过" : "";
@@ -559,17 +765,45 @@ async function loadHistory(showAll = false) {
         if (d.failing_input) blocks.push("<pre class='msg source'>" + esc(d.failing_input.text || "") + "</pre>");
         if (d.expected_output) blocks.push("<pre class='msg source'>" + esc(d.expected_output.text || "") + "</pre>");
         const detail = blocks.length ? "<details" + (s.result === "Accepted" ? "" : " open") + "><summary>查看判题详情</summary>" + blocks.join("") + "</details>" : "";
+        // 改动前这里只输出 7 个 <td> 而表头有 8 列：算好的 size 从未渲染，
+        // 于是「代码长度」往右每一列都错位一格。补上它。
         return "<tr><td>" + esc(s.user || "") + "</td><td>" + badge(s.result)
              + "</td><td class='num muted'>" + esc(memory) + "</td><td class='num muted'>" + esc(elapsed)
+             + "</td><td class='num muted'>" + esc(size)
              + "</td><td class='num muted'>" + esc((s.detail && s.detail.language_version) || s.language || "")
              + "</td><td class='num' title='" + esc(s.created) + "'>" + esc(relativeTime(s.created)) + "</td><td>" + code + detail + "<div class='muted'>" + esc(note) + "</div></td></tr>";
       }).join("") + "</tbody></table>";
 }
 historyToggle.addEventListener('click', () => {
   historyAll = !historyAll;
-  historyToggle.textContent = historyAll ? '我的提交' : '统计';
+  historyToggle.textContent = historyAll ? '只看我的' : '看全部';
   loadHistory(historyAll);
 });
+
+// 统计只用这道题的提交记录算，不去拉整份 catalog（那是几百 KB）。
+async function loadStats() {
+  const params = new URLSearchParams({ book: BOOK, problem: PROBLEM, limit: "500" });
+  const r = await fetch("/api/submissions?" + params, { credentials: "same-origin" });
+  if (r.status === 401) { statsbox.textContent = "登录后可以看到统计。"; return; }
+  const rows = (await r.json()).submissions;
+  if (!rows.length) { statsbox.textContent = "这道题还没有提交记录。"; return; }
+  const accepted = rows.filter(s => s.result === "Accepted");
+  const solvers = new Set(accepted.map(s => (s.user || "").toLowerCase()));
+  const people = new Set(rows.map(s => (s.user || "").toLowerCase()));
+  const byStatus = new Map();
+  for (const s of rows) byStatus.set(s.result, (byStatus.get(s.result) || 0) + 1);
+  const cards = [
+    ["提交次数", rows.length], ["通过次数", accepted.length],
+    ["通过率", Math.round(accepted.length / rows.length * 100) + "%"],
+    ["提交人数", people.size], ["通过人数", solvers.size],
+  ];
+  statsbox.innerHTML = '<div class="stat-grid">'
+    + cards.map(c => '<div class="stat-card"><b>' + esc(c[1]) + "</b><span>" + esc(c[0]) + "</span></div>").join("")
+    + '</div><table><thead><tr><th>结果</th><th>次数</th></tr></thead><tbody>'
+    + [...byStatus].sort((a, b) => b[1] - a[1]).map(([k, v]) =>
+        "<tr><td>" + badge(k) + "</td><td class='num'>" + v + "</td></tr>").join("")
+    + "</tbody></table>";
+}
 </script></html>"""
 
 
@@ -932,6 +1166,11 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(200); self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body)
 
+    def send_static(self, file, content_type):
+        body = file.read_bytes()
+        self.send_response(200); self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body)
+
     def local_page(self, page):
         text = page.read_text(encoding="utf-8", errors="replace")
         text = text.replace("http://cs101.openjudge.cn/", "/")
@@ -953,19 +1192,22 @@ class Handler(BaseHTTPRequestHandler):
         stats_html = stats.group(1).strip() if stats else ""
         return title, params_html, content_html, stats_html
 
-    def modern_problem_page(self, page, book, problem):
-        """Render the mirrored statement without the upstream navigation shell."""
-        title, params_html, content_html, stats_html = self.problem_parts(page, book, problem)
-        return f"""<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{escape(title)} · CS101 本机判题</title>
-<style>
-:root{{--ink:#16231d;--muted:#6c7b73;--line:#dfe7e1;--bg:#f4f7f4;--paper:#fff;--green:#237a50;--green-soft:#e5f3eb;--amber:#c87828}}
-*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 system-ui,-apple-system,"Segoe UI",sans-serif}}
-a{{color:var(--green)}}.shell{{max-width:1120px;margin:auto;padding:0 24px}}.top{{height:72px;display:flex;align-items:center;justify-content:space-between}}.brand{{display:flex;gap:11px;align-items:center;text-decoration:none;color:var(--ink);font-weight:750}}.mark{{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:white;font-size:16px}}.nav{{display:flex;align-items:center;gap:10px}}.nav a{{padding:8px 12px;border-radius:6px;text-decoration:none;color:var(--muted);font-size:14px}}.nav a:hover{{background:var(--green-soft);color:var(--green)}}.nav .primary{{background:var(--ink);color:white;padding:9px 15px}}.user-menu{{position:relative}}.account-menu{{position:absolute;right:0;top:100%;padding-top:8px;min-width:130px;z-index:5}}.account-menu-inner{{background:var(--paper);border:1px solid var(--line);border-radius:7px;box-shadow:0 18px 45px rgba(34,63,45,.08);padding:6px}}.account-menu-inner a,.account-menu-inner button{{display:block;width:100%;padding:7px 10px;border:0;background:transparent;text-align:left;color:var(--ink);font:inherit;cursor:pointer;border-radius:4px}}.account-menu-inner a:hover,.account-menu-inner button:hover{{background:var(--green-soft);color:var(--green)}}.user-menu:not(.authenticated) .account-menu{{display:none}}.user-menu.authenticated:hover .account-menu,.user-menu.authenticated:focus-within .account-menu{{display:block}}.crumb{{color:var(--muted);font-size:13px;margin:20px 0 12px}}.crumb a{{text-decoration:none}}.layout{{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:20px;align-items:start}}.article,.aside{{background:var(--paper);border:1px solid var(--line);border-radius:10px}}.article{{padding:34px 38px 42px}}h1{{font-size:clamp(28px,4vw,42px);line-height:1.15;margin:0 0 20px;letter-spacing:-.02em}}.eyebrow{{color:var(--green);font-size:12px;font-weight:750;letter-spacing:.12em;text-transform:uppercase;margin-bottom:9px}}.problem-params{{display:flex;flex-wrap:wrap;gap:7px 24px;padding:13px 16px;margin:0 0 30px;border-left:3px solid var(--amber);background:#fffaf3;color:var(--muted);font-size:13px}}.problem-params dt{{font-weight:650;color:var(--ink)}}.problem-params dd{{margin:0}}.problem-content{{margin:0}}.problem-content dt{{font-size:17px;font-weight:750;margin:28px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}}.problem-content dt:first-child{{margin-top:0}}.problem-content dd{{margin:0;color:#334139}}.problem-content pre{{overflow:auto;margin:10px 0;padding:15px 17px;border:1px solid var(--line);border-radius:7px;background:#f7faf7;color:var(--ink);font:13px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}}.aside{{padding:20px;position:sticky;top:18px}}.aside h2{{font-size:15px;margin:0 0 14px}}.aside dl{{margin:0;display:grid;grid-template-columns:1fr auto;gap:7px 10px;font-size:13px}}.aside dt{{color:var(--muted)}}.aside dd{{margin:0;font-variant-numeric:tabular-nums}}.aside-note{{margin-top:18px;padding-top:15px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}}.footer{{color:var(--muted);font-size:13px;padding:28px 0 40px}}@media(max-width:760px){{.shell{{padding:0 16px}}.top{{height:62px}}.nav a:not(.primary){{display:none}}.layout{{grid-template-columns:1fr}}.article{{padding:25px 20px 32px}}.aside{{position:static}}}}
-</style><style>.account-control{{position:relative}}.account-trigger{{border:0;background:transparent;color:var(--muted);font:inherit;cursor:pointer;padding:8px 12px}}.account-trigger:hover{{background:var(--green-soft);color:var(--green)}}.account-menu{{display:none}}.account-control:hover .account-menu,.account-control:focus-within .account-menu{{display:block}}</style></head><body>
-<header class="top shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><nav class="nav"><a id="account" href="/auth/login/">登录</a><span class="account-control" id="account-control" hidden><button class="account-trigger" type="button">账号</button><span class="account-menu"><span class="account-menu-inner"><a href="/account/">账户设置</a><button id="logout" type="button">退出登录</button></span></span></span><a class="primary" href="/{escape(book)}/{escape(problem)}/submit/">提交代码</a></nav></header>
-<main class="shell"><div class="crumb"><a href="/">首页</a> / <a href="/problems/">题库目录</a> / {escape(book)} / {escape(problem)}</div><div class="layout"><article class="article"><div class="eyebrow">Problem statement</div><h1>{escape(title)}</h1>{params_html}<dl class="problem-content">{content_html}</dl></article><aside class="aside"><h2>题目概览</h2><dl>{stats_html}</dl><div class="aside-note">本题使用测试数据判题。<br><a href="/{escape(book)}/{escape(problem)}/submit/">打开提交页 →</a></div></aside></div></main><footer class="footer shell">CS101 · 题面与判题服务</footer><script>fetch('/api/me').then(r=>r.json()).then(d=>{{const control=document.querySelector('#account-control');if(d.authenticated){{account.textContent=d.user;account.href='/history/?mine=1';control.hidden=false;}}}});document.querySelector('#logout').addEventListener('click',async()=>{{await fetch('/api/logout',{{method:'POST',credentials:'same-origin'}});location.reload();}});</script></body></html>"""
+    def sample_io(self, page):
+        """题面里的样例输入/输出，给「运行样例」用。
+
+        服务端出这份数据而不是让前端去刮 DOM：镜像页的结构是已知的，
+        全部 1849 页都恰有一组 `样例输入`/`样例输出`（构建本功能前逐页验过），
+        在这里解析一次比在浏览器里猜 DOM 稳。
+        """
+        text = self.local_page(page)
+        match = re.search(r'<dt>样例输入</dt>\s*<dd>(.*?)</dd>\s*<dt>样例输出</dt>\s*<dd>(.*?)</dd>',
+                          text, re.S)
+        if not match:
+            return {"input": "", "output": ""}
+        def plain(chunk):
+            chunk = re.sub(r"</?pre[^>]*>", "", chunk.strip())
+            return unescape(re.sub(r"<[^>]+>", "", chunk)).strip("\n")
+        return {"input": plain(match.group(1)), "output": plain(match.group(2))}
 
     def submission_page(self, page, book, problem):
         title, params_html, content_html, _ = self.problem_parts(page, book, problem)
@@ -979,11 +1221,14 @@ a{{color:var(--green)}}.shell{{max-width:1120px;margin:auto;padding:0 24px}}.top
                 .replace("__LANGUAGE_OPTIONS__", language_options)
                 .replace("__STATEMENT_TITLE__", escape(title))
                 .replace("__STATEMENT_PARAMS__", params_html)
+                .replace("__SAMPLE_JSON__", json.dumps(self.sample_io(page), ensure_ascii=False)
+                         .replace("</", "<\\/"))
                 .replace("__STATEMENT_CONTENT__", content_html))
 
     def help_page(self):
-        return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>说明 · CS101</title><style>
-:root{--ink:#16231d;--muted:#6c7b73;--line:#dfe7e1;--bg:#f4f7f4;--paper:#fff;--green:#237a50}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:820px;margin:auto;padding:0 24px}.top{height:72px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;gap:11px;align-items:center;text-decoration:none;color:var(--ink);font-weight:750}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:white}.back{color:var(--green);text-decoration:none}.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:30px 34px;box-shadow:0 12px 34px rgba(34,63,45,.06)}h1{font-size:30px;margin:0 0 7px}h2{font-size:18px;margin:28px 0 8px;padding-top:20px;border-top:1px solid var(--line)}p{color:var(--muted)}.rule{padding:14px 16px;border-left:3px solid #c87828;background:#fffaf3;color:var(--ink)}code{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;background:#eef4ef;padding:2px 5px;border-radius:4px}@media(max-width:600px){.shell{padding:0 16px}.panel{padding:24px 20px}.top{height:62px}}
+        return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>说明 · CS101</title>
+<link rel="stylesheet" href="/static/theme.css"><script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script><style>
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:820px;margin:auto;padding:0 24px}.top{height:72px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;gap:11px;align-items:center;text-decoration:none;color:var(--ink);font-weight:750}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg)}.back{color:var(--green);text-decoration:none}.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:30px 34px;box-shadow:0 12px 34px rgba(34,63,45,.06)}h1{font-size:30px;margin:0 0 7px}h2{font-size:18px;margin:28px 0 8px;padding-top:20px;border-top:1px solid var(--line)}p{color:var(--muted)}.rule{padding:14px 16px;border-left:3px solid var(--warn);background:var(--soft);color:var(--ink)}code{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--soft);padding:2px 5px;border-radius:4px}@media(max-width:600px){.shell{padding:0 16px}.panel{padding:24px 20px}.top{height:62px}}
 </style></head><body><header class="top shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><a class="back" href="/">返回首页</a></header><main class="shell"><section class="panel"><h1>帮助/说明</h1><p>这里使用本机测试数据判题，提交页右侧选择语言后即可提交代码并查看每组数据的结果。</p><h2>时间与内存倍率</h2><div class="rule">Python ×10 · PyPy3 ×3 · C/C++/Swift/Objective-C ×1 · C#/F#/VB.NET ×2<br>C#/F#/VB.NET 内存 ×2</div><h2>题面限制的含义</h2><p>题面显示的时限按 C/C++ 计算，是全部测试点限时之和。其他语言按照上面的倍率执行；内存限制仅对 C#、F#、VB.NET 按 2 倍计算。</p><h2>提交结果</h2><p>提交记录会保留提交人、结果、语言、运行时间、内存和代码。出现错误时，判题详情会标出出错的数据组，并展示对应的输入、期望输出和实际输出。</p></section></main></body></html>"""
 
     def account_page(self, register=False):
@@ -997,8 +1242,9 @@ a{{color:var(--green)}}.shell{{max-width:1120px;margin:auto;padding:0 24px}}.top
 <label>密码<input name="password" type="password" required autocomplete="current-password"></label>"""
         endpoint = "/api/user/register" if register else "/api/user/login"
         links = "<a href='/auth/login/'>已有账号？登录</a>" if register else "<a href='/auth/forgot/'>忘记密码？</a> · <a href='/register/'>点此注册</a>"
-        return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title><style>
-:root{{--ink:#16231d;--muted:#6c7b73;--line:#dfe7e1;--bg:#f4f7f4;--paper:#fff;--green:#237a50;--red:#b04f43}}*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}}.shell{{max-width:460px;margin:0 auto;padding:70px 20px}}.brand{{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:28px}}.mark{{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:#fff;font-size:15px}}.panel{{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}}h1{{font-size:28px;line-height:1.2;margin:0 0 6px}}.intro{{color:var(--muted);margin:0 0 23px}}label{{display:block;margin:16px 0 6px;font-weight:600}}input{{display:block;width:100%;padding:11px 12px;border:1px solid #ccd8cf;border-radius:6px;background:#fff;font:inherit;outline:none}}input:focus{{border-color:var(--green);box-shadow:0 0 0 3px #e5f3eb}}button{{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:#fff;border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}}a{{color:var(--green)}}.links{{margin:19px 0 0;color:var(--muted);font-size:14px;text-align:center}}.error{{min-height:22px;color:var(--red);margin:12px 0 0}}.captcha-question{{display:inline-block;margin-left:5px;color:var(--green);font-family:ui-monospace,monospace}}@media(max-width:520px){{.shell{{padding:35px 16px}}.panel{{padding:24px}}}}
+        return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>
+<link rel="stylesheet" href="/static/theme.css"><script>(function(){{try{{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}}catch(e){{document.documentElement.dataset.theme='light';}}}})();</script><style>
+*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}}.shell{{max-width:460px;margin:0 auto;padding:70px 20px}}.brand{{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:28px}}.mark{{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:15px}}.panel{{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}}h1{{font-size:28px;line-height:1.2;margin:0 0 6px}}.intro{{color:var(--muted);margin:0 0 23px}}label{{display:block;margin:16px 0 6px;font-weight:600}}input{{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font:inherit;outline:none}}input:focus{{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-soft)}}button{{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}}a{{color:var(--green)}}.links{{margin:19px 0 0;color:var(--muted);font-size:14px;text-align:center}}.error{{min-height:22px;color:var(--red);margin:12px 0 0}}.captcha-question{{display:inline-block;margin-left:5px;color:var(--green);font-family:ui-monospace,monospace}}@media(max-width:520px){{.shell{{padding:35px 16px}}.panel{{padding:24px}}}}
 </style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><h1>{title}</h1><p class="intro">{'创建账号后即可提交代码并查看判题记录。' if register else '登录后继续使用提交与判题功能。'}</p><form id="account">{fields}<p id="error" class="error"></p><button>提交</button></form><p class="links">{links} · <a href="/">返回首页</a></p></section></main><script>const form=document.querySelector('#account'),error=document.querySelector('#error');form.onsubmit=async e=>{{e.preventDefault();error.textContent='';const data=Object.fromEntries(new FormData(form));if(data.confirm_password!==undefined&&data.password!==data.confirm_password){{error.textContent='两次输入的密码不一致';return}}const r=await fetch('{endpoint}',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(data)}});const d=await r.json();if(r.ok){{if(d.activation_link){{error.style.color='#237a50';error.innerHTML='注册成功，请点击激活链接：<a href="'+d.activation_link+'">激活账号</a>';form.querySelector('button').disabled=true}}else location.href='/'}}else error.textContent=d.error||'操作失败'}};</script></body></html>"""
 
     def activation_page(self, token):
@@ -1010,19 +1256,23 @@ a{{color:var(--green)}}.shell{{max-width:1120px;margin:auto;padding:0 24px}}.top
                 message, detail = "账号已激活", "现在可以登录 CS101 题库。"
             else:
                 message, detail = "激活链接无效或已过期", "请重新注册或联系管理员。"
-        return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{message} · CS101</title><style>body{{margin:0;background:#f4f7f4;color:#16231d;font:15px/1.6 system-ui,sans-serif}}main{{max-width:460px;margin:70px auto;padding:0 20px}}section{{background:#fff;border:1px solid #dfe7e1;border-radius:10px;padding:30px}}h1{{margin:0 0 10px}}p{{color:#6c7b73}}a{{color:#237a50}}</style></head><body><main><section><h1>{message}</h1><p>{detail}</p><p><a href="/auth/login/">前往登录</a></p></section></main></body></html>"""
+        return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{message} · CS101</title>
+<link rel="stylesheet" href="/static/theme.css"><script>(function(){{try{{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}}catch(e){{document.documentElement.dataset.theme='light';}}}})();</script><style>body{{margin:0;background:#f4f7f4;color:#16231d;font:15px/1.6 system-ui,sans-serif}}main{{max-width:460px;margin:70px auto;padding:0 20px}}section{{background:#fff;border:1px solid #dfe7e1;border-radius:10px;padding:30px}}h1{{margin:0 0 10px}}p{{color:#6c7b73}}a{{color:#237a50}}</style></head><body><main><section><h1>{message}</h1><p>{detail}</p><p><a href="/auth/login/">前往登录</a></p></section></main></body></html>"""
 
     def forgot_page(self):
-        return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>找回密码 · CS101</title><style>
-:root{--ink:#16231d;--muted:#6c7b73;--line:#dfe7e1;--bg:#f4f7f4;--paper:#fff;--green:#237a50;--red:#b04f43}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:460px;margin:0 auto;padding:70px 20px}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:28px}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:#fff;font-size:15px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}h1{font-size:28px;line-height:1.2;margin:0 0 6px}.intro{color:var(--muted);margin:0 0 23px}label{display:block;margin:16px 0 6px;font-weight:600}input{display:block;width:100%;padding:11px 12px;border:1px solid #ccd8cf;border-radius:6px;font:inherit;outline:none}button{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:#fff;border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}a{color:var(--green)}.message{color:var(--muted);margin-top:15px;word-break:break-word}@media(max-width:520px){.shell{padding:35px 16px}.panel{padding:24px}}
+        return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>找回密码 · CS101</title>
+<link rel="stylesheet" href="/static/theme.css"><script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script><style>
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:460px;margin:0 auto;padding:70px 20px}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:28px}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:15px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}h1{font-size:28px;line-height:1.2;margin:0 0 6px}.intro{color:var(--muted);margin:0 0 23px}label{display:block;margin:16px 0 6px;font-weight:600}input{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;font:inherit;outline:none}button{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}a{color:var(--green)}.message{color:var(--muted);margin-top:15px;word-break:break-word}@media(max-width:520px){.shell{padding:35px 16px}.panel{padding:24px}}
 </style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><h1>忘记密码？</h1><p class="intro">输入注册邮箱，我们会生成一次性密码重置链接。</p><form id="forgot"><label>邮箱地址<input name="email" type="email" required autocomplete="email"></label><button>发送重置链接</button></form><p id="message" class="message"></p><p><a href="/auth/login/">返回登录</a> · <a href="/register/">点此注册</a></p></section></main><script>forgot.onsubmit=async e=>{e.preventDefault();message.textContent='正在处理…';const r=await fetch('/api/user/forgot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(forgot)))});const d=await r.json();message.innerHTML=d.reset_link?'邮件服务尚未配置，请使用本机重置链接：<a href="'+d.reset_link+'">立即重置密码</a>':'如果该邮箱已注册，重置链接已发送或正在等待管理员配置邮件服务。';}</script></body></html>"""
 
     def reset_page(self, token):
-        return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>重置密码 · CS101</title><style>body{{margin:0;background:#f4f7f4;color:#16231d;font:15px/1.6 system-ui,sans-serif}}main{{max-width:460px;margin:70px auto;padding:0 20px}}section{{background:#fff;border:1px solid #dfe7e1;border-radius:10px;padding:30px}}h1{{margin:0 0 20px}}label{{display:block;margin:14px 0 6px;font-weight:600}}input{{width:100%;padding:11px;box-sizing:border-box;border:1px solid #ccd8cf;border-radius:6px;font:inherit}}button{{width:100%;margin-top:20px;padding:11px;background:#16231d;color:white;border:0;border-radius:6px;font:inherit}}a{{color:#237a50}}#message{{color:#b04f43}}</style></head><body><main><section><h1>设置新密码</h1><form id="reset"><label>新密码<input name="password" type="password" minlength="8" required autocomplete="new-password"></label><label>确认密码<input name="confirm_password" type="password" minlength="8" required autocomplete="new-password"></label><p id="message"></p><button>保存新密码</button></form><p><a href="/auth/login/">返回登录</a></p></section></main><script>reset.onsubmit=async e=>{{e.preventDefault();message.textContent='';const d=Object.fromEntries(new FormData(reset));if(d.password!==d.confirm_password){{message.textContent='两次输入的密码不一致';return}}d.token={json.dumps(token)};const r=await fetch('/api/user/reset',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(d)}});const x=await r.json();if(r.ok){{message.style.color='#237a50';message.textContent='密码已更新，请返回登录。';reset.querySelector('button').disabled=true}}else message.textContent=x.error||'重置失败'}};</script></body></html>"""
+        return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>重置密码 · CS101</title>
+<link rel="stylesheet" href="/static/theme.css"><script>(function(){{try{{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}}catch(e){{document.documentElement.dataset.theme='light';}}}})();</script><style>body{{margin:0;background:#f4f7f4;color:#16231d;font:15px/1.6 system-ui,sans-serif}}main{{max-width:460px;margin:70px auto;padding:0 20px}}section{{background:#fff;border:1px solid #dfe7e1;border-radius:10px;padding:30px}}h1{{margin:0 0 20px}}label{{display:block;margin:14px 0 6px;font-weight:600}}input{{width:100%;padding:11px;box-sizing:border-box;border:1px solid var(--line);border-radius:6px;font:inherit}}button{{width:100%;margin-top:20px;padding:11px;background:#16231d;color:var(--bg);border:0;border-radius:6px;font:inherit}}a{{color:#237a50}}#message{{color:#b04f43}}</style></head><body><main><section><h1>设置新密码</h1><form id="reset"><label>新密码<input name="password" type="password" minlength="8" required autocomplete="new-password"></label><label>确认密码<input name="confirm_password" type="password" minlength="8" required autocomplete="new-password"></label><p id="message"></p><button>保存新密码</button></form><p><a href="/auth/login/">返回登录</a></p></section></main><script>reset.onsubmit=async e=>{{e.preventDefault();message.textContent='';const d=Object.fromEntries(new FormData(reset));if(d.password!==d.confirm_password){{message.textContent='两次输入的密码不一致';return}}d.token={json.dumps(token)};const r=await fetch('/api/user/reset',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(d)}});const x=await r.json();if(r.ok){{message.style.color='#237a50';message.textContent='密码已更新，请返回登录。';reset.querySelector('button').disabled=true}}else message.textContent=x.error||'重置失败'}};</script></body></html>"""
 
     def account_settings_page(self):
-        return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>账户设置 · CS101</title><style>
-:root{--ink:#16231d;--muted:#6c7b73;--line:#dfe7e1;--bg:#f4f7f4;--paper:#fff;--green:#237a50;--red:#b04f43}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:520px;margin:0 auto;padding:52px 20px}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:24px}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:#fff;font-size:15px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}.topline{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:22px}h1{font-size:28px;line-height:1.2;margin:0 0 5px}.muted{color:var(--muted);margin:0}.back{color:var(--green);text-decoration:none;font-size:14px}h2{font-size:16px;margin:0 0 14px;padding-top:22px;border-top:1px solid var(--line)}label{display:block;margin:14px 0 6px;font-weight:600}input{display:block;width:100%;padding:11px 12px;border:1px solid #ccd8cf;border-radius:6px;font:inherit;outline:none}input:focus{border-color:var(--green);box-shadow:0 0 0 3px #e5f3eb}button{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:#fff;border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}.message{min-height:22px;color:var(--red);margin:12px 0 0}.logout{display:block;width:100%;margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);font:inherit;cursor:pointer}@media(max-width:520px){.shell{padding:30px 16px}.panel{padding:24px}}
+        return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>账户设置 · CS101</title>
+<link rel="stylesheet" href="/static/theme.css"><script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script><style>
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:520px;margin:0 auto;padding:52px 20px}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:24px}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:15px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}.topline{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:22px}h1{font-size:28px;line-height:1.2;margin:0 0 5px}.muted{color:var(--muted);margin:0}.back{color:var(--green);text-decoration:none;font-size:14px}h2{font-size:16px;margin:0 0 14px;padding-top:22px;border-top:1px solid var(--line)}label{display:block;margin:14px 0 6px;font-weight:600}input{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;font:inherit;outline:none}input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-soft)}button{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}.message{min-height:22px;color:var(--red);margin:12px 0 0}.logout{display:block;width:100%;margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;cursor:pointer}@media(max-width:520px){.shell{padding:30px 16px}.panel{padding:24px}}
 </style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><div class="topline"><div><h1>账户设置</h1><p id="user" class="muted">正在读取账户…</p></div><a class="back" href="/">返回首页</a></div><h2>修改密码</h2><form id="change"><label>当前密码<input name="current_password" type="password" required autocomplete="current-password"></label><label>新密码<input name="new_password" type="password" minlength="8" required autocomplete="new-password"></label><label>确认新密码<input name="confirm_password" type="password" minlength="8" required autocomplete="new-password"></label><p id="message" class="message"></p><button>保存新密码</button></form><button id="logout" class="logout">退出登录</button></section></main><script>
 fetch('/api/me').then(r=>r.json()).then(d=>{if(!d.authenticated)location.href='/auth/login/';else user.textContent='用户名：'+d.user}).catch(()=>location.href='/auth/login/');
 change.onsubmit=async e=>{e.preventDefault();message.textContent='';const d=Object.fromEntries(new FormData(change));if(d.new_password!==d.confirm_password){message.textContent='两次输入的新密码不一致';return}const r=await fetch('/api/user/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});const x=await r.json();if(r.ok){message.style.color='#237a50';message.textContent='密码已更新。';change.reset()}else message.textContent=x.error||'修改失败'};
@@ -1133,16 +1383,20 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             if parse_qs(parsed.query).get("summary") == ["1"]:
                 self.send_json(catalog_summary_payload()); return
             self.send_json(catalog_full_payload()); return
-        file = ROOT / ("index.html" if path in ("/", "") else decoded_path.lstrip("/"))
-        if file.is_file() and ROOT in file.parents:
-            content_type = "text/html; charset=utf-8" if file.suffix == ".html" else "text/css; charset=utf-8" if file.suffix == ".css" else "text/javascript; charset=utf-8"
-            body = file.read_bytes()
-            self.send_response(200)
-            self.send_header("Content-Type", content_type)
-            self.send_header("Content-Length", str(len(body)))
-            self.end_headers()
-            self.wfile.write(body)
-            return
+        # 静态分发只有两条出口：首页，和 static/ 下的白名单后缀。
+        # 改动前这里是 `ROOT / decoded_path`，只要文件在 ROOT 底下就发 ——
+        # `ROOT in file.parents` 防的是「逃出 ROOT」，防不住「ROOT 里的东西不该全公开」。
+        # 实测 GET /data/course.db 能下到整个 SQLite 库（口令哈希 + 全部提交），
+        # GET /data/.admin_password 走的是同一条路径。.gitignore 挡的是 git，不是 HTTP。
+        if path in ("/", ""):
+            file = ROOT / "index.html"
+            if file.is_file():
+                self.send_static(file, "text/html; charset=utf-8"); return
+        if decoded_path.startswith("/static/"):
+            file = (STATIC_DIR / decoded_path[len("/static/"):]).resolve()
+            # resolve() 之后再判包含，符号链接就指不出 static/ 了
+            if STATIC_DIR in file.parents and file.is_file() and file.suffix in STATIC_TYPES:
+                self.send_static(file, STATIC_TYPES[file.suffix]); return
         # Keep the real OpenJudge URL space usable locally: problem, login,
         # statistics, search, and contest pages are fetched through this host.
         try:
@@ -1317,28 +1571,40 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                 set_setting(WINDOWS_KEY, json.dumps(windows, ensure_ascii=False))
             self.send_json({REVEAL_KEY: reveal_enabled(), "books": reveal_books(),
                             "windows": reveal_windows(), "active_window": active_window()}); return
+        if path in {"/api/run", "/api/run/"} and self.authorized():
+            # 「运行样例」：和提交走同一套沙箱，但不写 submissions 表、不计入统计。
+            book, problem = data.get("book", ""), data.get("problem", "")
+            with judging_slot(self.current_user() or ADMIN_USER) as got_slot:
+                if not got_slot:
+                    self.send_json({"status": "Busy", "message": "上一次判题还在跑，等它结束再试。"}, 429); return
+                self.send_json(run_sample(book, problem, data.get("language", "python"),
+                                          data.get("source", ""), data.get("stdin", "")))
+            return
         if path in {"/api/submit", "/api/submit/"} and self.authorized():
             book, problem = data.get("book", ""), data.get("problem", "")
             language = data.get("language", "python")
-            result = judge(book, problem, language, data.get("source", data.get("code", "")))
-            submitted_source = str(data.get("source", data.get("code", "")))
-            result["source_bytes"] = len(submitted_source.encode("utf-8"))
-            result["language_version"] = language_version(language)
-            # 开关关闭时片段根本不进 response —— 不是前端藏起来，是后端不发。
-            if reveal_effective(book) and result.get("case"):
-                snippet = failing_input_snippet(book, problem, result["case"])
-                if snippet: result["failing_input"] = snippet
-            if result.get("case"):
-                output = failing_output_snippet(book, problem, result["case"])
-                if output: result["expected_output"] = output
-            # detail 存判题器返回的全部字段（case / expected_tokens / message…），
-            # 历史页要靠它回答「错在哪组数据」，只存 status 是答不了的。
-            detail = json.dumps({k: v for k, v in result.items() if k != "status"}, ensure_ascii=False)
-            with sqlite3.connect(DB) as db:
-                db.execute("insert into submissions(user, problem, result, book, language, detail, source) values (?, ?, ?, ?, ?, ?, ?)",
-                           (self.current_user() or ADMIN_USER, problem, result["status"], book, language, detail,
-                            submitted_source))
-            self.send_json(result); return
+            with judging_slot(self.current_user() or ADMIN_USER) as got_slot:
+                if not got_slot:
+                    self.send_json({"status": "Busy", "message": "上一次判题还在跑，等它结束再试。"}, 429); return
+                result = judge(book, problem, language, data.get("source", data.get("code", "")))
+                submitted_source = str(data.get("source", data.get("code", "")))
+                result["source_bytes"] = len(submitted_source.encode("utf-8"))
+                result["language_version"] = language_version(language)
+                # 开关关闭时片段根本不进 response —— 不是前端藏起来，是后端不发。
+                if reveal_effective(book) and result.get("case"):
+                    snippet = failing_input_snippet(book, problem, result["case"])
+                    if snippet: result["failing_input"] = snippet
+                if result.get("case"):
+                    output = failing_output_snippet(book, problem, result["case"])
+                    if output: result["expected_output"] = output
+                # detail 存判题器返回的全部字段（case / expected_tokens / message…），
+                # 历史页要靠它回答「错在哪组数据」，只存 status 是答不了的。
+                detail = json.dumps({k: v for k, v in result.items() if k != "status"}, ensure_ascii=False)
+                with sqlite3.connect(DB) as db:
+                    db.execute("insert into submissions(user, problem, result, book, language, detail, source) values (?, ?, ?, ?, ?, ?, ?)",
+                               (self.current_user() or ADMIN_USER, problem, result["status"], book, language, detail,
+                                submitted_source))
+                self.send_json(result); return
         self.send_json({"error": "Unauthorized"}, 401)
 
 if __name__ == "__main__":

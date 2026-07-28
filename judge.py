@@ -40,6 +40,8 @@ CASE_FLOOR_S = 4
 CASE_CAP_S = 20
 # 整次提交的墙钟硬顶。改动前这一项无界：组数最多的一题有 150 组，150 × 5s = 750 秒。
 TOTAL_HARD_CAP_S = 300
+SAMPLE_STDIN_LIMIT = 64 * 1024
+SAMPLE_OUTPUT_LIMIT = 64 * 1024
 DOTNET_ADDRESS_SPACE = 2 * 768 * 1024 * 1024
 DOTNET_FILE_SIZE = 16 * 1024 * 1024
 LIMITS_CACHE = {}
@@ -166,6 +168,153 @@ def _compile_run(command, cwd, timeout=30):
     return subprocess.run(command, cwd=cwd, capture_output=True, timeout=timeout,
                           env={"PATH": CHILD_PATH, "HOME": str(cwd)})
 
+def prepare_program(work, language, source, warmup_input=b""):
+    """把源码变成一条可执行命令，或给出编译期裁定。
+
+    从 judge() 里原样抽出来，好让「运行样例」复用同一条沙箱路径 ——
+    新端点要是自己抄一份编译逻辑，两边迟早会漂，而漂掉的那一半就是沙箱。
+    返回 (command, None) 或 (None, 裁定字典)。
+    warmup_input 只给 .NET file-based app 预热用（它靠首次运行产出 build 缓存）。
+    """
+    if language in DOTNET_LANGUAGES:
+        dotnet = shutil.which("dotnet")
+        if dotnet is None:
+            return None, {"status": "Language Unavailable", "message": ".NET SDK 10 未安装，换一种语言提交。"}
+        if language in FILE_BASED_DOTNET_LANGUAGES:
+            # .NET SDK 10 file-based apps need no generated project. The first
+            # run creates the build cache; execute its DLL afterwards so the
+            # SDK CLI itself never runs inside the user-code address limit.
+            source_path = work / "Program.cs"
+            source_path.write_text(source, encoding="utf-8")
+            compile_result = subprocess.run(
+                [dotnet, "run", "--file", str(source_path), "--nologo"],
+                cwd=work, input=warmup_input, capture_output=True, timeout=30,
+                env={"PATH": CHILD_PATH, "HOME": str(work), "DOTNET_GCHeapHardLimit": "268435456"})
+            artifacts = list((work / ".local" / "share" / "dotnet" / "runfile").glob(
+                "*/bin/debug/Program.dll"))
+            if not artifacts:
+                message = (compile_result.stderr + compile_result.stdout).decode(errors="replace")[-4000:]
+                return None, {"status": "Compile Error", "message": message}
+            command = [dotnet, str(artifacts[0])]
+        else:
+            source_names = {"fsharp": "Program.fs", "vbnet": "Program.vb"}
+            source_path = work / source_names[language]
+            source_path.write_text(source, encoding="utf-8")
+            project_suffix = {"fsharp": ".fsproj", "vbnet": ".vbproj"}[language]
+            project = work / ("Judge" + project_suffix)
+            explicit_compile = '    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>\n'
+            project.write_text(
+                '<Project Sdk="Microsoft.NET.Sdk">\n'
+                '  <PropertyGroup>\n'
+                '    <OutputType>Exe</OutputType>\n'
+                '    <TargetFramework>net10.0</TargetFramework>\n'
+                '    <ImplicitUsings>disable</ImplicitUsings>\n'
+                '    <Nullable>disable</Nullable>\n'
+                + explicit_compile +
+                '  </PropertyGroup>\n'
+                f'  <ItemGroup><Compile Include="{source_path.name}" /></ItemGroup>\n'
+                '</Project>\n', encoding="utf-8")
+            compile_result = subprocess.run(
+                [dotnet, "build", str(project), "--nologo", "-c", "Release", "-o", str(work / "out")],
+                cwd=work, capture_output=True, timeout=30,
+                env={"PATH": CHILD_PATH, "HOME": str(work), "DOTNET_GCHeapHardLimit": "268435456"})
+            if compile_result.returncode:
+                message = (compile_result.stderr + compile_result.stdout).decode(errors="replace")[-4000:]
+                return None, {"status": "Compile Error", "message": message}
+            command = [str(work / "out" / "Judge")]
+    elif language in SWIFT_LANGUAGES | OBJC_LANGUAGES:
+        ext = ".swift" if language in SWIFT_LANGUAGES else ".m"
+        source_path = work / ("main" + ext)
+        source_path.write_text(source, encoding="utf-8")
+        compiler = shutil.which("swiftc" if language in SWIFT_LANGUAGES else "clang")
+        if compiler is None:
+            return None, {"status": "Language Unavailable", "message": "本机没有安装对应的 Swift/Objective-C 编译器。"}
+        executable = work / "main"
+        flags = ["-O"] if language in SWIFT_LANGUAGES else ["-O2", "-fobjc-runtime=gnustep-1.9"]
+        compile_result = _compile_run([compiler, *flags, str(source_path), "-o", str(executable)], cwd=work)
+        if compile_result.returncode:
+            return None, {"status": "Compile Error", "message": compile_result.stderr.decode(errors="replace")[-4000:]}
+        command = [str(executable)]
+    else:
+        ext = ".py" if language in CPYTHON_LANGUAGES | PYPY_LANGUAGES else ".c" if language == "c" else ".cpp"
+        source_path = work / ("main" + ext); source_path.write_text(source, encoding="utf-8")
+    if language in DOTNET_LANGUAGES | SWIFT_LANGUAGES | OBJC_LANGUAGES:
+        pass
+    elif ext == ".py":
+        interpreter = "pypy3" if language in PYPY_LANGUAGES else "python3"
+        # 必须解析成绝对路径再交给子进程：shutil.which 查的是**本进程**的 PATH，
+        # 而子进程拿的是上面那份受限 PATH，两者不一致时裸名字会 FileNotFoundError
+        # （judge 不接这个异常，服务端就变成 500 而不是给出判定）。
+        # 走绝对路径既修掉这点，又不用往子进程 PATH 里塞目录。
+        interpreter_path = shutil.which(interpreter)
+        if interpreter_path is None:
+            return None, {"status": "Language Unavailable", "message": f"本机没有安装 {interpreter}，换一种语言提交。"}
+        if interpreter == "python3":
+            try:
+                compile(source, str(source_path), "exec")
+            except (SyntaxError, ValueError) as error:
+                return None, {"status": "Compile Error", "message": str(error)[-4000:]}
+        else:
+            # 不能用宿主 CPython 的 compile() 代劳：PyPy3 是另一个版本的解释器，
+            # 语法判定必须由它自己给出，否则会把 CE 误判成 RE。
+            check = _run([interpreter_path, "-I", "-c", SYNTAX_CHECK, str(source_path)], cwd=work, timeout=15)
+            if check.returncode:
+                return None, {"status": "Compile Error", "message": check.stderr.decode(errors="replace")[-4000:]}
+        command = [interpreter_path, "-I", str(source_path)]
+    else:
+        executable = work / "main"
+        compile_result = _run(["g++" if ext == ".cpp" else "gcc", "-O2", "-std=c++17" if ext == ".cpp" else "-std=c11", str(source_path), "-o", str(executable)], cwd=work, timeout=15)
+        if compile_result.returncode: return {"status": "Compile Error", "message": compile_result.stderr.decode(errors="replace")[-4000:]}
+        command = [str(executable)]
+    return command, None
+
+
+def run_sample(book, problem_id, language, source, stdin):
+    """跑一次用户给的输入，只回显输出，不比对、不入库。
+
+    沙箱一条没放宽：命令来自同一个 prepare_program，执行走同一个 _run，
+    因此 RLIMIT_CPU / RLIMIT_FSIZE / RLIMIT_AS、env 白名单、python3 -I
+    和临时目录隔离与判题完全一致（SandboxContractTests 钉的就是这一点）。
+    """
+    if not isinstance(source, str) or not source.strip():
+        return {"status": "Empty Source", "message": "代码不能为空。"}
+    if len(source.encode()) > 512 * 1024:
+        return {"status": "Source Too Large", "message": "代码不能超过 512 KiB。"}
+    stdin = stdin if isinstance(stdin, str) else ""
+    if len(stdin.encode()) > SAMPLE_STDIN_LIMIT:
+        return {"status": "Input Too Large", "message": "样例输入不能超过 64 KiB。"}
+    language = language.lower()
+    digits = re.search(r"(\d+)$", str(problem_id))
+    number = int(digits.group(1)) if digits else None
+    cpu_seconds = case_seconds(number, language, 1)
+    payload = stdin.encode()
+    with tempfile.TemporaryDirectory(prefix="cs101-run-") as temp:
+        work = Path(temp)
+        command, failure = prepare_program(work, language, source, warmup_input=payload)
+        if failure is not None:
+            return failure
+        started = time.perf_counter()
+        run_address_space = DOTNET_ADDRESS_SPACE if language in DOTNET_LANGUAGES else 768 * 1024 * 1024
+        run_file_size = DOTNET_FILE_SIZE if language in DOTNET_LANGUAGES else 2 * 1024 * 1024
+        try:
+            result = _run(command, stdin=payload, cwd=work, timeout=cpu_seconds + 1,
+                          cpu_seconds=cpu_seconds, address_space_bytes=run_address_space,
+                          file_size_bytes=run_file_size)
+        except subprocess.TimeoutExpired:
+            return {"status": "Time Limit Exceeded",
+                    "message": f"运行超过 {cpu_seconds + 1} 秒。"}
+        metrics = {"time_ms": round((time.perf_counter() - started) * 1000),
+                   "memory_kb": int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss)}
+        if result.returncode in {-signal.SIGXCPU, -signal.SIGKILL}:
+            return {"status": "Time Limit Exceeded", **metrics, "message": "超过 CPU 限制。"}
+        stdout = result.stdout.decode(errors="replace")[:SAMPLE_OUTPUT_LIMIT]
+        stderr = result.stderr.decode(errors="replace")[-4000:]
+        if result.returncode != 0:
+            return {"status": "Runtime Error", **metrics, "stdout": stdout,
+                    "stderr": stderr, "message": stderr}
+        return {"status": "OK", **metrics, "stdout": stdout, "stderr": stderr}
+
+
 def judge(book, problem_id, language, source):
     catalog_path = MIRROR / "catalog.json"
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
@@ -178,97 +327,11 @@ def judge(book, problem_id, language, source):
     language = language.lower()
     with tempfile.TemporaryDirectory(prefix="cs101-judge-") as temp:
         work = Path(temp)
-        if language in DOTNET_LANGUAGES:
-            dotnet = shutil.which("dotnet")
-            if dotnet is None:
-                return {"status": "Language Unavailable", "message": ".NET SDK 10 未安装，换一种语言提交。"}
-            if language in FILE_BASED_DOTNET_LANGUAGES:
-                # .NET SDK 10 file-based apps need no generated project. The first
-                # run creates the build cache; execute its DLL afterwards so the
-                # SDK CLI itself never runs inside the user-code address limit.
-                source_path = work / "Program.cs"
-                source_path.write_text(source, encoding="utf-8")
-                first_input = (MIRROR / cases[0]["input"]).read_bytes()
-                compile_result = subprocess.run(
-                    [dotnet, "run", "--file", str(source_path), "--nologo"],
-                    cwd=work, input=first_input, capture_output=True, timeout=30,
-                    env={"PATH": CHILD_PATH, "HOME": str(work), "DOTNET_GCHeapHardLimit": "268435456"})
-                artifacts = list((work / ".local" / "share" / "dotnet" / "runfile").glob(
-                    "*/bin/debug/Program.dll"))
-                if not artifacts:
-                    message = (compile_result.stderr + compile_result.stdout).decode(errors="replace")[-4000:]
-                    return {"status": "Compile Error", "message": message}
-                command = [dotnet, str(artifacts[0])]
-            else:
-                source_names = {"fsharp": "Program.fs", "vbnet": "Program.vb"}
-                source_path = work / source_names[language]
-                source_path.write_text(source, encoding="utf-8")
-                project_suffix = {"fsharp": ".fsproj", "vbnet": ".vbproj"}[language]
-                project = work / ("Judge" + project_suffix)
-                explicit_compile = '    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>\n'
-                project.write_text(
-                    '<Project Sdk="Microsoft.NET.Sdk">\n'
-                    '  <PropertyGroup>\n'
-                    '    <OutputType>Exe</OutputType>\n'
-                    '    <TargetFramework>net10.0</TargetFramework>\n'
-                    '    <ImplicitUsings>disable</ImplicitUsings>\n'
-                    '    <Nullable>disable</Nullable>\n'
-                    + explicit_compile +
-                    '  </PropertyGroup>\n'
-                    f'  <ItemGroup><Compile Include="{source_path.name}" /></ItemGroup>\n'
-                    '</Project>\n', encoding="utf-8")
-                compile_result = subprocess.run(
-                    [dotnet, "build", str(project), "--nologo", "-c", "Release", "-o", str(work / "out")],
-                    cwd=work, capture_output=True, timeout=30,
-                    env={"PATH": CHILD_PATH, "HOME": str(work), "DOTNET_GCHeapHardLimit": "268435456"})
-                if compile_result.returncode:
-                    message = (compile_result.stderr + compile_result.stdout).decode(errors="replace")[-4000:]
-                    return {"status": "Compile Error", "message": message}
-                command = [str(work / "out" / "Judge")]
-        elif language in SWIFT_LANGUAGES | OBJC_LANGUAGES:
-            ext = ".swift" if language in SWIFT_LANGUAGES else ".m"
-            source_path = work / ("main" + ext)
-            source_path.write_text(source, encoding="utf-8")
-            compiler = shutil.which("swiftc" if language in SWIFT_LANGUAGES else "clang")
-            if compiler is None:
-                return {"status": "Language Unavailable", "message": "本机没有安装对应的 Swift/Objective-C 编译器。"}
-            executable = work / "main"
-            flags = ["-O"] if language in SWIFT_LANGUAGES else ["-O2", "-fobjc-runtime=gnustep-1.9"]
-            compile_result = _compile_run([compiler, *flags, str(source_path), "-o", str(executable)], cwd=work)
-            if compile_result.returncode:
-                return {"status": "Compile Error", "message": compile_result.stderr.decode(errors="replace")[-4000:]}
-            command = [str(executable)]
-        else:
-            ext = ".py" if language in CPYTHON_LANGUAGES | PYPY_LANGUAGES else ".c" if language == "c" else ".cpp"
-            source_path = work / ("main" + ext); source_path.write_text(source, encoding="utf-8")
-        if language in DOTNET_LANGUAGES | SWIFT_LANGUAGES | OBJC_LANGUAGES:
-            pass
-        elif ext == ".py":
-            interpreter = "pypy3" if language in PYPY_LANGUAGES else "python3"
-            # 必须解析成绝对路径再交给子进程：shutil.which 查的是**本进程**的 PATH，
-            # 而子进程拿的是上面那份受限 PATH，两者不一致时裸名字会 FileNotFoundError
-            # （judge 不接这个异常，服务端就变成 500 而不是给出判定）。
-            # 走绝对路径既修掉这点，又不用往子进程 PATH 里塞目录。
-            interpreter_path = shutil.which(interpreter)
-            if interpreter_path is None:
-                return {"status": "Language Unavailable", "message": f"本机没有安装 {interpreter}，换一种语言提交。"}
-            if interpreter == "python3":
-                try:
-                    compile(source, str(source_path), "exec")
-                except (SyntaxError, ValueError) as error:
-                    return {"status": "Compile Error", "message": str(error)[-4000:]}
-            else:
-                # 不能用宿主 CPython 的 compile() 代劳：PyPy3 是另一个版本的解释器，
-                # 语法判定必须由它自己给出，否则会把 CE 误判成 RE。
-                check = _run([interpreter_path, "-I", "-c", SYNTAX_CHECK, str(source_path)], cwd=work, timeout=15)
-                if check.returncode:
-                    return {"status": "Compile Error", "message": check.stderr.decode(errors="replace")[-4000:]}
-            command = [interpreter_path, "-I", str(source_path)]
-        else:
-            executable = work / "main"
-            compile_result = _run(["g++" if ext == ".cpp" else "gcc", "-O2", "-std=c++17" if ext == ".cpp" else "-std=c11", str(source_path), "-o", str(executable)], cwd=work, timeout=15)
-            if compile_result.returncode: return {"status": "Compile Error", "message": compile_result.stderr.decode(errors="replace")[-4000:]}
-            command = [str(executable)]
+        command, failure = prepare_program(
+            work, language, source,
+            warmup_input=(MIRROR / cases[0]["input"]).read_bytes() if language in DOTNET_LANGUAGES else b"")
+        if failure is not None:
+            return failure
         overall_started = time.perf_counter()
         peak_memory = 0
         last_metrics = {}

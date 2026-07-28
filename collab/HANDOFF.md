@@ -1,5 +1,42 @@
 # HANDOFF · 交接日志
 
+### 2026-07-28 · Claude → Codex · T-010 提交页力扣化改造（P1-P4 + 一处安全修复）
+
+- **做了什么**：把 `/practice/<id>/` 改成力扣式全屏工作台（整页 `100dvh` 不滚动、左右独立圆角卡片、
+  题面/提交记录/统计三个左侧标签页、编辑器与判题结果上下分栏、横竖两条可拖且带键盘支持）；
+  新增「运行样例」（`POST /api/run`，与判题同沙箱、不写 `submissions` 表）；
+  新建 `static/theme.css` 统一 10 个页面的设计 token 与深色模式；
+  **修掉一个既有的静态文件暴露漏洞**（下详）；给 `/api/submit` 与 `/api/run` 加每用户互斥。
+- **改了哪些文件**：`server.py`、`judge.py`、`static/theme.css`(新)、`index.html`、`problems.html`、
+  `history.html`、`admin.html`、`tests/test_server.py`、`tests/test_judge.py`、`tools/handoff.py`、
+  `collab/t010-manifest.md`(新)、`collab/PLAN.md`；删除 `style.css`、`app.js`（死代码，无任何页面引用）。
+- **关联提交**：待提交（本条随本轮提交落库）
+- **验证**：`python3 tools/handoff.py --verify` **退出码 0**（unittest / py_compile / check_pending_rework /
+  full_sweep 全 ✅）；`python3 -m unittest discover -s tests` **Ran 99 tests, OK (skipped=3)**，
+  改动前为 92。真实冒烟（本地 127.0.0.1:8127，非 jensen）：注册→登录→
+  运行样例正确解 `{"status":"OK","stdout":"3\n"}`、运行时错误正确归类为 `Runtime Error`、
+  **运行后 `/api/submissions?mine=1` 仍为 0 条**；提交 `{"status":"Accepted","cases":5}`；
+  同一用户并发两发 → 后到的 `429 {"status":"Busy"}`、先到的 200。
+  10 个页面逐个渲染核对：无字面 `{{` 残留、无 `:root` 残留、均已引用 theme.css。
+- **请重点看**：①**`judge.py` 的 `prepare_program` 抽取**——号称纯移动，但脚本化抽取时
+  `.NET` 分支有一行缩进被我改过（删掉 `first_input` 那行时缩进留给了下一行），
+  **本机没装 .NET SDK，测试跑不到那条分支**，请逐字核对是否与改动前等价。
+  ②**`/api/run` 不校验题号**：不查 catalog、不要求题目有数据，`book`/`problem` 只用来算限时，
+  等于给登录用户一个通用代码执行器（沙箱同一套）。我判断可接受，但这是取舍，请质疑。
+  ③每用户互斥是进程内 `set`+`Lock`，多进程部署即失效。
+  ④我改了一条既有断言：`test_server.py` 原来断言 `height:520px`，
+  而全屏布局的核心正是编辑器不再定高，已改为断言 `100dvh` / `pane-editor` 并反向断言 `height:520px` 不存在。
+- **红线自检**：判题沙箱未放宽 ✅（`prepare_program`/`_run` 限额值一条未动；
+  **新增 `SandboxContractTests` 两条把 `run_sample` 也钉进契约**，三条变异全抓：绕开 `_run`→FAILED(2)、
+  内存放宽 4GB→FAILED(1)、env 多塞变量→FAILED(2)）｜口令未入库 ✅｜
+  路径防线未动 ✅ **且已收紧**：静态兜底原为 `ROOT / decoded_path` + `ROOT in file.parents`，
+  只防「逃出 ROOT」不防「ROOT 内全公开」——**实测 `GET /data/course.db` 能下到整个 SQLite 库
+  （口令哈希 + 全部提交），`data/.admin_password` 同路径**；已改为白名单（首页 + `static/` 下白名单后缀），
+  新测试断言内容而非状态码（未命中会落到上游代理，代理通不通网只影响状态码），变异注入旧行为确实变红。
+- **下一步建议**：P4 只做到「共享 token + 深色模式」。`problems.html`/`history.html`/`admin.html`
+  **本来就没有导航条**（只有 `.bar` 工具条），加统一顶栏属 markup 改造而非配色迁移，未做，
+  这三页也因此还没有主题开关（只跟随系统）。这块最适合你接。
+
 ### 2026-07-27 · Codex → Claude · T-004 round19 完成，T-004 收官
 
 - **做了什么**：处理全量历史报告扫描发现的两项遗留。`4140` 是无输入题，明确记录恒定输出/单组数据豁免并把三个重复题库条目的 21 组各压为 1 组；`15291` 重写生成器为多种有重叠布局，20 组生成数据中 16 组输出非零，恒定输出探针恢复为 `rejected`。

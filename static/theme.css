@@ -1,0 +1,410 @@
+/* CS101 共享设计 token 与页面外壳。
+ *
+ * 为什么有这个文件（T-010，人拍板准许，见 collab/PLAN.md Decision Log）：
+ * 改动前 10 个页面各自内联一套 :root，同一个「主色」漂成了三个值
+ * （#2f7d55 / #237a50 / #3d8b68），深色模式只有提交页有、且靠 19 条硬编码色
+ * 覆盖堆出来。红线 6 禁的是「框架或依赖」，一个静态 CSS 文件两者都不是。
+ *
+ * 深色模式只有一个块。做得到的前提是：颜色一律走变量，页面 CSS 里不留硬编码色。
+ * 主题由 <head> 里的同步脚本在首屏绘制前写进 data-theme（见各页 THEME_BOOT），
+ * 所以这里不需要再写一遍 prefers-color-scheme —— 那会让深色值出现两份、迟早漂移。
+ */
+
+:root {
+  color-scheme: light;
+
+  --ink: #16231d;           /* 正文 */
+  --muted: #6b7a72;         /* 次要文字 */
+  --line: #dfe7e1;          /* 描边 */
+  --bg: #f4f7f4;            /* 页面底色 */
+  --panel: #ffffff;         /* 卡片面 */
+  --soft: #eef3ef;          /* 弱填充：工具条、代码块 */
+  --accent: #237a50;        /* 主色 */
+  --accent-soft: #e5f3eb;
+  --warn: #c87828;
+  --danger: #b04f43;
+  --shadow: 0 18px 45px rgba(34, 63, 45, .08);
+  --shadow-sm: 0 6px 18px rgba(34, 63, 45, .05);
+
+  /* 老页面沿用的别名。保留它们，P4 的迁移就只是「删掉本页 :root、加一行 link」，
+     而不必逐条改选择器 —— 改的面越小，越不容易在 10 个页面里漏掉一个。 */
+  --paper: var(--panel);
+  --green: var(--accent);
+  --green-soft: var(--accent-soft);
+  --amber: var(--warn);
+  --ok: var(--accent);
+  --none: #a8b2ab;
+
+  /* 编辑器语法高亮。改动前这些是硬编码的，正因如此深色模式才需要 19 条覆盖。 */
+  --tok-com: #7a8a80;
+  --tok-str: #2f7d55;
+  --tok-num: #8a6d1f;
+  --tok-kw: #9a3d8f;
+  --tok-pre: #3d6b8b;
+  --tok-match-bg: #ffe9a8;
+  --tok-match-ring: #d8b84a;
+  --gutter-bg: #fbfcfb;
+  --gutter-fg: #aab4ad;
+
+  /* 判题状态徽章 */
+  --badge-ac-bg: #e7f3ec;    --badge-ac-fg: #2f7d55;
+  --badge-wa-bg: #fdeceb;    --badge-wa-fg: #b04f43;
+  --badge-other-bg: #fdf4e3; --badge-other-fg: #8a6d1f;
+  --badge-info-bg: #eef1f4;  --badge-info-fg: #55606b;
+
+  --radius: 10px;
+  --radius-sm: 7px;
+  --topbar-h: 48px;
+  --pane-gap: 8px;
+  --code-size: 13px;
+  --font-ui: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --ink: #e6ece8;
+  --muted: #94a49b;
+  --line: #2f3a34;
+  --bg: #141917;
+  --panel: #181e1b;
+  --soft: #202923;
+  --accent: #8fd6ab;
+  --accent-soft: #1e3a2a;
+  --warn: #dcc07a;
+  --danger: #e59a90;
+  --shadow: 0 18px 45px rgba(0, 0, 0, .45);
+  --shadow-sm: 0 6px 18px rgba(0, 0, 0, .3);
+  --none: #5c6a63;
+
+  --tok-com: #7f8f86;
+  --tok-str: #7fc99b;
+  --tok-num: #d8b667;
+  --tok-kw: #d78fd0;
+  --tok-pre: #87b3d8;
+  --tok-match-bg: #5a4a1a;
+  --tok-match-ring: #b8952f;
+  --gutter-bg: #151a18;
+  --gutter-fg: #5c6a63;
+
+  --badge-ac-bg: #1e3a2a;    --badge-ac-fg: #8fd6ab;
+  --badge-wa-bg: #3d2320;    --badge-wa-fg: #e59a90;
+  --badge-other-bg: #39301a; --badge-other-fg: #dcc07a;
+  --badge-info-bg: #242c33;  --badge-info-fg: #a8b6c2;
+}
+
+* { box-sizing: border-box }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: var(--font-ui);
+}
+
+a { color: inherit }
+
+.muted { color: var(--muted) }
+
+/* ---- 顶栏：改动前这段 markup 在 5 个地方逐字复制 ------------------------ */
+
+.topbar {
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+  flex: 0 0 auto;
+}
+
+.brand {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  text-decoration: none;
+  font-weight: 750;
+  letter-spacing: .02em;
+  white-space: nowrap;
+}
+
+.mark {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 14px;
+}
+
+.topnav {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.topnav a,
+.account-trigger { text-decoration: none }
+
+.topnav a:hover,
+.account-trigger:hover { color: var(--accent) }
+
+.online { font-size: 13px }
+
+.account-control { position: relative }
+
+.account-trigger {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.account-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  padding-top: 8px;
+  min-width: 130px;
+  z-index: 20;
+  display: none;
+}
+
+.account-control:hover .account-menu,
+.account-control:focus-within .account-menu { display: block }
+
+.account-menu-inner {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  padding: 6px;
+}
+
+.account-menu-inner a,
+.account-menu-inner button {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.account-menu-inner a:hover,
+.account-menu-inner button:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ---- 面板：力扣式圆角卡片 ---------------------------------------------- */
+/* 每一层都要 min-height:0，否则内容会把面板撑破、滚动跑到 body 上去。 */
+
+.pane {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow-sm);
+}
+
+.pane-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  padding: 0 10px;
+  min-height: 40px;
+  border-bottom: 1px solid var(--line);
+  background: var(--soft);
+  font-size: 13px;
+}
+
+.pane-tab {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  padding: 9px 11px;
+  cursor: pointer;
+  border-radius: 6px 6px 0 0;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+
+.pane-tab:hover { color: var(--ink) }
+
+.pane-tab[aria-selected="true"] {
+  color: var(--ink);
+  font-weight: 650;
+  border-bottom-color: var(--accent);
+}
+
+.pane-tools {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.pane-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 18px 22px;
+}
+
+.pane-body[hidden] { display: none }
+
+/* ---- 拖拽分隔条 -------------------------------------------------------- */
+
+.splitter {
+  position: relative;
+  touch-action: none;
+  flex: 0 0 auto;
+  background: transparent;
+}
+
+.splitter::before {
+  content: "";
+  position: absolute;
+  background: var(--line);
+  transition: background .15s, transform .15s;
+}
+
+.splitter-v { cursor: col-resize }
+.splitter-v::before { top: 0; bottom: 0; left: 50%; width: 2px; transform: translateX(-50%) }
+
+.splitter-h { cursor: row-resize }
+.splitter-h::before { left: 0; right: 0; top: 50%; height: 2px; transform: translateY(-50%) }
+
+.splitter:hover::before,
+.splitter.dragging::before,
+.splitter:focus-visible::before { background: var(--accent) }
+
+.splitter-v:hover::before,
+.splitter-v.dragging::before,
+.splitter-v:focus-visible::before { transform: translateX(-50%) scaleX(2) }
+
+.splitter-h:hover::before,
+.splitter-h.dragging::before,
+.splitter-h:focus-visible::before { transform: translateY(-50%) scaleY(2) }
+
+.splitter:focus-visible { outline: none }
+
+/* ---- 控件 -------------------------------------------------------------- */
+
+select,
+button,
+.btn {
+  padding: 8px 13px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  background: var(--panel);
+  color: var(--ink);
+}
+
+button,
+.btn { cursor: pointer }
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--panel);
+  font-weight: 650;
+}
+
+button.primary:hover { filter: brightness(1.06) }
+
+button.ghost {
+  background: var(--panel);
+  color: var(--muted);
+}
+
+button.ghost:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--soft);
+}
+
+button[disabled] { opacity: .55; cursor: default; filter: none }
+
+/* ---- 徽章与指标 -------------------------------------------------------- */
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.b-ac    { background: var(--badge-ac-bg);    color: var(--badge-ac-fg) }
+.b-wa    { background: var(--badge-wa-bg);    color: var(--badge-wa-fg) }
+.b-other { background: var(--badge-other-bg); color: var(--badge-other-fg) }
+.b-info  { background: var(--badge-info-bg);  color: var(--badge-info-fg) }
+
+.chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--soft);
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.chip b {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  font-weight: 650;
+}
+
+/* ---- 表格 -------------------------------------------------------------- */
+
+table { width: 100%; border-collapse: collapse; font-size: 14px }
+
+th, td { text-align: left; padding: 7px 9px; border-bottom: 1px solid var(--line) }
+
+th { color: var(--muted); font-size: 12px; font-weight: 600 }
+
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap }
+
+/* ---- 代码块 ------------------------------------------------------------ */
+
+pre.msg {
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 10px;
+  margin: 10px 0 0;
+  font: 12px/1.5 var(--font-mono);
+  max-height: 220px;
+  overflow: auto;
+}
+
+pre.source { white-space: pre; max-height: 360px }

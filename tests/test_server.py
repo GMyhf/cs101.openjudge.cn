@@ -14,6 +14,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
+STATIC_DIR = ROOT / "static"
 
 # 认证提交这条链路要真的走进判题器，所以题号必须选数据已入库的（`*_made/`）；
 # `data/openjudge/tests/**` 下抓取的数据不入库，用它会让新克隆的仓库跑不通。
@@ -222,7 +223,12 @@ class ServerApiTests(unittest.TestCase):
         text = body.decode("utf-8", errors="replace")
         self.assertIn(SUBMIT_PROBLEM, text)
         self.assertIn("我的提交记录", text)
-        self.assertIn("height:520px", text)
+        # T-010 起编辑器不再定高：整页 100dvh 不滚动，编辑器随视口伸缩，
+        # 滚动只发生在 .pane-body 内。原来这里断言的是 `height:520px`——
+        # 那正是本次要去掉的东西，所以断言跟着设计意图一起改。
+        self.assertIn("100dvh", text)
+        self.assertIn("pane-editor", text)
+        self.assertNotIn("height:520px", text)
         self.assertIn("查看代码", text)
         self.assertIn("G++(", text)
         self.assertIn("Python3(", text)
@@ -645,11 +651,106 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(count("?limit=abc"), total)      # 非法值回落默认，不是 500
         self.assertEqual(count("?limit=99999"), total)    # 夹到上界，不是拒绝
 
+    def test_submit_page_embeds_sample_io(self):
+        """样例由服务端解析后注入，前端不刮 DOM。"""
+        status, _, body = request(self.port, "GET", f"/{SUBMIT_BOOK}/{SUBMIT_PROBLEM}/submit/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertNotIn("__SAMPLE_JSON__", text)
+        payload = json.loads(re.search(r"const SAMPLES = (\{.*?\});", text).group(1))
+        self.assertIn("input", payload)
+        self.assertIn("output", payload)
+        self.assertTrue(payload["output"].strip(), "样例输出不该是空的")
+        self.assertNotIn("<pre>", payload["input"])     # 标签要剥干净
+
+    def test_run_endpoint_requires_authentication(self):
+        status, _, _ = request(self.port, "POST", "/api/run", {
+            "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM,
+            "language": "python", "source": "print(1)", "stdin": "",
+        })
+        self.assertEqual(status, 401)
+
+    def test_run_endpoint_executes_without_recording_a_submission(self):
+        """「运行样例」不该进 submissions 表，否则会污染判题记录与统计。"""
+        cookie = self.register_and_login("t010_runner", "T010-password")
+
+        def submission_count():
+            _, _, raw = request(self.port, "GET", "/api/submissions?mine=1", cookie=cookie)
+            return len(json.loads(raw)["submissions"])
+
+        before = submission_count()
+        status, _, raw = request(self.port, "POST", "/api/run", {
+            "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
+            "source": "print(int(input()) * 2)", "stdin": "21\n",
+        }, cookie=cookie)
+        self.assertEqual(status, 200)
+        result = json.loads(raw)
+        self.assertEqual(result["status"], "OK", result)
+        self.assertEqual(result["stdout"].strip(), "42")
+        self.assertEqual(submission_count(), before, "运行样例不该产生提交记录")
+
+    def test_run_endpoint_reports_runtime_error_without_crashing(self):
+        cookie = self.register_and_login("t010_runner_err", "T010-password")
+        status, _, raw = request(self.port, "POST", "/api/run", {
+            "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
+            "source": "raise SystemExit(3)", "stdin": "",
+        }, cookie=cookie)
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(raw)["status"], "Runtime Error")
+
+    def test_run_endpoint_rejects_oversized_stdin(self):
+        cookie = self.register_and_login("t010_runner_big", "T010-password")
+        status, _, raw = request(self.port, "POST", "/api/run", {
+            "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
+            "source": "print(1)", "stdin": "x" * (64 * 1024 + 1),
+        }, cookie=cookie)
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(raw)["status"], "Input Too Large")
+
     def test_static_path_cannot_traverse(self):
         for path in ("/../server.py", "/%2e%2e/server.py", "/data/../server.py"):
             status, _, body = request(self.port, "GET", path)
             self.assertEqual(status, 404, path)
             self.assertNotIn(b"ThreadingHTTPServer", body, path)
+
+    def test_static_serves_only_whitelisted_assets(self):
+        # 上一条防的是「逃出 ROOT」；这条防的是「ROOT 里的东西不该全公开」。
+        # 改动前 GET /data/course.db 能下到整个 SQLite 库（口令哈希 + 全部提交），
+        # data/.admin_password 走的是同一条代码路径。断言查内容而不是状态码，
+        # 因为未命中会落到上游代理，代理通不通网决定了状态码、决定不了内容。
+        leaks = {
+            "/server.py": b"ThreadingHTTPServer",
+            "/judge.py": b"TOTAL_HARD_CAP_S",
+            "/data/course.db": b"SQLite format 3",
+            "/collab/PLAN.md": b"Decision Log",
+            "/data/openjudge/catalog.json": b"test_cases",
+        }
+        for path, fingerprint in leaks.items():
+            _, _, body = request(self.port, "GET", path)
+            self.assertNotIn(fingerprint, body, path)
+
+        canary = ROOT / "data" / ".probe-canary"
+        canary.write_text("CANARY-NOT-A-REAL-SECRET\n", encoding="utf-8")
+        try:
+            # 与 data/.admin_password 同目录同形态，但不动真的口令文件
+            _, _, body = request(self.port, "GET", "/data/.probe-canary")
+            self.assertNotIn(b"CANARY-NOT-A-REAL-SECRET", body)
+        finally:
+            canary.unlink()
+
+        status, headers, body = request(self.port, "GET", "/static/theme.css")
+        self.assertEqual(status, 200)
+        self.assertIn("text/css", headers.get("Content-Type", ""))
+        self.assertIn(b"--accent", body)
+
+        # 白名单是按后缀发的：static/ 下放一个非白名单后缀也不该发出去
+        blocked = STATIC_DIR / "probe-canary.md"
+        blocked.write_text("CANARY-NOT-A-REAL-SECRET\n", encoding="utf-8")
+        try:
+            _, _, body = request(self.port, "GET", "/static/probe-canary.md")
+            self.assertNotIn(b"CANARY-NOT-A-REAL-SECRET", body)
+        finally:
+            blocked.unlink()
 
 
 if __name__ == "__main__":

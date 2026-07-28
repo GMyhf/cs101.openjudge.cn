@@ -297,6 +297,54 @@ class SandboxContractTests(unittest.TestCase):
                 self.assertGreaterEqual(seen[resource.RLIMIT_CPU][0], judge_module.CASE_FLOOR_S)
                 self.assertLessEqual(seen[resource.RLIMIT_CPU][0], judge_module.CASE_CAP_S)
 
+    def test_run_sample_goes_through_the_same_limits(self):
+        """「运行样例」也在跑不可信代码，沙箱一条都不能少。
+
+        上一条测的是 judge()。T-010 加了第二条执行路径（/api/run → run_sample），
+        它必须走同一个 _run —— 这个项目一路的教训是：标准立了但没有机械判据，
+        等于没立。新开一条执行路径而不把它钉进契约，正是最容易漏的那种。
+        """
+        calls = []
+        real_run = judge_module.subprocess.run
+
+        def spy(command, **kwargs):
+            calls.append(kwargs.get("preexec_fn"))
+            return real_run(command, **kwargs)
+
+        with mock.patch.object(judge_module.subprocess, "run", spy):
+            result = judge_module.run_sample(BOOK, PROBLEM, "python", SUM_SOURCE, "1 2\n")
+        self.assertEqual(result["status"], "OK", result)
+        self.assertEqual(result["stdout"].strip(), "3")
+        self.assertTrue(calls)
+        for fn in calls:
+            self.assertIsNotNone(fn)
+            seen = {}
+            with mock.patch.object(resource, "setrlimit", lambda k, v: seen.__setitem__(k, v)):
+                fn()
+            self.assertEqual(sorted(seen), sorted([resource.RLIMIT_CPU, resource.RLIMIT_FSIZE,
+                                                   resource.RLIMIT_AS]))
+            self.assertEqual(seen[resource.RLIMIT_FSIZE], (2 * 1024 * 1024, 2 * 1024 * 1024))
+            self.assertEqual(seen[resource.RLIMIT_AS], (768 * 1024 * 1024, 768 * 1024 * 1024))
+            self.assertGreaterEqual(seen[resource.RLIMIT_CPU][0], judge_module.CASE_FLOOR_S)
+            self.assertLessEqual(seen[resource.RLIMIT_CPU][0], judge_module.CASE_CAP_S)
+
+    def test_run_sample_child_environment_is_the_fixed_minimal_set(self):
+        """子进程 env 必须恰好是 {PATH, HOME}，运行样例这条路径也一样。"""
+        seen = []
+        real_run = judge_module.subprocess.run
+
+        def spy(command, **kwargs):
+            if kwargs.get("preexec_fn") is not None:
+                seen.append(kwargs.get("env"))
+            return real_run(command, **kwargs)
+
+        with mock.patch.object(judge_module.subprocess, "run", spy):
+            judge_module.run_sample(BOOK, PROBLEM, "python", SUM_SOURCE, "1 2\n")
+        self.assertTrue(seen)
+        for env in seen:
+            self.assertEqual(sorted(env), ["HOME", "PATH"], env)
+            self.assertEqual(env["PATH"], judge_module.CHILD_PATH)
+
 
 CPP_SOURCE = "#include <cstdio>\nint main(){int a,b;scanf(\"%d %d\",&a,&b);printf(\"%d\\n\",a+b);}\n"
 

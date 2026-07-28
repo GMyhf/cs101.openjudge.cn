@@ -126,8 +126,12 @@ def run_verify():
     # 那次是碰巧想起来做的，不是流程的一部分。现在是了。
     if (ROOT / "tools" / "full_sweep.py").is_file():
         steps.append(["python3", "tools/full_sweep.py"])
-    if (ROOT / "app.js").is_file() and shutil.which("node"):
-        steps.append(["node", "--check", "app.js"])
+    # 前端 JS 现在只内联在 server.py 的页面模板里（T-010 删掉了没人引用的 app.js/style.css）。
+    # 语法由 tests/test_server.py 的两条 node 用例真跑一遍页面里的编辑器代码来保证，
+    # 比 `node --check` 一个死文件强得多。
+    for asset in sorted((ROOT / "static").glob("*.js")) if (ROOT / "static").is_dir() else []:
+        if shutil.which("node"):
+            steps.append(["node", "--check", str(asset.relative_to(ROOT))])
     outputs, ok = [], True
     for step in steps:
         proc = subprocess.run(step, cwd=ROOT, capture_output=True, text=True)

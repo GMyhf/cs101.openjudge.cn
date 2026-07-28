@@ -2,15 +2,16 @@
 <html lang="zh-CN">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/static/theme.css">
+<script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script>
 <title>提交记录 · CS101</title>
 <style>
-  :root { --ink:#17221d; --muted:#6b7a72; --line:#d9e0da; --bg:#f7f9f7; --ok:#2f7d55; --bad:#b04f43; }
   * { box-sizing:border-box; }
   body { font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink);
          max-width:980px; margin:0 auto; padding:28px 20px 60px; }
   h1 { font-size:26px; margin:0 0 4px; }
   .sub { color:var(--muted); margin:0 0 20px; }
-  .sub a { color:#3d8b68; }
+  .sub a { color:var(--accent); }
   .cards { display:flex; gap:10px; flex-wrap:wrap; margin:0 0 18px; }
   .stat { border:1px solid var(--line); border-radius:8px; padding:10px 14px; background:var(--bg); min-width:104px; }
   .stat b { display:block; font-size:20px; font-variant-numeric:tabular-nums; }
@@ -23,16 +24,16 @@
   th { color:var(--muted); font-size:13px; font-weight:600; }
   tr:hover td { background:var(--bg); }
   td.num { font-variant-numeric:tabular-nums; white-space:nowrap; }
-  a.pid { color:#3d8b68; text-decoration:none; font-weight:600; }
+  a.pid { color:var(--accent); text-decoration:none; font-weight:600; }
   a.pid:hover { text-decoration:underline; }
   .badge { display:inline-block; padding:1px 9px; border-radius:999px; font-size:12px; font-weight:600; white-space:nowrap; }
-  .b-ac { background:#e7f3ec; color:var(--ok); }
-  .b-wa { background:#fdeceb; color:var(--bad); }
-  .b-other { background:#fdf4e3; color:#8a6d1f; }
-  .b-info { background:#eef1f4; color:#55606b; }
+  .b-ac { background:var(--badge-ac-bg); color:var(--ok); }
+  .b-wa { background:var(--badge-wa-bg); color:var(--bad); }
+  .b-other { background:var(--badge-other-bg); color:var(--badge-other-fg); }
+  .b-info { background:var(--badge-info-bg); color:var(--badge-info-fg); }
   .muted { color:var(--muted); }
   .empty { padding:40px 0; text-align:center; color:var(--muted); }
-  details summary { color:#3d8b68; cursor:pointer; }
+  details summary { color:var(--accent); cursor:pointer; }
   pre.source { max-width:620px; max-height:360px; overflow:auto; margin:8px 0 0; padding:10px; border:1px solid var(--line); border-radius:5px; background:var(--bg); white-space:pre; font:12px/1.5 ui-monospace,monospace; }
 </style>
 <h1>提交记录</h1>
