@@ -116,7 +116,46 @@ QUOTA_HISTORY = {}
 QUOTA_LOCK = threading.Lock()
 
 
-def quota_retry_after(bucket, user, window, limit):
+QUOTAS_KEY = "quotas"
+# 默认值是拍的（按「改一版跑一版」的调试节奏），没有真实使用数据支撑 ——
+# 所以必须能在管理页上改，而不是改常量再重启：真正会撞上额度的是考试当天，
+# 那正是最不能重启的时刻。limit 填 0 表示不限（考试时可临时放开）。
+QUOTA_DEFAULTS = {
+    "run": {"limit": 30, "window": 300},
+    "submit": {"limit": 20, "window": 600},
+    # 注册按来源地址计数，而一个班常在同一出口 IP 后面：开学第一节课
+    # 集中注册就是一次「一个 IP、上百个合法请求」。所以默认给得宽，
+    # 只拦批量刷号；真要更紧或更松，管理页上改，不用重启。
+    "register": {"limit": 100, "window": 600},
+}
+QUOTA_LIMIT_CAP = 100000
+QUOTA_WINDOW_RANGE = (10, 86400)
+
+
+def quota_config():
+    """管理员配置优先，坏值或缺项回落到默认，永远返回三个桶都齐全的表。"""
+    try:
+        stored = json.loads(get_setting(QUOTAS_KEY, "{}")) or {}
+    except (ValueError, TypeError):
+        stored = {}
+    config = {}
+    for bucket, default in QUOTA_DEFAULTS.items():
+        entry = stored.get(bucket) if isinstance(stored.get(bucket), dict) else {}
+        try:
+            limit = int(entry.get("limit", default["limit"]))
+        except (TypeError, ValueError):
+            limit = default["limit"]
+        try:
+            window = int(entry.get("window", default["window"]))
+        except (TypeError, ValueError):
+            window = default["window"]
+        limit = max(0, min(limit, QUOTA_LIMIT_CAP))
+        window = max(QUOTA_WINDOW_RANGE[0], min(window, QUOTA_WINDOW_RANGE[1]))
+        config[bucket] = {"limit": limit, "window": window}
+    return config
+
+
+def quota_retry_after(bucket, user, window=None, limit=None):
     """每用户滑动窗口配额。返回还需等待的秒数；0 表示放行（并已记账）。
 
     互斥只挡「同时」，挡不住「一直」—— 一个登录用户可以串行地无限次要求我们执行代码。
@@ -124,7 +163,14 @@ def quota_retry_after(bucket, user, window, limit):
 
     限的是**请求我们执行**这件事，不是「成功执行」：题号不存在、编译失败一样计数，
     否则拿无效请求刷同样能把机器占满。
+
+    不传 window/limit 时读管理员配置；limit 为 0 表示不限。
     """
+    if window is None or limit is None:
+        conf = quota_config()[bucket]
+        window, limit = conf["window"], conf["limit"]
+    if limit <= 0:
+        return 0
     key = (bucket, (user or "").lower())
     now = time.time()
     with QUOTA_LOCK:
@@ -1568,6 +1614,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             book = parse_qs(parsed.query).get("book", [""])[0]
             self.send_json({REVEAL_KEY: reveal_enabled(), "books": reveal_books(),
                             "windows": reveal_windows(), "active_window": active_window(),
+                            "quotas": quota_config(), "quota_defaults": QUOTA_DEFAULTS,
                             "effective": reveal_effective(book) if book else None,
                             "is_admin": same_username(self.current_user() or "", ADMIN_USER)})
             return
@@ -1676,6 +1723,14 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             try: data = json.loads(raw or b"{}")
             except json.JSONDecodeError: self.send_json({"error": "Invalid JSON"}, 400); return
         if path == "/api/user/register":
+            # 未登录端点，没有用户名可依据，只能按来源地址计数。
+            # ⚠️ 一个班常在同一出口 IP 后面，开学第一节课集中注册会撞上这个额度 ——
+            # 所以默认给得宽，并且**管理页上可以直接调大或填 0 关掉**，不用重启。
+            # 验证码挡得住脚本，挡不住慢速刷号；这条挡的是后者。
+            retry_after = quota_retry_after("register", self.client_address[0])
+            if retry_after:
+                self.send_json({"error": f"注册太频繁了，请 {retry_after} 秒后再试",
+                                "retry_after": retry_after}, 429); return
             email = str(data.get("email", "")).strip().lower()
             username, password = str(data.get("username", "")).strip(), str(data.get("password", ""))
             if not re.fullmatch(r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+", email):
@@ -1829,14 +1884,30 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                         self.send_json({"error": "Window ends before it starts"}, 400); return
                     windows.append({"start": w["start"], "end": w["end"], "note": str(w.get("note", ""))[:60]})
                 set_setting(WINDOWS_KEY, json.dumps(windows, ensure_ascii=False))
+            if "quotas" in data:
+                quotas = {}
+                for bucket in QUOTA_DEFAULTS:
+                    entry = (data["quotas"] or {}).get(bucket)
+                    if not isinstance(entry, dict):
+                        continue
+                    try:
+                        limit, window = int(entry.get("limit")), int(entry.get("window"))
+                    except (TypeError, ValueError):
+                        self.send_json({"error": f"{bucket} 的额度必须是整数"}, 400); return
+                    if limit < 0 or limit > QUOTA_LIMIT_CAP:
+                        self.send_json({"error": f"{bucket} 的次数需在 0..{QUOTA_LIMIT_CAP}（0 表示不限）"}, 400); return
+                    if not QUOTA_WINDOW_RANGE[0] <= window <= QUOTA_WINDOW_RANGE[1]:
+                        self.send_json({"error": f"{bucket} 的窗口需在 {QUOTA_WINDOW_RANGE[0]}..{QUOTA_WINDOW_RANGE[1]} 秒"}, 400); return
+                    quotas[bucket] = {"limit": limit, "window": window}
+                set_setting(QUOTAS_KEY, json.dumps(quotas, ensure_ascii=False))
             self.send_json({REVEAL_KEY: reveal_enabled(), "books": reveal_books(),
-                            "windows": reveal_windows(), "active_window": active_window()}); return
+                            "windows": reveal_windows(), "active_window": active_window(),
+                            "quotas": quota_config(), "quota_defaults": QUOTA_DEFAULTS}); return
         if path in {"/api/run", "/api/run/"} and self.authorized():
             # 「运行样例」：和提交走同一套沙箱，但不写 submissions 表、不计入统计。
             book, problem = data.get("book", ""), data.get("problem", "")
             # 配额放在题号校验之前：超额的请求不该再去解析 4.1MB 的 catalog。
-            retry_after = quota_retry_after("run", self.current_user() or ADMIN_USER,
-                                            RUN_QUOTA_WINDOW_SECONDS, RUN_QUOTA_MAX)
+            retry_after = quota_retry_after("run", self.current_user() or ADMIN_USER)
             if retry_after:
                 self.send_json({"status": "Rate Limited", "retry_after": retry_after,
                                 "message": f"运行样例太频繁了，请 {retry_after} 秒后再试。"}, 429); return
@@ -1851,8 +1922,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
         if path in {"/api/submit", "/api/submit/"} and self.authorized():
             book, problem = data.get("book", ""), data.get("problem", "")
             language = data.get("language", "python")
-            retry_after = quota_retry_after("submit", self.current_user() or ADMIN_USER,
-                                            SUBMIT_QUOTA_WINDOW_SECONDS, SUBMIT_QUOTA_MAX)
+            retry_after = quota_retry_after("submit", self.current_user() or ADMIN_USER)
             if retry_after:
                 self.send_json({"status": "Rate Limited", "retry_after": retry_after,
                                 "message": f"提交太频繁了，请 {retry_after} 秒后再试。"}, 429); return

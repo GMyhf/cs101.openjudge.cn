@@ -100,11 +100,27 @@ class ServerApiTests(unittest.TestCase):
             try:
                 status, _, _ = request(cls.port, "GET", "/api/me")
                 if status == 200:
+                    cls._unthrottle_registration()
                     return
             except (ConnectionRefusedError, OSError):
                 time.sleep(0.05)
         cls._stop_server()
         raise RuntimeError("server did not start: " + (cls.process.stderr.read() or "<no stderr>"))
+
+    @classmethod
+    def _unthrottle_registration(cls):
+        """整个套件都从 127.0.0.1 注册，会撞上注册限频（默认按来源地址计数）。
+
+        所以这里显式把它关掉，让套件不依赖默认额度是多少；
+        专门测限频的那条用例自己再把额度调回小值。
+        """
+        status, headers, _ = request(cls.port, "POST", "/api/login",
+                                     {"username": "GMyhf", "password": "T001-admin-only"})
+        if status != 200:
+            return
+        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        request(cls.port, "POST", "/api/settings",
+                {"quotas": {"register": {"limit": 0, "window": 600}}}, cookie=cookie)
 
     @classmethod
     def _stop_server(cls):
@@ -863,6 +879,74 @@ class ServerApiTests(unittest.TestCase):
                 self.assertEqual(json.loads(raw)["status"], "Rate Limited")
                 break
         self.assertIn(429, codes, f"提交应在第 {server.SUBMIT_QUOTA_MAX + 1} 次被挡下，实际 {codes}")
+
+    def test_admin_can_change_quotas_without_a_restart(self):
+        """额度是拍的，撞上它的时刻（考试当天）恰恰最不能重启 —— 所以必须能在线改。"""
+        admin = self._admin_cookie()
+        status, _, raw = request(self.port, "GET", "/api/settings")
+        self.assertEqual(status, 200)
+        payload = json.loads(raw)
+        self.assertIn("quotas", payload)
+        self.assertIn("quota_defaults", payload)
+        original = payload["quotas"]
+
+        try:
+            status, _, raw = request(self.port, "POST", "/api/settings", {
+                "quotas": {"submit": {"limit": 3, "window": 600}},
+            }, cookie=admin)
+            self.assertEqual(status, 200)
+            self.assertEqual(json.loads(raw)["quotas"]["submit"], {"limit": 3, "window": 600})
+
+            cookie = self.register_and_login("t015_conf_quota", "T015-password")
+            codes = [request(self.port, "POST", "/api/submit", {
+                "book": SUBMIT_BOOK, "problem": "NOT-IN-CATALOG",
+                "language": "python", "source": "print(1)",
+            }, cookie=cookie)[0] for _ in range(4)]
+            self.assertEqual(codes[-1], 429, f"改小额度后第 4 次应被挡下，实际 {codes}")
+
+            # 0 表示不限：考试当天要能一键放开
+            status, _, _ = request(self.port, "POST", "/api/settings", {
+                "quotas": {"submit": {"limit": 0, "window": 600}},
+            }, cookie=admin)
+            self.assertEqual(status, 200)
+            status, _, raw = request(self.port, "POST", "/api/submit", {
+                "book": SUBMIT_BOOK, "problem": "NOT-IN-CATALOG",
+                "language": "python", "source": "print(1)",
+            }, cookie=cookie)
+            # /api/submit 对未知题号是 200 + status="Problem Not Found"（只有 /api/run 才是 404）
+            self.assertEqual(status, 200, "额度填 0 之后不该再被限频")
+            self.assertEqual(json.loads(raw)["status"], "Problem Not Found")
+
+            # 坏值要被拒绝，而不是悄悄存进去
+            for bad in ({"limit": -1, "window": 600}, {"limit": 5, "window": 1},
+                        {"limit": "abc", "window": 600}):
+                status, _, _ = request(self.port, "POST", "/api/settings",
+                                       {"quotas": {"submit": bad}}, cookie=admin)
+                self.assertEqual(status, 400, bad)
+        finally:
+            request(self.port, "POST", "/api/settings", {"quotas": original}, cookie=admin)
+
+    def test_quota_changes_require_admin(self):
+        cookie = self.register_and_login("t015_not_admin", "T015-password")
+        status, _, _ = request(self.port, "POST", "/api/settings",
+                               {"quotas": {"submit": {"limit": 9999, "window": 600}}}, cookie=cookie)
+        self.assertEqual(status, 403)
+
+    def test_registration_is_rate_limited(self):
+        """未登录端点，验证码挡得住脚本、挡不住慢速刷号。"""
+        admin = self._admin_cookie()
+        original = json.loads(request(self.port, "GET", "/api/settings")[2])["quotas"]
+        try:
+            request(self.port, "POST", "/api/settings",
+                    {"quotas": {"register": {"limit": 2, "window": 600}}}, cookie=admin)
+            codes = []
+            for i in range(4):
+                status, _, _ = request(self.port, "POST", "/api/user/register",
+                                       self.registration_payload(f"t015_reg_{i}", "T015-password"))
+                codes.append(status)
+            self.assertIn(429, codes, f"注册应被限频，实际 {codes}")
+        finally:
+            request(self.port, "POST", "/api/settings", {"quotas": original}, cookie=admin)
 
     def test_run_endpoint_rejects_oversized_stdin(self):
         cookie = self.register_and_login("t010_runner_big", "T010-password")
