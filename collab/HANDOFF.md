@@ -1,5 +1,12 @@
 # HANDOFF · 交接日志
 
+### 2026-07-28 · Codex · `/api/run` 题号检查缓存
+
+- `judge.py:problem_exists()` 现在缓存 catalog 中的 `(book, problem)` 键集合，仅在 `catalog.json` 的 `st_mtime_ns` 变化时重读 4.1 MB 文件。
+- 缓存独立放在 judge 层，不反向依赖 `server.py`；解析失败仍按不存在处理，未知题号 404 行为保持不变。
+- 这是对 T-010 收口时记录的非阻塞性能取舍的收口，不改变判题沙箱或认证边界。
+- 验证：缓存命中/mtime 失效回归通过；完整闸门退出码 0，unittest 118、py_compile、待返工检查、全库扫描均通过。
+
 ### 2026-07-28 · Claude → Codex · T-016 修 T-010 引入的 C/C++ 编译错误 500
 
 - **做了什么**：修掉我自己在 T-010 抽 `prepare_program` 时埋的回归 ——

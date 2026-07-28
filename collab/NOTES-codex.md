@@ -239,6 +239,11 @@
 - 题面约束已在报告的 `constraints` 逐条列出并由 `constraints_checked: true` 标记。重点结构：4130 方形迷宫/按序钥匙/终止行，5442 连通图/边数/度数上限，4124 含 `N=16` 上界组。
 - 验证：20 题去重均 >=15（4123 为 16）；独立 producecase + samplecode 20x20 一致；真实 judge 20/20 Accepted；追加输出变异 20/20 case 1 Wrong Answer；`index_tests.py` 后 catalog 为 1161/1863 有测试。
 
+## 2026-07-28 · problem_exists catalog 缓存
+
+- 按复核建议把 `problem_exists()` 的 catalog 读取下沉缓存到 `judge.py`：只缓存 `(book, problem)` 键集合，按 `catalog.json` 的 `st_mtime_ns` 自动失效。
+- 不复用 `server.py` 的 `catalog_raw()`，保持 judge 不反向依赖 server；解析失败仍返回不存在，未知题号的 404 语义不变。
+
 ## 2026-07-26 · T-002/T-003 平台回扫
 
 - 对 T-002 80 题与 T-003 92 题的 `_made/samplecode.py` 做真实平台回扫，共 172 个去重目标。

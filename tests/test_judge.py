@@ -3,6 +3,7 @@
 夹具自带在 `tests/fixtures/mirror/` 下并已入库，不依赖 `data/openjudge/tests/**`
 （那批抓取数据按人拍板决策不入库），因此新克隆的仓库也能跑通交接闸门。
 """
+import json
 import resource
 import shutil
 import tempfile
@@ -131,6 +132,7 @@ class JudgeCoreTests(unittest.TestCase):
         self.assertEqual(result["status"], "Runtime Error", result)
         self.assertEqual(result["case"], 1)
 
+
     @unittest.skipUnless(shutil.which("swiftc"), "本机没有 Swift")
     def test_swift_foundation_filehandle_is_available(self):
         source = '''import Foundation
@@ -141,6 +143,30 @@ print(values[0] + values[1])
         result = judge(BOOK, PROBLEM, "swift", source)
         self.assertEqual(result["status"], "Accepted", result)
         self.assertEqual(result["cases"], 2)
+
+
+class ProblemLookupCacheTests(unittest.TestCase):
+    def test_problem_exists_caches_until_catalog_changes(self):
+        with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
+            mirror = Path(temp)
+            catalog = mirror / "catalog.json"
+            catalog.write_text(json.dumps({"problems": [{"book": "b", "id": "1"}]}), encoding="utf-8")
+            old_cache = judge_module.PROBLEM_KEYS_CACHE
+            old_mtime = judge_module.PROBLEM_KEYS_MTIME_NS
+            try:
+                judge_module.PROBLEM_KEYS_CACHE = None
+                judge_module.PROBLEM_KEYS_MTIME_NS = None
+                with mock.patch.object(judge_module, "MIRROR", mirror), \
+                     mock.patch.object(judge_module.json, "loads", wraps=json.loads) as loads:
+                    self.assertTrue(judge_module.problem_exists("b", "1"))
+                    self.assertFalse(judge_module.problem_exists("b", "2"))
+                    self.assertEqual(loads.call_count, 1)
+                    catalog.write_text(json.dumps({"problems": [{"book": "b", "id": "2"}]}), encoding="utf-8")
+                    self.assertTrue(judge_module.problem_exists("b", "2"))
+                    self.assertEqual(loads.call_count, 2)
+            finally:
+                judge_module.PROBLEM_KEYS_CACHE = old_cache
+                judge_module.PROBLEM_KEYS_MTIME_NS = old_mtime
 
 
 if __name__ == "__main__":

@@ -6,12 +6,16 @@ import shutil
 import signal
 import subprocess
 import tempfile
+import threading
 import time
 import re
 from pathlib import Path
 
 ROOT = Path(__file__).parent
 MIRROR = ROOT / "data" / "openjudge"
+PROBLEM_KEYS_CACHE = None
+PROBLEM_KEYS_MTIME_NS = None
+PROBLEM_KEYS_LOCK = threading.Lock()
 
 # CPython 与 PyPy3 都跑 .py 源码，但是两个独立解释器：本机 PyPy 是 Python 3.9，
 # 宿主 CPython 是 3.12，语法能力并不一致，所以 PyPy 的语法检查必须交给它自己做。
@@ -317,13 +321,30 @@ def run_sample(book, problem_id, language, source, stdin):
 
 
 def problem_exists(book, problem_id):
-    """Return whether a requested run/submit target is in the local catalog."""
+    """Return whether a requested run/submit target is in the local catalog.
+
+    Cache only lookup keys and refresh them when catalog.json changes. This
+    keeps the judge independent from server.py's catalog cache.
+    """
+    global PROBLEM_KEYS_CACHE, PROBLEM_KEYS_MTIME_NS
+    catalog_path = MIRROR / "catalog.json"
     try:
-        catalog = json.loads((MIRROR / "catalog.json").read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+        mtime_ns = catalog_path.stat().st_mtime_ns
+    except OSError:
         return False
-    return any(p.get("book") == book and p.get("id") == problem_id
-               for p in catalog.get("problems", []))
+    with PROBLEM_KEYS_LOCK:
+        if PROBLEM_KEYS_CACHE is None or mtime_ns != PROBLEM_KEYS_MTIME_NS:
+            try:
+                catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError):
+                return False
+            PROBLEM_KEYS_CACHE = frozenset(
+                (p.get("book"), p.get("id"))
+                for p in catalog.get("problems", [])
+                if isinstance(p, dict)
+            )
+            PROBLEM_KEYS_MTIME_NS = mtime_ns
+        return (book, problem_id) in PROBLEM_KEYS_CACHE
 
 
 def judge(book, problem_id, language, source):
