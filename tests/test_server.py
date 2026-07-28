@@ -775,6 +775,77 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(json.loads(raw)["status"], "Input Too Large")
 
+    def test_password_hashes_use_a_per_user_salt(self):
+        """改动前全库共用源码里的常量盐，同口令 → 同哈希，一张彩虹表通吃。"""
+        import server
+        first, second = server.password_hash("CorrectHorse1"), server.password_hash("CorrectHorse1")
+        self.assertNotEqual(first, second, "同一口令两次应得到不同哈希（盐不同）")
+        self.assertTrue(first.startswith("pbkdf2$"))
+        self.assertTrue(server.valid_password(first, "CorrectHorse1"))
+        self.assertFalse(server.valid_password(first, "CorrectHorse2"))
+        # 老格式必须继续认，否则升级会把现有学生账号全锁在门外
+        legacy = server.legacy_password_hash("CorrectHorse1")
+        self.assertTrue(server.valid_password(legacy, "CorrectHorse1"))
+        self.assertFalse(server.valid_password(legacy, "CorrectHorse2"))
+        self.assertTrue(server.needs_rehash(legacy))
+        self.assertFalse(server.needs_rehash(first))
+
+    def test_existing_legacy_hash_still_logs_in_and_is_upgraded(self):
+        """线上已有学生账号存的是老格式哈希。升级不能把他们锁在门外。
+
+        直接往库里塞一条老格式记录（就是改动前 `password_hash` 的产物），
+        然后走真实登录链路，并确认这次登录顺手把它换成了带随机盐的新格式。
+        """
+        import server
+        username = "t012_legacy"
+        with sqlite3.connect(self.db_file.name) as db:
+            db.execute("insert into users(username, password_hash, email, active) values (?, ?, ?, 1)",
+                       (username, server.legacy_password_hash("LegacyPass-1"),
+                        "legacy@example.com"))
+
+        status, headers, _ = request(self.port, "POST", "/api/user/login",
+                                     {"username": username, "password": "LegacyPass-1"})
+        self.assertEqual(status, 200, "老格式账号必须还能登录")
+        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        self.assertTrue(json.loads(request(self.port, "GET", "/api/me", cookie=cookie)[2])["authenticated"])
+
+        with sqlite3.connect(self.db_file.name) as db:
+            stored = db.execute("select password_hash from users where username = ?",
+                                (username,)).fetchone()[0]
+        self.assertTrue(stored.startswith("pbkdf2$"), "登录后应已升级成每用户随机盐")
+        self.assertTrue(server.valid_password(stored, "LegacyPass-1"))
+
+    def test_changing_password_revokes_other_sessions(self):
+        """改密是「号被盗了」的标准补救；补救必须真的把别人踢下线。"""
+        username = "t012_revoke"
+        stolen = self.register_and_login(username, "OldPass-123")   # 模拟盗号者手上的 cookie
+        _, headers, _ = request(self.port, "POST", "/api/user/login",
+                                {"username": username, "password": "OldPass-123"})
+        keeper = headers["Set-Cookie"].split(";", 1)[0]             # 本人当前这条会话
+        self.assertTrue(json.loads(request(self.port, "GET", "/api/me", cookie=stolen)[2])["authenticated"])
+
+        status, _, _ = request(self.port, "POST", "/api/user/change-password", {
+            "current_password": "OldPass-123", "new_password": "BrandNew-456",
+            "confirm_password": "BrandNew-456",
+        }, cookie=keeper)
+        self.assertEqual(status, 200)
+
+        after = json.loads(request(self.port, "GET", "/api/me", cookie=stolen)[2])
+        self.assertFalse(after["authenticated"], "改密后旧会话必须失效")
+        # 发起改密的那条会话应当保留，否则用户会被自己踢出去
+        self.assertTrue(json.loads(request(self.port, "GET", "/api/me", cookie=keeper)[2])["authenticated"])
+
+    def test_login_throttles_repeated_failures(self):
+        username = "t012_throttle"
+        self.register_and_login(username, "GoodPass-123")
+        codes = [request(self.port, "POST", "/api/user/login",
+                         {"username": username, "password": f"wrong-{i}"})[0] for i in range(14)]
+        self.assertIn(429, codes, f"连续错误口令应触发冷却，实际全是 {sorted(set(codes))}")
+        # 冷却期间即使给对口令也不放行
+        status, _, _ = request(self.port, "POST", "/api/user/login",
+                               {"username": username, "password": "GoodPass-123"})
+        self.assertEqual(status, 429)
+
     def test_static_path_cannot_traverse(self):
         for path in ("/../server.py", "/%2e%2e/server.py", "/data/../server.py"):
             status, _, body = request(self.port, "GET", path)

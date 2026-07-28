@@ -1176,15 +1176,47 @@ def catalog_summary_payload():
     }
 
 
-def password_hash(password):
-    return hashlib.pbkdf2_hmac("sha256", password.encode(), b"cs101-local-user", 120000).hex()
+PBKDF2_ROUNDS = 120000
+LEGACY_SALT = b"cs101-local-user"          # 改动前全库共用这一个盐，且它就写在源码里
+
+
+def password_hash(password, salt=None):
+    """每个用户一份随机盐，存成 `pbkdf2$轮数$盐$哈希`。
+
+    改动前所有用户共用源码里的常量盐 `cs101-local-user`。后果不是理论上的：
+    同一个口令在库里就是同一串哈希（口令谁和谁一样，看一眼就知道），
+    而且盐公开、全库只有一份 —— 一张彩虹表就能同时打所有账号。
+    在这个洞之上，`/data/course.db` 还一度可以直接下载（见 T-010）。
+    """
+    salt = salt or secrets.token_bytes(16)
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, PBKDF2_ROUNDS).hex()
+    return f"pbkdf2${PBKDF2_ROUNDS}${salt.hex()}${digest}"
+
+
+def legacy_password_hash(password):
+    return hashlib.pbkdf2_hmac("sha256", password.encode(), LEGACY_SALT, PBKDF2_ROUNDS).hex()
 
 
 def same_username(left, right):
     return str(left).strip().casefold() == str(right).strip().casefold()
 
 def valid_password(stored, password):
-    return stored == password_hash(password)
+    """新旧两种格式都认；比较一律走 compare_digest，不用 `==`。"""
+    stored = str(stored or "")
+    if stored.startswith("pbkdf2$"):
+        try:
+            _, rounds, salt_hex, digest = stored.split("$", 3)
+            candidate = hashlib.pbkdf2_hmac("sha256", password.encode(),
+                                            bytes.fromhex(salt_hex), int(rounds)).hex()
+        except (ValueError, TypeError):
+            return False
+        return hmac.compare_digest(candidate, digest)
+    return hmac.compare_digest(stored, legacy_password_hash(password))
+
+
+def needs_rehash(stored):
+    """老格式（固定盐）在下一次成功登录时顺手升级，不用要求用户改密。"""
+    return not str(stored or "").startswith("pbkdf2$")
 
 def new_captcha():
     left, right = secrets.randbelow(8) + 2, secrets.randbelow(8) + 2
@@ -1197,6 +1229,64 @@ def valid_captcha(token, answer):
     if not challenge or challenge[1] < time.time():
         return False
     return hmac.compare_digest(challenge[0], str(answer).strip())
+
+SESSION_ISSUED = {}
+SESSION_TTL_SECONDS = 14 * 24 * 3600
+LOGIN_FAILURES = {}
+LOGIN_MAX_FAILURES = 10
+LOGIN_LOCKOUT_SECONDS = 900
+
+
+def start_session(username):
+    token = secrets.token_urlsafe(24)
+    TOKENS.add(token); SESSION_USERS[token] = username
+    SESSION_SEEN[token] = SESSION_ISSUED[token] = time.time()
+    return token
+
+
+def drop_session(token):
+    TOKENS.discard(token)
+    SESSION_USERS.pop(token, None)
+    SESSION_SEEN.pop(token, None)
+    SESSION_ISSUED.pop(token, None)
+
+
+def revoke_sessions(username, keep=None):
+    """改密/重置口令后把该用户的其它会话全部作废。
+
+    改动前不做这件事，于是「我号被盗了，赶紧改密码」这个动作**根本不起作用** ——
+    盗号者手上的 cookie 改密之后照样能用（实测过）。改密是补救被盗的标准手段，
+    它必须能把别人踢下线，否则等于没补救。
+    """
+    for token in [t for t, u in SESSION_USERS.items()
+                  if same_username(u, username) and t != keep]:
+        drop_session(token)
+
+
+def session_expired(token):
+    issued = SESSION_ISSUED.get(token)
+    if issued is None:                      # 服务重启前签发的会话，补记一次签发时间
+        SESSION_ISSUED[token] = time.time()
+        return False
+    return time.time() - issued > SESSION_TTL_SECONDS
+
+
+def login_locked(username):
+    """同一用户名连续失败过多就冷却一段时间。
+
+    按用户名而不是按 IP：一个班往往共用出口 IP，按 IP 锁会把整班一起锁掉。
+    """
+    failures, until = LOGIN_FAILURES.get(str(username).casefold(), (0, 0.0))
+    return failures >= LOGIN_MAX_FAILURES and time.time() < until
+
+
+def note_login_failure(username):
+    key = str(username).casefold()
+    failures, until = LOGIN_FAILURES.get(key, (0, 0.0))
+    if time.time() >= until:
+        failures = 0
+    LOGIN_FAILURES[key] = (failures + 1, time.time() + LOGIN_LOCKOUT_SECONDS)
+
 
 def reset_token_hash(token):
     return hashlib.sha256(token.encode()).hexdigest()
@@ -1252,6 +1342,8 @@ class Handler(BaseHTTPRequestHandler):
         token = jar.get("session")
         if token is None or token.value not in TOKENS:
             return False
+        if session_expired(token.value):
+            drop_session(token.value); return False
         self._touch(token.value)
         return True
 
@@ -1260,6 +1352,8 @@ class Handler(BaseHTTPRequestHandler):
         token = cookies.SimpleCookie(raw).get("session")
         if not token or token.value not in TOKENS:
             return None
+        if session_expired(token.value):
+            drop_session(token.value); return None
         self._touch(token.value)
         return SESSION_USERS.get(token.value)
 
@@ -1511,15 +1605,25 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
         # statistics, search, and contest pages are fetched through this host.
         try:
             upstream = urllib.request.Request("http://cs101.openjudge.cn" + self.path, headers={"User-Agent": "CS101 local mirror"})
-            with urllib.request.urlopen(upstream, timeout=15) as response:
-                body = response.read()
-                content_type = response.headers.get("Content-Type", "text/html; charset=UTF-8")
+            # 只带 User-Agent：本地会话 cookie 绝不能转发给上游（红线 5）。
+            status = 200
+            try:
+                with urllib.request.urlopen(upstream, timeout=15) as response:
+                    body = response.read()
+                    content_type = response.headers.get("Content-Type", "text/html; charset=UTF-8")
+            except urllib.error.HTTPError as upstream_error:
+                # 改动前这里不分状态一律回 200，于是打错的 URL 也会拿到 200 +
+                # 上游首页。副作用不止是难看：任何针对本站的测试都没法拿状态码当判据
+                # （T-010 的静态白名单测试就因此只能断言响应内容）。
+                status = upstream_error.code
+                body = upstream_error.read()
+                content_type = upstream_error.headers.get("Content-Type", "text/html; charset=UTF-8")
             if "text/html" in content_type:
                 text = body.decode("utf-8", errors="replace")
                 text = text.replace("http://cs101.openjudge.cn", "")
                 text = text.replace("https://cs101.openjudge.cn", "")
                 body = text.encode("utf-8")
-            self.send_response(200)
+            self.send_response(status)
             self.send_header("Content-Type", content_type)
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
@@ -1568,7 +1672,11 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             self.send_json({"ok": True} if sent else {"ok": True, "activation_link": activation_link}); return
         if path == "/api/user/login":
             username, password = str(data.get("username", "")).strip(), str(data.get("password", ""))
-            accepted = same_username(username, ADMIN_USER) and password == ADMIN_PASSWORD
+            if login_locked(username):
+                self.send_json({"error": "尝试次数过多，请 15 分钟后再试"}, 429); return
+            accepted = (same_username(username, ADMIN_USER)
+                        and bool(ADMIN_PASSWORD)
+                        and hmac.compare_digest(password, ADMIN_PASSWORD))
             session_user = ADMIN_USER if accepted else None
             if not accepted:
                 with sqlite3.connect(DB) as db:
@@ -1579,9 +1687,15 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                         active = row[2]
                         if not active:
                             self.send_json({"error": "账号尚未激活，请先点击邮箱中的激活链接"}, 403); return
+                        # 老格式（全库共用一个盐）在这里顺手升级，不必打扰用户
+                        if needs_rehash(row[1]):
+                            db.execute("update users set password_hash = ? where username = ?",
+                                       (password_hash(password), row[0]))
             if not accepted:
+                note_login_failure(username)
                 self.send_json({"error": "用户名或密码不正确"}, 401); return
-            token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = session_user; SESSION_SEEN[token] = time.time()
+            LOGIN_FAILURES.pop(str(username).casefold(), None)
+            token = start_session(session_user)
             self.send_response(200); self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/"); self.send_header("Content-Type", "application/json; charset=utf-8"); self.end_headers(); self.wfile.write(b'{"ok":true}'); return
         if path == "/api/user/change-password":
             username = self.current_user()
@@ -1600,6 +1714,8 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                 if not row or not valid_password(row[0], current):
                     self.send_json({"error": "当前密码不正确"}, 400); return
                 db.execute("update users set password_hash = ? where username = ?", (password_hash(new_password), username))
+            current_token = cookies.SimpleCookie(self.headers.get("Cookie", "")).get("session")
+            revoke_sessions(username, keep=current_token.value if current_token else None)
             self.send_json({"ok": True}); return
         if path == "/api/user/forgot":
             email = str(data.get("email", "")).strip().lower()
@@ -1634,16 +1750,17 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                     self.send_json({"error": "重置链接无效或已过期"}, 400); return
                 db.execute("update users set password_hash = ?, reset_token_hash = null, reset_expires = null where username = ?",
                            (password_hash(password), row[0]))
+            revoke_sessions(row[0])
             self.send_json({"ok": True}); return
         if path == "/api/login":
             if same_username(data.get("username", ""), ADMIN_USER) and data.get("password") == ADMIN_PASSWORD:
-                token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = ADMIN_USER; SESSION_SEEN[token] = time.time()
+                token = start_session(ADMIN_USER)
                 self.send_response(200); self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/")
                 self.send_header("Content-Type", "application/json; charset=utf-8"); self.end_headers(); self.wfile.write(b'{"ok":true}'); return
             self.send_json({"error": "账号或口令不正确"}, 401); return
         if path == "/api/auth/login/":
             if same_username(data.get("email", ""), ADMIN_USER) and data.get("password") == ADMIN_PASSWORD:
-                token = secrets.token_urlsafe(24); TOKENS.add(token); SESSION_USERS[token] = ADMIN_USER; SESSION_SEEN[token] = time.time()
+                token = start_session(ADMIN_USER)
                 self.send_response(200)
                 self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/")
                 self.send_header("Content-Type", "application/json; charset=utf-8")
@@ -1651,7 +1768,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             self.send_json({"error": "账号或口令不正确"}, 401); return
         if path == "/api/logout":
             jar = cookies.SimpleCookie(self.headers.get("Cookie", "")); token = jar.get("session")
-            if token: TOKENS.discard(token.value); SESSION_USERS.pop(token.value, None)
+            if token: drop_session(token.value)
             self.send_response(200); self.send_header("Set-Cookie", "session=; Max-Age=0; Path=/"); self.end_headers(); return
         if path == "/api/settings":
             if not same_username(self.current_user() or "", ADMIN_USER):
