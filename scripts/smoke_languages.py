@@ -13,9 +13,11 @@
 走 `/api/run`（运行样例）而不是 `/api/submit`：两者共用同一个 `prepare_program`
 和同一套沙箱，但运行样例**不写 submissions 表**，不会往判题记录里灌测试数据。
 
-用法（在部署机上跑）：
+用法（在部署机上跑，口令自动从 data/.admin_password 读）：
 
-    CS101_SMOKE_USER=GMyhf CS101_SMOKE_PASSWORD=... python3 scripts/smoke_languages.py
+    python3 scripts/smoke_languages.py --require-all
+
+也可用 CS101_SMOKE_USER / CS101_SMOKE_PASSWORD 显式指定。
 
 可选：`--base http://127.0.0.1:8000`、`--book practice`、`--problem 02942`。
 退出码 0 表示全部通过。
@@ -27,6 +29,7 @@ import os
 import sys
 import urllib.error
 import urllib.request
+from pathlib import Path
 
 # 02942「吃糖果」：读一个 n，输出斐波那契第 n 项（每天吃 1 或 2 块的方案数）。
 # 选它是因为输入输出都极短，各语言实现都能一眼看懂。
@@ -89,10 +92,17 @@ def main():
                              "「静默跳过」正是 PyPy3 那次回归藏身的方式")
     options = parser.parse_args()
 
-    user = os.environ.get("CS101_SMOKE_USER")
-    password = os.environ.get("CS101_SMOKE_PASSWORD")
-    if not user or not password:
-        print("需要 CS101_SMOKE_USER 与 CS101_SMOKE_PASSWORD 环境变量", file=sys.stderr)
+    # 在部署机上跑时不该还要人另外找口令：服务本身就是从 data/.admin_password 读的，
+    # 这个脚本以同一个用户身份跑，能读到同一个文件。省掉这一步，例行动作才真的会被执行。
+    user = os.environ.get("CS101_SMOKE_USER") or os.environ.get("CS101_ADMIN_USER") or "GMyhf"
+    password = os.environ.get("CS101_SMOKE_PASSWORD") or os.environ.get("CS101_ADMIN_PASSWORD")
+    if not password:
+        password_file = Path(__file__).resolve().parent.parent / "data" / ".admin_password"
+        if password_file.is_file():
+            password = password_file.read_text(encoding="utf-8").strip()
+    if not password:
+        print("找不到管理员口令：请设 CS101_SMOKE_PASSWORD，或在部署机上确保 "
+              "data/.admin_password 可读", file=sys.stderr)
         return 2
 
     opener = urllib.request.build_opener(
