@@ -4,12 +4,7 @@ Documentation=https://github.com/GMyhf/cs101.openjudge.cn
 After=network-online.target
 Wants=network-online.target
 
-# 进入失败状态时告警。# 默认软上限 1024 对判题服务太低：每个并发判题要占一个客户端连接
-# 加三个子进程管道，再加临时文件。实测 100 并发时已用到 644 个。
-# 用满之后 accept 失败，客户端看到的是「连上了又被断开」，服务端日志里什么都没有。
-LimitNOFILE=65536
-
-Restart=on-failure 会把服务拉起来，
+# 进入失败状态时告警。Restart=on-failure 会把服务拉起来，
 # 但崩溃循环因此是**静默**的 —— 自动恢复不该等于无人知晓。
 OnFailure=cs101-alert@%n.service
 
@@ -34,6 +29,11 @@ Environment=PATH=/home/rocky/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin
 # 管理员口令与 SMTP 由 server.py 自己从 data/.admin_password、data/.smtp.env 读，
 # 不要写进这里 —— unit 文件是全局可读的。
 ExecStart=/usr/bin/python3 -u server.py
+
+# 默认软上限 1024 对判题服务太低：每个并发判题要占一个客户端连接、三个子进程管道，
+# 再加临时文件。100 并发实测已用到 644 个。用满之后 accept 失败，
+# 客户端看到的是「连上了又被断开」，而服务端日志里什么都没有 —— 那些连接根本没被 accept。
+LimitNOFILE=65536
 
 Restart=on-failure
 RestartSec=3
