@@ -107,6 +107,21 @@ def parse_sample_sections(text, truncate_explanations=True):
 JUDGE_SLOTS = set()
 JUDGE_SLOTS_LOCK = threading.Lock()
 
+# 全局同时判题数。判题是 CPU 密集的，并发超过核数**不会提高吞吐** ——
+# 只会把墙钟拉长，而 `_run` 的超时（cpu_seconds + 1）量的正是墙钟。
+# 于是超售的后果不是「慢一点」，而是**正确代码被判 TLE**，还会作为真实判定
+# 写进学生的提交记录。连不上还能重试，判错了是要申诉的。
+#
+# 32 核实测（每人一份正确解，每组烧 1.5s CPU）：
+#   并发 60  → 60 AC，最慢 19s
+#   并发 100 → 5 个 TLE 冒出来
+#   并发 150 → 44 个 TLE
+# 排队等待换来的是「慢但对」，这个交换在判题场景里永远划算。
+JUDGE_CONCURRENCY = int(os.environ.get("CS101_JUDGE_CONCURRENCY", os.cpu_count() or 4))
+JUDGE_SEMAPHORE = threading.BoundedSemaphore(JUDGE_CONCURRENCY)
+# 排太久就明确回「忙」，而不是让浏览器无限等下去。
+JUDGE_QUEUE_WAIT_SECONDS = int(os.environ.get("CS101_JUDGE_QUEUE_WAIT", "150"))
+
 RUN_QUOTA_WINDOW_SECONDS = 300
 RUN_QUOTA_MAX = 30
 # 提交比运行样例重得多：一次要跑完全部测试点（最长 300 秒），还会入库留痕。
@@ -205,9 +220,14 @@ def judging_slot(user):
     if busy:
         yield False
         return
+    # 先占住这个用户的位置，再排全局队：顺序反过来的话，
+    # 一个用户连点两次会占掉两个全局名额。
+    got_slot = JUDGE_SEMAPHORE.acquire(timeout=JUDGE_QUEUE_WAIT_SECONDS)
     try:
-        yield True
+        yield got_slot
     finally:
+        if got_slot:
+            JUDGE_SEMAPHORE.release()
         with JUDGE_SLOTS_LOCK:
             JUDGE_SLOTS.discard(key)
 
@@ -1950,7 +1970,8 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                 self.send_json({"status": "Problem Not Found", "message": "本地题库中没有这道题。"}, 404); return
             with judging_slot(self.current_user() or ADMIN_USER) as got_slot:
                 if not got_slot:
-                    self.send_json({"status": "Busy", "message": "上一次判题还在跑，等它结束再试。"}, 429); return
+                    self.send_json({"status": "Busy",
+                                    "message": "判题队列忙，稍后再试（或你上一次判题还没结束）。"}, 429); return
                 self.send_json(run_sample(book, problem, data.get("language", "python"),
                                           data.get("source", ""), data.get("stdin", "")))
             return
