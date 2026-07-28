@@ -1136,6 +1136,51 @@ class ServerApiTests(unittest.TestCase):
                                {"username": username, "password": "GoodPass-123"})
         self.assertEqual(status, 429)
 
+    def test_forwarded_client_ip_is_only_trusted_from_a_local_proxy(self):
+        """反代下限频要按真实客户端算，但 X-Forwarded-For 不能无条件采信。
+
+        实测：开 Tailscale Funnel 后，公网来的请求 `client_address` 是 127.0.0.1 ——
+        照此限频会把整个互联网算成一个客户端，一个脚本就能耗尽全局额度。
+        所以要采信 XFF；但只在连接来自本机代理时采信，否则直连的人加个头就能伪造 IP。
+
+        测试连的是 127.0.0.1，本身就落在受信名单里，所以这里能验「采信」那一半；
+        「不采信」那一半直接对函数验，避免为它去搭一套非本地网络环境。
+        """
+        import server
+
+        class FakeHandler:
+            client_ip = server.Handler.client_ip
+            def __init__(self, peer, headers):
+                self.client_address = (peer, 12345)
+                self.headers = headers
+
+        # 来自本机代理 → 采信 XFF 的第一跳
+        self.assertEqual(FakeHandler("127.0.0.1", {"X-Forwarded-For": "203.0.113.9, 10.0.0.1"}).client_ip(),
+                         "203.0.113.9")
+        # 直连（非受信）→ 忽略 XFF，用真实对端，防伪造
+        self.assertEqual(FakeHandler("198.51.100.7", {"X-Forwarded-For": "1.2.3.4"}).client_ip(),
+                         "198.51.100.7")
+        # 代理但没带 XFF → 退回对端
+        self.assertEqual(FakeHandler("127.0.0.1", {}).client_ip(), "127.0.0.1")
+        # XFF 是空串 → 退回对端，不要返回空字符串当 key
+        self.assertEqual(FakeHandler("127.0.0.1", {"X-Forwarded-For": "  "}).client_ip(), "127.0.0.1")
+
+    def test_session_cookie_is_secure_only_over_https(self):
+        """公网走 HTTPS 时 cookie 要带 Secure；tailnet 内的 HTTP 访问不能因此登不上。"""
+        import server
+
+        class FakeHandler:
+            session_cookie = server.Handler.session_cookie
+            def __init__(self, headers): self.headers = headers
+
+        https = FakeHandler({"X-Forwarded-Proto": "https"}).session_cookie("abc")
+        plain = FakeHandler({}).session_cookie("abc")
+        for cookie in (https, plain):
+            self.assertIn("HttpOnly", cookie)
+            self.assertIn("SameSite=Lax", cookie)
+        self.assertIn("; Secure", https)
+        self.assertNotIn("Secure", plain)
+
     def test_static_path_cannot_traverse(self):
         for path in ("/../server.py", "/%2e%2e/server.py", "/data/../server.py"):
             status, _, body = request(self.port, "GET", path)

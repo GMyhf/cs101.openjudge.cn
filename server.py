@@ -1423,9 +1423,41 @@ def public_base_url():
     """Return the address users on the LAN can open from emailed links."""
     return os.environ.get("CS101_PUBLIC_URL", DEFAULT_PUBLIC_URL).rstrip("/")
 
+# 反向代理（Tailscale Funnel / Cloudflare / nginx）会把请求转成本机连接，
+# 只有来自这里的连接才允许用 X-Forwarded-For 覆盖来源地址 —— 否则任何人
+# 直接连上来加一个头就能伪造自己的 IP，限频形同虚设。
+TRUSTED_PROXIES = {"127.0.0.1", "::1"}
+
+
 class Handler(BaseHTTPRequestHandler):
+    def client_ip(self):
+        """真实客户端地址；限频与日志都用它。
+
+        **实测（2026-07-28 开 Funnel 后）**：从公网发来的请求，
+        `self.client_address[0]` 是 `127.0.0.1` —— 因为 Funnel 在本机做反代。
+        照此按来源地址限频，会把**整个互联网算成一个客户端**：
+        一个脚本就能耗尽全局额度把所有人挡在门外，而它自己也不会被单独限住。
+        注册与找回密码是仅有的两个未登录端点，限频是它们唯一的闸，所以这条必须对。
+        """
+        peer = self.client_address[0]
+        if peer in TRUSTED_PROXIES:
+            first = self.headers.get("X-Forwarded-For", "").split(",")[0].strip()
+            if first:
+                return first
+        return peer
+
+    def session_cookie(self, token):
+        """会话 cookie。经 HTTPS 进来时加 Secure。
+
+        按请求判断而不是全局开关：这台机器同时可以走 tailnet 内的 HTTP 访问，
+        一刀切加 Secure 会让那条路径登不上。伪造这个头只会让伪造者自己的 cookie
+        变成 Secure，损人不利己，所以采信它是安全的。
+        """
+        secure = "; Secure" if self.headers.get("X-Forwarded-Proto") == "https" else ""
+        return f"session={token}; HttpOnly; SameSite=Lax; Path=/{secure}"
+
     def log_message(self, fmt, *args):
-        print("%s - %s" % (self.address_string(), fmt % args))
+        print("%s - %s" % (self.client_ip(), fmt % args))
 
     def send_json(self, payload, status=200):
         body = json.dumps(payload, ensure_ascii=False).encode()
@@ -1755,7 +1787,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             # ⚠️ 一个班常在同一出口 IP 后面，开学第一节课集中注册会撞上这个额度 ——
             # 所以默认给得宽，并且**管理页上可以直接调大或填 0 关掉**，不用重启。
             # 验证码挡得住脚本，挡不住慢速刷号；这条挡的是后者。
-            retry_after = quota_retry_after("register", self.client_address[0])
+            retry_after = quota_retry_after("register", self.client_ip())
             if retry_after:
                 self.send_json({"error": f"注册太频繁了，请 {retry_after} 秒后再试",
                                 "retry_after": retry_after}, 429); return
@@ -1822,7 +1854,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                 self.send_json({"error": "用户名或密码不正确"}, 401); return
             LOGIN_FAILURES.pop(str(username).casefold(), None)
             token = start_session(session_user)
-            self.send_response(200); self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/"); self.send_header("Content-Type", "application/json; charset=utf-8"); self.end_headers(); self.wfile.write(b'{"ok":true}'); return
+            self.send_response(200); self.send_header("Set-Cookie", self.session_cookie(token)); self.send_header("Content-Type", "application/json; charset=utf-8"); self.end_headers(); self.wfile.write(b'{"ok":true}'); return
         if path == "/api/user/change-password":
             username = self.current_user()
             if username is None:
@@ -1849,7 +1881,7 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             # 否则只有真实邮箱才会被限住，429 本身就成了「这个邮箱注册过」的信号 ——
             # 那正是下面这个 generic 响应要藏起来的东西。
             retry_after = (quota_retry_after("forgot", "mail:" + email)
-                           or quota_retry_after("forgot", "ip:" + self.client_address[0]))
+                           or quota_retry_after("forgot", "ip:" + self.client_ip()))
             if retry_after:
                 self.send_json({"error": f"请求太频繁了，请 {retry_after} 秒后再试",
                                 "retry_after": retry_after}, 429); return
@@ -1898,14 +1930,14 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
         if path == "/api/login":
             if same_username(data.get("username", ""), ADMIN_USER) and data.get("password") == ADMIN_PASSWORD:
                 token = start_session(ADMIN_USER)
-                self.send_response(200); self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/")
+                self.send_response(200); self.send_header("Set-Cookie", self.session_cookie(token))
                 self.send_header("Content-Type", "application/json; charset=utf-8"); self.end_headers(); self.wfile.write(b'{"ok":true}'); return
             self.send_json({"error": "账号或口令不正确"}, 401); return
         if path == "/api/auth/login/":
             if same_username(data.get("email", ""), ADMIN_USER) and data.get("password") == ADMIN_PASSWORD:
                 token = start_session(ADMIN_USER)
                 self.send_response(200)
-                self.send_header("Set-Cookie", f"session={token}; HttpOnly; SameSite=Lax; Path=/")
+                self.send_header("Set-Cookie", self.session_cookie(token))
                 self.send_header("Content-Type", "application/json; charset=utf-8")
                 self.end_headers(); self.wfile.write(b'{"ok":true}'); return
             self.send_json({"error": "账号或口令不正确"}, 401); return
