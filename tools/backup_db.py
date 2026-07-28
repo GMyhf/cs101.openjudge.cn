@@ -20,7 +20,13 @@
     python3 tools/backup_db.py --verify <文件> # 单独验一份
     python3 tools/backup_db.py --restore <文件> --to /tmp/restored.db
 
-环境变量：`CS101_BACKUP_DIR`（默认 ~/backups/cs101）、`CS101_BACKUP_KEEP`（默认 14）。
+环境变量：
+  `CS101_BACKUP_DIR`     默认 ~/backups/cs101
+  `CS101_BACKUP_KEEP`    默认 14
+  `CS101_BACKUP_REMOTE`  形如 `user@host:~/cs101-backups`，设了就在本地备份之后推异地
+
+异地那一步失败会让整个命令非零退出（从而触发 systemd 的 OnFailure 告警）——
+**异地备份悄悄没在跑，正是这套东西要防的失败**。本地那份已经落盘，不会因此丢失。
 """
 import argparse
 import gzip
@@ -38,6 +44,54 @@ SOURCE = Path(os.environ.get("CS101_DB", ROOT / "data" / "course.db"))
 BACKUP_DIR = Path(os.environ.get("CS101_BACKUP_DIR", Path.home() / "backups" / "cs101"))
 KEEP = int(os.environ.get("CS101_BACKUP_KEEP", "14"))
 CHECKED_TABLES = ("users", "submissions", "settings")
+REMOTE = os.environ.get("CS101_BACKUP_REMOTE", "").strip()
+
+
+def sha256_of(path):
+    import hashlib
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def push_offsite(latest):
+    """把备份目录同步到另一台机器，并**核对远端那份的校验和**。
+
+    只看 rsync 的退出码是不够的：那只说明「传输过程没报错」，
+    不说明对面躺着的是一份完好的文件。异地备份如果从没验过，它就只是一个假设。
+    """
+    import subprocess
+    host, _, remote_dir = REMOTE.partition(":")
+    if not remote_dir:
+        print(f"CS101_BACKUP_REMOTE 格式应为 user@host:路径，收到 {REMOTE!r}", file=sys.stderr)
+        return False
+    print(f"→ 推送异地：{REMOTE}")
+    rsync = subprocess.run(
+        ["rsync", "-a", "--delete", "-e", "ssh -o BatchMode=yes -o ConnectTimeout=20",
+         str(BACKUP_DIR) + "/", REMOTE + "/"],
+        capture_output=True, text=True, timeout=1800)
+    if rsync.returncode != 0:
+        print(f"   rsync 失败：{(rsync.stderr or rsync.stdout).strip()[:400]}", file=sys.stderr)
+        return False
+
+    remote_path = f"{remote_dir.rstrip('/')}/{latest.name}"
+    # macOS 没有 sha256sum，用 shasum -a 256；两个都试一遍
+    probe = subprocess.run(
+        ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=20", host,
+         f"sha256sum {remote_path} 2>/dev/null || shasum -a 256 {remote_path}"],
+        capture_output=True, text=True, timeout=300)
+    if probe.returncode != 0 or not probe.stdout.strip():
+        print(f"   远端校验取不到：{(probe.stderr or probe.stdout).strip()[:300]}", file=sys.stderr)
+        return False
+    remote_hash = probe.stdout.split()[0]
+    local_hash = sha256_of(latest)
+    if remote_hash != local_hash:
+        print(f"   ❌ 远端校验和不一致\n     本地 {local_hash}\n     远端 {remote_hash}", file=sys.stderr)
+        return False
+    print(f"   ✅ 远端已核对一致 {remote_hash[:16]}…")
+    return True
 
 
 def table_counts(path):
@@ -116,6 +170,13 @@ def make_backup():
         stale.unlink()
         print(f"   轮转删除 {stale.name}")
     print(f"   保留 {len(sorted(BACKUP_DIR.glob('course-*.db.gz')))} 份于 {BACKUP_DIR}")
+
+    if REMOTE:
+        if not push_offsite(final):
+            return 1
+    else:
+        print("   （未设 CS101_BACKUP_REMOTE：只有本地备份，"
+              "这台机器没了备份也一起没）")
     return 0
 
 

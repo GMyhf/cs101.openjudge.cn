@@ -113,6 +113,47 @@ class BackupTests(unittest.TestCase):
         for path in self.backup_files():
             self.assertEqual(path.stat().st_mode & 0o777, 0o600, path.name)
 
+    def _shim_path(self, rsync_body, ssh_body):
+        """造一对假的 rsync/ssh 放进 PATH。
+
+        异地推送真正要验的逻辑是「rsync 说成功了，但对面那份是不是完好的」——
+        这条不需要真实 SSH 也能验，而真实 SSH 需要动开发机的密钥配置，不该为跑测试去动。
+        """
+        binaries = self.root / "bin"
+        binaries.mkdir(exist_ok=True)
+        for name, body in (("rsync", rsync_body), ("ssh", ssh_body)):
+            path = binaries / name
+            path.write_text("#!/bin/sh\n" + body + "\n", encoding="utf-8")
+            path.chmod(0o755)
+        return f"{binaries}:{os.environ['PATH']}"
+
+    def _run_with_path(self, path_value, remote):
+        environment = os.environ.copy()
+        environment.update({"CS101_DB": str(self.database), "CS101_BACKUP_DIR": str(self.backups),
+                            "CS101_BACKUP_REMOTE": remote, "PATH": path_value})
+        return subprocess.run([sys.executable, str(TOOL)], cwd=ROOT, env=environment,
+                              capture_output=True, text=True, timeout=120)
+
+    def test_offsite_push_rejects_a_mismatching_remote_copy(self):
+        """rsync 退出 0 只说明传输没报错，不说明对面那份是好的。"""
+        path_value = self._shim_path("exit 0", 'echo "0000000000000000000000000000000000000000000000000000000000000000  x"')
+        result = self._run_with_path(path_value, "u@h:/tmp/remote")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("远端校验和不一致", result.stdout + result.stderr)
+
+    def test_offsite_push_accepts_a_matching_remote_copy(self):
+        # 假 ssh 直接算本地那份的校验和：模拟「远端确实和本地一致」
+        ssh_body = ('f=$(ls -t %s/course-*.db.gz | head -1); sha256sum "$f"' % self.backups)
+        result = self._run_with_path(self._shim_path("exit 0", ssh_body), "u@h:/tmp/remote")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("远端已核对一致", result.stdout)
+
+    def test_offsite_failure_does_not_discard_the_local_backup(self):
+        """异地失败要非零退出（触发告警），但本地那份必须留下。"""
+        result = self._run_with_path(self._shim_path("exit 23", "exit 1"), "u@h:/tmp/remote")
+        self.assertEqual(result.returncode, 1)
+        self.assertEqual(len(self.backup_files()), 1, "本地备份不该因为推不出去而丢失")
+
     def test_missing_source_fails_loudly(self):
         result = run(database=self.root / "not-here.db", backup_dir=self.backups)
         self.assertEqual(result.returncode, 1)

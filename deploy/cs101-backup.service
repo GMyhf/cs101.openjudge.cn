@@ -11,6 +11,9 @@ Type=oneshot
 User=rocky
 Group=rocky
 WorkingDirectory=/home/rocky/git/cs101.openjudge.cn
+# 异地目标。留空 = 只有本地备份（这台机器没了备份也一起没）。
+# 需要先让本机的 ~/.ssh/id_ed25519.pub 进到目标机的 authorized_keys。
+Environment=CS101_BACKUP_REMOTE=
 ExecStart=/usr/bin/python3 tools/backup_db.py
 # 备份跑不通要能被看见：journalctl -u cs101-backup 会留下失败记录。
 # 日志走 journal，理由同主服务（SELinux 下 systemd 打不开 home 里的文件）。
