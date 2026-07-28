@@ -1,0 +1,9 @@
+[Unit]
+Description=CS101 单元失败告警（%i）
+
+[Service]
+Type=oneshot
+User=rocky
+Group=rocky
+WorkingDirectory=/home/rocky/git/cs101.openjudge.cn
+ExecStart=/usr/bin/python3 tools/notify_failure.py %i

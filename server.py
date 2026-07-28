@@ -1310,6 +1310,9 @@ def valid_captcha(token, answer):
         return False
     return hmac.compare_digest(challenge[0], str(answer).strip())
 
+# 未配邮件服务时是否把激活/重置链接直接回给调用者。**只为本机开发存在**：
+# 打开它等于「知道邮箱就能拿到该邮箱的账号链接」。
+ACCOUNT_LINKS_ENV = "CS101_SHOW_ACCOUNT_LINKS"
 SESSION_ISSUED = {}
 SESSION_TTL_SECONDS = 14 * 24 * 3600
 LOGIN_FAILURES = {}
@@ -1761,7 +1764,17 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             base = public_base_url()
             activation_link = f"{base}/auth/activate/?token={activation_token}"
             sent = send_account_email(email, "激活你的 CS101 账号", f"请在 24 小时内点击以下链接激活账号：\n{activation_link}\n")
-            self.send_json({"ok": True} if sent else {"ok": True, "activation_link": activation_link}); return
+            if sent:
+                self.send_json({"ok": True}); return
+            # 没发出去时，改动前会把激活链接直接回给调用者。它拿不到别人**既有**的账号
+            # （邮箱已注册会 409），但确实放开了一件本来做不到的事：
+            # 拿别人的邮箱注册、**无需进对方信箱**就能激活，把这个地址占掉。
+            # 邮件正常时占位需要对方信箱里的链接，这条兜底把那道门去掉了。
+            # 与重置链接同样处理：要显式开开关才给，否则只写日志。
+            if os.environ.get(ACCOUNT_LINKS_ENV) == "1":
+                self.send_json({"ok": True, "activation_link": activation_link}); return
+            print(f"[activate] {email} -> {activation_link}", flush=True)
+            self.send_json({"ok": True}); return
         if path == "/api/user/login":
             username, password = str(data.get("username", "")).strip(), str(data.get("password", ""))
             if login_locked(username):
@@ -1839,9 +1852,9 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             # 但它对匿名请求也生效 —— 只要知道某人的邮箱就能拿到他的重置链接，
             # 等于**任意账号接管**。而它是「悄悄降级」触发的：SMTP 没配、变量名打错、
             # 新克隆缺 data/.smtp.env，都会掉进来，没有任何告警。
-            # 现在要显式开开关才给，否则链接只写日志（读日志需要管理员权限），
+            # 现在要显式开开关才给（CS101_SHOW_ACCOUNT_LINKS=1），否则只写日志，
             # 对外仍返回与「邮箱不存在」完全一致的响应。
-            if os.environ.get("CS101_SHOW_RESET_LINK") == "1":
+            if os.environ.get(ACCOUNT_LINKS_ENV) == "1":
                 self.send_json({"ok": True, "reset_link": link}); return
             print(f"[reset] {email} -> {link}", flush=True)
             self.send_json(generic); return

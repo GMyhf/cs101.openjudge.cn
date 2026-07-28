@@ -4,6 +4,10 @@ Documentation=https://github.com/GMyhf/cs101.openjudge.cn
 After=network-online.target
 Wants=network-online.target
 
+# 进入失败状态时告警。Restart=on-failure 会把服务拉起来，
+# 但崩溃循环因此是**静默**的 —— 自动恢复不该等于无人知晓。
+OnFailure=cs101-alert@%n.service
+
 [Service]
 Type=simple
 # 换机器时只需要改这三行（User/Group 与 WorkingDirectory）。

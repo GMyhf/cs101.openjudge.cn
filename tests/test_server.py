@@ -42,7 +42,10 @@ def request(port, method, path, body=None, cookie=None):
 
 class ServerApiTests(unittest.TestCase):
     def registration_payload(self, username, password):
-        _, _, page = request(self.port, "GET", "/register/")
+        return self.registration_payload_for(self.port, username, password)
+
+    def registration_payload_for(self, port, username, password):
+        _, _, page = request(port, "GET", "/register/")
         html = page.decode("utf-8")
         token = re.search(r'name="captcha_token" value="([^"]+)"', html).group(1)
         left, right = map(int, re.search(r'class="captcha-question">(\d+) \+ (\d+)', html).groups())
@@ -78,6 +81,10 @@ class ServerApiTests(unittest.TestCase):
             "CS101_PORT": str(cls.port),
             "CS101_DB": cls.db_file.name,
             "CS101_ADMIN_PASSWORD": "T001-admin-only",
+            # 套件靠响应里的 activation_link 完成激活；生产上这条兜底是关着的
+            # （开着等于「知道邮箱就能拿到该邮箱的账号链接」），所以测试里显式打开，
+            # 让「这是开发专用行为」在代码里看得见，而不是依赖它恰好默认开着。
+            "CS101_SHOW_ACCOUNT_LINKS": "1",
         })
         for key in ("CS101_SMTP_HOST", "CS101_SMTP_PORT", "CS101_SMTP_USER",
                     "CS101_SMTP_PASSWORD", "CS101_SMTP_FROM", "CS101_PUBLIC_URL"):
@@ -972,6 +979,38 @@ class ServerApiTests(unittest.TestCase):
         finally:
             request(self.port, "POST", "/api/settings", {"quotas": original}, cookie=admin)
 
+    @staticmethod
+    def _spawn_server(extra_env):
+        """临时起一个自定义环境的服务端，用来验「生产配置下」才成立的性质。
+
+        套件本身跑在开发配置里（`CS101_SHOW_ACCOUNT_LINKS=1`，否则拿不到激活链接），
+        但有些性质恰恰只在开关关着时成立 —— 那就另起一个进程验，
+        而不是把断言放松成在两种配置下都成立的弱形式。
+        """
+        with socket.socket() as sock:
+            sock.bind(("127.0.0.1", 0))
+            port = sock.getsockname()[1]
+        database = tempfile.NamedTemporaryFile(prefix="cs101-alt-", suffix=".db", delete=False)
+        database.close()
+        environment = os.environ.copy()
+        environment.update({"CS101_HOST": "127.0.0.1", "CS101_PORT": str(port),
+                            "CS101_DB": database.name, "CS101_ADMIN_PASSWORD": "alt-admin",
+                            "CS101_LOAD_DOTENV": "0"})
+        for key in ("CS101_SMTP_HOST", "CS101_SHOW_ACCOUNT_LINKS"):
+            environment.pop(key, None)
+        environment.update(extra_env)
+        process = subprocess.Popen([sys.executable, "server.py"], cwd=ROOT, env=environment,
+                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        deadline = time.monotonic() + 30
+        while time.monotonic() < deadline:
+            try:
+                if request(port, "GET", "/api/me")[0] == 200:
+                    return port, process, database.name
+            except (ConnectionRefusedError, OSError):
+                time.sleep(0.05)
+        process.kill()
+        raise RuntimeError("备用服务端没起来")
+
     def test_password_reset_limit_does_not_leak_which_emails_exist(self):
         """限频不能变成「这个邮箱注册过」的信号。
 
@@ -987,8 +1026,18 @@ class ServerApiTests(unittest.TestCase):
             # 先确认两者的正常响应本来就一模一样（这是端点原有的防泄露设计）
             request(self.port, "POST", "/api/settings",
                     {"quotas": {"forgot": {"limit": 0, "window": 600}}}, cookie=admin)
-            real_status, _, real_body = request(self.port, "POST", "/api/user/forgot", {"email": real})
-            fake_status, _, fake_body = request(self.port, "POST", "/api/user/forgot", {"email": fake})
+            # 「两种邮箱响应完全一致」只在**生产配置**（开关关着）下成立，
+            # 而本套件跑在开发配置里，所以另起一个关掉开关的服务端来验这条。
+            port, process, db_path = self._spawn_server({})
+            try:
+                reg = self.registration_payload_for(port, "t016_alt", "T016-password")
+                request(port, "POST", "/api/user/register", reg)
+                real_status, _, real_body = request(port, "POST", "/api/user/forgot",
+                                                    {"email": "t016_alt@example.com"})
+                fake_status, _, fake_body = request(port, "POST", "/api/user/forgot",
+                                                    {"email": fake})
+            finally:
+                process.kill(); process.wait(); os.unlink(db_path)
             self.assertEqual(real_status, fake_status)
             # 改动前这里是不相等的：没配邮件服务时真实邮箱会**把重置链接直接回给调用者**，
             # 既泄露了「该邮箱已注册」，更等于任意账号接管。现在要显式开

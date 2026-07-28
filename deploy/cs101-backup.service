@@ -1,0 +1,16 @@
+[Unit]
+Description=备份 CS101 数据库（账号与提交记录，唯一不可重建的东西）
+Documentation=https://github.com/GMyhf/cs101.openjudge.cn
+
+# 进入失败状态时告警。Restart=on-failure 会把服务拉起来，
+# 但崩溃循环因此是**静默**的 —— 自动恢复不该等于无人知晓。
+OnFailure=cs101-alert@%n.service
+
+[Service]
+Type=oneshot
+User=rocky
+Group=rocky
+WorkingDirectory=/home/rocky/git/cs101.openjudge.cn
+ExecStart=/usr/bin/python3 tools/backup_db.py
+# 备份跑不通要能被看见：journalctl -u cs101-backup 会留下失败记录。
+# 日志走 journal，理由同主服务（SELinux 下 systemd 打不开 home 里的文件）。
