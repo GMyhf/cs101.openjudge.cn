@@ -264,7 +264,8 @@ def prepare_program(work, language, source, warmup_input=b""):
     else:
         executable = work / "main"
         compile_result = _run(["g++" if ext == ".cpp" else "gcc", "-O2", "-std=c++17" if ext == ".cpp" else "-std=c11", str(source_path), "-o", str(executable)], cwd=work, timeout=15)
-        if compile_result.returncode: return {"status": "Compile Error", "message": compile_result.stderr.decode(errors="replace")[-4000:]}
+        if compile_result.returncode:
+            return None, {"status": "Compile Error", "message": compile_result.stderr.decode(errors="replace")[-4000:]}
         command = [str(executable)]
     return command, None
 

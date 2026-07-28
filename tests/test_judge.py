@@ -45,6 +45,50 @@ class JudgeCoreTests(unittest.TestCase):
         result = judge(BOOK, PROBLEM, "python", "def broken(:\n    pass\n")
         self.assertEqual(result["status"], "Compile Error")
 
+    def test_compile_error_reaches_every_language_family(self):
+        """编译期失败必须在**每一类语言**上都产出裁定，而不是把服务端打成 500。
+
+        原来只测了 python / pypy3，两者走的都是「解释器」那条分支。编译型语言那条
+        分支没有任何编译错误用例 —— 于是 T-010 把 `prepare_program` 抽出去时，
+        gcc/g++ 分支里那句写成一行的 `if rc: return {...}` 漏改成二元组，
+        返回的是裸 dict；调用方 `command, failure = prepare_program(...)` 把它按
+        **键**解包成 ("status", "message")，judge() 最终返回字符串 "message"，
+        服务端再取 result["status"] 就 TypeError→500。闸门全绿了整整一轮。
+        """
+        broken = {
+            "python": "def broken(:\n    pass\n",
+            "cpp": "int main(){ this is not valid c++ }\n",
+            "c": "int main(){ this is not valid c }\n",
+        }
+        if shutil.which("pypy3"):
+            broken["pypy3"] = "def broken(:\n    pass\n"
+        for language, source in broken.items():
+            result = judge(BOOK, PROBLEM, language, source)
+            self.assertIsInstance(result, dict, f"{language}: judge() 必须返回裁定字典")
+            self.assertEqual(result["status"], "Compile Error", language)
+            self.assertIn("message", result, language)
+
+    def test_prepare_program_always_returns_a_pair(self):
+        """`prepare_program` 的契约是 (command, failure)；任何一条分支返回裸 dict 都会静默出错。
+
+        直接对契约本身设检查，不依赖某条分支恰好被测到。
+
+        走 AST 而不是逐行比字符串：原来的 bug 正是写成 `if rc: return {...}` 一行，
+        任何「行首是不是 return」的检查都看不见它 —— 用文本匹配来防文本形状的坑，
+        会连同一个盲点一起继承。
+        """
+        import ast, inspect, textwrap
+        tree = ast.parse(textwrap.dedent(inspect.getsource(judge_module.prepare_program)))
+        returns = [n for n in ast.walk(tree.body[0]) if isinstance(n, ast.Return)]
+        self.assertGreater(len(returns), 5, "没找到几条 return，解析大概出错了")
+        for node in returns:
+            value = node.value
+            self.assertIsInstance(
+                value, ast.Tuple,
+                f"prepare_program 第 {node.lineno} 行的 return 不是二元组："
+                f"{ast.dump(value)[:80] if value else 'None'}")
+            self.assertEqual(len(value.elts), 2, f"第 {node.lineno} 行返回的元组长度不是 2")
+
     def test_runtime_error(self):
         result = judge(BOOK, PROBLEM, "python", "raise RuntimeError('T001')\n")
         self.assertEqual(result["status"], "Runtime Error")
