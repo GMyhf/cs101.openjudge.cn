@@ -948,6 +948,54 @@ class ServerApiTests(unittest.TestCase):
         finally:
             request(self.port, "POST", "/api/settings", {"quotas": original}, cookie=admin)
 
+    def test_password_reset_requests_are_rate_limited(self):
+        """发信端点：可被用来对着某人的信箱反复刷重置邮件。"""
+        admin = self._admin_cookie()
+        original = json.loads(request(self.port, "GET", "/api/settings")[2])["quotas"]
+        try:
+            request(self.port, "POST", "/api/settings",
+                    {"quotas": {"forgot": {"limit": 3, "window": 600}}}, cookie=admin)
+            codes = [request(self.port, "POST", "/api/user/forgot",
+                             {"email": "someone@example.com"})[0] for _ in range(5)]
+            self.assertIn(429, codes, f"找回密码应被限频，实际 {codes}")
+        finally:
+            request(self.port, "POST", "/api/settings", {"quotas": original}, cookie=admin)
+
+    def test_password_reset_limit_does_not_leak_which_emails_exist(self):
+        """限频不能变成「这个邮箱注册过」的信号。
+
+        这个端点无论邮箱存不存在都回同一个 {"ok": true}，就是为了不泄露注册情况。
+        如果限频写在查库之后、只对真实邮箱生效，那 429 本身就把这层保护拆穿了。
+        """
+        admin = self._admin_cookie()
+        original = json.loads(request(self.port, "GET", "/api/settings")[2])["quotas"]
+        username = "t016_reset_probe"
+        self.register_and_login(username, "T016-password")
+        real, fake = username + "@example.com", "definitely-not-registered@example.com"
+        try:
+            # 先确认两者的正常响应本来就一模一样（这是端点原有的防泄露设计）
+            request(self.port, "POST", "/api/settings",
+                    {"quotas": {"forgot": {"limit": 0, "window": 600}}}, cookie=admin)
+            real_status, _, real_body = request(self.port, "POST", "/api/user/forgot", {"email": real})
+            fake_status, _, fake_body = request(self.port, "POST", "/api/user/forgot", {"email": fake})
+            self.assertEqual(real_status, fake_status)
+            # 改动前这里是不相等的：没配邮件服务时真实邮箱会**把重置链接直接回给调用者**，
+            # 既泄露了「该邮箱已注册」，更等于任意账号接管。现在要显式开
+            # CS101_SHOW_RESET_LINK=1 才给，默认两者完全一致。
+            self.assertEqual(json.loads(real_body), json.loads(fake_body))
+            self.assertNotIn("reset_link", json.loads(real_body))
+
+            # 关键判据：**不存在的邮箱同样消耗额度**。
+            # 如果限频写在查库之后、只对真实邮箱生效，这里永远不会出现 429，
+            # 而 429 与否也就成了「这个邮箱注册过」的旁路信号。
+            request(self.port, "POST", "/api/settings",
+                    {"quotas": {"forgot": {"limit": 2, "window": 600}}}, cookie=admin)
+            codes = [request(self.port, "POST", "/api/user/forgot", {"email": fake})[0]
+                     for _ in range(4)]
+            self.assertIn(429, codes, f"不存在的邮箱也必须计入额度，实际 {codes}")
+        finally:
+            request(self.port, "POST", "/api/settings", {"quotas": original}, cookie=admin)
+
     def test_run_endpoint_rejects_oversized_stdin(self):
         cookie = self.register_and_login("t010_runner_big", "T010-password")
         status, _, raw = request(self.port, "POST", "/api/run", {

@@ -71,7 +71,7 @@
 <h2>频次限额</h2>
 <p class="muted" style="margin:0 0 8px">按滑动窗口计数。<b>次数填 0 表示不限</b>——
   考试当天提交会比平时密集得多，撞上限额时可以临时放开，改完立即生效、不用重启。
-  运行与提交按<b>用户名</b>计数；注册未登录，只能按<b>来源地址</b>计数，
+  运行与提交按<b>用户名</b>计数；注册按<b>来源地址</b>计数；找回密码同时按<b>邮箱</b>和<b>来源地址</b>两个维度计数（共用同一份额度）。未登录端点没有用户名可依据，
   一个班常在同一出口 IP 后面，集中注册时可能撞上，必要时调大或填 0。</p>
 <table>
   <thead><tr><th>端点</th><th>次数</th><th>窗口（秒）</th><th>默认</th><th></th></tr></thead>
@@ -159,7 +159,8 @@ function paint() {
   addwin.disabled = !isAdmin;
 }
 
-const QUOTA_LABELS = { run: "运行样例 /api/run", submit: "提交判题 /api/submit", register: "注册 /api/user/register" };
+const QUOTA_LABELS = { run: "运行样例 /api/run", submit: "提交判题 /api/submit", register: "注册 /api/user/register",
+                       forgot: "找回密码 /api/user/forgot" };
 
 function renderQuotas() {
   const conf = state.quotas || {}, defs = state.quota_defaults || {};

@@ -127,6 +127,10 @@ QUOTA_DEFAULTS = {
     # 集中注册就是一次「一个 IP、上百个合法请求」。所以默认给得宽，
     # 只拦批量刷号；真要更紧或更松，管理页上改，不用重启。
     "register": {"limit": 100, "window": 600},
+    # 找回密码：两个维度共用这一份额度。按邮箱计数挡的是「盯着某人的信箱狂发重置邮件」，
+    # 按来源地址计数挡的是「手里有一份邮箱名单、从一个地方群发」。
+    # 正常人一次重置只需要一两封，10 次/10 分钟对真实使用绰绰有余。
+    "forgot": {"limit": 10, "window": 600},
 }
 QUOTA_LIMIT_CAP = 100000
 QUOTA_WINDOW_RANGE = (10, 86400)
@@ -1807,6 +1811,14 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             self.send_json({"ok": True}); return
         if path == "/api/user/forgot":
             email = str(data.get("email", "")).strip().lower()
+            # 限频必须在查库**之前**，而且按「请求里写的邮箱」计数，不管它存不存在。
+            # 否则只有真实邮箱才会被限住，429 本身就成了「这个邮箱注册过」的信号 ——
+            # 那正是下面这个 generic 响应要藏起来的东西。
+            retry_after = (quota_retry_after("forgot", "mail:" + email)
+                           or quota_retry_after("forgot", "ip:" + self.client_address[0]))
+            if retry_after:
+                self.send_json({"error": f"请求太频繁了，请 {retry_after} 秒后再试",
+                                "retry_after": retry_after}, 429); return
             generic = {"ok": True}
             with sqlite3.connect(DB) as db:
                 row = db.execute("select username from users where email = ?", (email,)).fetchone()
@@ -1823,7 +1835,16 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                 if not send_account_email(email, "CS101 密码重置", f"请在 30 分钟内打开以下链接重置 CS101 密码：\n{link}\n"):
                     self.send_json({"error": "邮件发送失败，请稍后重试"}, 503); return
                 self.send_json(generic); return
-            self.send_json({"ok": True, "reset_link": link}); return
+            # 没配邮件服务时，改动前会把重置链接直接回给调用者。那条路径是给本机开发用的，
+            # 但它对匿名请求也生效 —— 只要知道某人的邮箱就能拿到他的重置链接，
+            # 等于**任意账号接管**。而它是「悄悄降级」触发的：SMTP 没配、变量名打错、
+            # 新克隆缺 data/.smtp.env，都会掉进来，没有任何告警。
+            # 现在要显式开开关才给，否则链接只写日志（读日志需要管理员权限），
+            # 对外仍返回与「邮箱不存在」完全一致的响应。
+            if os.environ.get("CS101_SHOW_RESET_LINK") == "1":
+                self.send_json({"ok": True, "reset_link": link}); return
+            print(f"[reset] {email} -> {link}", flush=True)
+            self.send_json(generic); return
         if path == "/api/user/reset":
             token = str(data.get("token", ""))
             password, confirmation = str(data.get("password", "")), str(data.get("confirm_password", ""))
