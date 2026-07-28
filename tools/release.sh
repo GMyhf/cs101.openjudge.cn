@@ -8,7 +8,12 @@
 # 所以「重启完跑一次冒烟」必须是发版的一部分，不是想起来才做的事。
 #
 # 用法：  sudo -u rocky tools/release.sh      （或直接以服务用户身份执行）
+#
+# 整个脚本体包在 { } 里：这个脚本自己会 `git pull`，而 bash 是**边读边执行**的 ——
+# 拉取把文件改短或改长，正在执行的 bash 会从原来的字节偏移继续读，行为不可预期。
+# 包成一个复合命令，bash 必须先把整块解析完才开始执行，之后文件怎么变都不影响这一次。
 set -euo pipefail
+{
 
 cd "$(dirname "$0")/.."
 UNIT_SRC="deploy/cs101.service"
@@ -48,3 +53,5 @@ python3 scripts/smoke_languages.py --require-all --base "$BASE"
 
 echo
 echo "==> 发版完成：$(git rev-parse --short HEAD)"
+
+}
