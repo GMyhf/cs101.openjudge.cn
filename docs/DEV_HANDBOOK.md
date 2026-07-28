@@ -373,7 +373,7 @@ systemd 的 `TimeoutStopSec=20` 正是「先 TERM，20 秒后 KILL」。
 
 **锚点**：`server.py:2009 · class Server`
 
-Python `socketserver` 的默认 `request_queue_size = **5**`。这是
+Python `socketserver` 的默认 `request_queue_size` 是 **5**。这是
 `listen(backlog)` 的参数 —— 内核为**已完成三次握手但尚未被 `accept()`**
 的连接准备的队列长度。
 

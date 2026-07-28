@@ -103,5 +103,28 @@ class UnitFileTests(unittest.TestCase):
                          "工作目录就在 /home 下，加了它服务直接起不来")
 
 
+class HandbookBuildTests(unittest.TestCase):
+    """网页版手册必须与 Markdown 同步。
+
+    `docs/dev-handbook.html` 是产物，`docs/DEV_HANDBOOK.md` 是事实源。
+    改了 Markdown 忘了重新构建，公开页就会停在旧版本 —— 而且没有任何征兆，
+    页面照样打得开。所以这里重新构建一遍，和已提交的产物逐字节比。
+    """
+
+    def test_generated_page_is_up_to_date(self):
+        import subprocess, sys
+        built = ROOT / "docs" / "dev-handbook.html"
+        self.assertTrue(built.is_file(), "缺 docs/dev-handbook.html，跑 tools/build_handbook.py")
+        before = built.read_bytes()
+        result = subprocess.run([sys.executable, "tools/build_handbook.py"],
+                                cwd=ROOT, capture_output=True, text=True, timeout=120)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        after = built.read_bytes()
+        if before != after:
+            built.write_bytes(before)          # 测试不该改动工作区
+            self.fail("dev-handbook.html 与 DEV_HANDBOOK.md 不同步："
+                      "请跑 `python3 tools/build_handbook.py` 并提交产物")
+
+
 if __name__ == "__main__":
     unittest.main()

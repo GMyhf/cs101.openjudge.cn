@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CS101 判题系统 · 文档</title>
+<meta name="description" content="CS101 本机判题服务的开发教学手册、用户手册与管理员手册。">
+<style>
+:root{color-scheme:light;--ink:#16231d;--muted:#6b7a72;--line:#dfe7e1;--bg:#f4f7f4;
+  --panel:#fff;--accent:#237a50;--accent-soft:#e5f3eb}
+@media (prefers-color-scheme:dark){:root{color-scheme:dark;--ink:#e6ece8;--muted:#94a49b;
+  --line:#2f3a34;--bg:#141917;--panel:#181e1b;--accent:#8fd6ab;--accent-soft:#1e3a2a}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.7 system-ui,-apple-system,"Segoe UI","Noto Sans CJK SC",sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:70px 24px 80px}
+h1{font-size:clamp(26px,4vw,38px);margin:0 0 10px;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0 0 36px}
+a.card{display:block;background:var(--panel);border:1px solid var(--line);border-radius:11px;
+  padding:20px 22px;margin-bottom:14px;text-decoration:none;color:inherit;transition:border-color .15s}
+a.card:hover{border-color:var(--accent)}
+a.card b{display:block;font-size:18px;margin-bottom:5px;color:var(--accent)}
+a.card span{color:var(--muted);font-size:14.5px}
+footer{margin-top:38px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:20px}
+footer a{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>CS101 判题系统 · 文档</h1>
+  <p class="lede">本机判题服务：1,849 道题目，1,846 道有测试数据，共 27,465 组。</p>
+
+  <a class="card" href="dev-handbook.html">
+    <b>开发教学手册 →</b>
+    <span>用一个真在跑的判题系统学计算机：计算概论、数据结构与算法、操作系统、
+      计算机网络、数据库、计算机安全、软件工程与运维。每条结论背后都有一次真实事故。</span>
+  </a>
+  <a class="card" href="https://github.com/GMyhf/cs101.openjudge.cn/blob/main/docs/%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C.md">
+    <b>用户手册 →</b>
+    <span>面向学生：账号、找题、提交页、运行样例与提交判题的区别、判题结果怎么读、各项限制。</span>
+  </a>
+  <a class="card" href="https://github.com/GMyhf/cs101.openjudge.cn/blob/main/docs/%E7%AE%A1%E7%90%86%E5%91%98%E6%89%8B%E5%86%8C.md">
+    <b>管理员手册 →</b>
+    <span>面向运维：systemd 部署、配置与密钥、管理页、判题沙箱红线、备份与恢复、排障。</span>
+  </a>
+
+  <footer>
+    源码与全部事故记录：<a href="https://github.com/GMyhf/cs101.openjudge.cn">GMyhf/cs101.openjudge.cn</a>
+  </footer>
+</div>
+</body>
+</html>

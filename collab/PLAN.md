@@ -49,6 +49,8 @@
 
 | T-023 | **开发教学手册** `docs/DEV_HANDBOOK.md`：以本判题系统为案例，串起计概/数算/操作系统/网络/数据库/安全/软工/SRE 八门课 | Done | Claude | 形式参照 Redmoon 的 `docs/DEV_HANDBOOK.md`（知识点 → 代码锚点 → 解释 → 课堂讨论/实验）。**本手册的立足点是：这里几乎每一条安全与工程结论，背后都有一次带日期、有实测证据的真实失败** ——固定盐、改密不吊销会话、限频位置导致旁路泄露、fail-open 的重置链接、数据库可被 HTTP 下载、backlog=5 导致连接重置、fd 上限 1024、CPU 超售导致 TLE 误判、`LimitNOFILE` 落错 section 被静默忽略、systemd 不继承 PATH 导致 PyPy3 失效、正则漏改致 C/C++ 编译错误变 500。事故比教条好教，而这些事故的原始记录都在本文件里。另收录三条方法论：「标准立了但没有机械判据等于没立」「永远不会红的检查」「点名风险会让没被点名的地方无人复核」。**全部锚点已机械校验**：17/17 代码符号、3/3 模板内 JS 锚点、14/14 引用文件、12/12 目录锚点均存在。881 行，含 14 个课程实验设计 |
 
+| T-024 | **手册网页版 + GitHub Pages**：`tools/build_handbook.py` 把 `docs/DEV_HANDBOOK.md` 渲染成自包含的 `docs/dev-handbook.html`，另加 `docs/index.html` 落地页 | Done | Claude | 形式参照 Redmoon 的 `tools/build-handbook.mjs`，但**用 Python 标准库重写** —— 本项目的规矩是零第三方依赖，为一份文档引入 markdown 库不划算；只实现手册实际用到的语法子集，子集之外原样输出、不静默吃内容。**标题 id 沿用 GitHub slug 规则**，因为正文目录用的就是 GitHub 风格锚点，换规则会让目录全断；构建时校验每个目录链接都落在真实标题上，对不上直接报错退出。代码引用（`judge.py:100`、`server.py · _limits`）自动链到 GitHub 源码，实测生成 54 个。产出完整 HTML 文档（含 charset/viewport/og 元信息）而非 Redmoon 那种页面片段 —— 这是要公开分享的页面。**新增同步检查**：`tests/test_units.py · HandbookBuildTests` 重新构建并与已提交产物逐字节比 —— 改了 Markdown 忘了重建，公开页会停在旧版本而且毫无征兆（页面照样打得开）。变异自检：改动源文即变红。构建时另发现并修正手册里一处 Markdown 写法错误（粗体写在了行内代码里，GitHub 上同样会渲染成字面量）。另加 `docs/.nojekyll` 关掉 Jekyll，避免中文文件名与下划线前缀被特殊处理 |
+
 ## Decision Log
 
 > **服务改由 systemd 托管（2026-07-28，人拍板）**：此前是孤儿进程 + 手工 `pkill`/`nohup`，

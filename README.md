@@ -2,6 +2,10 @@
 
 > 手册：[用户手册](docs/用户手册.md)（学生） · [管理员手册](docs/管理员手册.md)（部署与运维）
 > · [开发教学手册](docs/DEV_HANDBOOK.md)（用这个系统教计算机课）
+> · 网页版：<https://gmyhf.github.io/cs101.openjudge.cn/dev-handbook.html>
+>
+> 网页版由 `python3 tools/build_handbook.py` 从 Markdown 生成，**改完源文要重新构建并提交** ——
+> `tests/test_units.py` 会检查两者是否同步。
 
 CS101 题库镜像与本机判题服务。当前目录收录 1,849 道题目，其中 1,846 道已有测试数据，共 27,465 组测试数据。
 
