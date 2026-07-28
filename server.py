@@ -27,6 +27,77 @@ DB = Path(os.environ.get("CS101_DB", ROOT / "data" / "course.db"))
 MIRROR = ROOT / "data" / "openjudge"
 # 唯一对外分发的目录。白名单是后缀而不是「除了 xx 以外」——
 # 排除法每加一种新文件就要记得再排一次，迟早漏掉一个。
+# 253/1849 道题的样例是「手写标注」式的：题面把多组样例塞进两个 <dl> 里，
+# 用 `sample1 in:` 这样的行分段，而不是上游那种一组输入一组输出。
+# 分隔行的写法在题库里散得很开（逐页统计过）：编号在关键词前（`Sample1 Input:`）
+# 或后（`Sample Input1:`、`Sample Input 1:`）；关键词有 in/input/out/output，
+# 还有一处把 Input 打成了 `Iutput`（routine__16530）；冒号有半角、全角、以及没有；
+# 编号用过罗马数字（practice__20163）；还有一页把编号和关键词拆成两行（practice__20125）。
+# 不能写 `sample\b`：`sample1` 里 e 和 1 之间没有词边界，最常见的那种写法反而匹配不上。
+SAMPLE_ANY = re.compile(r'^[ \t]*sample', re.I | re.M)
+SAMPLE_MARKER = re.compile(r'^[ \t]*sample[ \t]*(?P<a>\d+)?[ \t]*'
+                           r'(?P<kind>input|output|iutput|in|out)[ \t]*'
+                           r'(?P<b>\d+|[ivx]+)?[ \t]*[:：]?[ \t]*$', re.I)
+SAMPLE_INDEX_ONLY = re.compile(r'^[ \t]*sample[ \t]*(?P<n>\d+)[ \t]*[:：]?[ \t]*$', re.I)
+SAMPLE_KIND_ONLY = re.compile(r'^[ \t]*(?P<kind>input|output|iutput)[ \t]*'
+                              r'(?P<n>\d+)?[ \t]*[:：][ \t]*$', re.I)
+# 输出段里 `#` 开头的行往后全是讲解，而且讲解常常续到不带 `#` 的下一行
+# （pctbook__M16531 就是），所以是**截断**而不是逐行过滤。
+# 只在输出段截断：输入段的 `#` 可能是真数据 —— practice__19949 的 `###John###` 就是。
+# 全库核过：253 道标记式题目里，输出段第一行就是 `#` 的有 0 道，截断不会吃掉真输出。
+SAMPLE_EXPLAIN = re.compile(r'^[ \t]*(?:#|(?:解释|说明|注意|提示)[:：])')
+ROMAN = {"i": 1, "ii": 2, "iii": 3, "iv": 4, "v": 5,
+         "vi": 6, "vii": 7, "viii": 8, "ix": 9, "x": 10}
+
+
+def parse_sample_sections(text):
+    """把标注式样例切成 [{input, output}, ...]，解析不出就返回空列表。"""
+    sections, seen, pending, current = [], {"input": 0, "output": 0}, None, None
+    for line in text.split("\n"):
+        kind = number = None
+        marker = SAMPLE_MARKER.match(line)
+        if marker:
+            kind, number = marker.group("kind"), marker.group("a") or marker.group("b")
+        else:
+            index_only = SAMPLE_INDEX_ONLY.match(line)
+            if index_only:
+                pending, current = int(index_only.group("n")), None
+                continue
+            kind_only = SAMPLE_KIND_ONLY.match(line)
+            if kind_only:
+                kind, number = kind_only.group("kind"), kind_only.group("n")
+        if kind is None:
+            if current is not None:
+                current["lines"].append(line)
+            continue
+        kind = "input" if kind.lower() in ("in", "input", "iutput") else "output"
+        if number is None:
+            index = pending
+        elif number.isdigit():
+            index = int(number)
+        else:
+            index = ROMAN.get(number.lower())
+        if index is None:                       # 没编号就按出现顺序配对
+            seen[kind] += 1
+            index = seen[kind]
+        else:
+            seen[kind] = max(seen[kind], index)
+            pending = index
+        current = {"kind": kind, "index": index, "lines": []}
+        sections.append(current)
+    cases = {}
+    for section in sections:
+        body = section["lines"]
+        if section["kind"] == "output":
+            cut = next((i for i, line in enumerate(body) if SAMPLE_EXPLAIN.match(line)), None)
+            if cut is not None:
+                body = body[:cut]
+        cases.setdefault(section["index"], {})[section["kind"]] = "\n".join(body).strip("\n")
+    return [{"input": case.get("input", ""), "output": case.get("output", "")}
+            for _, case in sorted(cases.items())
+            if case.get("input", "").strip() or case.get("output", "").strip()]
+
+
 JUDGE_SLOTS = set()
 JUDGE_SLOTS_LOCK = threading.Lock()
 
@@ -188,6 +259,9 @@ document.documentElement.dataset.theme=t;}catch(e){document.documentElement.data
  .placeholder{color:var(--muted);font-size:13.5px}
 
  /* ---- 样例 ---- */
+ .sample-tabs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+ .sample-pick{cursor:pointer;font:inherit;font-size:12px}
+ .sample-pick.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
  .sample-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
  .sample-h{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);margin-bottom:5px}
  .sample-box{margin:0;height:148px;overflow:auto;padding:10px;border:1px solid var(--line);
@@ -286,6 +360,7 @@ document.documentElement.dataset.theme=t;}catch(e){document.documentElement.data
       </nav>
       <div class="pane-body" id="verdict" role="tabpanel"><div class="placeholder">提交后在这里显示判题结果。</div></div>
       <div class="pane-body" id="samples" role="tabpanel" hidden>
+        <div class="sample-tabs" id="sampleTabs" hidden></div>
         <div class="sample-grid">
           <div><div class="sample-h">输入<span class="muted">（可改）</span></div><textarea id="sampleIn" class="sample-box" spellcheck="false" autocomplete="off"></textarea></div>
           <div><div class="sample-h">预期输出</div><pre id="sampleExp" class="sample-box"></pre></div>
@@ -676,8 +751,29 @@ function renderVerdict(data) {
 
 // ---- 运行样例 ----------------------------------------------------------
 // 与提交走同一套沙箱，但不写 submissions 表、不计入统计。
-sampleIn.value = SAMPLES.input || "";
-sampleExp.textContent = SAMPLES.output || "";
+// 253 道题的题面把多组样例用 `sample1 in:` 这类行标注在一起，服务端已经切好，
+// 这里只负责让用户挑一组。只有一组时不显示切换条。
+const SAMPLE_CASES = (SAMPLES.cases && SAMPLES.cases.length)
+  ? SAMPLES.cases : [{ input: SAMPLES.input || "", output: SAMPLES.output || "" }];
+let sampleIdx = 0;
+function selectSample(i) {
+  sampleIdx = i;
+  sampleIn.value = SAMPLE_CASES[i].input;
+  sampleExp.textContent = SAMPLE_CASES[i].output;
+  sampleGot.textContent = "点「运行样例」后显示。";
+  sampleGot.classList.add("muted");
+  sampleVerdict.innerHTML = "";
+  if (SAMPLE_CASES.length > 1) {
+    sampleTabs.hidden = false;
+    sampleTabs.innerHTML = SAMPLE_CASES.map((c, k) =>
+      '<button type="button" class="chip sample-pick' + (k === i ? " on" : "") + '" data-i="' + k + '">样例 ' + (k + 1) + "</button>").join("");
+  }
+}
+sampleTabs.addEventListener("click", e => {
+  const hit = e.target.closest("[data-i]");
+  if (hit) selectSample(Number(hit.dataset.i));
+});
+selectSample(0);
 let busy = false;
 function setBusy(on, note) {
   busy = on;
@@ -707,7 +803,8 @@ run.addEventListener('click', async () => {
       sampleGot.textContent = data.stdout || (data.stderr ? "" : "（没有输出）");
       if (data.stderr) sampleGot.textContent += "\n--- stderr ---\n" + data.stderr;
       // 与判题器同一条比对规则：按 token 比，不计空白差异
-      const same = data.stdout.trim().split(/\s+/).join(" ") === (SAMPLES.output || "").trim().split(/\s+/).join(" ");
+      const want = SAMPLE_CASES[sampleIdx].output || "";
+      const same = data.stdout.trim().split(/\s+/).join(" ") === want.trim().split(/\s+/).join(" ");
       sampleVerdict.innerHTML = '<span class="badge ' + (same ? "b-ac" : "b-wa") + '">'
         + (same ? "与样例一致" : "与样例不一致") + "</span>";
     }
@@ -1203,11 +1300,19 @@ class Handler(BaseHTTPRequestHandler):
         match = re.search(r'<dt>样例输入</dt>\s*<dd>(.*?)</dd>\s*<dt>样例输出</dt>\s*<dd>(.*?)</dd>',
                           text, re.S)
         if not match:
-            return {"input": "", "output": ""}
+            return {"input": "", "output": "", "cases": []}
         def plain(chunk):
             chunk = re.sub(r"</?pre[^>]*>", "", chunk.strip())
             return unescape(re.sub(r"<[^>]+>", "", chunk)).strip("\n")
-        return {"input": plain(match.group(1)), "output": plain(match.group(2))}
+        raw_input, raw_output = plain(match.group(1)), plain(match.group(2))
+        cases = []
+        if SAMPLE_ANY.search(raw_input) or SAMPLE_ANY.search(raw_output):
+            # 标注式题面里两个 <dl> 的分工是乱的：T27237 把样例 1 的输入和输出
+            # 一起塞进「样例输入」，样例 2 整组塞进「样例输出」。所以合起来再切。
+            cases = parse_sample_sections(raw_input + "\n" + raw_output)
+        if not cases:
+            cases = [{"input": raw_input, "output": raw_output}]
+        return {"input": cases[0]["input"], "output": cases[0]["output"], "cases": cases}
 
     def submission_page(self, page, book, problem):
         title, params_html, content_html, _ = self.problem_parts(page, book, problem)

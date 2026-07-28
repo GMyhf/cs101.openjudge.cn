@@ -663,6 +663,51 @@ class ServerApiTests(unittest.TestCase):
         self.assertTrue(payload["output"].strip(), "样例输出不该是空的")
         self.assertNotIn("<pre>", payload["input"])     # 标签要剥干净
 
+    def test_submit_page_splits_annotated_multi_samples(self):
+        """T27237 这类题面：样例 1 的输入和输出一起塞在「样例输入」里，样例 2 整组在「样例输出」里。"""
+        status, _, body = request(self.port, "GET", "/pctbook/T27237/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        payload = json.loads(re.search(r"const SAMPLES = (\{.*?\});", text).group(1))
+        self.assertEqual(len(payload["cases"]), 2, payload)
+        self.assertEqual(payload["cases"][0], {"input": "1 6\n0 0", "output": "5\nHHHOO"})
+        self.assertEqual(payload["cases"][1], {"input": "2 4\n0 0", "output": "4\nHHOO"})
+        self.assertEqual(payload["input"], "1 6\n0 0")      # 默认给第一组
+        # 分隔行和 # 讲解都不该留在样例里
+        self.assertNotIn("sample", payload["input"].lower())
+        self.assertNotIn("#", payload["cases"][0]["output"])
+
+    def test_static_sample_parser_handles_the_variants_found_in_the_library(self):
+        """分隔行的写法在题库里散得很开，这些都是从 1849 个页面里实际扫出来的形状。"""
+        import server
+
+        def one(text):
+            return server.parse_sample_sections(text)
+
+        # 编号在关键词后 + 全角冒号
+        self.assertEqual(one("Sample Input1：\n1\nSample Output1：\n2"),
+                         [{"input": "1", "output": "2"}])
+        # 编号在关键词前 + 无冒号
+        self.assertEqual(one("Sample1 Input\n1\nSample1 Output\n2"),
+                         [{"input": "1", "output": "2"}])
+        # 上游把 Input 打成了 Iutput（routine__16530）
+        self.assertEqual(one("Sample Iutput2:\n7\nSample Output2:\n8"),
+                         [{"input": "7", "output": "8"}])
+        # 罗马数字编号（practice__20163）
+        self.assertEqual(one("Sample Input II:\na\nSample Output II:\nb"),
+                         [{"input": "a", "output": "b"}])
+        # 编号与关键词拆成两行（practice__20125）
+        self.assertEqual(one("Sample1\ninput：\n2\noutput:\n101"),
+                         [{"input": "2", "output": "101"}])
+        # 输出段的 # 讲解要截断，且讲解常常续到不带 # 的下一行（pctbook__M16531）
+        self.assertEqual(one("sample1 in:\n1\nsample1 out:\n6 0\n#讲解\n续行也是讲解"),
+                         [{"input": "1", "output": "6 0"}])
+        # 但输入段的 # 是真数据，不能动（practice__19949 的 ###John###）
+        self.assertEqual(one("Sample1 Input:\n###John### .\nSample1 Output:\n2"),
+                         [{"input": "###John### .", "output": "2"}])
+        # 没有标记就交回空列表，由调用方回落到「输入 dd / 输出 dd」的老行为
+        self.assertEqual(one("1 6\n0 0"), [])
+
     def test_run_endpoint_requires_authentication(self):
         status, _, _ = request(self.port, "POST", "/api/run", {
             "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM,
