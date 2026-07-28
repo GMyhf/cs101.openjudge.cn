@@ -10,6 +10,28 @@ python3 server.py
 
 服务默认监听 `0.0.0.0:8000`。本机局域网访问 `http://10.129.81.235:8000/`；同一 Tailnet 的其他机器访问 `http://100.123.12.92:8000/`。
 
+### 常驻部署（systemd）
+
+`deploy/cs101.service` 是常驻单元。换机器只需改 `User`/`Group`/`WorkingDirectory` 三处。
+
+```bash
+sudo cp deploy/cs101.service /etc/systemd/system/cs101.service
+sudo systemctl daemon-reload
+sudo systemctl enable --now cs101
+```
+
+装好之后，**发版就是这一条**：
+
+```bash
+git pull && sudo systemctl restart cs101
+```
+
+`systemctl status cs101` 看状态，日志仍写在 `server.log`。
+
+> 不要再用 `pkill` + `nohup` 手工重启。`pgrep -f "python3 -u server.py"` 会匹配到
+> **执行这条命令的 shell 自己**（命令串里就含这段文字），把自己杀掉、链条断在启动新进程之前——
+> 结果是老进程活得好好的，看起来却像重启过了。2026-07-28 就这么静默失败过一次。
+
 管理员账号通过 `CS101_ADMIN_USER` 配置，口令通过 `CS101_ADMIN_PASSWORD` 或本机未跟踪的 `data/.admin_password` 配置。
 
 提交页支持 Python3、PyPy3、C、C++、C#、F#、VB.NET、Swift 和 Objective-C。判题时间倍率为 Python ×10、PyPy3 ×3、C/C++/Swift/Objective-C ×1、C#/F#/VB.NET ×2；C#/F#/VB.NET 内存限额为 C/C++ 的 2 倍。题面限时按 C/C++ 口径计算。

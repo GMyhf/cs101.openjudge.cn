@@ -1,0 +1,41 @@
+[Unit]
+Description=CS101 OpenJudge 本机判题服务
+Documentation=https://github.com/GMyhf/cs101.openjudge.cn
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# 换机器时只需要改这三行（User/Group 与 WorkingDirectory）。
+User=rocky
+Group=rocky
+WorkingDirectory=/home/rocky/git/cs101.openjudge.cn
+
+Environment=CS101_HOST=0.0.0.0
+Environment=CS101_PORT=8000
+# 管理员口令与 SMTP 由 server.py 自己从 data/.admin_password、data/.smtp.env 读，
+# 不要写进这里 —— unit 文件是全局可读的。
+ExecStart=/usr/bin/python3 -u server.py
+
+Restart=on-failure
+RestartSec=3
+
+# 判题会把用户代码拉起成子进程。停止时必须带走整棵进程树，
+# 否则正在跑的用户程序会留成孤儿继续占 CPU。
+KillMode=control-group
+# 一次判题最长 300 秒（judge.py 的 TOTAL_HARD_CAP_S），但重启不必等它跑完：
+# 给 20 秒收尾，然后连同子进程一起 SIGKILL。
+TimeoutStopSec=20
+
+StandardOutput=append:/home/rocky/git/cs101.openjudge.cn/server.log
+StandardError=append:/home/rocky/git/cs101.openjudge.cn/server.log
+
+# 判题沙箱本身由 judge.py 的 _limits() 负责（RLIMIT_CPU/FSIZE/AS + env 白名单），
+# 这里只加两条不会干扰它的：私有 /tmp（判题的临时目录就在 /tmp 下），
+# 以及禁止提权（用户代码不该能靠 setuid 拿到更多权限）。
+# 不要加 ProtectHome —— 工作目录就在 /home 下，加了服务直接起不来。
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
