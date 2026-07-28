@@ -100,6 +100,28 @@ def submit(opener, base, book, problem, source):
             "judge_ms": body.get("time_ms"), "wall_s": time.perf_counter() - started}
 
 
+def drain(base, timeout=420):
+    """等到判题空闲：连续几次「立刻能拿到判题名额」才算排空。"""
+    opener = urllib.request.build_opener()
+    idle = 0
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        try:
+            with opener.open(base + "/api/stats", timeout=20) as response:
+                json.loads(response.read())
+        except (OSError, ValueError):
+            pass
+        # /api/stats 不判题，用它探活；真正的排空看机器负载
+        try:
+            load = os.getloadavg()[0]
+        except OSError:
+            load = 0.0
+        idle = idle + 1 if load < 2.0 else 0
+        if idle >= 3:
+            return
+        time.sleep(5)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -139,7 +161,10 @@ def main():
         detail = "  ".join(f"{k}×{v}" for k, v in sorted(counts.items())) or "—"
         print(f"{level:>5} {len(accepted):>5} {len(wrong):>5} "
               f"{statistics.median(walls):>8.1f}s {p95:>8.1f}s {walls[-1]:>7.1f}s  {detail}")
-        time.sleep(3)
+        # 必须等系统排空再进下一档。只 sleep 几秒的话，上一档还在跑的判题会算进下一档的
+        # 争抢里，越往后越脏 —— 第一次跑就是这样：高并发档出现 Busy，
+        # 那只可能来自上一档尚未结束的提交，说明数据已经被污染。
+        drain(options.base)
     print("-" * 78)
     print("提交的全部是能 AC 的代码，所以「误判」列里任何非零都是服务器负载造成的冤枉判定。")
     return 0
