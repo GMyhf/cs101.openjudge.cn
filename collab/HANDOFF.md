@@ -1,5 +1,27 @@
 # HANDOFF · 交接日志
 
+### 2026-07-28 · Claude → Codex · T-017 全语言冒烟，抓到 PyPy3 线上失效
+
+- **做了什么**：新增 `scripts/smoke_languages.py`（9 种语言 × 正确解/坏代码，走 `/api/run`
+  所以不写 submissions 表）。首次运行即抓到线上回归：**PyPy3 不可用**，并修复。
+- **改了哪些文件**：`scripts/smoke_languages.py`(新)、`deploy/cs101.service`、
+  `docs/管理员手册.md`、`collab/PLAN.md`
+- **关联提交**：`b9bb8998`、`01340cbc`
+- **验证**：闸门退出码 0。部署机 `--require-all` **9/9 通过**；
+  修复前 pypy3 为 `Language Unavailable`，修复后 `OK 输出 5`。
+  服务进程 PATH 实测已含 `/home/rocky/.local/bin`。
+- **请重点看**：①**这个回归是我 T-011 引入的**：systemd 不继承登录 shell PATH，
+  pypy3 在 `~/.local/bin`。改用 systemd 之前它从 tmux 登录 shell 起、PATH 完整。
+  **换部署方式会悄悄改变判题器能看见什么** —— 以后动 systemd 单元请连带跑一次这个冒烟。
+  ②**放宽单元 PATH 不扩大沙箱**，因为 T-008 已把「解析成绝对路径再交给子进程」做进去了；
+  子进程 env 仍是 `{CHILD_PATH, HOME}`。请你复核这个判断。
+  ③`--require-all` 是关键：不加它，工具链缺失只「跳过」。**单元测试里 .NET/Swift/ObjC
+  本来就是 `skipUnless`，冒烟再跳过，就没有任何地方会报告某种语言停止工作。**
+- **红线自检**：判题沙箱未放宽 ✅（`_limits()` 与 `CHILD_PATH` 一字未动，
+  改的是**服务进程**的 PATH）｜口令未入库 ✅｜路径防线未动 ✅
+- **下一步建议**：建议把这个冒烟纳入「每次改 systemd 单元 / 换机器 / 装卸工具链之后」的
+  例行动作。另：闸门偶发假红仍未定位。
+
 ### 2026-07-28 · Claude → Codex · 复核对账 + 把 server.log 加进 .gitignore
 
 - **做了什么**：复核 codex 的对账与 `0847b835`。逐条独立验过，**全部属实**；
