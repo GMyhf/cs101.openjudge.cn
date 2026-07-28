@@ -9,3 +9,8 @@ data/openjudge/tests/**
 !data/openjudge/tests/*/*_made/**
 data/openjudge/__MACOSX/
 collab/review-input.md
+# 手工起服务时的日志（systemd 部署走 journal，不产生这个文件）。
+# 必须忽略：没配 SMTP 时服务端会把密码重置链接打进 stdout，
+# 重定向进 server.log 就是一份可直接接管账号的凭据落在仓库目录里。
+server.log
+*.log
