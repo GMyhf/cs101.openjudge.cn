@@ -1277,6 +1277,77 @@ def catalog_summary_payload():
     }
 
 
+BOOK_STATUS_LIMIT = 100
+
+
+def book_page_payload(book, authenticated):
+    """题库页要的三份数据：题目表、排名、最近状态。
+
+    排名和状态**只在登录后返回**。理由不是洁癖：站点已经通过 Tailscale Funnel
+    对公网开着（见 docs/管理员手册.md），「谁在几点交了哪道题」连起来就是作息，
+    没有理由对匿名访客敞开。题目表本来就在 `/api/catalog` 里公开，这里维持不变。
+
+    这里只从 detail 里取 time_ms / memory_kb 两个数。**不要顺手把 detail 整个
+    发出去** —— 它含 `failing_input` / `expected_output`，那是出错那组的测试数据，
+    公开等于泄题（同一个理由让 `/api/submissions` 把 detail 限死在本人和管理员）。
+    """
+    problems = [item for item in catalog_raw().get("problems", []) if item.get("book") == book]
+    ranking, status = [], []
+    with sqlite3.connect(DB) as db:
+        stats = {
+            row[0]: {
+                "attempt_count": row[1],
+                "accepted_count": row[2],
+                "pass_rate": f"{row[2] / row[1] * 100:.0f}%" if row[1] else "",
+            }
+            for row in db.execute(
+                """select problem, count(distinct lower(user)),
+                          count(distinct case when result = 'Accepted' then lower(user) end)
+                     from submissions where book = ? group by problem""", (book,))
+        }
+        if authenticated:
+            ranking = [
+                {"user": row[0], "solved": row[1], "submissions": row[2], "last_submit": row[3]}
+                for row in db.execute(
+                    """select min(user),
+                              count(distinct case when result = 'Accepted' then problem end),
+                              count(*), max(created)
+                         from submissions where book = ?
+                         group by lower(user)
+                         order by 2 desc, 3 asc, 4 asc, lower(min(user)) asc""", (book,))
+            ]
+            for row in db.execute(
+                    """select created, user, problem, result, language, detail from submissions
+                         where book = ? order by id desc limit ?""", (book, BOOK_STATUS_LIMIT)):
+                try:
+                    detail = json.loads(row[5]) if row[5] else {}
+                except ValueError:
+                    detail = {}
+                status.append({"created": row[0], "user": row[1], "problem": row[2], "result": row[3],
+                               "language": row[4], "time_ms": detail.get("time_ms"),
+                               "memory_kb": detail.get("memory_kb")})
+    return {
+        "book": book,
+        "name": BOOK_META.get(book, {}).get("name", book),
+        "problem_count": len(problems),
+        "tested_count": sum(1 for item in problems if (item.get("test_count") or 0) > 0),
+        "authenticated": authenticated,
+        "problems": [
+            {
+                "id": item.get("id", ""),
+                "path": item.get("path", ""),
+                "title": catalog_title(item),
+                "test_count": item.get("test_count", 0),
+                **stats.get(item.get("id", ""),
+                            {"attempt_count": 0, "accepted_count": 0, "pass_rate": ""}),
+            }
+            for item in problems
+        ],
+        "ranking": ranking,
+        "status": status,
+    }
+
+
 PBKDF2_ROUNDS = 120000
 LEGACY_SALT = b"cs101-local-user"          # 改动前全库共用这一个盐，且它就写在源码里
 
@@ -1511,6 +1582,13 @@ class Handler(BaseHTTPRequestHandler):
         text = text.replace("https://cs101.openjudge.cn", "/")
         return text
 
+    def book_page(self, book, view):
+        template = (ROOT / "book.html").read_text(encoding="utf-8")
+        return (template.replace("__BOOK_NAME__", escape(BOOK_META.get(book, {}).get("name", book)))
+                .replace("__BOOK_JSON__", json.dumps(book, ensure_ascii=False))
+                .replace("__VIEW_JSON__", json.dumps(view))
+                .replace("__BOOK__", escape(book)))
+
     def problem_parts(self, page, book, problem):
         text = self.local_page(page)
         title_match = re.search(r'<div id="pageTitle"><h2>(.*?)</h2>', text, re.S)
@@ -1649,6 +1727,13 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             page = MIRROR / "pages" / f"{book}__{problem_id}.html"
             if page.is_file():
                 self.send_html(self.submission_page(page, book, problem_id)); return
+        # 题库页。三个标签页共用一份模板，视图名由服务端定，前端不去猜 URL。
+        # 走 /book/ 前缀而不是接管 /pctbook/：后者仍然是上游镜像的原页面，
+        # 老链接（题面里到处都是）不能因为换了首页入口就打不开。
+        book_view = re.fullmatch(r"/book/([^/]+)/(ranking/|status/)?", path)
+        if book_view and book_view.group(1) in BOOK_META:
+            view = (book_view.group(2) or "").rstrip("/") or "problems"
+            self.send_html(self.book_page(book_view.group(1), view)); return
         local_book = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/", path)
         if local_book:
             page_number = parse_qs(parsed.query).get("page", ["1"])[0]
@@ -1724,6 +1809,9 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             if parse_qs(parsed.query).get("summary") == ["1"]:
                 self.send_json(catalog_summary_payload()); return
             self.send_json(catalog_full_payload()); return
+        book_api = re.fullmatch(r"/api/books/([^/]+)/", path)
+        if book_api and book_api.group(1) in BOOK_META:
+            self.send_json(book_page_payload(book_api.group(1), self.authorized())); return
         # 静态分发只有两条出口：首页，和 static/ 下的白名单后缀。
         # 改动前这里是 `ROOT / decoded_path`，只要文件在 ROOT 底下就发 ——
         # `ROOT in file.parents` 防的是「逃出 ROOT」，防不住「ROOT 里的东西不该全公开」。

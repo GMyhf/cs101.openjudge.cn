@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-07-29 · 题库页重做：撤销过一次的东西，重做时先弄清它当初动了谁
+
+`93dedfff` 那一版题库页被撤销了，`CHANGELOG.md` 只记了「已撤销」，没写原因。
+重做前我把它的 diff 读完了，它做的关键动作是：
+
+```python
+-        local_book = re.fullmatch(r"/(pctbook|…|practice)/", path)   # 上游镜像原页
+-        if local_book: … self.send_html(self.local_page(page)); return
++        book_view = re.fullmatch(r"/([^/]+)/(?:ranking/|status/)?", path)
++        if book_view and book_view.group(1) in BOOK_META: …
+```
+
+也就是**把 `/pctbook/` 这一层 URL 整个顶掉了**。而 1849 个题面页、目录页里到处是
+指向 `/pctbook/…` 的链接，`local_page()` 还专门把上游绝对地址改写成本地路径 ——
+换一个首页入口，不该顺手让这批老链接改变含义。
+
+这一版走 `/book/` 前缀，镜像页原样不动。**改一个入口，就只改那个入口。**
+
+另一条：撤销记录里没写原因时，不要当成「随便撤的」而照搬重来，也不要当成
+「肯定是坏的」而绕开需求 —— 去读被撤销的 diff，它动了什么是查得出来的。
+
+---
+
 ## 2026-07-28 · 我自己在 T-010 埋的回归：C/C++ 编译错误 = 服务端 500
 
 写手册时逐行读 `judge.py`，发现 `prepare_program` 里有一条 return 返回的是**裸 dict**

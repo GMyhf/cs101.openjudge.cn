@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/static/theme.css">
+<script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script>
+<title>__BOOK_NAME__ · CS101 题库</title>
+<style>
+  /* 这一页刻意只有一张表。版式对着 http://cs101.openjudge.cn/pctbook/ 抄：
+     面包屑 + 三个标签页 + 一张表 + 一条页码。颜色一律走 theme.css 的变量。 */
+  * { box-sizing:border-box }
+  body { margin:0; padding:0 0 60px; background:var(--bg); color:var(--ink); font:var(--font-ui) }
+  .wrap { max-width:980px; margin:0 auto; padding:0 24px }
+  .head { padding:28px 0 0 }
+  .crumb { font-size:13px; color:var(--muted); text-decoration:none }
+  .crumb:hover { color:var(--accent) }
+  h1 { font-size:26px; margin:10px 0 3px }
+  .sub { color:var(--muted); font-size:13px; margin:0 0 16px }
+  .tabs { display:flex; gap:26px; border-bottom:1px solid var(--line) }
+  .tabs a { display:block; padding:10px 1px; color:var(--muted); font-weight:600; text-decoration:none;
+            border-bottom:2px solid transparent; margin-bottom:-1px }
+  .tabs a:hover { color:var(--ink) }
+  .tabs a.on { color:var(--ink); border-color:var(--accent) }
+  .bar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 0 8px }
+  .bar input { width:min(280px,55%); padding:7px 10px; border:1px solid var(--line); border-radius:var(--radius-sm);
+               background:var(--panel); color:var(--ink); font:inherit; outline:none }
+  .bar input:focus { border-color:var(--accent) }
+  .table-wrap { overflow-x:auto }
+  table { min-width:600px }
+  a.pid { color:var(--accent); text-decoration:none; font-weight:600 }
+  a.pid:hover { text-decoration:underline }
+  td.title a { color:inherit; text-decoration:none }
+  td.title a:hover { color:var(--accent); text-decoration:underline }
+  .pages { display:flex; justify-content:center; gap:6px; flex-wrap:wrap; padding:18px 0 0 }
+  .pages button { min-width:32px; padding:5px 9px; border:1px solid var(--line); border-radius:var(--radius-sm);
+                  background:var(--panel); color:var(--ink); font:inherit; font-size:13px; cursor:pointer }
+  .pages button.on { border-color:var(--accent); color:var(--accent); font-weight:650 }
+  .pages button:disabled { opacity:.45; cursor:default }
+  .note { padding:44px 0; text-align:center; color:var(--muted) }
+  .note a { color:var(--accent) }
+  @media (max-width:620px) {
+    .wrap { padding:0 14px }
+    .tabs { gap:18px }
+    h1 { font-size:22px }
+  }
+</style>
+</head>
+<body>
+<header class="topbar"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><nav class="topnav"><a href="/problems/">题库目录</a><a href="/history/">提交记录</a><a href="/help/">说明</a><button id="theme" type="button" class="ghost">深色</button><a id="account" href="/auth/login/">登录</a></nav></header>
+
+<div class="wrap">
+  <div class="head">
+    <a class="crumb" href="/">CS101</a>
+    <h1>__BOOK_NAME__</h1>
+    <p class="sub" id="sub">正在读取…</p>
+    <nav class="tabs">
+      <a id="tab-problems" href="/book/__BOOK__/">题目</a>
+      <a id="tab-ranking"  href="/book/__BOOK__/ranking/">排名</a>
+      <a id="tab-status"   href="/book/__BOOK__/status/">状态</a>
+    </nav>
+  </div>
+  <div id="view"><p class="note">正在读取…</p></div>
+</div>
+
+<script>
+const BOOK = __BOOK_JSON__, VIEW = __VIEW_JSON__;
+const view = document.querySelector('#view'), sub = document.querySelector('#sub');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const LANGS = {python:'Python3', pypy3:'PyPy3', cpp:'G++', c:'GCC', csharp:'C#', fsharp:'F#',
+               vbnet:'VB.NET', swift:'Swift', objc:'Objective-C'};
+const PAGE_SIZE = 100;
+// catalog 里的标题带着「E01003:」前缀（首页和 /problems/ 都这么剥）。
+// 上游那一页的标题列只有 Hangover，这里跟它一致。
+const titleOf = p => (p.title || p.id).replace(new RegExp('^' + p.id + '\\s*[:：]\\s*', 'i'), '') || p.id;
+document.querySelector('#tab-' + VIEW).classList.add('on');
+
+function table(headers, rows) {
+  return '<div class="table-wrap"><table><thead><tr>'
+    + headers.map(h => `<th class="${h.num ? 'num' : ''}">${h.text}</th>`).join('')
+    + '</tr></thead><tbody>' + rows.join('') + '</tbody></table></div>';
+}
+function badge(result) {
+  const kind = result === 'Accepted' ? 'b-ac' : result === 'Wrong Answer' ? 'b-wa' : 'b-other';
+  return `<span class="badge ${kind}">${esc(result || '—')}</span>`;
+}
+function note(html) { view.innerHTML = `<p class="note">${html}</p>`; }
+function loginNote(what) {
+  note(`登录后可查看本题库的${what}。<a href="/auth/login/">去登录</a>`);
+}
+
+fetch('/api/books/' + encodeURIComponent(BOOK) + '/', { credentials: 'same-origin' })
+  .then(r => r.ok ? r.json() : Promise.reject())
+  .then(render)
+  .catch(() => { sub.textContent = ''; note('题库暂时不可用。'); });
+
+function render(data) {
+  sub.textContent = `${data.problem_count} 道题目 · ${data.tested_count} 道可在本站判题`;
+  if (VIEW === 'problems') return renderProblems(data);
+  if (!data.authenticated) return loginNote(VIEW === 'ranking' ? '排名' : '提交状态');
+  if (VIEW === 'ranking') return renderRanking(data);
+  return renderStatus(data);
+}
+
+function renderProblems(data) {
+  view.innerHTML = `<div class="bar"><span class="muted" id="count"></span>
+    <input id="q" type="search" placeholder="搜索题号或标题" autocomplete="off"></div>
+    <div id="rows"></div><div class="pages" id="pager"></div>`;
+  const q = document.querySelector('#q'), rows = document.querySelector('#rows'),
+        pager = document.querySelector('#pager'), count = document.querySelector('#count');
+  let page = 1;
+  const draw = () => {
+    const term = q.value.trim().toLowerCase();
+    const hits = data.problems.filter(p => !term
+      || p.id.toLowerCase().includes(term) || (p.title || '').toLowerCase().includes(term));
+    const pages = Math.max(1, Math.ceil(hits.length / PAGE_SIZE));
+    page = Math.min(page, pages);
+    count.textContent = `${hits.length} 题`;
+    rows.innerHTML = hits.length ? table(
+      [{text:'题目ID'}, {text:'标题'}, {text:'通过率', num:true},
+       {text:'通过人数', num:true}, {text:'尝试人数', num:true}],
+      hits.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map(p => `<tr>
+        <td class="num"><a class="pid" href="${esc(p.path)}">${esc(p.id)}</a></td>
+        <td class="title"><a href="${esc(p.path)}">${esc(titleOf(p))}</a>${
+          p.test_count ? '' : ' <span class="badge b-info">暂无数据</span>'}</td>
+        <td class="num">${esc(p.pass_rate || '—')}</td>
+        <td class="num">${p.accepted_count || '—'}</td>
+        <td class="num">${p.attempt_count || '—'}</td></tr>`))
+      : '<p class="note">没有匹配的题目。</p>';
+    // 页码按钮：题目最多的题库也就 10 页，全列出来比「上一页/下一页」少点两次。
+    pager.innerHTML = pages > 1 ? Array.from({length: pages}, (_, i) =>
+      `<button type="button" data-page="${i + 1}" class="${i + 1 === page ? 'on' : ''}">${i + 1}</button>`).join('') : '';
+  };
+  q.addEventListener('input', () => { page = 1; draw(); });
+  pager.addEventListener('click', event => {
+    const target = event.target.closest('button[data-page]');
+    if (target) { page = Number(target.dataset.page); draw(); scrollTo(0, 0); }
+  });
+  draw();
+}
+
+function renderRanking(data) {
+  if (!data.ranking.length) return note('这个题库还没有提交记录。');
+  view.innerHTML = table(
+    [{text:'排名', num:true}, {text:'用户'}, {text:'通过题数', num:true},
+     {text:'提交次数', num:true}, {text:'最近提交'}],
+    data.ranking.map((r, i) => `<tr>
+      <td class="num">${i + 1}</td>
+      <td>${esc(r.user)}</td>
+      <td class="num">${r.solved}</td>
+      <td class="num">${r.submissions}</td>
+      <td class="num muted">${esc(r.last_submit || '—')}</td></tr>`));
+}
+
+function renderStatus(data) {
+  if (!data.status.length) return note('这个题库还没有提交记录。');
+  view.innerHTML = `<div class="bar"><span class="muted">最近 ${data.status.length} 次提交</span></div>` + table(
+    [{text:'提交时间'}, {text:'用户'}, {text:'题目'}, {text:'结果'},
+     {text:'语言'}, {text:'用时', num:true}, {text:'内存', num:true}],
+    data.status.map(s => `<tr>
+      <td class="num muted">${esc(s.created)}</td>
+      <td>${esc(s.user)}</td>
+      <td class="num"><a class="pid" href="/${encodeURIComponent(BOOK)}/${encodeURIComponent(s.problem)}/">${esc(s.problem)}</a></td>
+      <td>${badge(s.result)}</td>
+      <td class="muted">${esc(LANGS[s.language] || s.language || '—')}</td>
+      <td class="num">${s.time_ms == null ? '—' : s.time_ms + ' ms'}</td>
+      <td class="num">${s.memory_kb == null ? '—' : s.memory_kb + ' kB'}</td></tr>`));
+}
+</script>
+<script>const themeBtn=document.querySelector('#theme');function applyTheme(n){document.documentElement.dataset.theme=n;themeBtn.textContent=n==='dark'?'浅色':'深色';try{localStorage.setItem('cs101-theme',n)}catch(e){}}applyTheme(document.documentElement.dataset.theme==='dark'?'dark':'light');themeBtn.onclick=()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');fetch('/api/me',{credentials:'same-origin'}).then(r=>r.json()).then(d=>{if(d.authenticated){account.textContent=d.user;account.href='/history/?mine=1'}}).catch(()=>{});</script>
+</body>
+</html>

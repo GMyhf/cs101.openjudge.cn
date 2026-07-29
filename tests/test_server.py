@@ -255,6 +255,71 @@ class ServerApiTests(unittest.TestCase):
         self.assertTrue(any(item["title"] for item in payload["problems"]))
         self.assertLess(int(headers["Content-Length"]), 500_000)
 
+    def test_book_page_serves_the_three_tabs(self):
+        for view, path in (("problems", "/book/pctbook/"),
+                           ("ranking", "/book/pctbook/ranking/"),
+                           ("status", "/book/pctbook/status/")):
+            status, _, body = request(self.port, "GET", path)
+            self.assertEqual(status, 200, path)
+            text = body.decode("utf-8", errors="replace")
+            self.assertNotIn("__BOOK", text)                  # 占位符全部替换掉了
+            self.assertNotIn("__VIEW_JSON__", text)
+            self.assertIn("计算思维算法实践", text)
+            self.assertIn('href="/book/pctbook/ranking/"', text)
+            self.assertIn('href="/book/pctbook/status/"', text)
+            self.assertIn(f'VIEW = "{view}"', text)
+
+    def test_unknown_book_does_not_render_the_book_page(self):
+        # 断言内容而不是状态码：不认识的路径会落到上游代理，
+        # 而上游 cs101.openjudge.cn 对不存在的路径自己就返回 200（软 404）。
+        _, _, body = request(self.port, "GET", "/book/not-a-book/")
+        self.assertNotIn(b"tab-ranking", body)
+
+    def test_home_links_book_titles_to_the_book_page(self):
+        status, _, body = request(self.port, "GET", "/")
+        self.assertEqual(status, 200)
+        self.assertIn("/book/${encodeURIComponent(book)}/", body.decode("utf-8", errors="replace"))
+
+    def test_book_api_keeps_ranking_and_status_behind_login(self):
+        """题目表公开，排名和状态要登录 —— 站点现在对公网开着。"""
+        status, _, body = request(self.port, "GET", "/api/books/pctbook/")
+        self.assertEqual(status, 200)
+        anonymous = json.loads(body)
+        self.assertFalse(anonymous["authenticated"])
+        self.assertEqual(anonymous["ranking"], [])
+        self.assertEqual(anonymous["status"], [])
+        self.assertTrue(anonymous["problems"])
+        self.assertEqual(anonymous["name"], "计算思维算法实践")
+        self.assertGreater(anonymous["tested_count"], 0)
+        self.assertTrue(any(item["id"] == SUBMIT_PROBLEM for item in anonymous["problems"]))
+
+        username = "t026_book"
+        cookie = self.register_and_login(username, "T026-password")
+        status, _, _ = request(self.port, "POST", "/api/submit", {
+            "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
+            "source": "print('wrong')",
+        }, cookie=cookie)
+        self.assertEqual(status, 200)
+
+        status, _, body = request(self.port, "GET", "/api/books/pctbook/", cookie=cookie)
+        self.assertEqual(status, 200)
+        payload = json.loads(body)
+        self.assertTrue(payload["authenticated"])
+        self.assertIn(username, [row["user"] for row in payload["ranking"]])
+        latest = payload["status"][0]
+        self.assertEqual(latest["user"], username)
+        self.assertEqual(latest["problem"], SUBMIT_PROBLEM)
+        self.assertEqual(latest["result"], "Wrong Answer")
+        self.assertEqual(latest["language"], "python")
+        self.assertGreaterEqual(latest["time_ms"], 0)
+        # 出错那组的输入/期望输出是测试数据，公开就是泄题。整个响应里都不能有。
+        self.assertNotIn(b"failing_input", body)
+        self.assertNotIn(b"expected_output", body)
+        self.assertNotIn(b"print('wrong')", body)
+        # 题目表里这道题的通过/尝试人数跟着这次提交动了。
+        row = next(item for item in payload["problems"] if item["id"] == SUBMIT_PROBLEM)
+        self.assertGreaterEqual(row["attempt_count"], 1)
+
     def test_submit_page_renders_without_placeholders(self):
         status, _, body = request(self.port, "GET", f"/{SUBMIT_BOOK}/{SUBMIT_PROBLEM}/submit/")
         self.assertEqual(status, 200)

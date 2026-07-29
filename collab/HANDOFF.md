@@ -1,5 +1,35 @@
 # HANDOFF · 交接日志
 
+### 2026-07-29 · Claude → Codex · T-026 题库页（题目 / 排名 / 状态）
+
+- **做了什么**：首页每个题库标题现在进到 `/book/<题库>/`，一页三个标签页
+  「题目 / 排名 / 状态」，版式对着上游 `http://cs101.openjudge.cn/pctbook/` 抄
+  （面包屑 + 标签条 + 一张表 + 一条页码），颜色全走 `static/theme.css` 的变量。
+- **改了哪些文件**：`book.html`(新)、`server.py`、`index.html`、`tests/test_server.py`、
+  `CHANGELOG.md`、`collab/PLAN.md`
+- **关联提交**：本轮
+- **验证**：闸门退出码 0；unittest 132 → **136**。8 个题库 × 3 个标签页共 24 个页面
+  逐个实测 200；三个标签页 + 深色模式 + 未登录提示各截图核对。变异自检 2/2。
+- **请重点看**：
+  ①**这一版没有接管 `/{题库}/`**。被撤销的 `93dedfff` 是那么做的，结果把上游镜像原页
+  顶掉了 —— 而题面、目录页里到处是指向 `/pctbook/…` 的老链接。换首页入口不该让它们打不开，
+  所以新页面走 `/book/` 前缀，镜像页原样保留。
+  ②**排名和状态要登录才返回数据**（题目表维持公开，它本来就在 `/api/catalog` 里）。
+  站点自 T-025 起对公网开着，「谁在几点交了哪道题」连起来就是作息表。
+  ③**状态行只取 `detail` 里的 `time_ms`/`memory_kb`**。`detail` 整份含
+  `failing_input`/`expected_output`，那是出错那组的测试数据，公开等于泄题 ——
+  `/api/submissions` 把 detail 限死在本人与管理员，正是同一个理由。用例里有
+  `assertNotIn(b"failing_input", body)` 钉住这条。
+  ④首页卡片上的「985 题」来自 `BOOK_META` 里写死的上游数字，题库页上的「975 道题目」
+  来自 catalog 实际收录数，**两个数对不上是既有问题**（`/problems/?book=practice`
+  以前就显示 975），本轮没动它，只是从首页点进去更容易看见了。
+- **红线自检**：判题沙箱未动 ✅（未碰 `judge.py`）｜口令未入库 ✅｜路径防线未动 ✅
+  （`/book/` 与 `/api/books/` 都先校验题库名在 `BOOK_META` 里，不拼路径）｜
+  上游代理未动 ✅｜无新依赖 ✅（一个静态模板 + 标准库）
+- **下一步建议**：若要让排名对未登录也可见，改 `book_page_payload(book, authorized)`
+  的调用点即可，但要先想清楚公网可见的后果。开课前仍未做的是**混合语言压测**
+  （只验过 Python 扛 100 人，C++/.NET 在并发下一次没测过）。
+
 ### 2026-07-28 · Claude → Codex · T-025 对外开放 + 修反代下限频失效
 
 - **做了什么**：用 Tailscale Funnel 把服务开放到公网（`https://jensen.taildf6cf3.ts.net:8443/`）。
