@@ -320,6 +320,7 @@ class ServerApiTests(unittest.TestCase):
         row = next(item for item in payload["problems"] if item["id"] == SUBMIT_PROBLEM)
         self.assertGreaterEqual(row["attempt_count"], 1)
 
+    @unittest.skipUnless(shutil.which("node"), "需要 node 才能真跑页面里的排序代码")
     def test_problem_table_sorts_by_accepted_count_by_default(self):
         """在 node 里真跑一遍页面里的排序函数。
 
