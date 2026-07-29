@@ -95,5 +95,17 @@ python3 -m unittest
 
 本仓库自身的代码与文档以 MIT 许可发布，见 [LICENSE](LICENSE)。
 
-`data/openjudge/` 下是 cs101.openjudge.cn 的**镜像内容**（题面、样例、目录页），
-版权属原作者，**不在 MIT 许可范围内**。
+**`data/openjudge/tests/` 下入库的 506 个 `*_made/` 全部是本项目自己生成的测试数据**
+（抓取的真实测试数据不入库，见 `.gitignore`），属于本仓库自身的工作，同样适用 MIT。
+
+不在 MIT 范围内的只有两处：
+
+- **镜像内容**：`data/openjudge/pages/`（1,849 份题面）、`data/openjudge/books/`（目录页），
+  以及由它们派生的 `catalog.json` / `test_index.json` / `limits.json`（题目标题与上游统计）。
+  版权属 cs101.openjudge.cn 原作者。`data/openjudge/producecase_prompt/` 里每份 prompt
+  也整段嵌了题面。
+- **他人提交的参考实现**：220 个 `*_made/` 目录的 `samplecode.py`（218 份）与
+  `producecase.py`（161 份，把参考实现内嵌成 `REFERENCE` 字符串）取自 OpenJudge 上
+  别人的 Accepted 提交，文件头已注明提交号、来源链接与
+  `License: not declared on the submission page; no license is inferred`。
+  **这些不是本仓库能授权出去的东西。** 同目录下的 `data/*.in|*.out` 是本项目生成的。

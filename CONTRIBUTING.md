@@ -77,9 +77,19 @@ python3 server.py                      # 起服务，默认 0.0.0.0:8000
 **不要在公开 Issue 里贴** 口令、会话 cookie、`.smtp.env` 的内容或任何测试数据。
 安全问题请直接私下联系维护者，不要开公开 Issue。
 
-## 关于许可与镜像内容
+## 关于许可
 
-本仓库自身的代码与文档以 MIT 许可发布（见 `LICENSE`）。
+本仓库自身的代码与文档以 MIT 许可发布（见 `LICENSE`），
+**包括 `data/openjudge/tests/` 下那 506 个 `*_made/` 生成的测试数据** ——
+那是本项目自己造的，不是抓来的（抓取的真实测试数据不入库）。
 
-**`data/openjudge/` 下是 cs101.openjudge.cn 的镜像内容**（题面、样例、目录页）——
-版权属原作者，不在 MIT 许可范围内，提 PR 时也请不要把新抓取的题面数据加进来。
+两处例外，不在 MIT 范围内，提 PR 时请留意：
+
+- **镜像内容**：`data/openjudge/pages/`、`data/openjudge/books/` 与派生的
+  `catalog.json` / `test_index.json` / `limits.json`，版权属 cs101.openjudge.cn 原作者。
+  `producecase_prompt/` 里的 prompt 也整段嵌了题面。**不要把新抓取的题面数据加进来。**
+- **他人提交的参考实现**：220 个 `*_made/` 目录里的 `samplecode.py` / `producecase.py`
+  取自 OpenJudge 上别人的 Accepted 提交，文件头注明了提交号、来源链接与
+  `License: not declared ... no license is inferred`。
+  **新增这类文件时必须保留同样的头部署名**（提交号 + 来源链接 + 许可状态），
+  不要抹掉出处，也不要假装它是自己写的。

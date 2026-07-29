@@ -2,6 +2,24 @@
 
 ## 2026-07-29
 
+### 更正许可范围：`*_made/` 是自产数据，不是镜像
+
+- 人指出：`data/openjudge/tests/` 下 `_made` 结尾的都是本项目生成的测试数据，不是镜像。
+  **上一条记录里那句「`data/openjudge/` 下是镜像内容，不在 MIT 范围内」把范围划得太宽了。**
+  清点确认：`tests/` 下入库的 **506 个目录全部**以 `_made` 结尾，一个抓取来的都没有
+  （抓取数据本来就在 `.gitignore` 里）。已改成这批数据同样适用 MIT。
+- 借这次清点把真正的例外划准，只有两处：
+  ① **镜像内容** —— `pages/`（1,849 份题面）、`books/`（目录页）与派生的
+  `catalog.json` / `test_index.json` / `limits.json`；`producecase_prompt/`
+  里每份 prompt 也整段嵌了题面。
+  ② **他人提交的参考实现** —— 220 个 `*_made/` 目录里的 `samplecode.py`（218 份）与
+  `producecase.py`（161 份，参考实现内嵌成 `REFERENCE` 字符串）取自 OpenJudge 上
+  别人的 Accepted 提交，**文件头自己就写着
+  `License: not declared on the submission page; no license is inferred`** ——
+  仓库当初记下这句话，正是为了不把它们当成自己的。一张 MIT 盖上去等于推翻那句话。
+- `CONTRIBUTING.md` 相应加了一条：新增这类文件必须保留同样的头部署名
+  （提交号 + 来源链接 + 许可状态）。
+
 ### 开放贡献：LICENSE、CONTRIBUTING.md、GitHub Actions
 
 - **`LICENSE`**：MIT，署名先写成 `GMyhf`（要换成法定姓名请直接改）。
