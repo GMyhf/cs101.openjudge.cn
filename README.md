@@ -1,5 +1,12 @@
 # CS101 OpenJudge
 
+[![CI](https://github.com/GMyhf/cs101.openjudge.cn/actions/workflows/ci.yml/badge.svg)](https://github.com/GMyhf/cs101.openjudge.cn/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+> 想参与开发看 [CONTRIBUTING.md](CONTRIBUTING.md)。**提 PR 前请先跑
+> `python3 tools/handoff.py --verify`**，并读一遍那六条红线 ——
+> 这个项目直接运行不可信代码且对公网开放，有些地方碰不得。
+
 > 手册：[用户手册](docs/用户手册.md)（学生） · [管理员手册](docs/管理员手册.md)（部署与运维）
 > · [开发教学手册](docs/DEV_HANDBOOK.md)（用这个系统教计算机课）
 > · 网页版：<https://gmyhf.github.io/cs101.openjudge.cn/dev-handbook.html>
@@ -78,3 +85,15 @@ python3 tools/handoff.py --verify
 python3 scripts/t004_judge_round.py 16
 python3 -m unittest
 ```
+
+`.github/workflows/ci.yml` 在每个 PR 上跑的就是第一条命令。CI **刻意不装工具链**：
+缺 pypy3 / .NET 10 / Swift 时相应用例自动跳过，闸门在只有 Python 的干净克隆上也必须绿。
+「9 种语言都还判得动」由发版时在部署机上跑的 `scripts/smoke_languages.py --require-all`
+保证（见 `tools/release.sh`）——**CI 管逻辑没坏，发版冒烟管这台机器判得动。**
+
+## 许可
+
+本仓库自身的代码与文档以 MIT 许可发布，见 [LICENSE](LICENSE)。
+
+`data/openjudge/` 下是 cs101.openjudge.cn 的**镜像内容**（题面、样例、目录页），
+版权属原作者，**不在 MIT 许可范围内**。

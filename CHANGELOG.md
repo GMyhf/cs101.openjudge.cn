@@ -2,6 +2,30 @@
 
 ## 2026-07-29
 
+### 开放贡献：LICENSE、CONTRIBUTING.md、GitHub Actions
+
+- **`LICENSE`**：MIT，署名先写成 `GMyhf`（要换成法定姓名请直接改）。
+  **`data/openjudge/` 是上游镜像内容，版权属原作者，不在 MIT 范围内** ——
+  这一句写在 `README.md` 和 `CONTRIBUTING.md` 里，`LICENSE` 保持标准 MIT 原文
+  不动（改了 GitHub 就认不出许可证类型）。
+- **`CONTRIBUTING.md`**：怎么提 PR、六条红线、权限判断只有一份、
+  测试纪律（变异自检 / 全新克隆能跑 / 判据要判「能不能做」而不是「有没有这个文件」）、
+  以及「安全问题别开公开 Issue」。
+- **`.github/workflows/ci.yml`**：跑仓库自己那条闸门 `tools/handoff.py --verify`，
+  外加一条机械的红线检查（口令 / `*.db` / `server.log` 是否入库 —— 这个仓库
+  曾因口令进 git 被整体重写，此前全靠「作者记得」）。
+  **刻意不装任何工具链**：缺 pypy3/.NET/Swift 的用例本来就 skip，
+  「9 种语言判得动」由发版冒烟在部署机上保证。
+- **顺带修一个会让 CI 一开就红的判据**：`tests/test_judge.py` 里两条 C# 用例原来
+  只查 `shutil.which("dotnet")`，而判题走的是 `dotnet run --file`（.NET 10 的
+  file-based app）。`ubuntu-latest` 预装的是更低版本的 SDK —— 判据成立、用例照跑、
+  然后因为「这个 SDK 根本没这个功能」而失败。改成检查 `dotnet --list-sdks` 里
+  有没有 10+。
+- 验证：**在全新 `git clone` 里、并用一份去掉 pypy3 的 PATH（模拟 runner）
+  跑完整闸门**，退出码 0、143 用例 7 跳过（2 .NET + 1 Swift + 4 pypy3）。
+  workflow 的 YAML 与每个 `run:` 段的 shell 语法都单独校验过；
+  红线检查用一份含 `data/course.db`、`data/.smtp.env` 的假清单反向验证过确实会拦。
+
 ### 题库页：题目表默认按通过人数排序，表头可点
 
 - 人拍板：这一页是拿来挑题的，「多少人做出来了」比题号更能说明该先做哪道。

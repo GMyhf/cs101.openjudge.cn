@@ -4,8 +4,10 @@
 （那批抓取数据按人拍板决策不入库），因此新克隆的仓库也能跑通交接闸门。
 """
 import json
+import re
 import resource
 import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -13,6 +15,28 @@ from unittest import mock
 
 import judge as judge_module
 from judge import judge
+
+
+def dotnet_file_based_app_available():
+    """判题器跑 C# 用的是 `dotnet run --file`，**那是 .NET 10 才有的 file-based app**。
+
+    改动前这两条用例的判据只是 `shutil.which("dotnet")`。装了 SDK 8/9 的机器上
+    （GitHub Actions 的 `ubuntu-latest` 就预装了这么一个）判据成立、用例照跑，
+    然后因为「这个 SDK 根本没有这个功能」而失败 —— 报出来的样子却像是判题器坏了。
+    **判据要判的是「这台机器能不能做这件事」，不是「有没有这个可执行文件」。**
+    """
+    if shutil.which("dotnet") is None:
+        return False
+    try:
+        result = subprocess.run(["dotnet", "--list-sdks"],
+                                capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return any(int(match.group(1)) >= 10
+               for match in re.finditer(r"^(\d+)\.", result.stdout, re.M))
+
+
+HAS_FILE_BASED_DOTNET = dotnet_file_based_app_available()
 
 
 FIXTURE_MIRROR = Path(__file__).resolve().parent / "fixtures" / "mirror"
@@ -118,14 +142,14 @@ class JudgeCoreTests(unittest.TestCase):
         result = judge(BOOK, "NODATA", "python", SUM_SOURCE)
         self.assertEqual(result["status"], "No Test Data")
 
-    @unittest.skipUnless(shutil.which("dotnet"), "本机没有 .NET SDK")
+    @unittest.skipUnless(HAS_FILE_BASED_DOTNET, "本机没有支持 file-based app 的 .NET SDK（需要 10+）")
     def test_csharp_uses_dotnet_file_based_app(self):
         source = "using System; class Program { static void Main() { var p = Console.ReadLine().Split(); Console.WriteLine(int.Parse(p[0]) + int.Parse(p[1])); } }"
         result = judge(BOOK, PROBLEM, "csharp", source)
         self.assertEqual(result["status"], "Accepted", result)
         self.assertEqual(result["cases"], 2)
 
-    @unittest.skipUnless(shutil.which("dotnet"), "本机没有 .NET SDK")
+    @unittest.skipUnless(HAS_FILE_BASED_DOTNET, "本机没有支持 file-based app 的 .NET SDK（需要 10+）")
     def test_csharp_runtime_error_is_not_hidden_by_file_build(self):
         source = "using System; class Program { static void Main() { throw new Exception(\"T001\"); } }"
         result = judge(BOOK, PROBLEM, "csharp", source)

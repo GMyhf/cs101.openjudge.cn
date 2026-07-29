@@ -1,0 +1,61 @@
+# 交接闸门，跑在 GitHub 上。
+#
+# 跑的是仓库自己那一条命令（`tools/handoff.py --verify`），不是另写一套 ——
+# 本地绿、CI 红（或者反过来）比没有 CI 更浪费人。
+#
+# **刻意不装任何工具链。** 判题支持 9 种语言，但装齐 .NET/Swift/Objective-C
+# 要几分钟，而这些语言的用例在缺工具链时本来就会 skip。真正能保证「9 种语言都还能判」
+# 的是发版时在部署机上跑的 `scripts/smoke_languages.py --require-all`（见 tools/release.sh），
+# 那台机器上工具链是齐的。**CI 管「逻辑没坏」，发版冒烟管「这台机器判得动」。**
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # 出问题时先看这一段：哪些用例被跳过完全由这里决定。
+      # 一条测试「跳过」和「通过」在结果里长得很像，把清单打出来，
+      # 免得哪天工具链悄悄消失、大批用例静默跳过还显示全绿。
+      - name: 工具链清单
+        run: |
+          echo "python : $(python3 --version)"
+          echo "node   : $(node --version 2>/dev/null || echo '未安装')"
+          echo "gcc    : $(gcc --version 2>/dev/null | head -1 || echo '未安装')"
+          echo "g++    : $(g++ --version 2>/dev/null | head -1 || echo '未安装')"
+          echo "pypy3  : $(pypy3 --version 2>/dev/null | head -1 || echo '未安装（相关用例跳过）')"
+          echo "swiftc : $(swiftc --version 2>/dev/null | head -1 || echo '未安装（相关用例跳过）')"
+          echo "dotnet : $(dotnet --list-sdks 2>/dev/null | tr '\n' ' ' || echo '未安装')"
+          echo "         判题 C# 走 dotnet run --file，需要 SDK 10+，低版本一样跳过"
+
+      # 这一条等价于维护者本地交接前跑的那一条：全套 unittest + py_compile
+      # + 待返工检查 + full_sweep。退出码 0 才算过。
+      - name: 交接闸门（tools/handoff.py --verify）
+        run: python3 tools/handoff.py --verify
+
+      # 红线 2：口令与数据库绝不入库。这个仓库曾因为口令进 git 被整体重写过一次，
+      # 靠的是「作者记得」。这里把它变成机械判据 —— 只看这次改动新增/修改的文件。
+      - name: 红线检查 · 不该入库的东西
+        run: |
+          set -e
+          BAD=$(git ls-files | grep -E '(^|/)(\.env$|\.smtp\.env$|\.admin_password$)|\.db$|^server\.log$' || true)
+          if [ -n "$BAD" ]; then
+            echo "::error::这些文件不该入库（红线 2 / 红线 4）："
+            echo "$BAD"
+            exit 1
+          fi
+          echo "未发现口令 / 数据库 / 日志文件入库"

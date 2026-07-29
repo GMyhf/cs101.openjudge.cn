@@ -1,5 +1,41 @@
 # HANDOFF · 交接日志
 
+### 2026-07-29 · Claude → Codex · T-027 开放贡献的地基
+
+- **做了什么**：`LICENSE`（MIT）、`CONTRIBUTING.md`、`.github/workflows/ci.yml`，
+  README 加徽章与许可范围说明。另修掉一个会让 CI 一开就红的测试判据。
+- **改了哪些文件**：`LICENSE`(新)、`CONTRIBUTING.md`(新)、
+  `.github/workflows/ci.yml`(新)、`README.md`、`tests/test_judge.py`、
+  `CHANGELOG.md`、`collab/PLAN.md`
+- **关联提交**：本轮
+- **验证**：**在全新 `git clone` 里、并用一份去掉 pypy3 的影子 PATH（模拟
+  GitHub runner）跑完整闸门** —— 退出码 0，143 用例 7 跳过（2 .NET + 1 Swift + 4 pypy3）。
+  workflow 的 YAML 与每个 `run:` 段的 shell 都单独校验；红线检查用一份含
+  `data/course.db`、`data/.smtp.env` 的假清单反向验证过确实会拦。
+- **请重点看**：
+  ①**CI 跑的是仓库自己那条命令**（`tools/handoff.py --verify`），不是另写一套。
+  本地绿、CI 红（或反过来）比没有 CI 更浪费人。
+  ②**CI 刻意不装任何工具链。** 装齐 .NET/Swift 要几分钟，而这些用例缺工具链时
+  本来就 skip。「9 种语言都还判得动」由 `tools/release.sh` 里那条
+  `smoke_languages.py --require-all` 在部署机上保证 ——
+  **CI 管「逻辑没坏」，发版冒烟管「这台机器判得动」**，两件事不要混。
+  ③**两条 C# 用例的判据是错的，是我这次才发现的。** 它们查的是
+  `shutil.which("dotnet")`，而判题走 `dotnet run --file` —— 那是 .NET 10 的
+  file-based app。`ubuntu-latest` 预装的是更低版本的 SDK：判据成立、用例照跑、
+  然后因为「这个 SDK 根本没这个功能」失败，报出来的样子却像判题器坏了。
+  已改成检查 `dotnet --list-sdks` 有没有 10+。
+  **判据要判「这台机器能不能做这件事」，不是「有没有这个可执行文件」。**
+  ④**红线检查从「作者记得」变成机械判据**：`git ls-files` 里出现口令文件、
+  `*.db`、`server.log` 就直接失败。这个仓库正是因为口令进 git 被整体重写过一次。
+  ⑤`LICENSE` 保持标准 MIT 原文**一个字不改**（改了 GitHub 认不出许可证类型），
+  「`data/openjudge/` 是上游镜像内容、不在 MIT 范围内」这句写在 README 和
+  CONTRIBUTING 里。署名暂写 `GMyhf`，要换法定姓名直接改那一行。
+- **红线自检**：判题沙箱未动 ✅｜口令未入库 ✅（还新增了机械检查）｜
+  路径防线未动 ✅｜无新依赖 ✅（workflow 只用官方 checkout/setup-python）
+- **下一步建议**：分支保护（`main` 禁直推、要求 PR + 1 审 + CI 通过）只能由人在
+  GitHub 网页上开，**在开之前不要给任何人写权限** —— `main` 就是发版分支。
+  开课前仍未做的是混合语言压测。
+
 ### 2026-07-29 · Claude → Codex · T-026 追加：题目表按通过人数排序
 
 - **做了什么**：题库页题目表默认按通过人数从多到少；四列表头可点排序。
