@@ -116,6 +116,32 @@ def check_output_size():
     return f"输出超过判题器 {FSIZE_LIMIT // 1048576}MB 上限", bad
 
 
+def check_merged_judge():
+    """5. T-028 的报告必须带「合并后真判过」的实测，而且是 passed。
+
+    为什么是机械判据而不是复核时人眼看：**交叉验证只验「答案对不对」，
+    验不出「对但太慢」。** 2026-07-29 的 01384 就是这么溜过去的 ——
+    参考解法逐 token 复算出了全部存档输出、平台也判 Accepted，
+    但在本地合并后的数据上是 Time Limit Exceeded（卡在一份 117KB 的 2008 压测文件上）。
+    当轮报告写的是「20/20 Accepted」，因为那一步根本没跑。
+
+    人已定复核改成「攒几轮一起看」，所以这条更不能留给人眼：
+    **字段缺了就是红**，等同于「你没跑这一步」。
+    只查 T-028 起的批次，早于这条规则的 t002/t003/t004 不追溯。
+    """
+    bad = []
+    for source, entry in report_entries():
+        if not source.startswith("t028-"):
+            continue
+        merged = entry.get("merged_judge") or {}
+        if not merged:
+            bad.append(f"{entry.get('local_number')}（{source}）: 没有 merged_judge —— 合并后真判这一步没跑")
+        elif merged.get("status") != "passed":
+            bad.append(f"{entry.get('local_number')}（{source}）: merged_judge="
+                       f"{merged.get('status')} verdict={merged.get('verdict')}")
+    return "T-028 报告缺「合并后真判」的实测或未通过", bad
+
+
 def check_repeating_decimals():
     """4. 浮点输出里的循环小数。
 
@@ -178,7 +204,8 @@ def check_annotated_sample_outputs():
 
 
 CHECKS = (check_reported_failures, check_degenerate_constraints,
-          check_output_size, check_repeating_decimals, check_annotated_sample_outputs)
+          check_output_size, check_repeating_decimals, check_annotated_sample_outputs,
+          check_merged_judge)
 
 
 def main():

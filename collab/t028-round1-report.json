@@ -1,1615 +1,1796 @@
 {
-  "task": "T-028",
-  "round": 1,
-  "updated_at": "2026-07-29T11:32:41.820475+00:00",
-  "count": 20,
-  "pending_rework_status": {
-    "status": "passed",
-    "items": []
+ "task": "T-028",
+ "round": 1,
+ "updated_at": "2026-07-29T11:32:41.820475+00:00",
+ "count": 20,
+ "pending_rework_status": {
+  "status": "passed",
+  "items": []
+ },
+ "selection_exclusions": [
+  {
+   "number": 1077,
+   "reason": "multiple valid move sequences conflict with exact-output judging"
   },
-  "selection_exclusions": [
-    {
-      "number": 1077,
-      "reason": "multiple valid move sequences conflict with exact-output judging"
+  {
+   "number": 1276,
+   "reason": "no collected solution reproduced all scraped outputs"
+  },
+  {
+   "number": 1426,
+   "reason": "no collected solution reproduced all scraped outputs"
+  },
+  {
+   "number": 1852,
+   "reason": "no collected solution reproduced all scraped outputs"
+  },
+  {
+   "number": 2039,
+   "reason": "no collected solution reproduced all scraped outputs"
+  }
+ ],
+ "entries": [
+  {
+   "local_number": 1061,
+   "title": "青蛙的约会",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011031",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/practice/01061/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g1061",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 24,
+   "max_output_bytes": 8,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "exactly five integers with x != y, positive m/n, and 0 < L < 2100000000",
+     true
+    ]
+   ],
+   "constraint_counterexample": "1 1 3 4 5",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
     },
-    {
-      "number": 1276,
-      "reason": "no collected solution reproduced all scraped outputs"
+    "constant_output_probe": {
+     "frequency": 1,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.05
     },
-    {
-      "number": 1426,
-      "reason": "no collected solution reproduced all scraped outputs"
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
     },
-    {
-      "number": 1852,
-      "reason": "no collected solution reproduced all scraped outputs"
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
     },
-    {
-      "number": 2039,
-      "reason": "no collected solution reproduced all scraped outputs"
-    }
-  ],
-  "entries": [
-    {
-      "local_number": 1061,
-      "title": "青蛙的约会",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011031",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/practice/01061/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g1061",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 24,
-      "max_output_bytes": 8,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "exactly five integers with x != y, positive m/n, and 0 < L < 2100000000",
-          true
-        ]
-      ],
-      "constraint_counterexample": "1 1 3 4 5",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "exactly five integers with x != y, positive m/n, and 0 < L < 2100000000",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "1 1 3 4 5",
-            "constraints": [
-              "exactly five integers with x != y, positive m/n, and 0 < L < 2100000000"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "exactly five integers with x != y, positive m/n, and 0 < L < 2100000000",
+       "holds": true
       }
-    },
-    {
-      "local_number": 1125,
-      "title": "Stockbroker Grapevine",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011032",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/practice/01125/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g1125",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 307,
-      "max_output_bytes": 9,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
+     ],
+     "falsified_by": {
+      "input": "1 1 3 4 5",
       "constraints": [
-        [
-          "each data set has 1..100 brokers, valid contact/time pairs, and final terminator 0",
-          true
-        ]
-      ],
-      "constraint_counterexample": "101\n0",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 2,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.1
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "each data set has 1..100 brokers, valid contact/time pairs, and final terminator 0",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "101\n0",
-            "constraints": [
-              "each data set has 1..100 brokers, valid contact/time pairs, and final terminator 0"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+       "exactly five integers with x != y, positive m/n, and 0 < L < 2100000000"
+      ]
+     }
     },
-    {
-      "local_number": 1145,
-      "title": "Tree Summing",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md",
-      "solution_code_index": 3,
-      "submission_id": "53011033",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/01145/statistics/",
-      "source_url": "https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g1145",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 201,
-      "max_output_bytes": 14,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 4,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "each query has an integer target and a balanced LISP binary-tree expression",
-          true
-        ]
-      ],
-      "constraint_counterexample": "10 (3()()",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 13,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.65
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "each query has an integer target and a balanced LISP binary-tree expression",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "10 (3()()",
-            "constraints": [
-              "each query has an integer target and a balanced LISP binary-tree expression"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "byte_reproduction": {
+     "status": "passed"
     },
-    {
-      "local_number": 1321,
-      "title": "棋盘问题",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011034",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/01321/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g1321",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 176,
-      "max_output_bytes": 13,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "each board has 1 <= k <= n <= 8 and exactly n rows of n '#' or '.' cells",
-          true
-        ]
-      ],
-      "constraint_counterexample": "2 1\n##\n#X\n-1 -1",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 19,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 3,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.15
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "each board has 1 <= k <= n <= 8 and exactly n rows of n '#' or '.' cells",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "2 1\n##\n#X\n-1 -1",
-            "constraints": [
-              "each board has 1 <= k <= n <= 8 and exactly n rows of n '#' or '.' cells"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "practice",
+    "problem": "01061",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 3691
+   }
+  },
+  {
+   "local_number": 1125,
+   "title": "Stockbroker Grapevine",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011032",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/practice/01125/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g1125",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 307,
+   "max_output_bytes": 9,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "each data set has 1..100 brokers, valid contact/time pairs, and final terminator 0",
+     true
+    ]
+   ],
+   "constraint_counterexample": "101\n0",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
     },
-    {
-      "local_number": 1328,
-      "title": "Radar Installation",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011035",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/01328/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g1328",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 327,
-      "max_output_bytes": 32,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "each radar case has n >= 1, d >= 0, exactly n integer points, and final 0 0",
-          true
-        ]
-      ],
-      "constraint_counterexample": "1 -1\n0 0\n\n0 0",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 3,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.15
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "each radar case has n >= 1, d >= 0, exactly n integer points, and final 0 0",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "1 -1\n0 0\n\n0 0",
-            "constraints": [
-              "each radar case has n >= 1, d >= 0, exactly n integer points, and final 0 0"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "constant_output_probe": {
+     "frequency": 2,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.1
     },
-    {
-      "local_number": 1384,
-      "title": "Piggy-Bank",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011036",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/01384/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g1384",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 258,
-      "max_output_bytes": 217,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "each pig has 1 <= E <= F <= 10000 and positive coin values and weights",
-          true
-        ]
-      ],
-      "constraint_counterexample": "1\n10 5\n1\n1 1",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 2,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.1
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "each pig has 1 <= E <= F <= 10000 and positive coin values and weights",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "1\n10 5\n1\n1 1",
-            "constraints": [
-              "each pig has 1 <= E <= F <= 10000 and positive coin values and weights"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
     },
-    {
-      "local_number": 1577,
-      "title": "Falling Leaves",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md",
-      "solution_code_index": 5,
-      "submission_id": "53011037",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/01577/statistics/",
-      "source_url": "https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g1577",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 52,
-      "max_output_bytes": 35,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "leaf layers contain only sorted uppercase letters and end with '*' or final '$'",
-          true
-        ]
-      ],
-      "constraint_counterexample": "A1\n$",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "leaf layers contain only sorted uppercase letters and end with '*' or final '$'",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "A1\n$",
-            "constraints": [
-              "leaf layers contain only sorted uppercase letters and end with '*' or final '$'"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
     },
-    {
-      "local_number": 1611,
-      "title": "The Suspects",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011038",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/01611/statistics/",
-      "source_url": "https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g1611",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 1023,
-      "max_output_bytes": 9,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "each group member is in 0..n-1 and every data set is followed by final 0 0",
-          true
-        ]
-      ],
-      "constraint_counterexample": "3 1\n1 3\n0 0",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 2,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.1
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "each group member is in 0..n-1 and every data set is followed by final 0 0",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "3 1\n1 3\n0 0",
-            "constraints": [
-              "each group member is in 0..n-1 and every data set is followed by final 0 0"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "each data set has 1..100 brokers, valid contact/time pairs, and final terminator 0",
+       "holds": true
       }
+     ],
+     "falsified_by": {
+      "input": "101\n0",
+      "constraints": [
+       "each data set has 1..100 brokers, valid contact/time pairs, and final terminator 0"
+      ]
+     }
     },
-    {
-      "local_number": 2192,
-      "title": "Zipper",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011039",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/02192/statistics/",
-      "source_url": "https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g2192",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 431,
-      "max_output_bytes": 190,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "T is 1..1000; first strings are 1..200 letters and len(c)=len(a)+len(b)",
-          true
-        ]
-      ],
-      "constraint_counterexample": "1\na b a",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "T is 1..1000; first strings are 1..200 letters and len(c)=len(a)+len(b)",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "1\na b a",
-            "constraints": [
-              "T is 1..1000; first strings are 1..200 letters and len(c)=len(a)+len(b)"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "byte_reproduction": {
+     "status": "passed"
     },
-    {
-      "local_number": 2406,
-      "title": "字符串乘方",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011040",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/02406/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g2406",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 1183,
-      "max_output_bytes": 35,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 3,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "at least one printable string has length 1..1000000 before the final '.' line",
-          true
-        ]
-      ],
-      "constraint_counterexample": ".",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "at least one printable string has length 1..1000000 before the final '.' line",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": ".",
-            "constraints": [
-              "at least one printable string has length 1..1000000 before the final '.' line"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "practice",
+    "problem": "01125",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 3775
+   }
+  },
+  {
+   "local_number": 1145,
+   "title": "Tree Summing",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md",
+   "solution_code_index": 3,
+   "submission_id": "53011033",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/01145/statistics/",
+   "source_url": "https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g1145",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 201,
+   "max_output_bytes": 14,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 4,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "each query has an integer target and a balanced LISP binary-tree expression",
+     true
+    ]
+   ],
+   "constraint_counterexample": "10 (3()()",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
     },
-    {
-      "local_number": 2442,
-      "title": "Sequence",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011041",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/02442/statistics/",
-      "source_url": "https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g2442",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 1910,
-      "max_output_bytes": 337,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "each case has 1 <= m <= 100, 1 <= n <= 2000, and m*n nonnegative integers",
-          true
-        ]
-      ],
-      "constraint_counterexample": "1\n2 2\n0 0\n0 -1",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "each case has 1 <= m <= 100, 1 <= n <= 2000, and m*n nonnegative integers",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "1\n2 2\n0 0\n0 -1",
-            "constraints": [
-              "each case has 1 <= m <= 100, 1 <= n <= 2000, and m*n nonnegative integers"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "constant_output_probe": {
+     "frequency": 13,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.65
     },
-    {
-      "local_number": 2499,
-      "title": "Binary Tree",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011042",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/02499/statistics/",
-      "source_url": "https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g2499",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 109,
-      "max_output_bytes": 283,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "each scenario is a positive valid tree node pair bounded by 1000000000",
-          true
-        ]
-      ],
-      "constraint_counterexample": "1\n0 1",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "each scenario is a positive valid tree node pair bounded by 1000000000",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "1\n0 1",
-            "constraints": [
-              "each scenario is a positive valid tree node pair bounded by 1000000000"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
     },
-    {
-      "local_number": 2689,
-      "title": "大小写字母互换",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011043",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/02689/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g2689",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 75,
-      "max_output_bytes": 75,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 3,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "the single input line has fewer than 80 characters",
-          true
-        ]
-      ],
-      "constraint_counterexample": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "the single input line has fewer than 80 characters",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-            "constraints": [
-              "the single input line has fewer than 80 characters"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
     },
-    {
-      "local_number": 2701,
-      "title": "与7无关的数",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011045",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/02701/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g2701",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 3,
-      "max_output_bytes": 7,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 3,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "n is a single positive integer smaller than 100",
-          true
-        ]
-      ],
-      "constraint_counterexample": "100",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 18,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 2,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.1
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "n is a single positive integer smaller than 100",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "100",
-            "constraints": [
-              "n is a single positive integer smaller than 100"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "each query has an integer target and a balanced LISP binary-tree expression",
+       "holds": true
       }
+     ],
+     "falsified_by": {
+      "input": "10 (3()()",
+      "constraints": [
+       "each query has an integer target and a balanced LISP binary-tree expression"
+      ]
+     }
     },
-    {
-      "local_number": 2707,
-      "title": "求一元二次方程的根",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011046",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/routine/02707/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g2707",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 144,
-      "max_output_bytes": 452,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "the declared number of equations is present and every quadratic coefficient a is nonzero",
-          true
-        ]
-      ],
-      "constraint_counterexample": "1\n0 1 1",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "the declared number of equations is present and every quadratic coefficient a is nonzero",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "1\n0 1 1",
-            "constraints": [
-              "the declared number of equations is present and every quadratic coefficient a is nonzero"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "byte_reproduction": {
+     "status": "passed"
     },
-    {
-      "local_number": 2749,
-      "title": "分解因数",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011047",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2025sp_routine/02749/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g2749",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 49,
-      "max_output_bytes": 25,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "the declared values are all integers satisfying 1 < a < 32768",
-          true
-        ]
-      ],
-      "constraint_counterexample": "1\n1",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "the declared values are all integers satisfying 1 < a < 32768",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "1\n1",
-            "constraints": [
-              "the declared values are all integers satisfying 1 < a < 32768"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024sp_routine",
+    "problem": "01145",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 3375
+   }
+  },
+  {
+   "local_number": 1321,
+   "title": "棋盘问题",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011034",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/01321/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g1321",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 176,
+   "max_output_bytes": 13,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "each board has 1 <= k <= n <= 8 and exactly n rows of n '#' or '.' cells",
+     true
+    ]
+   ],
+   "constraint_counterexample": "2 1\n##\n#X\n-1 -1",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 19,
+     "threshold": 15,
+     "status": "passed"
     },
-    {
-      "local_number": 2753,
-      "title": "菲波那契数列",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011048",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/02753/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g2753",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 40,
-      "max_output_bytes": 45,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "the declared Fibonacci indices are all integers satisfying 1 <= a <= 20",
-          true
-        ]
-      ],
-      "constraint_counterexample": "1\n21",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "the declared Fibonacci indices are all integers satisfying 1 <= a <= 20",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "1\n21",
-            "constraints": [
-              "the declared Fibonacci indices are all integers satisfying 1 <= a <= 20"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "constant_output_probe": {
+     "frequency": 3,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.15
     },
-    {
-      "local_number": 2766,
-      "title": "最大子矩阵",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011049",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/02766/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g2766",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 1055,
-      "max_output_bytes": 5,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "N is 1..100 followed by exactly N*N integers, each in -127..127",
-          true
-        ]
-      ],
-      "constraint_counterexample": "2\n1 2 3",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "N is 1..100 followed by exactly N*N integers, each in -127..127",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "2\n1 2 3",
-            "constraints": [
-              "N is 1..100 followed by exactly N*N integers, each in -127..127"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
     },
-    {
-      "local_number": 2786,
-      "title": "Pell数列",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011050",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/02786/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g2786",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 141,
-      "max_output_bytes": 106,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "the declared Pell indices are all integers satisfying 1 <= k < 1000000",
-          true
-        ]
-      ],
-      "constraint_counterexample": "1\n1000000",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "the declared Pell indices are all integers satisfying 1 <= k < 1000000",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "1\n1000000",
-            "constraints": [
-              "the declared Pell indices are all integers satisfying 1 <= k < 1000000"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
-      }
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
     },
-    {
-      "local_number": 2792,
-      "title": "集合加法",
-      "status": "passed",
-      "reference_source": "solution collection code reproduced all scraped cases",
-      "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
-      "solution_code_index": 2,
-      "submission_id": "53011051",
-      "platform_verdict": "Accepted",
-      "submission_id_note": null,
-      "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/02792/statistics/",
-      "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
-      "license_status": "not declared in source collection; no license is inferred",
-      "generator": "g2792",
-      "generator_seed_smoke": {
-        "seeds": 20000,
-        "status": "passed"
-      },
-      "test_cases": 21,
-      "max_input_bytes": 845,
-      "max_output_bytes": 12,
-      "scraped_cross_check": {
-        "status": "passed",
-        "cases": 2,
-        "mismatched": []
-      },
-      "constraints": [
-        [
-          "each case has positive s,a,b <= 10000 and exactly a/b positive elements <=10000",
-          true
-        ]
-      ],
-      "constraint_counterexample": "1\n10\n1\n0\n1\n10",
-      "self_audit": {
-        "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
-          "threshold": 15,
-          "status": "passed"
-        },
-        "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
-          "status": "rejected",
-          "exemption": null,
-          "share": 0.05
-        },
-        "sample_is_case_zero": {
-          "input_matches": "passed",
-          "output_matches": "passed",
-          "status": "passed"
-        },
-        "samplecode_recompute": {
-          "status": "passed",
-          "cases": 21,
-          "mismatched": []
-        },
-        "constraint_checklist": {
-          "status": "passed",
-          "checked": 1,
-          "items": [
-            {
-              "constraint": "each case has positive s,a,b <= 10000 and exactly a/b positive elements <=10000",
-              "holds": true
-            }
-          ],
-          "falsified_by": {
-            "input": "1\n10\n1\n0\n1\n10",
-            "constraints": [
-              "each case has positive s,a,b <= 10000 and exactly a/b positive elements <=10000"
-            ]
-          }
-        },
-        "byte_reproduction": {
-          "status": "passed"
-        },
-        "failed": []
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "each board has 1 <= k <= n <= 8 and exactly n rows of n '#' or '.' cells",
+       "holds": true
       }
-    }
-  ],
-  "failed": []
+     ],
+     "falsified_by": {
+      "input": "2 1\n##\n#X\n-1 -1",
+      "constraints": [
+       "each board has 1 <= k <= n <= 8 and exactly n rows of n '#' or '.' cells"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024sp_routine",
+    "problem": "01321",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 6815
+   }
+  },
+  {
+   "local_number": 1328,
+   "title": "Radar Installation",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011035",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/01328/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g1328",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 327,
+   "max_output_bytes": 32,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "each radar case has n >= 1, d >= 0, exactly n integer points, and final 0 0",
+     true
+    ]
+   ],
+   "constraint_counterexample": "1 -1\n0 0\n\n0 0",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 3,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.15
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "each radar case has n >= 1, d >= 0, exactly n integer points, and final 0 0",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "1 -1\n0 0\n\n0 0",
+      "constraints": [
+       "each radar case has n >= 1, d >= 0, exactly n integer points, and final 0 0"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024fallroutine",
+    "problem": "01328",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4438
+   }
+  },
+  {
+   "local_number": 1384,
+   "title": "Piggy-Bank",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011036",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/01384/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g1384",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 258,
+   "max_output_bytes": 217,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "each pig has 1 <= E <= F <= 10000 and positive coin values and weights",
+     true
+    ]
+   ],
+   "constraint_counterexample": "1\n10 5\n1\n1 1",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 2,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.1
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "each pig has 1 <= E <= F <= 10000 and positive coin values and weights",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "1\n10 5\n1\n1 1",
+      "constraints": [
+       "each pig has 1 <= E <= F <= 10000 and positive coin values and weights"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024fallroutine",
+    "problem": "01384",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4465
+   }
+  },
+  {
+   "local_number": 1577,
+   "title": "Falling Leaves",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md",
+   "solution_code_index": 5,
+   "submission_id": "53011037",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/01577/statistics/",
+   "source_url": "https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g1577",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 52,
+   "max_output_bytes": 35,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "leaf layers contain only sorted uppercase letters and end with '*' or final '$'",
+     true
+    ]
+   ],
+   "constraint_counterexample": "A1\n$",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 1,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.05
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "leaf layers contain only sorted uppercase letters and end with '*' or final '$'",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "A1\n$",
+      "constraints": [
+       "leaf layers contain only sorted uppercase letters and end with '*' or final '$'"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024sp_routine",
+    "problem": "01577",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4356
+   }
+  },
+  {
+   "local_number": 1611,
+   "title": "The Suspects",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011038",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/01611/statistics/",
+   "source_url": "https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g1611",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 1023,
+   "max_output_bytes": 9,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "each group member is in 0..n-1 and every data set is followed by final 0 0",
+     true
+    ]
+   ],
+   "constraint_counterexample": "3 1\n1 3\n0 0",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 2,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.1
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "each group member is in 0..n-1 and every data set is followed by final 0 0",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "3 1\n1 3\n0 0",
+      "constraints": [
+       "each group member is in 0..n-1 and every data set is followed by final 0 0"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024sp_routine",
+    "problem": "01611",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 3978
+   }
+  },
+  {
+   "local_number": 2192,
+   "title": "Zipper",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011039",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/02192/statistics/",
+   "source_url": "https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g2192",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 431,
+   "max_output_bytes": 190,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "T is 1..1000; first strings are 1..200 letters and len(c)=len(a)+len(b)",
+     true
+    ]
+   ],
+   "constraint_counterexample": "1\na b a",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 1,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.05
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "T is 1..1000; first strings are 1..200 letters and len(c)=len(a)+len(b)",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "1\na b a",
+      "constraints": [
+       "T is 1..1000; first strings are 1..200 letters and len(c)=len(a)+len(b)"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024sp_routine",
+    "problem": "02192",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4737
+   }
+  },
+  {
+   "local_number": 2406,
+   "title": "字符串乘方",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011040",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/02406/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g2406",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 1183,
+   "max_output_bytes": 35,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 3,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "at least one printable string has length 1..1000000 before the final '.' line",
+     true
+    ]
+   ],
+   "constraint_counterexample": ".",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 1,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.05
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "at least one printable string has length 1..1000000 before the final '.' line",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": ".",
+      "constraints": [
+       "at least one printable string has length 1..1000000 before the final '.' line"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024sp_routine",
+    "problem": "02406",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4958
+   }
+  },
+  {
+   "local_number": 2442,
+   "title": "Sequence",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011041",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/02442/statistics/",
+   "source_url": "https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g2442",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 1910,
+   "max_output_bytes": 337,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "each case has 1 <= m <= 100, 1 <= n <= 2000, and m*n nonnegative integers",
+     true
+    ]
+   ],
+   "constraint_counterexample": "1\n2 2\n0 0\n0 -1",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 1,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.05
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "each case has 1 <= m <= 100, 1 <= n <= 2000, and m*n nonnegative integers",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "1\n2 2\n0 0\n0 -1",
+      "constraints": [
+       "each case has 1 <= m <= 100, 1 <= n <= 2000, and m*n nonnegative integers"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024sp_routine",
+    "problem": "02442",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4609
+   }
+  },
+  {
+   "local_number": 2499,
+   "title": "Binary Tree",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011042",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024sp_routine/02499/statistics/",
+   "source_url": "https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g2499",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 109,
+   "max_output_bytes": 283,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "each scenario is a positive valid tree node pair bounded by 1000000000",
+     true
+    ]
+   ],
+   "constraint_counterexample": "1\n0 1",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 1,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.05
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "each scenario is a positive valid tree node pair bounded by 1000000000",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "1\n0 1",
+      "constraints": [
+       "each scenario is a positive valid tree node pair bounded by 1000000000"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024sp_routine",
+    "problem": "02499",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4370
+   }
+  },
+  {
+   "local_number": 2689,
+   "title": "大小写字母互换",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011043",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/02689/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g2689",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 75,
+   "max_output_bytes": 75,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 3,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "the single input line has fewer than 80 characters",
+     true
+    ]
+   ],
+   "constraint_counterexample": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 1,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.05
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "the single input line has fewer than 80 characters",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+      "constraints": [
+       "the single input line has fewer than 80 characters"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024fallroutine",
+    "problem": "02689",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4018
+   }
+  },
+  {
+   "local_number": 2701,
+   "title": "与7无关的数",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011045",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/02701/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g2701",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 3,
+   "max_output_bytes": 7,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 3,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "n is a single positive integer smaller than 100",
+     true
+    ]
+   ],
+   "constraint_counterexample": "100",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 18,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 2,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.1
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "n is a single positive integer smaller than 100",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "100",
+      "constraints": [
+       "n is a single positive integer smaller than 100"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024fallroutine",
+    "problem": "02701",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4065
+   }
+  },
+  {
+   "local_number": 2707,
+   "title": "求一元二次方程的根",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011046",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/routine/02707/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g2707",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 144,
+   "max_output_bytes": 452,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "the declared number of equations is present and every quadratic coefficient a is nonzero",
+     true
+    ]
+   ],
+   "constraint_counterexample": "1\n0 1 1",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 1,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.05
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "the declared number of equations is present and every quadratic coefficient a is nonzero",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "1\n0 1 1",
+      "constraints": [
+       "the declared number of equations is present and every quadratic coefficient a is nonzero"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "routine",
+    "problem": "02707",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4525
+   }
+  },
+  {
+   "local_number": 2749,
+   "title": "分解因数",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011047",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2025sp_routine/02749/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g2749",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 49,
+   "max_output_bytes": 25,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "the declared values are all integers satisfying 1 < a < 32768",
+     true
+    ]
+   ],
+   "constraint_counterexample": "1\n1",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 1,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.05
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "the declared values are all integers satisfying 1 < a < 32768",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "1\n1",
+      "constraints": [
+       "the declared values are all integers satisfying 1 < a < 32768"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2025sp_routine",
+    "problem": "02749",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4096
+   }
+  },
+  {
+   "local_number": 2753,
+   "title": "菲波那契数列",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011048",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/02753/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g2753",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 40,
+   "max_output_bytes": 45,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "the declared Fibonacci indices are all integers satisfying 1 <= a <= 20",
+     true
+    ]
+   ],
+   "constraint_counterexample": "1\n21",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 1,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.05
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "the declared Fibonacci indices are all integers satisfying 1 <= a <= 20",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "1\n21",
+      "constraints": [
+       "the declared Fibonacci indices are all integers satisfying 1 <= a <= 20"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024fallroutine",
+    "problem": "02753",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4665
+   }
+  },
+  {
+   "local_number": 2766,
+   "title": "最大子矩阵",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011049",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/02766/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g2766",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 1055,
+   "max_output_bytes": 5,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "N is 1..100 followed by exactly N*N integers, each in -127..127",
+     true
+    ]
+   ],
+   "constraint_counterexample": "2\n1 2 3",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 1,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.05
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "N is 1..100 followed by exactly N*N integers, each in -127..127",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "2\n1 2 3",
+      "constraints": [
+       "N is 1..100 followed by exactly N*N integers, each in -127..127"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024fallroutine",
+    "problem": "02766",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4308
+   }
+  },
+  {
+   "local_number": 2786,
+   "title": "Pell数列",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011050",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/02786/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g2786",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 141,
+   "max_output_bytes": 106,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "the declared Pell indices are all integers satisfying 1 <= k < 1000000",
+     true
+    ]
+   ],
+   "constraint_counterexample": "1\n1000000",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 1,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.05
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "the declared Pell indices are all integers satisfying 1 <= k < 1000000",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "1\n1000000",
+      "constraints": [
+       "the declared Pell indices are all integers satisfying 1 <= k < 1000000"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024fallroutine",
+    "problem": "02786",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 42323,
+    "note": "参考解法每组都要约 2 秒（6 字节输入也一样，像是有固定的预处理开销），21 组累计 42 秒。**没有任何一组接近单组限额**，裁定是 Accepted；记在这里是因为它是吞吐问题：一次提交占住判题槽 42 秒，一个班同时交这道题会排长队。"
+   }
+  },
+  {
+   "local_number": 2792,
+   "title": "集合加法",
+   "status": "passed",
+   "reference_source": "solution collection code reproduced all scraped cases",
+   "solution_collection": "/home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md",
+   "solution_code_index": 2,
+   "submission_id": "53011051",
+   "platform_verdict": "Accepted",
+   "submission_id_note": null,
+   "statistics_url": "http://cs101.openjudge.cn/2024fallroutine/02792/statistics/",
+   "source_url": "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
+   "license_status": "not declared in source collection; no license is inferred",
+   "generator": "g2792",
+   "generator_seed_smoke": {
+    "seeds": 20000,
+    "status": "passed"
+   },
+   "test_cases": 21,
+   "max_input_bytes": 845,
+   "max_output_bytes": 12,
+   "scraped_cross_check": {
+    "status": "passed",
+    "cases": 2,
+    "mismatched": []
+   },
+   "constraints": [
+    [
+     "each case has positive s,a,b <= 10000 and exactly a/b positive elements <=10000",
+     true
+    ]
+   ],
+   "constraint_counterexample": "1\n10\n1\n0\n1\n10",
+   "self_audit": {
+    "distinct_cases": {
+     "total": 20,
+     "distinct": 20,
+     "threshold": 15,
+     "status": "passed"
+    },
+    "constant_output_probe": {
+     "frequency": 1,
+     "total": 20,
+     "status": "rejected",
+     "exemption": null,
+     "share": 0.05
+    },
+    "sample_is_case_zero": {
+     "input_matches": "passed",
+     "output_matches": "passed",
+     "status": "passed"
+    },
+    "samplecode_recompute": {
+     "status": "passed",
+     "cases": 21,
+     "mismatched": []
+    },
+    "constraint_checklist": {
+     "status": "passed",
+     "checked": 1,
+     "items": [
+      {
+       "constraint": "each case has positive s,a,b <= 10000 and exactly a/b positive elements <=10000",
+       "holds": true
+      }
+     ],
+     "falsified_by": {
+      "input": "1\n10\n1\n0\n1\n10",
+      "constraints": [
+       "each case has positive s,a,b <= 10000 and exactly a/b positive elements <=10000"
+      ]
+     }
+    },
+    "byte_reproduction": {
+     "status": "passed"
+    },
+    "failed": []
+   },
+   "merged_judge": {
+    "status": "passed",
+    "verdict": "Accepted",
+    "book": "2024fallroutine",
+    "problem": "02792",
+    "merged_cases": 21,
+    "measured_by": "Claude 复核补测（2026-07-29，2008 存档排除之后）",
+    "total_ms": 4322
+   }
+  }
+ ],
+ "failed": []
 }
