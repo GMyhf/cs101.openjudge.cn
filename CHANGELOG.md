@@ -12,8 +12,18 @@
   （`users=9 submissions=55 settings=2`，存于 jensen `~/backups/cs101`）。
   删后 `submissions=35`、`pragma integrity_check` 为 `ok`。
 - 未动其余 35 条。服务无需重启（每次请求现读库），practice 状态页已确认干净。
-- **留着没动**：另有 11 条 2026-07-23 的 GMyhf 记录 `book` 为空串（早于 book 列存在），
-  题库页不会显示（空串不匹配任何 `BOOK_META` 键），但会出现在 `/history/` 和站点统计里。
+
+### 线上数据：再清掉 11 条无题库的早期提交
+
+- 同样是**对 jensen 上 `data/course.db` 的不可逆删除**。删的是 id 1–11：
+  `book is null`、`user='GMyhf'`、`created like '2026-07-23%'` —— 早于 `book` 列存在，
+  无 `language`、无 `source`。`changes()` 返回 11，与删前清点一致。
+  （更正上一条里的说法：这些行的 `book` 是 `NULL`，不是空串。）
+- **删前先备份**：`course-20260729T035517Z.db.gz`（`submissions=35`）。
+  删后 `submissions=24`、`book` 为空的行 0 条、`pragma integrity_check` 为 `ok`。
+- 线上复核：`/api/stats` 为 `submissions=24 accepted=10 solved_problems=4`；
+  `/history/` 24 行、无缺 `book` 的行。剩下的全部是真实用户提交
+  （ZHANGSan / FuYn / Camellia / lyss_121259 / GMyhf 各自的真题记录）。
 
 ### 题库页：通过人数 / 尝试人数可点进统计页
 
