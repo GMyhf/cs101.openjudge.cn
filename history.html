@@ -9,6 +9,9 @@
   * { box-sizing:border-box; }
   body { font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; color:var(--ink);
          margin:0; padding:0 0 60px; }
+  /* 这条一直缺着：markup 里有 .wrap，但没有任何地方给它规则，整页贴着左边框。
+     题库页的人数现在点进来就是这一页，顺手补上。 */
+  .wrap { max-width:1180px; margin:0 auto; padding:22px 16px 0; }
   h1 { font-size:26px; margin:0 0 4px; }
   .sub { color:var(--muted); margin:0 0 20px; }
   .sub a { color:var(--accent); }
@@ -38,7 +41,7 @@
 </style>
 <header class="topbar"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><nav class="topnav"><a href="/problems/">题库</a><a href="/history/">提交记录</a><a href="/help/">说明</a><button id="theme" type="button" class="ghost theme-toggle">深色</button><a id="account" href="/auth/login/">登录</a></nav></header>
 <div class="wrap">
-<h1>提交记录</h1>
+<h1 id="pageTitle">提交记录</h1>
 <p class="sub" id="who">读取中…</p>
 
 <div class="cards" id="stats"></div>
@@ -50,6 +53,7 @@
     <option value="200">最近 200 条</option>
     <option value="500">最近 500 条</option>
   </select>
+  <span class="muted" id="truncated" hidden></span>
 </div>
 
 <table>
@@ -144,6 +148,15 @@ function paintStats() {
     + kinds.map(k => `<option value="${esc(k)}"${k === keep ? " selected" : ""}>${esc(k)}</option>`).join("");
 }
 
+// 从题库页的「通过人数 / 尝试人数」点进来就是这道题的统计页，默认拉满 ——
+// 上面那四张统计卡是拿返回的行算出来的，默认 50 条会让它们算出一个偏小的数
+// 却看起来像全量结论。截断时下面还会明说「已达上限」。
+if (queryProblem) {
+  limit.value = "500";
+  pageTitle.textContent = queryProblem + " · 提交统计";
+  document.title = queryProblem + " · 提交统计 · CS101";
+}
+
 async function load() {
   const mine = new URLSearchParams(location.search).get("mine") === "1";
   const params = new URLSearchParams({ limit: limit.value });
@@ -160,7 +173,10 @@ async function load() {
   all = data.submissions || [];
   currentUser = data.user || "";
   const scope = queryProblem ? ' · 当前题目：<b>' + esc(queryProblem) + '</b>' : '';
-  who.innerHTML = '登录为 <b>' + esc(data.user) + '</b>' + scope + ' · <a href="/problems/">题库目录</a> · <a href="/">首页</a>';
+  const back = queryBook ? ' · <a href="/book/' + encodeURIComponent(queryBook) + '/">返回题库</a>' : '';
+  who.innerHTML = '登录为 <b>' + esc(data.user) + '</b>' + scope + back + ' · <a href="/problems/">题库目录</a> · <a href="/">首页</a>';
+  truncated.hidden = all.length < Number(limit.value);
+  truncated.textContent = '已达上限，下面的统计只算这 ' + all.length + ' 条';
   paintStats();
   render();
 }

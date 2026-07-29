@@ -320,6 +320,48 @@ class ServerApiTests(unittest.TestCase):
         row = next(item for item in payload["problems"] if item["id"] == SUBMIT_PROBLEM)
         self.assertGreaterEqual(row["attempt_count"], 1)
 
+    def test_book_page_links_the_counts_to_the_statistics_page(self):
+        status, _, body = request(self.port, "GET", "/book/pctbook/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn("/history/?book=${encodeURIComponent(BOOK)}"
+                      "&problem=${encodeURIComponent(p.id)}", text)
+
+    def test_problem_statistics_keeps_code_and_detail_to_the_owner(self):
+        """题库页的人数点进去就是这个查询。老规则在这条 URL 上也得成立。"""
+        query = f"/api/submissions?book={SUBMIT_BOOK}&problem={SUBMIT_PROBLEM}&limit=500"
+        status, _, _ = request(self.port, "GET", query)
+        self.assertEqual(status, 401)
+
+        first = self.register_and_login("t026_stat_a", "T026-password")
+        second = self.register_and_login("t026_stat_b", "T026-password")
+        for cookie, source in ((first, "print('aaa')"), (second, "print('bbb')")):
+            status, _, _ = request(self.port, "POST", "/api/submit", {
+                "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
+                "source": source,
+            }, cookie=cookie)
+            self.assertEqual(status, 200)
+
+        status, _, body = request(self.port, "GET", query, cookie=second)
+        self.assertEqual(status, 200)
+        rows = json.loads(body)["submissions"]
+        self.assertTrue(all(row["problem"] == SUBMIT_PROBLEM for row in rows))
+        mine = [row for row in rows if row["user"] == "t026_stat_b"]
+        others = [row for row in rows if row["user"] == "t026_stat_a"]
+        self.assertTrue(mine and others)
+        # 自己的：代码和判题详情都在。别人的：结果看得见，代码和详情看不见。
+        self.assertEqual(mine[0]["source"], "print('bbb')")
+        self.assertTrue(mine[0]["detail"])
+        self.assertTrue(all(row["result"] for row in others))
+        self.assertTrue(all(row["source"] == "" and row["detail"] == {} for row in others))
+        self.assertNotIn(b"print('aaa')", body)
+
+        status, _, body = request(self.port, "GET", query, cookie=self._admin_cookie())
+        self.assertEqual(status, 200)
+        by_user = {row["user"]: row for row in json.loads(body)["submissions"]}
+        self.assertEqual(by_user["t026_stat_a"]["source"], "print('aaa')")
+        self.assertEqual(by_user["t026_stat_b"]["source"], "print('bbb')")
+
     def test_submit_page_renders_without_placeholders(self):
         status, _, body = request(self.port, "GET", f"/{SUBMIT_BOOK}/{SUBMIT_PROBLEM}/submit/")
         self.assertEqual(status, 200)

@@ -73,6 +73,12 @@ const PAGE_SIZE = 100;
 // catalog 里的标题带着「E01003:」前缀（首页和 /problems/ 都这么剥）。
 // 上游那一页的标题列只有 Hangover，这里跟它一致。
 const titleOf = p => (p.title || p.id).replace(new RegExp('^' + p.id + '\\s*[:：]\\s*', 'i'), '') || p.id;
+// 通过/尝试人数点进去是这道题的统计页（按题过滤的提交记录）。谁能看到什么由
+// /api/submissions 定：列表人人可见，代码和判题详情只有本人和管理员拿得到。
+// 0 不做成链接 —— 一个点进去必然是空表的链接，只会让人以为出了错。
+const statsLink = (p, count) => count
+  ? `<a class="pid" href="/history/?book=${encodeURIComponent(BOOK)}&problem=${encodeURIComponent(p.id)}">${count}</a>`
+  : '—';
 document.querySelector('#tab-' + VIEW).classList.add('on');
 
 function table(headers, rows) {
@@ -124,8 +130,8 @@ function renderProblems(data) {
         <td class="title"><a href="${esc(p.path)}">${esc(titleOf(p))}</a>${
           p.test_count ? '' : ' <span class="badge b-info">暂无数据</span>'}</td>
         <td class="num">${esc(p.pass_rate || '—')}</td>
-        <td class="num">${p.accepted_count || '—'}</td>
-        <td class="num">${p.attempt_count || '—'}</td></tr>`))
+        <td class="num">${statsLink(p, p.accepted_count)}</td>
+        <td class="num">${statsLink(p, p.attempt_count)}</td></tr>`))
       : '<p class="note">没有匹配的题目。</p>';
     // 页码按钮：题目最多的题库也就 10 页，全列出来比「上一页/下一页」少点两次。
     pager.innerHTML = pages > 1 ? Array.from({length: pages}, (_, i) =>
