@@ -2150,6 +2150,16 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             if not nickname or len(nickname) > 32 or not nickname.isprintable():
                 self.send_json({"error": "昵称需为 1-32 个可见字符"}, 400); return
             with sqlite3.connect(DB) as db:
+                # 昵称不能是**别人的**用户名。排名页显示的是昵称、链接才是用户名，
+                # 不拦这一条，任何人都能把自己在排行榜上显示成别的同学（或管理员）——
+                # 一个课程排行榜上的冒名，学生看不出来，看出来了也说不清。
+                # 只拦「别人的」：自己的用户名当然可以，那本来就是默认值。
+                taken = db.execute(
+                    "select 1 from users where lower(username) = lower(?) and lower(username) != lower(?)",
+                    (nickname, username)).fetchone()
+                if taken or (same_username(nickname, ADMIN_USER)
+                             and not same_username(username, ADMIN_USER)):
+                    self.send_json({"error": "这个昵称与其他账号的用户名相同，换一个"}, 409); return
                 updated = db.execute("update users set nickname = ? where username = ?",
                                      (nickname, username)).rowcount
                 if not updated and same_username(username, ADMIN_USER):

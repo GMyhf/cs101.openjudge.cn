@@ -210,6 +210,34 @@ def check_archive_oracle_is_auditable():
     return "T-028 报告未记录 oracle 用了哪些存档目录（round8 起）", bad
 
 
+def check_priority_gaps_are_recorded():
+    """8. T-028 按 priority 顺序做，**跳过可以，不留痕不行**。
+
+    round8-10 覆盖 priority 121-180，实际只建了 57 题 —— 131/141/173 被跳过，
+    而清单里一条记录都没有。三个决定后来查下来都是对的（00000 输出超 2MB、
+    02982 Sudoku 是「print any」多解题、01729 疑为多解/浮点），
+    **但没有记录就等于没有人在跟着它们** —— 下一轮要么重新踩一遍，要么永远忘掉。
+
+    判据：把各轮 manifest 里的 priority 取并集，凡是落在 [最小, 最大] 区间内、
+    既没建也没记进 `selection_exclusions` 的，就报出来。
+    """
+    built, excluded = set(), set()
+    for path in sorted(ROOT.glob("collab/t028-round*-manifest.json")):
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        built |= {row["priority"] for row in data.get("entries", []) if "priority" in row}
+        excluded |= {row["priority"] for row in data.get("selection_exclusions", [])
+                     if isinstance(row, dict) and "priority" in row}
+    if not built:
+        return "T-028 priority 有缺口却没有记录", []
+    gaps = sorted(p for p in range(min(built), max(built) + 1)
+                  if p not in built and p not in excluded)
+    return "T-028 priority 有缺口却没有记录", [
+        f"priority {p}: 既没构建也没记进 selection_exclusions" for p in gaps]
+
+
 def check_repeating_decimals():
     """4. 浮点输出里的循环小数。
 
@@ -274,7 +302,7 @@ def check_annotated_sample_outputs():
 CHECKS = (check_reported_failures, check_degenerate_constraints,
           check_output_size, check_repeating_decimals, check_annotated_sample_outputs,
           check_merged_judge, check_multi_answer_problems,
-          check_archive_oracle_is_auditable)
+          check_archive_oracle_is_auditable, check_priority_gaps_are_recorded)
 
 
 def main():

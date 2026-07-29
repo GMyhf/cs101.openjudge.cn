@@ -231,6 +231,38 @@ class ServerApiTests(unittest.TestCase):
         })
         self.assertEqual(status, 200)
 
+    def test_nickname_cannot_impersonate_another_account(self):
+        """排名页显示的是昵称、链接才是用户名 —— 昵称能随便取，就能冒充同学。
+
+        实测过：BobY 把昵称设成 AliceX，排行榜上就出现两个 AliceX。
+        对课程排行榜来说这不是理论风险，学生看不出来，看出来了也说不清。
+        只拦「别人的用户名」——自己的当然可以，那本来就是默认值。
+        """
+        first = self.register_and_login("t029_nick_a", "T029-password")
+        second = self.register_and_login("t029_nick_b", "T029-password")
+
+        for taken in ("t029_nick_a", "T029_NICK_A", "GMyhf"):
+            status, _, body = request(self.port, "POST", "/api/profile",
+                                      {"nickname": taken}, cookie=second)
+            self.assertEqual(status, 409, f"{taken} 应被拦下：{body}")
+
+        # 自己的用户名、以及普通昵称，都要照常能设
+        for allowed in ("t029_nick_b", "鲍勃"):
+            status, _, body = request(self.port, "POST", "/api/profile",
+                                      {"nickname": allowed}, cookie=second)
+            self.assertEqual(status, 200, body)
+            self.assertEqual(json.loads(body)["nickname"], allowed)
+        status, _, _ = request(self.port, "POST", "/api/profile",
+                               {"nickname": "爱丽丝"}, cookie=first)
+        self.assertEqual(status, 200)
+
+    def test_nickname_is_escaped_where_it_is_shown(self):
+        """昵称是用户可控文本，排名页要显示它 —— 渲染必须转义。"""
+        _, _, body = request(self.port, "GET", "/book/pctbook/ranking/")
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn("userLink(r.user, r.name)", text)
+        self.assertIn("${esc(label)}</a>", text)
+
     def test_profile_nickname_defaults_updates_and_appears_in_ranking(self):
         username = "t006_profile"
         nickname = "算法练习生"

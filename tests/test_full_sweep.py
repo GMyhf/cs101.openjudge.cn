@@ -87,3 +87,28 @@ class ArchiveOracleAuditabilityTests(unittest.TestCase):
         # 只该报第 1 条：round8 且既没记 dirs 也没写「没有存档」的理由
         self.assertEqual(len(bad), 1, bad)
         self.assertIn("1（t028-round8-report.json）", bad[0])
+
+
+class PriorityGapTests(unittest.TestCase):
+    """跳过某个 priority 可以，不留痕不行 —— 没记录就等于没人在跟着它。"""
+
+    def test_flags_a_priority_that_is_neither_built_nor_excluded(self):
+        import json, tempfile, pathlib
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp); (root / "collab").mkdir()
+            (root / "collab" / "t028-round1-manifest.json").write_text(json.dumps({
+                "entries": [{"priority": 1}, {"priority": 2}, {"priority": 4}],
+                "selection_exclusions": [{"priority": 3, "reason": "多解题"}],
+            }), encoding="utf-8")
+            with mock.patch.object(full_sweep, "ROOT", root):
+                _label, bad = full_sweep.check_priority_gaps_are_recorded()
+            self.assertEqual(bad, [], "3 已记录、1/2/4 已建，不该报")
+
+            (root / "collab" / "t028-round1-manifest.json").write_text(json.dumps({
+                "entries": [{"priority": 1}, {"priority": 2}, {"priority": 4}],
+                "selection_exclusions": [],
+            }), encoding="utf-8")
+            with mock.patch.object(full_sweep, "ROOT", root):
+                _label, bad = full_sweep.check_priority_gaps_are_recorded()
+            self.assertEqual(len(bad), 1, bad)
+            self.assertIn("priority 3", bad[0])
