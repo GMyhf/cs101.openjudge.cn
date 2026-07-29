@@ -28,6 +28,10 @@
   .bar input:focus { border-color:var(--accent) }
   .table-wrap { overflow-x:auto }
   table { min-width:600px }
+  th.sortable { cursor:pointer; user-select:none; white-space:nowrap }
+  th.sortable:hover, th.sortable:focus-visible { color:var(--ink) }
+  th.sortable.on { color:var(--ink) }
+  th .arrow { display:inline-block; width:12px; text-align:center }
   a.pid { color:var(--accent); text-decoration:none; font-weight:600 }
   a.pid:hover { text-decoration:underline }
   td.title a { color:inherit; text-decoration:none }
@@ -98,10 +102,41 @@ const userLink = name =>
 // 所以标题下面再给一条回题库的路，人不至于只能靠浏览器后退。
 const bookLink = name => `<a class="pid" href="/book/${encodeURIComponent(BOOK)}/">${esc(name)}</a>`;
 
-function table(headers, rows) {
+function table(headers, rows, sort) {
   return '<div class="table-wrap"><table><thead><tr>'
-    + headers.map(h => `<th class="${h.num ? 'num' : ''}">${h.text}</th>`).join('')
+    + headers.map(h => {
+        if (!h.key) return `<th class="${h.num ? 'num' : ''}">${h.text}</th>`;
+        const on = sort && sort.key === h.key;
+        return `<th class="${h.num ? 'num ' : ''}sortable${on ? ' on' : ''}"`
+          + ` data-key="${h.key}" tabindex="0" role="button"`
+          + ` aria-sort="${on ? (sort.dir < 0 ? 'descending' : 'ascending') : 'none'}">`
+          + `${h.text}<span class="arrow">${on ? (sort.dir < 0 ? '↓' : '↑') : ''}</span></th>`;
+      }).join('')
     + '</tr></thead><tbody>' + rows.join('') + '</tbody></table></div>';
+}
+
+// 排序键。通过率在数据里是 "80%" 这种字符串，直接比字符串会把 "9%" 排在 "80%" 后面，
+// 所以取回它的数值；没有提交过的题（空串）压到最后，而不是当成 0% 混进真实的 0%。
+function sortValue(item, key) {
+  if (key === 'id') return String(item.id || '');
+  if (key === 'pass_rate') {
+    const percent = parseFloat(item.pass_rate);
+    return Number.isNaN(percent) ? -1 : percent;
+  }
+  return Number(item[key] || 0);
+}
+
+// 排序本身。**稳定排序**：JS 的 sort 按规范是稳定的，所以数值相同的行
+// 仍然保持传进来的顺序（题号升序）—— 全库大部分题通过人数都是 0，
+// 没有这条它们的相对次序会随实现漂移，看起来像每次刷新都在乱跳。
+function sortProblems(items, sort) {
+  const rows = items.slice();
+  rows.sort((a, b) => {
+    const left = sortValue(a, sort.key), right = sortValue(b, sort.key);
+    if (left === right) return 0;
+    return (left < right ? -1 : 1) * sort.dir;
+  });
+  return rows;
 }
 function badge(result) {
   const kind = result === 'Accepted' ? 'b-ac' : result === 'Wrong Answer' ? 'b-wa' : 'b-other';
@@ -145,23 +180,26 @@ function renderProblems(data) {
   const q = document.querySelector('#q'), rows = document.querySelector('#rows'),
         pager = document.querySelector('#pager'), count = document.querySelector('#count');
   let page = 1;
+  // 默认按通过人数从多到少。人拍板的：这一页是拿来挑题的，
+  // 「多少人做出来了」比题号更能说明这道题值不值得先做。点表头可以改。
+  let sort = { key: 'accepted_count', dir: -1 };
   const draw = () => {
     const term = q.value.trim().toLowerCase();
-    const hits = data.problems.filter(p => !term
-      || p.id.toLowerCase().includes(term) || (p.title || '').toLowerCase().includes(term));
+    const hits = sortProblems(data.problems.filter(p => !term
+      || p.id.toLowerCase().includes(term) || (p.title || '').toLowerCase().includes(term)), sort);
     const pages = Math.max(1, Math.ceil(hits.length / PAGE_SIZE));
     page = Math.min(page, pages);
     count.textContent = `${hits.length} 题`;
     rows.innerHTML = hits.length ? table(
-      [{text:'题目ID'}, {text:'标题'}, {text:'通过率', num:true},
-       {text:'通过人数', num:true}, {text:'尝试人数', num:true}],
+      [{text:'题目ID', key:'id'}, {text:'标题'}, {text:'通过率', num:true, key:'pass_rate'},
+       {text:'通过人数', num:true, key:'accepted_count'}, {text:'尝试人数', num:true, key:'attempt_count'}],
       hits.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE).map(p => `<tr>
         <td class="num"><a class="pid" href="${esc(p.path)}">${esc(p.id)}</a></td>
         <td class="title"><a href="${esc(p.path)}">${esc(titleOf(p))}</a>${
           p.test_count ? '' : ' <span class="badge b-info">暂无数据</span>'}</td>
         <td class="num">${esc(p.pass_rate || '—')}</td>
         <td class="num">${statsLink(p, p.accepted_count)}</td>
-        <td class="num">${statsLink(p, p.attempt_count)}</td></tr>`))
+        <td class="num">${statsLink(p, p.attempt_count)}</td></tr>`), sort)
       : '<p class="note">没有匹配的题目。</p>';
     // 页码按钮：题目最多的题库也就 10 页，全列出来比「上一页/下一页」少点两次。
     pager.innerHTML = pages > 1 ? Array.from({length: pages}, (_, i) =>
@@ -171,6 +209,21 @@ function renderProblems(data) {
   pager.addEventListener('click', event => {
     const target = event.target.closest('button[data-page]');
     if (target) { page = Number(target.dataset.page); draw(); scrollTo(0, 0); }
+  });
+  // 点表头换排序：同一列再点一次翻方向。题号默认升序，几个数值列默认降序 ——
+  // 「谁最多」几乎总是先想看的那一头。
+  const resort = target => {
+    if (!target) return;
+    const key = target.dataset.key;
+    sort = sort.key === key ? { key, dir: -sort.dir } : { key, dir: key === 'id' ? 1 : -1 };
+    page = 1;
+    draw();
+  };
+  rows.addEventListener('click', event => resort(event.target.closest('th[data-key]')));
+  rows.addEventListener('keydown', event => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    const target = event.target.closest('th[data-key]');
+    if (target) { event.preventDefault(); resort(target); }
   });
   draw();
 }

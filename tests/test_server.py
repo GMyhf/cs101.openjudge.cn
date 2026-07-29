@@ -320,6 +320,52 @@ class ServerApiTests(unittest.TestCase):
         row = next(item for item in payload["problems"] if item["id"] == SUBMIT_PROBLEM)
         self.assertGreaterEqual(row["attempt_count"], 1)
 
+    def test_problem_table_sorts_by_accepted_count_by_default(self):
+        """在 node 里真跑一遍页面里的排序函数。
+
+        这段逻辑全在浏览器里跑，HTTP 断言只能看到「字符串在不在」。
+        而这里有两个只有真跑才看得出来的点：通过率是 `"80%"` 这种**字符串**
+        （直接比会把 `"9%"` 排在 `"80%"` 后面），以及大量并列 0 的行必须**保持题号序**
+        （否则看起来像每次刷新都在乱跳）。照 `test_submit_page_highlighter_runs` 的做法。
+        """
+        page = (ROOT / "book.html").read_text(encoding="utf-8")
+        script = page[page.index("<script>") + 8: page.rindex("</script>")]
+        core = script[script.index("function sortValue"): script.index("function badge")]
+        harness = core + """
+// A0 是「很多人交过、没人过」，A1/A3 是「根本没人交过」。这两件事不一样，
+// 排序必须分得开 —— 所以 A0 故意排在 A1/A3 前面，把两种取值区分出来。
+const items = [
+  {id: "A0", accepted_count: 0,  attempt_count: 7,   pass_rate: "0%"},
+  {id: "A1", accepted_count: 0,  attempt_count: 0,   pass_rate: ""},
+  {id: "A2", accepted_count: 9,  attempt_count: 100, pass_rate: "9%"},
+  {id: "A3", accepted_count: 0,  attempt_count: 0,   pass_rate: ""},
+  {id: "A4", accepted_count: 40, attempt_count: 50,  pass_rate: "80%"},
+];
+const ids = (sort) => sortProblems(items, sort).map(p => p.id).join(",");
+// 默认：通过人数从多到少；并列的 0 保持传入顺序（稳定排序）
+const byAccepted = ids({key: "accepted_count", dir: -1}) === "A4,A2,A0,A1,A3";
+// 通过率按数值比，不是按字符串 —— 字符串比会得出 "9%" > "80%"
+const byRate = ids({key: "pass_rate", dir: -1}) === "A4,A2,A0,A1,A3";
+// 没人交过的题压在 0% 之后，而不是跟「7 个人交了没一个过」混成一档
+const rateAsc = ids({key: "pass_rate", dir: 1}) === "A1,A3,A0,A2,A4";
+// 题号列仍然能排回去
+const byId = ids({key: "id", dir: 1}) === "A0,A1,A2,A3,A4";
+// 原数组不被就地改动
+const untouched = items.map(p => p.id).join(",") === "A0,A1,A2,A3,A4";
+process.exit(byAccepted && byRate && rateAsc && byId && untouched ? 0 : 1);
+"""
+        with tempfile.NamedTemporaryFile("w", suffix=".mjs", encoding="utf-8", delete=False) as handle:
+            handle.write(harness)
+            path = handle.name
+        self.addCleanup(os.unlink, path)
+        result = subprocess.run(["node", path], capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0,
+                         "题目表排序不对（通过人数默认降序 / 通过率按数值 / 稳定）："
+                         + (result.stderr or result.stdout)[:400])
+        # 默认排序键得真的是通过人数 —— 上面那段只证明函数对，不证明页面用了它
+        self.assertIn("let sort = { key: 'accepted_count', dir: -1 };", script)
+        self.assertIn('data-key="${h.key}"', script)
+
     def test_book_user_and_solution_pages_render(self):
         for view, path in (("user", "/book/pctbook/user/ZHANGSan/"),
                            ("solution", "/book/pctbook/solution/12/")):
