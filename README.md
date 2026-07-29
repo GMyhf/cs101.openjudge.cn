@@ -111,8 +111,13 @@ python3 -m unittest
   以及由它们派生的 `catalog.json` / `test_index.json` / `limits.json`（题目标题与上游统计）。
   版权属 cs101.openjudge.cn 原作者。`data/openjudge/producecase_prompt/` 里每份 prompt
   也整段嵌了题面。
-- **他人提交的参考实现**：220 个 `*_made/` 目录的 `samplecode.py`（218 份）与
-  `producecase.py`（161 份，把参考实现内嵌成 `REFERENCE` 字符串）取自 OpenJudge 上
-  别人的 Accepted 提交，文件头已注明提交号、来源链接与
-  `License: not declared on the submission page; no license is inferred`。
-  **这些不是本仓库能授权出去的东西。** 同目录下的 `data/*.in|*.out` 是本项目生成的。
+- **他人提交的参考实现**：凡文件头写着
+  `License: not declared ... no license is inferred` 的源码，都取自 OpenJudge 上
+  **别人的 Accepted 提交**，并注明统计页、提交号与源码链接。
+  **这些不是本仓库能授权出去的东西。** 目前分布在两处：
+  `data/openjudge/tests/**/*_made/` 下的 `samplecode.*` 与 `producecase.py`
+  （参考实现内嵌成 `REFERENCE` 字符串），以及 `scripts/t00*_platform_accepted_*`。
+  同目录下生成的 `data/*.in|*.out` 是本项目的产物，不受此限。
+  **这里刻意不写数量** —— 每一轮 T-028 都在变，写死的数字只会变成过期信息
+  （2026-07-30 复核时原文还停在「220 个目录」，而 `scripts/` 下已另有 345 份没被提及）。
+  判据是那行 `License:` 头，不是计数。

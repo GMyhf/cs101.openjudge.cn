@@ -238,6 +238,59 @@ def check_priority_gaps_are_recorded():
         f"priority {p}: 既没构建也没记进 selection_exclusions" for p in gaps]
 
 
+def check_self_audit_numbers_are_measured():
+    """9. 报告里的自检数字必须能从 `data/` 重算出来。
+
+    T-002 立过一条：**自检字段必须是实测值，不得写字面量常量**
+    （Decision Log 2026-07-25 第五代自检项②）。它一直靠复核时人眼重算 ——
+    而复核已改成攒几轮一起看，人眼最不该承担这件事。
+
+    2026-07-30 实测抓到 02800：报告写 `constant_output_probe.frequency = 2`，
+    而 20 组输出两两不同，真实频次是 1。方向上偏保守、没掩盖缺陷，
+    但它说明那个数不是量出来的。
+
+    **判据对「含不含第 0 组」两种口径都放行** —— 报告里这两种都出现过
+    （02800 的 total 是 20/21 组，03259 的 total 是 20/20 组）。
+    这条判据管的是「数字是不是量出来的」，不是「口径统不统一」；
+    口径不一致另记，不在这里罚。
+    """
+    import collections
+    made = dict(made_dirs())
+    bad = []
+    for source, entry in report_entries():
+        if not source.startswith("t028-"):
+            continue
+        audit = entry.get("self_audit") or {}
+        probe, distinct = audit.get("constant_output_probe") or {}, audit.get("distinct_cases") or {}
+        path = made.get(entry.get("local_number"))
+        if path is None or not probe:
+            continue
+        cases = sorted((path / "data").glob("*.in"), key=lambda p: int(p.stem))
+        if not cases:
+            continue
+        for label, reported, values in (
+            ("constant_output_probe.total", probe.get("total"),
+             [p.with_suffix(".out").read_bytes() for p in cases]),
+            ("distinct_cases.total", distinct.get("total"), [p.read_bytes() for p in cases]),
+        ):
+            if reported is not None and reported not in (len(values), len(values) - 1):
+                bad.append(f"{entry.get('local_number')}（{source}）: {label} 写的是 {reported}，"
+                           f"data/ 里是 {len(values)} 组（含样例）/{len(values) - 1}（不含）")
+        outs = [p.with_suffix(".out").read_bytes() for p in cases]
+        ins = [p.read_bytes() for p in cases]
+        for label, reported, allowed in (
+            ("constant_output_probe.frequency", probe.get("frequency"),
+             {collections.Counter(outs).most_common(1)[0][1],
+              collections.Counter(outs[1:]).most_common(1)[0][1] if outs[1:] else 0}),
+            ("distinct_cases.distinct", distinct.get("distinct"),
+             {len(set(ins)), len(set(ins[1:]))}),
+        ):
+            if reported is not None and reported not in allowed:
+                bad.append(f"{entry.get('local_number')}（{source}）: {label} 写的是 {reported}，"
+                           f"从 data/ 重算只可能是 {sorted(allowed)}")
+    return "报告自检数字与 data/ 重算不符（必须是实测值）", bad
+
+
 def check_repeating_decimals():
     """4. 浮点输出里的循环小数。
 
@@ -302,7 +355,8 @@ def check_annotated_sample_outputs():
 CHECKS = (check_reported_failures, check_degenerate_constraints,
           check_output_size, check_repeating_decimals, check_annotated_sample_outputs,
           check_merged_judge, check_multi_answer_problems,
-          check_archive_oracle_is_auditable, check_priority_gaps_are_recorded)
+          check_archive_oracle_is_auditable, check_priority_gaps_are_recorded,
+          check_self_audit_numbers_are_measured)
 
 
 def main():

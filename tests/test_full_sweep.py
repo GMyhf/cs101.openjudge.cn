@@ -112,3 +112,34 @@ class PriorityGapTests(unittest.TestCase):
                 _label, bad = full_sweep.check_priority_gaps_are_recorded()
             self.assertEqual(len(bad), 1, bad)
             self.assertIn("priority 3", bad[0])
+
+
+class SelfAuditMeasuredTests(unittest.TestCase):
+    """自检数字必须是量出来的 —— T-002 立的规矩，现在搬进闸门。"""
+
+    def test_flags_a_frequency_that_data_cannot_produce(self):
+        import tempfile, pathlib
+        with tempfile.TemporaryDirectory() as tmp:
+            made = pathlib.Path(tmp) / "2000-2999" / "09999_made" / "data"
+            made.mkdir(parents=True)
+            for i, out in enumerate(["a", "b", "c"]):          # 三组、输出两两不同
+                (made / f"{i}.in").write_text(f"{i}\n")
+                (made / f"{i}.out").write_text(out + "\n")
+            entry = {"local_number": 9999,
+                     "self_audit": {"constant_output_probe": {"total": 2, "frequency": 2},
+                                    "distinct_cases": {"total": 2, "distinct": 2}}}
+            with mock.patch.object(full_sweep, "made_dirs",
+                                   return_value=[(9999, made.parent)]), \
+                 mock.patch.object(full_sweep, "report_entries",
+                                   return_value=iter([("t028-round9-report.json", entry)])):
+                _label, bad = full_sweep.check_self_audit_numbers_are_measured()
+            self.assertEqual(len(bad), 1, bad)
+            self.assertIn("frequency", bad[0])
+
+            entry["self_audit"]["constant_output_probe"]["frequency"] = 1
+            with mock.patch.object(full_sweep, "made_dirs",
+                                   return_value=[(9999, made.parent)]), \
+                 mock.patch.object(full_sweep, "report_entries",
+                                   return_value=iter([("t028-round9-report.json", entry)])):
+                _label, bad = full_sweep.check_self_audit_numbers_are_measured()
+            self.assertEqual(bad, [], "改成实测值就该放行")
