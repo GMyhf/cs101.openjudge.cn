@@ -183,6 +183,31 @@ def check_multi_answer_problems():
     return "多解题却生成了精确比对数据", sorted(set(bad))
 
 
+def check_archive_oracle_is_auditable():
+    """7. round8 起：报告要记下**用了哪些存档目录**当 oracle，不能只记排除了谁。
+
+    round6/7 引入了「按标题匹配历史存档」——不再只按题号找。技术本身合理（2008 存档
+    很多目录是按题名起的），但它能伸手到任意目录：1789 Truck History 那轮就够到了
+    `tests/1000-1999/1798`（数字转置），Codex 自己发现是「无关的德语编码存档」并排除。
+
+    **这次是排掉了，但复核方无法核对没排掉的那些** —— 报告只记 `excluded`，
+    不记实际用了哪几个目录。oracle 是这套流程里最强的一道验证，它必须可回查。
+
+    只对 round8 及以后生效：早于这条规则的轮次不追溯（也无法追溯 —— 用了哪些目录
+    已经无从得知，这本身就是这条判据要防的事）。
+    """
+    bad = []
+    for source, entry in report_entries():
+        match = re.match(r"t028-round(\d+)-report\.json$", source)
+        if not match or int(match.group(1)) < 8:
+            continue
+        check = entry.get("archive_cross_check") or entry.get("scraped_cross_check") or {}
+        if not check.get("dirs") and not check.get("no_archive_reason"):
+            bad.append(f"{entry.get('local_number')}（{source}）: "
+                       f"archive_cross_check 没记 dirs（没有存档就写 no_archive_reason）")
+    return "T-028 报告未记录 oracle 用了哪些存档目录（round8 起）", bad
+
+
 def check_repeating_decimals():
     """4. 浮点输出里的循环小数。
 
@@ -246,7 +271,8 @@ def check_annotated_sample_outputs():
 
 CHECKS = (check_reported_failures, check_degenerate_constraints,
           check_output_size, check_repeating_decimals, check_annotated_sample_outputs,
-          check_merged_judge, check_multi_answer_problems)
+          check_merged_judge, check_multi_answer_problems,
+          check_archive_oracle_is_auditable)
 
 
 def main():

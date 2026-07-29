@@ -64,3 +64,22 @@ class MultiAnswerDetectionTests(unittest.TestCase):
             self.assertTrue(full_sweep.MULTI_ANSWER.search(text), text[:40])
         for text in self.FAKE:
             self.assertIsNone(full_sweep.MULTI_ANSWER.search(text), text[:40])
+
+
+class ArchiveOracleAuditabilityTests(unittest.TestCase):
+    """oracle 可回查：round8 起报告要记下用了哪些存档目录，不能只记排除了谁。"""
+
+    ENTRIES = [
+        ("t028-round8-report.json", {"local_number": 1, "archive_cross_check": {"cases": 2}}),
+        ("t028-round8-report.json", {"local_number": 2, "archive_cross_check": {"dirs": ["tests/x/1"]}}),
+        ("t028-round9-report.json", {"local_number": 3,
+                                     "archive_cross_check": {"no_archive_reason": "盘上没有存档"}}),
+        ("t028-round7-report.json", {"local_number": 4, "archive_cross_check": {"cases": 1}}),
+    ]
+
+    def test_requires_recorded_dirs_from_round8_onwards(self):
+        with mock.patch.object(full_sweep, "report_entries", return_value=iter(self.ENTRIES)):
+            _label, bad = full_sweep.check_archive_oracle_is_auditable()
+        # 只该报第 1 条：round8 且既没记 dirs 也没写「没有存档」的理由
+        self.assertEqual(len(bad), 1, bad)
+        self.assertIn("1（t028-round8-report.json）", bad[0])
