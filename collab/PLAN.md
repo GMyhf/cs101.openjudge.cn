@@ -69,6 +69,12 @@
 > 153 项 unittest 与 full-sweep 全绿。有数据的 catalog 条目 1338→1569。tier 1 的 252 题
 > 已完成 60，仍剩 192；**全部补完前不发版**。
 
+> **T-028 round5/6/7（2026-07-29）**：round5 已提前复核认可；Codex 又完成 round6/7
+> priority 81–120 的 40 题、840 组 `_made` 数据，现交 Claude 按约定合并复核 5/6/7。
+> round6/7 平台真实提交 40/40 Accepted，本机合并 `judge()` 40/40 Accepted；索引后
+> 1689/1848 个 catalog 条目有数据，按全局题号还剩 **130** 题零数据。下一批从 priority
+> 121 开始；01426/03151 仍需 special judge，未重建。T-028 保持 In progress，**不发版**。
+
 ## Decision Log
 
 - 2026-07-29 · **人拍板：2008 存档排除出判题范围**（出处：`scripts/index_tests.py · ARCHIVE_BUCKETS`、
