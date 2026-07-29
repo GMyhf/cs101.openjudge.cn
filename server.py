@@ -1277,6 +1277,49 @@ def catalog_summary_payload():
     }
 
 
+def book_dashboard_payload(book):
+    """Public, book-scoped data for the compact problem/ranking/status views.
+
+    Keep this separate from ``/api/submissions``: the latter is authenticated
+    because it may return a submitter's source and judge detail. These views
+    deliberately expose only the public scoreboard fields.
+    """
+    problems = [item for item in catalog_raw().get("problems", []) if item.get("book") == book]
+    with sqlite3.connect(DB) as db:
+        problem_stats = {
+            (row[0], row[1]): {"attempt_count": row[2], "accepted_count": row[3]}
+            for row in db.execute(
+                """select book, problem, count(*),
+                          count(case when result = 'Accepted' then 1 end)
+                     from submissions where book = ? group by book, problem""", (book,))
+        }
+        ranking = [
+            {"user": row[0], "solved": row[1], "submissions": row[2], "last_submit": row[3]}
+            for row in db.execute(
+                """select user, count(distinct case when result = 'Accepted' then problem end),
+                          count(*), max(created)
+                     from submissions where book = ?
+                     group by lower(user), user
+                     order by 2 desc, 3 asc, 4 asc, lower(user) asc""", (book,))
+        ]
+        status = [
+            {"user": row[0], "problem": row[1], "result": row[2], "created": row[3]}
+            for row in db.execute(
+                """select user, problem, result, created from submissions
+                     where book = ? order by id desc limit 200""", (book,))
+        ]
+    return {
+        "name": BOOK_META[book]["name"], "problem_count": len(problems),
+        "problems": [
+            {"id": item.get("id", ""), "title": catalog_title(item),
+             "test_count": item.get("test_count", 0),
+             **problem_stats.get((book, item.get("id", "")), {"attempt_count": 0, "accepted_count": 0})}
+            for item in problems
+        ],
+        "ranking": ranking, "status": status,
+    }
+
+
 PBKDF2_ROUNDS = 120000
 LEGACY_SALT = b"cs101-local-user"          # 改动前全库共用这一个盐，且它就写在源码里
 
@@ -1511,6 +1554,12 @@ class Handler(BaseHTTPRequestHandler):
         text = text.replace("https://cs101.openjudge.cn", "/")
         return text
 
+    def book_page(self, book):
+        template = (ROOT / "book.html").read_text(encoding="utf-8")
+        return (template.replace("__BOOK__", book)
+                .replace("__BOOK_NAME__", escape(BOOK_META[book]["name"]))
+                .replace("__BOOK_JSON__", json.dumps(book, ensure_ascii=False)))
+
     def problem_parts(self, page, book, problem):
         text = self.local_page(page)
         title_match = re.search(r'<div id="pageTitle"><h2>(.*?)</h2>', text, re.S)
@@ -1649,12 +1698,9 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             page = MIRROR / "pages" / f"{book}__{problem_id}.html"
             if page.is_file():
                 self.send_html(self.submission_page(page, book, problem_id)); return
-        local_book = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/", path)
-        if local_book:
-            page_number = parse_qs(parsed.query).get("page", ["1"])[0]
-            page = MIRROR / "books" / f"{local_book.group(1)}__{page_number}.html"
-            if page.is_file():
-                self.send_html(self.local_page(page)); return
+        book_view = re.fullmatch(r"/([^/]+)/(?:ranking/|status/)?", path)
+        if book_view and book_view.group(1) in BOOK_META:
+            self.send_html(self.book_page(book_view.group(1))); return
         local_problem = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/([^/]+)/", path)
         if local_problem:
             book, problem = local_problem.groups()
@@ -1724,6 +1770,9 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             if parse_qs(parsed.query).get("summary") == ["1"]:
                 self.send_json(catalog_summary_payload()); return
             self.send_json(catalog_full_payload()); return
+        book_api = re.fullmatch(r"/api/books/([^/]+)/", path)
+        if book_api and book_api.group(1) in BOOK_META:
+            self.send_json(book_dashboard_payload(book_api.group(1))); return
         # 静态分发只有两条出口：首页，和 static/ 下的白名单后缀。
         # 改动前这里是 `ROOT / decoded_path`，只要文件在 ROOT 底下就发 ——
         # `ROOT in file.parents` 防的是「逃出 ROOT」，防不住「ROOT 里的东西不该全公开」。

@@ -237,6 +237,37 @@ class ServerApiTests(unittest.TestCase):
         self.assertIn("题库目录", text)
         self.assertIn("/api/catalog", text)          # 目录页的数据来源
 
+    def test_every_book_has_compact_problem_ranking_and_status_pages(self):
+        """题库根路径及其两个 tab 都走本地统一页面，不再回退到旧镜像目录。"""
+        import server
+        for book in server.BOOK_META:
+            for suffix, tab in (("", "problemsTab"), ("ranking/", "rankingTab"),
+                                ("status/", "statusTab")):
+                status, _, body = request(self.port, "GET", f"/{book}/{suffix}")
+                self.assertEqual(status, 200, f"{book}/{suffix}")
+                text = body.decode("utf-8", errors="replace")
+                self.assertIn('id="' + tab + '"', text)
+                self.assertIn(f'const BOOK={json.dumps(book, ensure_ascii=False)}', text)
+                self.assertIn("/api/books/", text)
+
+    def test_book_dashboard_is_public_and_scoped_without_submission_secrets(self):
+        """排名/状态只需公开摘要；不能借它读到 source/detail 或其它题库记录。"""
+        cookie = self.register_and_login("t026_dashboard", "T026-password")
+        request(self.port, "POST", "/api/submit", {
+            "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM,
+            "language": "python", "source": "print(1)",
+        }, cookie=cookie)
+        status, _, raw = request(self.port, "GET", f"/api/books/{SUBMIT_BOOK}/")
+        self.assertEqual(status, 200)
+        payload = json.loads(raw)
+        self.assertEqual(payload["name"], "计算思维算法实践")
+        self.assertTrue(any(row["user"] == "t026_dashboard" for row in payload["ranking"]))
+        self.assertTrue(any(row["problem"] == SUBMIT_PROBLEM for row in payload["status"]))
+        self.assertTrue(all("source" not in row and "detail" not in row for row in payload["status"]))
+        self.assertTrue(all(row["id"] for row in payload["problems"]))
+        status, _, _ = request(self.port, "GET", "/api/books/not-a-book/")
+        self.assertEqual(status, 404)
+
     def test_catalog_exposes_display_book_names(self):
         status, _, body = request(self.port, "GET", "/api/catalog")
         self.assertEqual(status, 200)

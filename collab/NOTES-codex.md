@@ -251,3 +251,8 @@
   14683 因平台题页无 contestId，记为 NOT_SUBMITTABLE。
 - 这次回扫证明人工题解来源也不能免除平台验证；T-002/T-003 当前不能标记为全量平台通过。
 - 报告：`collab/t002-t003-platform-check-2026-07-26.json`。
+## 2026-07-29 · T-026 统一题库页面
+
+- `book.html` 是八个题库共用的极简浏览页：题目、排名、状态分别由根路径、`/ranking/`、`/status/` 打开。
+- `GET /api/books/<book>/` 只返回题目列表、聚合排名和最近 200 条提交摘要；它不复用需要认证的 `/api/submissions`，因此不会泄露 source 或 detail。
+- 验证：新定向回归 2/2，`python3 tools/handoff.py --verify` 退出码 0，`git diff --check` 通过。
