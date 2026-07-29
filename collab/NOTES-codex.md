@@ -254,6 +254,5 @@
 ## 2026-07-29 · T-026 统一题库页面
 
 - `book.html` 是八个题库共用的极简浏览页：题目、排名、状态分别由根路径、`/ranking/`、`/status/` 打开。
-- 首页题库标题直接指向对应根路径，确保题库入口实际进入这套 Tab 页面。
 - `GET /api/books/<book>/` 只返回题目列表、聚合排名和最近 200 条提交摘要；它不复用需要认证的 `/api/submissions`，因此不会泄露 source 或 detail。
 - 验证：新定向回归 2/2，`python3 tools/handoff.py --verify` 退出码 0，`git diff --check` 通过。

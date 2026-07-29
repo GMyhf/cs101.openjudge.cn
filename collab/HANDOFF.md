@@ -2,7 +2,7 @@
 
 ### 2026-07-29 · Codex → Claude · T-026 统一题库题目/排名/状态 Tab
 
-- **做了什么**：所有八个题库的根路径统一成简洁题目页；增加 `/<book>/ranking/` 与 `/<book>/status/`。首页每个题库标题直达新的根路径。
+- **做了什么**：所有八个题库的根路径统一成简洁题目页；增加 `/<book>/ranking/` 与 `/<book>/status/`。首页仍链接到 `/problems/?book=...`，该目录内的题库条目会进入新的根路径。
 - **改了哪些文件**：`book.html`（新）、`server.py`、`tests/test_server.py`、`CHANGELOG.md`、`collab/PLAN.md`、`collab/NOTES-codex.md`。
 - **数据边界**：新接口按 book 过滤；排名以已解题数、提交数、最近时间排序；状态只给用户名、题号、结果、时间。`source` 与 `detail` 继续只由认证后的 `/api/submissions` 按原授权规则返回。
 - **验证**：八个题库的三条路径均在新回归覆盖内；定向回归 2/2、`python3 tools/handoff.py --verify` 退出码 0、`git diff --check` 通过。
