@@ -39,6 +39,15 @@
   .pages button:disabled { opacity:.45; cursor:default }
   .note { padding:44px 0; text-align:center; color:var(--muted) }
   .note a { color:var(--accent) }
+  .verdict-link { text-decoration:none }
+  .verdict-head { display:flex; align-items:center; gap:12px; padding:20px 0 12px; font-size:17px }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; padding-bottom:6px }
+  .block { padding:20px 0 0; border-top:1px solid var(--line); margin-top:18px }
+  .block h2 { font-size:15px; margin:0 0 10px; color:var(--muted); font-weight:650 }
+  .block div { margin-bottom:6px }
+  pre.src { margin:8px 0 0; padding:11px 13px; border:1px solid var(--line); border-radius:var(--radius-sm);
+            background:var(--soft); overflow:auto; max-height:420px;
+            font:var(--code-size)/1.55 var(--font-mono); white-space:pre }
   @media (max-width:620px) {
     .wrap { padding:0 14px }
     .tabs { gap:18px }
@@ -64,7 +73,7 @@
 </div>
 
 <script>
-const BOOK = __BOOK_JSON__, VIEW = __VIEW_JSON__;
+const BOOK = __BOOK_JSON__, VIEW = __VIEW_JSON__, SUBJECT = __SUBJECT_JSON__;
 const view = document.querySelector('#view'), sub = document.querySelector('#sub');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const LANGS = {python:'Python3', pypy3:'PyPy3', cpp:'G++', c:'GCC', csharp:'C#', fsharp:'F#',
@@ -79,7 +88,15 @@ const titleOf = p => (p.title || p.id).replace(new RegExp('^' + p.id + '\\s*[:�
 const statsLink = (p, count) => count
   ? `<a class="pid" href="/history/?book=${encodeURIComponent(BOOK)}&problem=${encodeURIComponent(p.id)}">${count}</a>`
   : '—';
-document.querySelector('#tab-' + VIEW).classList.add('on');
+// 用户页和提交详情页没有自己的标签，各自高亮把人送过来的那一个。
+const TAB_OF = {problems:'problems', ranking:'ranking', status:'status',
+                user:'ranking', solution:'status'};
+document.querySelector('#tab-' + TAB_OF[VIEW]).classList.add('on');
+const userLink = name =>
+  `<a class="pid" href="/book/${encodeURIComponent(BOOK)}/user/${encodeURIComponent(name)}/">${esc(name)}</a>`;
+// 用户页和提交详情页的标签条高亮的是「排名 / 状态」，但那两个标签指向的是题库根，
+// 所以标题下面再给一条回题库的路，人不至于只能靠浏览器后退。
+const bookLink = name => `<a class="pid" href="/book/${encodeURIComponent(BOOK)}/">${esc(name)}</a>`;
 
 function table(headers, rows) {
   return '<div class="table-wrap"><table><thead><tr>'
@@ -95,12 +112,25 @@ function loginNote(what) {
   note(`登录后可查看本题库的${what}。<a href="/auth/login/">去登录</a>`);
 }
 
-fetch('/api/books/' + encodeURIComponent(BOOK) + '/', { credentials: 'same-origin' })
-  .then(r => r.ok ? r.json() : Promise.reject())
+const ENDPOINT = VIEW === 'user'
+  ? `/api/books/${encodeURIComponent(BOOK)}/user/${encodeURIComponent(SUBJECT)}/`
+  : VIEW === 'solution'
+  ? `/api/books/${encodeURIComponent(BOOK)}/solution/${encodeURIComponent(SUBJECT)}/`
+  : `/api/books/${encodeURIComponent(BOOK)}/`;
+
+fetch(ENDPOINT, { credentials: 'same-origin' })
+  .then(r => r.ok ? r.json() : Promise.reject(r.status))
   .then(render)
-  .catch(() => { sub.textContent = ''; note('题库暂时不可用。'); });
+  .catch(status => {
+    sub.textContent = '';
+    if (status === 401) return loginNote(VIEW === 'solution' ? '提交详情' : '这个页面');
+    if (status === 404) return note(VIEW === 'solution' ? '找不到这次提交。' : '这个用户在本题库没有提交记录。');
+    note('题库暂时不可用。');
+  });
 
 function render(data) {
+  if (VIEW === 'user') return renderUser(data);
+  if (VIEW === 'solution') return renderSolution(data);
   sub.textContent = `${data.problem_count} 道题目 · ${data.tested_count} 道可在本站判题`;
   if (VIEW === 'problems') return renderProblems(data);
   if (!data.authenticated) return loginNote(VIEW === 'ranking' ? '排名' : '提交状态');
@@ -152,7 +182,7 @@ function renderRanking(data) {
      {text:'提交次数', num:true}, {text:'最近提交'}],
     data.ranking.map((r, i) => `<tr>
       <td class="num">${i + 1}</td>
-      <td>${esc(r.user)}</td>
+      <td>${userLink(r.user)}</td>
       <td class="num">${r.solved}</td>
       <td class="num">${r.submissions}</td>
       <td class="num muted">${esc(r.last_submit || '—')}</td></tr>`));
@@ -165,12 +195,68 @@ function renderStatus(data) {
      {text:'语言'}, {text:'用时', num:true}, {text:'内存', num:true}],
     data.status.map(s => `<tr>
       <td class="num muted">${esc(s.created)}</td>
-      <td>${esc(s.user)}</td>
+      <td>${userLink(s.user)}</td>
       <td class="num"><a class="pid" href="/${encodeURIComponent(BOOK)}/${encodeURIComponent(s.problem)}/">${esc(s.problem)}</a></td>
-      <td>${badge(s.result)}</td>
+      <td><a class="verdict-link" href="/book/${encodeURIComponent(BOOK)}/solution/${encodeURIComponent(s.id)}/">${badge(s.result)}</a></td>
       <td class="muted">${esc(LANGS[s.language] || s.language || '—')}</td>
       <td class="num">${s.time_ms == null ? '—' : s.time_ms + ' ms'}</td>
       <td class="num">${s.memory_kb == null ? '—' : s.memory_kb + ' kB'}</td></tr>`));
+}
+
+function renderUser(data) {
+  sub.innerHTML = `${bookLink(data.name)} · 通过 <b>${data.solved}</b> / 尝试 <b>${data.attempted}</b> 题`
+    + ` · 共 <b>${data.submissions}</b> 次提交`;
+  document.querySelector('h1').textContent = data.user;
+  document.title = data.user + ' · ' + data.name + ' · CS101 题库';
+  if (!data.problems.length) return note('这个用户在本题库还没有提交记录。');
+  view.innerHTML = table(
+    [{text:'题目ID'}, {text:'标题'}, {text:'结果'}, {text:'提交次数', num:true},
+     {text:'首次通过'}, {text:'最近提交'}],
+    data.problems.map(p => `<tr>
+      <td class="num"><a class="pid" href="${esc(p.path || '/' + BOOK + '/' + p.id + '/')}">${esc(p.id)}</a></td>
+      <td class="title"><a href="${esc(p.path || '/' + BOOK + '/' + p.id + '/')}">${esc(titleOf(p))}</a></td>
+      <td>${badge(p.result)}</td>
+      <td class="num"><a class="pid" href="/history/?book=${encodeURIComponent(BOOK)}&problem=${encodeURIComponent(p.id)}">${p.attempts}</a></td>
+      <td class="num muted">${esc(p.accepted_at || '—')}</td>
+      <td class="num muted">${esc(p.last_submit || '—')}</td></tr>`));
+}
+
+function renderSolution(data) {
+  sub.innerHTML = `${bookLink(data.name)} · <a class="pid" href="${esc(data.path || '/' + BOOK + '/' + data.problem + '/')}">`
+    + `${esc(data.problem)} ${esc(titleOf({id: data.problem, title: data.title}))}</a>`
+    + ` · 提交人 ${userLink(data.user)}`;
+  document.querySelector('h1').textContent = '提交 #' + data.id;
+  document.title = '提交 #' + data.id + ' · ' + data.name + ' · CS101 题库';
+  const chip = (label, value) => value == null || value === ''
+    ? '' : `<span class="chip">${label}<b>${esc(value)}</b></span>`;
+  const blocks = [
+    `<div class="verdict-head">${badge(data.result)}<span class="muted">${esc(data.created)}</span></div>`,
+    '<div class="chips">'
+      + chip('用时', data.time_ms == null ? '' : data.time_ms + ' ms')
+      + chip('内存', data.memory_kb == null ? '' : data.memory_kb + ' kB')
+      + chip('代码长度', data.source_bytes == null ? '' : data.source_bytes + ' B')
+      + chip('语言', data.language_version || LANGS[data.language] || data.language)
+      + '</div>',
+  ];
+  if (!data.mine) {
+    // 老规则：别人的代码和判题详情看不到。这里把「看不到」明说出来，
+    // 而不是渲染成一片空白 —— 空白会被当成「这次提交没有代码」。
+    blocks.push('<p class="note">只有本人和管理员能看到这次提交的代码与判题详情。</p>');
+  } else {
+    const d = data.detail || {};
+    const lines = [];
+    if (d.case !== undefined) lines.push(`<div><b>出错的数据组：</b>第 ${esc(d.case)} 组</div>`);
+    if (d.cases !== undefined) lines.push(`<div><b>通过用例：</b>${esc(d.cases)} 组全部通过</div>`);
+    if (d.expected_tokens !== undefined)
+      lines.push(`<div><b>输出规模：</b>期望 ${esc(d.expected_tokens)} 个 token，实际 ${esc(d.actual_tokens)} 个</div>`);
+    if (d.message) lines.push(`<pre class="src">${esc(d.message)}</pre>`);
+    if (d.failing_input) lines.push(`<div><b>出错那组的输入：</b></div><pre class="src">${esc(d.failing_input.text || '')}</pre>`);
+    if (d.expected_output) lines.push(`<div><b>期望输出：</b></div><pre class="src">${esc(d.expected_output.text || '')}</pre>`);
+    if (lines.length) blocks.push('<section class="block"><h2>判题详情</h2>' + lines.join('') + '</section>');
+    blocks.push('<section class="block"><h2>代码</h2><pre class="src code">'
+      + esc(data.source || '（这次提交没有留下代码）') + '</pre></section>');
+  }
+  view.innerHTML = blocks.join('');
 }
 </script>
 <script>const themeBtn=document.querySelector('#theme');function applyTheme(n){document.documentElement.dataset.theme=n;themeBtn.textContent=n==='dark'?'浅色':'深色';try{localStorage.setItem('cs101-theme',n)}catch(e){}}applyTheme(document.documentElement.dataset.theme==='dark'?'dark':'light');themeBtn.onclick=()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');fetch('/api/me',{credentials:'same-origin'}).then(r=>r.json()).then(d=>{if(d.authenticated){account.textContent=d.user;account.href='/history/?mine=1'}}).catch(()=>{});</script>

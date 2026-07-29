@@ -1280,6 +1280,105 @@ def catalog_summary_payload():
 BOOK_STATUS_LIMIT = 100
 
 
+def load_detail(raw):
+    """判题详情存的是 JSON 文本。**坏数据不该让整页打不开** —— 返回空 dict。"""
+    try:
+        detail = json.loads(raw) if raw else {}
+    except ValueError:
+        return {}
+    return detail if isinstance(detail, dict) else {}
+
+
+def book_user_payload(book, username):
+    """某个用户在这个题库里做过哪些题。排名页点用户名进来的就是这一页。
+
+    只出「结果 / 次数 / 时间」这类记分板字段，**不出代码，也不出判题详情** ——
+    这一页是给别人看的，别人的代码只有本人和管理员看得到（`/api/submissions`
+    定的规矩），换个 URL 不该换个规矩。
+    """
+    catalog = {item.get("id", ""): item
+               for item in catalog_raw().get("problems", []) if item.get("book") == book}
+    with sqlite3.connect(DB) as db:
+        rows = db.execute(
+            """select problem, count(*), max(created),
+                      count(case when result = 'Accepted' then 1 end),
+                      min(case when result = 'Accepted' then created end)
+                 from submissions where book = ? and lower(user) = lower(?)
+                group by problem""", (book, username)).fetchall()
+        # 每题的「最新一次结果」单独查。**不要靠 max(id) 带出裸列** —— SQLite 只在
+        # 查询里恰好有一个 min/max 聚合时才保证裸列来自那一行，这里聚合有好几个。
+        latest = dict(db.execute(
+            """select s.problem, s.result from submissions s
+                 join (select problem, max(id) as top from submissions
+                        where book = ? and lower(user) = lower(?) group by problem) m
+                   on s.id = m.top""", (book, username)).fetchall())
+        canonical = db.execute(
+            """select user from submissions where book = ? and lower(user) = lower(?)
+                order by id desc limit 1""", (book, username)).fetchone()
+    if canonical is None:
+        return None
+    problems = []
+    for problem, attempts, last_submit, accepted, first_accepted in rows:
+        item = catalog.get(problem, {})
+        problems.append({
+            "id": problem,
+            "title": catalog_title({"book": book, "id": problem}),
+            "path": item.get("path", ""),
+            "result": "Accepted" if accepted else latest.get(problem, ""),
+            "attempts": attempts,
+            "accepted_at": first_accepted,
+            "last_submit": last_submit,
+        })
+    problems.sort(key=lambda entry: entry["id"])
+    return {
+        "book": book,
+        "name": BOOK_META.get(book, {}).get("name", book),
+        "user": canonical[0],
+        "solved": sum(1 for entry in problems if entry["result"] == "Accepted"),
+        "attempted": len(problems),
+        "submissions": sum(entry["attempts"] for entry in problems),
+        "problems": problems,
+    }
+
+
+def book_solution_payload(book, submission_id, viewer):
+    """一次提交的详情。状态页点结果进来的就是这一页。
+
+    分成两半：**记分板那半人人可见**（谁、哪道题、什么结果、用时内存代码长度），
+    **代码与判题详情只有本人和管理员**。这跟 `/api/submissions` 是同一条判断，
+    照抄而不是另写一份 —— 权限判断有两份，迟早只改一份。
+    """
+    with sqlite3.connect(DB) as db:
+        row = db.execute(
+            """select id, user, problem, result, created, language, detail, source
+                 from submissions where id = ? and book = ?""", (submission_id, book)).fetchone()
+    if row is None:
+        return None
+    detail = load_detail(row[6])
+    owner = same_username(row[1] or "", viewer) or same_username(viewer, ADMIN_USER)
+    item = next((entry for entry in catalog_raw().get("problems", [])
+                 if entry.get("book") == book and entry.get("id") == row[2]), {})
+    return {
+        "id": row[0],
+        "book": book,
+        "name": BOOK_META.get(book, {}).get("name", book),
+        "user": row[1],
+        "problem": row[2],
+        "title": catalog_title({"book": book, "id": row[2]}),
+        "path": item.get("path", ""),
+        "result": row[3],
+        "created": row[4],
+        "language": row[5],
+        "language_version": detail.get("language_version"),
+        "time_ms": detail.get("time_ms"),
+        "memory_kb": detail.get("memory_kb"),
+        "source_bytes": detail.get("source_bytes"),
+        "mine": owner,
+        "detail": detail if owner else {},
+        "source": (row[7] or "") if owner else "",
+    }
+
+
 def book_page_payload(book, authenticated):
     """题库页要的三份数据：题目表、排名、最近状态。
 
@@ -1317,14 +1416,11 @@ def book_page_payload(book, authenticated):
                          order by 2 desc, 3 asc, 4 asc, lower(min(user)) asc""", (book,))
             ]
             for row in db.execute(
-                    """select created, user, problem, result, language, detail from submissions
+                    """select id, created, user, problem, result, language, detail from submissions
                          where book = ? order by id desc limit ?""", (book, BOOK_STATUS_LIMIT)):
-                try:
-                    detail = json.loads(row[5]) if row[5] else {}
-                except ValueError:
-                    detail = {}
-                status.append({"created": row[0], "user": row[1], "problem": row[2], "result": row[3],
-                               "language": row[4], "time_ms": detail.get("time_ms"),
+                detail = load_detail(row[6])
+                status.append({"id": row[0], "created": row[1], "user": row[2], "problem": row[3],
+                               "result": row[4], "language": row[5], "time_ms": detail.get("time_ms"),
                                "memory_kb": detail.get("memory_kb")})
     return {
         "book": book,
@@ -1582,11 +1678,12 @@ class Handler(BaseHTTPRequestHandler):
         text = text.replace("https://cs101.openjudge.cn", "/")
         return text
 
-    def book_page(self, book, view):
+    def book_page(self, book, view, subject=""):
         template = (ROOT / "book.html").read_text(encoding="utf-8")
         return (template.replace("__BOOK_NAME__", escape(BOOK_META.get(book, {}).get("name", book)))
                 .replace("__BOOK_JSON__", json.dumps(book, ensure_ascii=False))
                 .replace("__VIEW_JSON__", json.dumps(view))
+                .replace("__SUBJECT_JSON__", json.dumps(subject, ensure_ascii=False).replace("</", "<\\/"))
                 .replace("__BOOK__", escape(book)))
 
     def problem_parts(self, page, book, problem):
@@ -1734,6 +1831,12 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
         if book_view and book_view.group(1) in BOOK_META:
             view = (book_view.group(2) or "").rstrip("/") or "problems"
             self.send_html(self.book_page(book_view.group(1), view)); return
+        book_user = re.fullmatch(r"/book/([^/]+)/user/([^/]+)/", decoded_path)
+        if book_user and book_user.group(1) in BOOK_META:
+            self.send_html(self.book_page(book_user.group(1), "user", book_user.group(2))); return
+        book_solution = re.fullmatch(r"/book/([^/]+)/solution/(\d+)/", path)
+        if book_solution and book_solution.group(1) in BOOK_META:
+            self.send_html(self.book_page(book_solution.group(1), "solution", book_solution.group(2))); return
         local_book = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/", path)
         if local_book:
             page_number = parse_qs(parsed.query).get("page", ["1"])[0]
@@ -1812,6 +1915,25 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
         book_api = re.fullmatch(r"/api/books/([^/]+)/", path)
         if book_api and book_api.group(1) in BOOK_META:
             self.send_json(book_page_payload(book_api.group(1), self.authorized())); return
+        # 用户页与提交详情页整页都要登录：它们展示的是「谁做了什么」，
+        # 不像题目表那样本来就公开。未登录一律 401，页面据此提示去登录。
+        user_api = re.fullmatch(r"/api/books/([^/]+)/user/([^/]+)/", unquote(path))
+        if user_api and user_api.group(1) in BOOK_META:
+            if not self.authorized():
+                self.send_json({"error": "Unauthorized"}, 401); return
+            payload = book_user_payload(user_api.group(1), user_api.group(2))
+            if payload is None:
+                self.send_json({"error": "Not Found"}, 404); return
+            self.send_json(payload); return
+        solution_api = re.fullmatch(r"/api/books/([^/]+)/solution/(\d+)/", path)
+        if solution_api and solution_api.group(1) in BOOK_META:
+            if not self.authorized():
+                self.send_json({"error": "Unauthorized"}, 401); return
+            payload = book_solution_payload(solution_api.group(1), int(solution_api.group(2)),
+                                            self.current_user() or "")
+            if payload is None:
+                self.send_json({"error": "Not Found"}, 404); return
+            self.send_json(payload); return
         # 静态分发只有两条出口：首页，和 static/ 下的白名单后缀。
         # 改动前这里是 `ROOT / decoded_path`，只要文件在 ROOT 底下就发 ——
         # `ROOT in file.parents` 防的是「逃出 ROOT」，防不住「ROOT 里的东西不该全公开」。

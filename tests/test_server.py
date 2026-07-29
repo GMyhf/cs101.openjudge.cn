@@ -320,6 +320,110 @@ class ServerApiTests(unittest.TestCase):
         row = next(item for item in payload["problems"] if item["id"] == SUBMIT_PROBLEM)
         self.assertGreaterEqual(row["attempt_count"], 1)
 
+    def test_book_user_and_solution_pages_render(self):
+        for view, path in (("user", "/book/pctbook/user/ZHANGSan/"),
+                           ("solution", "/book/pctbook/solution/12/")):
+            status, _, body = request(self.port, "GET", path)
+            self.assertEqual(status, 200, path)
+            text = body.decode("utf-8", errors="replace")
+            self.assertNotIn("__SUBJECT_JSON__", text)
+            self.assertIn(f'VIEW = "{view}"', text)
+        # 用户名原样带进页面，而不是靠前端从 URL 里再解一次
+        _, _, body = request(self.port, "GET", "/book/pctbook/user/ZHANGSan/")
+        self.assertIn('SUBJECT = "ZHANGSan"', body.decode("utf-8", errors="replace"))
+
+    def test_ranking_and_status_link_to_the_new_pages(self):
+        _, _, body = request(self.port, "GET", "/book/pctbook/ranking/")
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn("/book/${encodeURIComponent(BOOK)}/user/${encodeURIComponent(name)}/", text)
+        self.assertIn("/book/${encodeURIComponent(BOOK)}/solution/${encodeURIComponent(s.id)}/", text)
+
+    def test_user_page_lists_problems_without_leaking_code(self):
+        query = "/api/books/pctbook/user/t026_userpage/"
+        status, _, _ = request(self.port, "GET", query)
+        self.assertEqual(status, 401)
+
+        cookie = self.register_and_login("t026_userpage", "T026-password")
+        status, _, body = request(self.port, "GET", "/api/books/pctbook/user/nobody_at_all/",
+                                  cookie=cookie)
+        self.assertEqual(status, 404)
+
+        for source in ("print('wrong')", "print('still wrong')"):
+            status, _, _ = request(self.port, "POST", "/api/submit", {
+                "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
+                "source": source,
+            }, cookie=cookie)
+            self.assertEqual(status, 200)
+
+        # 大小写不同也要认出是同一个人（排名就是按 lower(user) 归并的）
+        status, _, body = request(self.port, "GET", "/api/books/pctbook/user/T026_USERPAGE/",
+                                  cookie=cookie)
+        self.assertEqual(status, 200)
+        payload = json.loads(body)
+        self.assertEqual(payload["user"], "t026_userpage")
+        self.assertEqual(payload["solved"], 0)
+        self.assertEqual(payload["attempted"], 1)
+        self.assertEqual(payload["submissions"], 2)
+        row = payload["problems"][0]
+        self.assertEqual(row["id"], SUBMIT_PROBLEM)
+        self.assertEqual(row["result"], "Wrong Answer")
+        self.assertEqual(row["attempts"], 2)
+        self.assertIsNone(row["accepted_at"])
+        # 这一页是给别人看的：不出代码，也不出判题详情。
+        self.assertNotIn(b"print('wrong')", body)
+        self.assertNotIn(b"failing_input", body)
+        self.assertNotIn(b"source", body)
+
+    def test_solution_page_keeps_code_to_the_owner_and_admin(self):
+        owner = self.register_and_login("t026_sol_owner", "T026-password")
+        other = self.register_and_login("t026_sol_other", "T026-password")
+        status, _, _ = request(self.port, "POST", "/api/submit", {
+            "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
+            "source": "print('owner code')",
+        }, cookie=owner)
+        self.assertEqual(status, 200)
+        submission_id = None
+        _, _, body = request(self.port, "GET", "/api/books/pctbook/", cookie=owner)
+        for row in json.loads(body)["status"]:
+            if row["user"] == "t026_sol_owner":
+                submission_id = row["id"]; break
+        self.assertIsNotNone(submission_id, "状态行必须带 id，否则前端拼不出详情页链接")
+        query = f"/api/books/pctbook/solution/{submission_id}/"
+
+        status, _, _ = request(self.port, "GET", query)
+        self.assertEqual(status, 401)
+        status, _, _ = request(self.port, "GET", "/api/books/pctbook/solution/99999999/", cookie=owner)
+        self.assertEqual(status, 404)
+        # 换个题库取同一个 id：这条提交不属于那个题库，不能被取出来
+        status, _, _ = request(self.port, "GET",
+                               f"/api/books/dsapre/solution/{submission_id}/", cookie=owner)
+        self.assertEqual(status, 404)
+
+        status, _, body = request(self.port, "GET", query, cookie=owner)
+        self.assertEqual(status, 200)
+        payload = json.loads(body)
+        self.assertTrue(payload["mine"])
+        self.assertEqual(payload["user"], "t026_sol_owner")
+        self.assertEqual(payload["source"], "print('owner code')")
+        self.assertTrue(payload["detail"])
+        self.assertGreaterEqual(payload["time_ms"], 0)
+
+        status, _, body = request(self.port, "GET", query, cookie=other)
+        self.assertEqual(status, 200)
+        payload = json.loads(body)
+        self.assertFalse(payload["mine"])
+        self.assertEqual(payload["source"], "")
+        self.assertEqual(payload["detail"], {})
+        # 记分板那半仍然看得见 —— 上游的状态页也是这样。
+        self.assertEqual(payload["result"], "Wrong Answer")
+        self.assertEqual(payload["user"], "t026_sol_owner")
+        self.assertNotIn(b"print('owner code')", body)
+        self.assertNotIn(b"failing_input", body)
+
+        status, _, body = request(self.port, "GET", query, cookie=self._admin_cookie())
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["source"], "print('owner code')")
+
     def test_book_page_links_the_counts_to_the_statistics_page(self):
         status, _, body = request(self.port, "GET", "/book/pctbook/")
         self.assertEqual(status, 200)
