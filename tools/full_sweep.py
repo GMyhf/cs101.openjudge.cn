@@ -49,7 +49,7 @@ ACCEPTED_REPEATING = {
 
 
 def report_entries():
-    for path in sorted(ROOT.glob("collab/t004-round*-report.json")):
+    for path in sorted(ROOT.glob("collab/t0*-round*-report.json")):
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):

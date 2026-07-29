@@ -31,7 +31,7 @@ TESTS = ROOT / "data" / "openjudge" / "tests"
 def collect():
     """把各轮清单里带 machine_gate 的返工项汇总起来，后出现的覆盖先出现的。"""
     items = {}
-    for path in sorted(ROOT.glob("collab/t004-round*-manifest.json")):
+    for path in sorted(ROOT.glob("collab/t0*-round*-manifest.json")):
         try:
             manifest = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
