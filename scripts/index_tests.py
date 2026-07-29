@@ -10,6 +10,29 @@ MIRROR = ROOT / "data" / "openjudge"
 TESTS = MIRROR / "tests"
 BUCKETS = {"1000-1999", "2000-2999", "3000-3682", "4000-8210", "10000-19963", "20000-29982", "30000-"}
 
+# 这三个桶不是抓来的平台数据，是**某人 2008 年的工作目录**（人拍板 2026-07-29 排除）。
+#
+# 证据：三个桶合计 11,075 + 12,043 + 1,890 个文件的时间戳是 2008 年，里面混着 915 + 777
+# + 202 个 `.c/.cpp/.java/.pas/.dpr/.p` 解法源码；数据文件名是 `mydata` / `pig` / `radar`
+# / `g` / `e` 这种随手起的，不是平台那种 `1.in` / `2.in` 编号。
+#
+# 为什么必须排除，而不只是「看着不整齐」：**这些数据在判题里是真算数的** ——
+# `main()` 见到 `.in`/`.out` 成对就收，同题号的多个目录还会合并。2026-07-29 实测
+# 01384：参考解法在平台上是 Accepted，在本地却 Time Limit Exceeded，卡的正是
+# `1000-1999/1384/pig.in`（117KB，单跑 38.4 秒，而生成的 21 组全部 ≤0.20 秒）。
+# **学生在平台过、在我们这挂**，而挂的原因是一份 2008 年的私人压力测试文件。
+#
+# `*_made/` 不受影响：那是本项目自己生成、入库、有完整自检记录的数据。
+# 代价记在这里，不藏着：**498 条 catalog 记录（246 个唯一题号）因此掉到零测试数据**，
+# 要靠 T-028 逐批补回来。
+ARCHIVE_BUCKETS = {"1000-1999", "2000-2999", "3000-3682"}
+
+
+def is_archive(bucket, directory_name):
+    """2008 存档目录（`*_made/` 除外）。"""
+    return bucket in ARCHIVE_BUCKETS and not directory_name.endswith("_made")
+
+
 def numeric(value):
     match = re.search(r"(\d+)$", value)
     return int(match.group(1)) if match else None
@@ -75,6 +98,7 @@ def main():
         if not root.is_dir(): continue
         for directory in root.iterdir():
             if not directory.is_dir(): continue
+            if is_archive(bucket, directory.name): continue
             number = directory_numeric(directory.name)
             if number is None: continue
             pairs = []
