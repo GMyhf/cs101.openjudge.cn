@@ -20,6 +20,7 @@ OPENJUDGE = ROOT / "data" / "openjudge"
 CANDIDATES = ROOT / "collab" / "t028-candidates.json"
 MANIFEST = ROOT / "collab" / "t028-round1-manifest.json"
 REPORT = ROOT / "collab" / "t028-round1-report.json"
+PLATFORM = ROOT / "collab" / "t028-round1-platform.json"
 SOURCE_URLS = {
     0: "https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md",
     1: "https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md",
@@ -297,6 +298,10 @@ def main():
     all_candidates = json.loads(CANDIDATES.read_text(encoding="utf-8"))["entries"]
     candidates = {int(e["number"]): e for e in all_candidates}
     selected = source_sections()
+    platform_rows = {}
+    if PLATFORM.exists():
+        platform = json.loads(PLATFORM.read_text(encoding="utf-8"))
+        platform_rows = {int(row["local_number"]): row for row in platform.get("results", [])}
 
     # The cross-check is deliberately complete and precedes every output write.
     cross = {n: cross_check(selected[n][2], candidates[n]) for n in SOURCE_SPEC}
@@ -347,10 +352,15 @@ def main():
             sample_output=entry["sample_output"], constraints=rows,
             constraint_counterexample=(invalid.strip(), [(rows[0][0], meaningful_check(n, invalid))]))
         for seed in range(20000): generator(random.Random(seed))
-        report_entries.append({"local_number":n, "title":title, "status":"passed" if not audit["failed"] else "FAILED",
+        platform_row = platform_rows.get(n)
+        platform_failed = platform_row is not None and platform_row.get("verdict") != "Accepted"
+        report_entries.append({"local_number":n, "title":title,
+            "status":"passed" if not audit["failed"] and not platform_failed else "FAILED",
             "reference_source":"solution collection code reproduced all scraped cases",
             "solution_collection":str(source_path), "solution_code_index":code_index,
-            "submission_id":None, "submission_id_note":"not recorded in source collection",
+            "submission_id":platform_row.get("solution_id") if platform_row else None,
+            "platform_verdict":platform_row.get("verdict") if platform_row else "not_run",
+            "submission_id_note":None if platform_row else "not recorded in source collection",
             "statistics_url":f"http://cs101.openjudge.cn{upstream_path}statistics/",
             "source_url":SOURCE_URLS[source_index],
             "license_status":"not declared in source collection; no license is inferred",

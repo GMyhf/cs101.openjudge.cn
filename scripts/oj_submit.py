@@ -91,8 +91,8 @@ class Session:
             raise RuntimeError(f"{number}: 提交被拒 {str(doc)[:120]}")
         return doc["redirect"].rstrip("/").rsplit("/", 1)[-1]
 
-    def poll(self, solution_id, attempts=90, interval=3):
-        url = f"{HOST}/practice/solution/{solution_id}/"
+    def poll(self, solution_id, attempts=90, interval=3, group="practice"):
+        url = f"{HOST}/{group}/solution/{solution_id}/"
         for _ in range(attempts):
             page = self._get(url)
             for verdict in FINAL_VERDICTS:
@@ -104,7 +104,7 @@ class Session:
         return {"verdict": "TIMEOUT_POLLING", "ms": None, "solution_id": solution_id}
 
     def run(self, number, source, language, group="practice"):
-        return self.poll(self.submit(number, source, language, group))
+        return self.poll(self.submit(number, source, language, group), group=group)
 
 
 def escalate(session, number, source, tiers=("Python3", "PyPy3"), group="practice"):

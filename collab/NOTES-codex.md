@@ -264,5 +264,7 @@
   无效反例。修正后全批样例锚、>=15 去重、常量输出、约束反例、参考复算、字节复现均通过。
 - 生成器 smoke 为 20,000 种子/题；真实 judge 20/20 Accepted，退出钩子变异
   20/20 在 case 1 Wrong Answer；索引后各题恰为 `current_test_count + 21`。
-- 当前环境没有 `OJ_USER/OJ_PASS`，不能做平台提交；统计页、GitHub 源码链接和许可
-  状态均已记录，`submission_id` 如实为 null，待有平台会话时补做，不伪造背书。
+- 人提供一次性平台会话后，20/20 Python3 Accepted，逐题提交号写入
+  `collab/t028-round1-platform.json` 并合并进 round1 report；凭据未落盘。
+- 首次提交前两题 Accepted，第三题 1145 因 `oj_submit.poll()` 硬编码 practice 路径
+  而 401。已改为按实际 group 轮询并完整重跑，最终 20/20 Accepted。
