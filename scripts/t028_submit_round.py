@@ -32,18 +32,20 @@ def main():
     for index, entry in enumerate(jobs, 1):
         number = int(entry["local_number"])
         source = (ROOT / "data" / "openjudge" / entry["made_dir"] / "samplecode.py").read_text(encoding="utf-8")
-        group = "practice" if "practice" in entry["books"] else entry["books"][0]
+        group = entry.get("submit_group", "practice")
+        problem_id = entry.get("submit_id") or entry.get("practice_id") or f"{number:05d}"
         error = None
         for _attempt in range(3):
             try:
-                result = session.run(entry["ids"][0], source, "Python3", group)
+                result = session.run(problem_id, source, "Python3", group)
                 error = None
                 break
             except Exception as exc:  # Network resets and transient 5xx are common.
                 error = f"{type(exc).__name__}: {exc}"[:160]
         if error:
             result = {"verdict": "SUBMIT_FAILED", "solution_id": None, "error": error}
-        row = {"local_number": number, "group": group, "problem_id": entry["ids"][0],
+        row = {"local_number": number, "global_number": entry.get("global_number"),
+               "group": group, "problem_id": problem_id,
                "language": "Python3", **result}
         results.append(row)
         results.sort(key=lambda item: next(i for i, entry in enumerate(manifest["entries"])

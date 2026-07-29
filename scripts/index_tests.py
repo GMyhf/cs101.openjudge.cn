@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Index OpenJudge .in/.out pairs according to numeric problem IDs."""
+"""Index OpenJudge .in/.out pairs according to global problem numbers."""
 import json
 import re
 from html.parser import HTMLParser
@@ -40,6 +40,82 @@ def numeric(value):
 def directory_numeric(value):
     match = re.search(r"(\d+)", value)
     return int(match.group(1)) if match else None
+
+
+class GlobalNumberParser(HTMLParser):
+    """Read the globally unique problem number from a mirrored problem page."""
+
+    def __init__(self):
+        super().__init__()
+        self.in_dt = False
+        self.in_dd = False
+        self.label = []
+        self.value = []
+        self.expect_global_number = False
+        self.global_number = None
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "dt":
+            self.in_dt = True
+            self.label = []
+        elif tag == "dd" and self.expect_global_number:
+            self.in_dd = True
+            self.value = []
+
+    def handle_data(self, data):
+        if self.in_dt:
+            self.label.append(data)
+        elif self.in_dd:
+            self.value.append(data)
+
+    def handle_endtag(self, tag):
+        if tag == "dt" and self.in_dt:
+            self.in_dt = False
+            self.expect_global_number = "".join(self.label).strip() == "全局题号"
+        elif tag == "dd" and self.in_dd:
+            self.in_dd = False
+            value = "".join(self.value).strip()
+            if value.isdigit():
+                self.global_number = int(value)
+            self.expect_global_number = False
+
+
+def read_global_number(page):
+    parser = GlobalNumberParser()
+    parser.feed(page.read_text(encoding="utf-8", errors="replace"))
+    if parser.global_number is None:
+        raise ValueError(f"missing global problem number in {page}")
+    return parser.global_number
+
+
+def catalog_global_numbers(catalog):
+    """Return per-entry and practice-local-ID mappings to global numbers."""
+    per_entry = {}
+    practice = {}
+    for item in catalog["problems"]:
+        key = (item["book"], item["id"])
+        page = MIRROR / "pages" / f"{item['book']}__{item['id']}.html"
+        global_number = read_global_number(page)
+        per_entry[key] = global_number
+        if item["book"] == "practice":
+            local_number = numeric(item["id"])
+            if local_number in practice and practice[local_number] != global_number:
+                raise ValueError(f"practice ID {item['id']} maps to multiple global numbers")
+            practice[local_number] = global_number
+    return per_entry, practice
+
+
+def test_directory_global_numbers(per_entry, practice):
+    """Map total-library IDs, with an unambiguous sub-book fallback."""
+    choices = {}
+    for (book, problem_id), global_number in per_entry.items():
+        local_number = numeric(problem_id)
+        choices.setdefault(local_number, set()).add(global_number)
+    result = dict(practice)
+    for local_number, global_numbers in choices.items():
+        if local_number not in result and len(global_numbers) == 1:
+            result[local_number] = next(iter(global_numbers))
+    return result
 
 
 class BookStatsParser(HTMLParser):
@@ -92,7 +168,11 @@ def book_stats():
     return stats
 
 def main():
-    by_number = {}
+    catalog_path = MIRROR / "catalog.json"
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    per_entry_global, practice_global = catalog_global_numbers(catalog)
+    directory_global = test_directory_global_numbers(per_entry_global, practice_global)
+    by_global_number = {}
     for bucket in BUCKETS:
         root = TESTS / bucket
         if not root.is_dir(): continue
@@ -101,6 +181,11 @@ def main():
             if is_archive(bucket, directory.name): continue
             number = directory_numeric(directory.name)
             if number is None: continue
+            global_number = directory_global.get(number)
+            # Most directories use IDs from `practice`. A few mirrored problems
+            # currently exist only in a sub-book, so accept that suffix only when
+            # it maps to exactly one global problem.
+            if global_number is None: continue
             pairs = []
             test_files = list(directory.glob("*.in")) + list((directory / "data").glob("*.in"))
             output_files = list(directory.glob("*.out")) + list((directory / "data").glob("*.out"))
@@ -109,23 +194,22 @@ def main():
             for stem in sorted(inputs.keys() & outputs.keys()):
                 pairs.append({"input": str(inputs[stem].relative_to(MIRROR)), "output": str(outputs[stem].relative_to(MIRROR))})
             if pairs:
-                by_number.setdefault(number, []).extend(pairs)
+                by_global_number.setdefault(global_number, []).extend(pairs)
 
-    catalog_path = MIRROR / "catalog.json"
-    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
     stats = book_stats()
     matched = 0
     for item in catalog["problems"]:
-        number = numeric(item["id"])
-        cases = by_number.get(number, [])
+        global_number = per_entry_global[(item["book"], item["id"])]
+        cases = by_global_number.get(global_number, [])
+        item["global_number"] = global_number
         item["tests"] = bool(cases)
         item["test_count"] = len(cases)
         item["test_cases"] = cases
         item.update({key: value for key, value in stats.get((item["book"], item["id"]), {}).items()
                      if key != "id"})
         if cases: matched += 1
-    (MIRROR / "test_index.json").write_text(json.dumps({"buckets": sorted(BUCKETS), "matched_catalog_problems": matched, "indexed_problem_numbers": len(by_number), "catalog": catalog}, ensure_ascii=False, indent=2), encoding="utf-8")
+    (MIRROR / "test_index.json").write_text(json.dumps({"buckets": sorted(BUCKETS), "matched_catalog_problems": matched, "indexed_problem_numbers": len(by_global_number), "catalog": catalog}, ensure_ascii=False, indent=2), encoding="utf-8")
     catalog_path.write_text(json.dumps(catalog, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"indexed {len(by_number)} numeric problem directories; {matched}/{len(catalog['problems'])} catalog problems have tests")
+    print(f"indexed {len(by_global_number)} global problems; {matched}/{len(catalog['problems'])} catalog problems have tests")
 
 if __name__ == "__main__": main()

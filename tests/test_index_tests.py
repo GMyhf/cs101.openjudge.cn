@@ -13,9 +13,16 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import index_tests
+import update_t028_candidate_globals
 
 
 class ArchiveExclusionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.catalog = json.loads((ROOT / "data" / "openjudge" / "catalog.json")
+                                 .read_text(encoding="utf-8"))
+        cls.per_entry, cls.practice = index_tests.catalog_global_numbers(cls.catalog)
+
     def test_archive_buckets_are_excluded_but_generated_data_is_not(self):
         for bucket in ("1000-1999", "2000-2999", "3000-3682"):
             self.assertTrue(index_tests.is_archive(bucket, "1384"), bucket)
@@ -36,6 +43,47 @@ class ArchiveExclusionTests(unittest.TestCase):
                 if len(parts) > 2 and index_tests.is_archive(parts[1], parts[2]):
                     offenders.append(case["input"])
         self.assertEqual(offenders[:5], [], f"catalog 里还引着 {len(offenders)} 条存档数据")
+
+    def test_problem_pages_supply_global_identity(self):
+        self.assertEqual(self.per_entry[("pctbook", "E02676")], 1678)
+        self.assertEqual(self.per_entry[("practice", "02676")], 1678)
+
+    def test_equal_local_suffix_does_not_override_global_identity(self):
+        self.assertEqual(self.per_entry[("practice", "02746")], 1748)
+        self.assertEqual(self.per_entry[("routine", "02746")], 1747)
+
+    def test_different_local_ids_can_share_one_global_problem(self):
+        self.assertEqual(self.per_entry[("2024fallroutine", "03253")], 2255)
+        self.assertEqual(self.per_entry[("practice", "03254")], 2255)
+
+    def test_sub_book_only_id_maps_only_when_unambiguous(self):
+        directories = index_tests.test_directory_global_numbers(self.per_entry, self.practice)
+        self.assertEqual(directories[2707], 1709)
+        self.assertEqual(directories[2746], 1748)  # practice wins over routine's 1747
+
+    def test_every_catalog_entry_carries_its_parsed_global_number(self):
+        missing = []
+        wrong = []
+        for problem in self.catalog["problems"]:
+            key = (problem["book"], problem["id"])
+            if "global_number" not in problem:
+                missing.append(key)
+            elif problem["global_number"] != self.per_entry[key]:
+                wrong.append(key)
+        self.assertEqual(missing[:5], [], f"{len(missing)} catalog entries lack global_number")
+        self.assertEqual(wrong[:5], [], f"{len(wrong)} catalog entries have stale global_number")
+
+    def test_t028_candidates_use_global_identity_and_practice_entry(self):
+        candidates = json.loads((ROOT / "collab" / "t028-candidates.json")
+                                .read_text(encoding="utf-8"))["entries"]
+        by_global = {row["global_number"]: row for row in candidates}
+        self.assertEqual(len(by_global), len(candidates))
+        self.assertEqual(by_global[1678]["practice_id"], "02676")
+        self.assertNotIn("routine", by_global[1748]["books"])
+        self.assertIn("routine", by_global[1747]["books"])
+        self.assertEqual(by_global[2255]["priority"], 47)
+        self.assertIn(249, by_global[2255]["retired_priorities"])
+        self.assertNotIn(30947, by_global)  # practice/30947 already has 21 cases
 
 
 if __name__ == "__main__":

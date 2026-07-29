@@ -2,7 +2,6 @@
 """Run a T-028 round through the real local judge and update its report."""
 import argparse
 import json
-import re
 import sys
 from pathlib import Path
 
@@ -17,14 +16,17 @@ def main():
     report_path=ROOT/'collab'/f't028-round{opt.round}-report.json'
     manifest=json.loads(manifest_path.read_text());report=json.loads(report_path.read_text())
     catalog=json.loads((ROOT/'data/openjudge/catalog.json').read_text())['problems']
-    by_number={}
+    by_key={}
     for item in catalog:
-        m=re.search(r'(\d+)$',item['id'])
-        if m and item.get('test_cases'):by_number.setdefault(int(m.group(1)),item)
+        if item.get('test_cases'):
+            by_key[(item['book'],item['id'])]=item
     report_rows={int(x['local_number']):x for x in report['entries']};failed=[]
     results=[]
     for entry in manifest['entries']:
-        n=int(entry['local_number']);item=by_number[n]
+        n=int(entry['local_number'])
+        group=entry.get('submit_group','practice')
+        problem_id=entry.get('submit_id') or entry.get('practice_id') or f'{n:05d}'
+        item=by_key[(group,problem_id)]
         source=(ROOT/'data/openjudge'/entry['made_dir']/'samplecode.py').read_text()
         verdict=judge(item['book'],item['id'],'python',source)
         merged={'status':'passed' if verdict['status']=='Accepted' else 'FAILED',
