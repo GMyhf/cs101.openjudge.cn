@@ -2,6 +2,29 @@
 
 ## 2026-07-29
 
+### T-028 round2/3/4 合并复核：58/60 认可，移除 2 道多解题
+
+- 三轮一起复核（人定的攒批节奏）。**全部结论我自己重跑得出，不读报告里的结论**：
+  范围 priority 恰好 1–60、全是 tier 1、60×21=1260 组；60 个生成器重跑后工作区
+  **逐字节不变**；报告 60 题 × 4 个自检数字与我重算**全部一致**；60 条约束判据、
+  60 份反例**各自唯一**（round1 的教训守住了）；`merged_judge` 60/60 present+passed，
+  另抽 8 题用真 `judge()` 复核全 Accepted；报告 ↔ platform.json 60/60 一致。
+- **移除 01426 Find The Multiple 与 03151 Pots。** 两题题面明写「多解任选其一」
+  （`any one of them is acceptable` / `output any one of them`），而判题器是
+  **token 精确比对**。实测：给 01426 另写一份同样合法、只是输出第二小 0/1 倍数的解法，
+  判定是 **Wrong Answer** —— 学生看到 WA 只会以为是自己错了。
+  **构建期的语义校验解决的是错的那一半**：它让 oracle 交叉验证过得去，
+  判题这一头仍然是精确比对。这类题要 special judge 才能收。
+- **新增 `full_sweep` 第 6 条**：`_made` 题目的题面若写着「随便哪个都算对」就报错。
+  判据两头都验：抓住 4 种真多解说法，放过 4 种假阳性 ——
+  04012「output the one whose first number is the smallest」题面自己消歧、
+  30931「对任意一个右括号」是语法用词。**第一版判据把这两条都误报了**，
+  收紧后才对；`tests/test_full_sweep.py` 把两头都钉住。
+- **我自己报错过一次并纠正**：naive 重跑存档 oracle 时报了 19 组不符，
+  查下来是 **2008 存档用的是批处理格式**（`2750/sample.in` 首行 `2` 是用例数），
+  Codex 的「adapt old batch wrappers」是对的 —— 拆开后 40 组 + 2 组全部对上。
+- catalog 有数据条目 1338 → **1561**，总组数 30830。tier 1 还剩 194 题，**仍未发版**。
+
 ### T-028 round2/3/4：按 priority 连续补齐 60 个零数据题
 
 - 严格取 `collab/t028-candidates.json` 的 priority **1–60**，分成 round2/3/4 三轮，

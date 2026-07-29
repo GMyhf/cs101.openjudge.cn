@@ -142,6 +142,47 @@ def check_merged_judge():
     return "T-028 报告缺「合并后真判」的实测或未通过", bad
 
 
+# 判据要抓的是「随便哪个都算对」，不是「存在多个解」。这两者差别很大：
+#   04012「If there exists multiple solutions, output the one whose first number is
+#          the smallest」—— 题面自己消歧了，答案唯一，精确比对没问题。
+#   30931「对任意一个右括号，它必须…」—— 「任意一」在这里是语法用词，跟输出无关。
+# 第一版判据把这两条都误报了。所以只认「any / 任意」直接修饰「输出」的那几种说法。
+MULTI_ANSWER = re.compile(
+    r"any one of them|any of them is acceptable|any one is acceptable"
+    r"|(?:output|print)\s+any\b"
+    r"|输出任意一|任意输出一|任选一|输出其中任意|任意一[个种组].{0,6}(?:即可|均可|都(?:算)?可以)", re.I)
+
+
+def check_multi_answer_problems():
+    """6. 题面明说「多解任选其一」的题，不能生成精确比对数据。
+
+    判题器是 token 精确比对。题面写着 any one of them 的题，**学生给出另一个同样正确的
+    答案会被判 Wrong Answer** —— 而 WA 长得就像他自己错了，他不会想到是数据的问题。
+
+    2026-07-29 实测：01426 Find The Multiple（「If there are multiple solutions …
+    any one of them is acceptable」）生成了精确数据之后，另写一份同样合法、只是输出
+    第二小 0/1 倍数的解法，判定是 Wrong Answer。03151 Pots 同理。两题已移出。
+
+    **构建期的「语义校验」解决不了这件事** —— 那只让 oracle 交叉验证过得去，
+    判题这一头仍然是精确比对。要收这类题得先有 special judge。
+    """
+    made = {number for number, _path in made_dirs()}
+    bad = []
+    for page in sorted((ROOT / "data" / "openjudge" / "pages").glob("*.html")):
+        match = re.search(r"__(\d+)\.html$", page.name)
+        if not match or int(match.group(1)) not in made:
+            continue
+        text = re.sub(r"<[^>]+>", " ", page.read_text(encoding="utf-8", errors="replace"))
+        text = re.sub(r"\s+", " ", text)
+        start = text.find("输出")
+        window = text[start:start + 900] if start > 0 else text[:900]
+        found = MULTI_ANSWER.search(window)
+        if found:
+            bad.append(f"{int(match.group(1))}: 题面写着「{found.group(0)}」，"
+                       f"却生成了精确比对数据（需 special judge，先排除）")
+    return "多解题却生成了精确比对数据", sorted(set(bad))
+
+
 def check_repeating_decimals():
     """4. 浮点输出里的循环小数。
 
@@ -205,7 +246,7 @@ def check_annotated_sample_outputs():
 
 CHECKS = (check_reported_failures, check_degenerate_constraints,
           check_output_size, check_repeating_decimals, check_annotated_sample_outputs,
-          check_merged_judge)
+          check_merged_judge, check_multi_answer_problems)
 
 
 def main():

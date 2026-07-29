@@ -36,3 +36,31 @@ class FullSweepConstraintTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class MultiAnswerDetectionTests(unittest.TestCase):
+    """多解题判据要两头都对：抓住「随便哪个都算对」，放过「存在多解但题面自己消歧」。
+
+    第一版判据这两头都错过：`multiple solutions` 一命中就报，于是误伤了 04012
+    （「output the one whose first number is the smallest」—— 答案唯一）；
+    `任意一[个种组]` 太松，误伤了 30931（「对任意一个右括号」是语法用词，跟输出无关）。
+    """
+
+    REAL = (
+        "If there are multiple solutions for a given value of n, any one of them is acceptable.",
+        "If there are several sequences of minimal length, output any one of them.",
+        "如果有多个答案，输出任意一个即可。",
+        "存在多组解时任选一组输出。",
+    )
+    FAKE = (
+        "If there exists multiple solutions, output the one whose first number is the smallest",
+        "对任意一个右括号，它必须与当前距离它最近的尚未匹配的左括号类型相同。",
+        "输出一个整数，表示最大嵌套深度。",
+        "若有多解，输出字典序最小的那个。",
+    )
+
+    def test_flags_only_statements_that_accept_any_valid_answer(self):
+        for text in self.REAL:
+            self.assertTrue(full_sweep.MULTI_ANSWER.search(text), text[:40])
+        for text in self.FAKE:
+            self.assertIsNone(full_sweep.MULTI_ANSWER.search(text), text[:40])

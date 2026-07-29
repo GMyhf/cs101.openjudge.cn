@@ -1,5 +1,36 @@
 # HANDOFF · 交接日志
 
+### 2026-07-29 · Claude → Codex · T-028 round2/3/4 合并复核：58/60 认可，2 题移除
+
+- **做了什么**：三轮一起复核（人定的攒批节奏）。**58 题认可，移除 2 题**，
+  并把移除的理由变成闸门里的机械判据。
+- **改了哪些文件**：删 `01426_made`、`03151_made`；`tools/full_sweep.py`（新增第 6 条检查）、
+  `tests/test_full_sweep.py`、`collab/t028-round{2,3}-{report,manifest}.json`、
+  `data/openjudge/catalog.json`（重建索引）、`collab/NOTES-claude.md`、`collab/PLAN.md`、`CHANGELOG.md`
+- **关联提交**：本轮
+- **验证**（全部我自己重跑，不读报告结论）：范围 priority 恰好 1–60、全是 tier 1、
+  60×21=1260 组；**60 个生成器重跑后工作区逐字节不变**；报告 **60 题 × 4 个自检数字
+  与我重算全部一致**；**60 条判据 60 个唯一、60 份反例 60 个唯一**（round1 的教训守住了）；
+  `merged_judge` 60/60 present+passed，我另抽 8 题用真 `judge()` 复核全 Accepted；
+  报告 ↔ platform.json 60/60 一致；闸门退出码 0。
+- **请重点看**：
+  ①**移除 01426 / 03151。** 两题题面明写「多解任选其一」
+  （`any one of them is acceptable` / `output any one of them`），而判题器是
+  **token 精确比对**。实测证据：给 01426 另写一份同样合法、只是输出第二小 0/1 倍数的解法，
+  判定是 **Wrong Answer**。**构建期的 `semantic_cases` 语义校验解决的是错的那一半** ——
+  它让 oracle 交叉验证过得去，判题这一头仍然是精确比对。这类题要 special judge 才能收。
+  round1 把 1077 以同样理由排除过、也排过 1426，这次又建了回来，所以我把判据机械化了。
+  ②**新增 `full_sweep` 第 6 条**：`_made` 题目的题面若写着「随便哪个都算对」就报错。
+  判据两头都验过：抓住 4 种真多解说法，放过 4 种假阳性 —— 04012「output the one whose
+  first number is the smallest」题面自己消歧、30931「对任意一个右括号」是语法用词。
+  **第一版判据把这两条都误报了**，收紧后才对，`tests/test_full_sweep.py` 钉住两头。
+  ③**我自己报错过一次**：naive 重跑存档 oracle 时报了 19 组不符，查下来是
+  **2008 存档用的是批处理格式**（`sample.in` 首行 `2` 是用例数），Codex 的
+  「adapt old batch wrappers」是对的 —— 拆开后 2750 的 40 组 + 2 组全部对上。**是我的重跑方法错了。**
+- **红线自检**：判题沙箱未动 ✅｜口令未入库 ✅｜路径防线未动 ✅
+- **下一步建议**：继续 round5/6/7，priority 61 起。01426/03151 留在 candidates 里但
+  **不要再建**，除非先做 special judge（那是架构决策，要人拍板）。tier 1 还剩 194 题。
+
 ### 2026-07-29 · Codex → Claude · T-028 round2/3/4 合并复核
 
 - **做了什么**：按 priority 1–60 连续完成三轮 60 个 tier 1 零数据题，每题 21 组；
