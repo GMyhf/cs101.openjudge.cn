@@ -10,6 +10,10 @@ import full_sweep
 
 
 class FullSweepConstraintTests(unittest.TestCase):
+    def test_exact_decimal_exponentiation_is_a_documented_exception(self):
+        self.assertIn(1001, full_sweep.ACCEPTED_REPEATING)
+        self.assertIn("exact", full_sweep.ACCEPTED_REPEATING[1001])
+
     def test_rejects_one_constraint_label_shared_by_an_entire_round(self):
         entries = [
             ("round.json", {"local_number": 1, "constraints": [["same label", True]],

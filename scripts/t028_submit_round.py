@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -16,6 +17,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("round", type=int)
     parser.add_argument("--only", help="comma-separated local problem numbers")
+    parser.add_argument("--delay", type=float, default=0, help="seconds to wait between submissions")
     opts = parser.parse_args()
     only = {int(x) for x in opts.only.split(",")} if opts.only else None
     manifest_path = ROOT / "collab" / f"t028-round{opts.round}-manifest.json"
@@ -30,14 +32,18 @@ def main():
         previous = json.loads(output.read_text(encoding="utf-8")).get("results", [])
     results = [row for row in previous if int(row["local_number"]) not in (only or set())]
     for index, entry in enumerate(jobs, 1):
+        if index > 1 and opts.delay:
+            time.sleep(opts.delay)
         number = int(entry["local_number"])
-        source = (ROOT / "data" / "openjudge" / entry["made_dir"] / "samplecode.py").read_text(encoding="utf-8")
+        language = entry.get("reference_language", "Python3")
+        suffix = "py" if language == "Python3" else "cpp"
+        source = (ROOT / "data" / "openjudge" / entry["made_dir"] / f"samplecode.{suffix}").read_text(encoding="utf-8")
         group = entry.get("submit_group", "practice")
         problem_id = entry.get("submit_id") or entry.get("practice_id") or f"{number:05d}"
         error = None
         for _attempt in range(3):
             try:
-                result = session.run(problem_id, source, "Python3", group)
+                result = session.run(problem_id, source, language, group)
                 error = None
                 break
             except Exception as exc:  # Network resets and transient 5xx are common.
@@ -46,7 +52,7 @@ def main():
             result = {"verdict": "SUBMIT_FAILED", "solution_id": None, "error": error}
         row = {"local_number": number, "global_number": entry.get("global_number"),
                "group": group, "problem_id": problem_id,
-               "language": "Python3", **result}
+               "language": language, **result}
         results.append(row)
         results.sort(key=lambda item: next(i for i, entry in enumerate(manifest["entries"])
                                            if int(entry["local_number"]) == int(item["local_number"])))

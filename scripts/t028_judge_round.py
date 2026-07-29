@@ -27,8 +27,11 @@ def main():
         group=entry.get('submit_group','practice')
         problem_id=entry.get('submit_id') or entry.get('practice_id') or f'{n:05d}'
         item=by_key[(group,problem_id)]
-        source=(ROOT/'data/openjudge'/entry['made_dir']/'samplecode.py').read_text()
-        verdict=judge(item['book'],item['id'],'python',source)
+        language=entry.get('reference_language','Python3')
+        suffix='py' if language=='Python3' else 'cpp'
+        judge_language='python' if language=='Python3' else 'cpp'
+        source=(ROOT/'data/openjudge'/entry['made_dir']/f'samplecode.{suffix}').read_text()
+        verdict=judge(item['book'],item['id'],judge_language,source)
         merged={'status':'passed' if verdict['status']=='Accepted' else 'FAILED',
                 'verdict':verdict['status'],'book':item['book'],'problem':item['id'],
                 'merged_cases':verdict.get('cases',item.get('test_count')),

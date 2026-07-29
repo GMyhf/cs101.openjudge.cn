@@ -75,6 +75,13 @@
 > 1689/1848 个 catalog 条目有数据，按全局题号还剩 **130** 题零数据。下一批从 priority
 > 121 开始；01426/03151 仍需 special judge，未重建。T-028 保持 In progress，**不发版**。
 
+> **T-028 round8/9/10（2026-07-30）**：Codex 严格覆盖 priority 121–180，完成 57 题、
+> 1157 组 `_made` 数据；01729/02982 因题面允许任意合法解而留待 special judge，00000
+> 因正确输出超过 2MB 永久排除。平台真实提交与索引后本机合并 `judge()` 均 **57/57
+> Accepted**；round8 起每条报告记录实际 archive `dirs` 或 `no_archive_reason`。
+> catalog 有数据条目 1689→1766/1848；tier 1 仍有 73 项（含 5 个已知排除项），下一批
+> 从 priority 181 开始。T-028 保持 In progress，**不发版**，等待 Claude 合并复核 8/9/10。
+
 ## Decision Log
 
 - 2026-07-29 · **人拍板：2008 存档排除出判题范围**（出处：`scripts/index_tests.py · ARCHIVE_BUCKETS`、

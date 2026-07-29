@@ -1,5 +1,30 @@
 # CHANGELOG
 
+## 2026-07-30
+
+### T-028 round8/9/10（priority 121–180）：补齐 57 题，3 题按判题能力排除
+
+- 严格覆盖 priority 121–180：round8/9/10 各构建 19 题、各明确排除 1 题。
+  01729 Jack and Jill 与 02982 Sudoku 的题面允许输出任意合法解，而本站仍是 token
+  精确比对，故留待 special judge；priority 173 的 00000 正确输出约 20MB，继续按
+  `RLIMIT_FSIZE=2MB` 永久排除。三项都保留在 manifest/report 的 `excluded`，没有伪造数据。
+- 新增 57 个 `_made` 目录：55 题各 21 组，03225/02698 是无输入题各 1 组，共
+  **1157 组**。14 题采用人工题解合集；其余 43 题采用统计页既有 Accepted 源码，
+  Python3 优先、无 Python3 时保留 G++，来源提交号和未声明许可状态均入库。
+- round8 起的 oracle 可回查契约已落实：每题报告写实际 `archive_cross_check.dirs`；
+  03129 的旧目录实际是 Prime Path，02977 的旧目录使用多组 `Case n` 接口，均记录
+  `no_archive_reason`；01204 只排除一个同词出现两次且题面无消歧的历史输入。
+- 平台真实提交 round8/9/10 **57/57 Accepted**（逐题提交号见三个 platform JSON）；
+  重建索引后本机合并 `judge()` **57/57 Accepted**。有测试的 catalog 条目
+  **1689 → 1766/1848**，缺测试唯一题号为 74；T-028 tier 1 清单仍有 73 项（含 5 个
+  已知排除项），下一项从 priority 181 开始。
+- 提交器与本机真判器新增原生 G++ 参考支持；提交器增加可选 `--delay`，用于避开平台
+  频率限制。`full_sweep` 为 01001 的 exact decimal 输出增加有题面依据的窄例外，
+  避免把精确十进制误报为容差浮点。
+- 验证：round 专项 4 项、full-sweep 回归 5 项通过；完整 handoff 闸门的全量 unittest、
+  全量 `py_compile`、pending rework、full sweep 全绿，`full_sweep` 扫描
+  **700 份数据 / 588 条报告记录**无残留。**tier 1 补完前仍不发版，本轮未发版。**
+
 ## 2026-07-29
 
 ### T-028 round5/6/7 合并复核：60/60 认可，另加一条 oracle 可回查判据
