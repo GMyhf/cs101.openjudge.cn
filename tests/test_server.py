@@ -173,6 +173,7 @@ class ServerApiTests(unittest.TestCase):
         # **功能仍在**的证据，而不是旧的 DOM 名字。
         self.assertIn('id="account-control"', text)
         self.assertIn('id="account"', text)
+        self.assertIn('href="/settings/">个人信息</a>', text)
         self.assertIn('href="/account/">账户设置</a>', text)
         self.assertIn('id="logout"', text)
 
@@ -230,6 +231,61 @@ class ServerApiTests(unittest.TestCase):
         })
         self.assertEqual(status, 200)
 
+    def test_profile_nickname_defaults_updates_and_appears_in_ranking(self):
+        username = "t006_profile"
+        nickname = "算法练习生"
+        cookie = self.register_and_login(username, "T006-password")
+
+        with sqlite3.connect(self.db_file.name) as db:
+            stored = db.execute("select nickname from users where username = ?", (username,)).fetchone()
+        self.assertEqual(stored, (username,))
+
+        status, _, body = request(self.port, "GET", "/settings/", cookie=cookie)
+        self.assertEqual(status, 200)
+        self.assertIn("个人信息", body.decode("utf-8"))
+        status, _, body = request(self.port, "GET", "/api/profile", cookie=cookie)
+        self.assertEqual(json.loads(body), {"username": username, "nickname": username})
+
+        status, _, _ = request(self.port, "POST", "/api/profile", {"nickname": "   "}, cookie=cookie)
+        self.assertEqual(status, 400)
+        status, _, body = request(self.port, "POST", "/api/profile",
+                                  {"nickname": "  " + nickname + "  "}, cookie=cookie)
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["nickname"], nickname)
+
+        status, _, _ = request(self.port, "POST", "/api/submit", {
+            "book": SUBMIT_BOOK, "problem": SUBMIT_PROBLEM, "language": "python",
+            "source": "print('wrong')",
+        }, cookie=cookie)
+        self.assertEqual(status, 200)
+        status, _, body = request(self.port, "GET", "/api/books/pctbook/", cookie=cookie)
+        row = next(item for item in json.loads(body)["ranking"] if item["user"] == username)
+        self.assertEqual(row["name"], nickname)
+
+        page = (ROOT / "book.html").read_text(encoding="utf-8")
+        self.assertIn("{text:'名字'}", page)
+        self.assertIn("userLink(r.user, r.name)", page)
+
+    def test_profile_requires_login(self):
+        status, headers, _ = request(self.port, "GET", "/settings/")
+        self.assertEqual(status, 302)
+        self.assertEqual(headers["Location"], "/auth/login/")
+        status, _, _ = request(self.port, "POST", "/api/profile", {"nickname": "nobody"})
+        self.assertEqual(status, 401)
+
+    def test_admin_can_set_profile_nickname(self):
+        status, headers, _ = request(self.port, "POST", "/api/login", {
+            "username": "GMyhf", "password": "T001-admin-only",
+        })
+        self.assertEqual(status, 200)
+        cookie = headers["Set-Cookie"].split(";", 1)[0]
+        status, _, body = request(self.port, "POST", "/api/profile",
+                                  {"nickname": "课程管理员"}, cookie=cookie)
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(body)["nickname"], "课程管理员")
+        status, _, body = request(self.port, "GET", "/api/profile", cookie=cookie)
+        self.assertEqual(json.loads(body), {"username": "GMyhf", "nickname": "课程管理员"})
+
     def test_problem_catalog_page_is_served(self):
         status, _, body = request(self.port, "GET", "/problems/")
         self.assertEqual(status, 200)
@@ -242,8 +298,26 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(status, 200)
         meta = json.loads(body)["book_meta"]
         self.assertEqual(meta["practice"]["name"], "题库（包括计概、数算题目）")
-        self.assertEqual(meta["practice"]["count"], 985)
+        self.assertEqual(meta["practice"]["count"], 986)
         self.assertEqual(meta["pctbook"]["name"], "计算思维算法实践")
+
+    def test_practice_02977_is_mirrored_by_global_number(self):
+        status, _, body = request(self.port, "GET", "/practice/02977/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn("02977:生理周期", text)
+        mirrored = (ROOT / "data/openjudge/pages/practice__02977.html").read_text(encoding="utf-8")
+        self.assertRegex(mirrored, r"全局题号\s*</dt>\s*<dd>\s*1978")
+
+        status, _, body = request(self.port, "GET", "/api/catalog")
+        entries = [item for item in json.loads(body)["problems"]
+                   if item.get("global_number") == 1978]
+        self.assertEqual({(item["book"], item["id"]) for item in entries},
+                         {("practice", "02977"), ("pctbook", "M02977")})
+        self.assertEqual({item["test_count"] for item in entries}, {21})
+        case_sets = {tuple((case["input"], case["output"]) for case in item["test_cases"])
+                     for item in entries}
+        self.assertEqual(len(case_sets), 1)
 
     def test_catalog_summary_is_small_and_contains_judgeable_titles(self):
         status, headers, body = request(self.port, "GET", "/api/catalog?summary=1")

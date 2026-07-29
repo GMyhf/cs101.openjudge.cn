@@ -237,7 +237,7 @@ STATIC_TYPES = {".css": "text/css; charset=utf-8", ".js": "text/javascript; char
                 ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon",
                 ".woff2": "font/woff2"}
 BOOK_META = {
-    "practice": {"name": "题库（包括计概、数算题目）", "count": 985},
+    "practice": {"name": "题库（包括计概、数算题目）", "count": 986},
     "pctbook": {"name": "计算思维算法实践", "count": 215},
     "routine": {"name": "数算 2025Spring每日选作", "count": 203},
     "2025sp_routine": {"name": "数算 2025Spring每日选作", "count": 73},
@@ -1022,10 +1022,11 @@ def init_db():
             if column.split()[0] not in existing:
                 db.execute(f"alter table submissions add column {column}")
         user_columns = {row[1] for row in db.execute("pragma table_info(users)")}
-        for column in ("email text", "active integer default 1", "activation_token_hash text", "activation_expires integer", "reset_token_hash text", "reset_expires integer"):
+        for column in ("email text", "nickname text", "active integer default 1", "activation_token_hash text", "activation_expires integer", "reset_token_hash text", "reset_expires integer"):
             if column.split()[0] not in user_columns:
                 db.execute(f"alter table users add column {column}")
         db.execute("update users set active = 1 where activation_token_hash is null")
+        db.execute("update users set nickname = username where nickname is null or trim(nickname) = ''")
 
 # 「出错那组的输入片段」开关。默认**关**：管理员忘了考前关掉是泄题，
 # 忘了课后打开只是少点帮助——两种疏忽的代价不对称，所以默认取保守的一侧。
@@ -1405,8 +1406,22 @@ def book_page_payload(book, authenticated):
                      from submissions where book = ? group by problem""", (book,))
         }
         if authenticated:
+            nicknames = {
+                row[0].casefold(): row[1]
+                for row in db.execute(
+                    "select username, coalesce(nullif(trim(nickname), ''), username) from users"
+                )
+            }
+            nicknames.update({
+                row[0][len("profile_nickname:"):]: row[1]
+                for row in db.execute(
+                    "select key, value from settings where key like 'profile_nickname:%'"
+                )
+            })
             ranking = [
-                {"user": row[0], "solved": row[1], "submissions": row[2], "last_submit": row[3]}
+                {"user": row[0] or "",
+                 "name": nicknames.get(str(row[0] or "").casefold(), row[0] or ""),
+                 "solved": row[1], "submissions": row[2], "last_submit": row[3]}
                 for row in db.execute(
                     """select min(user),
                               count(distinct case when result = 'Accepted' then problem end),
@@ -1799,6 +1814,15 @@ change.onsubmit=async e=>{e.preventDefault();message.textContent='';const d=Obje
 logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.href='/'};
 </script></body></html>"""
 
+    def profile_settings_page(self):
+        return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>个人信息 · CS101</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/theme.css"><script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script><style>
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:520px;margin:0 auto;padding:52px 20px}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:24px}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:15px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}.topline{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:22px}h1{font-size:28px;line-height:1.2;margin:0 0 5px}.muted{color:var(--muted);margin:0}.back{color:var(--green);text-decoration:none;font-size:14px}label{display:block;margin:14px 0 6px;font-weight:600}input{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;outline:none}input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-soft)}input[readonly]{background:var(--panel);color:var(--muted)}button{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}.message{min-height:22px;color:var(--red);margin:12px 0 0}@media(max-width:520px){.shell{padding:30px 16px}.panel{padding:24px}}
+</style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><div class="topline"><div><h1>个人信息</h1><p class="muted">设置排名中显示的名字</p></div><a class="back" href="/">返回首页</a></div><form id="profile"><label>用户名<input id="username" readonly></label><label>昵称<input id="nickname" name="nickname" maxlength="32" required autocomplete="nickname"></label><p id="message" class="message"></p><button>保存个人信息</button></form></section></main><script>
+fetch('/api/profile').then(async r=>{if(r.status===401){location.href='/auth/login/';return null}const d=await r.json();if(!r.ok)throw new Error(d.error||'读取失败');return d}).then(d=>{if(d){username.value=d.username;nickname.value=d.nickname}}).catch(e=>message.textContent=e.message);
+profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=await fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nickname:nickname.value})});const d=await r.json();if(r.ok){nickname.value=d.nickname;message.style.color='var(--green)';message.textContent='个人信息已保存。'}else{message.style.color='var(--red)';message.textContent=d.error||'保存失败'}};
+</script></body></html>"""
+
     def do_GET(self):
         parsed = urlparse(self.path)
         path = parsed.path
@@ -1832,6 +1856,10 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             if not self.authorized():
                 self.send_response(302); self.send_header("Location", "/auth/login/"); self.end_headers(); return
             self.send_html(self.account_settings_page()); return
+        if path == "/settings/":
+            if not self.authorized():
+                self.send_response(302); self.send_header("Location", "/auth/login/"); self.end_headers(); return
+            self.send_html(self.profile_settings_page()); return
         submit_page = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/([^/]+)/submit/", path)
         if submit_page:
             book, problem_id = submit_page.groups()
@@ -1868,6 +1896,20 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             return
         if path == "/api/me":
             self.send_json({"authenticated": self.authorized(), "user": self.current_user()})
+            return
+        if path == "/api/profile":
+            username = self.current_user()
+            if username is None:
+                self.send_json({"error": "Unauthorized"}, 401); return
+            with sqlite3.connect(DB) as db:
+                row = db.execute(
+                    "select coalesce(nullif(trim(nickname), ''), username) from users where username = ?",
+                    (username,),
+                ).fetchone()
+                if row is None:
+                    row = db.execute("select value from settings where key = ?",
+                                     ("profile_nickname:" + username.casefold(),)).fetchone()
+            self.send_json({"username": username, "nickname": row[0] if row else username})
             return
         if path == "/api/stats":
             self.send_json(site_stats())
@@ -2034,8 +2076,9 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
                 with sqlite3.connect(DB) as db:
                     if db.execute("select 1 from users where lower(username) = lower(?) or lower(email) = ?", (username, email)).fetchone():
                         self.send_json({"error": "用户名或邮箱已存在"}, 409); return
-                    db.execute("insert into users(username, password_hash, email, active, activation_token_hash, activation_expires) values (?, ?, ?, 0, ?, ?)",
-                               (username, password_hash(password), email, reset_token_hash(activation_token), int(time.time()) + 86400))
+                    db.execute("insert into users(username, password_hash, email, nickname, active, activation_token_hash, activation_expires) values (?, ?, ?, ?, 0, ?, ?)",
+                               (username, password_hash(password), email, username,
+                                reset_token_hash(activation_token), int(time.time()) + 86400))
             except sqlite3.IntegrityError:
                 self.send_json({"error": "用户名或邮箱已存在"}, 409); return
             base = public_base_url()
@@ -2099,6 +2142,24 @@ logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.hre
             current_token = cookies.SimpleCookie(self.headers.get("Cookie", "")).get("session")
             revoke_sessions(username, keep=current_token.value if current_token else None)
             self.send_json({"ok": True}); return
+        if path == "/api/profile":
+            username = self.current_user()
+            if username is None:
+                self.send_json({"error": "Unauthorized"}, 401); return
+            nickname = str(data.get("nickname", "")).strip()
+            if not nickname or len(nickname) > 32 or not nickname.isprintable():
+                self.send_json({"error": "昵称需为 1-32 个可见字符"}, 400); return
+            with sqlite3.connect(DB) as db:
+                updated = db.execute("update users set nickname = ? where username = ?",
+                                     (nickname, username)).rowcount
+                if not updated and same_username(username, ADMIN_USER):
+                    db.execute("insert into settings(key, value) values (?, ?)"
+                               " on conflict(key) do update set value = excluded.value",
+                               ("profile_nickname:" + username.casefold(), nickname))
+                    updated = 1
+            if not updated:
+                self.send_json({"error": "账号不存在"}, 404); return
+            self.send_json({"ok": True, "nickname": nickname}); return
         if path == "/api/user/forgot":
             email = str(data.get("email", "")).strip().lower()
             # 限频必须在查库**之前**，而且按「请求里写的邮箱」计数，不管它存不存在。

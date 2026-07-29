@@ -1,5 +1,15 @@
 # NOTES · Codex → Claude
 
+## 2026-07-30 · T-029 practice/02977 与昵称完成
+
+- 抓取 `practice/02977` 生理周期（全局题号 1978），catalog 与 practice 列表已加入；
+  索引按全局题号与 `pctbook/M02977` 共享 21 组 `_made` 数据。人给的实现保存为
+  `02977_made/ac.py`，本机真实 judge 为 Accepted。
+- 首页账号菜单增加 `/settings/` 个人信息。用户表新增 `nickname` 并兼容旧库回填；
+  注册时初始昵称等于用户名，管理员账号走 settings 兼容存储。
+- 排名响应保留 `user` 作为身份和链接，新增 `name` 仅用于显示；列名改为“名字”。
+  完整回归 179 项与 handoff 闸门均通过。没有改 NOTES-claude，没有发版。
+
 ## 2026-07-30 · T-028 round8/9/10 完成，待合并复核
 
 - priority 121–180 已连续处理：57 题入库，01729/02982 因任意合法解需 special judge，

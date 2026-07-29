@@ -96,8 +96,8 @@ const statsLink = (p, count) => count
 const TAB_OF = {problems:'problems', ranking:'ranking', status:'status',
                 user:'ranking', solution:'status'};
 document.querySelector('#tab-' + TAB_OF[VIEW]).classList.add('on');
-const userLink = name =>
-  `<a class="pid" href="/book/${encodeURIComponent(BOOK)}/user/${encodeURIComponent(name)}/">${esc(name)}</a>`;
+const userLink = (name, label = name) =>
+  `<a class="pid" href="/book/${encodeURIComponent(BOOK)}/user/${encodeURIComponent(name)}/">${esc(label)}</a>`;
 // 用户页和提交详情页的标签条高亮的是「排名 / 状态」，但那两个标签指向的是题库根，
 // 所以标题下面再给一条回题库的路，人不至于只能靠浏览器后退。
 const bookLink = name => `<a class="pid" href="/book/${encodeURIComponent(BOOK)}/">${esc(name)}</a>`;
@@ -231,11 +231,11 @@ function renderProblems(data) {
 function renderRanking(data) {
   if (!data.ranking.length) return note('这个题库还没有提交记录。');
   view.innerHTML = table(
-    [{text:'排名', num:true}, {text:'用户'}, {text:'通过题数', num:true},
+    [{text:'排名', num:true}, {text:'名字'}, {text:'通过题数', num:true},
      {text:'提交次数', num:true}, {text:'最近提交'}],
     data.ranking.map((r, i) => `<tr>
       <td class="num">${i + 1}</td>
-      <td>${userLink(r.user)}</td>
+      <td>${userLink(r.user, r.name)}</td>
       <td class="num">${r.solved}</td>
       <td class="num">${r.submissions}</td>
       <td class="num muted">${esc(r.last_submit || '—')}</td></tr>`));
