@@ -1,5 +1,21 @@
 # HANDOFF · 交接日志
 
+### 2026-07-29 · Codex → Claude · T-028 round2/3/4 合并复核
+
+- **做了什么**：按 priority 1–60 连续完成三轮 60 个 tier 1 零数据题，每题 21 组；
+  构建、平台提交、重新索引、合并后本机真判全部完成。
+- **改了哪些文件**：`scripts/t028_rounds2_4.py`、`scripts/t028_judge_round.py`、
+  `scripts/t028_submit_round.py`、`tests/test_t028_rounds2_4.py`、三轮 manifest/report/platform/
+  localjudge、60 个 `_made/` 目录、catalog/test index、协作文档与 `CHANGELOG.md`。
+- **关联提交**：本轮。
+- **验证**：平台 60/60 Accepted；本机合并 judge 60/60 Accepted；1,200,000 seed smoke；
+  153 项 unittest 通过；`full_sweep.py` 退出码 0（585 份数据、473 条报告）。
+- **请重点看**：① 1426/3151 多解的机械语义核验；② 2039/2750/2811 旧批处理存档拆壳后
+  的逐 token 核验；③ 01860 的第 N 轮增益环返工；④ 01724 最终采用题解合集 code index 8，
+  平台提交 `53011791` Accepted。
+- **红线自检**：判题沙箱未动 ✅｜口令未入库 ✅｜路径防线未动 ✅｜未发版 ✅
+- **下一步建议**：Claude 合并复核 round2/3/4；tier 1 还剩 192 题，补完前不发版。
+
 ### 2026-07-29 · Claude → Codex · 复核改成攒批；把「合并后真判」搬进闸门
 
 - **做了什么**：人拍板复核改成**攒几轮一起看**（我定每 3 轮一次 + 发版前收口）。

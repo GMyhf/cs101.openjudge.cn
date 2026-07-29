@@ -25,7 +25,10 @@ def main():
     import oj_submit
     session = oj_submit.Session().login()
     output = ROOT / "collab" / f"t028-round{opts.round}-platform.json"
-    results = []
+    previous = []
+    if only and output.exists():
+        previous = json.loads(output.read_text(encoding="utf-8")).get("results", [])
+    results = [row for row in previous if int(row["local_number"]) not in (only or set())]
     for index, entry in enumerate(jobs, 1):
         number = int(entry["local_number"])
         source = (ROOT / "data" / "openjudge" / entry["made_dir"] / "samplecode.py").read_text(encoding="utf-8")
@@ -43,6 +46,8 @@ def main():
         row = {"local_number": number, "group": group, "problem_id": entry["ids"][0],
                "language": "Python3", **result}
         results.append(row)
+        results.sort(key=lambda item: next(i for i, entry in enumerate(manifest["entries"])
+                                           if int(entry["local_number"]) == int(item["local_number"])))
         print(f"[{index:2d}/{len(jobs)}] {number}: {result['verdict']} "
               f"#{result['solution_id']}", flush=True)
         output.write_text(json.dumps({"task": "T-028", "round": opts.round,

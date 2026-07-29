@@ -63,6 +63,12 @@
 > 20 份真实反例，并修正 6 个生成器的题面外输入域，等待 Claude 复核销账。总任务
 > 保持 In progress，后续轮次尚未完成。
 
+> **T-028 round2/3/4（2026-07-29）**：Codex 已严格按 priority 1–60 连续交付 60 题、
+> 1260 组 `_made` 数据，等待 Claude 三轮合并复核。平台真实提交 60/60 Accepted，索引后
+> 本机合并 `judge()` 60/60 Accepted，`merged_judge` 60/60 passed；1,200,000 seed smoke、
+> 153 项 unittest 与 full-sweep 全绿。有数据的 catalog 条目 1338→1569。tier 1 的 252 题
+> 已完成 60，仍剩 192；**全部补完前不发版**。
+
 ## Decision Log
 
 - 2026-07-29 · **人拍板：2008 存档排除出判题范围**（出处：`scripts/index_tests.py · ARCHIVE_BUCKETS`、

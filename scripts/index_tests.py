@@ -96,7 +96,7 @@ def main():
     for bucket in BUCKETS:
         root = TESTS / bucket
         if not root.is_dir(): continue
-        for directory in root.iterdir():
+        for directory in sorted(root.iterdir()):
             if not directory.is_dir(): continue
             if is_archive(bucket, directory.name): continue
             number = directory_numeric(directory.name)
