@@ -79,19 +79,30 @@ def check_reported_failures():
 
 
 def check_degenerate_constraints():
-    """2. 约束写成「永远不会红」的形态：措辞像「非空」，且反例是空串。
+    """2. Catch empty non-constraints and one-label-for-the-whole-round checks.
 
     只看措辞会误伤 —— 30932 的 `tree root is present` 反例是 `"null\\n"`，空树是那题
     合法的输入格式，真实数据保持 True、反例翻 False，这条是好的。所以两个条件都要满足。
     """
-    bad = []
+    bad, by_source = [], {}
     for source, entry in report_entries():
-        labels = " ".join(str(c[0]) for c in (entry.get("constraints") or []))
-        counter = entry.get("constraint_counterexample") or [""]
-        empty = str(counter[0]).strip() in ("", "deliberate invalid input", "None")
-        if DEGENERATE.search(labels) and empty:
-            bad.append(f"{entry.get('local_number')}（{source}）: {labels[:50]!r} 反例={counter[0]!r}")
-    return "退化约束（措辞像非空 且 反例是空串）", bad
+        labels_list = [str(c[0]).strip() for c in (entry.get("constraints") or [])]
+        labels = " ".join(labels_list)
+        counter = entry.get("constraint_counterexample")
+        if isinstance(counter, (list, tuple)):
+            counter = counter[0] if counter else ""
+        counter_text = str(counter or "").strip()
+        if DEGENERATE.search(labels) and not counter_text:
+            bad.append(f"{entry.get('local_number')}（{source}）: {labels[:50]!r} 反例={counter_text!r}")
+        by_source.setdefault(source, []).append((entry.get("local_number"), set(labels_list)))
+
+    for source, rows in by_source.items():
+        if len(rows) < 2:
+            continue
+        shared = set.intersection(*(labels for _number, labels in rows)) if rows else set()
+        for label in sorted(shared):
+            bad.append(f"{source}: {len(rows)} 题共用同一约束 {label[:80]!r}")
+    return "退化约束（非空占位+空反例，或整轮共用同一判据）", bad
 
 
 def check_output_size():

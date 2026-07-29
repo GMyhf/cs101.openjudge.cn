@@ -3,7 +3,7 @@ from pathlib import Path
 def g1321(r):
     blocks = []
     for _ in range(r.randint(1, 3)):
-        n = r.randint(1, 8); k = r.randint(0, n)
+        n = r.randint(1, 8); k = r.randint(1, n)
         board = ["".join(r.choice("##.") for _ in range(n)) for _ in range(n)]
         blocks.append(f"{n} {k}\n" + "\n".join(board))
     return "\n".join(blocks) + "\n-1 -1\n"

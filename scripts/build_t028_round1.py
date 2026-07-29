@@ -73,7 +73,7 @@ def g1145(r):
 def g1321(r):
     blocks = []
     for _ in range(r.randint(1, 3)):
-        n = r.randint(1, 8); k = r.randint(0, n)
+        n = r.randint(1, 8); k = r.randint(1, n)
         board = ["".join(r.choice("##.") for _ in range(n)) for _ in range(n)]
         blocks.append(f"{n} {k}\n" + "\n".join(board))
     return "\n".join(blocks) + "\n-1 -1\n"
@@ -91,7 +91,7 @@ def g1328(r):
 def g1384(r):
     out = [str(r.randint(1, 4))]
     for _ in range(int(out[0])):
-        empty = r.randint(0, 300); target = empty + r.randint(1, 600); n = r.randint(1, 12)
+        empty = r.randint(1, 300); target = empty + r.randint(1, 600); n = r.randint(1, 12)
         out += [f"{empty} {target}", str(n)]
         out += [f"{r.randint(1,100)} {r.randint(1,80)}" for _ in range(n)]
     return "\n".join(out) + "\n"
@@ -179,12 +179,12 @@ def g2707(r):
 
 
 def g2749(r):
-    values = [r.randint(1, 500) for _ in range(r.randint(1, 12))]
+    values = [r.randint(2, 500) for _ in range(r.randint(1, 12))]
     return str(len(values)) + "\n" + "\n".join(map(str, values)) + "\n"
 
 
 def g2753(r):
-    values = [r.randint(1, 25) for _ in range(r.randint(1, 15))]
+    values = [r.randint(1, 20) for _ in range(r.randint(1, 15))]
     return str(len(values)) + "\n" + "\n".join(map(str, values)) + "\n"
 
 
@@ -194,7 +194,7 @@ def g2766(r):
 
 
 def g2786(r):
-    values = [r.randint(1, 1000000) for _ in range(r.randint(1, 20))]
+    values = [r.randint(1, 999999) for _ in range(r.randint(1, 20))]
     return str(len(values)) + "\n" + "\n".join(map(str, values)) + "\n"
 
 
@@ -202,11 +202,57 @@ def g2792(r):
     out = [str(r.randint(1, 6))]
     for _ in range(int(out[0])):
         p, q = r.randint(1, 40), r.randint(1, 40)
-        out += [str(r.randint(-50, 50)), str(p), " ".join(str(r.randint(-60,60)) for _ in range(p)), str(q), " ".join(str(r.randint(-60,60)) for _ in range(q))]
+        out += [str(r.randint(1, 200)), str(p), " ".join(str(r.randint(1,100)) for _ in range(p)), str(q), " ".join(str(r.randint(1,100)) for _ in range(q))]
     return "\n".join(out) + "\n"
 
 
 GENERATORS = {n: globals()[f"g{n}"] for n in SOURCE_SPEC}
+
+CONSTRAINTS = {
+    1061: "exactly five integers with x != y, positive m/n, and 0 < L < 2100000000",
+    1125: "each data set has 1..100 brokers, valid contact/time pairs, and final terminator 0",
+    1145: "each query has an integer target and a balanced LISP binary-tree expression",
+    1321: "each board has 1 <= k <= n <= 8 and exactly n rows of n '#' or '.' cells",
+    1328: "each radar case has n >= 1, d >= 0, exactly n integer points, and final 0 0",
+    1384: "each pig has 1 <= E <= F <= 10000 and positive coin values and weights",
+    1577: "leaf layers contain only sorted uppercase letters and end with '*' or final '$'",
+    1611: "each group member is in 0..n-1 and every data set is followed by final 0 0",
+    2192: "T is 1..1000; first strings are 1..200 letters and len(c)=len(a)+len(b)",
+    2406: "at least one printable string has length 1..1000000 before the final '.' line",
+    2442: "each case has 1 <= m <= 100, 1 <= n <= 2000, and m*n nonnegative integers",
+    2499: "each scenario is a positive valid tree node pair bounded by 1000000000",
+    2689: "the single input line has fewer than 80 characters",
+    2701: "n is a single positive integer smaller than 100",
+    2707: "the declared number of equations is present and every quadratic coefficient a is nonzero",
+    2749: "the declared values are all integers satisfying 1 < a < 32768",
+    2753: "the declared Fibonacci indices are all integers satisfying 1 <= a <= 20",
+    2766: "N is 1..100 followed by exactly N*N integers, each in -127..127",
+    2786: "the declared Pell indices are all integers satisfying 1 <= k < 1000000",
+    2792: "each case has positive s,a,b <= 10000 and exactly a/b positive elements <=10000",
+}
+
+COUNTEREXAMPLES = {
+    1061: "1 1 3 4 5\n",
+    1125: "101\n0\n",
+    1145: "10 (3()()\n",
+    1321: "2 1\n##\n#X\n-1 -1\n",
+    1328: "1 -1\n0 0\n\n0 0\n",
+    1384: "1\n10 5\n1\n1 1\n",
+    1577: "A1\n$\n",
+    1611: "3 1\n1 3\n0 0\n",
+    2192: "1\na b a\n",
+    2406: ".\n",
+    2442: "1\n2 2\n0 0\n0 -1\n",
+    2499: "1\n0 1\n",
+    2689: "X" * 80 + "\n",
+    2701: "100\n",
+    2707: "1\n0 1 1\n",
+    2749: "1\n1\n",
+    2753: "1\n21\n",
+    2766: "2\n1 2 3\n",
+    2786: "1\n1000000\n",
+    2792: "1\n10\n1\n0\n1\n10\n",
+}
 
 
 def source_sections():
@@ -249,28 +295,92 @@ def cross_check(source, entry):
 
 
 def meaningful_check(number, text):
-    """One problem-specific structural/bounds check; malformed text returns False."""
+    """Check the stated constraint named in CONSTRAINTS; malformed text is false."""
     try:
         lines, tokens = text.splitlines(), text.split()
-        if number == 1061: return len(tokens) == 5 and int(tokens[4]) >= 2 and int(tokens[0]) != int(tokens[1])
-        if number == 1125: return lines[-1] == "0" and 1 <= int(lines[0]) <= 100
+        if number == 1061:
+            x, y, m, n, length = map(int, tokens)
+            return x != y and m > 0 and n > 0 and 0 < length < 2100000000
+        if number == 1125:
+            pos = 0
+            while int(lines[pos]) != 0:
+                count = int(lines[pos]); pos += 1
+                if not 1 <= count <= 100: return False
+                for broker in range(1, count + 1):
+                    row = list(map(int, lines[pos].split())); pos += 1
+                    if len(row) != 1 + 2 * row[0]: return False
+                    if any(not 1 <= row[i] <= count or row[i] == broker or not 1 <= row[i+1] <= 10
+                           for i in range(1, len(row), 2)): return False
+            return pos == len(lines) - 1
         if number == 1145: return bool(lines) and "(" in text and text.count("(") == text.count(")")
-        if number == 1321: return lines[-1] == "-1 -1" and all(set(x) <= set("#.") for x in lines if set(x) <= set("#."))
-        if number == 1328: return lines[-1] == "0 0" and int(lines[0].split()[1]) >= 0
-        if number == 1384: return 1 <= int(tokens[0]) <= 50 and all(int(x) >= 0 for x in tokens)
-        if number == 1577: return lines[-1] == "$" and all(x in ("*", "$") or x.isalpha() for x in lines)
-        if number == 1611: return lines[-1] == "0 0" and 0 < int(tokens[0]) <= 30000
-        if number == 2192: return int(lines[0]) == len(lines)-1 and all(len(x.split()[2]) == len(x.split()[0])+len(x.split()[1]) for x in lines[1:])
-        if number == 2406: return lines[-1] == "." and all(1 <= len(x) <= 1000000 for x in lines[:-1])
-        if number == 2442: return 1 <= int(tokens[0]) <= 10 and all(int(x) >= 0 for x in tokens)
-        if number == 2499: return int(lines[0]) == len(lines)-1 and all(int(v) > 0 for v in tokens[1:])
+        if number == 1321:
+            pos = 0
+            while lines[pos] != "-1 -1":
+                n, k = map(int, lines[pos].split()); pos += 1
+                if not 1 <= k <= n <= 8: return False
+                board = lines[pos:pos+n]; pos += n
+                if len(board) != n or any(len(row) != n or not set(row) <= set("#.") for row in board): return False
+            return pos == len(lines) - 1
+        if number == 1328:
+            pos = 0
+            while lines[pos] != "0 0":
+                n, d = map(int, lines[pos].split()); pos += 1
+                if n < 1 or d < 0 or len(lines) < pos + n: return False
+                if any(len(lines[pos+i].split()) != 2 for i in range(n)): return False
+                pos += n
+                while pos < len(lines) and not lines[pos].strip(): pos += 1
+            return pos == len(lines) - 1
+        if number == 1384:
+            pos = 1; cases = int(lines[0])
+            for _ in range(cases):
+                empty, full = map(int, lines[pos].split()); pos += 1
+                count = int(lines[pos]); pos += 1
+                if not 1 <= empty <= full <= 10000 or count < 1: return False
+                coins = [tuple(map(int, line.split())) for line in lines[pos:pos+count]]; pos += count
+                if len(coins) != count or any(value <= 0 or weight <= 0 for value, weight in coins): return False
+            return pos == len(lines)
+        if number == 1577:
+            return lines[-1] == "$" and all(x in ("*", "$") or x.isupper() and x.isalpha() and "".join(sorted(x)) == x for x in lines)
+        if number == 1611:
+            pos = 0
+            while lines[pos] != "0 0":
+                n, m = map(int, lines[pos].split()); pos += 1
+                if not 0 < n <= 30000 or not 0 <= m <= 500: return False
+                for _ in range(m):
+                    row = list(map(int, lines[pos].split())); pos += 1
+                    if len(row) != row[0] + 1 or any(not 0 <= member < n for member in row[1:]): return False
+            return pos == len(lines) - 1
+        if number == 2192:
+            return 1 <= int(lines[0]) <= 1000 and int(lines[0]) == len(lines)-1 and all(
+                len(parts := row.split()) == 3 and all(word.isalpha() for word in parts)
+                and 1 <= len(parts[0]) <= 200 and 1 <= len(parts[1]) <= 200
+                and len(parts[2]) == len(parts[0]) + len(parts[1]) for row in lines[1:])
+        if number == 2406: return len(lines) >= 2 and lines[-1] == "." and all(1 <= len(x) <= 1000000 for x in lines[:-1])
+        if number == 2442:
+            pos = 1; cases = int(lines[0])
+            for _ in range(cases):
+                m, n = map(int, lines[pos].split()); pos += 1
+                if not 1 <= m <= 100 or not 1 <= n <= 2000: return False
+                rows = lines[pos:pos+m]; pos += m
+                if len(rows) != m or any(len(row.split()) != n or any(int(v) < 0 for v in row.split()) for row in rows): return False
+            return pos == len(lines)
+        if number == 2499: return int(lines[0]) == len(lines)-1 and all(1 <= int(v) <= 1000000000 for v in tokens[1:])
         if number == 2689: return len(lines) == 1 and len(lines[0]) < 80
         if number == 2701: return len(tokens) == 1 and 1 <= int(tokens[0]) < 100
         if number == 2707: return int(lines[0]) == len(lines)-1 and all(float(x.split()[0]) != 0 for x in lines[1:])
-        if number in (2749, 2753, 2786): return int(lines[0]) == len(lines)-1 and all(int(v) > 0 for v in lines[1:])
+        if number == 2749: return int(lines[0]) == len(lines)-1 and all(1 < int(v) < 32768 for v in lines[1:])
+        if number == 2753: return int(lines[0]) == len(lines)-1 and all(1 <= int(v) <= 20 for v in lines[1:])
         if number == 2766: return 1 <= int(tokens[0]) <= 100 and len(tokens) == 1 + int(tokens[0])**2 and all(-127 <= int(v) <= 127 for v in tokens[1:])
-        if number == 2792: return int(lines[0]) >= 1 and all(-1000000 <= int(v) <= 1000000 for v in tokens)
-    except (IndexError, ValueError):
+        if number == 2786: return int(lines[0]) == len(lines)-1 and all(1 <= int(v) < 1000000 for v in lines[1:])
+        if number == 2792:
+            pos = 1; cases = int(lines[0])
+            for _ in range(cases):
+                target = int(lines[pos]); a = int(lines[pos+1]); av = list(map(int, lines[pos+2].split()))
+                b = int(lines[pos+3]); bv = list(map(int, lines[pos+4].split())); pos += 5
+                if not 1 <= target <= 10000 or not 1 <= a <= 10000 or len(av) != a: return False
+                if not 1 <= b <= 10000 or len(bv) != b or any(not 1 <= v <= 10000 for v in av+bv): return False
+            return pos == len(lines)
+    except (IndexError, ValueError, TypeError):
         return False
     return False
 
@@ -346,8 +456,8 @@ def main():
         (made/"samplecode.py").write_text(source, encoding="utf-8")
         write_producecase(made, source, generator, sample)
 
-        generated = cases[1:]; invalid = ("X" * 80 + "\n") if n == 2689 else "INVALID\n"
-        rows = [("problem-specific input structure and stated bounds", all(meaningful_check(n, c) for c in generated))]
+        generated = cases[1:]; invalid = COUNTEREXAMPLES[n]; label = CONSTRAINTS[n]
+        rows = [(label, all(meaningful_check(n, c) for c in generated))]
         audit = common.audit(made, cases=generated, outputs=outputs[1:], sample_input=sample,
             sample_output=entry["sample_output"], constraints=rows,
             constraint_counterexample=(invalid.strip(), [(rows[0][0], meaningful_check(n, invalid))]))

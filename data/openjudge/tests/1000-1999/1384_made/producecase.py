@@ -3,7 +3,7 @@ from pathlib import Path
 def g1384(r):
     out = [str(r.randint(1, 4))]
     for _ in range(int(out[0])):
-        empty = r.randint(0, 300); target = empty + r.randint(1, 600); n = r.randint(1, 12)
+        empty = r.randint(1, 300); target = empty + r.randint(1, 600); n = r.randint(1, 12)
         out += [f"{empty} {target}", str(n)]
         out += [f"{r.randint(1,100)} {r.randint(1,80)}" for _ in range(n)]
     return "\n".join(out) + "\n"
