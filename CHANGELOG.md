@@ -2,6 +2,19 @@
 
 ## 2026-07-29
 
+### 线上数据：清掉 20 条 `NOT-IN-CATALOG` 占位提交
+
+- 不是代码改动，是**对 jensen 上 `data/course.db` 的一次不可逆删除**，记在这里备查。
+- 删的是：`book='practice'`、`problem='NOT-IN-CATALOG'`、`user='GMyhf'`、
+  `result='Problem Not Found'`、`created like '2026-07-28 08:22:%'` —— id 36–55 共 20 条，
+  来自 T-025 开放公网当天的手工冒烟。`changes()` 返回 20，与删前清点一致。
+- **删前先备份**：`tools/backup_db.py` → `course-20260729T032301Z.db.gz`
+  （`users=9 submissions=55 settings=2`，存于 jensen `~/backups/cs101`）。
+  删后 `submissions=35`、`pragma integrity_check` 为 `ok`。
+- 未动其余 35 条。服务无需重启（每次请求现读库），practice 状态页已确认干净。
+- **留着没动**：另有 11 条 2026-07-23 的 GMyhf 记录 `book` 为空串（早于 book 列存在），
+  题库页不会显示（空串不匹配任何 `BOOK_META` 键），但会出现在 `/history/` 和站点统计里。
+
 ### 题库页：通过人数 / 尝试人数可点进统计页
 
 - `book.html` 把这两个数字做成链接，指向 `/history/?book=…&problem=…`，
