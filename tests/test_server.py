@@ -255,6 +255,37 @@ class ServerApiTests(unittest.TestCase):
         self.assertTrue(any(item["title"] for item in payload["problems"]))
         self.assertLess(int(headers["Content-Length"]), 500_000)
 
+    def test_pages_declare_the_local_favicon(self):
+        """标签页图标必须是本站的。
+
+        这条以前是坏的，而且坏得不显眼：页面不声明图标，浏览器就隐式请求
+        `/favicon.ico`；那条路径没人接，于是落到上游代理，**真的从 openjudge
+        取回了 POJ 的图标**。所以两头都要钉：页面声明了图标，`/favicon.ico`
+        也不再转发给上游。
+        """
+        for path in ("/", "/problems/", "/history/", "/book/pctbook/",
+                     "/pctbook/E03406/", "/help/", "/auth/login/", "/register/"):
+            _, _, body = request(self.port, "GET", path)
+            self.assertIn('href="/static/favicon.svg"',
+                          body.decode("utf-8", errors="replace"), path)
+
+        status, headers, _ = request(self.port, "GET", "/favicon.ico")
+        self.assertEqual(status, 302)
+        self.assertEqual(headers["Location"], "/static/favicon.svg")
+
+        status, headers, body = request(self.port, "GET", "/static/favicon.svg")
+        self.assertEqual(status, 200)
+        self.assertEqual(headers["Content-Type"], "image/svg+xml")
+        self.assertIn(b"<svg", body)
+        # 图标本身得是合法 XML —— 注释里一个 `--` 就能让整份 SVG 静默不显示。
+        import xml.dom.minidom
+        xml.dom.minidom.parseString(body)
+
+    def test_mirror_pages_do_not_link_the_upstream_favicon(self):
+        _, _, body = request(self.port, "GET", "/pctbook/")
+        text = body.decode("utf-8", errors="replace")
+        self.assertNotIn("static.openjudge.cn/styles/favicon.ico", text)
+
     def test_book_page_serves_the_three_tabs(self):
         for view, path in (("problems", "/book/pctbook/"),
                            ("ranking", "/book/pctbook/ranking/"),
