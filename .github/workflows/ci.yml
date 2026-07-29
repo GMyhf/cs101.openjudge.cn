@@ -45,7 +45,29 @@ jobs:
       # 这一条等价于维护者本地交接前跑的那一条：全套 unittest + py_compile
       # + 待返工检查 + full_sweep。退出码 0 才算过。
       - name: 交接闸门（tools/handoff.py --verify）
-        run: python3 tools/handoff.py --verify
+        run: |
+          set -o pipefail
+          python3 tools/handoff.py --verify 2>&1 | tee gate.log
+
+      # 失败时把闸门输出同时写进 job summary 和一条 error 注解。
+      # 为什么要多这一步：**下载完整 Actions 日志需要仓库管理员权限**，
+      # 而 job summary 与注解在公开仓库里是公开可读的。没有这一步，
+      # 一个外部贡献者（或任何没有 admin 的人）看到的只有「红了」，看不到红在哪。
+      - name: 失败时把闸门输出摊开
+        if: failure()
+        run: |
+          {
+            echo '### 闸门失败'
+            echo '```'
+            tail -n 150 gate.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          python3 - <<'PY'
+          import pathlib
+          text = pathlib.Path("gate.log").read_text(errors="replace")[-4000:]
+          escaped = text.replace("%", "%25").replace("\r", "%0D").replace("\n", "%0A")
+          print("::error title=闸门失败::" + escaped)
+          PY
 
       # 红线 2：口令与数据库绝不入库。这个仓库曾因为口令进 git 被整体重写过一次，
       # 靠的是「作者记得」。这里把它变成机械判据 —— 只看这次改动新增/修改的文件。
