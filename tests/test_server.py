@@ -237,6 +237,11 @@ class ServerApiTests(unittest.TestCase):
         self.assertIn("题库目录", text)
         self.assertIn("/api/catalog", text)          # 目录页的数据来源
 
+    def test_homepage_book_titles_open_their_book_tabs(self):
+        text = (ROOT / "index.html").read_text(encoding="utf-8")
+        self.assertIn('href="/${encodeURIComponent(book)}/"', text)
+        self.assertNotIn('/problems/?book=${encodeURIComponent(book)}', text)
+
     def test_every_book_has_compact_problem_ranking_and_status_pages(self):
         """题库根路径及其两个 tab 都走本地统一页面，不再回退到旧镜像目录。"""
         import server
