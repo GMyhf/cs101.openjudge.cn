@@ -38,6 +38,19 @@ def problem_links(book, html):
 def LinksFrom(html):
     parser = Links(); parser.feed(html); return parser.hrefs
 
+# 人拍板删掉的条目（2026-07-29）。**不是「删一次文件」而是一条规则** ——
+# 抓取脚本每次跑都会把上游有的条目重新写回 catalog，删文件是留不住的。
+#
+# `routine/02746` 的标题是「显示器」（全局题号 1747），而其余五个题库里的 `02746`
+# 全是「约瑟夫问题」（全局 1748）—— **两道不同的题共用一个后缀**。
+# 在按全局题号索引之前，显示器一直在拿约瑟夫问题的测试数据判，学生写对了也判 WA。
+# 显示器本身没有消失：它在 `practice/02745` 还在（同为全局 1747），要补数据补那一条。
+EXCLUDED_ENTRIES = {
+    ("routine", "02746"): "与 practice/02746（约瑟夫问题）后缀冲突；本题是显示器，"
+                          "同一道题在 practice/02745 保留",
+}
+
+
 def main():
     DATA.mkdir(parents=True, exist_ok=True); (DATA / "pages").mkdir(exist_ok=True); (DATA / "books").mkdir(exist_ok=True)
     catalog = []
@@ -53,6 +66,9 @@ def main():
             seen.update(fresh)
             for href in sorted(fresh):
                 problem_id = href.strip("/").split("/")[-1]
+                if (book, problem_id) in EXCLUDED_ENTRIES:
+                    print(f"  跳过 {book}/{problem_id}：{EXCLUDED_ENTRIES[(book, problem_id)]}", flush=True)
+                    continue
                 catalog.append({"book": book, "id": problem_id, "path": href, "tests": False})
             print(f"{book}: page {page}, +{len(fresh)}, total {len(seen)}", flush=True)
             page += 1

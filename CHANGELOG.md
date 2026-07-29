@@ -2,6 +2,25 @@
 
 ## 2026-07-29
 
+### 删除 `routine/02746`（显示器）——后缀与约瑟夫问题冲突（人拍板）
+
+- 删的是**别名，不是题目**：`routine/02746` 标题「显示器」（全局 1747），而
+  `practice`/`2024fallroutine`/`2024sp_routine`/`25dsapre`/`pctbook` 五处的 `02746`
+  全是「约瑟夫问题」（全局 1748）。**显示器本身在 `practice/02745` 保留**（同为全局 1747），
+  它仍在 T-028 待补清单里（priority 172）。
+- **做成规则而不是删一次文件**：`scripts/crawl_openjudge.py` 新增 `EXCLUDED_ENTRIES`
+  并在抓取时跳过 —— 抓取脚本每次跑都会按上游内容重写 catalog，只删文件留不住。
+  同时删除 `data/openjudge/pages/routine__02746.html`、移出 `catalog.json`、
+  更新 `collab/t028-candidates.json`（1747 的 `books` 收敛为 `["practice"]`）。
+- 实测确认：`/book/routine/` 不再列出它，`problem_exists("routine","02746")` 为 False
+  （提交会得到 Problem Not Found），`practice/02745` 显示器与 `practice/02746`
+  约瑟夫问题都在。catalog 1849 → **1848** 条，有数据 1608 条、31,823 组。
+- **把一条测试从「钉住那一对」改成「钉住那条规则」**：
+  `test_equal_local_suffix_does_not_override_global_identity` 原来断言
+  `routine/02746→1747`、`practice/02746→1748`，删完这对就没了。改成扫全库断言
+  **同一后缀不得对应多个全局题号** —— 若哪次重新抓取又引进一对，按后缀共享数据
+  就会重演「显示器拿约瑟夫问题的数据判」。规则比实例活得久。
+
 ### round5 提前复核：全局题号重构认可，并证实它修掉了一处线上错判
 
 - 约定是 5/6/7 一起复核，但这一轮动了**全库身份键**，风险量级不同，所以先看。

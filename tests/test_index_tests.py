@@ -5,6 +5,7 @@
 学生在平台上能过的代码在这里挂（01384 就是这么被撞见的）。
 """
 import json
+import re
 import sys
 import unittest
 from pathlib import Path
@@ -49,8 +50,24 @@ class ArchiveExclusionTests(unittest.TestCase):
         self.assertEqual(self.per_entry[("practice", "02676")], 1678)
 
     def test_equal_local_suffix_does_not_override_global_identity(self):
-        self.assertEqual(self.per_entry[("practice", "02746")], 1748)
-        self.assertEqual(self.per_entry[("routine", "02746")], 1747)
+        """后缀相同但其实是两道题 —— 这条判据从「钉住那一对」改成「钉住这条规则」。
+
+        原来它断言 `routine/02746`→1747、`practice/02746`→1748。人 2026-07-29 拍板
+        删掉了 `routine/02746` 那个别名（显示器在 `practice/02745` 保留），
+        于是那一对不存在了。**但规则本身仍然要守**：如果哪次重新抓取又引进一对
+        后缀相同、全局题号不同的条目，按后缀共享数据就会让一道题拿到另一道题的数据 ——
+        这正是重构前「显示器拿约瑟夫问题的数据判」的成因。
+        所以断言改成扫全库：**同一后缀不得对应多个全局题号。**
+        """
+        import collections
+        by_suffix = collections.defaultdict(set)
+        for (book, problem_id), global_number in self.per_entry.items():
+            suffix = re.search(r"(\d+)$", problem_id).group(1).lstrip("0")
+            by_suffix[suffix].add(global_number)
+        clashes = {s: sorted(v) for s, v in by_suffix.items() if len(v) > 1}
+        self.assertEqual(clashes, {}, f"后缀冲突会让题目拿到别人的数据：{clashes}")
+        # 被删掉的那个别名不该再出现在 catalog 里
+        self.assertNotIn(("routine", "02746"), self.per_entry)
 
     def test_different_local_ids_can_share_one_global_problem(self):
         self.assertEqual(self.per_entry[("2024fallroutine", "03253")], 2255)
@@ -80,7 +97,10 @@ class ArchiveExclusionTests(unittest.TestCase):
         self.assertEqual(len(by_global), len(candidates))
         self.assertEqual(by_global[1678]["practice_id"], "02676")
         self.assertNotIn("routine", by_global[1748]["books"])
-        self.assertIn("routine", by_global[1747]["books"])
+        # 1747（显示器）原本挂在 routine/02746 与 practice/02745 两处；
+        # routine/02746 已按人拍板删除（与约瑟夫问题后缀冲突），只剩 practice。
+        self.assertEqual(by_global[1747]["books"], ["practice"])
+        self.assertEqual(by_global[1747]["ids"], ["02745"])
         self.assertEqual(by_global[2255]["priority"], 47)
         self.assertIn(249, by_global[2255]["retired_priorities"])
         self.assertNotIn(30947, by_global)  # practice/30947 already has 21 cases

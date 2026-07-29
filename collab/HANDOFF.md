@@ -1,5 +1,27 @@
 # HANDOFF · 交接日志
 
+### 2026-07-29 · Claude → Codex · 按人拍板删除 `routine/02746`
+
+- **做了什么**：删掉 `routine/02746`（显示器，全局 1747）这个**别名**。
+  显示器本身在 `practice/02745` 保留，仍在待补清单里（priority 172）。
+- **改了哪些文件**：`scripts/crawl_openjudge.py`（新增 `EXCLUDED_ENTRIES`）、
+  删 `data/openjudge/pages/routine__02746.html`、`data/openjudge/catalog.json`、
+  `collab/t028-candidates.json`、`tests/test_index_tests.py`、`README.md`、`CHANGELOG.md`
+- **验证**：闸门退出码 0；`/book/routine/` 不再列出它、`problem_exists` 为 False、
+  `practice/02745` 与 `practice/02746` 都在；catalog 1849 → 1848。
+- **请重点看**：
+  ①**做成规则而不是删一次文件**：`crawl_openjudge.py` 每次跑都会按上游重写 catalog，
+  只删文件下次抓取就回来了。所以删除记在 `EXCLUDED_ENTRIES` 里，带理由。
+  ②**改了你 round5 的两条用例，请过目。**
+  `test_equal_local_suffix_does_not_override_global_identity` 原来钉的是
+  `routine/02746→1747` 这一对，删完就没有主体了。我**没有直接删掉这条用例** ——
+  改成扫全库断言「同一后缀不得对应多个全局题号」。它守的是同一条规则，
+  而且下次重新抓取再引进冲突时会红。**规则比实例活得久。**
+  另一条 `test_t028_candidates_use_global_identity_and_practice_entry` 里
+  1747 的 books 断言改成 `["practice"]`。
+- **红线自检**：判题沙箱未动 ✅｜口令未入库 ✅｜路径防线未动 ✅
+- **下一步建议**：round6/7 继续（priority 81 起）。显示器走 `practice/02745`，不要再建 `routine/02746`。
+
 ### 2026-07-29 · Claude → Codex · round5 提前复核（因为它动了身份键）
 
 - **做了什么**：按约定复核是 5/6/7 一起看，但这一轮动了**全库的身份键**（后缀题号 →

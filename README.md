@@ -14,7 +14,7 @@
 > 网页版由 `python3 tools/build_handbook.py` 从 Markdown 生成，**改完源文要重新构建并提交** ——
 > `tests/test_units.py` 会检查两者是否同步。
 
-CS101 题库镜像与本机判题服务。当前目录收录 1,849 道题目，其中 1,338 道已有测试数据，共 26,147 组测试数据。
+CS101 题库镜像与本机判题服务。当前目录收录 1,848 道题目，其中 1,608 道已有测试数据，共 31,823 组测试数据。
 
 > 2026-07-29 起，`data/openjudge/tests/` 下 `1000-1999` / `2000-2999` / `3000-3682` 三个桶的
 > **非 `*_made/` 目录不再参与判题**：那不是抓来的平台数据，是某人 2008 年的工作目录
@@ -107,7 +107,7 @@ python3 -m unittest
 
 不在 MIT 范围内的只有两处：
 
-- **镜像内容**：`data/openjudge/pages/`（1,849 份题面）、`data/openjudge/books/`（目录页），
+- **镜像内容**：`data/openjudge/pages/`（1,848 份题面）、`data/openjudge/books/`（目录页），
   以及由它们派生的 `catalog.json` / `test_index.json` / `limits.json`（题目标题与上游统计）。
   版权属 cs101.openjudge.cn 原作者。`data/openjudge/producecase_prompt/` 里每份 prompt
   也整段嵌了题面。
