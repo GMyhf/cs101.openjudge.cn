@@ -21,8 +21,8 @@ def dotnet_file_based_app_available():
     """判题器跑 C# 用的是 `dotnet run --file`，**那是 .NET 10 才有的 file-based app**。
 
     改动前这两条用例的判据只是 `shutil.which("dotnet")`。装了 SDK 8/9 的机器上
-    （GitHub Actions 的 `ubuntu-latest` 就预装了这么一个）判据成立、用例照跑，
-    然后因为「这个 SDK 根本没有这个功能」而失败 —— 报出来的样子却像是判题器坏了。
+    判据成立、用例照跑，然后因为「这个 SDK 根本没有这个功能」而失败 ——
+    报出来的样子却像是判题器坏了。
     **判据要判的是「这台机器能不能做这件事」，不是「有没有这个可执行文件」。**
     """
     if shutil.which("dotnet") is None:
@@ -37,6 +37,27 @@ def dotnet_file_based_app_available():
 
 
 HAS_FILE_BASED_DOTNET = dotnet_file_based_app_available()
+
+# 「SDK 版本对」仍然不等于「这台机器跑得动」。GitHub Actions 的 runner 上实测：
+# SDK 是 10.0.x，但程序一起来就是 `Fatal error. Failed to load JIT compiler` ——
+# .NET 运行时在本判题沙箱的地址空间限额里加载不了 JIT。
+# 这是「这台机器能不能做这件事」的问题，不是判题逻辑的问题，
+# **而为了让 CI 变绿去放宽沙箱限额，是红线 1 明确禁止的**（CI 不该反过来定义安全边界）。
+#
+# 只认这一个签名，且只在它出现时跳过：判题器自己坏掉不会产生这句话。
+# 一条「永远不会红的检查」比没有检查更糟，所以宁可窄。
+DOTNET_JIT_UNAVAILABLE = "Failed to load JIT compiler"
+
+
+def skip_if_dotnet_cannot_run(case, result):
+    """这台机器的 .NET 在沙箱里根本起不来时跳过，而不是红。
+
+    两条 C# 用例都要先过这一关。**尤其是那条期望 Runtime Error 的** ——
+    JIT 加载失败本身就是 Runtime Error，不先看一眼消息，它会「因为全坏了而通过」。
+    """
+    if DOTNET_JIT_UNAVAILABLE in str(result.get("message", "")):
+        case.skipTest("这台机器的 .NET 在判题沙箱里加载不了 JIT："
+                      + str(result.get("message", "")).strip())
 
 
 FIXTURE_MIRROR = Path(__file__).resolve().parent / "fixtures" / "mirror"
@@ -146,6 +167,7 @@ class JudgeCoreTests(unittest.TestCase):
     def test_csharp_uses_dotnet_file_based_app(self):
         source = "using System; class Program { static void Main() { var p = Console.ReadLine().Split(); Console.WriteLine(int.Parse(p[0]) + int.Parse(p[1])); } }"
         result = judge(BOOK, PROBLEM, "csharp", source)
+        skip_if_dotnet_cannot_run(self, result)
         self.assertEqual(result["status"], "Accepted", result)
         self.assertEqual(result["cases"], 2)
 
@@ -153,8 +175,12 @@ class JudgeCoreTests(unittest.TestCase):
     def test_csharp_runtime_error_is_not_hidden_by_file_build(self):
         source = "using System; class Program { static void Main() { throw new Exception(\"T001\"); } }"
         result = judge(BOOK, PROBLEM, "csharp", source)
+        # 先看消息再断言：JIT 加载失败也是 Runtime Error，
+        # 不看一眼这条用例会在「.NET 完全跑不动」的机器上假通过。
+        skip_if_dotnet_cannot_run(self, result)
         self.assertEqual(result["status"], "Runtime Error", result)
         self.assertEqual(result["case"], 1)
+        self.assertIn("T001", str(result.get("message", "")), result)
 
 
     @unittest.skipUnless(shutil.which("swiftc"), "本机没有 Swift")

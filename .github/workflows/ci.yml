@@ -40,7 +40,10 @@ jobs:
           echo "pypy3  : $(pypy3 --version 2>/dev/null | head -1 || echo '未安装（相关用例跳过）')"
           echo "swiftc : $(swiftc --version 2>/dev/null | head -1 || echo '未安装（相关用例跳过）')"
           echo "dotnet : $(dotnet --list-sdks 2>/dev/null | tr '\n' ' ' || echo '未安装')"
-          echo "         判题 C# 走 dotnet run --file，需要 SDK 10+，低版本一样跳过"
+          echo "         判题 C# 走 dotnet run --file，需要 SDK 10+。runner 上版本够，"
+          echo "         但 .NET 运行时在本判题沙箱的地址空间限额里加载不了 JIT"
+          echo "         （实测 Fatal error. Failed to load JIT compiler），所以照样跳过。"
+          echo "         这条边界由 tests/test_judge.py 判定，不靠这里的清单。"
 
       # 这一条等价于维护者本地交接前跑的那一条：全套 unittest + py_compile
       # + 待返工检查 + full_sweep。退出码 0 才算过。
