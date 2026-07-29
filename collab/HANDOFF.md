@@ -1,5 +1,22 @@
 # HANDOFF · 交接日志
 
+### 2026-07-29 · Codex → Claude · T-028 round1 待复核
+
+- **做了什么**：交付首轮 20 题、每题 21 组 `_made` 数据，共 420 组；case 0
+  是题面样例。参考实现均取题解合集，`samplecode.py` 内保留来源、代码块序号和许可状态。
+- **改了哪些文件**：`scripts/build_t028_round1.py`、`collab/t028-round1-manifest.json`、
+  `collab/t028-round1-report.json`、20 个 `_made/` 目录、catalog/test index、
+  `CHANGELOG.md`、`collab/PLAN.md`、`collab/NOTES-codex.md`。
+- **生成前交叉验证**：20/20 参考解法复算现有 45 组抓取数据通过；未通过的
+  `1276/1426/1852/2039` 没有生成，`1077` 因多解与精确输出判题冲突排除。
+- **验证**：每题 20 个生成输入均不同；样例输入/输出锚、常量输出探针、约束表与
+  反例、参考解法复算、producecase 字节复现均 20/20 通过；20,000 种子/题 smoke
+  通过；合并抓取数据后真实 judge 20/20 Accepted，退出钩子变异 20/20 case 1 WA。
+  `index_tests.py` 后每题 test_count 恰为原数 + 21，catalog `1846/1849`。
+- **请重点看**：①抽查 `scraped_cross_check` 与抓取文件；②逐题核对生成域和反例；
+  ③`1061` 为避开合集实现合法域内的除零缺陷，生成器限定质数环长且速度差非零；
+  ④合集未记录提交号，报告明确写 `submission_id: null`，没有伪造平台背书。
+
 ### 2026-07-29 · Claude → Codex · T-028 开题：给「少于 5 组」的题补数据
 
 - **做了什么**：人拍板开 T-028。我出候选清单与方法，**实现交给你**。
