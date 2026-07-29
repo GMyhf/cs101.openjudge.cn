@@ -1,1596 +1,17 @@
 {
  "task": "T-028",
- "note": "抓取数据少于 5 组、且尚无 _made 生成数据的题目。数量是「唯一题号」，不是 catalog 条目数 —— 同一题号出现在多个题库里，一份 _made 数据服务全部。",
+ "generated_for": "2026-07-29 排除 2008 存档之后重算",
+ "note": "tier 1 = 现在完全没有测试数据（判不了，挡着发版）；tier 2 = 还有 1-4 组。oracle_dir 是盘上仍在的 2008 存档目录 —— **已排除出判题，但仍可当构建时的 oracle**：参考解法必须能从它的 .in 逐 token 复算出 .out，复算不出就停手。",
  "counts": {
-  "unique_numbers": 216,
-  "catalog_entries": 436,
-  "with_solution_in_collection": 111,
-  "needs_self_written_solution": 105,
-  "by_current_test_count": {
-   "0": 3,
-   "1": 102,
-   "2": 82,
-   "3": 25,
-   "4": 5
-  },
-  "no_scraped_data_at_all": 2,
-  "excluded": 1
+  "total": 300,
+  "tier1_zero_data": 252,
+  "tier2_under_five": 48,
+  "with_oracle": 296,
+  "no_oracle": 4,
+  "in_solution_collection": 167,
+  "featured_book": 296
  },
  "entries": [
-  {
-   "number": 1001,
-   "ids": [
-    "01001"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1001",
-   "made_dir": "tests/1000-1999/1001_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1003,
-   "ids": [
-    "01003",
-    "E01003"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1003",
-   "made_dir": "tests/1000-1999/1003_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1004,
-   "ids": [
-    "01004"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1004",
-   "made_dir": "tests/1000-1999/1004_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1005,
-   "ids": [
-    "01005"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1005",
-   "made_dir": "tests/1000-1999/1005_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1008,
-   "ids": [
-    "01008"
-   ],
-   "books": [
-    "2024fallroutine",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1008",
-   "made_dir": "tests/1000-1999/1008_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1011,
-   "ids": [
-    "01011",
-    "T01011"
-   ],
-   "books": [
-    "pctbook",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1011",
-   "made_dir": "tests/1000-1999/1011_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1017,
-   "ids": [
-    "01017",
-    "M01017"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1017",
-   "made_dir": "tests/1000-1999/1017_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1019,
-   "ids": [
-    "01019"
-   ],
-   "books": [
-    "2024fallroutine",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1019",
-   "made_dir": "tests/1000-1999/1019_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1021,
-   "ids": [
-    "01021"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1021",
-   "made_dir": "tests/1000-1999/1021_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1026,
-   "ids": [
-    "01026"
-   ],
-   "books": [
-    "2024fallroutine",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1026",
-   "made_dir": "tests/1000-1999/1026_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1047,
-   "ids": [
-    "01047"
-   ],
-   "books": [
-    "2024fallroutine",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1047",
-   "made_dir": "tests/1000-1999/1047_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1050,
-   "ids": [
-    "01050"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1050",
-   "made_dir": "tests/1000-1999/1050_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1056,
-   "ids": [
-    "01056"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1056",
-   "made_dir": "tests/1000-1999/1056_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1061,
-   "ids": [
-    "01061"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1061",
-   "made_dir": "tests/1000-1999/1061_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1065,
-   "ids": [
-    "01065"
-   ],
-   "books": [
-    "2024fallroutine",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1065",
-   "made_dir": "tests/1000-1999/1065_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1068,
-   "ids": [
-    "01068"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1068",
-   "made_dir": "tests/1000-1999/1068_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1073,
-   "ids": [
-    "01073"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1073",
-   "made_dir": "tests/1000-1999/1073_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1077,
-   "ids": [
-    "01077"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1077",
-   "made_dir": "tests/1000-1999/1077_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1080,
-   "ids": [
-    "01080"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1080",
-   "made_dir": "tests/1000-1999/1080_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1084,
-   "ids": [
-    "01084"
-   ],
-   "books": [
-    "2024sp_routine",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1084",
-   "made_dir": "tests/1000-1999/1084_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1094,
-   "ids": [
-    "01094"
-   ],
-   "books": [
-    "2024sp_routine",
-    "2025sp_routine",
-    "dsapre",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1094",
-   "made_dir": "tests/1000-1999/1094_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1095,
-   "ids": [
-    "01095"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1095",
-   "made_dir": "tests/1000-1999/1095_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1125,
-   "ids": [
-    "01125"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1125",
-   "made_dir": "tests/1000-1999/1125_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1129,
-   "ids": [
-    "01129"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1129",
-   "made_dir": "tests/1000-1999/1129_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1145,
-   "ids": [
-    "01145"
-   ],
-   "books": [
-    "2024sp_routine",
-    "2025sp_routine",
-    "25dsapre",
-    "dsapre",
-    "practice"
-   ],
-   "current_test_count": 4,
-   "scraped_dir": "tests/1000-1999/1145",
-   "made_dir": "tests/1000-1999/1145_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1218,
-   "ids": [
-    "01218",
-    "E01218"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1218",
-   "made_dir": "tests/1000-1999/1218_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1230,
-   "ids": [
-    "01230"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1230",
-   "made_dir": "tests/1000-1999/1230_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1240,
-   "ids": [
-    "01240"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1240",
-   "made_dir": "tests/1000-1999/1240_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1248,
-   "ids": [
-    "01248"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1248",
-   "made_dir": "tests/1000-1999/1248_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1251,
-   "ids": [
-    "01251"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1251",
-   "made_dir": "tests/1000-1999/1251_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1258,
-   "ids": [
-    "01258"
-   ],
-   "books": [
-    "2025sp_routine",
-    "dsapre",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1258",
-   "made_dir": "tests/1000-1999/1258_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1269,
-   "ids": [
-    "01269"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1269",
-   "made_dir": "tests/1000-1999/1269_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1273,
-   "ids": [
-    "01273"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1273",
-   "made_dir": "tests/1000-1999/1273_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1276,
-   "ids": [
-    "01276"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1276",
-   "made_dir": "tests/1000-1999/1276_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1307,
-   "ids": [
-    "01307"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1307",
-   "made_dir": "tests/1000-1999/1307_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1308,
-   "ids": [
-    "01308"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1308",
-   "made_dir": "tests/1000-1999/1308_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1321,
-   "ids": [
-    "01321",
-    "M01321"
-   ],
-   "books": [
-    "2024sp_routine",
-    "2025sp_routine",
-    "25dsapre",
-    "dsapre",
-    "pctbook",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1321",
-   "made_dir": "tests/1000-1999/1321_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1324,
-   "ids": [
-    "01324"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1324",
-   "made_dir": "tests/1000-1999/1324_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1328,
-   "ids": [
-    "01328",
-    "M01328"
-   ],
-   "books": [
-    "2024fallroutine",
-    "2025sp_routine",
-    "pctbook",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1328",
-   "made_dir": "tests/1000-1999/1328_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1376,
-   "ids": [
-    "01376"
-   ],
-   "books": [
-    "2024sp_routine",
-    "2025sp_routine",
-    "dsapre",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1376",
-   "made_dir": "tests/1000-1999/1376_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1384,
-   "ids": [
-    "01384"
-   ],
-   "books": [
-    "2024fallroutine",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1384",
-   "made_dir": "tests/1000-1999/1384_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1390,
-   "ids": [
-    "01390"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1390",
-   "made_dir": "tests/1000-1999/1390_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1426,
-   "ids": [
-    "01426"
-   ],
-   "books": [
-    "2024sp_routine",
-    "2025sp_routine",
-    "dsapre",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1426",
-   "made_dir": "tests/1000-1999/1426_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1458,
-   "ids": [
-    "01458"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1458",
-   "made_dir": "tests/1000-1999/1458_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1459,
-   "ids": [
-    "01459"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1459",
-   "made_dir": "tests/1000-1999/1459_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1481,
-   "ids": [
-    "01481"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1481",
-   "made_dir": "tests/1000-1999/1481_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1548,
-   "ids": [
-    "01548"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1548",
-   "made_dir": "tests/1000-1999/1548_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1577,
-   "ids": [
-    "01577"
-   ],
-   "books": [
-    "2024sp_routine",
-    "2025sp_routine",
-    "25dsapre",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1577",
-   "made_dir": "tests/1000-1999/1577_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1581,
-   "ids": [
-    "01581"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1581",
-   "made_dir": "tests/1000-1999/1581_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1610,
-   "ids": [
-    "01610"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1610",
-   "made_dir": "tests/1000-1999/1610_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1611,
-   "ids": [
-    "01611"
-   ],
-   "books": [
-    "2024sp_routine",
-    "dsapre",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1611",
-   "made_dir": "tests/1000-1999/1611_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1657,
-   "ids": [
-    "01657"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1657",
-   "made_dir": "tests/1000-1999/1657_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1661,
-   "ids": [
-    "01661",
-    "T01661"
-   ],
-   "books": [
-    "pctbook",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1661",
-   "made_dir": "tests/1000-1999/1661_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1664,
-   "ids": [
-    "01664"
-   ],
-   "books": [
-    "2024fallroutine",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1664",
-   "made_dir": "tests/1000-1999/1664_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1686,
-   "ids": [
-    "01686"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1686",
-   "made_dir": "tests/1000-1999/1686_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1696,
-   "ids": [
-    "01696"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1696",
-   "made_dir": "tests/1000-1999/1696_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1702,
-   "ids": [
-    "01702"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1702",
-   "made_dir": "tests/1000-1999/1702_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1703,
-   "ids": [
-    "01703"
-   ],
-   "books": [
-    "2024sp_routine",
-    "25dsapre",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1703",
-   "made_dir": "tests/1000-1999/1703_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1729,
-   "ids": [
-    "01729"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1729",
-   "made_dir": "tests/1000-1999/1729_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1742,
-   "ids": [
-    "01742"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1742",
-   "made_dir": "tests/1000-1999/1742_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1789,
-   "ids": [
-    "01789"
-   ],
-   "books": [
-    "dsapre",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1789",
-   "made_dir": "tests/1000-1999/1789_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1798,
-   "ids": [
-    "01798"
-   ],
-   "books": [
-    "2024sp_routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1798",
-   "made_dir": "tests/1000-1999/1798_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1802,
-   "ids": [
-    "01802"
-   ],
-   "books": [
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1802",
-   "made_dir": "tests/1000-1999/1802_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1816,
-   "ids": [
-    "01816"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1816",
-   "made_dir": "tests/1000-1999/1816_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1828,
-   "ids": [
-    "01828"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1828",
-   "made_dir": "tests/1000-1999/1828_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1833,
-   "ids": [
-    "01833",
-    "T01833"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1833",
-   "made_dir": "tests/1000-1999/1833_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1835,
-   "ids": [
-    "01835"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1835",
-   "made_dir": "tests/1000-1999/1835_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1852,
-   "ids": [
-    "01852",
-    "M01852"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/1000-1999/1852",
-   "made_dir": "tests/1000-1999/1852_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1905,
-   "ids": [
-    "01905"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1905",
-   "made_dir": "tests/1000-1999/1905_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1922,
-   "ids": [
-    "01922",
-    "M01922"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1922",
-   "made_dir": "tests/1000-1999/1922_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1923,
-   "ids": [
-    "01923"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1923",
-   "made_dir": "tests/1000-1999/1923_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1936,
-   "ids": [
-    "01936"
-   ],
-   "books": [
-    "2024sp_routine",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1936",
-   "made_dir": "tests/1000-1999/1936_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 1941,
-   "ids": [
-    "01941"
-   ],
-   "books": [
-    "2024sp_routine",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1941",
-   "made_dir": "tests/1000-1999/1941_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1958,
-   "ids": [
-    "01958"
-   ],
-   "books": [
-    "2024fallroutine",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1958",
-   "made_dir": "tests/1000-1999/1958_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 1961,
-   "ids": [
-    "01961"
-   ],
-   "books": [
-    "2024sp_routine",
-    "2025sp_routine",
-    "25dsapre",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/1000-1999/1961",
-   "made_dir": "tests/1000-1999/1961_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2000,
-   "ids": [
-    "02000"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/2000-2999/2000",
-   "made_dir": "tests/2000-2999/2000_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2039,
-   "ids": [
-    "02039",
-    "M02039"
-   ],
-   "books": [
-    "2024sp_routine",
-    "dsapre",
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2039",
-   "made_dir": "tests/2000-2999/2039_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2040,
-   "ids": [
-    "02040"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2040",
-   "made_dir": "tests/2000-2999/2040_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2049,
-   "ids": [
-    "02049"
-   ],
-   "books": [
-    "dsapre",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2049",
-   "made_dir": "tests/2000-2999/2049_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2092,
-   "ids": [
-    "02092"
-   ],
-   "books": [
-    "dsapre",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2092",
-   "made_dir": "tests/2000-2999/2092_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2109,
-   "ids": [
-    "02109"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2109",
-   "made_dir": "tests/2000-2999/2109_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2157,
-   "ids": [
-    "02157"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2157",
-   "made_dir": "tests/2000-2999/2157_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2191,
-   "ids": [
-    "02191"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2191",
-   "made_dir": "tests/2000-2999/2191_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2192,
-   "ids": [
-    "02192"
-   ],
-   "books": [
-    "2024sp_routine",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2192",
-   "made_dir": "tests/2000-2999/2192_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2245,
-   "ids": [
-    "02245"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2245",
-   "made_dir": "tests/2000-2999/2245_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2251,
-   "ids": [
-    "02251"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2251",
-   "made_dir": "tests/2000-2999/2251_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2253,
-   "ids": [
-    "02253"
-   ],
-   "books": [
-    "dsapre",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2253",
-   "made_dir": "tests/2000-2999/2253_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2255,
-   "ids": [
-    "02255"
-   ],
-   "books": [
-    "2024sp_routine",
-    "dsapre",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2255",
-   "made_dir": "tests/2000-2999/2255_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2286,
-   "ids": [
-    "02286"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2286",
-   "made_dir": "tests/2000-2999/2286_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2299,
-   "ids": [
-    "02299"
-   ],
-   "books": [
-    "2024sp_routine",
-    "2025sp_routine",
-    "25dsapre",
-    "dsapre",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2299",
-   "made_dir": "tests/2000-2999/2299_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2312,
-   "ids": [
-    "02312"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2312",
-   "made_dir": "tests/2000-2999/2312_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2318,
-   "ids": [
-    "02318"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2318",
-   "made_dir": "tests/2000-2999/2318_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2337,
-   "ids": [
-    "02337"
-   ],
-   "books": [
-    "dsapre",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2337",
-   "made_dir": "tests/2000-2999/2337_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2406,
-   "ids": [
-    "02406"
-   ],
-   "books": [
-    "2024sp_routine",
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/2000-2999/2406",
-   "made_dir": "tests/2000-2999/2406_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2418,
-   "ids": [
-    "02418"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 4,
-   "scraped_dir": "tests/2000-2999/2418",
-   "made_dir": "tests/2000-2999/2418_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2424,
-   "ids": [
-    "02424"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2424",
-   "made_dir": "tests/2000-2999/2424_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2442,
-   "ids": [
-    "02442"
-   ],
-   "books": [
-    "2024sp_routine",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2442-6648",
-   "made_dir": "tests/2000-2999/2442-6648_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2485,
-   "ids": [
-    "02485"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2485",
-   "made_dir": "tests/2000-2999/2485_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2488,
-   "ids": [
-    "02488"
-   ],
-   "books": [
-    "2024sp_routine",
-    "2025sp_routine",
-    "dsapre",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2488",
-   "made_dir": "tests/2000-2999/2488_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2492,
-   "ids": [
-    "02492"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2492",
-   "made_dir": "tests/2000-2999/2492_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2499,
-   "ids": [
-    "02499"
-   ],
-   "books": [
-    "2024sp_routine",
-    "2025sp_routine",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2499",
-   "made_dir": "tests/2000-2999/2499_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2503,
-   "ids": [
-    "02503"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2503",
-   "made_dir": "tests/2000-2999/2503_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2524,
-   "ids": [
-    "02524",
-    "M02524"
-   ],
-   "books": [
-    "2025sp_routine",
-    "25dsapre",
-    "dsapre",
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2524",
-   "made_dir": "tests/2000-2999/2524_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2528,
-   "ids": [
-    "02528"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/2000-2999/2528",
-   "made_dir": "tests/2000-2999/2528_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2538,
-   "ids": [
-    "02538"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2538",
-   "made_dir": "tests/2000-2999/2538_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2549,
-   "ids": [
-    "02549"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2549",
-   "made_dir": "tests/2000-2999/2549_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2663,
-   "ids": [
-    "02663"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2663",
-   "made_dir": "tests/2000-2999/2663_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2676,
-   "ids": [
-    "02676",
-    "E02676"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2676",
-   "made_dir": "tests/2000-2999/2676_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2679,
-   "ids": [
-    "02679"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2679",
-   "made_dir": "tests/2000-2999/2679_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2689,
-   "ids": [
-    "02689",
-    "E02689"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/2000-2999/2689",
-   "made_dir": "tests/2000-2999/2689_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2692,
-   "ids": [
-    "02692",
-    "M02692"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2692",
-   "made_dir": "tests/2000-2999/2692_made",
-   "in_solution_collection": false
-  },
   {
    "number": 2694,
    "ids": [
@@ -1606,160 +27,37 @@
     "practice",
     "routine"
    ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2694",
-   "made_dir": "tests/2000-2999/2694_made",
-   "in_solution_collection": true
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2694",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 7,
+   "priority": 1
   },
   {
-   "number": 2696,
+   "number": 2945,
    "ids": [
-    "02696"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2696",
-   "made_dir": "tests/2000-2999/2696_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2698,
-   "ids": [
-    "02698"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2698",
-   "made_dir": "tests/2000-2999/2698_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2701,
-   "ids": [
-    "02701",
-    "E02701"
+    "02945",
+    "M02945"
    ],
    "books": [
     "2024fallroutine",
+    "2024sp_routine",
+    "dsapre",
     "pctbook",
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/2000-2999/2701",
-   "made_dir": "tests/2000-2999/2701_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2707,
-   "ids": [
-    "02707"
-   ],
-   "books": [
+    "practice",
     "routine"
    ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2707",
-   "made_dir": "tests/2000-2999/2707_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2712,
-   "ids": [
-    "02712",
-    "E02712"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2712",
-   "made_dir": "tests/2000-2999/2712_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2713,
-   "ids": [
-    "02713"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2713",
-   "made_dir": "tests/2000-2999/2713_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2714,
-   "ids": [
-    "02714"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2714",
-   "made_dir": "tests/2000-2999/2714_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2724,
-   "ids": [
-    "02724",
-    "E02724"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2724",
-   "made_dir": "tests/2000-2999/2724_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2729,
-   "ids": [
-    "02729"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/2000-2999/2729",
-   "made_dir": "tests/2000-2999/2729_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2744,
-   "ids": [
-    "02744"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2744",
-   "made_dir": "tests/2000-2999/2744_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2745,
-   "ids": [
-    "02745"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2745",
-   "made_dir": "tests/2000-2999/2745_made",
-   "in_solution_collection": true
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2945",
+   "oracle_cases": 5,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 6,
+   "priority": 2
   },
   {
    "number": 2746,
@@ -1775,318 +73,79 @@
     "practice",
     "routine"
    ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2746",
-   "made_dir": "tests/2000-2999/2746_made",
-   "in_solution_collection": true
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2746",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 6,
+   "priority": 3
   },
   {
-   "number": 2749,
+   "number": 2773,
    "ids": [
-    "02749",
-    "M02749"
-   ],
-   "books": [
-    "2025sp_routine",
-    "pctbook",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2749",
-   "made_dir": "tests/2000-2999/2749_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2750,
-   "ids": [
-    "02750",
-    "E02750"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2750",
-   "made_dir": "tests/2000-2999/2750_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2753,
-   "ids": [
-    "02753",
-    "E02753"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2753",
-   "made_dir": "tests/2000-2999/2753_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2754,
-   "ids": [
-    "02754",
-    "T02754"
+    "02773",
+    "M02773"
    ],
    "books": [
     "2024sp_routine",
-    "pctbook",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2754",
-   "made_dir": "tests/2000-2999/2754_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2766,
-   "ids": [
-    "02766",
-    "M02766"
-   ],
-   "books": [
-    "2024fallroutine",
-    "2025sp_routine",
     "dsapre",
     "pctbook",
     "practice",
     "routine"
    ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2766",
-   "made_dir": "tests/2000-2999/2766_made",
-   "in_solution_collection": false
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2773",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 5,
+   "priority": 4
   },
   {
-   "number": 2767,
+   "number": 2734,
    "ids": [
-    "02767",
-    "E02767"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2767",
-   "made_dir": "tests/2000-2999/2767_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2775,
-   "ids": [
-    "02775"
+    "02734",
+    "E02734"
    ],
    "books": [
     "2024sp_routine",
     "2025sp_routine",
     "25dsapre",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2775",
-   "made_dir": "tests/2000-2999/2775_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2783,
-   "ids": [
-    "02783"
-   ],
-   "books": [
-    "2024fallroutine",
-    "2024sp_routine",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2783",
-   "made_dir": "tests/2000-2999/2783_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2786,
-   "ids": [
-    "02786",
-    "M02786"
-   ],
-   "books": [
-    "2024fallroutine",
     "pctbook",
     "practice"
    ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2786",
-   "made_dir": "tests/2000-2999/2786_made",
-   "in_solution_collection": true
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2734",
+   "oracle_cases": 6,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 5,
+   "priority": 5
   },
   {
-   "number": 2787,
+   "number": 2488,
    "ids": [
-    "02787"
+    "02488"
    ],
    "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2787",
-   "made_dir": "tests/2000-2999/2787_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2788,
-   "ids": [
-    "02788"
-   ],
-   "books": [
+    "2024sp_routine",
     "2025sp_routine",
     "dsapre",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2788",
-   "made_dir": "tests/2000-2999/2788_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2790,
-   "ids": [
-    "02790"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2790",
-   "made_dir": "tests/2000-2999/2790_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2791,
-   "ids": [
-    "02791"
-   ],
-   "books": [
     "practice",
     "routine"
    ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/2000-2999/2791",
-   "made_dir": "tests/2000-2999/2791_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2792,
-   "ids": [
-    "02792",
-    "E02792"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2792",
-   "made_dir": "tests/2000-2999/2792_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2793,
-   "ids": [
-    "02793"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2793",
-   "made_dir": "tests/2000-2999/2793_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2795,
-   "ids": [
-    "02795"
-   ],
-   "books": [
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2795",
-   "made_dir": "tests/2000-2999/2795_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2796,
-   "ids": [
-    "02796"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/2000-2999/2796",
-   "made_dir": "tests/2000-2999/2796_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2802,
-   "ids": [
-    "02802"
-   ],
-   "books": [
-    "2024fallroutine",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2802",
-   "made_dir": "tests/2000-2999/2802_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2804,
-   "ids": [
-    "02804",
-    "E02804"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/2000-2999/2804",
-   "made_dir": "tests/2000-2999/2804_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2806,
-   "ids": [
-    "02806",
-    "M02806"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/2000-2999/2806",
-   "made_dir": "tests/2000-2999/2806_made",
-   "in_solution_collection": true
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2488",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 5,
+   "priority": 6
   },
   {
    "number": 2810,
@@ -2101,10 +160,551 @@
     "practice",
     "routine"
    ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2810",
-   "made_dir": "tests/2000-2999/2810_made",
-   "in_solution_collection": true
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2810",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 5,
+   "priority": 7
+  },
+  {
+   "number": 2299,
+   "ids": [
+    "02299"
+   ],
+   "books": [
+    "2024sp_routine",
+    "2025sp_routine",
+    "25dsapre",
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2299",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 5,
+   "priority": 8
+  },
+  {
+   "number": 2775,
+   "ids": [
+    "02775"
+   ],
+   "books": [
+    "2024sp_routine",
+    "2025sp_routine",
+    "25dsapre",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2775",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 5,
+   "priority": 9
+  },
+  {
+   "number": 2815,
+   "ids": [
+    "02815",
+    "M02815"
+   ],
+   "books": [
+    "2024sp_routine",
+    "2025sp_routine",
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2815",
+   "oracle_cases": 6,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 5,
+   "priority": 10
+  },
+  {
+   "number": 2524,
+   "ids": [
+    "02524",
+    "M02524"
+   ],
+   "books": [
+    "2025sp_routine",
+    "25dsapre",
+    "dsapre",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2524",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 5,
+   "priority": 11
+  },
+  {
+   "number": 1088,
+   "ids": [
+    "01088",
+    "M01088"
+   ],
+   "books": [
+    "2025sp_routine",
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1088",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 12
+  },
+  {
+   "number": 1182,
+   "ids": [
+    "01182",
+    "T01182"
+   ],
+   "books": [
+    "2024sp_routine",
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1182",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 13
+  },
+  {
+   "number": 1760,
+   "ids": [
+    "01760"
+   ],
+   "books": [
+    "2024sp_routine",
+    "25dsapre",
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1760",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 14
+  },
+  {
+   "number": 2386,
+   "ids": [
+    "02386"
+   ],
+   "books": [
+    "2024fallroutine",
+    "2024sp_routine",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2386",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 15
+  },
+  {
+   "number": 2456,
+   "ids": [
+    "02456"
+   ],
+   "books": [
+    "2024fallroutine",
+    "2025sp_routine",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2456",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 16
+  },
+  {
+   "number": 2808,
+   "ids": [
+    "02808",
+    "E02808"
+   ],
+   "books": [
+    "2024fallroutine",
+    "2024sp_routine",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2808",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 17
+  },
+  {
+   "number": 2995,
+   "ids": [
+    "02995",
+    "M02995"
+   ],
+   "books": [
+    "2024fallroutine",
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2995",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 18
+  },
+  {
+   "number": 2760,
+   "ids": [
+    "02760",
+    "M02760"
+   ],
+   "books": [
+    "2024fallroutine",
+    "2024sp_routine",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2760",
+   "oracle_cases": 7,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 19
+  },
+  {
+   "number": 3151,
+   "ids": [
+    "03151"
+   ],
+   "books": [
+    "2024sp_routine",
+    "2025sp_routine",
+    "25dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/3000-3682/3151",
+   "oracle_cases": 7,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 20
+  },
+  {
+   "number": 2733,
+   "ids": [
+    "02733",
+    "E02733"
+   ],
+   "books": [
+    "2024fallroutine",
+    "2024sp_routine",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2733",
+   "oracle_cases": 6,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 21
+  },
+  {
+   "number": 2774,
+   "ids": [
+    "02774"
+   ],
+   "books": [
+    "2024sp_routine",
+    "dsapre",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2774",
+   "oracle_cases": 6,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 22
+  },
+  {
+   "number": 2806,
+   "ids": [
+    "02806",
+    "M02806"
+   ],
+   "books": [
+    "2024fallroutine",
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2806",
+   "oracle_cases": 3,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 23
+  },
+  {
+   "number": 1426,
+   "ids": [
+    "01426"
+   ],
+   "books": [
+    "2024sp_routine",
+    "2025sp_routine",
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1426",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 24
+  },
+  {
+   "number": 1852,
+   "ids": [
+    "01852",
+    "M01852"
+   ],
+   "books": [
+    "2024fallroutine",
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1852",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 25
+  },
+  {
+   "number": 2039,
+   "ids": [
+    "02039",
+    "M02039"
+   ],
+   "books": [
+    "2024sp_routine",
+    "dsapre",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2039",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 26
+  },
+  {
+   "number": 2754,
+   "ids": [
+    "02754",
+    "T02754"
+   ],
+   "books": [
+    "2024sp_routine",
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2754",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 27
+  },
+  {
+   "number": 2783,
+   "ids": [
+    "02783"
+   ],
+   "books": [
+    "2024fallroutine",
+    "2024sp_routine",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2783",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 28
+  },
+  {
+   "number": 1094,
+   "ids": [
+    "01094"
+   ],
+   "books": [
+    "2024sp_routine",
+    "2025sp_routine",
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1094",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 29
+  },
+  {
+   "number": 1376,
+   "ids": [
+    "01376"
+   ],
+   "books": [
+    "2024sp_routine",
+    "2025sp_routine",
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1376",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 30
+  },
+  {
+   "number": 1833,
+   "ids": [
+    "01833",
+    "T01833"
+   ],
+   "books": [
+    "2024fallroutine",
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1833",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 31
+  },
+  {
+   "number": 1961,
+   "ids": [
+    "01961"
+   ],
+   "books": [
+    "2024sp_routine",
+    "2025sp_routine",
+    "25dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1961",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 32
+  },
+  {
+   "number": 2255,
+   "ids": [
+    "02255"
+   ],
+   "books": [
+    "2024sp_routine",
+    "dsapre",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2255",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 33
   },
   {
    "number": 2811,
@@ -2118,273 +718,14 @@
     "practice",
     "routine"
    ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2811",
-   "made_dir": "tests/2000-2999/2811_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2816,
-   "ids": [
-    "02816"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 4,
-   "scraped_dir": "tests/2000-2999/2816",
-   "made_dir": "tests/2000-2999/2816_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2818,
-   "ids": [
-    "02818"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2818",
-   "made_dir": "tests/2000-2999/2818_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2883,
-   "ids": [
-    "02883",
-    "E02883"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2883",
-   "made_dir": "tests/2000-2999/2883_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2911,
-   "ids": [
-    "02911",
-    "E02911"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2911",
-   "made_dir": "tests/2000-2999/2911_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2913,
-   "ids": [
-    "02913",
-    "E02913"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2913",
-   "made_dir": "tests/2000-2999/2913_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2915,
-   "ids": [
-    "02915"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/2000-2999/2915",
-   "made_dir": "tests/2000-2999/2915_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2927,
-   "ids": [
-    "02927",
-    "E02927"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2927",
-   "made_dir": "tests/2000-2999/2927_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2964,
-   "ids": [
-    "02964"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2964",
-   "made_dir": "tests/2000-2999/2964_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2979,
-   "ids": [
-    "02979"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2979",
-   "made_dir": "tests/2000-2999/2979_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2981,
-   "ids": [
-    "02981",
-    "M02981"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/2000-2999/2981",
-   "made_dir": "tests/2000-2999/2981_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 2982,
-   "ids": [
-    "02982"
-   ],
-   "books": [
-    "practice",
-    "routine"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2982",
-   "made_dir": "tests/2000-2999/2982_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2983,
-   "ids": [
-    "02983"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2983",
-   "made_dir": "tests/2000-2999/2983_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2984,
-   "ids": [
-    "02984"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/2000-2999/2984",
-   "made_dir": "tests/2000-2999/2984_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 2985,
-   "ids": [
-    "02985"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/2000-2999/2985",
-   "made_dir": "tests/2000-2999/2985_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 3094,
-   "ids": [
-    "T03094"
-   ],
-   "books": [
-    "pctbook"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/3000-3682/3094",
-   "made_dir": "tests/3000-3682/3094_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 3129,
-   "ids": [
-    "03129"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/3000-3682/3129",
-   "made_dir": "tests/3000-3682/3129_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 3141,
-   "ids": [
-    "03141"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/3000-3682/3141",
-   "made_dir": "tests/3000-3682/3141_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 3225,
-   "ids": [
-    "03225",
-    "E03225"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/3000-3682/3225",
-   "made_dir": "tests/3000-3682/3225_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 3237,
-   "ids": [
-    "03237"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/3000-3682/3237",
-   "made_dir": "tests/3000-3682/3237_made",
-   "in_solution_collection": false
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2811",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 34
   },
   {
    "number": 3248,
@@ -2398,24 +739,3774 @@
     "practice",
     "routine"
    ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/3000-3682/3248",
-   "made_dir": "tests/3000-3682/3248_made",
-   "in_solution_collection": true
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/3000-3682/3248",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 35
   },
   {
-   "number": 3253,
+   "number": 2692,
    "ids": [
-    "03253"
+    "02692",
+    "M02692"
    ],
    "books": [
     "2024fallroutine",
-    "2024sp_routine"
+    "pctbook",
+    "practice",
+    "routine"
    ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/3000-3682/3253",
-   "made_dir": "tests/3000-3682/3253_made",
-   "in_solution_collection": false
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2692",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 36
+  },
+  {
+   "number": 3143,
+   "ids": [
+    "03143",
+    "E03143"
+   ],
+   "books": [
+    "2024fallroutine",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/3000-3682/3143",
+   "oracle_cases": 20,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 37
+  },
+  {
+   "number": 1860,
+   "ids": [
+    "01860"
+   ],
+   "books": [
+    "2025sp_routine",
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1860",
+   "oracle_cases": 19,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 38
+  },
+  {
+   "number": 1035,
+   "ids": [
+    "01035"
+   ],
+   "books": [
+    "2024sp_routine",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1035",
+   "oracle_cases": 12,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 39
+  },
+  {
+   "number": 2431,
+   "ids": [
+    "02431",
+    "M02431"
+   ],
+   "books": [
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2431",
+   "oracle_cases": 12,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 40
+  },
+  {
+   "number": 2756,
+   "ids": [
+    "02756"
+   ],
+   "books": [
+    "dsapre",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2756",
+   "oracle_cases": 12,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 41
+  },
+  {
+   "number": 2757,
+   "ids": [
+    "02757",
+    "M02757"
+   ],
+   "books": [
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2757",
+   "oracle_cases": 11,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 42
+  },
+  {
+   "number": 1159,
+   "ids": [
+    "01159"
+   ],
+   "books": [
+    "2025sp_routine",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1159",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 43
+  },
+  {
+   "number": 1724,
+   "ids": [
+    "01724"
+   ],
+   "books": [
+    "2024sp_routine",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1724",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 44
+  },
+  {
+   "number": 2706,
+   "ids": [
+    "02706",
+    "T02706"
+   ],
+   "books": [
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2706",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 45
+  },
+  {
+   "number": 2996,
+   "ids": [
+    "02996"
+   ],
+   "books": [
+    "2024fallroutine",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2996",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 46
+  },
+  {
+   "number": 3254,
+   "ids": [
+    "03254",
+    "M03254"
+   ],
+   "books": [
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/3000-3682/3254joseph2",
+   "oracle_cases": 8,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 47
+  },
+  {
+   "number": 2502,
+   "ids": [
+    "02502"
+   ],
+   "books": [
+    "2024sp_routine",
+    "2025sp_routine",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2502",
+   "oracle_cases": 7,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 48
+  },
+  {
+   "number": 2748,
+   "ids": [
+    "02748",
+    "M02748"
+   ],
+   "books": [
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2748",
+   "oracle_cases": 6,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 49
+  },
+  {
+   "number": 1191,
+   "ids": [
+    "01191"
+   ],
+   "books": [
+    "2024sp_routine",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1191",
+   "oracle_cases": 5,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 50
+  },
+  {
+   "number": 2287,
+   "ids": [
+    "02287",
+    "T02287"
+   ],
+   "books": [
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2287",
+   "oracle_cases": 5,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 51
+  },
+  {
+   "number": 2981,
+   "ids": [
+    "02981",
+    "M02981"
+   ],
+   "books": [
+    "2024fallroutine",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2981",
+   "oracle_cases": 3,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 52
+  },
+  {
+   "number": 2750,
+   "ids": [
+    "02750",
+    "E02750"
+   ],
+   "books": [
+    "2024fallroutine",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2750",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 53
+  },
+  {
+   "number": 2788,
+   "ids": [
+    "02788"
+   ],
+   "books": [
+    "2025sp_routine",
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2788",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 54
+  },
+  {
+   "number": 2802,
+   "ids": [
+    "02802"
+   ],
+   "books": [
+    "2024fallroutine",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2802",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 55
+  },
+  {
+   "number": 1003,
+   "ids": [
+    "01003",
+    "E01003"
+   ],
+   "books": [
+    "2024fallroutine",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1003",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 56
+  },
+  {
+   "number": 1011,
+   "ids": [
+    "01011",
+    "T01011"
+   ],
+   "books": [
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1011",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 57
+  },
+  {
+   "number": 1017,
+   "ids": [
+    "01017",
+    "M01017"
+   ],
+   "books": [
+    "2024fallroutine",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1017",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 58
+  },
+  {
+   "number": 1065,
+   "ids": [
+    "01065"
+   ],
+   "books": [
+    "2024fallroutine",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1065",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 59
+  },
+  {
+   "number": 1218,
+   "ids": [
+    "01218",
+    "E01218"
+   ],
+   "books": [
+    "2024fallroutine",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1218",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 60
+  },
+  {
+   "number": 1258,
+   "ids": [
+    "01258"
+   ],
+   "books": [
+    "2025sp_routine",
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1258",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 61
+  },
+  {
+   "number": 1661,
+   "ids": [
+    "01661",
+    "T01661"
+   ],
+   "books": [
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1661",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 62
+  },
+  {
+   "number": 1664,
+   "ids": [
+    "01664"
+   ],
+   "books": [
+    "2024fallroutine",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1664",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 63
+  },
+  {
+   "number": 1703,
+   "ids": [
+    "01703"
+   ],
+   "books": [
+    "2024sp_routine",
+    "25dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1703",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 64
+  },
+  {
+   "number": 1958,
+   "ids": [
+    "01958"
+   ],
+   "books": [
+    "2024fallroutine",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1958",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 65
+  },
+  {
+   "number": 2812,
+   "ids": [
+    "02812"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2812",
+   "oracle_cases": 25,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 66
+  },
+  {
+   "number": 1042,
+   "ids": [
+    "01042"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1042",
+   "oracle_cases": 19,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 67
+  },
+  {
+   "number": 2226,
+   "ids": [
+    "02226"
+   ],
+   "books": [
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2226",
+   "oracle_cases": 18,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 68
+  },
+  {
+   "number": 1064,
+   "ids": [
+    "01064"
+   ],
+   "books": [
+    "2025sp_routine",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1064",
+   "oracle_cases": 13,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 69
+  },
+  {
+   "number": 1185,
+   "ids": [
+    "01185"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1185",
+   "oracle_cases": 12,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 70
+  },
+  {
+   "number": 2229,
+   "ids": [
+    "02229"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2229",
+   "oracle_cases": 11,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 71
+  },
+  {
+   "number": 2533,
+   "ids": [
+    "02533"
+   ],
+   "books": [
+    "2024fallroutine",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2533",
+   "oracle_cases": 11,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 72
+  },
+  {
+   "number": 2659,
+   "ids": [
+    "02659"
+   ],
+   "books": [
+    "2024fallroutine",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2659",
+   "oracle_cases": 11,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 73
+  },
+  {
+   "number": 2946,
+   "ids": [
+    "02946",
+    "E02946"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2946",
+   "oracle_cases": 11,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 74
+  },
+  {
+   "number": 1037,
+   "ids": [
+    "01037"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1037",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 75
+  },
+  {
+   "number": 1160,
+   "ids": [
+    "01160"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1160",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 76
+  },
+  {
+   "number": 1944,
+   "ids": [
+    "01944"
+   ],
+   "books": [
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1944",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 77
+  },
+  {
+   "number": 2385,
+   "ids": [
+    "02385"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2385",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 78
+  },
+  {
+   "number": 2711,
+   "ids": [
+    "02711"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2711",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 79
+  },
+  {
+   "number": 2797,
+   "ids": [
+    "02797"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2797",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 80
+  },
+  {
+   "number": 3247,
+   "ids": [
+    "03247",
+    "M03247"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/3000-3682/3247",
+   "oracle_cases": 9,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 81
+  },
+  {
+   "number": 1002,
+   "ids": [
+    "01002",
+    "M01002"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1002",
+   "oracle_cases": 8,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 82
+  },
+  {
+   "number": 2181,
+   "ids": [
+    "02181"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2181",
+   "oracle_cases": 8,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 83
+  },
+  {
+   "number": 2936,
+   "ids": [
+    "02936",
+    "E02936"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2936",
+   "oracle_cases": 8,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 84
+  },
+  {
+   "number": 2814,
+   "ids": [
+    "02814"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2814",
+   "oracle_cases": 6,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 85
+  },
+  {
+   "number": 2910,
+   "ids": [
+    "02910",
+    "E02910"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2910",
+   "oracle_cases": 6,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 86
+  },
+  {
+   "number": 2940,
+   "ids": [
+    "02940",
+    "E02940"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2940",
+   "oracle_cases": 6,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 87
+  },
+  {
+   "number": 1178,
+   "ids": [
+    "01178"
+   ],
+   "books": [
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1178",
+   "oracle_cases": 5,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 88
+  },
+  {
+   "number": 1190,
+   "ids": [
+    "01190"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1190",
+   "oracle_cases": 5,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 89
+  },
+  {
+   "number": 2899,
+   "ids": [
+    "02899",
+    "E02899"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2899",
+   "oracle_cases": 5,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 90
+  },
+  {
+   "number": 2942,
+   "ids": [
+    "02942",
+    "E02942"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2942",
+   "oracle_cases": 5,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 91
+  },
+  {
+   "number": 2791,
+   "ids": [
+    "02791"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2791",
+   "oracle_cases": 3,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 92
+  },
+  {
+   "number": 2804,
+   "ids": [
+    "02804",
+    "E02804"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2804",
+   "oracle_cases": 3,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 93
+  },
+  {
+   "number": 1077,
+   "ids": [
+    "01077"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1077",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 94
+  },
+  {
+   "number": 1230,
+   "ids": [
+    "01230"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1230",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 95
+  },
+  {
+   "number": 1276,
+   "ids": [
+    "01276"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1276",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 96
+  },
+  {
+   "number": 1481,
+   "ids": [
+    "01481"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1481",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 97
+  },
+  {
+   "number": 2049,
+   "ids": [
+    "02049"
+   ],
+   "books": [
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2049",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 98
+  },
+  {
+   "number": 2767,
+   "ids": [
+    "02767",
+    "E02767"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2767",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 99
+  },
+  {
+   "number": 2787,
+   "ids": [
+    "02787"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2787",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 100
+  },
+  {
+   "number": 2927,
+   "ids": [
+    "02927",
+    "E02927"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2927",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 101
+  },
+  {
+   "number": 2979,
+   "ids": [
+    "02979"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2979",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 102
+  },
+  {
+   "number": 1008,
+   "ids": [
+    "01008"
+   ],
+   "books": [
+    "2024fallroutine",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1008",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 103
+  },
+  {
+   "number": 1019,
+   "ids": [
+    "01019"
+   ],
+   "books": [
+    "2024fallroutine",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1019",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 104
+  },
+  {
+   "number": 1026,
+   "ids": [
+    "01026"
+   ],
+   "books": [
+    "2024fallroutine",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1026",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 105
+  },
+  {
+   "number": 1047,
+   "ids": [
+    "01047"
+   ],
+   "books": [
+    "2024fallroutine",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1047",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 106
+  },
+  {
+   "number": 1056,
+   "ids": [
+    "01056"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1056",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 107
+  },
+  {
+   "number": 1742,
+   "ids": [
+    "01742"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1742",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 108
+  },
+  {
+   "number": 1789,
+   "ids": [
+    "01789"
+   ],
+   "books": [
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1789",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 109
+  },
+  {
+   "number": 1941,
+   "ids": [
+    "01941"
+   ],
+   "books": [
+    "2024sp_routine",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1941",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 110
+  },
+  {
+   "number": 2092,
+   "ids": [
+    "02092"
+   ],
+   "books": [
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2092",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 111
+  },
+  {
+   "number": 2253,
+   "ids": [
+    "02253"
+   ],
+   "books": [
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2253",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 112
+  },
+  {
+   "number": 2337,
+   "ids": [
+    "02337"
+   ],
+   "books": [
+    "dsapre",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2337",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 113
+  },
+  {
+   "number": 2676,
+   "ids": [
+    "02676",
+    "E02676"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2676",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 114
+  },
+  {
+   "number": 2712,
+   "ids": [
+    "02712",
+    "E02712"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2712",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 115
+  },
+  {
+   "number": 2818,
+   "ids": [
+    "02818"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2818",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 116
+  },
+  {
+   "number": 2883,
+   "ids": [
+    "02883",
+    "E02883"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2883",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 117
+  },
+  {
+   "number": 2911,
+   "ids": [
+    "02911",
+    "E02911"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2911",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 118
+  },
+  {
+   "number": 2913,
+   "ids": [
+    "02913",
+    "E02913"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2913",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 119
+  },
+  {
+   "number": 1753,
+   "ids": [
+    "01753"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1753",
+   "oracle_cases": 20,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 120
+  },
+  {
+   "number": 2184,
+   "ids": [
+    "02184"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2184",
+   "oracle_cases": 11,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 121
+  },
+  {
+   "number": 2313,
+   "ids": [
+    "02313"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2313",
+   "oracle_cases": 11,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 122
+  },
+  {
+   "number": 2755,
+   "ids": [
+    "02755"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2755",
+   "oracle_cases": 11,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 123
+  },
+  {
+   "number": 1837,
+   "ids": [
+    "01837"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1837",
+   "oracle_cases": 10,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 124
+  },
+  {
+   "number": 2373,
+   "ids": [
+    "02373"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2373",
+   "oracle_cases": 10,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 125
+  },
+  {
+   "number": 1204,
+   "ids": [
+    "01204"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1204",
+   "oracle_cases": 7,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 126
+  },
+  {
+   "number": 2992,
+   "ids": [
+    "02992",
+    "M02992"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2992",
+   "oracle_cases": 6,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 127
+  },
+  {
+   "number": 1084,
+   "ids": [
+    "01084"
+   ],
+   "books": [
+    "2024sp_routine",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1084",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 128
+  },
+  {
+   "number": 1251,
+   "ids": [
+    "01251"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1251",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 129
+  },
+  {
+   "number": 1390,
+   "ids": [
+    "01390"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1390",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 130
+  },
+  {
+   "number": 1729,
+   "ids": [
+    "01729"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1729",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 131
+  },
+  {
+   "number": 2191,
+   "ids": [
+    "02191"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2191",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 132
+  },
+  {
+   "number": 2503,
+   "ids": [
+    "02503"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2503",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 133
+  },
+  {
+   "number": 2724,
+   "ids": [
+    "02724",
+    "E02724"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2724",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 134
+  },
+  {
+   "number": 1273,
+   "ids": [
+    "01273"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1273",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 135
+  },
+  {
+   "number": 1835,
+   "ids": [
+    "01835"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1835",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 136
+  },
+  {
+   "number": 1905,
+   "ids": [
+    "01905"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1905",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 137
+  },
+  {
+   "number": 1922,
+   "ids": [
+    "01922",
+    "M01922"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1922",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 138
+  },
+  {
+   "number": 1936,
+   "ids": [
+    "01936"
+   ],
+   "books": [
+    "2024sp_routine",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1936",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 139
+  },
+  {
+   "number": 2538,
+   "ids": [
+    "02538"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2538",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 140
+  },
+  {
+   "number": 2982,
+   "ids": [
+    "02982"
+   ],
+   "books": [
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2982",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 141
+  },
+  {
+   "number": 3225,
+   "ids": [
+    "03225",
+    "E03225"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/3000-3682/3225",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 142
+  },
+  {
+   "number": 1006,
+   "ids": [
+    "01006"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1006",
+   "oracle_cases": 29,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 143
+  },
+  {
+   "number": 2159,
+   "ids": [
+    "02159"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2159",
+   "oracle_cases": 29,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 144
+  },
+  {
+   "number": 1113,
+   "ids": [
+    "01113"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1113",
+   "oracle_cases": 16,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 145
+  },
+  {
+   "number": 2381,
+   "ids": [
+    "02381"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2381",
+   "oracle_cases": 14,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 146
+  },
+  {
+   "number": 2186,
+   "ids": [
+    "02186"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2186",
+   "oracle_cases": 12,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 147
+  },
+  {
+   "number": 1236,
+   "ids": [
+    "01236"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1236",
+   "oracle_cases": 11,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 148
+  },
+  {
+   "number": 1062,
+   "ids": [
+    "01062"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1062",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 149
+  },
+  {
+   "number": 1067,
+   "ids": [
+    "01067"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1067",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 150
+  },
+  {
+   "number": 1091,
+   "ids": [
+    "01091"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1091",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 151
+  },
+  {
+   "number": 1154,
+   "ids": [
+    "01154"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1154",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 152
+  },
+  {
+   "number": 1183,
+   "ids": [
+    "01183"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1183",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 153
+  },
+  {
+   "number": 1184,
+   "ids": [
+    "01184"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1184",
+   "oracle_cases": 10,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 154
+  },
+  {
+   "number": 2001,
+   "ids": [
+    "02001"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2001",
+   "oracle_cases": 9,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 155
+  },
+  {
+   "number": 2141,
+   "ids": [
+    "02141"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2141",
+   "oracle_cases": 8,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 156
+  },
+  {
+   "number": 1164,
+   "ids": [
+    "01164"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1164",
+   "oracle_cases": 6,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 157
+  },
+  {
+   "number": 1166,
+   "ids": [
+    "01166"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1166",
+   "oracle_cases": 6,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 158
+  },
+  {
+   "number": 1193,
+   "ids": [
+    "01193"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1193",
+   "oracle_cases": 5,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 159
+  },
+  {
+   "number": 2002,
+   "ids": [
+    "02002"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2002",
+   "oracle_cases": 5,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 160
+  },
+  {
+   "number": 2000,
+   "ids": [
+    "02000"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2000",
+   "oracle_cases": 3,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 161
+  },
+  {
+   "number": 1324,
+   "ids": [
+    "01324"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1324",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 162
+  },
+  {
+   "number": 2318,
+   "ids": [
+    "02318"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2318",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 163
+  },
+  {
+   "number": 3129,
+   "ids": [
+    "03129"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/3000-3682/3129",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 164
+  },
+  {
+   "number": 1001,
+   "ids": [
+    "01001"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1001",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 165
+  },
+  {
+   "number": 1004,
+   "ids": [
+    "01004"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1004",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 166
+  },
+  {
+   "number": 1005,
+   "ids": [
+    "01005"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1005",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 167
+  },
+  {
+   "number": 1021,
+   "ids": [
+    "01021"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1021",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 168
+  },
+  {
+   "number": 2251,
+   "ids": [
+    "02251"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2251",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 169
+  },
+  {
+   "number": 2663,
+   "ids": [
+    "02663"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2663",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 170
+  },
+  {
+   "number": 2698,
+   "ids": [
+    "02698"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2698",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 171
+  },
+  {
+   "number": 2745,
+   "ids": [
+    "02745"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2745",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 172
+  },
+  {
+   "number": 0,
+   "ids": [
+    "00000"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": null,
+   "oracle_cases": 0,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 173
+  },
+  {
+   "number": 2977,
+   "ids": [
+    "M02977"
+   ],
+   "books": [
+    "pctbook"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2977",
+   "oracle_cases": 29,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 174
+  },
+  {
+   "number": 2352,
+   "ids": [
+    "02352"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2352",
+   "oracle_cases": 16,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 175
+  },
+  {
+   "number": 2599,
+   "ids": [
+    "02599"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2599",
+   "oracle_cases": 12,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 176
+  },
+  {
+   "number": 2937,
+   "ids": [
+    "02937"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2937",
+   "oracle_cases": 12,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 177
+  },
+  {
+   "number": 2943,
+   "ids": [
+    "02943"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2943",
+   "oracle_cases": 11,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 178
+  },
+  {
+   "number": 1007,
+   "ids": [
+    "01007"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1007",
+   "oracle_cases": 10,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 179
+  },
+  {
+   "number": 1836,
+   "ids": [
+    "01836"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1836",
+   "oracle_cases": 10,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 180
+  },
+  {
+   "number": 2236,
+   "ids": [
+    "02236"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2236",
+   "oracle_cases": 10,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 181
+  },
+  {
+   "number": 2388,
+   "ids": [
+    "02388"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2388",
+   "oracle_cases": 10,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 182
+  },
+  {
+   "number": 2994,
+   "ids": [
+    "02994"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2994",
+   "oracle_cases": 10,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 183
+  },
+  {
+   "number": 1089,
+   "ids": [
+    "01089"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1089",
+   "oracle_cases": 9,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 184
+  },
+  {
+   "number": 1114,
+   "ids": [
+    "01114"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1114",
+   "oracle_cases": 9,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 185
+  },
+  {
+   "number": 2393,
+   "ids": [
+    "02393"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2393",
+   "oracle_cases": 9,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 186
+  },
+  {
+   "number": 2800,
+   "ids": [
+    "02800"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2800",
+   "oracle_cases": 9,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 187
+  },
+  {
+   "number": 1163,
+   "ids": [
+    "01163"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1163",
+   "oracle_cases": 7,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 188
+  },
+  {
+   "number": 3177,
+   "ids": [
+    "03177"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/3000-3682/3177",
+   "oracle_cases": 7,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 189
+  },
+  {
+   "number": 3186,
+   "ids": [
+    "03186"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/3000-3682/3186",
+   "oracle_cases": 7,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 190
+  },
+  {
+   "number": 2735,
+   "ids": [
+    "02735"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2735",
+   "oracle_cases": 6,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 191
+  },
+  {
+   "number": 2576,
+   "ids": [
+    "02576"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2576",
+   "oracle_cases": 5,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 192
+  },
+  {
+   "number": 2986,
+   "ids": [
+    "02986"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2986",
+   "oracle_cases": 5,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 193
+  },
+  {
+   "number": 2418,
+   "ids": [
+    "02418"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2418",
+   "oracle_cases": 4,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 194
+  },
+  {
+   "number": 2816,
+   "ids": [
+    "02816"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2816",
+   "oracle_cases": 4,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 195
+  },
+  {
+   "number": 2528,
+   "ids": [
+    "02528"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2528",
+   "oracle_cases": 3,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 196
+  },
+  {
+   "number": 2729,
+   "ids": [
+    "02729"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2729",
+   "oracle_cases": 3,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 197
+  },
+  {
+   "number": 2796,
+   "ids": [
+    "02796"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2796",
+   "oracle_cases": 3,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 198
+  },
+  {
+   "number": 2915,
+   "ids": [
+    "02915"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2915",
+   "oracle_cases": 3,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 199
+  },
+  {
+   "number": 1050,
+   "ids": [
+    "01050"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1050",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 200
+  },
+  {
+   "number": 1129,
+   "ids": [
+    "01129"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1129",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 201
+  },
+  {
+   "number": 1240,
+   "ids": [
+    "01240"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1240",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 202
+  },
+  {
+   "number": 1248,
+   "ids": [
+    "01248"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1248",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 203
+  },
+  {
+   "number": 1458,
+   "ids": [
+    "01458"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1458",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 204
+  },
+  {
+   "number": 1459,
+   "ids": [
+    "01459"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1459",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 205
+  },
+  {
+   "number": 1548,
+   "ids": [
+    "01548"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1548",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 206
+  },
+  {
+   "number": 1581,
+   "ids": [
+    "01581"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1581",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 207
+  },
+  {
+   "number": 1610,
+   "ids": [
+    "01610"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1610",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 208
+  },
+  {
+   "number": 1702,
+   "ids": [
+    "01702"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1702",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 209
+  },
+  {
+   "number": 1816,
+   "ids": [
+    "01816"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1816",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 210
+  },
+  {
+   "number": 1828,
+   "ids": [
+    "01828"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1828",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 211
+  },
+  {
+   "number": 2040,
+   "ids": [
+    "02040"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2040",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 212
+  },
+  {
+   "number": 2109,
+   "ids": [
+    "02109"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2109",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 213
+  },
+  {
+   "number": 2312,
+   "ids": [
+    "02312"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2312",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 214
+  },
+  {
+   "number": 2424,
+   "ids": [
+    "02424"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2424",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 215
+  },
+  {
+   "number": 2492,
+   "ids": [
+    "02492"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2492",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 216
+  },
+  {
+   "number": 2790,
+   "ids": [
+    "02790"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2790",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 217
+  },
+  {
+   "number": 2793,
+   "ids": [
+    "02793"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2793",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 218
+  },
+  {
+   "number": 2985,
+   "ids": [
+    "02985"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2985",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 219
+  },
+  {
+   "number": 3141,
+   "ids": [
+    "03141"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/3000-3682/3141",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 220
+  },
+  {
+   "number": 3237,
+   "ids": [
+    "03237"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/3000-3682/3237",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 221
+  },
+  {
+   "number": 1068,
+   "ids": [
+    "01068"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1068",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 222
+  },
+  {
+   "number": 1073,
+   "ids": [
+    "01073"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1073",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 223
+  },
+  {
+   "number": 1080,
+   "ids": [
+    "01080"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1080",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 224
+  },
+  {
+   "number": 1095,
+   "ids": [
+    "01095"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1095",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 225
+  },
+  {
+   "number": 1269,
+   "ids": [
+    "01269"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1269",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 226
+  },
+  {
+   "number": 1307,
+   "ids": [
+    "01307"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1307",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 227
+  },
+  {
+   "number": 1308,
+   "ids": [
+    "01308"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1308",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 228
+  },
+  {
+   "number": 1657,
+   "ids": [
+    "01657"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1657",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 229
+  },
+  {
+   "number": 1686,
+   "ids": [
+    "01686"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1686",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 230
+  },
+  {
+   "number": 1696,
+   "ids": [
+    "01696"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1696",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 231
+  },
+  {
+   "number": 1923,
+   "ids": [
+    "01923"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1923",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 232
+  },
+  {
+   "number": 2157,
+   "ids": [
+    "02157"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2157",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 233
+  },
+  {
+   "number": 2245,
+   "ids": [
+    "02245"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2245",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 234
+  },
+  {
+   "number": 2286,
+   "ids": [
+    "02286"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2286",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 235
+  },
+  {
+   "number": 2485,
+   "ids": [
+    "02485"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2485",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 236
+  },
+  {
+   "number": 2549,
+   "ids": [
+    "02549"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2549",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 237
+  },
+  {
+   "number": 2679,
+   "ids": [
+    "02679"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2679",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 238
+  },
+  {
+   "number": 2696,
+   "ids": [
+    "02696"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2696",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 239
+  },
+  {
+   "number": 2713,
+   "ids": [
+    "02713"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2713",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 240
+  },
+  {
+   "number": 2714,
+   "ids": [
+    "02714"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2714",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 241
+  },
+  {
+   "number": 2744,
+   "ids": [
+    "02744"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2744",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 242
+  },
+  {
+   "number": 2964,
+   "ids": [
+    "02964"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2964",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 243
+  },
+  {
+   "number": 2983,
+   "ids": [
+    "02983"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2983",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 244
+  },
+  {
+   "number": 2984,
+   "ids": [
+    "02984"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2984",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 245
+  },
+  {
+   "number": 3094,
+   "ids": [
+    "T03094"
+   ],
+   "books": [
+    "pctbook"
+   ],
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/3000-3682/3094",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 246
   },
   {
    "number": 3259,
@@ -2426,172 +4517,99 @@
     "practice"
    ],
    "current_test_count": 0,
-   "scraped_dir": null,
-   "made_dir": null,
-   "in_solution_collection": false
+   "tier": 1,
+   "oracle_dir": null,
+   "oracle_cases": 0,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 247
   },
   {
-   "number": 4013,
+   "number": 29986,
    "ids": [
-    "04013"
+    "29986"
    ],
    "books": [
     "practice"
    ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4013",
-   "made_dir": "tests/4000-8210/4013_made",
-   "in_solution_collection": false
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": null,
+   "oracle_cases": 0,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 248
   },
   {
-   "number": 4014,
+   "number": 3253,
    "ids": [
-    "04014"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4014",
-   "made_dir": "tests/4000-8210/4014_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4015,
-   "ids": [
-    "04015",
-    "M04015"
+    "03253"
    ],
    "books": [
     "2024fallroutine",
-    "2025sp_routine",
-    "pctbook",
-    "practice"
+    "2024sp_routine"
    ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4015",
-   "made_dir": "tests/4000-8210/4015_made",
-   "in_solution_collection": true
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/3000-3682/3253",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": false,
+   "book_count": 2,
+   "priority": 249
   },
   {
-   "number": 4016,
+   "number": 1802,
    "ids": [
-    "04016"
+    "01802"
    ],
    "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4016",
-   "made_dir": "tests/4000-8210/4016_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4017,
-   "ids": [
-    "04017"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4017",
-   "made_dir": "tests/4000-8210/4017_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4018,
-   "ids": [
-    "04018",
-    "E04018"
-   ],
-   "books": [
-    "pctbook",
-    "practice",
     "routine"
    ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4018",
-   "made_dir": "tests/4000-8210/4018_made",
-   "in_solution_collection": true
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1802",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": false,
+   "book_count": 1,
+   "priority": 250
   },
   {
-   "number": 4019,
+   "number": 2795,
    "ids": [
-    "04019"
+    "02795"
    ],
    "books": [
-    "practice"
+    "routine"
    ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4019",
-   "made_dir": "tests/4000-8210/4019_made",
-   "in_solution_collection": false
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/2000-2999/2795",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": false,
+   "book_count": 1,
+   "priority": 251
   },
   {
-   "number": 4020,
+   "number": 1798,
    "ids": [
-    "04020"
+    "01798"
    ],
    "books": [
-    "practice"
+    "2024sp_routine"
    ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4020",
-   "made_dir": "tests/4000-8210/4020_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4041,
-   "ids": [
-    "04041"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/4000-8210/4041",
-   "made_dir": "tests/4000-8210/4041_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 4042,
-   "ids": [
-    "04042"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4042",
-   "made_dir": "tests/4000-8210/4042_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4044,
-   "ids": [
-    "04044"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4044",
-   "made_dir": "tests/4000-8210/4044_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4045,
-   "ids": [
-    "04045"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/4000-8210/4045",
-   "made_dir": "tests/4000-8210/4045_made",
-   "in_solution_collection": false
+   "current_test_count": 0,
+   "tier": 1,
+   "oracle_dir": "tests/1000-1999/1798",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": false,
+   "book_count": 1,
+   "priority": 252
   },
   {
    "number": 4067,
@@ -2607,411 +4625,13 @@
     "practice"
    ],
    "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4067",
-   "made_dir": "tests/4000-8210/4067_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 4068,
-   "ids": [
-    "04068"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4068",
-   "made_dir": "tests/4000-8210/4068_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4069,
-   "ids": [
-    "04069"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/4000-8210/4069",
-   "made_dir": "tests/4000-8210/4069_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4070,
-   "ids": [
-    "04070"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/4000-8210/4070",
-   "made_dir": "tests/4000-8210/4070_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 4071,
-   "ids": [
-    "04071"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4071",
-   "made_dir": "tests/4000-8210/4071_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4072,
-   "ids": [
-    "04072"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4072",
-   "made_dir": "tests/4000-8210/4072_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4073,
-   "ids": [
-    "04073"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/4000-8210/4073",
-   "made_dir": "tests/4000-8210/4073_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4074,
-   "ids": [
-    "04074",
-    "T04074"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4074",
-   "made_dir": "tests/4000-8210/4074_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4095,
-   "ids": [
-    "04095"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/4000-8210/4095",
-   "made_dir": "tests/4000-8210/4095_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4096,
-   "ids": [
-    "04096"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/4000-8210/4096",
-   "made_dir": "tests/4000-8210/4096_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 4097,
-   "ids": [
-    "04097"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/4000-8210/4097",
-   "made_dir": "tests/4000-8210/4097_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4098,
-   "ids": [
-    "04098"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/4000-8210/4098",
-   "made_dir": "tests/4000-8210/4098_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4099,
-   "ids": [
-    "04099"
-   ],
-   "books": [
-    "2024sp_routine",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/4000-8210/4099",
-   "made_dir": "tests/4000-8210/4099_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 4100,
-   "ids": [
-    "04100"
-   ],
-   "books": [
-    "2024fallroutine",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/4000-8210/4100",
-   "made_dir": "tests/4000-8210/4100_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 4101,
-   "ids": [
-    "04101"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/4000-8210/4101",
-   "made_dir": "tests/4000-8210/4101_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 4113,
-   "ids": [
-    "04113"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/4000-8210/4113",
-   "made_dir": "tests/4000-8210/4113_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 5585,
-   "ids": [
-    "05585",
-    "M05585"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/4000-8210/5585",
-   "made_dir": "tests/4000-8210/5585_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 12555,
-   "ids": [
-    "12555"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/10000-19963/12555",
-   "made_dir": "tests/10000-19963/12555_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 12556,
-   "ids": [
-    "12556",
-    "E12556"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/10000-19963/12556",
-   "made_dir": "tests/10000-19963/12556_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 12557,
-   "ids": [
-    "12557"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/10000-19963/12557",
-   "made_dir": "tests/10000-19963/12557_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 12558,
-   "ids": [
-    "12558",
-    "M12558"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/10000-19963/12558",
-   "made_dir": "tests/10000-19963/12558_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 12559,
-   "ids": [
-    "12559",
-    "T12559"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 4,
-   "scraped_dir": "tests/10000-19963/12559",
-   "made_dir": "tests/10000-19963/12559_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 12560,
-   "ids": [
-    "12560",
-    "M12560"
-   ],
-   "books": [
-    "2024fallroutine",
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/10000-19963/12560",
-   "made_dir": "tests/10000-19963/12560_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 18104,
-   "ids": [
-    "18104"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/10000-19963/18104",
-   "made_dir": "tests/10000-19963/18104_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 18105,
-   "ids": [
-    "18105"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/10000-19963/18105",
-   "made_dir": "tests/10000-19963/18105_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 18106,
-   "ids": [
-    "18106",
-    "M18106"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/10000-19963/18106",
-   "made_dir": "tests/10000-19963/18106_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 18107,
-   "ids": [
-    "18107"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/10000-19963/18107",
-   "made_dir": "tests/10000-19963/18107_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 18108,
-   "ids": [
-    "18108",
-    "M18108"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/10000-19963/18108",
-   "made_dir": "tests/10000-19963/18108_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 18182,
-   "ids": [
-    "18182",
-    "M18182"
-   ],
-   "books": [
-    "2024sp_routine",
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 1,
-   "scraped_dir": "tests/10000-19963/18182",
-   "made_dir": "tests/10000-19963/18182_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 21608,
-   "ids": [
-    "21608",
-    "M21608"
-   ],
-   "books": [
-    "pctbook",
-    "practice"
-   ],
-   "current_test_count": 3,
-   "scraped_dir": "tests/20000-29982/21608",
-   "made_dir": "tests/20000-29982/21608_made",
-   "in_solution_collection": true
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4067",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 5,
+   "priority": 253
   },
   {
    "number": 23421,
@@ -3026,9 +4646,245 @@
     "routine"
    ],
    "current_test_count": 2,
-   "scraped_dir": "tests/20000-29982/23421",
-   "made_dir": "tests/20000-29982/23421_made",
-   "in_solution_collection": true
+   "tier": 2,
+   "oracle_dir": "tests/20000-29982/23421",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 254
+  },
+  {
+   "number": 4015,
+   "ids": [
+    "04015",
+    "M04015"
+   ],
+   "books": [
+    "2024fallroutine",
+    "2025sp_routine",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4015",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 4,
+   "priority": 255
+  },
+  {
+   "number": 12556,
+   "ids": [
+    "12556",
+    "E12556"
+   ],
+   "books": [
+    "2024fallroutine",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 3,
+   "tier": 2,
+   "oracle_dir": "tests/10000-19963/12556",
+   "oracle_cases": 3,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 256
+  },
+  {
+   "number": 12560,
+   "ids": [
+    "12560",
+    "M12560"
+   ],
+   "books": [
+    "2024fallroutine",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 3,
+   "tier": 2,
+   "oracle_dir": "tests/10000-19963/12560",
+   "oracle_cases": 3,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 257
+  },
+  {
+   "number": 4018,
+   "ids": [
+    "04018",
+    "E04018"
+   ],
+   "books": [
+    "pctbook",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4018",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 258
+  },
+  {
+   "number": 18182,
+   "ids": [
+    "18182",
+    "M18182"
+   ],
+   "books": [
+    "2024sp_routine",
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/10000-19963/18182",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 259
+  },
+  {
+   "number": 4140,
+   "ids": [
+    "04140"
+   ],
+   "books": [
+    "2025sp_routine",
+    "practice",
+    "routine"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": null,
+   "oracle_cases": 0,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 3,
+   "priority": 260
+  },
+  {
+   "number": 12559,
+   "ids": [
+    "12559",
+    "T12559"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 4,
+   "tier": 2,
+   "oracle_dir": "tests/10000-19963/12559",
+   "oracle_cases": 4,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 261
+  },
+  {
+   "number": 18108,
+   "ids": [
+    "18108",
+    "M18108"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 3,
+   "tier": 2,
+   "oracle_dir": "tests/10000-19963/18108",
+   "oracle_cases": 3,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 262
+  },
+  {
+   "number": 21608,
+   "ids": [
+    "21608",
+    "M21608"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 3,
+   "tier": 2,
+   "oracle_dir": "tests/20000-29982/21608",
+   "oracle_cases": 3,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 263
+  },
+  {
+   "number": 4099,
+   "ids": [
+    "04099"
+   ],
+   "books": [
+    "2024sp_routine",
+    "practice"
+   ],
+   "current_test_count": 2,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4099",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 264
+  },
+  {
+   "number": 4100,
+   "ids": [
+    "04100"
+   ],
+   "books": [
+    "2024fallroutine",
+    "practice"
+   ],
+   "current_test_count": 2,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4100",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 265
+  },
+  {
+   "number": 5585,
+   "ids": [
+    "05585",
+    "M05585"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 2,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/5585",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 266
   },
   {
    "number": 26572,
@@ -3040,35 +4896,13 @@
     "practice"
    ],
    "current_test_count": 1,
-   "scraped_dir": "tests/20000-29982/26572",
-   "made_dir": "tests/20000-29982/26572_made",
-   "in_solution_collection": true
-  },
-  {
-   "number": 27072,
-   "ids": [
-    "27072"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 4,
-   "scraped_dir": "tests/20000-29982/27072",
-   "made_dir": "tests/20000-29982/27072_made",
-   "in_solution_collection": false
-  },
-  {
-   "number": 27623,
-   "ids": [
-    "27623"
-   ],
-   "books": [
-    "practice"
-   ],
-   "current_test_count": 2,
-   "scraped_dir": "tests/20000-29982/27623",
-   "made_dir": "tests/20000-29982/27623_made",
-   "in_solution_collection": true
+   "tier": 2,
+   "oracle_dir": "tests/20000-29982/26572",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 267
   },
   {
    "number": 29917,
@@ -3081,38 +4915,563 @@
     "practice"
    ],
    "current_test_count": 1,
-   "scraped_dir": "tests/20000-29982/29917",
-   "made_dir": "tests/20000-29982/29917_made",
-   "in_solution_collection": true
+   "tier": 2,
+   "oracle_dir": "tests/20000-29982/29917",
+   "oracle_cases": 1,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 268
   },
   {
-   "number": 29986,
+   "number": 12558,
    "ids": [
-    "29986"
+    "12558",
+    "M12558"
    ],
    "books": [
+    "pctbook",
     "practice"
    ],
-   "current_test_count": 0,
-   "scraped_dir": null,
-   "made_dir": null,
-   "in_solution_collection": false
-  }
- ],
- "excluded": [
+   "current_test_count": 3,
+   "tier": 2,
+   "oracle_dir": "tests/10000-19963/12558",
+   "oracle_cases": 3,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 269
+  },
   {
-   "number": 0,
+   "number": 18106,
    "ids": [
-    "00000"
+    "18106",
+    "M18106"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 3,
+   "tier": 2,
+   "oracle_dir": "tests/10000-19963/18106",
+   "oracle_cases": 3,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 270
+  },
+  {
+   "number": 4074,
+   "ids": [
+    "04074",
+    "T04074"
+   ],
+   "books": [
+    "pctbook",
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4074",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 2,
+   "priority": 271
+  },
+  {
+   "number": 4041,
+   "ids": [
+    "04041"
    ],
    "books": [
     "practice"
    ],
-   "current_test_count": 0,
-   "scraped_dir": null,
-   "made_dir": null,
+   "current_test_count": 2,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4041",
+   "oracle_cases": 2,
    "in_solution_collection": true,
-   "exclusion": "已被永久排除：`.out` 超过判题器 RLIMIT_FSIZE 的 2MB 上限，见 tools/full_sweep.py 的第 3 条。不要为它生成数据。"
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 272
+  },
+  {
+   "number": 4070,
+   "ids": [
+    "04070"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 2,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4070",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 273
+  },
+  {
+   "number": 4096,
+   "ids": [
+    "04096"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 2,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4096",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 274
+  },
+  {
+   "number": 27623,
+   "ids": [
+    "27623"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 2,
+   "tier": 2,
+   "oracle_dir": "tests/20000-29982/27623",
+   "oracle_cases": 2,
+   "in_solution_collection": true,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 275
+  },
+  {
+   "number": 27072,
+   "ids": [
+    "27072"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 4,
+   "tier": 2,
+   "oracle_dir": "tests/20000-29982/27072",
+   "oracle_cases": 4,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 276
+  },
+  {
+   "number": 4095,
+   "ids": [
+    "04095"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 3,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4095",
+   "oracle_cases": 3,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 277
+  },
+  {
+   "number": 4097,
+   "ids": [
+    "04097"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 3,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4097",
+   "oracle_cases": 3,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 278
+  },
+  {
+   "number": 12555,
+   "ids": [
+    "12555"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 3,
+   "tier": 2,
+   "oracle_dir": "tests/10000-19963/12555",
+   "oracle_cases": 3,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 279
+  },
+  {
+   "number": 12557,
+   "ids": [
+    "12557"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 3,
+   "tier": 2,
+   "oracle_dir": "tests/10000-19963/12557",
+   "oracle_cases": 3,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 280
+  },
+  {
+   "number": 18104,
+   "ids": [
+    "18104"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 3,
+   "tier": 2,
+   "oracle_dir": "tests/10000-19963/18104",
+   "oracle_cases": 3,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 281
+  },
+  {
+   "number": 18105,
+   "ids": [
+    "18105"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 3,
+   "tier": 2,
+   "oracle_dir": "tests/10000-19963/18105",
+   "oracle_cases": 3,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 282
+  },
+  {
+   "number": 18107,
+   "ids": [
+    "18107"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 3,
+   "tier": 2,
+   "oracle_dir": "tests/10000-19963/18107",
+   "oracle_cases": 3,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 283
+  },
+  {
+   "number": 4045,
+   "ids": [
+    "04045"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 2,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4045",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 284
+  },
+  {
+   "number": 4069,
+   "ids": [
+    "04069"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 2,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4069",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 285
+  },
+  {
+   "number": 4073,
+   "ids": [
+    "04073"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 2,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4073",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 286
+  },
+  {
+   "number": 4098,
+   "ids": [
+    "04098"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 2,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4098",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 287
+  },
+  {
+   "number": 4101,
+   "ids": [
+    "04101"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 2,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4101",
+   "oracle_cases": 2,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 288
+  },
+  {
+   "number": 4013,
+   "ids": [
+    "04013"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4013",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 289
+  },
+  {
+   "number": 4014,
+   "ids": [
+    "04014"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4014",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 290
+  },
+  {
+   "number": 4016,
+   "ids": [
+    "04016"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4016",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 291
+  },
+  {
+   "number": 4017,
+   "ids": [
+    "04017"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4017",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 292
+  },
+  {
+   "number": 4019,
+   "ids": [
+    "04019"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4019",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 293
+  },
+  {
+   "number": 4020,
+   "ids": [
+    "04020"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4020",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 294
+  },
+  {
+   "number": 4042,
+   "ids": [
+    "04042"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4042",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 295
+  },
+  {
+   "number": 4044,
+   "ids": [
+    "04044"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4044",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 296
+  },
+  {
+   "number": 4068,
+   "ids": [
+    "04068"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4068",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 297
+  },
+  {
+   "number": 4071,
+   "ids": [
+    "04071"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4071",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 298
+  },
+  {
+   "number": 4072,
+   "ids": [
+    "04072"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4072",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 299
+  },
+  {
+   "number": 4113,
+   "ids": [
+    "04113"
+   ],
+   "books": [
+    "practice"
+   ],
+   "current_test_count": 1,
+   "tier": 2,
+   "oracle_dir": "tests/4000-8210/4113",
+   "oracle_cases": 1,
+   "in_solution_collection": false,
+   "featured_book": true,
+   "book_count": 1,
+   "priority": 300
   }
  ]
 }
