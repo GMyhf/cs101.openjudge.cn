@@ -254,6 +254,8 @@ class ServerApiTests(unittest.TestCase):
                 self.assertIn('id="' + tab + '"', text)
                 self.assertIn(f'const BOOK={json.dumps(book, ensure_ascii=False)}', text)
                 self.assertIn("/api/books/", text)
+                self.assertIn('class="course"', text)
+                self.assertIn('class="pagination"', text)
 
     def test_book_dashboard_is_public_and_scoped_without_submission_secrets(self):
         """排名/状态只需公开摘要；不能借它读到 source/detail 或其它题库记录。"""
