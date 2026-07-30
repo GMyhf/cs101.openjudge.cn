@@ -45,6 +45,20 @@ class ArchiveExclusionTests(unittest.TestCase):
                     offenders.append(case["input"])
         self.assertEqual(offenders[:5], [], f"catalog 里还引着 {len(offenders)} 条存档数据")
 
+    def test_generated_data_replaces_legacy_data_for_the_same_global_problem(self):
+        offenders = []
+        by_global = {}
+        for problem in self.catalog["problems"]:
+            by_global.setdefault(problem["global_number"], problem.get("test_cases", []))
+        for global_number, cases in by_global.items():
+            has_made = any(case["input"].split("/")[2].endswith("_made") for case in cases)
+            if has_made:
+                legacy = [case["input"] for case in cases
+                          if not case["input"].split("/")[2].endswith("_made")]
+                offenders.extend((global_number, path) for path in legacy)
+        self.assertEqual([], offenders[:5],
+                         f"已有自产数据的全局题仍混入 {len(offenders)} 条旧数据")
+
     def test_problem_pages_supply_global_identity(self):
         self.assertEqual(self.per_entry[("pctbook", "E02676")], 1678)
         self.assertEqual(self.per_entry[("practice", "02676")], 1678)

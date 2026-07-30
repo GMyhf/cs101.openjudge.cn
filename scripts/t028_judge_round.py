@@ -37,11 +37,17 @@ def main():
                 'merged_cases':verdict.get('cases',item.get('test_count')),
                 'total_ms':verdict.get('time_ms')}
         report_rows[n]['merged_judge']=merged
-        if verdict['status']!='Accepted':failed.append(n);report_rows[n]['status']='FAILED'
+        if verdict['status']!='Accepted':
+            failed.append(n);report_rows[n]['status']='FAILED'
+        elif (not report_rows[n].get('self_audit',{}).get('failed') and
+              report_rows[n].get('platform_verdict') in ('Accepted','not_run')):
+            report_rows[n]['status']='passed'
         results.append({'local_number':n,**merged})
         print(f"{n:05d} {verdict['status']} cases={merged['merged_cases']} total_ms={merged['total_ms']}",flush=True)
     report['entries']=[report_rows[int(x['local_number'])] for x in report['entries']]
-    report['failed']=sorted(set(report.get('failed',[]))|set(failed));report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+    report['failed']=sorted(int(row['local_number']) for row in report['entries']
+                            if row.get('status')!='passed')
+    report_path.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     out=ROOT/'collab'/f't028-round{opt.round}-localjudge.json'
     out.write_text(json.dumps({'task':'T-028','round':opt.round,'accepted':len(results)-len(failed),'total':len(results),
                                'not_accepted':failed,'results':results},ensure_ascii=False,indent=2)+'\n')

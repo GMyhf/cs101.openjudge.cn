@@ -119,6 +119,13 @@
 > 又抓到 `19960` 样例输出混入解释，均修复后重建。phase 2 继续 In progress，下一轮从
 > priority 61 / round18 开始，仍未交 Claude review。
 
+> **T-028 phase 2 · round18（2026-07-30）**：priority 61–80 已完成，20 题新增 420 组
+> `_made` 数据；旧数据 oracle 182/182 一致，本站自产数据判题与平台重提交均 20/20
+> Accepted（`53014256–53014278`）。`18159` 的旧目录含 7.68MB 正确输出，超过本站 2MB
+> 上限；索引因此落实替换语义：同一全局题存在 `_made` 时只启用自产数据，未构造题仍保留
+> legacy，回归机械保证不混用。phase 2 继续 In progress，下一轮从 priority 81 / round19
+> 开始，仍未交 Claude review。
+
 ## Decision Log
 
 - 2026-07-30 · **人拍板：T-028 第二阶段覆盖全部 208 个仍在用的非 `_made` 题目。**

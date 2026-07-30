@@ -172,7 +172,8 @@ def main():
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
     per_entry_global, practice_global = catalog_global_numbers(catalog)
     directory_global = test_directory_global_numbers(per_entry_global, practice_global)
-    by_global_number = {}
+    made_by_global_number = {}
+    legacy_by_global_number = {}
     for bucket in BUCKETS:
         root = TESTS / bucket
         if not root.is_dir(): continue
@@ -194,7 +195,14 @@ def main():
             for stem in sorted(inputs.keys() & outputs.keys()):
                 pairs.append({"input": str(inputs[stem].relative_to(MIRROR)), "output": str(outputs[stem].relative_to(MIRROR))})
             if pairs:
-                by_global_number.setdefault(global_number, []).extend(pairs)
+                target = made_by_global_number if directory.name.endswith("_made") else legacy_by_global_number
+                target.setdefault(global_number, []).extend(pairs)
+
+    # A generated corpus replaces legacy data for that global problem. Problems
+    # not rebuilt yet keep their legacy cases, so T-028 phase 2 can roll forward
+    # incrementally without mixing incompatible output limits or semantics.
+    by_global_number = dict(legacy_by_global_number)
+    by_global_number.update(made_by_global_number)
 
     stats = book_stats()
     matched = 0
