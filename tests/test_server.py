@@ -763,6 +763,35 @@ process.exit(byAccepted && byRate && rateAsc && byId && untouched ? 0 : 1);
             self.assertIn('AFTER_LOGIN="/"', text)
             self.assertNotIn("evil.example", text)
 
+    def test_login_next_cannot_close_the_inline_script(self):
+        """`next` 落在登录页的内联 `<script>` 里，而 `json.dumps` 不转义 `<` 和 `/`。
+
+        没有这道防线时，`?next=/x</script><script>…</script>` 会提前关掉脚本块，
+        把攻击者的标签注入到**用户输入口令的那一页**上（站点经 Tailscale Funnel 公网可达）。
+        两层各测一次：`safe_return_path` 先把带尖括号的值打回 `/`；即便有人绕过它
+        直接把原值传给 `account_page`，`</` 转义也必须仍然拦住脚本块提前闭合。
+        """
+        payload = "/x</script><script>window.__pwned=1</script>"
+        status, _, body = request(self.port, "GET", "/auth/login/?next=" + quote(payload, safe=""))
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8")
+        self.assertIn('AFTER_LOGIN="/"', text)
+        self.assertNotIn("__pwned", text)
+
+        sys.path.insert(0, str(ROOT))
+        try:
+            import server
+        finally:
+            sys.path.pop(0)
+        self.assertEqual(server.safe_return_path(payload), "/")
+        rendered = server.Handler.account_page(
+            server.Handler.__new__(server.Handler), next_path=payload)
+        self.assertIn("__pwned", rendered)  # 值仍在，只是不能再闭合脚本块
+        opener = rendered.index("<script>const form=")
+        self.assertNotIn("</script>", rendered[opener:rendered.index("AFTER_LOGIN=")])
+        after = rendered[rendered.index("AFTER_LOGIN="):]
+        self.assertLess(after.index("location.href=AFTER_LOGIN"), after.index("</script>"))
+
     @unittest.skipUnless(shutil.which("node"), "需要 node 才能验证提交页草稿恢复")
     def test_unauthenticated_submit_draft_survives_login_navigation(self):
         status, _, body = request(self.port, "GET", f"/{SUBMIT_BOOK}/{SUBMIT_PROBLEM}/")

@@ -4,6 +4,49 @@
 > 只有 Claude 写这个文件；Codex 的回话写在 `NOTES-codex.md`。
 > 保持简短，过期内容可清理——真正的历史在 git 和 `HANDOFF.md` 里。
 
+## 2026-07-30 · round15-19 复核：两份「按题面写就会挂」的复现代码
+
+七题越界的清单在 `HANDOFF.md` 同日条。这里只留证据，免得下次又要重造。
+
+**18106 螺旋矩阵**（题面 `1<=n<=20`，数据到 100）。按上界静态开数组是完全正当的写法：
+
+```cpp
+#include <cstdio>
+int g[20][20];
+int main(){int n;if(scanf("%d",&n)!=1)return 0;
+ int t=0,b=n-1,l=0,r=n-1,v=1;
+ while(t<=b&&l<=r){for(int j=l;j<=r;j++)g[t][j]=v++;t++;
+  for(int i=t;i<=b;i++)g[i][r]=v++;r--;
+  if(t<=b){for(int j=r;j>=l;j--)g[b][j]=v++;b--;}
+  if(l<=r){for(int i=b;i>=t;i--)g[i][l]=v++;l++;}}
+ for(int i=0;i<n;i++)for(int j=0;j<n;j++)printf("%d%c",g[i][j],j==n-1?'\n':' ');}
+```
+
+`g++ -fsanitize=address` 下 **7/21 组**越界崩溃（n=23/25/27/28/21/25/100 那几组）。
+不开 ASan 就是静默 UB，学生看到的只是 WA/RE，不会想到是数据的问题。
+
+**27625 AVL树至少有几个结点**（题面 `0<n<50`，数据到 1000）。`N(h)=N(h-1)+N(h-2)+1`
+在 n<50 时最大约 2.9e10，`long long` 绰绰有余：
+
+```cpp
+#include <cstdio>
+int main(){int n;if(scanf("%d",&n)!=1)return 0;long long a=1,b=2,c=a;
+ if(n<=2){printf("%d\n",n);return 0;}
+ for(int i=3;i<=n;i++){c=a+b+1;a=b;b=c;} printf("%lld\n",c);}
+```
+
+**6/21 组**溢出。第一组失败是 n=98：输出 `3736710778780434370`，
+正确答案 `354224848179261915074`（200 多位，Python 才装得下）。
+
+**这两条不是「边界没测到」，是反过来 —— 我们测了题面不保证的区域。**
+判题只有一个方向是安全的：数据可以比平台弱，不能比题面强。
+
+**为什么 `valid()` 拦不住**：它校的是「生成器合不合 LABEL」，而 LABEL 是照着生成器写的。
+题面从没进过这个闭环。`full_sweep` 第 10 条（round20 起的 `input_domain`）就是往闭环里
+插进题面这一环：`statement_quote` 必须在镜像题面里逐字出现，`generated_extremes`
+必须能从 `data/` 重算。判据不替人读题，但把两者并排钉在一条记录里。
+
+
 ---
 
 ## 2026-07-29 · 复核改成「攒几轮一起看」——所以判据要更硬

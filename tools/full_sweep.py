@@ -24,6 +24,7 @@ round9 的 15291 —— 它们的 `self_audit.failed` 一直非空，只是当�
 """
 import argparse
 import glob
+import html
 import json
 import re
 import sys
@@ -210,6 +211,111 @@ def check_archive_oracle_is_auditable():
     return "T-028 报告未记录 oracle 用了哪些存档目录（round8 起）", bad
 
 
+def statement_text(book, problem_id):
+    """镜像题面的纯文本，用于「原话必须逐字出现」的核对。
+
+    `re.sub(r"<(?![/a-zA-Z!])", ...)` 那一步是必须的：题面里的 `1<=n<=20` 在 HTML 里
+    就是裸的 `<`，按标签剥会把整段范围声明连同后文一起吃掉 —— 而范围声明**正是**
+    这条检查要读的东西。2026-07-30 复核 18106 时就是先被这一口吃掉、差点判成「题面没写上界」。
+    """
+    page = ROOT / "data" / "openjudge" / "pages" / f"{book}__{problem_id}.html"
+    if not page.is_file():
+        return ""
+    raw = page.read_text(encoding="utf-8", errors="replace")
+    raw = re.sub(r"<script.*?</script>", " ", raw, flags=re.S)
+    raw = re.sub(r"<(?![/a-zA-Z!])", "&lt;", raw)
+    text = html.unescape(re.sub(r"<[^>]+>", " ", raw))
+    return " ".join(text.split())
+
+
+def generated_extremes(made_dir):
+    """从 `data/*.in` 重算整数极值。口径写死在这里，报告必须按同一口径填。
+
+    token 定义：按空白切开后能整体匹配 `-?\\d+` 且长度不超过 18 位的片段。
+    18 位是为了把「不是数量、只是长串数字」（题号、超长整数题的输入）挡在外面。
+    """
+    values = []
+    for path in sorted((made_dir / "data").glob("*.in")):
+        for token in path.read_text(encoding="utf-8", errors="replace").split():
+            if re.fullmatch(r"-?\d{1,18}", token):
+                values.append(int(token))
+    if not values:
+        return None
+    return {"max_int": max(values), "min_int": min(values)}
+
+
+def check_input_domain_is_anchored():
+    """10. round20 起：每题要记下**题面对输入范围的原话**，以及生成数据的实际极值。
+
+    2026-07-30 复核 round15-19 时抓到七题，生成的数据跑到了题面保证的范围之外：
+    18106 题面写 `1<=n<=20`、数据到 100；27625 题面写 `0<n<50`、数据到 1000；
+    18159 每个 n 题面写 `2<=n<=10001`、数据到 199700；4100 题面写起止时间「不超过 100」、
+    数据到 10^9；4044 题面写 `1<N<100`、数据到 990；27122 题面写 `1<=position[i]<=10^9`、
+    数据里全是负数；21458 题面写 `0<w_i`、数据里有 0。
+
+    **这正是这个仓库最不能出的错**：学生按题面写的正确解法，在平台 Accepted，
+    在我们这里 RE 或 WA。实测过两条 —— 按 `1<=n<=20` 静态开数组的 18106 解法越界崩了
+    7/21 组；用 `long long`（在 `0<n<50` 内绰绰有余）的 27625 解法在 6/21 组上溢出。
+
+    为什么之前没红：`valid()` 校的是「生成器合不合自己写的 LABEL」，而 LABEL 是照着
+    生成器写的 —— 这是个闭环，题面从没进过这个环。`archive_cross_check` 只覆盖存档里
+    那些本来就合规的输入，也够不着。
+
+    这条判据**不判「原话是否蕴含这些极值合法」** —— 那要人读题，我没有把它变成规则。
+    它做的是把两件事钉进同一条记录并各自可验：
+      - `input_domain.statement_quote` 必须在镜像题面里**逐字**出现（防转述、防凭印象）；
+      - `input_domain.generated_extremes` 必须能从 `data/` 按 `generated_extremes()`
+        的口径重算出来（防写一个好看的数字）。
+    两半并排摆着，矛盾就藏不住了 —— 上面七条里有六条一眼可见。
+
+    只对 round20 及以后生效（外加任何已经填了这个字段的条目）：round15-19 那七题
+    要在返工时补上，其余轮次不追溯。
+    """
+    manifests = {}
+    for path in sorted(ROOT.glob("collab/t028-round*-manifest.json")):
+        match = re.search(r"round(\d+)-manifest", path.name)
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if match:
+            manifests[int(match.group(1))] = {
+                int(row["local_number"]): row for row in data.get("entries", [])
+                if "local_number" in row}
+    bad = []
+    for source, entry in report_entries():
+        match = re.match(r"t028-round(\d+)-report\.json$", source)
+        if not match:
+            continue
+        round_number = int(match.group(1))
+        domain = entry.get("input_domain")
+        if round_number < 20 and not domain:
+            continue
+        number = entry.get("local_number")
+        if not isinstance(domain, dict):
+            bad.append(f"{number}（{source}）: 没有 input_domain")
+            continue
+        row = manifests.get(round_number, {}).get(int(number), {})
+        quote = str(domain.get("statement_quote") or "")
+        text = statement_text(row.get("submit_group", ""), row.get("submit_id", ""))
+        if not quote:
+            bad.append(f"{number}（{source}）: input_domain.statement_quote 为空")
+        elif not text:
+            bad.append(f"{number}（{source}）: 找不到镜像题面，无法核对 statement_quote")
+        elif " ".join(quote.split()) not in text:
+            bad.append(f"{number}（{source}）: statement_quote 在题面里找不到原话")
+        made = ROOT / "data" / "openjudge" / str(row.get("made_dir", ""))
+        actual = generated_extremes(made) if row.get("made_dir") else None
+        recorded = domain.get("generated_extremes")
+        if actual is None:
+            bad.append(f"{number}（{source}）: 无法从 data/ 重算极值")
+        elif not isinstance(recorded, dict) or any(
+                recorded.get(key) != value for key, value in actual.items()):
+            bad.append(f"{number}（{source}）: generated_extremes 记的是 {recorded}，"
+                       f"从 data/ 重算是 {actual}")
+    return "T-028 报告未把题面范围与生成极值钉在一起（round20 起）", bad
+
+
 def check_priority_gaps_are_recorded():
     """8. T-028 按 priority 顺序做，**跳过可以，不留痕不行**。
 
@@ -356,7 +462,7 @@ CHECKS = (check_reported_failures, check_degenerate_constraints,
           check_output_size, check_repeating_decimals, check_annotated_sample_outputs,
           check_merged_judge, check_multi_answer_problems,
           check_archive_oracle_is_auditable, check_priority_gaps_are_recorded,
-          check_self_audit_numbers_are_measured)
+          check_self_audit_numbers_are_measured, check_input_domain_is_anchored)
 
 
 def main():

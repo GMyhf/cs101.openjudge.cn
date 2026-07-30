@@ -143,3 +143,71 @@ class SelfAuditMeasuredTests(unittest.TestCase):
                                    return_value=iter([("t028-round9-report.json", entry)])):
                 _label, bad = full_sweep.check_self_audit_numbers_are_measured()
             self.assertEqual(bad, [], "改成实测值就该放行")
+
+
+class InputDomainAnchorTests(unittest.TestCase):
+    """把「题面范围」和「生成极值」钉在一起的判据（full_sweep 第 10 条）。
+
+    这条判据是 2026-07-30 复核 round15-19 抓到七题「生成数据越出题面保证范围」之后加的
+    （18106 题面 `1<=n<=20`、数据到 100；27625 题面 `0<n<50`、数据到 1000 …）。
+    它只对 round20 起生效，所以**现在跑全库是绿的** —— 一条现在必然绿的判据，
+    必须在这里证明它真能红，否则就是我自己批评过的「永远不会红的检查」。
+    """
+
+    def _entries(self, domain):
+        return [("t028-round20-report.json", {"local_number": 18106, "input_domain": domain})]
+
+    def _manifest(self, tmp):
+        return {"task": "T-028", "entries": [{"local_number": 18106, "submit_group": "practice",
+                                              "submit_id": "18106", "made_dir": "tests/x_made"}]}
+
+    def _run(self, domain, quote_text, cases, made_rel="tests/x_made"):
+        import json
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / "collab").mkdir()
+            (root / "data" / "openjudge" / "pages").mkdir(parents=True)
+            data = root / "data" / "openjudge" / made_rel / "data"
+            data.mkdir(parents=True)
+            for index, case in enumerate(cases):
+                (data / f"{index}.in").write_text(case, encoding="utf-8")
+            (root / "data" / "openjudge" / "pages" / "practice__18106.html").write_text(
+                f"<html><body><dd>{quote_text}</dd></body></html>", encoding="utf-8")
+            (root / "collab" / "t028-round20-manifest.json").write_text(
+                json.dumps(self._manifest(root)), encoding="utf-8")
+            with mock.patch.object(full_sweep, "ROOT", root), \
+                 mock.patch.object(full_sweep, "report_entries",
+                                   return_value=iter(self._entries(domain))):
+                return full_sweep.check_input_domain_is_anchored()[1]
+
+    def test_accepts_a_verbatim_quote_with_recomputed_extremes(self):
+        bad = self._run({"statement_quote": "给定一个n(1<=n<=20)",
+                         "generated_extremes": {"max_int": 20, "min_int": 3}},
+                        "给定一个n(1&lt;=n&lt;=20)，生成数组", ["3\n", "20\n"])
+        self.assertEqual(bad, [])
+
+    def test_rejects_a_quote_that_is_not_in_the_statement(self):
+        bad = self._run({"statement_quote": "给定一个n(1<=n<=100)",
+                         "generated_extremes": {"max_int": 20, "min_int": 3}},
+                        "给定一个n(1&lt;=n&lt;=20)，生成数组", ["3\n", "20\n"])
+        self.assertEqual(len(bad), 1)
+        self.assertIn("找不到原话", bad[0])
+
+    def test_rejects_extremes_that_disagree_with_the_data_on_disk(self):
+        """报告说数据最大到 20，磁盘上其实有 100 —— 正是 18106 那条缺陷的形状。"""
+        bad = self._run({"statement_quote": "给定一个n(1<=n<=20)",
+                         "generated_extremes": {"max_int": 20, "min_int": 3}},
+                        "给定一个n(1&lt;=n&lt;=20)，生成数组", ["3\n", "100\n"])
+        self.assertEqual(len(bad), 1)
+        self.assertIn("重算是", bad[0])
+
+    def test_rejects_a_round20_entry_with_no_input_domain_at_all(self):
+        bad = self._run(None, "给定一个n(1&lt;=n&lt;=20)", ["3\n"])
+        self.assertEqual(len(bad), 1)
+        self.assertIn("没有 input_domain", bad[0])
+
+    def test_bare_less_than_in_the_statement_survives_tag_stripping(self):
+        """题面里的 `1<=n<=20` 是裸的 `<`；按标签剥会把范围声明整段吃掉。"""
+        text = full_sweep.statement_text.__doc__
+        self.assertIn("裸的", text)
