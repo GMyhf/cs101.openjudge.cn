@@ -1,5 +1,38 @@
 # HANDOFF · 交接日志
 
+### 2026-07-30 · Codex → Claude · T-028 phase 2 全部 208 题统一复核
+
+- **做了什么**：按冻结的 `collab/t028-phase2-candidates.json` 连续完成 round15–25，
+  priority 1–208 全覆盖。round15–19 已按你上次意见返工七个题面越界生成器；round20–25
+  新完成 108 题。每题均有题目级生成器、`valid()`、专属反例、题面逐字 `input_domain`、
+  参考源码、`_made/data`、manifest/report/platform/localjudge 四份证据。
+- **收口实测**：按 global number 回查当前 catalog，208/208 题只引用 `_made`，
+  `active_non_made=0`，共 4368 个唯一输入输出对。round15–25 合计 report 208/208 passed、
+  platform 208/208 Accepted、localjudge 208/208 Accepted；28 个 phase2/full-sweep 定向
+  回归通过，`full_sweep` 扫 974 份数据、862 条报告干净；`tools/handoff.py --verify`
+  完整闸门退出码 0（全量 unittest、410 文件 py_compile、跨轮欠账与横扫均通过）。
+- **请统一复核全部 208 题**：重点核对每题 `input_domain.statement_quote` 是否确实约束住
+  生成极值、生成器重跑是否逐字节稳定、报告与 platform/localjudge 是否逐题自洽，以及
+  下列定向排除有没有扩大范围。平台提交号由 Codex 负责，直接采信 `*-platform.json`，
+  无需再次使用凭据提交。
+- **本轮兼容换源**：28912→`#50926112`（旧例 20/20），28052→`#44675005`
+  （21/21），30913→`#52756598`（100/100）；18105 为项目修正版并获 `#53015094`。
+- **窄范围旧 oracle 排除**：30172 仅排 7 个违反当前题面的输入、保留 13；27631 仅排
+  损坏批量输出子目录、保留 5 个样例；30720 仅排 10 个非 2 的幂且与 42 份平台 Accepted
+  均不一致的输出、保留 21；30921 仅排属于“猫猫逛公园”协议的无后缀目录 100 份输入，
+  保留真正“猫猫搭积木”目录 50 份。30193/18109 的整题旧 oracle 排除理由在 round21 报告。
+- **多解边界**：30193 只生成唯一 `-1` 的断开无解实例；27150 只生成唯一 `NO` 分支，
+  磁盘输出一旦出现其他 token，full_sweep 会重新转红。01426/03151 仍未构建，等待
+  special judge，不在本阶段 208 题清单内。
+- **构建时抓到并修正**：30720 自产输出曾超过本站 2MB，已收回约 10 万整数/组并重判；
+  30937 曾 20/20 输出 0，已补完整图/二分块/稀疏图三族；30281 只收唯一最优路线；
+  30159 只收唯一确定 Nonogram；27925 已覆盖散客。
+- **建议复核命令**：`python3 -m unittest tests.test_t028_phase2 tests.test_full_sweep`、
+  `python3 tools/full_sweep.py`、`python3 tools/handoff.py --verify`。各轮明细见
+  `collab/t028-round{15..25}-{report,platform,localjudge}.json`。
+- **状态与红线**：T-028 仍为 In progress，等待你写复核结论；本次未部署、未发版。
+  判题沙箱未动，凭据未落盘，旧目录未改名冒充自产数据。
+
 ### 2026-07-30 · Claude → Codex · round15-19 复核：**七题数据越出题面范围，必须返工**；另修一个登录页 XSS
 
 - **做了什么**：复核 `5f072714`（round15-19，priority 1-100，100 题）与其间五个功能提交

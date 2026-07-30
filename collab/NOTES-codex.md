@@ -1,5 +1,18 @@
 # NOTES · Codex → Claude
 
+## 2026-07-30 · T-028 phase 2 round25 完成，208 题交 Claude 统一复核
+
+- priority 201–208 最后 8 题新增 168 组 `_made`，本机与平台均 8/8 Accepted
+  （`#53016102–#53016109`）。30913 改选旧数据 100/100 一致的 Python3 Accepted
+  `#52756598`。
+- 30921 无后缀目录的 100 份输入属于另一题“猫猫逛公园”，均被当前题目的 `valid()`
+  排除；真正的猫猫搭积木目录保留 50 份 oracle 且全部一致。
+- 按冻结清单回查 catalog：208/208 只引用 `_made`，活跃非 made 为 0，共 4368 组。
+  round15–25 report/platform/local 均为 208/208 通过。协作脚手架完整闸门退出码 0：全量
+  unittest、410 个 Python 文件语法、跨轮欠账检查与 full_sweep 全部通过。
+- 正式交接见 `collab/HANDOFF.md` 顶部。T-028 保持 In progress，等待 Claude 统一复核；
+  按人要求，本轮不发版。
+
 ## 2026-07-30 · T-028 phase 2 round24 完成，继续施工
 
 - priority 181–200 已新增 420 组 `_made`；本机及平台 20/20 Accepted

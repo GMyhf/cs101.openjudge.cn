@@ -16,10 +16,11 @@ import t028_phase2_round21 as round21  # noqa: E402
 import t028_phase2_round22 as round22  # noqa: E402
 import t028_phase2_round23 as round23  # noqa: E402
 import t028_phase2_round24 as round24  # noqa: E402
+import t028_phase2_round25 as round25  # noqa: E402
 
 ROUNDS = ((15, round15), (16, round16), (17, round17), (18, round18),
           (19, round19), (20, round20), (21, round21), (22, round22),
-          (23, round23), (24, round24))
+          (23, round23), (24, round24), (25, round25))
 
 
 class T028Phase2Tests(unittest.TestCase):
@@ -36,7 +37,7 @@ class T028Phase2Tests(unittest.TestCase):
         self.assertEqual([15, 25], self.candidates["round_range"])
         for number, module in ROUNDS:
             start = (number - 15) * 20 + 1
-            self.assertEqual(list(range(start, start + 20)),
+            self.assertEqual(list(range(start, min(start + 20, 209))),
                              [row["priority"] for row in self.manifests[number]["entries"]])
             self.assertEqual(module.NUMBERS,
                              {int(row["local_number"]) for row in self.manifests[number]["entries"]})
@@ -52,12 +53,12 @@ class T028Phase2Tests(unittest.TestCase):
                                     (number, seed))
 
     def test_round15_report_platform_and_local_judge_are_green(self):
-        for round_number, _ in ROUNDS:
+        for round_number, module in ROUNDS:
             report, platform, local = self.reports[round_number], self.platforms[round_number], self.locals[round_number]
             self.assertEqual([], report["failed"])
-            self.assertEqual(20, platform["accepted"])
+            self.assertEqual(len(module.NUMBERS), platform["accepted"])
             self.assertEqual([], platform["not_accepted"])
-            self.assertEqual(20, local["accepted"])
+            self.assertEqual(len(module.NUMBERS), local["accepted"])
             self.assertEqual([], local["not_accepted"])
             by_number = {int(row["local_number"]): row for row in platform["results"]}
             for row in report["entries"]:
@@ -158,6 +159,15 @@ class T028Phase2Tests(unittest.TestCase):
         for item in cross["excluded_broken_oracles"]:
             n = int((archive / item["input"]).read_text().split()[0])
             self.assertNotEqual(0, n & (n - 1))
+
+    def test_round25_separates_30921_from_the_wrong_archive_directory(self):
+        row = next(entry for entry in self.reports[25]["entries"]
+                   if entry["local_number"] == 30921)
+        cross = row["archive_cross_check"]
+        self.assertEqual(50, cross["cases"])
+        self.assertEqual(100, len(cross["excluded_invalid_inputs"]))
+        self.assertTrue(all(item.startswith("tests/30000-/30921/test")
+                            for item in cross["excluded_invalid_inputs"]))
 
 
 if __name__ == "__main__":
