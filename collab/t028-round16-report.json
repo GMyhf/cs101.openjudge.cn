@@ -1,0 +1,1801 @@
+{
+  "task": "T-028",
+  "phase": 2,
+  "round": 16,
+  "updated_at": "2026-07-30T06:05:23.267383+00:00",
+  "count": 20,
+  "priority_range": [
+    21,
+    40
+  ],
+  "pending_rework_status": {
+    "status": "passed",
+    "items": []
+  },
+  "entries": [
+    {
+      "local_number": 16531,
+      "global_number": 16531,
+      "title": "上机考试",
+      "priority": 21,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "52675256",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52675256/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014059",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 21,
+        "dirs": [
+          "tests/10000-19963/16531"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 11146,
+      "max_output_bytes": 7,
+      "constraint": "the M-by-N seating grid is a permutation of 0..M*N-1 followed by exactly one binary answer row per student",
+      "constraint_counterexample": "1 2\n0 0\n1\n0",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 3,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.15
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "the M-by-N seating grid is a permutation of 0..M*N-1 followed by exactly one binary answer row per student",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "1 2\n0 0\n1\n0",
+            "constraints": [
+              "the M-by-N seating grid is a permutation of 0..M*N-1 followed by exactly one binary answer row per student"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "16531",
+        "merged_cases": 42,
+        "total_ms": 771
+      }
+    },
+    {
+      "local_number": 18211,
+      "global_number": 18211,
+      "title": "军备竞赛",
+      "priority": 22,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "52602683",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52602683/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014060",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 21,
+        "dirs": [
+          "tests/10000-19963/18211"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 871,
+      "max_output_bytes": 3,
+      "constraint": "the initial budget and every one-use blueprint cost are nonnegative integers",
+      "constraint_counterexample": "10\n5 -1 8",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 2,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.1
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "the initial budget and every one-use blueprint cost are nonnegative integers",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "10\n5 -1 8",
+            "constraints": [
+              "the initial budget and every one-use blueprint cost are nonnegative integers"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "18211",
+        "merged_cases": 42,
+        "total_ms": 723
+      }
+    },
+    {
+      "local_number": 27103,
+      "global_number": 27103,
+      "title": "最短的愉悦旋律长度",
+      "priority": 23,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "51527453",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/51527453/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014061",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 21,
+        "dirs": [
+          "tests/20000-29982/27103"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 255096,
+      "max_output_bytes": 5,
+      "constraint": "the note row contains exactly N values in 1..M with 1<=M<=N",
+      "constraint_counterexample": "4 3\n1 2 4 1",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 6,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.3
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "the note row contains exactly N values in 1..M with 1<=M<=N",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "4 3\n1 2 4 1",
+            "constraints": [
+              "the note row contains exactly N values in 1..M with 1<=M<=N"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "27103",
+        "merged_cases": 42,
+        "total_ms": 1022
+      }
+    },
+    {
+      "local_number": 27625,
+      "global_number": 27625,
+      "title": "AVL树至少有几个结点",
+      "priority": 24,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "52701621",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52701621/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014062",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 21,
+        "dirs": [
+          "tests/20000-29982/27625"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 5,
+      "max_output_bytes": 211,
+      "constraint": "the requested AVL height is a positive integer at most 1000",
+      "constraint_counterexample": "0",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 17,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 2,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.1
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "the requested AVL height is a positive integer at most 1000",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "0",
+            "constraints": [
+              "the requested AVL height is a positive integer at most 1000"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "27625",
+        "merged_cases": 42,
+        "total_ms": 635
+      }
+    },
+    {
+      "local_number": 26978,
+      "global_number": 26978,
+      "title": "滑动窗口最大值",
+      "priority": 25,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "52325412",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52325412/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014063",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 22,
+        "dirs": [
+          "tests/20000-29982/26978"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 538786,
+      "max_output_bytes": 125520,
+      "constraint": "1<=k<=n<=100000 and the second line contains exactly n integers in -10000..10000",
+      "constraint_counterexample": "3 4\n1 2 3",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "1<=k<=n<=100000 and the second line contains exactly n integers in -10000..10000",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "3 4\n1 2 3",
+            "constraints": [
+              "1<=k<=n<=100000 and the second line contains exactly n integers in -10000..10000"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "26978",
+        "merged_cases": 43,
+        "total_ms": 1057
+      }
+    },
+    {
+      "local_number": 27653,
+      "global_number": 27653,
+      "title": "Fraction类",
+      "priority": 26,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "51853545",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/51853545/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014064",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 22,
+        "dirs": [
+          "tests/20000-29982/27653"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 24,
+      "max_output_bytes": 20,
+      "constraint": "four integers describe two fractions whose denominators are nonzero",
+      "constraint_counterexample": "1 0 2 3",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "four integers describe two fractions whose denominators are nonzero",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "1 0 2 3",
+            "constraints": [
+              "four integers describe two fractions whose denominators are nonzero"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "27653",
+        "merged_cases": 43,
+        "total_ms": 668
+      }
+    },
+    {
+      "local_number": 26971,
+      "global_number": 26971,
+      "title": "分发糖果",
+      "priority": 27,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "52498222",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52498222/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014065",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 25,
+        "dirs": [
+          "tests/20000-29982/26971"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 108890,
+      "max_output_bytes": 6,
+      "constraint": "1<=n<=20000 and exactly n ratings lie in 0..20000",
+      "constraint_counterexample": "3\n1 2",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 2,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.1
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "1<=n<=20000 and exactly n ratings lie in 0..20000",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "3\n1 2",
+            "constraints": [
+              "1<=n<=20000 and exactly n ratings lie in 0..20000"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "26971",
+        "merged_cases": 46,
+        "total_ms": 756
+      }
+    },
+    {
+      "local_number": 27104,
+      "global_number": 27104,
+      "title": "世界杯只因",
+      "priority": 28,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "52459416",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52459416/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014066",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 27,
+        "dirs": [
+          "tests/20000-29982/27104"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 1000007,
+      "max_output_bytes": 7,
+      "constraint": "1<=N<=500000 and exactly N observation radii lie in 0..N",
+      "constraint_counterexample": "3\n0 4 1",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 5,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.25
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "1<=N<=500000 and exactly N observation radii lie in 0..N",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "3\n0 4 1",
+            "constraints": [
+              "1<=N<=500000 and exactly N observation radii lie in 0..N"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "27104",
+        "merged_cases": 48,
+        "total_ms": 8131
+      }
+    },
+    {
+      "local_number": 18156,
+      "global_number": 18156,
+      "title": "寻找离目标数最近的两数之和",
+      "priority": 29,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "52468268",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52468268/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014067",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 51,
+        "dirs": [
+          "tests/10000-19963/18156"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 1038606,
+      "max_output_bytes": 11,
+      "constraint": "the second line contains 2..100000 integers from which two distinct positions are chosen",
+      "constraint_counterexample": "10\n5",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "the second line contains 2..100000 integers from which two distinct positions are chosen",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "10\n5",
+            "constraints": [
+              "the second line contains 2..100000 integers from which two distinct positions are chosen"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "18156",
+        "merged_cases": 72,
+        "total_ms": 2087
+      }
+    },
+    {
+      "local_number": 4018,
+      "global_number": 3090,
+      "title": "子串",
+      "priority": 30,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "52517182",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52517182/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014068",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 1,
+        "dirs": [
+          "tests/4000-8210/4018"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 303,
+      "max_output_bytes": 50,
+      "constraint": "each EOF-driven dataset contains two nonempty whitespace-free strings",
+      "constraint_counterexample": "abc",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 2,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.1
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "each EOF-driven dataset contains two nonempty whitespace-free strings",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "abc",
+            "constraints": [
+              "each EOF-driven dataset contains two nonempty whitespace-free strings"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "04018",
+        "merged_cases": 22,
+        "total_ms": 364
+      }
+    },
+    {
+      "local_number": 18182,
+      "global_number": 18182,
+      "title": "打怪兽",
+      "priority": 31,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "52705451",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52705451/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014069",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 1,
+        "dirs": [
+          "tests/10000-19963/18182"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 25817,
+      "max_output_bytes": 16,
+      "constraint": "1..100 cases contain the stated 1..1000 skills with positive bounded time, damage, capacity and health",
+      "constraint_counterexample": "1\n2 1 10\n1 5",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 2,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.1
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "1..100 cases contain the stated 1..1000 skills with positive bounded time, damage, capacity and health",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "1\n2 1 10\n1 5",
+            "constraints": [
+              "1..100 cases contain the stated 1..1000 skills with positive bounded time, damage, capacity and health"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "18182",
+        "merged_cases": 22,
+        "total_ms": 376
+      }
+    },
+    {
+      "local_number": 12556,
+      "global_number": 12556,
+      "title": "编码字符串",
+      "priority": 32,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "51375933",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/51375933/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014070",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 3,
+        "dirs": [
+          "tests/10000-19963/12556"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 1001,
+      "max_output_bytes": 4816,
+      "constraint": "the input is one 1..1000-character alphabetic string",
+      "constraint_counterexample": "abc1",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "the input is one 1..1000-character alphabetic string",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "abc1",
+            "constraints": [
+              "the input is one 1..1000-character alphabetic string"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "12556",
+        "merged_cases": 24,
+        "total_ms": 356
+      }
+    },
+    {
+      "local_number": 12560,
+      "global_number": 12560,
+      "title": "生存游戏",
+      "priority": 33,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "51204202",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/51204202/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014071",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 3,
+        "dirs": [
+          "tests/10000-19963/12560"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 20008,
+      "max_output_bytes": 20000,
+      "constraint": "the n-by-m board has exact dimensions and contains only zero and one",
+      "constraint_counterexample": "2 3\n0 1\n1 0 1",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "the n-by-m board has exact dimensions and contains only zero and one",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "2 3\n0 1\n1 0 1",
+            "constraints": [
+              "the n-by-m board has exact dimensions and contains only zero and one"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "12560",
+        "merged_cases": 24,
+        "total_ms": 420
+      }
+    },
+    {
+      "local_number": 4101,
+      "global_number": 5585,
+      "title": "晶矿的个数",
+      "priority": 34,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "51446154",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/51446154/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014072",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 4,
+        "dirs": [
+          "tests/4000-8210/4101",
+          "tests/4000-8210/5585"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 4667,
+      "max_output_bytes": 40,
+      "constraint": "the case count matches square 3..30 grids over r, b and non-mineral cells",
+      "constraint_counterexample": "1\n2\nrb\nbr",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "the case count matches square 3..30 grids over r, b and non-mineral cells",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "1\n2\nrb\nbr",
+            "constraints": [
+              "the case count matches square 3..30 grids over r, b and non-mineral cells"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "04101",
+        "merged_cases": 25,
+        "total_ms": 385
+      }
+    },
+    {
+      "local_number": 28050,
+      "global_number": 28050,
+      "title": "骑士周游",
+      "priority": 35,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "53014037",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/53014037/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014073",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 5,
+        "dirs": [
+          "tests/20000-29982/28050"
+        ],
+        "missing_outputs": [
+          "tests/20000-29982/28050/sample11.in"
+        ],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 8,
+      "max_output_bytes": 8,
+      "constraint": "3<=n<=19 and the knight start coordinates lie inside the n-by-n board",
+      "constraint_counterexample": "5\n5 0",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 12,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.6
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "3<=n<=19 and the knight start coordinates lie inside the n-by-n board",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "5\n5 0",
+            "constraints": [
+              "3<=n<=19 and the knight start coordinates lie inside the n-by-n board"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "28050",
+        "merged_cases": 26,
+        "total_ms": 385
+      }
+    },
+    {
+      "local_number": 4030,
+      "global_number": 4362,
+      "title": "统计单词数",
+      "priority": 36,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "50783029",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/50783029/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014074",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 10,
+        "dirs": [
+          "tests/4000-8210/4030"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 175,
+      "max_output_bytes": 6,
+      "constraint": "the first line is one alphabetic word and the second contains only letters and spaces",
+      "constraint_counterexample": "two words\na short article",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 10,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.5
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "the first line is one alphabetic word and the second contains only letters and spaces",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "two words\na short article",
+            "constraints": [
+              "the first line is one alphabetic word and the second contains only letters and spaces"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "04030",
+        "merged_cases": 31,
+        "total_ms": 532
+      }
+    },
+    {
+      "local_number": 16528,
+      "global_number": 16528,
+      "title": "充实的寒假生活",
+      "priority": 37,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "52491463",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52491463/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014075",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 10,
+        "dirs": [
+          "tests/10000-19963/16528"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 58180,
+      "max_output_bytes": 3,
+      "constraint": "0<=n<10000 activities each satisfy 0<=start<=end<=60",
+      "constraint_counterexample": "1\n10 9",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 3,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.15
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "0<=n<10000 activities each satisfy 0<=start<=end<=60",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "1\n10 9",
+            "constraints": [
+              "0<=n<10000 activities each satisfy 0<=start<=end<=60"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "16528",
+        "merged_cases": 31,
+        "total_ms": 624
+      }
+    },
+    {
+      "local_number": 20134,
+      "global_number": 20134,
+      "title": "鹅腿阿姨送鹅腿",
+      "priority": 38,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "52789455",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/52789455/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014076",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 10,
+        "dirs": [
+          "tests/20000-29982/20134"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 261,
+      "max_output_bytes": 12,
+      "constraint": "stations are unique inside the route and all distance, capacity, mileage and price values are positive",
+      "constraint_counterexample": "100 0 10 5 0",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 8,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.4
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "stations are unique inside the route and all distance, capacity, mileage and price values are positive",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "100 0 10 5 0",
+            "constraints": [
+              "stations are unique inside the route and all distance, capacity, mileage and price values are positive"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "20134",
+        "merged_cases": 31,
+        "total_ms": 465
+      }
+    },
+    {
+      "local_number": 18146,
+      "global_number": 18146,
+      "title": "乌鸦坐飞机",
+      "priority": 39,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "51465624",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/51465624/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014077",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 20,
+        "dirs": [
+          "tests/10000-19963/18146"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 602,
+      "max_output_bytes": 4,
+      "constraint": "1<=n<=10000, 1<=k<=100 and exactly k nest sizes lie in 1..10000",
+      "constraint_counterexample": "2 3\n1 2",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 10,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.5
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "1<=n<=10000, 1<=k<=100 and exactly k nest sizes lie in 1..10000",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "2 3\n1 2",
+            "constraints": [
+              "1<=n<=10000, 1<=k<=100 and exactly k nest sizes lie in 1..10000"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "18146",
+        "merged_cases": 41,
+        "total_ms": 628
+      }
+    },
+    {
+      "local_number": 18176,
+      "global_number": 18176,
+      "title": "2050年成绩计算",
+      "priority": 40,
+      "phase": 2,
+      "status": "passed",
+      "reference_source": "existing platform Accepted submission",
+      "reference_language": "Python3",
+      "reference_solution_id": "51529047",
+      "source_url": "http://cs101.openjudge.cn/practice/solution/51529047/",
+      "license_status": "not declared; no license is inferred",
+      "submission_id": "53014078",
+      "platform_verdict": "Accepted",
+      "archive_cross_check": {
+        "status": "passed",
+        "cases": 20,
+        "dirs": [
+          "tests/10000-19963/18176"
+        ],
+        "missing_outputs": [],
+        "mismatched": [],
+        "method": "existing Accepted source recomputed every legacy input; output tokens compared"
+      },
+      "generator": "generate",
+      "generator_seed_smoke": {
+        "seeds": 2000,
+        "status": "passed",
+        "failed_seeds": []
+      },
+      "test_cases": 21,
+      "max_input_bytes": 326702,
+      "max_output_bytes": 16946,
+      "constraint": "1<=m<=2000 and each of m nonempty score rows has at most n values in 1..100000000",
+      "constraint_counterexample": "2 2\n4 9",
+      "self_audit": {
+        "distinct_cases": {
+          "total": 20,
+          "distinct": 20,
+          "threshold": 15,
+          "status": "passed"
+        },
+        "constant_output_probe": {
+          "frequency": 1,
+          "total": 20,
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.05
+        },
+        "sample_is_case_zero": {
+          "input_matches": "passed",
+          "output_matches": "passed",
+          "status": "passed"
+        },
+        "samplecode_recompute": {
+          "status": "passed",
+          "cases": 21,
+          "mismatched": []
+        },
+        "constraint_checklist": {
+          "status": "passed",
+          "checked": 1,
+          "items": [
+            {
+              "constraint": "1<=m<=2000 and each of m nonempty score rows has at most n values in 1..100000000",
+              "holds": true
+            }
+          ],
+          "falsified_by": {
+            "input": "2 2\n4 9",
+            "constraints": [
+              "1<=m<=2000 and each of m nonempty score rows has at most n values in 1..100000000"
+            ]
+          }
+        },
+        "byte_reproduction": {
+          "status": "passed"
+        },
+        "failed": []
+      },
+      "merged_judge": {
+        "status": "passed",
+        "verdict": "Accepted",
+        "book": "practice",
+        "problem": "18176",
+        "merged_cases": 41,
+        "total_ms": 964
+      }
+    }
+  ],
+  "failed": []
+}

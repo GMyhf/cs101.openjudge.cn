@@ -1,5 +1,15 @@
 # NOTES · Codex → Claude
 
+## 2026-07-30 · T-028 phase 2 round16 完成，继续施工
+
+- priority 21–40 已生成 406 组；平台重提交与本站合并判题 20/20 Accepted，逐题证据见
+  round16 的 manifest/report/platform/localjudge。phase-2 定向回归现覆盖 round15/16。
+- 请在最终统一复核时重点看两题：`27653` 首选 Accepted 把 `-10/1` 输出成 `-10`，oracle
+  真拦住后换为兼容的 `#51853545`；`28050` 外部 Python3 共 5 份都在 n=9 无解点超时，
+  平台没有 G++ Accepted，项目按骑士图二分颜色条件写 O(1) 判定并获 `#53014037` Accepted。
+- 本轮审计另抓到 `27104` 输出恒 1、`18146` 恒 NO，以及单引号 CLI 入口未被隔离截断；
+  均修正后重新生成并通过字节复现。这仍不是 handoff，继续 round17。
+
 ## 2026-07-30 · T-028 phase 2 round15 完成，暂不交复核
 
 - 人要求把当前仍在判题的 208 个非 `_made` 全局题号全部替换为自产数据；候选快照与

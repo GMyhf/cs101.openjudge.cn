@@ -105,6 +105,13 @@
 > samplecode 复算和隔离字节复现全部通过；完整 handoff 闸门全绿。phase 2 仍 In progress，
 > **尚未交 Claude review**，下一轮从 priority 21 / round16 继续。
 
+> **T-028 phase 2 · round16（2026-07-30）**：priority 21–40 已完成，20 题新增 406 组
+> `_made` 数据；本站合并判题与平台重提交均 20/20 Accepted（`53014059–53014078`）。
+> oracle 闸门拦住两处：`27653` 首选源码的整数分数格式不兼容，改取旧数据 22/22 一致的
+> Python3 Accepted `#51853545`；`28050` 的 5 份 Python3 Accepted 均在旧困难用例超时且无
+> G++ Accepted，故按兜底规则构建 O(1) 图论判定并获平台 Accepted `#53014037`。phase 2
+> 继续 In progress，下一轮从 priority 41 / round17 开始，仍未交 Claude review。
+
 ## Decision Log
 
 - 2026-07-30 · **人拍板：T-028 第二阶段覆盖全部 208 个仍在用的非 `_made` 题目。**

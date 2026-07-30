@@ -93,7 +93,7 @@ def archive_check(command: list[str], entry: dict) -> dict:
 def write_producecase(made: Path, generator_module, number: int, source: str,
                       language: str, sample: str) -> None:
     generator_source = Path(inspect.getsourcefile(generator_module)).read_text(encoding="utf-8")
-    generator_source = generator_source.split('\nif __name__ == "__main__":', 1)[0]
+    generator_source = generator_source.split("\nif __name__", 1)[0]
     program = (generator_source + "\n\n" +
         "import subprocess as _subprocess, sys as _sys, tempfile as _tempfile\n"
         "from pathlib import Path as _Path\n" +
