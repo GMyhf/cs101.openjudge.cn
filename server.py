@@ -1422,7 +1422,7 @@ def book_solution_payload(book, submission_id, viewer):
     }
 
 
-def book_page_payload(book, authenticated):
+def book_page_payload(book, authenticated, status_problem="", status_name=""):
     """题库页要的三份数据：题目表、排名、最近状态。
 
     排名和状态**只在登录后返回**。理由不是洁癖：站点已经通过 Tailscale Funnel
@@ -1472,21 +1472,44 @@ def book_page_payload(book, authenticated):
                          group by lower(user)
                          order by 2 desc, 3 asc, 4 asc, lower(min(user)) asc""", (book,))
             ]
-            for row in db.execute(
-                    """select id, created, user, problem, result, language, detail from submissions
-                         where book = ? order by id desc limit ?""", (book, BOOK_STATUS_LIMIT)):
+            status_sql = """select id, created, user, problem, result, language, detail, source
+                              from submissions where book = ?"""
+            status_params = [book]
+            if status_problem:
+                status_sql += " and lower(problem) = lower(?)"
+                status_params.append(status_problem)
+            if status_name:
+                term = status_name.casefold()
+                matching_users = [
+                    str(row[0] or "").casefold()
+                    for row in db.execute(
+                        "select distinct user from submissions where book = ?", (book,))
+                    if term in str(nicknames.get(str(row[0] or "").casefold(), row[0] or "")).casefold()
+                ]
+                if matching_users:
+                    status_sql += " and lower(user) in (" + ",".join(["?"] * len(matching_users)) + ")"
+                    status_params.extend(matching_users)
+                else:
+                    status_sql += " and 0"
+            status_sql += " order by id desc limit ?"
+            status_params.append(BOOK_STATUS_LIMIT)
+            for row in db.execute(status_sql, status_params):
                 detail = load_detail(row[6])
                 status.append({"id": row[0], "created": row[1], "user": row[2],
                                "name": nicknames.get(str(row[2] or "").casefold(), row[2] or ""),
                                "problem": row[3],
+                               "title": catalog_title({"book": book, "id": row[3]}),
                                "result": row[4], "language": row[5], "time_ms": detail.get("time_ms"),
-                               "memory_kb": detail.get("memory_kb")})
+                               "memory_kb": detail.get("memory_kb"),
+                               "source_bytes": detail.get(
+                                   "source_bytes", len((row[7] or "").encode("utf-8")))})
     return {
         "book": book,
         "name": BOOK_META.get(book, {}).get("name", book),
         "problem_count": len(problems),
         "tested_count": sum(1 for item in problems if (item.get("test_count") or 0) > 0),
         "authenticated": authenticated,
+        "filters": {"problem": status_problem, "name": status_name},
         "problems": [
             {
                 "id": item.get("id", ""),
@@ -2032,7 +2055,11 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             self.send_json(catalog_full_payload()); return
         book_api = re.fullmatch(r"/api/books/([^/]+)/", path)
         if book_api and book_api.group(1) in BOOK_META:
-            self.send_json(book_page_payload(book_api.group(1), self.authorized())); return
+            query = parse_qs(parsed.query)
+            status_problem = str(query.get("problem", [""])[0]).strip()[:64]
+            status_name = str(query.get("name", [""])[0]).strip()[:64]
+            self.send_json(book_page_payload(book_api.group(1), self.authorized(),
+                                             status_problem, status_name)); return
         # 用户页与提交详情页整页都要登录：它们展示的是「谁做了什么」，
         # 不像题目表那样本来就公开。未登录一律 401，页面据此提示去登录。
         user_api = re.fullmatch(r"/api/books/([^/]+)/user/([^/]+)/", unquote(path))

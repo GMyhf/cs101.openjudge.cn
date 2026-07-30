@@ -26,6 +26,17 @@
   .bar input { width:min(280px,55%); padding:7px 10px; border:1px solid var(--line); border-radius:var(--radius-sm);
                background:var(--panel); color:var(--ink); font:inherit; outline:none }
   .bar input:focus { border-color:var(--accent) }
+  .status-filter { display:flex; align-items:end; gap:10px; flex-wrap:wrap; padding:14px 0 8px }
+  .status-filter label { display:grid; gap:4px; color:var(--muted); font-size:12px }
+  .status-filter input { width:180px; padding:7px 10px; border:1px solid var(--line);
+                         border-radius:var(--radius-sm); background:var(--panel); color:var(--ink);
+                         font:14px var(--font-ui); outline:none }
+  .status-filter input:focus { border-color:var(--accent) }
+  .status-filter button { padding:8px 15px; border:1px solid var(--accent); border-radius:var(--radius-sm);
+                          background:var(--accent); color:white; font:600 13px var(--font-ui); cursor:pointer }
+  .status-filter .clear { padding:7px 4px; color:var(--muted); font-size:13px; text-decoration:none }
+  .status-results table { min-width:900px }
+  .status-results th, .status-results td { white-space:nowrap }
   .table-wrap { overflow-x:auto }
   table { min-width:600px }
   th.sortable { cursor:pointer; user-select:none; white-space:nowrap }
@@ -147,11 +158,12 @@ function loginNote(what) {
   note(`登录后可查看本题库的${what}。<a href="/auth/login/">去登录</a>`);
 }
 
+const statusQuery = VIEW === 'status' ? location.search : '';
 const ENDPOINT = VIEW === 'user'
   ? `/api/books/${encodeURIComponent(BOOK)}/user/${encodeURIComponent(SUBJECT)}/`
   : VIEW === 'solution'
   ? `/api/books/${encodeURIComponent(BOOK)}/solution/${encodeURIComponent(SUBJECT)}/`
-  : `/api/books/${encodeURIComponent(BOOK)}/`;
+  : `/api/books/${encodeURIComponent(BOOK)}/${statusQuery}`;
 
 fetch(ENDPOINT, { credentials: 'same-origin' })
   .then(r => r.ok ? r.json() : Promise.reject(r.status))
@@ -242,18 +254,30 @@ function renderRanking(data) {
 }
 
 function renderStatus(data) {
-  if (!data.status.length) return note('这个题库还没有提交记录。');
-  view.innerHTML = `<div class="bar"><span class="muted">最近 ${data.status.length} 次提交</span></div>` + table(
-    [{text:'提交时间'}, {text:'名字'}, {text:'题目'}, {text:'结果'},
-     {text:'语言'}, {text:'用时', num:true}, {text:'内存', num:true}],
+  const filters = data.filters || {};
+  const action = `/book/${encodeURIComponent(BOOK)}/status/`;
+  const form = `<form class="status-filter" method="get" action="${action}">
+    <label>题目ID<input name="problem" value="${esc(filters.problem || '')}" autocomplete="off"></label>
+    <label>昵称<input name="name" value="${esc(filters.name || '')}" autocomplete="off"></label>
+    <button type="submit">查询</button>
+    ${(filters.problem || filters.name) ? `<a class="clear" href="${action}">清除</a>` : ''}
+  </form>`;
+  if (!data.status.length) {
+    view.innerHTML = form + '<p class="note">没有匹配的提交记录。</p>';
+    return;
+  }
+  view.innerHTML = form + `<div class="bar"><span class="muted">最近 ${data.status.length} 次提交</span></div><div class="status-results">` + table(
+    [{text:'提交人'}, {text:'题目'}, {text:'结果'}, {text:'内存', num:true},
+     {text:'时间', num:true}, {text:'代码长度', num:true}, {text:'语言'}, {text:'提交时间'}],
     data.status.map(s => `<tr>
-      <td class="num muted">${esc(s.created)}</td>
       <td>${userLink(s.user, s.name)}</td>
-      <td class="num"><a class="pid" href="/${encodeURIComponent(BOOK)}/${encodeURIComponent(s.problem)}/">${esc(s.problem)}</a></td>
+      <td><a class="pid" href="/${encodeURIComponent(BOOK)}/${encodeURIComponent(s.problem)}/">${esc(s.problem)}:${esc(titleOf({id:s.problem, title:s.title}))}</a></td>
       <td><a class="verdict-link" href="/book/${encodeURIComponent(BOOK)}/solution/${encodeURIComponent(s.id)}/">${badge(s.result)}</a></td>
-      <td class="muted">${esc(LANGS[s.language] || s.language || '—')}</td>
+      <td class="num">${s.memory_kb == null ? '—' : s.memory_kb + ' kB'}</td>
       <td class="num">${s.time_ms == null ? '—' : s.time_ms + ' ms'}</td>
-      <td class="num">${s.memory_kb == null ? '—' : s.memory_kb + ' kB'}</td></tr>`));
+      <td class="num">${s.source_bytes == null ? '—' : s.source_bytes + ' B'}</td>
+      <td class="muted">${esc(LANGS[s.language] || s.language || '—')}</td>
+      <td class="num muted">${esc(s.created)}</td></tr>`)) + '</div>';
 }
 
 function renderUser(data) {

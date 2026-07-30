@@ -11,6 +11,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from urllib.parse import quote
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -296,12 +297,31 @@ class ServerApiTests(unittest.TestCase):
         status_row = next(item for item in payload["status"] if item["user"] == username)
         self.assertEqual(ranking_row["name"], nickname)
         self.assertEqual(status_row["name"], nickname)
+        self.assertEqual(status_row["source_bytes"], len("print('wrong')".encode()))
+        self.assertIn(SUBMIT_PROBLEM, status_row["title"])
+
+        filters = f"?problem={SUBMIT_PROBLEM}&name={quote('练习生')}"
+        status, _, body = request(self.port, "GET", "/api/books/pctbook/" + filters,
+                                  cookie=cookie)
+        self.assertEqual(status, 200)
+        filtered = json.loads(body)
+        self.assertEqual(filtered["filters"], {"problem": SUBMIT_PROBLEM, "name": "练习生"})
+        self.assertTrue(filtered["status"])
+        self.assertTrue(all(row["user"] == username and row["problem"] == SUBMIT_PROBLEM
+                            for row in filtered["status"]))
+        status, _, body = request(self.port, "GET", "/api/books/pctbook/?name=not-a-nickname",
+                                  cookie=cookie)
+        self.assertEqual(json.loads(body)["status"], [])
 
         page = (ROOT / "book.html").read_text(encoding="utf-8")
-        self.assertIn("{text:'名字'}", page)
+        self.assertIn("{text:'提交人'}", page)
         self.assertIn("userLink(r.user, r.name)", page)
         self.assertNotIn("{text:'用户'}", page)
         self.assertIn("userLink(s.user, s.name)", page)
+        self.assertIn("{text:'代码长度'", page)
+        self.assertIn('name="problem"', page)
+        self.assertIn('name="name"', page)
+        self.assertIn("${esc(s.problem)}:${esc(titleOf", page)
 
     def test_profile_requires_login(self):
         status, headers, _ = request(self.port, "GET", "/settings/")
