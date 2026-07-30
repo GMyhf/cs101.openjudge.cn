@@ -18,14 +18,18 @@ permissions:
   contents: read
 
 jobs:
-  # **job 的 id 就是 GitHub 上那个状态检查的名字**（没写 `name:` 时用 id）。
-  # 分支保护里配的必需检查叫 `build`，而这里原来叫 `gate` —— 名字对不上，
-  # 那条必需检查**永远没有产出者、永远不会变绿**，PR 因此永远合不了，
-  # 于是每次推 main 都只能绕过规则（GitHub 每次回的
-  # `Required status check "build" is expected.` 说的就是这件事）。
-  # 两边任选一边改都行，这里改仓库这边：不需要仓库管理权限。
-  # **不要给这个 job 加 `name:`** —— 一加，检查名就变成那个显示名，又对不上了。
-  build:
+  # **不要把这个 job 改名叫 `build`。** 2026-07-30 试过一次，是错的：
+  # 仓库开着 GitHub Pages，它会注入一条动态工作流 `pages-build-deployment`
+  # （`dynamic/pages/pages-build-deployment`），里面的 job 就叫 `build`／`deploy`／
+  # `report-build-status`。改名之后**两条不同的检查同时叫 `build`**，
+  # 按名字匹配的必需检查会变得没法分辨谁是谁。
+  #
+  # 顺带查清了一件更要紧的事：分支保护里那条必需检查 `build`，
+  # **一直指的是 Pages 的静态站构建，不是这条闸门** —— 也就是说
+  # `tools/handoff.py --verify` 从来就不是 `main` 的必需检查，
+  # PR 可以在闸门红着的情况下让 `build` 变绿。要修的是**设置那一侧**：
+  # 把必需检查改成 `gate`（见 T-031），仓库这边不用动。
+  gate:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
