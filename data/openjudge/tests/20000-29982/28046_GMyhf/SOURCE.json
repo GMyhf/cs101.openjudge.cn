@@ -7,14 +7,6 @@
   "global_number": 28046,
   "files": [
     {
-      "case": 0,
-      "source_dir": "tests/20000-29982/28046",
-      "source_input": "tests/20000-29982/28046/other/sample6.in",
-      "source_output": "tests/20000-29982/28046/other/sample6.out",
-      "input_sha256": "a27e1e3b81abf42720268c228bf2756deccec68720fa242f31368d846538c77a",
-      "output_sha256": "dc77f5862ceb1af2aa5d5be526ed3297bc0cf2b7dcd11976b052bff767b5e2c2"
-    },
-    {
       "case": 1,
       "source_dir": "tests/20000-29982/28046",
       "source_input": "tests/20000-29982/28046/sample1.in",
@@ -69,6 +61,13 @@
       "source_output": "tests/20000-29982/28046/sample9.out",
       "input_sha256": "10b6b6db4548c36302d470aa83f3b24c091f946e2c691c795803fe0173380ca2",
       "output_sha256": "4e3774e93e7150f06fbe8d4b2709f3ba4797e754caf976f2c34d74a20f93a31e"
+    }
+  ],
+  "excluded_pairs": [
+    {
+      "source_input": "tests/20000-29982/28046/other/sample6.in",
+      "source_output": "tests/20000-29982/28046/other/sample6.out",
+      "reason": "not covered by archive_cross_check glob scope"
     }
   ]
 }

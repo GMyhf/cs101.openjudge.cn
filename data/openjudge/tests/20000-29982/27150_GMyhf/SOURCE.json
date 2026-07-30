@@ -55,14 +55,6 @@
       "output_sha256": "23794d91c53ae875c8e247d72561e35d9d06ee07c70c9e0dbcc977a6d161504a"
     },
     {
-      "case": 6,
-      "source_dir": "tests/20000-29982/27150",
-      "source_input": "tests/20000-29982/27150/15.in",
-      "source_output": "tests/20000-29982/27150/15.out",
-      "input_sha256": "626c56d97b873a6619e2a19cdcd46e3fa613d0a9a80980a64a9e46eeb4e87abf",
-      "output_sha256": "955ec8fa78f8623ba4c4662f5e905e2fc341be150be206e4516bd8b7542d89e7"
-    },
-    {
       "case": 7,
       "source_dir": "tests/20000-29982/27150",
       "source_input": "tests/20000-29982/27150/16.in",
@@ -165,6 +157,18 @@
       "source_output": "tests/20000-29982/27150/9.out",
       "input_sha256": "f1aac69fae0d13c4bd7e626ca818ade71b962498783d9d2d0a2790209d550cdf",
       "output_sha256": "3000c0272e771e67bd2e2f1636f6b36a3e16b0138448a2489351d4889eb534c5"
+    }
+  ],
+  "excluded_pairs": [
+    {
+      "source_input": "tests/20000-29982/27150/15.in",
+      "source_output": "tests/20000-29982/27150/15.out",
+      "reason": "multiple legal exact outputs",
+      "legal_outputs": [
+        "64",
+        "664"
+      ],
+      "legal_output_count": 2
     }
   ]
 }

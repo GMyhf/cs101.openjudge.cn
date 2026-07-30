@@ -33,6 +33,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+SCRIPTS = ROOT / "scripts"
+if str(SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS))
+from gmyhf_validators import analyze_27150_case
 TESTS = ROOT / "data" / "openjudge" / "tests"
 FSIZE_LIMIT = 2 * 1024 * 1024          # judge.py 的 RLIMIT_FSIZE
 DEGENERATE = re.compile(r"is present|nonempty|non-?empty", re.I)
@@ -211,6 +215,14 @@ def check_multi_answer_problems():
     for _source, entry in report_entries():
         if entry.get("multi_answer_exemption"):
             exemptions[int(entry["local_number"])] = entry["multi_answer_exemption"]
+    try:
+        gmyhf_audit = json.loads((ROOT / "collab" / "gmyhf-data-audit.json")
+                                  .read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        gmyhf_audit = {}
+    for entry in gmyhf_audit.get("entries", []):
+        if entry.get("multi_answer_exemption"):
+            exemptions[int(entry["global_number"])] = entry["multi_answer_exemption"]
     bad = []
     for page in sorted((ROOT / "data" / "openjudge" / "pages").glob("*.html")):
         match = re.search(r"__(\d+)\.html$", page.name)
@@ -224,6 +236,21 @@ def check_multi_answer_problems():
         if found:
             outputs = sorted((made_paths[int(match.group(1))] / "data").glob("*.out"))
             exemption = exemptions.get(int(match.group(1)))
+            if (int(match.group(1)) == 27150 and isinstance(exemption, dict) and
+                    exemption.get("validator") ==
+                    "all divisible-by-8 subsequences of length 1..3 are enumerated"):
+                inputs = sorted((made_paths[27150] / "data").glob("*.in"))
+                analyses = [analyze_27150_case(
+                    input_path.read_text(encoding="utf-8", errors="replace"),
+                    input_path.with_suffix(".out").read_text(encoding="utf-8", errors="replace"))
+                    for input_path in inputs if input_path.with_suffix(".out").is_file()]
+                if (inputs and len(analyses) == len(inputs) and
+                        all(analysis["valid_unique"] for analysis in analyses) and
+                        sum(analysis["kind"] == "YES" for analysis in analyses) ==
+                        exemption.get("unique_yes_cases") and
+                        sum(analysis["kind"] == "NO" for analysis in analyses) ==
+                        exemption.get("no_answer_cases")):
+                    continue
             unique_output = (exemption.get("unique_output_tokens")
                              if isinstance(exemption, dict) else ["-1"])
             if (exemption and isinstance(unique_output, list) and outputs and

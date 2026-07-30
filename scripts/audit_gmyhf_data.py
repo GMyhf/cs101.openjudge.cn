@@ -13,6 +13,7 @@ import shutil
 import sys
 
 import oj_submit
+from gmyhf_validators import analyze_27150_case
 
 ROOT = Path(__file__).resolve().parents[1]
 OPENJUDGE = ROOT / "data" / "openjudge"
@@ -20,6 +21,16 @@ OWNERSHIP = ROOT / "collab" / "gmyhf-editable-problems.json"
 AUDIT = ROOT / "collab" / "gmyhf-data-audit.json"
 LOCAL_JUDGE = ROOT / "collab" / "gmyhf-localjudge.json"
 LOCAL_OUTPUT_LIMIT = 2 * 1024 * 1024
+ARCHIVE_BUCKETS = {"1000-1999", "2000-2999", "3000-3682"}
+RUNTIME_MARGIN_LIMIT = 0.75
+# Claude reviewed the largest cases of every materialized problem in 961acb7e.
+# These four do not retain enough wall-clock margin for stable local judging.
+RUNTIME_MARGIN_REJECTIONS = {
+    28190: {"max_case_ms": 4330, "case_limit_ms": 4000},
+    30179: {"max_case_ms": 6500, "case_limit_ms": 5000},
+    30908: {"max_case_ms": 15100, "case_limit_ms": 20000},
+    30937: {"max_case_ms": 12710, "case_limit_ms": 10000},
+}
 
 
 class AdminProblemParser(HTMLParser):
@@ -140,12 +151,59 @@ def validation_evidence():
 
 
 def directory_pairs(source):
+    """Pairs covered by archive_cross_check: directory root and data/, not rglob."""
+    inputs = list(source.glob("*.in")) + list((source / "data").glob("*.in"))
+    pairs = []
+    for input_path in sorted(inputs):
+        output_path = input_path.with_suffix(".out")
+        if output_path.is_file():
+            pairs.append((input_path, output_path))
+    return pairs
+
+
+def all_directory_pairs(source):
     pairs = []
     for input_path in sorted(source.rglob("*.in")):
         output_path = input_path.with_suffix(".out")
         if output_path.is_file():
             pairs.append((input_path, output_path))
     return pairs
+
+
+def filter_problem_pairs(number, pairs):
+    """Exclude exact-judge-unsafe cases while retaining byte-identical safe originals."""
+    if number != 27150:
+        return pairs, [], None
+    kept, excluded = [], []
+    unique_yes = no_answer = 0
+    for source_dir, input_path, output_path in pairs:
+        analysis = analyze_27150_case(
+            input_path.read_text(encoding="utf-8", errors="replace"),
+            output_path.read_text(encoding="utf-8", errors="replace"))
+        answers = analysis["answers"]
+        if analysis["valid_unique"]:
+            kept.append((source_dir, input_path, output_path))
+            if answers:
+                unique_yes += 1
+            else:
+                no_answer += 1
+        else:
+            excluded.append({
+                "source_input": str(input_path.relative_to(OPENJUDGE)),
+                "source_output": str(output_path.relative_to(OPENJUDGE)),
+                "reason": "multiple legal exact outputs" if len(answers) > 1 else "oracle is not uniquely valid",
+                "legal_outputs": sorted(answers)[:20],
+                "legal_output_count": len(answers),
+            })
+    exemption = {
+        "validator": "all divisible-by-8 subsequences of length 1..3 are enumerated",
+        "status": "passed" if kept and len(kept) + len(excluded) == len(pairs) else "failed",
+        "kept_cases": len(kept),
+        "excluded_ambiguous_cases": len(excluded),
+        "unique_yes_cases": unique_yes,
+        "no_answer_cases": no_answer,
+    }
+    return kept, excluded, exemption
 
 
 def sha256(path):
@@ -165,7 +223,7 @@ def made_directories():
     return result
 
 
-def audit(materialize=False):
+def audit(materialize=False, replace_materialized=False):
     ownership = json.loads(OWNERSHIP.read_text(encoding="utf-8"))
     editable = {int(row["global_number"]): row for row in ownership["entries"]}
     catalog = json.loads((OPENJUDGE / "catalog.json").read_text(encoding="utf-8"))
@@ -173,11 +231,17 @@ def audit(materialize=False):
     made = made_directories()
     evidence = validation_evidence()
     rows = []
-    totals = {"eligible": 0, "original_problem": 0, "unverified": 0, "without_made": 0,
-              "materialized": 0, "cases": 0, "bytes": 0}
+    totals = {"eligible": 0, "partial_eligible": 0, "original_problem": 0,
+              "unverified": 0, "without_made": 0, "materialized": 0,
+              "cases": 0, "bytes": 0}
+
+    if materialize and replace_materialized:
+        for destination in OPENJUDGE.glob("tests/*/*_GMyhf"):
+            if destination.parent.parent != OPENJUDGE / "tests" or not destination.name.endswith("_GMyhf"):
+                raise RuntimeError(f"unsafe replacement target {destination}")
+            shutil.rmtree(destination)
 
     for number in sorted(set(editable) & catalog_numbers):
-        oversized = []
         made_dir = made.get(number)
         if made_dir is None:
             status = "without_made"
@@ -185,6 +249,10 @@ def audit(materialize=False):
             rows.append({"global_number": number, "title": editable[number]["title"], "status": status})
             continue
         proof = evidence.get(number)
+        pairs = []
+        excluded_pairs = []
+        multi_answer_exemption = None
+        issues = []
         if not proof:
             status = "unverified"
         elif proof["issues"]:
@@ -195,18 +263,52 @@ def audit(materialize=False):
             missing = [path for path in proof["passed_dirs"]
                        if not (OPENJUDGE / path).is_dir()]
             status = "unverified" if missing else "eligible"
-            oversized = []
             if status == "eligible":
                 for source_dir in proof["passed_dirs"]:
-                    for output_path in (OPENJUDGE / source_dir).rglob("*.out"):
-                        if output_path.stat().st_size > LOCAL_OUTPUT_LIMIT:
-                            oversized.append({
-                                "path": str(output_path.relative_to(OPENJUDGE)),
-                                "bytes": output_path.stat().st_size,
-                                "limit": LOCAL_OUTPUT_LIMIT,
+                    source = OPENJUDGE / source_dir
+                    covered = directory_pairs(source)
+                    pairs.extend((source_dir, inp, out) for inp, out in covered)
+                    covered_inputs = {inp for inp, _out in covered}
+                    for input_path, output_path in all_directory_pairs(source):
+                        if input_path not in covered_inputs:
+                            excluded_pairs.append({
+                                "source_input": str(input_path.relative_to(OPENJUDGE)),
+                                "source_output": str(output_path.relative_to(OPENJUDGE)),
+                                "reason": "not covered by archive_cross_check glob scope",
                             })
+                if made_dir.parent.name in ARCHIVE_BUCKETS:
+                    status = "unverified"
+                    issues.append({"status": "archive_bucket_excluded",
+                                   "bucket": made_dir.parent.name})
+                oversized = []
+                for _source_dir, _input_path, output_path in pairs:
+                    if output_path.stat().st_size > LOCAL_OUTPUT_LIMIT:
+                        oversized.append({
+                            "path": str(output_path.relative_to(OPENJUDGE)),
+                            "bytes": output_path.stat().st_size,
+                            "limit": LOCAL_OUTPUT_LIMIT,
+                        })
                 if oversized:
                     status = "original_problem"
+                    issues.append({"status": "local_output_limit_exceeded", "details": oversized})
+                runtime = RUNTIME_MARGIN_REJECTIONS.get(number)
+                if runtime:
+                    status = "original_problem"
+                    issues.append({
+                        "status": "insufficient_runtime_margin",
+                        **runtime,
+                        "ratio": round(runtime["max_case_ms"] / runtime["case_limit_ms"], 4),
+                        "required_max_ratio": RUNTIME_MARGIN_LIMIT,
+                        "source": "Claude review commit 961acb7e",
+                    })
+                if status == "eligible":
+                    pairs, ambiguous, multi_answer_exemption = filter_problem_pairs(number, pairs)
+                    excluded_pairs.extend(ambiguous)
+                    if not pairs:
+                        status = "original_problem"
+                        issues.append({"status": "no_exact-judge-safe_original_cases"})
+                    elif excluded_pairs:
+                        status = "partial_eligible"
         totals[status] += 1
         row = {
             "global_number": number,
@@ -217,21 +319,16 @@ def audit(materialize=False):
         if proof:
             row["evidence_reports"] = sorted(proof["reports"])
             row["source_dirs"] = sorted(proof["passed_dirs"])
-            row["issues"] = proof["issues"]
-        if oversized:
-            row.setdefault("issues", []).append({
-                "status": "local_output_limit_exceeded",
-                "details": oversized,
-            })
-        if status == "eligible":
-            pairs = []
-            for source_dir in sorted(proof["passed_dirs"]):
-                source = OPENJUDGE / source_dir
-                pairs.extend((source_dir, inp, out) for inp, out in directory_pairs(source))
+            row["issues"] = proof["issues"] + issues
+        if excluded_pairs:
+            row["excluded_pairs"] = excluded_pairs
+        if multi_answer_exemption:
+            row["multi_answer_exemption"] = multi_answer_exemption
+        if status in {"eligible", "partial_eligible"}:
             if not pairs:
                 row["status"] = "unverified"
                 row["reason"] = "validated source directories contain no .in/.out pairs"
-                totals["eligible"] -= 1
+                totals[status] -= 1
                 totals["unverified"] += 1
             else:
                 row["case_count"] = len(pairs)
@@ -247,7 +344,16 @@ def audit(materialize=False):
                     data = destination / "data"
                     data.mkdir(parents=True)
                     files = []
-                    for index, (source_dir, input_path, output_path) in enumerate(pairs):
+                    stable_indexes = {}
+                    if excluded_pairs:
+                        ordinal = 0
+                        for source_dir in proof["passed_dirs"]:
+                            source = OPENJUDGE / source_dir
+                            for input_path, _output_path in all_directory_pairs(source):
+                                stable_indexes[(source_dir, input_path)] = ordinal
+                                ordinal += 1
+                    for sequence, (source_dir, input_path, output_path) in enumerate(pairs):
+                        index = stable_indexes.get((source_dir, input_path), sequence)
                         target_input = data / f"{index}.in"
                         target_output = data / f"{index}.out"
                         shutil.copyfile(input_path, target_input)
@@ -267,6 +373,8 @@ def audit(materialize=False):
                         "global_number": number,
                         "files": files,
                     }
+                    if excluded_pairs:
+                        provenance["excluded_pairs"] = excluded_pairs
                     (destination / "SOURCE.json").write_text(
                         json.dumps(provenance, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
                     row["materialized_dir"] = str(destination.relative_to(ROOT))
@@ -274,7 +382,8 @@ def audit(materialize=False):
         rows.append(row)
 
     payload = {
-        "policy": "editable admin problem; use _GMyhf only with clean archive_cross_check evidence",
+        "policy": ("editable admin problem; copy only archive_cross_check-covered pairs; "
+                   "require local output/runtime margin and exact-judge-safe outputs"),
         "ownership_source": str(OWNERSHIP.relative_to(ROOT)),
         "audited_at": datetime.now(timezone.utc).isoformat(),
         "totals": totals,
@@ -307,7 +416,8 @@ def verify_active():
             result = {"status": "Missing Reference"}
         else:
             result = judge.judge(problem["book"], problem["id"], language,
-                                 source_path.read_text(encoding="utf-8"))
+                                 source_path.read_text(encoding="utf-8"),
+                                 collect_case_times=True)
         entries.append({
             "global_number": number,
             "book": problem["book"],
@@ -319,12 +429,15 @@ def verify_active():
         if index % 20 == 0 or result.get("status") != "Accepted":
             print(f"local judge: {index}/{audit_payload['totals']['materialized']} "
                   f"{number} {result.get('status')}", flush=True)
+    failed = [row for row in entries if row["status"] != "Accepted" or
+              (row.get("timing_audit") or {}).get("status") != "passed"]
     payload = {
         "source": str(AUDIT.relative_to(ROOT)),
         "verified_at": datetime.now(timezone.utc).isoformat(),
         "count": len(entries),
         "accepted": sum(row["status"] == "Accepted" for row in entries),
-        "failed": [row for row in entries if row["status"] != "Accepted"],
+        "runtime_margin_policy": "every case must use at most 75% of its local CPU-second limit",
+        "failed": failed,
         "entries": entries,
     }
     LOCAL_JUDGE.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -336,13 +449,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--fetch-ownership", action="store_true")
     parser.add_argument("--materialize", action="store_true")
+    parser.add_argument("--replace-materialized", action="store_true",
+                        help="replace all existing _GMyhf directories; requires --materialize")
     parser.add_argument("--verify-active", action="store_true")
     args = parser.parse_args()
+    if args.replace_materialized and not args.materialize:
+        parser.error("--replace-materialized requires --materialize")
     if args.fetch_ownership:
         fetch_ownership()
     if not OWNERSHIP.exists():
         parser.error(f"missing {OWNERSHIP}; run with --fetch-ownership")
-    audit(materialize=args.materialize)
+    audit(materialize=args.materialize, replace_materialized=args.replace_materialized)
     if args.verify_active:
         result = verify_active()
         if result["failed"]:

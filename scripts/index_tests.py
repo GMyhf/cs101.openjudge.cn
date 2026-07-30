@@ -22,8 +22,8 @@ BUCKETS = {"1000-1999", "2000-2999", "3000-3682", "4000-8210", "10000-19963", "2
 # `1000-1999/1384/pig.in`（117KB，单跑 38.4 秒，而生成的 21 组全部 ≤0.20 秒）。
 # **学生在平台过、在我们这挂**，而挂的原因是一份 2008 年的私人压力测试文件。
 #
-# `*_made/` 与 `*_GMyhf/` 不受影响：前者是项目自产数据，后者是经管理页所有权
-# 和逐题 oracle 验证后入库的 GMyhf 自有平台数据。
+# `*_made/` 不受影响。`*_GMyhf/` 只允许在非存档桶启用：管理页编辑权限能证明
+# 所有权，但不能把 2008 私人工作目录变回平台数据，01384/pig.in 这条红线不绕过。
 # 代价记在这里，不藏着：**498 条 catalog 记录（246 个唯一题号）因此掉到零测试数据**，
 # 要靠 T-028 逐批补回来。
 ARCHIVE_BUCKETS = {"1000-1999", "2000-2999", "3000-3682"}
@@ -31,7 +31,7 @@ ARCHIVE_BUCKETS = {"1000-1999", "2000-2999", "3000-3682"}
 
 def is_archive(bucket, directory_name):
     """2008 存档目录（已验证入库的项目数据除外）。"""
-    return bucket in ARCHIVE_BUCKETS and not directory_name.endswith(("_made", "_GMyhf"))
+    return bucket in ARCHIVE_BUCKETS and not directory_name.endswith("_made")
 
 
 def numeric(value):

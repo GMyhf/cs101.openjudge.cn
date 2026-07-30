@@ -347,7 +347,7 @@ def problem_exists(book, problem_id):
         return (book, problem_id) in PROBLEM_KEYS_CACHE
 
 
-def judge(book, problem_id, language, source):
+def judge(book, problem_id, language, source, collect_case_times=False):
     catalog_path = MIRROR / "catalog.json"
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
     item = next((p for p in catalog["problems"] if p["book"] == book and p["id"] == problem_id), None)
@@ -371,6 +371,7 @@ def judge(book, problem_id, language, source):
         number = int(digits.group(1)) if digits else None
         budget_seconds = total_budget_seconds(number, language, len(cases))
         cpu_seconds = case_seconds(number, language, len(cases))
+        case_timings = []
         for index, case in enumerate(cases, 1):
             # 题面的限时语义是「所有测试点之和」，所以总量这一层必须真的存在；
             # 同时它也是服务器的护栏 —— 改动前整次提交是无界的（150 组 × 5s = 750 秒）。
@@ -384,6 +385,7 @@ def judge(book, problem_id, language, source):
             expected = (MIRROR / case["output"]).read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
             run_address_space = DOTNET_ADDRESS_SPACE if language in DOTNET_LANGUAGES else 768 * 1024 * 1024
             run_file_size = DOTNET_FILE_SIZE if language in DOTNET_LANGUAGES else 2 * 1024 * 1024
+            case_started = time.perf_counter()
             try: result = _run(command, stdin=input_data, cwd=work, timeout=cpu_seconds + 1,
                                cpu_seconds=cpu_seconds, address_space_bytes=run_address_space,
                                file_size_bytes=run_file_size)
@@ -391,6 +393,14 @@ def judge(book, problem_id, language, source):
                 return {"status": "Time Limit Exceeded", "case": index, "time_ms": round((time.perf_counter() - overall_started) * 1000),
                         "memory_kb": int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss),
                         "message": f"单组测试超过 {cpu_seconds + 1} 秒。"}
+            case_elapsed_ms = round((time.perf_counter() - case_started) * 1000)
+            if collect_case_times:
+                case_timings.append({
+                    "case": index,
+                    "time_ms": case_elapsed_ms,
+                    "case_limit_ms": cpu_seconds * 1000,
+                    "ratio": round(case_elapsed_ms / (cpu_seconds * 1000), 4),
+                })
             memory_kb = int(resource.getrusage(resource.RUSAGE_CHILDREN).ru_maxrss)
             peak_memory = max(peak_memory, memory_kb)
             last_metrics = {"time_ms": round((time.perf_counter() - overall_started) * 1000), "memory_kb": peak_memory}
@@ -400,4 +410,13 @@ def judge(book, problem_id, language, source):
             if result.returncode in {-signal.SIGXCPU, -signal.SIGKILL}: return {"status": "Time Limit Exceeded", "case": index, **metrics, "message": "单组测试超过 CPU 限制。"}
             if result.returncode != 0: return {"status": "Runtime Error", "case": index, **metrics, "message": result.stderr.decode(errors="replace")[-4000:]}
             if actual.split() != expected.split(): return {"status": "Wrong Answer", "case": index, **metrics, "expected_tokens": len(expected.split()), "actual_tokens": len(actual.split())}
-    return {"status": "Accepted", "cases": len(cases), **last_metrics}
+    accepted = {"status": "Accepted", "cases": len(cases), **last_metrics}
+    if collect_case_times:
+        max_case = max(case_timings, key=lambda row: row["ratio"])
+        accepted["timing_audit"] = {
+            "status": "passed" if max_case["ratio"] <= 0.75 else "insufficient_margin",
+            "required_max_ratio": 0.75,
+            "max_case": max_case,
+            "cases": case_timings,
+        }
+    return accepted

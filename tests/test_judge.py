@@ -80,6 +80,19 @@ class JudgeCoreTests(unittest.TestCase):
         self.assertEqual(result["status"], "Accepted")
         self.assertEqual(result["cases"], 2)
 
+    def test_timing_audit_is_opt_in_and_reports_every_case(self):
+        ordinary = judge(BOOK, PROBLEM, "python", SUM_SOURCE)
+        self.assertNotIn("timing_audit", ordinary)
+
+        audited = judge(BOOK, PROBLEM, "python", SUM_SOURCE, collect_case_times=True)
+        self.assertEqual("Accepted", audited["status"])
+        timing = audited["timing_audit"]
+        self.assertEqual("passed", timing["status"])
+        self.assertEqual(2, len(timing["cases"]))
+        self.assertEqual({1, 2}, {row["case"] for row in timing["cases"]})
+        self.assertLessEqual(timing["max_case"]["ratio"],
+                             timing["required_max_ratio"])
+
     def test_wrong_answer_reports_the_failing_case(self):
         # 第 1 组正确、第 2 组错误：必须报出错在第 2 组，而不是笼统的 WA。
         source = "a, b = map(int, input().split())\nprint(3 if a == 1 else 0)\n"

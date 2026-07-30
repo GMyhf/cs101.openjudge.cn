@@ -1,15 +1,16 @@
 {
-  "policy": "editable admin problem; use _GMyhf only with clean archive_cross_check evidence",
+  "policy": "editable admin problem; copy only archive_cross_check-covered pairs; require local output/runtime margin and exact-judge-safe outputs",
   "ownership_source": "collab/gmyhf-editable-problems.json",
-  "audited_at": "2026-07-30T10:52:33.782459+00:00",
+  "audited_at": "2026-07-30T12:04:15.060824+00:00",
   "totals": {
-    "eligible": 162,
-    "original_problem": 10,
+    "eligible": 156,
+    "partial_eligible": 3,
+    "original_problem": 13,
     "unverified": 139,
     "without_made": 1,
-    "materialized": 162,
-    "cases": 3408,
-    "bytes": 807404945
+    "materialized": 159,
+    "cases": 3309,
+    "bytes": 690818415
   },
   "entries": [
     {
@@ -1405,7 +1406,7 @@
     {
       "global_number": 27018,
       "title": "康托展开",
-      "status": "original_problem",
+      "status": "eligible",
       "made_dir": "data/openjudge/tests/20000-29982/27018_made",
       "evidence_reports": [
         "collab/t028-round17-report.json"
@@ -1413,18 +1414,10 @@
       "source_dirs": [
         "tests/20000-29982/27018"
       ],
-      "issues": [
-        {
-          "status": "local_output_limit_exceeded",
-          "details": [
-            {
-              "path": "tests/20000-29982/27018/a.out",
-              "bytes": 8109762,
-              "limit": 2097152
-            }
-          ]
-        }
-      ]
+      "issues": [],
+      "case_count": 22,
+      "byte_count": 11733535,
+      "materialized_dir": "data/openjudge/tests/20000-29982/27018_GMyhf"
     },
     {
       "global_number": 27072,
@@ -1461,7 +1454,7 @@
     {
       "global_number": 27103,
       "title": "最短的愉悦旋律长度",
-      "status": "eligible",
+      "status": "partial_eligible",
       "made_dir": "data/openjudge/tests/20000-29982/27103_made",
       "evidence_reports": [
         "collab/t028-round16-report.json"
@@ -1470,8 +1463,110 @@
         "tests/20000-29982/27103"
       ],
       "issues": [],
-      "case_count": 41,
-      "byte_count": 8507145,
+      "excluded_pairs": [
+        {
+          "source_input": "tests/20000-29982/27103/data2/0.in",
+          "source_output": "tests/20000-29982/27103/data2/0.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/1.in",
+          "source_output": "tests/20000-29982/27103/data2/1.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/10.in",
+          "source_output": "tests/20000-29982/27103/data2/10.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/11.in",
+          "source_output": "tests/20000-29982/27103/data2/11.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/12.in",
+          "source_output": "tests/20000-29982/27103/data2/12.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/13.in",
+          "source_output": "tests/20000-29982/27103/data2/13.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/14.in",
+          "source_output": "tests/20000-29982/27103/data2/14.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/15.in",
+          "source_output": "tests/20000-29982/27103/data2/15.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/16.in",
+          "source_output": "tests/20000-29982/27103/data2/16.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/17.in",
+          "source_output": "tests/20000-29982/27103/data2/17.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/18.in",
+          "source_output": "tests/20000-29982/27103/data2/18.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/19.in",
+          "source_output": "tests/20000-29982/27103/data2/19.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/2.in",
+          "source_output": "tests/20000-29982/27103/data2/2.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/3.in",
+          "source_output": "tests/20000-29982/27103/data2/3.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/4.in",
+          "source_output": "tests/20000-29982/27103/data2/4.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/5.in",
+          "source_output": "tests/20000-29982/27103/data2/5.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/6.in",
+          "source_output": "tests/20000-29982/27103/data2/6.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/7.in",
+          "source_output": "tests/20000-29982/27103/data2/7.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/8.in",
+          "source_output": "tests/20000-29982/27103/data2/8.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27103/data2/9.in",
+          "source_output": "tests/20000-29982/27103/data2/9.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        }
+      ],
+      "case_count": 21,
+      "byte_count": 4624957,
       "materialized_dir": "data/openjudge/tests/20000-29982/27103_GMyhf"
     },
     {
@@ -1525,7 +1620,7 @@
     {
       "global_number": 27150,
       "title": "Divisibility by Eight 加强版",
-      "status": "eligible",
+      "status": "partial_eligible",
       "made_dir": "data/openjudge/tests/20000-29982/27150_made",
       "evidence_reports": [
         "collab/t028-round22-report.json"
@@ -1534,8 +1629,28 @@
         "tests/20000-29982/27150"
       ],
       "issues": [],
-      "case_count": 20,
-      "byte_count": 29990777,
+      "excluded_pairs": [
+        {
+          "source_input": "tests/20000-29982/27150/15.in",
+          "source_output": "tests/20000-29982/27150/15.out",
+          "reason": "multiple legal exact outputs",
+          "legal_outputs": [
+            "64",
+            "664"
+          ],
+          "legal_output_count": 2
+        }
+      ],
+      "multi_answer_exemption": {
+        "validator": "all divisible-by-8 subsequences of length 1..3 are enumerated",
+        "status": "passed",
+        "kept_cases": 19,
+        "excluded_ambiguous_cases": 1,
+        "unique_yes_cases": 12,
+        "no_answer_cases": 7
+      },
+      "case_count": 19,
+      "byte_count": 27990770,
       "materialized_dir": "data/openjudge/tests/20000-29982/27150_GMyhf"
     },
     {
@@ -2002,46 +2117,83 @@
           "status": "local_output_limit_exceeded",
           "details": [
             {
-              "path": "tests/20000-29982/27699/toadd_sample_in_out/14.out",
-              "bytes": 3113242,
-              "limit": 2097152
-            },
-            {
-              "path": "tests/20000-29982/27699/toadd_sample_in_out/15.out",
-              "bytes": 2305421,
-              "limit": 2097152
-            },
-            {
-              "path": "tests/20000-29982/27699/toadd_sample_in_out/12.out",
-              "bytes": 2431512,
-              "limit": 2097152
-            },
-            {
-              "path": "tests/20000-29982/27699/toadd_sample_in_out/11.out",
-              "bytes": 3059510,
-              "limit": 2097152
-            },
-            {
-              "path": "tests/20000-29982/27699/toadd_sample_in_out/10.out",
-              "bytes": 3058719,
-              "limit": 2097152
-            },
-            {
-              "path": "tests/20000-29982/27699/toadd_sample_in_out/7.out",
-              "bytes": 3282712,
-              "limit": 2097152
-            },
-            {
-              "path": "tests/20000-29982/27699/toadd_sample_in_out/6.out",
-              "bytes": 2616977,
-              "limit": 2097152
-            },
-            {
               "path": "tests/20000-29982/27699/data/1.out",
               "bytes": 2545913,
               "limit": 2097152
             }
           ]
+        }
+      ],
+      "excluded_pairs": [
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/10.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/10.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/11.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/11.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/12.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/12.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/14.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/14.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/15.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/15.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/16.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/16.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/17.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/17.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/18.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/18.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/3.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/3.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/4.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/4.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/5.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/5.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/6.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/6.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/7.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/7.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        },
+        {
+          "source_input": "tests/20000-29982/27699/toadd_sample_in_out/9.in",
+          "source_output": "tests/20000-29982/27699/toadd_sample_in_out/9.out",
+          "reason": "not covered by archive_cross_check glob scope"
         }
       ]
     },
@@ -2158,7 +2310,7 @@
     {
       "global_number": 28046,
       "title": "词梯",
-      "status": "eligible",
+      "status": "partial_eligible",
       "made_dir": "data/openjudge/tests/20000-29982/28046_made",
       "evidence_reports": [
         "collab/t028-round15-report.json"
@@ -2167,8 +2319,15 @@
         "tests/20000-29982/28046"
       ],
       "issues": [],
-      "case_count": 8,
-      "byte_count": 79503,
+      "excluded_pairs": [
+        {
+          "source_input": "tests/20000-29982/28046/other/sample6.in",
+          "source_output": "tests/20000-29982/28046/other/sample6.out",
+          "reason": "not covered by archive_cross_check glob scope"
+        }
+      ],
+      "case_count": 7,
+      "byte_count": 59788,
       "materialized_dir": "data/openjudge/tests/20000-29982/28046_GMyhf"
     },
     {
@@ -2227,7 +2386,7 @@
     {
       "global_number": 28190,
       "title": "奶牛排队",
-      "status": "eligible",
+      "status": "original_problem",
       "made_dir": "data/openjudge/tests/20000-29982/28190_made",
       "evidence_reports": [
         "collab/t028-round23-report.json"
@@ -2235,10 +2394,16 @@
       "source_dirs": [
         "tests/20000-29982/28190"
       ],
-      "issues": [],
-      "case_count": 25,
-      "byte_count": 13001725,
-      "materialized_dir": "data/openjudge/tests/20000-29982/28190_GMyhf"
+      "issues": [
+        {
+          "status": "insufficient_runtime_margin",
+          "max_case_ms": 4330,
+          "case_limit_ms": 4000,
+          "ratio": 1.0825,
+          "required_max_ratio": 0.75,
+          "source": "Claude review commit 961acb7e"
+        }
+      ]
     },
     {
       "global_number": 28193,
@@ -2272,23 +2437,23 @@
           "status": "local_output_limit_exceeded",
           "details": [
             {
-              "path": "tests/20000-29982/28203/data/14.out",
-              "bytes": 8295641,
+              "path": "tests/20000-29982/28203/data/0.out",
+              "bytes": 3833814,
               "limit": 2097152
             },
             {
-              "path": "tests/20000-29982/28203/data/15.out",
-              "bytes": 18415589,
+              "path": "tests/20000-29982/28203/data/1.out",
+              "bytes": 15239449,
               "limit": 2097152
             },
             {
-              "path": "tests/20000-29982/28203/data/17.out",
-              "bytes": 10242587,
+              "path": "tests/20000-29982/28203/data/10.out",
+              "bytes": 9787682,
               "limit": 2097152
             },
             {
-              "path": "tests/20000-29982/28203/data/16.out",
-              "bytes": 16466508,
+              "path": "tests/20000-29982/28203/data/11.out",
+              "bytes": 12348895,
               "limit": 2097152
             },
             {
@@ -2302,43 +2467,28 @@
               "limit": 2097152
             },
             {
-              "path": "tests/20000-29982/28203/data/11.out",
-              "bytes": 12348895,
+              "path": "tests/20000-29982/28203/data/14.out",
+              "bytes": 8295641,
               "limit": 2097152
             },
             {
-              "path": "tests/20000-29982/28203/data/10.out",
-              "bytes": 9787682,
+              "path": "tests/20000-29982/28203/data/15.out",
+              "bytes": 18415589,
               "limit": 2097152
             },
             {
-              "path": "tests/20000-29982/28203/data/8.out",
-              "bytes": 15236935,
+              "path": "tests/20000-29982/28203/data/16.out",
+              "bytes": 16466508,
               "limit": 2097152
             },
             {
-              "path": "tests/20000-29982/28203/data/9.out",
-              "bytes": 11940419,
+              "path": "tests/20000-29982/28203/data/17.out",
+              "bytes": 10242587,
               "limit": 2097152
             },
             {
-              "path": "tests/20000-29982/28203/data/4.out",
-              "bytes": 12816875,
-              "limit": 2097152
-            },
-            {
-              "path": "tests/20000-29982/28203/data/5.out",
-              "bytes": 6661399,
-              "limit": 2097152
-            },
-            {
-              "path": "tests/20000-29982/28203/data/7.out",
-              "bytes": 14122908,
-              "limit": 2097152
-            },
-            {
-              "path": "tests/20000-29982/28203/data/6.out",
-              "bytes": 20570362,
+              "path": "tests/20000-29982/28203/data/19.out",
+              "bytes": 15494172,
               "limit": 2097152
             },
             {
@@ -2352,18 +2502,33 @@
               "limit": 2097152
             },
             {
-              "path": "tests/20000-29982/28203/data/1.out",
-              "bytes": 15239449,
+              "path": "tests/20000-29982/28203/data/4.out",
+              "bytes": 12816875,
               "limit": 2097152
             },
             {
-              "path": "tests/20000-29982/28203/data/0.out",
-              "bytes": 3833814,
+              "path": "tests/20000-29982/28203/data/5.out",
+              "bytes": 6661399,
               "limit": 2097152
             },
             {
-              "path": "tests/20000-29982/28203/data/19.out",
-              "bytes": 15494172,
+              "path": "tests/20000-29982/28203/data/6.out",
+              "bytes": 20570362,
+              "limit": 2097152
+            },
+            {
+              "path": "tests/20000-29982/28203/data/7.out",
+              "bytes": 14122908,
+              "limit": 2097152
+            },
+            {
+              "path": "tests/20000-29982/28203/data/8.out",
+              "bytes": 15236935,
+              "limit": 2097152
+            },
+            {
+              "path": "tests/20000-29982/28203/data/9.out",
+              "bytes": 11940419,
               "limit": 2097152
             }
           ]
@@ -3032,7 +3197,7 @@
     {
       "global_number": 30179,
       "title": "数字华容道（Hard Version）",
-      "status": "eligible",
+      "status": "original_problem",
       "made_dir": "data/openjudge/tests/30000-/30179_made",
       "evidence_reports": [
         "collab/t028-round21-report.json"
@@ -3040,10 +3205,16 @@
       "source_dirs": [
         "tests/30000-/30179数字华容道(Hard Version)"
       ],
-      "issues": [],
-      "case_count": 10,
-      "byte_count": 55465510,
-      "materialized_dir": "data/openjudge/tests/30000-/30179_GMyhf"
+      "issues": [
+        {
+          "status": "insufficient_runtime_margin",
+          "max_case_ms": 6500,
+          "case_limit_ms": 5000,
+          "ratio": 1.3,
+          "required_max_ratio": 0.75,
+          "source": "Claude review commit 961acb7e"
+        }
+      ]
     },
     {
       "global_number": 30191,
@@ -3392,6 +3563,11 @@
               "limit": 2097152
             },
             {
+              "path": "tests/30000-/30550/7.out",
+              "bytes": 2820366,
+              "limit": 2097152
+            },
+            {
               "path": "tests/30000-/30550/8.out",
               "bytes": 10411544,
               "limit": 2097152
@@ -3399,11 +3575,6 @@
             {
               "path": "tests/30000-/30550/9.out",
               "bytes": 18666359,
-              "limit": 2097152
-            },
-            {
-              "path": "tests/30000-/30550/7.out",
-              "bytes": 2820366,
               "limit": 2097152
             }
           ]
@@ -3673,7 +3844,7 @@
     {
       "global_number": 30908,
       "title": "力场叠加模拟 (在线版)",
-      "status": "eligible",
+      "status": "original_problem",
       "made_dir": "data/openjudge/tests/30000-/30908_made",
       "evidence_reports": [
         "collab/t028-round24-report.json"
@@ -3681,10 +3852,16 @@
       "source_dirs": [
         "tests/30000-/30908"
       ],
-      "issues": [],
-      "case_count": 31,
-      "byte_count": 43384608,
-      "materialized_dir": "data/openjudge/tests/30000-/30908_GMyhf"
+      "issues": [
+        {
+          "status": "insufficient_runtime_margin",
+          "max_case_ms": 15100,
+          "case_limit_ms": 20000,
+          "ratio": 0.755,
+          "required_max_ratio": 0.75,
+          "source": "Claude review commit 961acb7e"
+        }
+      ]
     },
     {
       "global_number": 30909,
@@ -3901,7 +4078,7 @@
     {
       "global_number": 30937,
       "title": "01最小生成树 (new data)",
-      "status": "eligible",
+      "status": "original_problem",
       "made_dir": "data/openjudge/tests/30000-/30937_made",
       "evidence_reports": [
         "collab/t028-round24-report.json"
@@ -3909,10 +4086,16 @@
       "source_dirs": [
         "tests/30000-/30937"
       ],
-      "issues": [],
-      "case_count": 33,
-      "byte_count": 10566312,
-      "materialized_dir": "data/openjudge/tests/30000-/30937_GMyhf"
+      "issues": [
+        {
+          "status": "insufficient_runtime_margin",
+          "max_case_ms": 12710,
+          "case_limit_ms": 10000,
+          "ratio": 1.271,
+          "required_max_ratio": 0.75,
+          "source": "Claude review commit 961acb7e"
+        }
+      ]
     },
     {
       "global_number": 30942,

@@ -1,4 +1,5 @@
 """Regression tests for report-wide data-quality checks."""
+import json
 import sys
 import unittest
 from pathlib import Path
@@ -257,6 +258,34 @@ class MultiAnswerUniqueFailureTests(unittest.TestCase):
                                        statement=statement))
         self.assertEqual(1, len(self._run("168\n", number=27150,
                                          exemption=exemption, statement=statement)))
+
+    def test_gmyhf_27150_exemption_recomputes_unique_answers(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            page_dir = root / "data/openjudge/pages"
+            active = root / "data/openjudge/tests/20000-29982/27150_GMyhf"
+            (active / "data").mkdir(parents=True); page_dir.mkdir(parents=True)
+            (page_dir / "practice__27150.html").write_text(
+                "<p>输出移除某些数字的结果。</p>", encoding="utf-8")
+            (active / "data/0.in").write_text("3445\n", encoding="utf-8")
+            (active / "data/0.out").write_text("YES\n344\n", encoding="utf-8")
+            (root / "collab").mkdir()
+            (root / "collab/gmyhf-data-audit.json").write_text(json.dumps({"entries": [{
+                "global_number": 27150,
+                "multi_answer_exemption": {
+                    "validator": "all divisible-by-8 subsequences of length 1..3 are enumerated",
+                    "unique_yes_cases": 1,
+                    "no_answer_cases": 0,
+                },
+            }]}), encoding="utf-8")
+            with mock.patch.object(full_sweep, "ROOT", root), \
+                 mock.patch.object(full_sweep, "active_dirs", return_value=[(27150, active)]), \
+                 mock.patch.object(full_sweep, "report_entries", return_value=iter(())):
+                self.assertEqual([], full_sweep.check_multi_answer_problems()[1])
+                (active / "data/0.in").write_text("4664\n", encoding="utf-8")
+                (active / "data/0.out").write_text("YES\n64\n", encoding="utf-8")
+                self.assertEqual(1, len(full_sweep.check_multi_answer_problems()[1]))
 
 
 class ActiveDataCoverageTests(unittest.TestCase):
