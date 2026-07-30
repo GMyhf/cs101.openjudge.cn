@@ -574,7 +574,7 @@ process.exit(byAccepted && byRate && rateAsc && byId && untouched ? 0 : 1);
     def test_ranking_and_status_link_to_the_new_pages(self):
         _, _, body = request(self.port, "GET", "/book/pctbook/ranking/")
         text = body.decode("utf-8", errors="replace")
-        self.assertIn("/book/${encodeURIComponent(BOOK)}/user/${encodeURIComponent(name)}/", text)
+        self.assertIn("/history/?user=${encodeURIComponent(name)}", text)
         self.assertIn("/book/${encodeURIComponent(BOOK)}/solution/${encodeURIComponent(s.id)}/", text)
 
     def test_user_page_lists_problems_without_leaking_code(self):
@@ -697,7 +697,20 @@ process.exit(byAccepted && byRate && rateAsc && byId && untouched ? 0 : 1);
         self.assertTrue(mine[0]["detail"])
         self.assertTrue(all(row["result"] for row in others))
         self.assertTrue(all(row["source"] == "" and row["detail"] == {} for row in others))
+        self.assertTrue(all(row["id"] and row["book_name"] and row["title"] for row in others))
+        self.assertTrue(all(row["memory_kb"] is not None and row["time_ms"] is not None
+                            and row["source_bytes"] > 0 for row in others))
         self.assertNotIn(b"print('aaa')", body)
+
+        status, _, body = request(
+            self.port, "GET", "/api/submissions?user=t026_stat_a&limit=500", cookie=second)
+        self.assertEqual(status, 200)
+        filtered = json.loads(body)
+        self.assertEqual(filtered["scope_user"], "t026_stat_a")
+        self.assertTrue(filtered["submissions"])
+        self.assertTrue(all(row["user"] == "t026_stat_a" for row in filtered["submissions"]))
+        self.assertTrue(all(row["source"] == "" and row["detail"] == {}
+                            for row in filtered["submissions"]))
 
         status, _, body = request(self.port, "GET", query, cookie=self._admin_cookie())
         self.assertEqual(status, 200)
@@ -795,12 +808,13 @@ process.exit(restored && loginOk && draftOk && values.size === 0 ? 0 : 1);
         self.assertIn("Python ×10", text)
         self.assertIn("C#/F#/VB.NET 内存 ×2", text)
 
-    def test_history_page_exposes_error_details(self):
+    def test_history_page_links_results_to_error_details(self):
         status, _, body = request(self.port, "GET", "/history/")
         self.assertEqual(status, 200)
         text = body.decode("utf-8", errors="replace")
-        self.assertIn("查看判题详情", text)
-        self.assertIn("result-message", text)
+        self.assertIn("const solutionPath = s.book && s.id", text)
+        self.assertIn('<a class="verdict-link" href="${solutionPath}">', text)
+        self.assertNotIn("result-message", text)
 
     def test_submissions_require_authentication(self):
         status, _, body = request(self.port, "GET", "/api/submissions")
@@ -1170,6 +1184,10 @@ process.exit(restored && loginOk && draftOk && values.size === 0 ? 0 : 1);
         text = body.decode("utf-8", errors="replace")
         self.assertIn("提交记录", text)
         self.assertIn("/api/submissions", text)
+        self.assertIn("['题库名', '题目', '结果', '内存', '时间', '代码长度', '语言', '提交时间']", text)
+        self.assertIn('params.set("user", queryUser)', text)
+        self.assertIn('/solution/${encodeURIComponent(s.id)}/', text)
+        self.assertIn("${esc(s.problem)}:${esc(titleOf(s))}", text)
 
         username = "t006_hist_page"
         cookie = self.register_and_login(username, "T006-password")

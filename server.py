@@ -1332,8 +1332,22 @@ def load_detail(raw):
     return detail if isinstance(detail, dict) else {}
 
 
+def nickname_map(db):
+    names = {
+        row[0].casefold(): row[1]
+        for row in db.execute(
+            "select username, coalesce(nullif(trim(nickname), ''), username) from users")
+    }
+    names.update({
+        row[0][len("profile_nickname:"):]: row[1]
+        for row in db.execute(
+            "select key, value from settings where key like 'profile_nickname:%'")
+    })
+    return names
+
+
 def book_user_payload(book, username):
-    """某个用户在这个题库里做过哪些题。排名页点用户名进来的就是这一页。
+    """兼容旧链接：汇总某个用户在一个题库里做过哪些题。
 
     只出「结果 / 次数 / 时间」这类记分板字段，**不出代码，也不出判题详情** ——
     这一页是给别人看的，别人的代码只有本人和管理员看得到（`/api/submissions`
@@ -1448,18 +1462,7 @@ def book_page_payload(book, authenticated, status_problem="", status_name=""):
                      from submissions where book = ? group by problem""", (book,))
         }
         if authenticated:
-            nicknames = {
-                row[0].casefold(): row[1]
-                for row in db.execute(
-                    "select username, coalesce(nullif(trim(nickname), ''), username) from users"
-                )
-            }
-            nicknames.update({
-                row[0][len("profile_nickname:"):]: row[1]
-                for row in db.execute(
-                    "select key, value from settings where key like 'profile_nickname:%'"
-                )
-            })
+            nicknames = nickname_map(db)
             ranking = [
                 {"user": row[0] or "",
                  "name": nicknames.get(str(row[0] or "").casefold(), row[0] or ""),
@@ -2015,11 +2018,13 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             user = self.current_user()
             if user is None:
                 self.send_json({"error": "Unauthorized"}, 401); return
-            mine = parse_qs(parsed.query).get("mine", [""])[0] == "1"
-            query_book = parse_qs(parsed.query).get("book", [""])[0]
-            query_problem = parse_qs(parsed.query).get("problem", [""])[0]
+            query = parse_qs(parsed.query)
+            mine = query.get("mine", [""])[0] == "1"
+            query_user = str(query.get("user", [""])[0]).strip()[:64]
+            query_book = query.get("book", [""])[0]
+            query_problem = query.get("problem", [""])[0]
             try:
-                limit = min(max(int(parse_qs(parsed.query).get("limit", ["50"])[0]), 1), 500)
+                limit = min(max(int(query.get("limit", ["50"])[0]), 1), 500)
             except ValueError:
                 limit = 50
             with sqlite3.connect(DB) as db:
@@ -2030,16 +2035,38 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                     filters.append("problem = ?"); values.append(query_problem)
                 if mine:
                     filters.append("lower(user) = lower(?)"); values.append(user)
-                else:
-                    pass
+                elif query_user:
+                    filters.append("lower(user) = lower(?)"); values.append(query_user)
                 where = (" where " + " and ".join(filters)) if filters else ""
-                rows = db.execute("select user, problem, result, created, book, language, detail, source from submissions"
+                rows = db.execute("select id, user, problem, result, created, book, language, detail, source from submissions"
                                   + where + " order by id desc limit ?", (*values, limit)).fetchall()
+                nicknames = nickname_map(db)
             is_admin = same_username(user, ADMIN_USER)
-            self.send_json({"user": user, "submissions": [
-                {"user": r[0], "problem": r[1], "result": r[2], "created": r[3], "book": r[4], "language": r[5],
-                 "detail": json.loads(r[6]) if r[6] and (is_admin or same_username(r[0] or "", user)) else {},
-                 "source": (r[7] or "") if (is_admin or same_username(r[0] or "", user)) else ""} for r in rows]})
+            submissions = []
+            for row in rows:
+                detail = load_detail(row[7])
+                owner = is_admin or same_username(row[1] or "", user)
+                submissions.append({
+                    "id": row[0], "user": row[1],
+                    "name": nicknames.get(str(row[1] or "").casefold(), row[1] or ""),
+                    "problem": row[2], "title": catalog_title({"book": row[5], "id": row[2]}),
+                    "result": row[3], "created": row[4], "book": row[5],
+                    "book_name": BOOK_META.get(row[5], {}).get("name", row[5]),
+                    "language": row[6], "language_version": detail.get("language_version"),
+                    "time_ms": detail.get("time_ms"),
+                    "memory_kb": detail.get("memory_kb"),
+                    "source_bytes": detail.get(
+                        "source_bytes", len((row[8] or "").encode("utf-8"))),
+                    "detail": detail if owner else {},
+                    "source": (row[8] or "") if owner else "",
+                })
+            scope_user = user if mine else query_user
+            self.send_json({
+                "user": user,
+                "scope_user": scope_user,
+                "scope_name": nicknames.get(scope_user.casefold(), scope_user) if scope_user else "",
+                "submissions": submissions,
+            })
             return
         if path in ("/history", "/history/"):
             page = ROOT / "history.html"

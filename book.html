@@ -108,7 +108,7 @@ const TAB_OF = {problems:'problems', ranking:'ranking', status:'status',
                 user:'ranking', solution:'status'};
 document.querySelector('#tab-' + TAB_OF[VIEW]).classList.add('on');
 const userLink = (name, label = name) =>
-  `<a class="pid" href="/book/${encodeURIComponent(BOOK)}/user/${encodeURIComponent(name)}/">${esc(label)}</a>`;
+  `<a class="pid" href="/history/?user=${encodeURIComponent(name)}">${esc(label)}</a>`;
 // 用户页和提交详情页的标签条高亮的是「排名 / 状态」，但那两个标签指向的是题库根，
 // 所以标题下面再给一条回题库的路，人不至于只能靠浏览器后退。
 const bookLink = name => `<a class="pid" href="/book/${encodeURIComponent(BOOK)}/">${esc(name)}</a>`;
