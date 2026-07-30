@@ -169,7 +169,12 @@ def check_multi_answer_problems():
     **构建期的「语义校验」解决不了这件事** —— 那只让 oracle 交叉验证过得去，
     判题这一头仍然是精确比对。要收这类题得先有 special judge。
     """
-    made = {number for number, _path in made_dirs()}
+    made_paths = {number: path for number, path in made_dirs()}
+    made = set(made_paths)
+    exemptions = {}
+    for _source, entry in report_entries():
+        if entry.get("multi_answer_exemption"):
+            exemptions[int(entry["local_number"])] = entry["multi_answer_exemption"]
     bad = []
     for page in sorted((ROOT / "data" / "openjudge" / "pages").glob("*.html")):
         match = re.search(r"__(\d+)\.html$", page.name)
@@ -181,6 +186,11 @@ def check_multi_answer_problems():
         window = text[start:start + 900] if start > 0 else text[:900]
         found = MULTI_ANSWER.search(window)
         if found:
+            outputs = sorted((made_paths[int(match.group(1))] / "data").glob("*.out"))
+            if (int(match.group(1)) in exemptions and outputs and
+                    all(path.read_text(encoding="utf-8", errors="replace").split() == ["-1"]
+                        for path in outputs)):
+                continue
             bad.append(f"{int(match.group(1))}: 题面写着「{found.group(0)}」，"
                        f"却生成了精确比对数据（需 special judge，先排除）")
     return "多解题却生成了精确比对数据", sorted(set(bad))

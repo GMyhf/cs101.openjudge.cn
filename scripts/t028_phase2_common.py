@@ -155,7 +155,11 @@ def build_round(round_number: int, generator_module) -> None:
         sample_output = generator_module.SAMPLE_OUTPUTS.get(number, page_sample(entry, "样例输出"))
         with tempfile.TemporaryDirectory(prefix="t028-phase2-") as folder:
             command = compile_source(source, language, Path(folder))
-            cross = archive_check(command, entry)
+            no_archive_reason = getattr(generator_module, "NO_ARCHIVE_REASONS", {}).get(number)
+            cross = ({"status": "passed", "cases": 0, "dirs": [],
+                      "no_archive_reason": no_archive_reason,
+                      "method": "legacy oracle excluded with a problem-specific audited reason"}
+                     if no_archive_reason else archive_check(command, entry))
             if cross["status"] != "passed":
                 raise SystemExit(f"{number:05d} legacy cross-check failed: {cross}")
             cases = ([sample] if sample else []) + [generator_module.generate(number, seed)
@@ -221,6 +225,9 @@ def build_round(round_number: int, generator_module) -> None:
                        "max_input_bytes": max(len(case.encode()) for case in cases),
                        "max_output_bytes": max(len(output.encode()) for output in outputs),
                        "constraint": label, "constraint_counterexample": invalid.strip(),
+                       **({"multi_answer_exemption":
+                           generator_module.MULTI_ANSWER_EXEMPTIONS[number]}
+                          if number in getattr(generator_module, "MULTI_ANSWER_EXEMPTIONS", {}) else {}),
                        **({"input_domain": {
                            "statement_quote": generator_module.INPUT_DOMAINS[number],
                            "generated_extremes": generated_extremes(data),

@@ -220,3 +220,29 @@ class InputDomainAnchorTests(unittest.TestCase):
             data.mkdir()
             (data / "0.in").write_text("ABCD\n", encoding="utf-8")
             self.assertEqual({"integer_tokens": 0}, full_sweep.generated_extremes(made))
+
+
+class MultiAnswerUniqueFailureTests(unittest.TestCase):
+    def _run(self, output):
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            page_dir = root / "data" / "openjudge" / "pages"
+            made = root / "data" / "openjudge" / "tests" / "30193_made"
+            page_dir.mkdir(parents=True); (made / "data").mkdir(parents=True)
+            (page_dir / "practice__30193.html").write_text(
+                "<p>输出任意一种即可。</p>", encoding="utf-8")
+            (made / "data" / "0.out").write_text(output, encoding="utf-8")
+            entry = {"local_number": 30193,
+                     "multi_answer_exemption": "only unique no-solution cases"}
+            with mock.patch.object(full_sweep, "ROOT", root), \
+                 mock.patch.object(full_sweep, "made_dirs", return_value=[(30193, made)]), \
+                 mock.patch.object(full_sweep, "report_entries",
+                                   return_value=iter([("t028-round21-report.json", entry)])):
+                return full_sweep.check_multi_answer_problems()[1]
+
+    def test_all_minus_one_outputs_are_unambiguous(self):
+        self.assertEqual([], self._run("-1\n"))
+
+    def test_a_path_output_reactivates_the_multi_answer_gate(self):
+        self.assertEqual(1, len(self._run("1 1\n1 2\n")))
