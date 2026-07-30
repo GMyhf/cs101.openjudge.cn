@@ -14,9 +14,11 @@ import t028_phase2_round19 as round19  # noqa: E402
 import t028_phase2_round20 as round20  # noqa: E402
 import t028_phase2_round21 as round21  # noqa: E402
 import t028_phase2_round22 as round22  # noqa: E402
+import t028_phase2_round23 as round23  # noqa: E402
 
 ROUNDS = ((15, round15), (16, round16), (17, round17), (18, round18),
-          (19, round19), (20, round20), (21, round21), (22, round22))
+          (19, round19), (20, round20), (21, round21), (22, round22),
+          (23, round23))
 
 
 class T028Phase2Tests(unittest.TestCase):
@@ -135,6 +137,15 @@ class T028Phase2Tests(unittest.TestCase):
         archive = ROOT / "data/openjudge/tests/30000-/30172"
         for relative in cross["excluded_invalid_inputs"]:
             self.assertFalse(round22.valid(30172, (archive / Path(relative).name).read_text()))
+
+    def test_round23_keeps_valid_27631_oracles_and_names_broken_batches(self):
+        row = next(entry for entry in self.reports[23]["entries"]
+                   if entry["local_number"] == 27631)
+        cross = row["archive_cross_check"]
+        self.assertEqual(5, cross["cases"])
+        self.assertEqual(20, len(cross["excluded_broken_oracles"]))
+        self.assertTrue(all(item["input"].startswith("tests/20000-29982/27631/data/")
+                            and item["reason"] for item in cross["excluded_broken_oracles"]))
 
 
 if __name__ == "__main__":

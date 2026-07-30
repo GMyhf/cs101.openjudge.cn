@@ -70,15 +70,22 @@ def generated_extremes(data: Path) -> dict | None:
             if values else {"integer_tokens": 0})
 
 
-def archive_check(command: list[str], entry: dict, case_filter=None) -> dict:
+def archive_check(command: list[str], entry: dict, case_filter=None,
+                  excluded_oracle_dirs=None) -> dict:
     paths = []
     for relative in entry["source_dirs"]:
         directory = OPENJUDGE / relative
         paths.extend(directory.glob("*.in"))
         paths.extend((directory / "data").glob("*.in"))
     paths = sorted(set(paths))
-    missing, mismatched, excluded_invalid = [], [], []
+    missing, mismatched, excluded_invalid, excluded_broken = [], [], [], []
+    excluded_oracle_dirs = excluded_oracle_dirs or {}
     for path in paths:
+        relative_parent = str(path.parent.relative_to(OPENJUDGE))
+        if relative_parent in excluded_oracle_dirs:
+            excluded_broken.append({"input": str(path.relative_to(OPENJUDGE)),
+                                    "reason": excluded_oracle_dirs[relative_parent]})
+            continue
         case = path.read_text(encoding="utf-8", errors="replace")
         if case_filter is not None and not case_filter(case):
             excluded_invalid.append(str(path.relative_to(OPENJUDGE)))
@@ -97,10 +104,11 @@ def archive_check(command: list[str], entry: dict, case_filter=None) -> dict:
         if got.replace("\x1a", " ").split() != expected.replace("\x1a", " ").split():
             mismatched.append({"input": str(path.relative_to(OPENJUDGE)),
                                "expected": expected.split()[:8], "actual": got.split()[:8]})
-    usable = len(paths) - len(missing) - len(excluded_invalid)
+    usable = len(paths) - len(missing) - len(excluded_invalid) - len(excluded_broken)
     return {"status": "passed" if usable and not mismatched else "FAILED",
             "cases": usable, "dirs": entry["source_dirs"],
             "excluded_invalid_inputs": excluded_invalid,
+            "excluded_broken_oracles": excluded_broken,
             "missing_outputs": missing, "mismatched": mismatched,
             "method": "existing Accepted source recomputed every legacy input; output tokens compared"}
 
@@ -169,7 +177,8 @@ def build_round(round_number: int, generator_module) -> None:
                          ((lambda case, n=number: generator_module.valid(n, case))
                           if number in getattr(generator_module,
                                                "FILTER_INVALID_ARCHIVE_INPUTS", set())
-                          else None)))
+                          else None),
+                         getattr(generator_module, "EXCLUDE_ARCHIVE_DIRS", {}).get(number)))
             if cross["status"] != "passed":
                 raise SystemExit(f"{number:05d} legacy cross-check failed: {cross}")
             cases = ([sample] if sample else []) + [generator_module.generate(number, seed)
