@@ -223,20 +223,20 @@ class InputDomainAnchorTests(unittest.TestCase):
 
 
 class MultiAnswerUniqueFailureTests(unittest.TestCase):
-    def _run(self, output):
+    def _run(self, output, *, number=30193, exemption="only unique no-solution cases",
+             statement="输出任意一种即可。"):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             page_dir = root / "data" / "openjudge" / "pages"
-            made = root / "data" / "openjudge" / "tests" / "30193_made"
+            made = root / "data" / "openjudge" / "tests" / f"{number}_made"
             page_dir.mkdir(parents=True); (made / "data").mkdir(parents=True)
-            (page_dir / "practice__30193.html").write_text(
-                "<p>输出任意一种即可。</p>", encoding="utf-8")
+            (page_dir / f"practice__{number}.html").write_text(
+                f"<p>{statement}</p>", encoding="utf-8")
             (made / "data" / "0.out").write_text(output, encoding="utf-8")
-            entry = {"local_number": 30193,
-                     "multi_answer_exemption": "only unique no-solution cases"}
+            entry = {"local_number": number, "multi_answer_exemption": exemption}
             with mock.patch.object(full_sweep, "ROOT", root), \
-                 mock.patch.object(full_sweep, "made_dirs", return_value=[(30193, made)]), \
+                 mock.patch.object(full_sweep, "made_dirs", return_value=[(number, made)]), \
                  mock.patch.object(full_sweep, "report_entries",
                                    return_value=iter([("t028-round21-report.json", entry)])):
                 return full_sweep.check_multi_answer_problems()[1]
@@ -246,3 +246,12 @@ class MultiAnswerUniqueFailureTests(unittest.TestCase):
 
     def test_a_path_output_reactivates_the_multi_answer_gate(self):
         self.assertEqual(1, len(self._run("1 1\n1 2\n")))
+
+    def test_custom_unique_no_token_is_enforced(self):
+        exemption = {"reason": "only the unique failure branch",
+                     "unique_output_tokens": ["NO"]}
+        statement = "输出移除某些数字的结果。"
+        self.assertEqual([], self._run("NO\n", number=27150, exemption=exemption,
+                                       statement=statement))
+        self.assertEqual(1, len(self._run("168\n", number=27150,
+                                         exemption=exemption, statement=statement)))

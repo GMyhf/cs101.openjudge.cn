@@ -13,9 +13,10 @@ import t028_phase2_round18 as round18  # noqa: E402
 import t028_phase2_round19 as round19  # noqa: E402
 import t028_phase2_round20 as round20  # noqa: E402
 import t028_phase2_round21 as round21  # noqa: E402
+import t028_phase2_round22 as round22  # noqa: E402
 
 ROUNDS = ((15, round15), (16, round16), (17, round17), (18, round18),
-          (19, round19), (20, round20), (21, round21))
+          (19, round19), (20, round20), (21, round21), (22, round22))
 
 
 class T028Phase2Tests(unittest.TestCase):
@@ -123,6 +124,17 @@ class T028Phase2Tests(unittest.TestCase):
                        if row["local_number"] == 18105)
         self.assertEqual("53015094", h_index["submission_id"])
         self.assertIn("project-authored", h_index["reference_source"])
+
+    def test_round22_filters_only_invalid_30172_archive_inputs(self):
+        row = next(entry for entry in self.reports[22]["entries"]
+                   if entry["local_number"] == 30172)
+        cross = row["archive_cross_check"]
+        self.assertEqual(13, cross["cases"])
+        self.assertEqual([f"tests/30000-/30172/{index}.in" for index in range(13, 20)],
+                         cross["excluded_invalid_inputs"])
+        archive = ROOT / "data/openjudge/tests/30000-/30172"
+        for relative in cross["excluded_invalid_inputs"]:
+            self.assertFalse(round22.valid(30172, (archive / Path(relative).name).read_text()))
 
 
 if __name__ == "__main__":

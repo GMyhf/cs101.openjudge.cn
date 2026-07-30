@@ -70,21 +70,25 @@ def generated_extremes(data: Path) -> dict | None:
             if values else {"integer_tokens": 0})
 
 
-def archive_check(command: list[str], entry: dict) -> dict:
+def archive_check(command: list[str], entry: dict, case_filter=None) -> dict:
     paths = []
     for relative in entry["source_dirs"]:
         directory = OPENJUDGE / relative
         paths.extend(directory.glob("*.in"))
         paths.extend((directory / "data").glob("*.in"))
     paths = sorted(set(paths))
-    missing, mismatched = [], []
+    missing, mismatched, excluded_invalid = [], [], []
     for path in paths:
+        case = path.read_text(encoding="utf-8", errors="replace")
+        if case_filter is not None and not case_filter(case):
+            excluded_invalid.append(str(path.relative_to(OPENJUDGE)))
+            continue
         output = path.with_suffix(".out")
         if not output.exists():
             missing.append(str(path.relative_to(OPENJUDGE)))
             continue
         try:
-            got = run(command, path.read_text(encoding="utf-8", errors="replace"))
+            got = run(command, case)
         except Exception as exc:
             mismatched.append({"input": str(path.relative_to(OPENJUDGE)),
                                "reason": f"{type(exc).__name__}: {exc}"[:160]})
@@ -93,9 +97,10 @@ def archive_check(command: list[str], entry: dict) -> dict:
         if got.replace("\x1a", " ").split() != expected.replace("\x1a", " ").split():
             mismatched.append({"input": str(path.relative_to(OPENJUDGE)),
                                "expected": expected.split()[:8], "actual": got.split()[:8]})
-    usable = len(paths) - len(missing)
+    usable = len(paths) - len(missing) - len(excluded_invalid)
     return {"status": "passed" if usable and not mismatched else "FAILED",
             "cases": usable, "dirs": entry["source_dirs"],
+            "excluded_invalid_inputs": excluded_invalid,
             "missing_outputs": missing, "mismatched": mismatched,
             "method": "existing Accepted source recomputed every legacy input; output tokens compared"}
 
@@ -159,7 +164,12 @@ def build_round(round_number: int, generator_module) -> None:
             cross = ({"status": "passed", "cases": 0, "dirs": [],
                       "no_archive_reason": no_archive_reason,
                       "method": "legacy oracle excluded with a problem-specific audited reason"}
-                     if no_archive_reason else archive_check(command, entry))
+                     if no_archive_reason else archive_check(
+                         command, entry,
+                         ((lambda case, n=number: generator_module.valid(n, case))
+                          if number in getattr(generator_module,
+                                               "FILTER_INVALID_ARCHIVE_INPUTS", set())
+                          else None)))
             if cross["status"] != "passed":
                 raise SystemExit(f"{number:05d} legacy cross-check failed: {cross}")
             cases = ([sample] if sample else []) + [generator_module.generate(number, seed)

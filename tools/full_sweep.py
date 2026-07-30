@@ -153,7 +153,8 @@ def check_merged_judge():
 MULTI_ANSWER = re.compile(
     r"any one of them|any of them is acceptable|any one is acceptable"
     r"|(?:output|print)\s+any\b"
-    r"|输出任意一|任意输出一|任选一|输出其中任意|任意一[个种组].{0,6}(?:即可|均可|都(?:算)?可以)", re.I)
+    r"|输出任意一|任意输出一|任选一|输出其中任意|输出移除某些数字的结果"
+    r"|任意一[个种组].{0,6}(?:即可|均可|都(?:算)?可以)", re.I)
 
 
 def check_multi_answer_problems():
@@ -187,8 +188,11 @@ def check_multi_answer_problems():
         found = MULTI_ANSWER.search(window)
         if found:
             outputs = sorted((made_paths[int(match.group(1))] / "data").glob("*.out"))
-            if (int(match.group(1)) in exemptions and outputs and
-                    all(path.read_text(encoding="utf-8", errors="replace").split() == ["-1"]
+            exemption = exemptions.get(int(match.group(1)))
+            unique_output = (exemption.get("unique_output_tokens")
+                             if isinstance(exemption, dict) else ["-1"])
+            if (exemption and isinstance(unique_output, list) and outputs and
+                    all(path.read_text(encoding="utf-8", errors="replace").split() == unique_output
                         for path in outputs)):
                 continue
             bad.append(f"{int(match.group(1))}: 题面写着「{found.group(0)}」，"
