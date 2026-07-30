@@ -65,10 +65,45 @@ def report_entries():
 
 
 def made_dirs():
+    """自产数据目录。**报告类判据用这个** —— 报告写的就是 `_made` 里的数字。"""
     for path in sorted(TESTS.glob("*/*_made")):
         match = re.search(r"/0*(\d+)_made$", str(path))
         if match:
             yield int(match.group(1)), path
+
+
+def active_dirs():
+    """**真正在判学生代码的**数据目录，按 catalog 实际引用的算，不靠目录名后缀猜。
+
+    2026-07-30 加的。T-030 引入 `_GMyhf`（优先级 `_GMyhf > _made > legacy`）之后，
+    `made_dirs()` 只 glob `*_made`，于是**320 条 catalog 记录正在用的数据，
+    全库横扫一份都没看过** —— 2MB 上限、循环小数、多解题这三条判据全部落空，闸门照样绿。
+    更糟的是 27150：它的多解豁免是拿**已经不判的** `_made` 副本（输出清一色 `NO`）
+    去核对的，而真正在判的 `_GMyhf` 是有 YES 分支的真多解数据。
+    **判据必须盯着真正生效的那份数据**，否则豁免会替错文件背书。
+
+    所以这里从 `catalog.json` 反推：每道题的 `test_cases` 指向哪个目录，哪个就是活的。
+    `made_dirs()` 保留原样给报告类判据用（第 9 条要拿报告里的数字和 `_made` 重算对账，
+    换成活目录反而对不上）。
+    """
+    catalog_path = ROOT / "data" / "openjudge" / "catalog.json"
+    try:
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return
+    seen = {}
+    for problem in catalog.get("problems", []):
+        for case in problem.get("test_cases") or []:
+            parts = str(case.get("input", "")).split("/")
+            if len(parts) < 3:
+                continue
+            # 用目录名里的题号，和 `made_dirs()` 同一口径 —— 调用方（多解判据）
+            # 是拿镜像题面文件名 `<题库>__<题号>.html` 去对的。
+            match = re.match(r"0*(\d+)", parts[2])
+            if match:
+                seen.setdefault((int(match.group(1)), TESTS / parts[1] / parts[2]), None)
+    for number, directory in sorted(seen, key=lambda item: (item[0], str(item[1]))):
+        yield number, directory
 
 
 def check_reported_failures():
@@ -111,7 +146,7 @@ def check_degenerate_constraints():
 def check_output_size():
     """3. .out 超过判题器 2MB —— 学生的正确解法会被 Output Limit Exceeded 打掉。"""
     bad = []
-    for number, made in made_dirs():
+    for number, made in active_dirs():
         for path in (made / "data").glob("*.out"):
             if path.stat().st_size > FSIZE_LIMIT:
                 bad.append(f"{number}: {path.name} {path.stat().st_size / 1048576:.2f}MB")
@@ -170,7 +205,7 @@ def check_multi_answer_problems():
     **构建期的「语义校验」解决不了这件事** —— 那只让 oracle 交叉验证过得去，
     判题这一头仍然是精确比对。要收这类题得先有 special judge。
     """
-    made_paths = {number: path for number, path in made_dirs()}
+    made_paths = {number: path for number, path in active_dirs()}
     made = set(made_paths)
     exemptions = {}
     for _source, entry in report_entries():
@@ -498,7 +533,7 @@ def main():
     if total:
         print(f"全库横扫：**{total} 处残留**")
         return 1
-    print(f"全库横扫：{len(list(made_dirs()))} 份数据，{sum(1 for _ in report_entries())} 条报告记录，干净")
+    print(f"全库横扫：{len(set(p for _n, p in active_dirs()))} 份在判数据，{sum(1 for _ in report_entries())} 条报告记录，干净")
     return 0
 
 

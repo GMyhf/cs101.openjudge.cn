@@ -235,8 +235,10 @@ class MultiAnswerUniqueFailureTests(unittest.TestCase):
                 f"<p>{statement}</p>", encoding="utf-8")
             (made / "data" / "0.out").write_text(output, encoding="utf-8")
             entry = {"local_number": number, "multi_answer_exemption": exemption}
+            # 判据已改为盯 catalog 指向的**活数据**（T-030 的 `_GMyhf` 优先级），
+            # 所以这里 mock 的是 `active_dirs` 而不是 `made_dirs`。
             with mock.patch.object(full_sweep, "ROOT", root), \
-                 mock.patch.object(full_sweep, "made_dirs", return_value=[(number, made)]), \
+                 mock.patch.object(full_sweep, "active_dirs", return_value=[(number, made)]), \
                  mock.patch.object(full_sweep, "report_entries",
                                    return_value=iter([("t028-round21-report.json", entry)])):
                 return full_sweep.check_multi_answer_problems()[1]
@@ -255,3 +257,54 @@ class MultiAnswerUniqueFailureTests(unittest.TestCase):
                                        statement=statement))
         self.assertEqual(1, len(self._run("168\n", number=27150,
                                          exemption=exemption, statement=statement)))
+
+
+class ActiveDataCoverageTests(unittest.TestCase):
+    """全库横扫必须盯着**真正在判**的那份数据，不是按目录名后缀猜。
+
+    T-030 引入 `_GMyhf`（优先级 `_GMyhf > _made > legacy`）之后，原来的
+    `made_dirs()` 只 glob `*_made`，320 条 catalog 记录正在用的数据一份都没被扫过，
+    闸门却是绿的。这里两头都钉：活目录要认出来，`_made` 那条口径不能被顺手改坏。
+    """
+
+    def _repo(self, folder, active_suffix):
+        import json
+        root = Path(folder)
+        tests = root / "data" / "openjudge" / "tests"
+        (tests / "20000-29982" / f"27150{active_suffix}" / "data").mkdir(parents=True)
+        (tests / "20000-29982" / "27150_made" / "data").mkdir(parents=True)
+        (root / "data" / "openjudge" / "catalog.json").write_text(json.dumps({"problems": [
+            {"global_number": 27150, "test_cases": [
+                {"input": f"tests/20000-29982/27150{active_suffix}/data/0.in",
+                 "output": f"tests/20000-29982/27150{active_suffix}/data/0.out"}]}]}),
+            encoding="utf-8")
+        return root, tests
+
+    def test_active_dirs_follows_the_catalog_not_the_made_suffix(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            root, tests = self._repo(folder, "_GMyhf")
+            with mock.patch.object(full_sweep, "ROOT", root), \
+                 mock.patch.object(full_sweep, "TESTS", tests):
+                active = dict(full_sweep.active_dirs())
+                made = dict(full_sweep.made_dirs())
+        self.assertEqual({27150}, set(active))
+        self.assertTrue(str(active[27150]).endswith("27150_GMyhf"),
+                        f"活目录应当是 catalog 指向的 _GMyhf，实际是 {active[27150]}")
+        # `made_dirs()` 仍然只认 `_made` —— 第 9 条要拿它跟报告里的数字对账
+        self.assertTrue(str(made[27150]).endswith("27150_made"))
+
+    def test_output_size_check_reads_the_active_copy(self):
+        """2MB 上限判据必须看活数据：超限的 `.out` 放在 `_GMyhf` 里也要红。"""
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            root, tests = self._repo(folder, "_GMyhf")
+            big = tests / "20000-29982" / "27150_GMyhf" / "data" / "0.out"
+            big.write_bytes(b"x" * (full_sweep.FSIZE_LIMIT + 1))
+            # 同名的 `_made` 副本是干净的 —— 只扫 `_made` 就会漏掉上面那份
+            (tests / "20000-29982" / "27150_made" / "data" / "0.out").write_bytes(b"ok\n")
+            with mock.patch.object(full_sweep, "ROOT", root), \
+                 mock.patch.object(full_sweep, "TESTS", tests):
+                _label, bad = full_sweep.check_output_size()
+        self.assertEqual(1, len(bad), bad)
+        self.assertIn("27150", bad[0])
