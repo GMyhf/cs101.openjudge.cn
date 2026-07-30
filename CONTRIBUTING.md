@@ -24,6 +24,12 @@ python3 server.py                      # 起服务，默认 0.0.0.0:8000
 
 一个 PR 只做一件事。commit message 写「为什么」，不是「改了哪个文件」。
 
+`main` 上的必需检查是 **`gate`**（`.github/workflows/ci.yml` 跑的 `tools/handoff.py --verify`）。
+PR 要合进来，`gate` 必须绿，外加维护者 1 次批准。
+**别把这个 job 改名叫 `build`** —— 仓库开着 GitHub Pages，它注入的
+`pages-build-deployment` 里已经有个 job 叫 `build`，重名会让按名字匹配的必需检查失去分辨力。
+（2026-07-30 之前必需检查配的正是那个 `build`，于是闸门在 GitHub 上红了整整一轮没人看见。）
+
 ## 六条红线（审查时必查）
 
 这个项目跑的是**别人写的代码**，而且对公网开放。下面六条不是风格偏好，
