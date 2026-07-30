@@ -259,7 +259,7 @@ class MultiAnswerUniqueFailureTests(unittest.TestCase):
         self.assertEqual(1, len(self._run("168\n", number=27150,
                                          exemption=exemption, statement=statement)))
 
-    def test_gmyhf_27150_exemption_recomputes_unique_answers(self):
+    def test_gmyhf_27150_cannot_bypass_the_special_judge_gate(self):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
@@ -282,7 +282,7 @@ class MultiAnswerUniqueFailureTests(unittest.TestCase):
             with mock.patch.object(full_sweep, "ROOT", root), \
                  mock.patch.object(full_sweep, "active_dirs", return_value=[(27150, active)]), \
                  mock.patch.object(full_sweep, "report_entries", return_value=iter(())):
-                self.assertEqual([], full_sweep.check_multi_answer_problems()[1])
+                self.assertEqual(1, len(full_sweep.check_multi_answer_problems()[1]))
                 (active / "data/0.in").write_text("4664\n", encoding="utf-8")
                 (active / "data/0.out").write_text("YES\n64\n", encoding="utf-8")
                 self.assertEqual(1, len(full_sweep.check_multi_answer_problems()[1]))

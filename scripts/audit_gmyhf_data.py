@@ -13,7 +13,7 @@ import shutil
 import sys
 
 import oj_submit
-from gmyhf_validators import analyze_27150_case
+from index_tests import SPECIAL_JUDGE_GLOBAL_NUMBERS
 
 ROOT = Path(__file__).resolve().parents[1]
 OPENJUDGE = ROOT / "data" / "openjudge"
@@ -170,42 +170,6 @@ def all_directory_pairs(source):
     return pairs
 
 
-def filter_problem_pairs(number, pairs):
-    """Exclude exact-judge-unsafe cases while retaining byte-identical safe originals."""
-    if number != 27150:
-        return pairs, [], None
-    kept, excluded = [], []
-    unique_yes = no_answer = 0
-    for source_dir, input_path, output_path in pairs:
-        analysis = analyze_27150_case(
-            input_path.read_text(encoding="utf-8", errors="replace"),
-            output_path.read_text(encoding="utf-8", errors="replace"))
-        answers = analysis["answers"]
-        if analysis["valid_unique"]:
-            kept.append((source_dir, input_path, output_path))
-            if answers:
-                unique_yes += 1
-            else:
-                no_answer += 1
-        else:
-            excluded.append({
-                "source_input": str(input_path.relative_to(OPENJUDGE)),
-                "source_output": str(output_path.relative_to(OPENJUDGE)),
-                "reason": "multiple legal exact outputs" if len(answers) > 1 else "oracle is not uniquely valid",
-                "legal_outputs": sorted(answers)[:20],
-                "legal_output_count": len(answers),
-            })
-    exemption = {
-        "validator": "all divisible-by-8 subsequences of length 1..3 are enumerated",
-        "status": "passed" if kept and len(kept) + len(excluded) == len(pairs) else "failed",
-        "kept_cases": len(kept),
-        "excluded_ambiguous_cases": len(excluded),
-        "unique_yes_cases": unique_yes,
-        "no_answer_cases": no_answer,
-    }
-    return kept, excluded, exemption
-
-
 def sha256(path):
     digest = hashlib.sha256()
     with path.open("rb") as stream:
@@ -231,7 +195,8 @@ def audit(materialize=False, replace_materialized=False):
     made = made_directories()
     evidence = validation_evidence()
     rows = []
-    totals = {"eligible": 0, "partial_eligible": 0, "original_problem": 0,
+    totals = {"eligible": 0, "partial_eligible": 0, "requires_special_judge": 0,
+              "original_problem": 0,
               "unverified": 0, "without_made": 0, "materialized": 0,
               "cases": 0, "bytes": 0}
 
@@ -248,10 +213,20 @@ def audit(materialize=False, replace_materialized=False):
             totals[status] += 1
             rows.append({"global_number": number, "title": editable[number]["title"], "status": status})
             continue
+        if number in SPECIAL_JUDGE_GLOBAL_NUMBERS:
+            status = "requires_special_judge"
+            totals[status] += 1
+            rows.append({
+                "global_number": number,
+                "title": editable[number]["title"],
+                "status": status,
+                "made_dir": str(made_dir.relative_to(ROOT)),
+                "reason": "multiple valid outputs require a special judge; exact token data disabled",
+            })
+            continue
         proof = evidence.get(number)
         pairs = []
         excluded_pairs = []
-        multi_answer_exemption = None
         issues = []
         if not proof:
             status = "unverified"
@@ -302,8 +277,6 @@ def audit(materialize=False, replace_materialized=False):
                         "source": "Claude review commit 961acb7e",
                     })
                 if status == "eligible":
-                    pairs, ambiguous, multi_answer_exemption = filter_problem_pairs(number, pairs)
-                    excluded_pairs.extend(ambiguous)
                     if not pairs:
                         status = "original_problem"
                         issues.append({"status": "no_exact-judge-safe_original_cases"})
@@ -322,8 +295,6 @@ def audit(materialize=False, replace_materialized=False):
             row["issues"] = proof["issues"] + issues
         if excluded_pairs:
             row["excluded_pairs"] = excluded_pairs
-        if multi_answer_exemption:
-            row["multi_answer_exemption"] = multi_answer_exemption
         if status in {"eligible", "partial_eligible"}:
             if not pairs:
                 row["status"] = "unverified"

@@ -1,16 +1,17 @@
 {
   "policy": "editable admin problem; copy only archive_cross_check-covered pairs; require local output/runtime margin and exact-judge-safe outputs",
   "ownership_source": "collab/gmyhf-editable-problems.json",
-  "audited_at": "2026-07-30T12:04:15.060824+00:00",
+  "audited_at": "2026-07-30T12:32:55.276249+00:00",
   "totals": {
     "eligible": 156,
-    "partial_eligible": 3,
+    "partial_eligible": 2,
+    "requires_special_judge": 1,
     "original_problem": 13,
     "unverified": 139,
     "without_made": 1,
-    "materialized": 159,
-    "cases": 3309,
-    "bytes": 690818415
+    "materialized": 158,
+    "cases": 3290,
+    "bytes": 662827645
   },
   "entries": [
     {
@@ -1620,38 +1621,9 @@
     {
       "global_number": 27150,
       "title": "Divisibility by Eight 加强版",
-      "status": "partial_eligible",
+      "status": "requires_special_judge",
       "made_dir": "data/openjudge/tests/20000-29982/27150_made",
-      "evidence_reports": [
-        "collab/t028-round22-report.json"
-      ],
-      "source_dirs": [
-        "tests/20000-29982/27150"
-      ],
-      "issues": [],
-      "excluded_pairs": [
-        {
-          "source_input": "tests/20000-29982/27150/15.in",
-          "source_output": "tests/20000-29982/27150/15.out",
-          "reason": "multiple legal exact outputs",
-          "legal_outputs": [
-            "64",
-            "664"
-          ],
-          "legal_output_count": 2
-        }
-      ],
-      "multi_answer_exemption": {
-        "validator": "all divisible-by-8 subsequences of length 1..3 are enumerated",
-        "status": "passed",
-        "kept_cases": 19,
-        "excluded_ambiguous_cases": 1,
-        "unique_yes_cases": 12,
-        "no_answer_cases": 7
-      },
-      "case_count": 19,
-      "byte_count": 27990770,
-      "materialized_dir": "data/openjudge/tests/20000-29982/27150_GMyhf"
+      "reason": "multiple valid outputs require a special judge; exact token data disabled"
     },
     {
       "global_number": 27205,

@@ -42,7 +42,7 @@ class GMyhfDataArtifactTests(unittest.TestCase):
                         if row.get("materialized_dir")}
         problems = {int(row["global_number"]) for row in self.audit["entries"]
                     if row["status"] == "original_problem"}
-        self.assertEqual(159, len(materialized))
+        self.assertEqual(158, len(materialized))
         self.assertEqual({18159, 27631, 27699, 28050, 28190, 28203, 30172,
                           30179, 30550, 30720, 30908, 30921, 30937}, problems)
         for item in self.catalog:
@@ -66,19 +66,22 @@ class GMyhfDataArtifactTests(unittest.TestCase):
                 self.assertEqual(item["input_sha256"], audit_gmyhf_data.sha256(input_path))
                 self.assertEqual(item["output_sha256"], audit_gmyhf_data.sha256(output_path))
                 checked += 1
-        self.assertEqual(3309, checked)
+        self.assertEqual(3290, checked)
 
     def test_partial_copies_record_every_excluded_pair(self):
         partial = {int(row["global_number"]): row for row in self.audit["entries"]
                    if row["status"] == "partial_eligible"}
-        self.assertEqual({27103, 27150, 28046}, set(partial))
+        self.assertEqual({27103, 28046}, set(partial))
         self.assertEqual(20, len(partial[27103]["excluded_pairs"]))
         self.assertEqual(1, len(partial[28046]["excluded_pairs"]))
-        self.assertEqual(1, len(partial[27150]["excluded_pairs"]))
-        exemption = partial[27150]["multi_answer_exemption"]
-        self.assertEqual((19, 12, 7), (exemption["kept_cases"],
-                                      exemption["unique_yes_cases"],
-                                      exemption["no_answer_cases"]))
+
+    def test_27150_is_reserved_for_a_special_judge(self):
+        row = next(row for row in self.audit["entries"]
+                   if int(row["global_number"]) == 27150)
+        self.assertEqual("requires_special_judge", row["status"])
+        self.assertNotIn("materialized_dir", row)
+        self.assertFalse((audit_gmyhf_data.OPENJUDGE /
+                          "tests/20000-29982/27150_GMyhf").exists())
 
     def test_runtime_margin_rejections_stay_on_made_data(self):
         rejected = {int(row["global_number"]): row for row in self.audit["entries"]
@@ -92,9 +95,14 @@ class GMyhfDataArtifactTests(unittest.TestCase):
 
     def test_every_active_reference_has_per_case_runtime_margin(self):
         report = self.localjudge
-        self.assertEqual((159, 159, []),
+        self.assertEqual((158, 158, []),
                          (report["count"], report["accepted"], report["failed"]))
-        self.assertEqual(159, len(report["entries"]))
+        self.assertEqual(158, len(report["entries"]))
+        materialized = {int(row["global_number"]) for row in self.audit["entries"]
+                        if row.get("materialized_dir")}
+        judged = {int(row["global_number"]) for row in report["entries"]}
+        self.assertEqual(materialized, judged)
+        self.assertNotIn(27150, judged)
         for row in report["entries"]:
             timing = row.get("timing_audit", {})
             self.assertEqual("passed", timing.get("status"), row["global_number"])

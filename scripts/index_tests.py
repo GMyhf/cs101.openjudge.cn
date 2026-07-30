@@ -27,11 +27,19 @@ BUCKETS = {"1000-1999", "2000-2999", "3000-3682", "4000-8210", "10000-19963", "2
 # 代价记在这里，不藏着：**498 条 catalog 记录（246 个唯一题号）因此掉到零测试数据**，
 # 要靠 T-028 逐批补回来。
 ARCHIVE_BUCKETS = {"1000-1999", "2000-2999", "3000-3682"}
+# These problems permit multiple correct outputs, while judge.py currently does
+# exact token comparison. Keep every available corpus offline until an SPJ exists.
+SPECIAL_JUDGE_GLOBAL_NUMBERS = {27150}
 
 
 def is_archive(bucket, directory_name):
     """2008 存档目录（已验证入库的项目数据除外）。"""
     return bucket in ARCHIVE_BUCKETS and not directory_name.endswith("_made")
+
+
+def exclude_special_judge_cases(by_global_number):
+    return {number: cases for number, cases in by_global_number.items()
+            if number not in SPECIAL_JUDGE_GLOBAL_NUMBERS}
 
 
 def numeric(value):
@@ -212,6 +220,7 @@ def main():
     by_global_number = dict(legacy_by_global_number)
     by_global_number.update(made_by_global_number)
     by_global_number.update(gmyhf_by_global_number)
+    by_global_number = exclude_special_judge_cases(by_global_number)
 
     stats = book_stats()
     matched = 0
