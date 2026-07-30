@@ -7,6 +7,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import audit_gmyhf_data
+import gmyhf_validators as validators
 
 
 class AdminProblemParserTests(unittest.TestCase):
@@ -100,6 +101,36 @@ class GMyhfDataArtifactTests(unittest.TestCase):
             self.assertLessEqual(timing["max_case"]["ratio"],
                                  timing["required_max_ratio"], row["global_number"])
             self.assertEqual(row["cases"], len(timing["cases"]), row["global_number"])
+
+
+class LongerAnswerWitnessTests(unittest.TestCase):
+    """合法输出**不限长度** —— 唯一性判据只枚举 1..3 位是不够的。
+
+    能被 8 整除只由最后三位决定：只要存在三位答案 `c`，且 `c` 在「第一个非零数字之后」
+    仍然是子序列，那么把那个数字放到前面就得到又一个合法输出。
+    2026-07-30 复核实测：27150 保留的 19 组里，case 0/1/2/18/19 正是这样
+    （期望 `992` 而 `9992` 同样合法、期望 `112` 而 `1112` 同样合法……），
+    一份先试四位再退回三位的正常解法在这 5 组上全部被判 Wrong Answer。
+    """
+
+    def test_three_digit_answer_with_a_leading_digit_is_not_unique(self):
+        text = "1" + "2" * 20 + "1" + "2" * 20 + "1" + "2" * 20 + "\n"
+        self.assertIn("112", validators.divisible_by_eight_answers(text))
+        self.assertEqual("1112", validators.longer_answer_witness(text))
+        analysis = validators.analyze_27150_case(text, "YES\n112\n")
+        self.assertFalse(analysis["valid_unique"])
+        self.assertEqual("1112", analysis["longer_answer"])
+
+    def test_a_case_with_no_room_to_prepend_stays_unique(self):
+        """两位输入没有多余数字可以打头 —— 这一头也要钉住，否则判据会变成「一律不唯一」。"""
+        analysis = validators.analyze_27150_case("10\n", "YES\n0\n")
+        self.assertTrue(analysis["valid_unique"])
+        self.assertIsNone(analysis["longer_answer"])
+
+    def test_no_answer_cases_are_unaffected(self):
+        analysis = validators.analyze_27150_case("1111111\n", "NO\n")
+        self.assertTrue(analysis["valid_unique"])
+        self.assertEqual("NO", analysis["kind"])
 
 
 if __name__ == "__main__":
