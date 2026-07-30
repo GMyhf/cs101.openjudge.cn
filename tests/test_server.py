@@ -406,6 +406,22 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(len(image), 8682)
         self.assertTrue(image.startswith(b"\xff\xd8\xff"))
 
+    def test_m01328_statement_uses_its_local_gif(self):
+        source = "http://media.openjudge.cn/images/g330/1328_1.jpg"
+        manifest = json.loads((STATIC_DIR / "openjudge/images/manifest.json").read_text())
+        local_path = manifest["assets"][source]["path"]
+
+        status, _, body = request(self.port, "GET", "/pctbook/M01328/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn(f"src={local_path}", text)
+        self.assertNotIn(source, text)
+
+        status, headers, image = request(self.port, "GET", local_path)
+        self.assertEqual(status, 200)
+        self.assertEqual(headers["Content-Type"], "image/gif")
+        self.assertTrue(image.startswith(b"GIF89a"))
+
     def test_book_page_serves_the_three_tabs(self):
         for view, path in (("problems", "/book/pctbook/"),
                            ("ranking", "/book/pctbook/ranking/"),

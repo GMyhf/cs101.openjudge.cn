@@ -2,6 +2,22 @@
 
 ## 2026-07-30
 
+### 全量本地化已抓取题目中的图片
+
+- 扫描 `data/openjudge/pages/` 与 `data/openjudge/books/` 的 **1880** 份 HTML，识别出
+  **200** 个唯一远程图片 URL、**2260** 组 URL/页面引用；来源包括 OpenJudge、洛谷、
+  Wikimedia、LeetCode 与腾讯云，不再只处理 `E01003` 的单张图片。
+- 全部资源按真实文件签名验证并下载到本站，按 SHA-256 内容寻址去重为 **199** 个文件
+  （约 16 MiB），生成 `static/openjudge/images/manifest.json` 保存源 URL、本地路径、大小、
+  哈希、MIME 和引用页面。源站把 `M01328` 的 `1328_1.jpg` 错标为 JPEG，实际是
+  397×238 GIF；本站按真实格式和 `image/gif` 提供。
+- 4 个 Wikimedia 旧公式缓存 URL 已失效/限流，使用题面保留的 `alt` 公式文本经
+  Wikimedia 官方数学接口重新渲染后入库。抓取脚本以后自动更新图片镜像；另提供
+  `scripts/mirror_openjudge_images.py --check` 做无需联网的覆盖、哈希与签名校验。
+- 页面输出按清单将所有远程图片精确改写成本站同源路径，静态白名单补齐 GIF/BMP/WebP。
+  回归遍历全部 1880 份 HTML，渲染后远程 `<img>` 为 **0**，并单独覆盖 `M01328` 无引号
+  `src=`、真实 GIF MIME/文件头以及原 `E01003` JPEG。
+
 ### E01003 题面图片改为本站静态资源
 
 - `pctbook/E01003` 原题面嵌入 `http://media.openjudge.cn/images/1003/hangover.jpg`；本站

@@ -235,8 +235,23 @@ def judging_slot(user):
 STATIC_DIR = (ROOT / "static").resolve()
 STATIC_TYPES = {".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8",
                 ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg",
-                ".jpeg": "image/jpeg", ".ico": "image/x-icon",
+                ".jpeg": "image/jpeg", ".gif": "image/gif", ".bmp": "image/bmp",
+                ".webp": "image/webp", ".ico": "image/x-icon",
                 ".woff2": "font/woff2"}
+IMAGE_MANIFEST = STATIC_DIR / "openjudge" / "images" / "manifest.json"
+if IMAGE_MANIFEST.is_file():
+    _image_assets = json.loads(IMAGE_MANIFEST.read_text(encoding="utf-8")).get("assets", {})
+else:
+    _image_assets = {}
+MIRRORED_IMAGE_URLS = {
+    source: entry["path"] for source, entry in _image_assets.items()
+    if isinstance(entry, dict) and isinstance(entry.get("path"), str)
+}
+MIRRORED_IMAGE_PATTERN = (
+    re.compile("|".join(re.escape(source) for source in sorted(MIRRORED_IMAGE_URLS, key=len,
+                                                               reverse=True)))
+    if MIRRORED_IMAGE_URLS else None
+)
 BOOK_META = {
     "practice": {"name": "题库（包括计概、数算题目）", "count": 986},
     "pctbook": {"name": "计算思维算法实践", "count": 215},
@@ -1698,10 +1713,11 @@ class Handler(BaseHTTPRequestHandler):
         # 标签页上挂的是别人家的图标。换成本站的。
         text = re.sub(r'href="https?://static\.openjudge\.cn/styles/favicon\.ico[^"]*"',
                       'href="/static/favicon.svg"', text)
-        # 公网入口是 HTTPS；浏览器会拦截题面里的 HTTP 图片（mixed content）。
-        # 运行时改写保证重新抓取题面后仍然使用已入库的本机副本。
-        text = re.sub(r'https?://media\.openjudge\.cn/images/1003/hangover\.jpg',
-                      '/static/openjudge/images/1003/hangover.jpg', text)
+        # 题面图片统一走本站副本：既避免 HTTP mixed content，也避免外站失效或限流。
+        # 清单由抓取脚本生成，运行时改写保证重新抓取 HTML 后仍使用同源资源。
+        if MIRRORED_IMAGE_PATTERN:
+            text = MIRRORED_IMAGE_PATTERN.sub(
+                lambda match: MIRRORED_IMAGE_URLS[match.group(0)], text)
         return text
 
     def book_page(self, book, view, subject=""):

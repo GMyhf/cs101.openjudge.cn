@@ -8,6 +8,8 @@ import re
 import time
 from urllib.request import Request, urlopen
 
+from mirror_openjudge_images import mirror_all
+
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "openjudge"
 BASE = "http://cs101.openjudge.cn"
@@ -87,6 +89,7 @@ def main():
             future.result(); done += 1
             if done % 50 == 0: print(f"details: {done}/{len(catalog)}", flush=True)
     (DATA / "catalog.json").write_text(json.dumps({"source": BASE, "updated": time.strftime("%Y-%m-%d"), "count": len(catalog), "problems": catalog}, ensure_ascii=False, indent=2), encoding="utf-8")
+    mirror_all()
     print(f"mirrored {len(catalog)} problem pages into {DATA}")
 
 if __name__ == "__main__": main()

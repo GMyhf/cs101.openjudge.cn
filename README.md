@@ -68,6 +68,13 @@ CS101 分组的题库详情、样例和分页目录保存在 `data/openjudge/`�
 python3 scripts/crawl_openjudge.py
 ```
 
+抓取完成后脚本会扫描题面和题库 HTML 的所有远程 `<img>`，按内容哈希下载到
+`static/openjudge/images/` 并生成 URL 映射清单。可离线复核清单覆盖与文件完整性：
+
+```bash
+python3 scripts/mirror_openjudge_images.py --check
+```
+
 重新扫描测试数据并更新题库索引：
 
 ```bash
