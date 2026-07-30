@@ -22,15 +22,16 @@ BUCKETS = {"1000-1999", "2000-2999", "3000-3682", "4000-8210", "10000-19963", "2
 # `1000-1999/1384/pig.in`（117KB，单跑 38.4 秒，而生成的 21 组全部 ≤0.20 秒）。
 # **学生在平台过、在我们这挂**，而挂的原因是一份 2008 年的私人压力测试文件。
 #
-# `*_made/` 不受影响：那是本项目自己生成、入库、有完整自检记录的数据。
+# `*_made/` 与 `*_GMyhf/` 不受影响：前者是项目自产数据，后者是经管理页所有权
+# 和逐题 oracle 验证后入库的 GMyhf 自有平台数据。
 # 代价记在这里，不藏着：**498 条 catalog 记录（246 个唯一题号）因此掉到零测试数据**，
 # 要靠 T-028 逐批补回来。
 ARCHIVE_BUCKETS = {"1000-1999", "2000-2999", "3000-3682"}
 
 
 def is_archive(bucket, directory_name):
-    """2008 存档目录（`*_made/` 除外）。"""
-    return bucket in ARCHIVE_BUCKETS and not directory_name.endswith("_made")
+    """2008 存档目录（已验证入库的项目数据除外）。"""
+    return bucket in ARCHIVE_BUCKETS and not directory_name.endswith(("_made", "_GMyhf"))
 
 
 def numeric(value):
@@ -173,6 +174,7 @@ def main():
     per_entry_global, practice_global = catalog_global_numbers(catalog)
     directory_global = test_directory_global_numbers(per_entry_global, practice_global)
     made_by_global_number = {}
+    gmyhf_by_global_number = {}
     legacy_by_global_number = {}
     for bucket in BUCKETS:
         root = TESTS / bucket
@@ -195,14 +197,21 @@ def main():
             for stem in sorted(inputs.keys() & outputs.keys()):
                 pairs.append({"input": str(inputs[stem].relative_to(MIRROR)), "output": str(outputs[stem].relative_to(MIRROR))})
             if pairs:
-                target = made_by_global_number if directory.name.endswith("_made") else legacy_by_global_number
+                if directory.name.endswith("_GMyhf"):
+                    target = gmyhf_by_global_number
+                elif directory.name.endswith("_made"):
+                    target = made_by_global_number
+                else:
+                    target = legacy_by_global_number
                 target.setdefault(global_number, []).extend(pairs)
 
-    # A generated corpus replaces legacy data for that global problem. Problems
-    # not rebuilt yet keep their legacy cases, so T-028 phase 2 can roll forward
-    # incrementally without mixing incompatible output limits or semantics.
+    # Priority is verified GMyhf-owned platform data, then generated data, then legacy.
+    # `_GMyhf` is materialized only when the admin page grants Edit and the original
+    # cases pass the recorded oracle audit. If that audit finds any problem, no
+    # `_GMyhf` directory is created and `_made` remains active.
     by_global_number = dict(legacy_by_global_number)
     by_global_number.update(made_by_global_number)
+    by_global_number.update(gmyhf_by_global_number)
 
     stats = book_stats()
     matched = 0

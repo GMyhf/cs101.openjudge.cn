@@ -29,6 +29,7 @@ class ArchiveExclusionTests(unittest.TestCase):
             self.assertTrue(index_tests.is_archive(bucket, "1384"), bucket)
             # 同一个桶里我们自己生成的数据必须留下 —— 这正是 T-028 在补的东西
             self.assertFalse(index_tests.is_archive(bucket, "1384_made"), bucket)
+            self.assertFalse(index_tests.is_archive(bucket, "1384_GMyhf"), bucket)
             self.assertFalse(index_tests.is_archive(bucket, "2442-6648_made"), bucket)
         for bucket in ("4000-8210", "10000-19963", "20000-29982", "30000-"):
             self.assertFalse(index_tests.is_archive(bucket, "20025"), bucket)

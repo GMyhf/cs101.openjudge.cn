@@ -2,11 +2,13 @@ __pycache__/
 data/*.db
 data/.admin_password
 data/.smtp.env
-# 抓取的真实测试数据不入库；所有现有及今后生成的 *_made 数据目录及其内容必须入库
+# 抓取的第三方测试数据不入库；自产 *_made 与 GMyhf 自有 *_GMyhf 数据必须入库
 data/openjudge/tests/**
 !data/openjudge/tests/*/
 !data/openjudge/tests/*/*_made/
 !data/openjudge/tests/*/*_made/**
+!data/openjudge/tests/*/*_GMyhf/
+!data/openjudge/tests/*/*_GMyhf/**
 data/openjudge/__MACOSX/
 collab/review-input.md
 # 手工起服务时的日志（systemd 部署走 journal，不产生这个文件）。
