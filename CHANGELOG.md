@@ -2,6 +2,16 @@
 
 ## 2026-07-30
 
+### T-028 收口后正式发版与全语言冒烟
+
+- 在干净且与 `origin/main` 对齐的 `301f9032` 上执行 `tools/release.sh`：代码无需再拉取，
+  systemd 单元与仓库版本一致，服务完成重启并通过 `/api/me` 健康检查。
+- 使用 `scripts/smoke_languages.py --require-all` 真实验证 Python、PyPy3、C++、C、C#、
+  F#、VB.NET、Swift、Objective-C 共 9 种语言；每种语言的正确解均输出 `5`，故意坏代码
+  均返回 Compile Error，18 条路径全部符合预期。
+- 服务重启前 MainPID 为 2252343，首次发版后为 2404331；systemd 保持 enabled/active，
+  本地 `http://127.0.0.1:8000/api/me` 与公网 TLS `/api/me` 均返回 HTTP 200。
+
 ### T-028 发版前收口：补齐题面输入锚并排除 30193
 
 - rounds 15–19 的 100 题现已全部记录 `input_domain`：保留 7 条已人工复核的约束原文，
