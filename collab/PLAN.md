@@ -112,6 +112,13 @@
 > G++ Accepted，故按兜底规则构建 O(1) 图论判定并获平台 Accepted `#53014037`。phase 2
 > 继续 In progress，下一轮从 priority 41 / round17 开始，仍未交 Claude review。
 
+> **T-028 phase 2 · round17（2026-07-30）**：priority 41–60 已完成，20 题新增 420 组
+> `_made` 数据；旧数据 oracle 395/395 组一致，本站合并判题与平台重提交均 20/20
+> Accepted（`53014144–53014165`）。本轮覆盖大整数、转子置换、树、排列、二维矩阵与
+> 表达式等 20 种输入协议；2000-seed 预检曾抓到整百年日期的 `seed=0` 非法日，统一审计
+> 又抓到 `19960` 样例输出混入解释，均修复后重建。phase 2 继续 In progress，下一轮从
+> priority 61 / round18 开始，仍未交 Claude review。
+
 ## Decision Log
 
 - 2026-07-30 · **人拍板：T-028 第二阶段覆盖全部 208 个仍在用的非 `_made` 题目。**

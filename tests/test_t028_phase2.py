@@ -8,21 +8,24 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 import t028_phase2_round15 as round15  # noqa: E402
 import t028_phase2_round16 as round16  # noqa: E402
+import t028_phase2_round17 as round17  # noqa: E402
+
+ROUNDS = ((15, round15), (16, round16), (17, round17))
 
 
 class T028Phase2Tests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.candidates = json.loads((ROOT / "collab/t028-phase2-candidates.json").read_text())
-        cls.manifests = {number: json.loads((ROOT / f"collab/t028-round{number}-manifest.json").read_text()) for number in (15, 16)}
-        cls.reports = {number: json.loads((ROOT / f"collab/t028-round{number}-report.json").read_text()) for number in (15, 16)}
-        cls.platforms = {number: json.loads((ROOT / f"collab/t028-round{number}-platform.json").read_text()) for number in (15, 16)}
-        cls.locals = {number: json.loads((ROOT / f"collab/t028-round{number}-localjudge.json").read_text()) for number in (15, 16)}
+        cls.manifests = {number: json.loads((ROOT / f"collab/t028-round{number}-manifest.json").read_text()) for number, _ in ROUNDS}
+        cls.reports = {number: json.loads((ROOT / f"collab/t028-round{number}-report.json").read_text()) for number, _ in ROUNDS}
+        cls.platforms = {number: json.loads((ROOT / f"collab/t028-round{number}-platform.json").read_text()) for number, _ in ROUNDS}
+        cls.locals = {number: json.loads((ROOT / f"collab/t028-round{number}-localjudge.json").read_text()) for number, _ in ROUNDS}
 
     def test_candidate_snapshot_and_round15_priority_are_complete(self):
         self.assertEqual(208, self.candidates["count"])
         self.assertEqual([15, 25], self.candidates["round_range"])
-        for number, module in ((15, round15), (16, round16)):
+        for number, module in ROUNDS:
             start = (number - 15) * 20 + 1
             self.assertEqual(list(range(start, start + 20)),
                              [row["priority"] for row in self.manifests[number]["entries"]])
@@ -30,7 +33,7 @@ class T028Phase2Tests(unittest.TestCase):
                              {int(row["local_number"]) for row in self.manifests[number]["entries"]})
 
     def test_generators_satisfy_named_contracts_and_counterexamples_fail(self):
-        for module in (round15, round16):
+        for _, module in ROUNDS:
             self.assertEqual(len(module.NUMBERS), len(set(module.LABELS.values())))
             self.assertEqual(len(module.NUMBERS), len(set(module.INVALID.values())))
             for number in module.NUMBERS:
@@ -40,7 +43,7 @@ class T028Phase2Tests(unittest.TestCase):
                                     (number, seed))
 
     def test_round15_report_platform_and_local_judge_are_green(self):
-        for round_number in (15, 16):
+        for round_number, _ in ROUNDS:
             report, platform, local = self.reports[round_number], self.platforms[round_number], self.locals[round_number]
             self.assertEqual([], report["failed"])
             self.assertEqual(20, platform["accepted"])
