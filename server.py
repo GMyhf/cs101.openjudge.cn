@@ -1476,7 +1476,9 @@ def book_page_payload(book, authenticated):
                     """select id, created, user, problem, result, language, detail from submissions
                          where book = ? order by id desc limit ?""", (book, BOOK_STATUS_LIMIT)):
                 detail = load_detail(row[6])
-                status.append({"id": row[0], "created": row[1], "user": row[2], "problem": row[3],
+                status.append({"id": row[0], "created": row[1], "user": row[2],
+                               "name": nicknames.get(str(row[2] or "").casefold(), row[2] or ""),
+                               "problem": row[3],
                                "result": row[4], "language": row[5], "time_ms": detail.get("time_ms"),
                                "memory_kb": detail.get("memory_kb")})
     return {

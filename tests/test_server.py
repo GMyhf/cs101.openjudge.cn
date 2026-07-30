@@ -291,12 +291,17 @@ class ServerApiTests(unittest.TestCase):
         }, cookie=cookie)
         self.assertEqual(status, 200)
         status, _, body = request(self.port, "GET", "/api/books/pctbook/", cookie=cookie)
-        row = next(item for item in json.loads(body)["ranking"] if item["user"] == username)
-        self.assertEqual(row["name"], nickname)
+        payload = json.loads(body)
+        ranking_row = next(item for item in payload["ranking"] if item["user"] == username)
+        status_row = next(item for item in payload["status"] if item["user"] == username)
+        self.assertEqual(ranking_row["name"], nickname)
+        self.assertEqual(status_row["name"], nickname)
 
         page = (ROOT / "book.html").read_text(encoding="utf-8")
         self.assertIn("{text:'名字'}", page)
         self.assertIn("userLink(r.user, r.name)", page)
+        self.assertNotIn("{text:'用户'}", page)
+        self.assertIn("userLink(s.user, s.name)", page)
 
     def test_profile_requires_login(self):
         status, headers, _ = request(self.port, "GET", "/settings/")

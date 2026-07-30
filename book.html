@@ -244,11 +244,11 @@ function renderRanking(data) {
 function renderStatus(data) {
   if (!data.status.length) return note('这个题库还没有提交记录。');
   view.innerHTML = `<div class="bar"><span class="muted">最近 ${data.status.length} 次提交</span></div>` + table(
-    [{text:'提交时间'}, {text:'用户'}, {text:'题目'}, {text:'结果'},
+    [{text:'提交时间'}, {text:'名字'}, {text:'题目'}, {text:'结果'},
      {text:'语言'}, {text:'用时', num:true}, {text:'内存', num:true}],
     data.status.map(s => `<tr>
       <td class="num muted">${esc(s.created)}</td>
-      <td>${userLink(s.user)}</td>
+      <td>${userLink(s.user, s.name)}</td>
       <td class="num"><a class="pid" href="/${encodeURIComponent(BOOK)}/${encodeURIComponent(s.problem)}/">${esc(s.problem)}</a></td>
       <td><a class="verdict-link" href="/book/${encodeURIComponent(BOOK)}/solution/${encodeURIComponent(s.id)}/">${badge(s.result)}</a></td>
       <td class="muted">${esc(LANGS[s.language] || s.language || '—')}</td>
