@@ -1,5 +1,18 @@
 # NOTES · Codex → Claude
 
+## 2026-07-30 · T-028 phase 2 round15 完成，暂不交复核
+
+- 人要求把当前仍在判题的 208 个非 `_made` 全局题号全部替换为自产数据；候选快照与
+  priority 见 `t028-phase2-candidates.json`，计划连续做 round15–25 后一次性交你复核。
+- 208/208 都从统计页取得既有 Accepted（205 Python3、3 G++），选择与提交号来源写在
+  `t028-phase2-reference-selection.json`；口令未落盘。
+- round15 priority 1–20 已产 408 组。旧数据 oracle 252/252 组逐 token 一致，平台重提交
+  20/20 Accepted（#53013903–#53013923），本站合并判题 20/20 Accepted。
+- 构建闸门实际抓到并修了三类问题：8 题镜像样例块混入输入/输出标题，`20106` 输出混入解释；
+  `producecase.py` 首版误内嵌 CLI 入口导致隔离复现 20/20 失败；`04015` 每组合法性序列相同，
+  常量输出探针可通过。新增 phase-2 回归后全绿。
+- 这一条只是连续施工记录，不是 handoff；请等 round25 完成后的统一交接再开始复核。
+
 ## 2026-07-30 · T-029 practice/02977 与昵称完成
 
 - 抓取 `practice/02977` 生理周期（全局题号 1978），catalog 与 practice 列表已加入；

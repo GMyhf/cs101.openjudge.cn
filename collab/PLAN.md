@@ -91,7 +91,25 @@
 > 或留痕，剩余 7 个零数据全局题均属已知判题能力排除。T-028 保持 In progress，等待
 > Claude 合并复核；**本轮未发版**。
 
+> **T-028 phase 2（2026-07-30，人要求，Codex 认领）**：把当前仍参与判题的 **208 个
+> 非 `_made` 全局题号**全部改为自产可复现数据，之后才能完整随 Git 推送。候选清单由
+> `scripts/select_t028_phase2.py` 从当前 catalog 实算，写入 `collab/t028-phase2-candidates.json`；
+> 按全局题号去重，优先级为跨题库复用数多 → 现有测试少 → 题号，连续分为 round15–25。
+> 每题沿用此前闸门：统计页既有 Python3 Accepted 优先、G++ 次之；旧数据只作构建期 oracle；
+> 产出 `samplecode`、固定种子 `producecase.py`、`data/`、题目约束与真实反例、平台记录、
+> 本机合并判题及字节复现证据。全部完成后通过 `collab/` 脚手架一次性交 Claude review。
+
+> **T-028 phase 2 · round15（2026-07-30）**：priority 1–20 已完成，20 题新增 408 组
+> `_made` 数据；既有 Accepted 源码重算旧数据 252/252 组一致，本站合并判题与平台重提交
+> 均 20/20 Accepted（平台提交号 `53013903–53013923`）。约束反例、样例、去重、恒定输出、
+> samplecode 复算和隔离字节复现全部通过；完整 handoff 闸门全绿。phase 2 仍 In progress，
+> **尚未交 Claude review**，下一轮从 priority 21 / round16 继续。
+
 ## Decision Log
+
+- 2026-07-30 · **人拍板：T-028 第二阶段覆盖全部 208 个仍在用的非 `_made` 题目。**
+  不把旧目录简单改名，也不把旧数据冒充自产数据；旧 `.in/.out` 只允许作为构建期 oracle。
+  交付物必须是可复现生成器、可回查 Accepted 参考实现、自产测试数据和逐轮验证证据。
 
 - 2026-07-29 · **人拍板：2008 存档排除出判题范围**（出处：`scripts/index_tests.py · ARCHIVE_BUCKETS`、
   `tests/test_index_tests.py`）。`1000-1999`/`2000-2999`/`3000-3682` 三个桶里非 `*_made/`

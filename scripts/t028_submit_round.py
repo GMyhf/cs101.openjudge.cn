@@ -13,20 +13,45 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 
+def sync_report(round_number, results):
+    report_path = ROOT / "collab" / f"t028-round{round_number}-report.json"
+    if not report_path.exists():
+        return
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    by_number = {int(row["local_number"]): row for row in results}
+    for entry in report.get("entries", []):
+        platform = by_number.get(int(entry["local_number"]))
+        if not platform:
+            continue
+        entry["submission_id"] = platform.get("solution_id")
+        entry["platform_verdict"] = platform.get("verdict")
+        if platform.get("verdict") != "Accepted":
+            entry["status"] = "FAILED"
+    report["failed"] = sorted(int(entry["local_number"]) for entry in report.get("entries", [])
+                              if entry.get("status") != "passed")
+    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("round", type=int)
     parser.add_argument("--only", help="comma-separated local problem numbers")
     parser.add_argument("--delay", type=float, default=0, help="seconds to wait between submissions")
+    parser.add_argument("--sync-only", action="store_true",
+                        help="copy an existing platform JSON into the round report without submitting")
     opts = parser.parse_args()
     only = {int(x) for x in opts.only.split(",")} if opts.only else None
     manifest_path = ROOT / "collab" / f"t028-round{opts.round}-manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    output = ROOT / "collab" / f"t028-round{opts.round}-platform.json"
+    if opts.sync_only:
+        payload = json.loads(output.read_text(encoding="utf-8"))
+        sync_report(opts.round, payload.get("results", []))
+        return 1 if payload.get("not_accepted") else 0
     jobs = [e for e in manifest["entries"] if only is None or int(e["local_number"]) in only]
 
     import oj_submit
     session = oj_submit.Session().login()
-    output = ROOT / "collab" / f"t028-round{opts.round}-platform.json"
     previous = []
     if only and output.exists():
         previous = json.loads(output.read_text(encoding="utf-8")).get("results", [])
@@ -68,6 +93,7 @@ def main():
                "accepted": len(results) - len(rejected), "total": len(results),
                "not_accepted": rejected, "results": results}
     output.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    sync_report(opts.round, results)
     print(f"wrote {output.relative_to(ROOT)}")
     return 1 if rejected else 0
 
