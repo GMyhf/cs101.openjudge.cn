@@ -126,6 +126,12 @@
 > legacy，回归机械保证不混用。phase 2 继续 In progress，下一轮从 priority 81 / round19
 > 开始，仍未交 Claude review。
 
+> **T-028 phase 2 · round19（2026-07-30）**：priority 81–100 已完成，20 题新增 420 组
+> `_made` 数据；旧数据 oracle 360/360 一致，本站自产数据判题与平台重提交均 20/20
+> Accepted（`53014370–53014390`）。`18155` 首选及另两份 Accepted 无法处理旧空集合组，
+> 改用重算 49/49 一致的 Python3 Accepted `#47911639`；恒定输出探针另促使 `27363`
+> 拆成合法嵌套、交叉非法和单次颜色三族。下一轮从 priority 101 / round20 开始，仍未交 review。
+
 ## Decision Log
 
 - 2026-07-30 · **人拍板：T-028 第二阶段覆盖全部 208 个仍在用的非 `_made` 题目。**

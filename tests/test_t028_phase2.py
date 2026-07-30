@@ -10,8 +10,10 @@ import t028_phase2_round15 as round15  # noqa: E402
 import t028_phase2_round16 as round16  # noqa: E402
 import t028_phase2_round17 as round17  # noqa: E402
 import t028_phase2_round18 as round18  # noqa: E402
+import t028_phase2_round19 as round19  # noqa: E402
 
-ROUNDS = ((15, round15), (16, round16), (17, round17), (18, round18))
+ROUNDS = ((15, round15), (16, round16), (17, round17), (18, round18),
+          (19, round19))
 
 
 class T028Phase2Tests(unittest.TestCase):
