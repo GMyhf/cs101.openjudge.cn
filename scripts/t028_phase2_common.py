@@ -66,7 +66,8 @@ def generated_extremes(data: Path) -> dict | None:
         for token in path.read_text(encoding="utf-8", errors="replace").split():
             if re.fullmatch(r"-?\d{1,18}", token):
                 values.append(int(token))
-    return {"max_int": max(values), "min_int": min(values)} if values else None
+    return ({"max_int": max(values), "min_int": min(values)}
+            if values else {"integer_tokens": 0})
 
 
 def archive_check(command: list[str], entry: dict) -> dict:

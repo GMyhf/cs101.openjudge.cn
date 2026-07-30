@@ -211,3 +211,12 @@ class InputDomainAnchorTests(unittest.TestCase):
         """题面里的 `1<=n<=20` 是裸的 `<`；按标签剥会把范围声明整段吃掉。"""
         text = full_sweep.statement_text.__doc__
         self.assertIn("裸的", text)
+
+    def test_string_only_input_has_a_recomputable_zero_integer_state(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            made = Path(folder)
+            data = made / "data"
+            data.mkdir()
+            (data / "0.in").write_text("ABCD\n", encoding="utf-8")
+            self.assertEqual({"integer_tokens": 0}, full_sweep.generated_extremes(made))

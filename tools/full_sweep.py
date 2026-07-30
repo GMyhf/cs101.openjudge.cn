@@ -240,7 +240,7 @@ def generated_extremes(made_dir):
             if re.fullmatch(r"-?\d{1,18}", token):
                 values.append(int(token))
     if not values:
-        return None
+        return {"integer_tokens": 0}
     return {"max_int": max(values), "min_int": min(values)}
 
 

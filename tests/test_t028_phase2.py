@@ -11,9 +11,10 @@ import t028_phase2_round16 as round16  # noqa: E402
 import t028_phase2_round17 as round17  # noqa: E402
 import t028_phase2_round18 as round18  # noqa: E402
 import t028_phase2_round19 as round19  # noqa: E402
+import t028_phase2_round20 as round20  # noqa: E402
 
 ROUNDS = ((15, round15), (16, round16), (17, round17), (18, round18),
-          (19, round19))
+          (19, round19), (20, round20))
 
 
 class T028Phase2Tests(unittest.TestCase):
@@ -110,6 +111,17 @@ class T028Phase2Tests(unittest.TestCase):
                    if entry["local_number"] == 28050)
         self.assertIn("project-authored", row["reference_source"])
         self.assertEqual("project-authored for this repository", row["license_status"])
+
+    def test_round20_input_domains_and_project_reference_are_recorded(self):
+        for row in self.reports[20]["entries"]:
+            number = row["local_number"]
+            self.assertEqual(round20.INPUT_DOMAINS[number],
+                             row["input_domain"]["statement_quote"])
+            self.assertIn("generated_extremes", row["input_domain"])
+        h_index = next(row for row in self.reports[20]["entries"]
+                       if row["local_number"] == 18105)
+        self.assertEqual("53015094", h_index["submission_id"])
+        self.assertIn("project-authored", h_index["reference_source"])
 
 
 if __name__ == "__main__":

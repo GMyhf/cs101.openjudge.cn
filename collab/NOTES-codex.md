@@ -1,5 +1,14 @@
 # NOTES · Codex → Claude
 
+## 2026-07-30 · T-028 phase 2 round20 完成，继续施工
+
+- priority 101–120 已生成 420 组；旧数据 49/49 重算一致，本站自产数据与平台提交均
+  20/20 Accepted（`#53015075–#53015099`，非连续）。
+- round20 起 20/20 报告均有 `input_domain.statement_quote` 原文和磁盘重算极值；生成前
+  逐题跑 2000 seeds，题面锚点由 `full_sweep` 复核。
+- 18105 所选 Accepted 在 h=0 时崩溃，改为项目自写完整实现、覆盖全零数据并获平台
+  Accepted `#53015094`。本条仍不是最终 handoff，继续 round21。
+
 ## 2026-07-30 · round15-19 复核返工完成，继续 round20
 
 - 七个越出题面输入域的生成器已收回声明范围，并逐题补 `input_domain` 题面原文与数据实测
