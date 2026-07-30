@@ -7,6 +7,8 @@ from functools import cmp_to_key
 NUMBERS={16529,27626,29949,30947,16530,27122,27925,27373,27363,18155,
 28700,4013,4014,4016,4017,4019,4020,4042,4044,4068}
 EXEMPTIONS={}
+INPUT_DOMAINS={27122:"1 <= position[i] <= 10^9 所有 position 中的整数 互不相同 。",
+4044:"N只小白鼠(1 < N < 100)，每只鼠头上戴着一顶有颜色的帽子。"}
 SAMPLE_INPUTS={16529:"5\n0.1 0.8 20 0.5 0.01\n",16530:"2\nLARHONDA\nLARSEN\n",
 27122:"5 3\n1 2 3 4 7\n",27373:"4\n4\n23 9 182 79\n",27363:"7\n0 1 4 5 1 3 3\n",
 18155:"12\n1 2 3 4 5\n",27925:"2\n101 102 103\n201 202 203\nENQUEUE 101\nENQUEUE 201\nENQUEUE 102\nENQUEUE 202\nENQUEUE 103\nENQUEUE 203\nDEQUEUE\nDEQUEUE\nDEQUEUE\nDEQUEUE\nDEQUEUE\nDEQUEUE\nSTOP\n"}
@@ -18,7 +20,7 @@ LABELS={
 29949:"1<=N<=100, 1<=M<=10000 and N ore rows have value and weight in 1..1000",
 30947:"1<=n<=100000, 1<=q<=100, n counts in 0..10^9 and q targets in 1..10^9",
 16530:"even 2<=n<=1000 followed by n uppercase names shorter than 30 characters",
-27122:"2<=m<=n<=100000 and n distinct basket positions are integers",
+27122:"2<=m<=n<=100000 and n distinct basket positions are integers in 1..10^9",
 27925:"1<=t<100 nonempty disjoint member rows precede at most 50000 valid queue commands ending STOP",
 27373:"1<=m<=200, 1<=n<=1000 and n positive integers each use at most 20 digits",
 27363:"1<=n<50000 followed by n colors in 0..n",
@@ -31,7 +33,7 @@ LABELS={
 4019:"each nonempty EOF-driven line is a weekday integer in 1..7",
 4020:"1<=N<=100 and every case contains exactly 53 distinct cards from the 54-card deck",
 4042:"1<=N<=100 and every row has lowercase S, 1<=m<len(S), and integer q",
-4044:"1<=N<=1000 followed by distinct positive weights and nonempty colors of at most 10 characters",
+4044:"1<N<100 followed by distinct positive weights and nonempty colors of at most 10 characters",
 4068:"1<=N<=100 followed by N nonempty integer arrays, one per line",
 }
 INVALID={16529:"2\n1 0\n",27626:"50000000\n",29949:"1 0\n1 1\n",30947:"1 1\n-1\n2\n",
@@ -61,14 +63,14 @@ def generate(number,seed):
   while len(names)<n:names[''.join(r.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ') for _ in range(r.randint(1,29)))]=1
   return f"{n}\n"+'\n'.join(names)+'\n'
  if number==27122:
-  n=100000 if seed==20 else r.randint(2,300);a=r.sample(range(-10**9,10**9),n);return f"{n} {r.randint(2,n)}\n"+' '.join(map(str,a))+'\n'
+  n=100000 if seed==20 else r.randint(2,300);a=r.sample(range(1,10**9+1),n);return f"{n} {r.randint(2,n)}\n"+' '.join(map(str,a))+'\n'
  if number==27925:
-  t=r.randint(1,20);ids=r.sample(range(1000000),r.randint(t,min(1000,t*20)));groups=[[] for _ in range(t)]
+  t=r.randint(1,20);ids=r.sample(range(800000),r.randint(t,min(1000,t*20)));groups=[[] for _ in range(t)]
   for i,x in enumerate(ids):groups[i%t].append(x)
-  active=[];commands=[]
+  outsiders=r.sample(range(900000,1000000),r.randint(1,10));active=[outsiders[0]];commands=[f'ENQUEUE {outsiders[0]}']
   for _ in range(r.randint(1,500)):
    if active and r.random()<.4:commands.append('DEQUEUE');active.pop(0)
-   else:x=r.choice(ids);commands.append(f'ENQUEUE {x}');active.append(x)
+   else:x=r.choice(ids+outsiders);commands.append(f'ENQUEUE {x}');active.append(x)
   return f"{t}\n"+'\n'.join(' '.join(map(str,g)) for g in groups)+'\n'+'\n'.join(commands)+'\nSTOP\n'
  if number==27373:
   m=r.randint(1,200);n=r.randint(1,1000);a=[str(r.randint(1,10**r.randint(1,20)-1)) for _ in range(n)];return f"{m}\n{n}\n"+' '.join(a)+'\n'
@@ -107,7 +109,7 @@ def generate(number,seed):
    n=r.randint(2,100);s=''.join(r.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(n));rows.append(f"{s} {r.randint(1,n-1)} {r.randint(1,26*n)}")
   return f"{count}\n"+'\n'.join(rows)+'\n'
  if number==4044:
-  n=r.randint(1,1000);weights=r.sample(range(1,2**31),n);return f"{n}\n"+'\n'.join(f"{w} {''.join(r.choice('abcdefgh') for _ in range(r.randint(1,10)))}" for w in weights)+'\n'
+  n=r.randint(2,99);weights=r.sample(range(1,2**31),n);return f"{n}\n"+'\n'.join(f"{w} {''.join(r.choice('abcdefgh') for _ in range(r.randint(1,10)))}" for w in weights)+'\n'
  if number==4068:
   count=r.randint(1,100);rows=[]
   for _ in range(count):rows.append(' '.join(str(r.randint(-10000,10000)) for _ in range(r.randint(1,100))))
@@ -145,7 +147,7 @@ def valid(number,text):
    m=int(lines[0]);n=int(lines[1]);a=lines[2].split();return len(lines)==3 and 1<=m<=200 and 1<=n<=1000 and len(a)==n and all(x.isdigit() and 0<int(x) and len(x)<=20 for x in a)
   if number==27363:
    n=int(lines[0]);a=list(map(int,lines[1].split()));return len(lines)==2 and 1<=n<50000 and len(a)==n and all(0<=x<=n for x in a)
-  if number==18155:return len(lines)==2 and 1<=len(lines[1].split())<=16 and all(int(x)>0 for x in lines[1].split())
+  if number==18155:return len(lines)==2 and re.fullmatch(r'-?\d+',lines[0]) is not None and 1<=len(lines[1].split())<=16 and all(int(x)>0 for x in lines[1].split())
   if number==28700:
    s=lines[0]
    if len(lines)!=1:return False
@@ -174,7 +176,7 @@ def valid(number,text):
   if number==4042:
    n=int(lines[0]);rows=[x.split() for x in lines[1:]];return 1<=n<=100 and len(rows)==n and all(len(x)==3 and x[0].islower() and x[0].isalpha() and 1<=int(x[1])<len(x[0]) for x in rows)
   if number==4044:
-   n=int(lines[0]);rows=[x.split() for x in lines[1:]];return 1<=n<=1000 and len(rows)==n and len({int(x[0]) for x in rows})==n and all(len(x)==2 and int(x[0])>0 and 1<=len(x[1])<=10 for x in rows)
+   n=int(lines[0]);rows=[x.split() for x in lines[1:]];return 1<n<100 and len(rows)==n and len({int(x[0]) for x in rows})==n and all(len(x)==2 and int(x[0])>0 and 1<=len(x[1])<=10 for x in rows)
   if number==4068:return 1<=int(lines[0])<=100 and len(lines)==int(lines[0])+1 and all(x.split() and all(re.fullmatch(r'-?\d+',v) for v in x.split()) for x in lines[1:])
  except (ValueError,IndexError,TypeError,KeyError):return False
  return False
@@ -182,7 +184,7 @@ def valid(number,text):
 
 import subprocess as _subprocess, sys as _sys, tempfile as _tempfile
 from pathlib import Path as _Path
-REFERENCE="# External reference: http://cs101.openjudge.cn/practice/27925/statistics/\n# Accepted submission: 52723049\n# Source: http://cs101.openjudge.cn/practice/solution/52723049/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\nfrom collections import deque\ndef main():\n    data = sys.stdin.read().splitlines()\n    t = int(data[0])\n    ptr = 1\n    person_to_group = {}\n    group_queue = {}\n    main_queue = deque()\n    group_id = 0\n    for _ in range(t):\n        members = list(map(int, data[ptr].split()))\n        ptr += 1\n        group_queue[group_id] = deque()\n        for p in members:\n            person_to_group[p] = group_id\n        group_id += 1\n    while ptr < len(data):\n        line = data[ptr].strip()\n        ptr += 1\n        if not line:\n            continue\n        cmd = line.split()\n        if cmd[0] == 'STOP':\n            break\n        elif cmd[0] == 'ENQUEUE':\n            x = int(cmd[1])\n            if x not in person_to_group:\n                g = -x\n                group_queue[g] = deque([x])\n                main_queue.append(g)\n            else:\n                g = person_to_group[x]\n                if not group_queue[g]:\n                    main_queue.append(g)\n                group_queue[g].append(x)\n        elif cmd[0] == 'DEQUEUE':\n            cur_g = main_queue[0]\n            out_p = group_queue[cur_g].popleft()\n            print(out_p)\n            if not group_queue[cur_g]:\n                main_queue.popleft()\nif __name__ == '__main__':\n    main()\n"
+REFERENCE="# External reference: http://cs101.openjudge.cn/practice/27925/statistics/\n# Accepted submission: 52723049\n# Source: http://cs101.openjudge.cn/practice/solution/52723049/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\nfrom collections import deque\ndef main():\n    data = sys.stdin.read().splitlines()\n    t = int(data[0])\n    ptr = 1\n    person_to_group = {}\n    group_queue = {}\n    main_queue = deque()\n    group_id = 0\n    outsider_group = -1\n    for _ in range(t):\n        members = list(map(int, data[ptr].split()))\n        ptr += 1\n        group_queue[group_id] = deque()\n        for p in members:\n            person_to_group[p] = group_id\n        group_id += 1\n    while ptr < len(data):\n        line = data[ptr].strip()\n        ptr += 1\n        if not line:\n            continue\n        cmd = line.split()\n        if cmd[0] == 'STOP':\n            break\n        elif cmd[0] == 'ENQUEUE':\n            x = int(cmd[1])\n            if x not in person_to_group:\n                g = outsider_group\n                outsider_group -= 1\n                group_queue[g] = deque([x])\n                main_queue.append(g)\n            else:\n                g = person_to_group[x]\n                if not group_queue[g]:\n                    main_queue.append(g)\n                group_queue[g].append(x)\n        elif cmd[0] == 'DEQUEUE':\n            cur_g = main_queue[0]\n            out_p = group_queue[cur_g].popleft()\n            print(out_p)\n            if not group_queue[cur_g]:\n                main_queue.popleft()\nif __name__ == '__main__':\n    main()\n"
 LANGUAGE='Python3'
 NUMBER=27925
 SAMPLE='2\n101 102 103\n201 202 203\nENQUEUE 101\nENQUEUE 201\nENQUEUE 102\nENQUEUE 202\nENQUEUE 103\nENQUEUE 203\nDEQUEUE\nDEQUEUE\nDEQUEUE\nDEQUEUE\nDEQUEUE\nDEQUEUE\nSTOP\n'

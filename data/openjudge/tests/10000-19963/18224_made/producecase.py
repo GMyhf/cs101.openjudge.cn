@@ -7,6 +7,9 @@ import re
 NUMBERS={29917,4099,4100,12558,18106,18108,21608,12559,28334,18159,
          18160,20089,16532,18177,18188,18224,28674,28914,29918,29947}
 EXEMPTIONS={}
+INPUT_DOMAINS={4100:"开始时间和截止时间均为非负整数，且不超过100。",
+18106:"给定一个n(1<=n<=20)，生成一个n*n的二维数组",
+18159:"当输入一个整数 n(2<=n<=10001),要求输出所有从 1 到这个整数之间"}
 SAMPLE_INPUTS={
   12559:"4\n23 9 182 79\n",21608:"5\n53 : -1\n118 : 119 136 137\n92 : 107 93 102 91\n102 : -1\n130 : 66 132 135 103\n",
   18160:"2\n2 2\nW.\n.W\n10 12\nW........WW.\n.WWW.....WWW\n....WW...WW.\n.........WW.\n.........W..\n..W......W..\n.W.W.....WW.\nW.W.W.....W.\n.W.W......W.\n..W.......W.\n",
@@ -21,14 +24,14 @@ SAMPLE_OUTPUTS={12559:"97923182 18223799\n",21608:"5\n",18160:"2\n16\n",
 LABELS={
 29917:"each nonempty input line is a positive decimal number",
 4099:"1<=m<100 and each group has 0<=n<150 syntactically valid push-integer or pop operations with live size at most 100",
-4100:"1<=k<100 and each group has 1<=n<50 nonnegative start-end pairs with start<=end",
+4100:"1<=k<100 and each group has 1<=n<50 start-end pairs with 0<=start<=end<=100",
 12558:"1<=n,m<=100 binary grid contains one nonempty four-connected island",
-18106:"the input is one integer n in 1..100",
+18106:"the input is one integer n in 1..20",
 18108:"pond-count input has 1<=T<=100 exact nonempty N-by-M grids over W and dot",
 21608:"2<=n<=200 unique questionnaire rows use name-colon-friend syntax and at least one respondent has a friend",
 12559:"1<=n<=1000 followed by exactly n positive decimal integers",
 28334:"1<=n<=10 and 1<=m<=100 distinct non-loop edges form a directed acyclic graph",
-18159:"2<=T<=10000 followed by T integers greater than one and at most 200000",
+18159:"2<=T<=10000 followed by T integers in 2..10001",
 18160:"largest-area input has 1<=T<=100 exact nonempty N-by-M grids over W and dot",
 20089:"50<=N<=1000000 and exactly seven nonnegative ticket inventories follow",
 16532:"distinct interior ball coordinates, diagonal unit direction and nonnegative energy describe the 16-by-5 table",
@@ -82,7 +85,7 @@ def generate(number,seed):
   k=r.randint(1,20);chunks=[]
   for _ in range(k):
    n=r.randint(1,49);rows=[]
-   for _ in range(n):a=r.randint(0,10**9);rows.append((a,r.randint(a,10**9)))
+   for _ in range(n):a=r.randint(0,100);rows.append((a,r.randint(a,100)))
    chunks.append(str(n)+'\n'+'\n'.join(f'{a} {b}' for a,b in rows))
   return f"{k}\n"+'\n'.join(chunks)+'\n'
  if number==12558:
@@ -90,7 +93,7 @@ def generate(number,seed):
   for _ in range(r.randint(0,n*m*2)):
    dx,dy=r.choice(((1,0),(-1,0),(0,1),(0,-1)));x=max(0,min(n-1,x+dx));y=max(0,min(m-1,y+dy));a[x][y]=1
   return f"{n} {m}\n"+'\n'.join(' '.join(map(str,row)) for row in a)+'\n'
- if number==18106:return f"{100 if seed==20 else r.randint(1,30)}\n"
+ if number==18106:return f"{(seed-1)%20+1}\n"
  if number in (18108,18160):
   t=r.randint(1,10);chunks=[]
   for k in range(t):
@@ -110,7 +113,7 @@ def generate(number,seed):
   return f"{n} {len(edges)}\n"+'\n'.join(f'{a} {b}' for a,b in edges)+'\n'
  if number==18159:
   t=10000 if seed==20 else r.randint(2,10)
-  values=([2+(i%29) for i in range(t)] if seed==20 else [r.randint(2,200000) for _ in range(t)])
+  values=([2+(i%29) for i in range(t)] if seed==20 else [r.randint(2,10001) for _ in range(t)])
   return f"{t}\n"+'\n'.join(map(str,values))+'\n'
  if number==20089:
   target=1000000 if seed==20 else r.randrange(1,20001)*50;stock=[r.randint(0,30) for _ in range(7)];return f"{target}\n"+' '.join(map(str,stock))+'\n'
@@ -162,7 +165,7 @@ def valid(number,text):
       elif re.fullmatch(r'push -?\d+',row):size+=1
       else:return False
       if size>100:return False
-    elif any(len(row.split())!=2 or not (0<=int(row.split()[0])<=int(row.split()[1])) for row in lines[i:i+n]):return False
+    elif any(len(row.split())!=2 or not (0<=int(row.split()[0])<=int(row.split()[1])<=100) for row in lines[i:i+n]):return False
     i+=n
    return i==len(lines)
   if number==12558:
@@ -174,7 +177,7 @@ def valid(number,text):
     if p in seen:continue
     seen.add(p);i,j=p;stack += [(x,y) for x,y in ((i+1,j),(i-1,j),(i,j+1),(i,j-1)) if (x,y) in cells-seen]
    return bool(cells) and seen==cells
-  if number==18106:return len(tokens)==1 and 1<=int(tokens[0])<=100
+  if number==18106:return len(tokens)==1 and 1<=int(tokens[0])<=20
   if number in (18108,18160):
    t=int(lines[0]);i=1
    for _ in range(t):
@@ -204,7 +207,7 @@ def valid(number,text):
     color[x]=2;return True
    return all(dfs(i) for i in range(n))
   if number==18159:
-   t=int(lines[0]);a=list(map(int,lines[1:]));return 2<=t<=10000 and len(a)==t and all(2<=x<=200000 for x in a)
+   t=int(lines[0]);a=list(map(int,lines[1:]));return 2<=t<=10000 and len(a)==t and all(2<=x<=10001 for x in a)
   if number==20089:return len(lines)==2 and 50<=int(lines[0])<=1000000 and len(lines[1].split())==7 and all(int(x)>=0 for x in lines[1].split())
   if number==16532:
    a=tuple(map(int,lines[0].split()));b=tuple(map(int,lines[1].split()));d=tuple(map(int,lines[2].split()));return len(lines)==4 and a!=b and all(1<=p[0]<=15 and 1<=p[1]<=4 for p in (a,b)) and d[0] in (-1,1) and d[1] in (-1,1) and int(lines[3])>=0

@@ -1,3 +1,4 @@
+# Unselected external candidate; retained only as evidence of the timed-out search.
 # External reference: http://cs101.openjudge.cn/practice/28050/statistics/
 # Accepted submission: 52726572
 # Source: http://cs101.openjudge.cn/practice/solution/52726572/

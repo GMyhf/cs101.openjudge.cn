@@ -2,7 +2,7 @@
   "task": "T-028",
   "phase": 2,
   "round": 18,
-  "updated_at": "2026-07-30T06:32:10.079404+00:00",
+  "updated_at": "2026-07-30T07:36:19.127133+00:00",
   "count": 20,
   "priority_range": [
     61,
@@ -188,7 +188,7 @@
         "book": "practice",
         "problem": "04099",
         "merged_cases": 21,
-        "total_ms": 375
+        "total_ms": 359
       }
     },
     {
@@ -203,7 +203,7 @@
       "reference_solution_id": "52530757",
       "source_url": "http://cs101.openjudge.cn/practice/solution/52530757/",
       "license_status": "not declared; no license is inferred",
-      "submission_id": "53014259",
+      "submission_id": "53014934",
       "platform_verdict": "Accepted",
       "archive_cross_check": {
         "status": "passed",
@@ -222,10 +222,17 @@
         "failed_seeds": []
       },
       "test_cases": 21,
-      "max_input_bytes": 11157,
-      "max_output_bytes": 43,
-      "constraint": "1<=k<100 and each group has 1<=n<50 nonnegative start-end pairs with start<=end",
+      "max_input_bytes": 3086,
+      "max_output_bytes": 42,
+      "constraint": "1<=k<100 and each group has 1<=n<50 start-end pairs with 0<=start<=end<=100",
       "constraint_counterexample": "1\n1\n5 2",
+      "input_domain": {
+        "statement_quote": "开始时间和截止时间均为非负整数，且不超过100。",
+        "generated_extremes": {
+          "max_int": 100,
+          "min_int": 0
+        }
+      },
       "self_audit": {
         "distinct_cases": {
           "total": 20,
@@ -255,14 +262,14 @@
           "checked": 1,
           "items": [
             {
-              "constraint": "1<=k<100 and each group has 1<=n<50 nonnegative start-end pairs with start<=end",
+              "constraint": "1<=k<100 and each group has 1<=n<50 start-end pairs with 0<=start<=end<=100",
               "holds": true
             }
           ],
           "falsified_by": {
             "input": "1\n1\n5 2",
             "constraints": [
-              "1<=k<100 and each group has 1<=n<50 nonnegative start-end pairs with start<=end"
+              "1<=k<100 and each group has 1<=n<50 start-end pairs with 0<=start<=end<=100"
             ]
           }
         },
@@ -277,7 +284,7 @@
         "book": "practice",
         "problem": "04100",
         "merged_cases": 21,
-        "total_ms": 328
+        "total_ms": 312
       }
     },
     {
@@ -366,7 +373,7 @@
         "book": "practice",
         "problem": "12558",
         "merged_cases": 21,
-        "total_ms": 331
+        "total_ms": 315
       }
     },
     {
@@ -381,7 +388,7 @@
       "reference_solution_id": "52526886",
       "source_url": "http://cs101.openjudge.cn/practice/solution/52526886/",
       "license_status": "not declared; no license is inferred",
-      "submission_id": "53014261",
+      "submission_id": "53014935",
       "platform_verdict": "Accepted",
       "archive_cross_check": {
         "status": "passed",
@@ -400,23 +407,30 @@
         "failed_seeds": []
       },
       "test_cases": 21,
-      "max_input_bytes": 4,
-      "max_output_bytes": 48894,
-      "constraint": "the input is one integer n in 1..100",
+      "max_input_bytes": 3,
+      "max_output_bytes": 1492,
+      "constraint": "the input is one integer n in 1..20",
       "constraint_counterexample": "0",
+      "input_domain": {
+        "statement_quote": "给定一个n(1<=n<=20)，生成一个n*n的二维数组",
+        "generated_extremes": {
+          "max_int": 20,
+          "min_int": 1
+        }
+      },
       "self_audit": {
         "distinct_cases": {
           "total": 20,
-          "distinct": 18,
+          "distinct": 20,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 2,
+          "frequency": 1,
           "total": 20,
           "status": "rejected",
           "exemption": null,
-          "share": 0.1
+          "share": 0.05
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -433,14 +447,14 @@
           "checked": 1,
           "items": [
             {
-              "constraint": "the input is one integer n in 1..100",
+              "constraint": "the input is one integer n in 1..20",
               "holds": true
             }
           ],
           "falsified_by": {
             "input": "0",
             "constraints": [
-              "the input is one integer n in 1..100"
+              "the input is one integer n in 1..20"
             ]
           }
         },
@@ -455,7 +469,7 @@
         "book": "practice",
         "problem": "18106",
         "merged_cases": 21,
-        "total_ms": 332
+        "total_ms": 300
       }
     },
     {
@@ -544,7 +558,7 @@
         "book": "practice",
         "problem": "18108",
         "merged_cases": 21,
-        "total_ms": 392
+        "total_ms": 373
       }
     },
     {
@@ -633,7 +647,7 @@
         "book": "practice",
         "problem": "21608",
         "merged_cases": 21,
-        "total_ms": 1064
+        "total_ms": 1062
       }
     },
     {
@@ -722,7 +736,7 @@
         "book": "practice",
         "problem": "12559",
         "merged_cases": 21,
-        "total_ms": 339
+        "total_ms": 381
       }
     },
     {
@@ -811,7 +825,7 @@
         "book": "practice",
         "problem": "28334",
         "merged_cases": 21,
-        "total_ms": 310
+        "total_ms": 311
       }
     },
     {
@@ -826,7 +840,7 @@
       "reference_solution_id": "51809745",
       "source_url": "http://cs101.openjudge.cn/practice/solution/51809745/",
       "license_status": "not declared; no license is inferred",
-      "submission_id": "53014266",
+      "submission_id": "53014936",
       "platform_verdict": "Accepted",
       "archive_cross_check": {
         "status": "passed",
@@ -846,9 +860,16 @@
       },
       "test_cases": 21,
       "max_input_bytes": 27246,
-      "max_output_bytes": 159639,
-      "constraint": "2<=T<=10000 followed by T integers greater than one and at most 200000",
+      "max_output_bytes": 135794,
+      "constraint": "2<=T<=10000 followed by T integers in 2..10001",
       "constraint_counterexample": "1\n5",
+      "input_domain": {
+        "statement_quote": "当输入一个整数 n(2<=n<=10001),要求输出所有从 1 到这个整数之间",
+        "generated_extremes": {
+          "max_int": 10000,
+          "min_int": 2
+        }
+      },
       "self_audit": {
         "distinct_cases": {
           "total": 20,
@@ -878,14 +899,14 @@
           "checked": 1,
           "items": [
             {
-              "constraint": "2<=T<=10000 followed by T integers greater than one and at most 200000",
+              "constraint": "2<=T<=10000 followed by T integers in 2..10001",
               "holds": true
             }
           ],
           "falsified_by": {
             "input": "1\n5",
             "constraints": [
-              "2<=T<=10000 followed by T integers greater than one and at most 200000"
+              "2<=T<=10000 followed by T integers in 2..10001"
             ]
           }
         },
@@ -900,7 +921,7 @@
         "book": "practice",
         "problem": "18159",
         "merged_cases": 21,
-        "total_ms": 1201
+        "total_ms": 393
       }
     },
     {
@@ -989,7 +1010,7 @@
         "book": "practice",
         "problem": "18160",
         "merged_cases": 21,
-        "total_ms": 386
+        "total_ms": 398
       }
     },
     {
@@ -1078,7 +1099,7 @@
         "book": "practice",
         "problem": "20089",
         "merged_cases": 21,
-        "total_ms": 1008
+        "total_ms": 1049
       }
     },
     {
@@ -1167,7 +1188,7 @@
         "book": "practice",
         "problem": "16532",
         "merged_cases": 21,
-        "total_ms": 314
+        "total_ms": 317
       }
     },
     {
@@ -1256,7 +1277,7 @@
         "book": "practice",
         "problem": "18177",
         "merged_cases": 21,
-        "total_ms": 322
+        "total_ms": 335
       }
     },
     {
@@ -1345,7 +1366,7 @@
         "book": "practice",
         "problem": "18188",
         "merged_cases": 21,
-        "total_ms": 367
+        "total_ms": 366
       }
     },
     {
@@ -1434,7 +1455,7 @@
         "book": "practice",
         "problem": "18224",
         "merged_cases": 21,
-        "total_ms": 358
+        "total_ms": 363
       }
     },
     {
@@ -1523,7 +1544,7 @@
         "book": "practice",
         "problem": "28674",
         "merged_cases": 21,
-        "total_ms": 307
+        "total_ms": 324
       }
     },
     {
@@ -1612,7 +1633,7 @@
         "book": "practice",
         "problem": "28914",
         "merged_cases": 21,
-        "total_ms": 331
+        "total_ms": 338
       }
     },
     {
@@ -1701,7 +1722,7 @@
         "book": "practice",
         "problem": "29918",
         "merged_cases": 21,
-        "total_ms": 320
+        "total_ms": 310
       }
     },
     {
@@ -1790,7 +1811,7 @@
         "book": "practice",
         "problem": "29947",
         "merged_cases": 21,
-        "total_ms": 316
+        "total_ms": 304
       }
     }
   ],

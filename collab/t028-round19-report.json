@@ -2,7 +2,7 @@
   "task": "T-028",
   "phase": 2,
   "round": 19,
-  "updated_at": "2026-07-30T06:40:14.373666+00:00",
+  "updated_at": "2026-07-30T07:34:21.887529+00:00",
   "count": 20,
   "priority_range": [
     81,
@@ -99,7 +99,7 @@
         "book": "practice",
         "problem": "16529",
         "merged_cases": 21,
-        "total_ms": 389
+        "total_ms": 381
       }
     },
     {
@@ -188,7 +188,7 @@
         "book": "practice",
         "problem": "27626",
         "merged_cases": 21,
-        "total_ms": 334
+        "total_ms": 313
       }
     },
     {
@@ -277,7 +277,7 @@
         "book": "practice",
         "problem": "29949",
         "merged_cases": 21,
-        "total_ms": 340
+        "total_ms": 335
       }
     },
     {
@@ -366,7 +366,7 @@
         "book": "practice",
         "problem": "30947",
         "merged_cases": 21,
-        "total_ms": 443
+        "total_ms": 418
       }
     },
     {
@@ -455,7 +455,7 @@
         "book": "practice",
         "problem": "16530",
         "merged_cases": 21,
-        "total_ms": 338
+        "total_ms": 314
       }
     },
     {
@@ -470,7 +470,7 @@
       "reference_solution_id": "52535954",
       "source_url": "http://cs101.openjudge.cn/practice/solution/52535954/",
       "license_status": "not declared; no license is inferred",
-      "submission_id": "53014375",
+      "submission_id": "53014940",
       "platform_verdict": "Accepted",
       "archive_cross_check": {
         "status": "passed",
@@ -489,10 +489,17 @@
         "failed_seeds": []
       },
       "test_cases": 21,
-      "max_input_bytes": 1038524,
-      "max_output_bytes": 11,
-      "constraint": "2<=m<=n<=100000 and n distinct basket positions are integers",
+      "max_input_bytes": 989112,
+      "max_output_bytes": 10,
+      "constraint": "2<=m<=n<=100000 and n distinct basket positions are integers in 1..10^9",
       "constraint_counterexample": "3 4\n1 2 3",
+      "input_domain": {
+        "statement_quote": "1 <= position[i] <= 10^9 所有 position 中的整数 互不相同 。",
+        "generated_extremes": {
+          "max_int": 999988136,
+          "min_int": 1
+        }
+      },
       "self_audit": {
         "distinct_cases": {
           "total": 20,
@@ -522,14 +529,14 @@
           "checked": 1,
           "items": [
             {
-              "constraint": "2<=m<=n<=100000 and n distinct basket positions are integers",
+              "constraint": "2<=m<=n<=100000 and n distinct basket positions are integers in 1..10^9",
               "holds": true
             }
           ],
           "falsified_by": {
             "input": "3 4\n1 2 3",
             "constraints": [
-              "2<=m<=n<=100000 and n distinct basket positions are integers"
+              "2<=m<=n<=100000 and n distinct basket positions are integers in 1..10^9"
             ]
           }
         },
@@ -544,7 +551,7 @@
         "book": "practice",
         "problem": "27122",
         "merged_cases": 21,
-        "total_ms": 774
+        "total_ms": 704
       }
     },
     {
@@ -559,7 +566,7 @@
       "reference_solution_id": "52723049",
       "source_url": "http://cs101.openjudge.cn/practice/solution/52723049/",
       "license_status": "not declared; no license is inferred",
-      "submission_id": "53014376",
+      "submission_id": "53014941",
       "platform_verdict": "Accepted",
       "archive_cross_check": {
         "status": "passed",
@@ -578,8 +585,8 @@
         "failed_seeds": []
       },
       "test_cases": 21,
-      "max_input_bytes": 6355,
-      "max_output_bytes": 1302,
+      "max_input_bytes": 7293,
+      "max_output_bytes": 1289,
       "constraint": "1<=t<100 nonempty disjoint member rows precede at most 50000 valid queue commands ending STOP",
       "constraint_counterexample": "1\n\nSTOP",
       "self_audit": {
@@ -633,7 +640,7 @@
         "book": "practice",
         "problem": "27925",
         "merged_cases": 21,
-        "total_ms": 373
+        "total_ms": 358
       }
     },
     {
@@ -722,7 +729,7 @@
         "book": "practice",
         "problem": "27373",
         "merged_cases": 21,
-        "total_ms": 787
+        "total_ms": 798
       }
     },
     {
@@ -811,7 +818,7 @@
         "book": "practice",
         "problem": "27363",
         "merged_cases": 21,
-        "total_ms": 368
+        "total_ms": 366
       }
     },
     {
@@ -900,7 +907,7 @@
         "book": "practice",
         "problem": "18155",
         "merged_cases": 21,
-        "total_ms": 556
+        "total_ms": 526
       }
     },
     {
@@ -989,7 +996,7 @@
         "book": "practice",
         "problem": "28700",
         "merged_cases": 21,
-        "total_ms": 351
+        "total_ms": 302
       }
     },
     {
@@ -1078,7 +1085,7 @@
         "book": "practice",
         "problem": "04013",
         "merged_cases": 21,
-        "total_ms": 372
+        "total_ms": 319
       }
     },
     {
@@ -1167,7 +1174,7 @@
         "book": "practice",
         "problem": "04014",
         "merged_cases": 21,
-        "total_ms": 371
+        "total_ms": 313
       }
     },
     {
@@ -1256,7 +1263,7 @@
         "book": "practice",
         "problem": "04016",
         "merged_cases": 21,
-        "total_ms": 357
+        "total_ms": 319
       }
     },
     {
@@ -1345,7 +1352,7 @@
         "book": "practice",
         "problem": "04017",
         "merged_cases": 21,
-        "total_ms": 345
+        "total_ms": 313
       }
     },
     {
@@ -1434,7 +1441,7 @@
         "book": "practice",
         "problem": "04019",
         "merged_cases": 21,
-        "total_ms": 346
+        "total_ms": 306
       }
     },
     {
@@ -1523,7 +1530,7 @@
         "book": "practice",
         "problem": "04020",
         "merged_cases": 21,
-        "total_ms": 355
+        "total_ms": 314
       }
     },
     {
@@ -1612,7 +1619,7 @@
         "book": "practice",
         "problem": "04042",
         "merged_cases": 21,
-        "total_ms": 357
+        "total_ms": 330
       }
     },
     {
@@ -1627,7 +1634,7 @@
       "reference_solution_id": "50794714",
       "source_url": "http://cs101.openjudge.cn/practice/solution/50794714/",
       "license_status": "not declared; no license is inferred",
-      "submission_id": "53014389",
+      "submission_id": "53014942",
       "platform_verdict": "Accepted",
       "archive_cross_check": {
         "status": "passed",
@@ -1646,10 +1653,17 @@
         "failed_seeds": []
       },
       "test_cases": 21,
-      "max_input_bytes": 16901,
-      "max_output_bytes": 6483,
-      "constraint": "1<=N<=1000 followed by distinct positive weights and nonempty colors of at most 10 characters",
+      "max_input_bytes": 1633,
+      "max_output_bytes": 640,
+      "constraint": "1<N<100 followed by distinct positive weights and nonempty colors of at most 10 characters",
       "constraint_counterexample": "2\n1 red\n1 blue",
+      "input_domain": {
+        "statement_quote": "N只小白鼠(1 < N < 100)，每只鼠头上戴着一顶有颜色的帽子。",
+        "generated_extremes": {
+          "max_int": 2147120748,
+          "min_int": 3
+        }
+      },
       "self_audit": {
         "distinct_cases": {
           "total": 20,
@@ -1679,14 +1693,14 @@
           "checked": 1,
           "items": [
             {
-              "constraint": "1<=N<=1000 followed by distinct positive weights and nonempty colors of at most 10 characters",
+              "constraint": "1<N<100 followed by distinct positive weights and nonempty colors of at most 10 characters",
               "holds": true
             }
           ],
           "falsified_by": {
             "input": "2\n1 red\n1 blue",
             "constraints": [
-              "1<=N<=1000 followed by distinct positive weights and nonempty colors of at most 10 characters"
+              "1<N<100 followed by distinct positive weights and nonempty colors of at most 10 characters"
             ]
           }
         },
@@ -1701,7 +1715,7 @@
         "book": "practice",
         "problem": "04044",
         "merged_cases": 21,
-        "total_ms": 359
+        "total_ms": 297
       }
     },
     {
@@ -1790,7 +1804,7 @@
         "book": "practice",
         "problem": "04068",
         "merged_cases": 21,
-        "total_ms": 353
+        "total_ms": 306
       }
     }
   ],

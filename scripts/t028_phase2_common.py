@@ -60,6 +60,15 @@ def run(command: list[str], input_text: str) -> str:
     return "\n".join(line.rstrip() for line in result.stdout.rstrip().splitlines()) + "\n"
 
 
+def generated_extremes(data: Path) -> dict | None:
+    values = []
+    for path in sorted(data.glob("*.in")):
+        for token in path.read_text(encoding="utf-8", errors="replace").split():
+            if re.fullmatch(r"-?\d{1,18}", token):
+                values.append(int(token))
+    return {"max_int": max(values), "min_int": min(values)} if values else None
+
+
 def archive_check(command: list[str], entry: dict) -> dict:
     paths = []
     for relative in entry["source_dirs"]:
@@ -194,11 +203,13 @@ def build_round(round_number: int, generator_module) -> None:
                          "pending_rework": []})
         report.append({"local_number": number, "global_number": entry["global_number"],
                        "title": entry["title"], "priority": priority, "phase": 2,
-                       "status": status, "reference_source": "existing platform Accepted submission",
+                       "status": status, "reference_source": reference.get(
+                           "reference_source", "existing platform Accepted submission"),
                        "reference_language": language,
                        "reference_solution_id": reference["solution_id"],
                        "source_url": reference["source_url"],
-                       "license_status": "not declared; no license is inferred",
+                       "license_status": reference.get(
+                           "license_status", "not declared; no license is inferred"),
                        "submission_id": platform_row.get("solution_id") if platform_row else None,
                        "platform_verdict": platform_row.get("verdict") if platform_row else "not_run",
                        "archive_cross_check": cross, "generator": "generate",
@@ -209,6 +220,10 @@ def build_round(round_number: int, generator_module) -> None:
                        "max_input_bytes": max(len(case.encode()) for case in cases),
                        "max_output_bytes": max(len(output.encode()) for output in outputs),
                        "constraint": label, "constraint_counterexample": invalid.strip(),
+                       **({"input_domain": {
+                           "statement_quote": generator_module.INPUT_DOMAINS[number],
+                           "generated_extremes": generated_extremes(data),
+                       }} if number in getattr(generator_module, "INPUT_DOMAINS", {}) else {}),
                        "self_audit": audit})
         print(f"{number:05d} built ({language}, legacy={cross['cases']})", flush=True)
 

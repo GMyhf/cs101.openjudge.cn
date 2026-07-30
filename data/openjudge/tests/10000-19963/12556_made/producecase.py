@@ -9,6 +9,7 @@ import re
 NUMBERS = {16531,18211,27103,27625,26978,27653,26971,27104,18156,4018,
            18182,12556,12560,4101,28050,4030,16528,20134,18146,18176}
 EXEMPTIONS = {}
+INPUT_DOMAINS = {27625: "输入n(0<n<50),输出一个n层的AVL树至少有多少个结点。"}
 SAMPLE_INPUTS = {
   16531:"2 5\n0 1 2 3 4\n5 6 7 8 9\n1 1 1\n1 0 1\n0 0 0\n0 0 1\n0 0 0\n1 1 1\n1 1 1\n1 1 1\n1 1 1\n1 1 1\n",
   18211:"10\n20 30 40\n",26978:"8 3\n1 3 -1 -3 5 3 6 7\n",
@@ -22,7 +23,7 @@ LABELS={
 16531:"the M-by-N seating grid is a permutation of 0..M*N-1 followed by exactly one binary answer row per student",
 18211:"the initial budget and every one-use blueprint cost are nonnegative integers",
 27103:"the note row contains exactly N values in 1..M with 1<=M<=N",
-27625:"the requested AVL height is a positive integer at most 1000",
+27625:"the requested AVL height is a positive integer less than 50",
 26978:"1<=k<=n<=100000 and the second line contains exactly n integers in -10000..10000",
 27653:"four integers describe two fractions whose denominators are nonzero",
 26971:"1<=n<=20000 and exactly n ratings lie in 0..20000",
@@ -56,7 +57,7 @@ def generate(number,seed):
  if number==18211:return f"{r.randint(0,100000)}\n"+' '.join(str(r.randint(0,100000)) for _ in range(r.randint(1,150)))+'\n'
  if number==27103:
   n=100000 if seed==20 else r.randint(1,300);m=r.randint(1,min(n,50));return f"{n} {m}\n"+' '.join(str(r.randint(1,m)) for _ in range(n))+'\n'
- if number==27625:return f"{1000 if seed==20 else r.randint(1,100)}\n"
+ if number==27625:return f"{([*range(1,20),49])[(seed-1)%20]}\n"
  if number==26978:
   n=100000 if seed==20 else r.randint(1,500);k=r.randint(1,n);return f"{n} {k}\n"+' '.join(str(r.randint(-10000,10000)) for _ in range(n))+'\n'
  if number==27653:
@@ -124,15 +125,15 @@ def valid(number,text):
    m,n=map(int,lines[0].split());total=m*n;seat=[int(x) for line in lines[1:1+m] for x in line.split()];answers=lines[1+m:];return m>=1 and n>=1 and len(seat)==total and sorted(seat)==list(range(total)) and len(answers)==total and len({len(x.split()) for x in answers})==1 and all(set(x.split())<={'0','1'} for x in answers)
   if number==18211:return len(lines)==2 and int(lines[0])>=0 and bool(lines[1].split()) and all(int(x)>=0 for x in lines[1].split())
   if number==27103:
-   n,m=map(int,lines[0].split());a=list(map(int,lines[1].split()));return 1<=m<=n and len(a)==n and all(1<=x<=m for x in a)
-  if number==27625:return len(tokens)==1 and 1<=int(tokens[0])<=1000
+   n,m=map(int,lines[0].split());a=list(map(int,lines[1].split()));return len(lines)==2 and 1<=m<=n and len(a)==n and all(1<=x<=m for x in a)
+  if number==27625:return len(tokens)==1 and 1<=int(tokens[0])<50
   if number==26978:
-   n,k=map(int,lines[0].split());a=list(map(int,lines[1].split()));return 1<=k<=n<=100000 and len(a)==n and all(-10000<=x<=10000 for x in a)
-  if number==27653:return len(tokens)==4 and int(tokens[1])!=0 and int(tokens[3])!=0
+   n,k=map(int,lines[0].split());a=list(map(int,lines[1].split()));return len(lines)==2 and 1<=k<=n<=100000 and len(a)==n and all(-10000<=x<=10000 for x in a)
+  if number==27653:return len(tokens)==4 and all(re.fullmatch(r'-?\d+',x) for x in tokens) and int(tokens[1])!=0 and int(tokens[3])!=0
   if number==26971:
-   n=int(lines[0]);a=list(map(int,lines[1].split()));return 1<=n<=20000 and len(a)==n and all(0<=x<=20000 for x in a)
+   n=int(lines[0]);a=list(map(int,lines[1].split()));return len(lines)==2 and 1<=n<=20000 and len(a)==n and all(0<=x<=20000 for x in a)
   if number==27104:
-   n=int(lines[0]);a=list(map(int,lines[1].split()));return 1<=n<=500000 and len(a)==n and all(0<=x<=n for x in a)
+   n=int(lines[0]);a=list(map(int,lines[1].split()));return len(lines)==2 and 1<=n<=500000 and len(a)==n and all(0<=x<=n for x in a)
   if number==18156:return len(lines)==2 and 2<=len(lines[1].split())<=100000 and all(re.fullmatch(r'-?\d+',x) for x in tokens)
   if number==4018:return len(tokens)>=2 and len(tokens)%2==0 and all(x and not any(c.isspace() for c in x) for x in tokens)
   if number==18182:
@@ -162,7 +163,7 @@ def valid(number,text):
   if number==20134:
    d,c,mileage,price,n=map(float,lines[0].split());n=int(n);rows=[list(map(float,x.split())) for x in lines[1:]];return d>0 and c>0 and mileage>0 and price>0 and n>=0 and len(rows)==n and all(len(x)==2 and 0<x[0]<d and x[1]>0 for x in rows) and len({x[0] for x in rows})==n
   if number==18146:
-   n,k=map(int,lines[0].split());a=list(map(int,lines[1].split()));return 1<=n<=10000 and 1<=k<=100 and len(a)==k and all(1<=x<=10000 for x in a)
+   n,k=map(int,lines[0].split());a=list(map(int,lines[1].split()));return len(lines)==2 and 1<=n<=10000 and 1<=k<=100 and len(a)==k and all(1<=x<=10000 for x in a)
   if number==18176:
    m,n=map(int,lines[0].split());return 1<=m<=2000 and 1<=n<=100 and len(lines)==m+1 and all(1<=len(row.split())<=n and all(1<=int(x)<=10**8 for x in row.split()) for row in lines[1:])
  except (ValueError,IndexError,TypeError):return False

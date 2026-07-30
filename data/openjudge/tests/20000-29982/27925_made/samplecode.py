@@ -13,6 +13,7 @@ def main():
     group_queue = {}
     main_queue = deque()
     group_id = 0
+    outsider_group = -1
     for _ in range(t):
         members = list(map(int, data[ptr].split()))
         ptr += 1
@@ -31,7 +32,8 @@ def main():
         elif cmd[0] == 'ENQUEUE':
             x = int(cmd[1])
             if x not in person_to_group:
-                g = -x
+                g = outsider_group
+                outsider_group -= 1
                 group_queue[g] = deque([x])
                 main_queue.append(g)
             else:

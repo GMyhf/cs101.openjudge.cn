@@ -62,6 +62,55 @@ class T028Phase2Tests(unittest.TestCase):
                 self.assertEqual("passed", row["merged_judge"]["status"])
                 self.assertEqual([], row["self_audit"]["failed"])
 
+    def test_reviewed_statement_bounds_stay_enforced(self):
+        reviewed = {
+            21458: round15,
+            27625: round16,
+            4100: round18,
+            18106: round18,
+            18159: round18,
+            27122: round19,
+            4044: round19,
+        }
+        for number, module in reviewed.items():
+            for seed in range(2000):
+                self.assertTrue(module.valid(number, module.generate(number, seed)),
+                                (number, seed))
+            round_number = next(r for r, candidate in ROUNDS if candidate is module)
+            row = next(entry for entry in self.reports[round_number]["entries"]
+                       if entry["local_number"] == number)
+            self.assertEqual(module.INPUT_DOMAINS[number],
+                             row["input_domain"]["statement_quote"])
+
+    def test_reviewed_validator_holes_are_closed(self):
+        bad_cases = {
+            (round16, 27653): "1 x 2 3\n",
+            (round16, 27103): "3 2\n1 2 1\nextra\n",
+            (round16, 26978): "3 2\n1 2 3\nextra\n",
+            (round16, 26971): "3\n1 2 3\nextra\n",
+            (round16, 27104): "3\n1 2 3\nextra\n",
+            (round16, 18146): "2 2\n1 2\nextra\n",
+            (round19, 18155): "target\n1 2 3\n",
+        }
+        for (module, number), case in bad_cases.items():
+            self.assertFalse(module.valid(number, case), number)
+
+    def test_round19_exercises_ungrouped_queue_members(self):
+        for seed in range(1, 101):
+            lines = round19.generate(27925, seed).splitlines()
+            group_count = int(lines[0])
+            members = {int(value) for row in lines[1:1 + group_count]
+                       for value in row.split()}
+            enqueued = [int(row.split()[1]) for row in lines[1 + group_count:]
+                        if row.startswith("ENQUEUE ")]
+            self.assertTrue(any(value not in members for value in enqueued), seed)
+
+    def test_28050_provenance_matches_project_authored_reference(self):
+        row = next(entry for entry in self.reports[16]["entries"]
+                   if entry["local_number"] == 28050)
+        self.assertIn("project-authored", row["reference_source"])
+        self.assertEqual("project-authored for this repository", row["license_status"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -8,6 +8,7 @@ import re
 NUMBERS = {18164, 20106, 4067, 27638, 20140, 8210, 4015, 23421, 4133, 28046,
            23558, 23568, 27637, 20052, 18161, 19930, 21458, 21554, 27256, 27300}
 EXEMPTIONS = {}
+INPUT_DOMAINS = {21458: "保证 0 < t i ≤ T ≤ 10 3 , 0 < n ≤ 10 3 , 0 < w i < 20。"}
 SAMPLE_INPUTS = {
     23558: "7 7 2\n0 1\n1 2\n2 3\n2 4\n0 4\n0 5\n5 6\n0\n",
     23568: "3\n1.18 1.27 100\n1.23 1.27 20\n2.4 2.8 81\n",
@@ -55,7 +56,7 @@ INVALID = {
     23568: "1\n1-07 1-20 5\n", 27637: "1\nA(B)\n",
     20052: "2 2 1\n0 0\n0 0\n", 18161: "1 2\n1\n2 1\n1\n1\n1 1\n0\n",
     19930: "2 2\n1 0\n0 1\n", 21458: "10 1\n11 5\n",
-    21554: "3\n1 2\n", 27256: "1\nquery\n", 27300: "1\nGPT-1000M\n",
+    21554: "4\n1 2 3\n", 27256: "1\nquery\n", 27300: "1\nGPT-1000M\n",
 }
 
 
@@ -185,7 +186,7 @@ def generate(number: int, seed: int) -> str:
         return f"{m} {n}\n" + "\n".join(" ".join(map(str, row)) for row in grid) + "\n"
     if number == 21458:
         target = 1000 if seed == 20 else r.randint(1, 250); n = r.randint(1, 80)
-        rows = [(r.randint(1, target), r.randint(0, 19)) for _ in range(n)]
+        rows = [(r.randint(1, target), r.randint(1, 19)) for _ in range(n)]
         return f"{target} {n}\n" + "\n".join(f"{t} {w}" for t, w in rows) + "\n"
     if number == 21554:
         n = 1000 if seed == 20 else r.randint(1, 120); values = [r.randint(1, 10000) for _ in range(n)]
@@ -307,7 +308,7 @@ def valid(number: int, text: str) -> bool:
         if number == 19930:
             m,n=map(int,lines[0].split());vals=[int(x) for x in tokens[2:]];return 1<=m<=50 and 1<=n<=50 and len(lines)==m+1 and all(len(x.split())==n for x in lines[1:]) and set(vals)<={0,1,2} and vals.count(1)==1
         if number == 21458:
-            T,n=map(int,lines[0].split());rows=[list(map(int,x.split())) for x in lines[1:]];return 1<=T<=1000 and n>=1 and len(rows)==n and all(len(x)==2 and 1<=x[0]<=T and 0<=x[1]<20 for x in rows)
+            T,n=map(int,lines[0].split());rows=[list(map(int,x.split())) for x in lines[1:]];return 1<=T<=1000 and n>=1 and len(rows)==n and all(len(x)==2 and 1<=x[0]<=T and 0<x[1]<20 for x in rows)
         if number == 21554:
             n=int(tokens[0]);return 1<=n<=1000 and len(tokens)==n+1 and all(int(x)>0 for x in tokens[1:])
         if number == 27256:

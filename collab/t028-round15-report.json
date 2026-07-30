@@ -2,7 +2,7 @@
   "task": "T-028",
   "phase": 2,
   "round": 15,
-  "updated_at": "2026-07-30T05:43:41.116356+00:00",
+  "updated_at": "2026-07-30T07:36:29.203097+00:00",
   "count": 20,
   "priority_range": [
     1,
@@ -98,8 +98,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "18164",
-        "merged_cases": 31,
-        "total_ms": 606
+        "merged_cases": 21,
+        "total_ms": 361
       }
     },
     {
@@ -187,8 +187,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "20106",
-        "merged_cases": 40,
-        "total_ms": 1730
+        "merged_cases": 21,
+        "total_ms": 597
       }
     },
     {
@@ -276,8 +276,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "04067",
-        "merged_cases": 22,
-        "total_ms": 319
+        "merged_cases": 21,
+        "total_ms": 316
       }
     },
     {
@@ -365,8 +365,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "27638",
-        "merged_cases": 30,
-        "total_ms": 441
+        "merged_cases": 21,
+        "total_ms": 313
       }
     },
     {
@@ -454,8 +454,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "20140",
-        "merged_cases": 31,
-        "total_ms": 462
+        "merged_cases": 21,
+        "total_ms": 315
       }
     },
     {
@@ -543,8 +543,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "08210",
-        "merged_cases": 41,
-        "total_ms": 2356
+        "merged_cases": 21,
+        "total_ms": 510
       }
     },
     {
@@ -632,8 +632,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "04015",
-        "merged_cases": 22,
-        "total_ms": 333
+        "merged_cases": 21,
+        "total_ms": 310
       }
     },
     {
@@ -721,8 +721,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "23421",
-        "merged_cases": 23,
-        "total_ms": 350
+        "merged_cases": 21,
+        "total_ms": 310
       }
     },
     {
@@ -810,8 +810,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "04133",
-        "merged_cases": 26,
-        "total_ms": 5745
+        "merged_cases": 21,
+        "total_ms": 4769
       }
     },
     {
@@ -899,8 +899,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "28046",
-        "merged_cases": 28,
-        "total_ms": 551
+        "merged_cases": 21,
+        "total_ms": 378
       }
     },
     {
@@ -988,8 +988,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "23558",
-        "merged_cases": 31,
-        "total_ms": 471
+        "merged_cases": 21,
+        "total_ms": 338
       }
     },
     {
@@ -1077,8 +1077,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "23568",
-        "merged_cases": 31,
-        "total_ms": 473
+        "merged_cases": 21,
+        "total_ms": 331
       }
     },
     {
@@ -1166,8 +1166,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "27637",
-        "merged_cases": 34,
-        "total_ms": 501
+        "merged_cases": 21,
+        "total_ms": 321
       }
     },
     {
@@ -1255,8 +1255,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "20052",
-        "merged_cases": 36,
-        "total_ms": 1792
+        "merged_cases": 21,
+        "total_ms": 831
       }
     },
     {
@@ -1344,8 +1344,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "18161",
-        "merged_cases": 41,
-        "total_ms": 897
+        "merged_cases": 21,
+        "total_ms": 320
       }
     },
     {
@@ -1433,8 +1433,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "19930",
-        "merged_cases": 41,
-        "total_ms": 702
+        "merged_cases": 21,
+        "total_ms": 346
       }
     },
     {
@@ -1449,7 +1449,7 @@
       "reference_solution_id": "52212724",
       "source_url": "http://cs101.openjudge.cn/practice/solution/52212724/",
       "license_status": "not declared; no license is inferred",
-      "submission_id": "53013920",
+      "submission_id": "53014931",
       "platform_verdict": "Accepted",
       "archive_cross_check": {
         "status": "passed",
@@ -1468,10 +1468,17 @@
         "failed_seeds": []
       },
       "test_cases": 21,
-      "max_input_bytes": 485,
+      "max_input_bytes": 488,
       "max_output_bytes": 4,
       "constraint": "1<=T<=1000, item count matches, and every training time is in 1..T with 0<=gain<20",
       "constraint_counterexample": "10 1\n11 5",
+      "input_domain": {
+        "statement_quote": "保证 0 < t i ≤ T ≤ 10 3 , 0 < n ≤ 10 3 , 0 < w i < 20。",
+        "generated_extremes": {
+          "max_int": 1000,
+          "min_int": 1
+        }
+      },
       "self_audit": {
         "distinct_cases": {
           "total": 20,
@@ -1480,11 +1487,11 @@
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 4,
+          "frequency": 5,
           "total": 20,
           "status": "rejected",
           "exemption": null,
-          "share": 0.2
+          "share": 0.25
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -1522,8 +1529,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "21458",
-        "merged_cases": 41,
-        "total_ms": 1361
+        "merged_cases": 21,
+        "total_ms": 317
       }
     },
     {
@@ -1611,8 +1618,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "21554",
-        "merged_cases": 41,
-        "total_ms": 595
+        "merged_cases": 21,
+        "total_ms": 296
       }
     },
     {
@@ -1700,8 +1707,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "27256",
-        "merged_cases": 41,
-        "total_ms": 1694
+        "merged_cases": 21,
+        "total_ms": 669
       }
     },
     {
@@ -1789,8 +1796,8 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "27300",
-        "merged_cases": 41,
-        "total_ms": 591
+        "merged_cases": 21,
+        "total_ms": 303
       }
     }
   ],
