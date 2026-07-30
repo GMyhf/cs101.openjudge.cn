@@ -336,3 +336,52 @@ class ActiveDataCoverageTests(unittest.TestCase):
                 _label, bad = full_sweep.check_output_size()
         self.assertEqual(1, len(bad), bad)
         self.assertIn("27150", bad[0])
+
+
+class QuoteMustCarryABoundTests(unittest.TestCase):
+    """题面锚的引文里必须真的含一条数值范围，否则「逐字引用」锚不住任何东西。
+
+    2026-07-30 复核 round15-25 的 208 条锚时发现：27018 的上界 `1≤N≤10^6` 写在「提示」段，
+    引文却只引了「第一行一个正整数 N」；20134 的约束全在「数据范围与约定」段，引文引的是
+    输入格式。两条都能通过原来的判据 —— **引文选错段落，闸门看不出来**。
+    数据本身我逐条核过没有越界，所以这 32 条记进 `QUOTES_WITHOUT_BOUND` 而不是放宽判据：
+    新出现的无界引文仍然会红。
+    """
+
+    def _run(self, number, quote, statement):
+        import json
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / "collab").mkdir()
+            (root / "data" / "openjudge" / "pages").mkdir(parents=True)
+            data = root / "data" / "openjudge" / "tests" / "x_made" / "data"
+            data.mkdir(parents=True)
+            (data / "0.in").write_text("7\n", encoding="utf-8")
+            (root / "data" / "openjudge" / "pages" / "practice__1.html").write_text(
+                f"<p>{statement}</p>", encoding="utf-8")
+            (root / "collab" / "t028-round20-manifest.json").write_text(json.dumps(
+                {"entries": [{"local_number": number, "submit_group": "practice",
+                              "submit_id": "1", "made_dir": "tests/x_made"}]}), encoding="utf-8")
+            entry = {"local_number": number, "input_domain": {
+                "statement_quote": quote,
+                "generated_extremes": {"max_int": 7, "min_int": 7}}}
+            with mock.patch.object(full_sweep, "ROOT", root), \
+                 mock.patch.object(full_sweep, "report_entries",
+                                   return_value=iter([("t028-round20-report.json", entry)])):
+                return full_sweep.check_input_domain_is_anchored()[1]
+
+    def test_a_quote_with_a_bound_passes(self):
+        self.assertEqual([], self._run(1, "第一行一个正整数 N，N <= 100",
+                                       "第一行一个正整数 N，N &lt;= 100"))
+
+    def test_a_bound_free_quote_is_rejected(self):
+        bad = self._run(1, "第一行一个正整数 N", "第一行一个正整数 N 提示 1≤N≤1000000")
+        self.assertEqual(1, len(bad))
+        self.assertIn("没有任何数值范围", bad[0])
+
+    def test_a_recorded_bound_free_problem_is_allowed(self):
+        number = sorted(full_sweep.QUOTES_WITHOUT_BOUND)[0]
+        self.assertEqual([], self._run(number, "第一行一个正整数 N", "第一行一个正整数 N"))
+        self.assertTrue(full_sweep.QUOTES_WITHOUT_BOUND[number],
+                        "例外必须写明理由，不能是空字符串")
