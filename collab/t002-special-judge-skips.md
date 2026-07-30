@@ -42,3 +42,24 @@
 | --- | --- | --- | --- |
 | 27150 | `routine/27150`、`practice/27150` | `requires-special-judge` | 题面允许输出任一可被 8 整除的子序列；现有 19 组 YES 数据中至少 5 组存在不同的合法输出，正常解法实测被 token judge 判 WA。索引层已禁用所有数据来源；实现并验证 special judge 后方可解除。 |
 | 30193 | `practice/30193` | `requires-special-judge` | 题面允许输出任一可行路径；现有 21 组 `_made` 只覆盖无解分支，常量 `print(-1)` 可通过 21/21，既无判别力也不能安全加入有解实例做 token 精确比对。索引层已禁用所有数据来源；实现并验证 special judge 后方可解除。 |
+| 428 | `practice/01426` 等 4 条 | `requires-special-judge` | Find The Multiple，题面明写「If there are multiple solutions … any one of them is acceptable」。Claude 复核实测：另写一份同样合法、只是输出第二小 0/1 倍数的解法被判 Wrong Answer。出处 `t028-round3-manifest.json`。 |
+| 2152 | `practice/03151` 等 4 条 | `requires-special-judge` | Pots，同为「多解任选其一」，实测同上。出处 `t028-round2-manifest.json`。 |
+| 1983 | `practice/02982`、`routine/02982` | `requires-special-judge` | Sudoku，题面允许非唯一数独输出任意一解。出处 `t028-round9-manifest.json`。 |
+| 1795 | `practice/02793` | `requires-special-judge` | 题面允许输出任意一组合法系数（any valid coefficient vector）。出处 `t028-round12-manifest.json`。 |
+| 731 | `practice/01729`、`routine/01729` | `requires-special-judge` | Jack and Jill，题面允许任意一组最优路线。出处 `t028-round8-report.json`。 |
+
+**为什么要把这 5 条也搬进来**：它们的排除理由此前散落在 round1/2/3/8/9/12 的 manifest 与 report 里，
+而本文件是「哪些题在等 SPJ」的唯一汇总处 —— 2026-07-30 之前它只记了 27150 和 30193 两条。
+**决定被记下来了，但没记在会被查到的地方**，要回答「引入 SPJ 到底能解锁多少」得先做一遍考古。
+现在一次看全：**7 道题、16 条 catalog 记录**。
+
+另外两道零数据题**不是** SPJ 能解的，别混进来：
+`00000`（`.out` 超判题器 2MB 上限，见 `tools/full_sweep.py` 第 3 条）、
+`29986`（依赖平台 `query()` 交互，本站无对应机制）。
+
+### 解锁代价参考
+
+- **27150 / 30193 的数据已经有了**：27150 是 20 组原始平台数据（13 YES / 7 NO，输入到 200 万位），
+  30193 有 21 组 `_made`。这两题不需要重新造数据，只差判题器这一环。
+- 其余 5 题需要 SPJ 之后再走一遍常规生成流程。
+- 动的是**判题沙箱（红线 1）**：每题一个 `checker.py`，跑在与提交代码同级的沙箱里。
