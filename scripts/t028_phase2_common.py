@@ -71,7 +71,7 @@ def generated_extremes(data: Path) -> dict | None:
 
 
 def archive_check(command: list[str], entry: dict, case_filter=None,
-                  excluded_oracle_dirs=None) -> dict:
+                  excluded_oracle_dirs=None, broken_oracle_filter=None) -> dict:
     paths = []
     for relative in entry["source_dirs"]:
         directory = OPENJUDGE / relative
@@ -87,6 +87,11 @@ def archive_check(command: list[str], entry: dict, case_filter=None,
                                     "reason": excluded_oracle_dirs[relative_parent]})
             continue
         case = path.read_text(encoding="utf-8", errors="replace")
+        broken_reason = broken_oracle_filter(case) if broken_oracle_filter else None
+        if broken_reason:
+            excluded_broken.append({"input": str(path.relative_to(OPENJUDGE)),
+                                    "reason": broken_reason})
+            continue
         if case_filter is not None and not case_filter(case):
             excluded_invalid.append(str(path.relative_to(OPENJUDGE)))
             continue
@@ -178,7 +183,8 @@ def build_round(round_number: int, generator_module) -> None:
                           if number in getattr(generator_module,
                                                "FILTER_INVALID_ARCHIVE_INPUTS", set())
                           else None),
-                         getattr(generator_module, "EXCLUDE_ARCHIVE_DIRS", {}).get(number)))
+                         getattr(generator_module, "EXCLUDE_ARCHIVE_DIRS", {}).get(number),
+                         getattr(generator_module, "BROKEN_ARCHIVE_FILTERS", {}).get(number)))
             if cross["status"] != "passed":
                 raise SystemExit(f"{number:05d} legacy cross-check failed: {cross}")
             cases = ([sample] if sample else []) + [generator_module.generate(number, seed)

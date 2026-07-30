@@ -15,10 +15,11 @@ import t028_phase2_round20 as round20  # noqa: E402
 import t028_phase2_round21 as round21  # noqa: E402
 import t028_phase2_round22 as round22  # noqa: E402
 import t028_phase2_round23 as round23  # noqa: E402
+import t028_phase2_round24 as round24  # noqa: E402
 
 ROUNDS = ((15, round15), (16, round16), (17, round17), (18, round18),
           (19, round19), (20, round20), (21, round21), (22, round22),
-          (23, round23))
+          (23, round23), (24, round24))
 
 
 class T028Phase2Tests(unittest.TestCase):
@@ -146,6 +147,17 @@ class T028Phase2Tests(unittest.TestCase):
         self.assertEqual(20, len(cross["excluded_broken_oracles"]))
         self.assertTrue(all(item["input"].startswith("tests/20000-29982/27631/data/")
                             and item["reason"] for item in cross["excluded_broken_oracles"]))
+
+    def test_round24_keeps_power_of_two_30720_oracles(self):
+        row = next(entry for entry in self.reports[24]["entries"]
+                   if entry["local_number"] == 30720)
+        cross = row["archive_cross_check"]
+        self.assertEqual(21, cross["cases"])
+        self.assertEqual(10, len(cross["excluded_broken_oracles"]))
+        archive = ROOT / "data/openjudge"
+        for item in cross["excluded_broken_oracles"]:
+            n = int((archive / item["input"]).read_text().split()[0])
+            self.assertNotEqual(0, n & (n - 1))
 
 
 if __name__ == "__main__":
