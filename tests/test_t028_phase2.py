@@ -24,6 +24,17 @@ ROUNDS = ((15, round15), (16, round16), (17, round17), (18, round18),
           (23, round23), (24, round24), (25, round25))
 
 
+# 抓取来的镜像数据**不入库**（红线 4：只有 `_made/`、`_GMyhf/` 进仓库）。
+# 下面两条判据要读 `tests/<桶>/<题号>/` 里的原始存档文件，那些文件在开发机上有、
+# **在 CI 的全新 clone 里没有** —— 2026-07-30 之前它们在 GitHub 上一直是 FileNotFoundError，
+# 只是分支保护那条必需检查指向的是 GitHub Pages 的 `build`，闸门红了没人看见。
+# 这里显式跳过而不是假装通过：报告层的断言照跑，读文件那一半在缺数据时明说跳过。
+def skip_without_archive(test, directory):
+    if not directory.is_dir():
+        test.skipTest(f"{directory.relative_to(ROOT)} 未入库（抓取镜像不进仓库），"
+                      f"这半条判据只能在有镜像的机器上跑")
+
+
 class T028Phase2Tests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -153,6 +164,7 @@ class T028Phase2Tests(unittest.TestCase):
         self.assertEqual([f"tests/30000-/30172/{index}.in" for index in range(13, 20)],
                          cross["excluded_invalid_inputs"])
         archive = ROOT / "data/openjudge/tests/30000-/30172"
+        skip_without_archive(self, archive)
         for relative in cross["excluded_invalid_inputs"]:
             self.assertFalse(round22.valid(30172, (archive / Path(relative).name).read_text()))
 
@@ -172,9 +184,20 @@ class T028Phase2Tests(unittest.TestCase):
         self.assertEqual(21, cross["cases"])
         self.assertEqual(10, len(cross["excluded_broken_oracles"]))
         archive = ROOT / "data/openjudge"
+        skip_without_archive(self, archive / "tests/30000-/30720")
         for item in cross["excluded_broken_oracles"]:
             n = int((archive / item["input"]).read_text().split()[0])
             self.assertNotEqual(0, n & (n - 1))
+
+    def test_archive_guard_skips_instead_of_erroring_when_the_mirror_is_absent(self):
+        """守卫本身也要有判据：缺镜像时必须是 skip，不能是 FileNotFoundError。
+
+        没有这一条，上面两条判据在 CI 里到底是「跳过」还是「悄悄没跑」就无从分辨。
+        """
+        with self.assertRaises(unittest.SkipTest):
+            skip_without_archive(self, ROOT / "data/openjudge/tests/no-such-bucket/00000")
+        # 有目录时不能跳 —— 否则守卫会把真判据一起吞掉
+        skip_without_archive(self, ROOT / "collab")
 
     def test_round25_separates_30921_from_the_wrong_archive_directory(self):
         row = next(entry for entry in self.reports[25]["entries"]
