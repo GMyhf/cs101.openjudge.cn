@@ -18,7 +18,14 @@ permissions:
   contents: read
 
 jobs:
-  gate:
+  # **job 的 id 就是 GitHub 上那个状态检查的名字**（没写 `name:` 时用 id）。
+  # 分支保护里配的必需检查叫 `build`，而这里原来叫 `gate` —— 名字对不上，
+  # 那条必需检查**永远没有产出者、永远不会变绿**，PR 因此永远合不了，
+  # 于是每次推 main 都只能绕过规则（GitHub 每次回的
+  # `Required status check "build" is expected.` 说的就是这件事）。
+  # 两边任选一边改都行，这里改仓库这边：不需要仓库管理权限。
+  # **不要给这个 job 加 `name:`** —— 一加，检查名就变成那个显示名，又对不上了。
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
