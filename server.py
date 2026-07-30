@@ -234,7 +234,8 @@ def judging_slot(user):
 
 STATIC_DIR = (ROOT / "static").resolve()
 STATIC_TYPES = {".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8",
-                ".svg": "image/svg+xml", ".png": "image/png", ".ico": "image/x-icon",
+                ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg", ".ico": "image/x-icon",
                 ".woff2": "font/woff2"}
 BOOK_META = {
     "practice": {"name": "题库（包括计概、数算题目）", "count": 986},
@@ -328,6 +329,7 @@ document.documentElement.dataset.theme=t;}catch(e){document.documentElement.data
    padding-bottom:5px;border-bottom:1px solid var(--line)}
  .statement-panel .problem-content dt:first-child{margin-top:0}
  .statement-panel .problem-content dd{margin:0}
+ .statement-panel .problem-content img{max-width:100%;height:auto}
  .statement-panel .problem-content pre{overflow:auto;margin:9px 0;padding:12px 14px;
    border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--soft);
    font:12.5px/1.6 var(--font-mono)}
@@ -1696,6 +1698,10 @@ class Handler(BaseHTTPRequestHandler):
         # 标签页上挂的是别人家的图标。换成本站的。
         text = re.sub(r'href="https?://static\.openjudge\.cn/styles/favicon\.ico[^"]*"',
                       'href="/static/favicon.svg"', text)
+        # 公网入口是 HTTPS；浏览器会拦截题面里的 HTTP 图片（mixed content）。
+        # 运行时改写保证重新抓取题面后仍然使用已入库的本机副本。
+        text = re.sub(r'https?://media\.openjudge\.cn/images/1003/hangover\.jpg',
+                      '/static/openjudge/images/1003/hangover.jpg', text)
         return text
 
     def book_page(self, book, view, subject=""):

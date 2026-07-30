@@ -392,6 +392,20 @@ class ServerApiTests(unittest.TestCase):
         text = body.decode("utf-8", errors="replace")
         self.assertNotIn("static.openjudge.cn/styles/favicon.ico", text)
 
+    def test_hangover_statement_uses_the_local_image(self):
+        status, _, body = request(self.port, "GET", "/pctbook/E01003/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        local_path = "/static/openjudge/images/1003/hangover.jpg"
+        self.assertIn(f'src="{local_path}"', text)
+        self.assertNotIn("media.openjudge.cn/images/1003/hangover.jpg", text)
+
+        status, headers, image = request(self.port, "GET", local_path)
+        self.assertEqual(status, 200)
+        self.assertEqual(headers["Content-Type"], "image/jpeg")
+        self.assertEqual(len(image), 8682)
+        self.assertTrue(image.startswith(b"\xff\xd8\xff"))
+
     def test_book_page_serves_the_three_tabs(self):
         for view, path in (("problems", "/book/pctbook/"),
                            ("ranking", "/book/pctbook/ranking/"),

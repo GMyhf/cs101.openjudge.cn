@@ -2,6 +2,14 @@
 
 ## 2026-07-30
 
+### E01003 题面图片改为本站静态资源
+
+- `pctbook/E01003` 原题面嵌入 `http://media.openjudge.cn/images/1003/hangover.jpg`；本站
+  使用 HTTPS，浏览器会把该 HTTP 图片作为 mixed content 拦截。下载上游原始 424×115
+  JPEG 到 `static/openjudge/images/1003/hangover.jpg`，题面渲染时改写为同源路径。
+- 静态白名单增加 JPEG MIME，题面图片增加窄屏自适应。回归测试同时检查页面不再引用
+  上游 URL、本地资源返回 `image/jpeg`、8682 bytes 且具有 JPEG 文件头。
+
 ### round11-14 复核：66 题认可；修掉一个非实测的自检数字与过期的许可说明
 
 - 复核 priority 181-251 共 66 题，**数据全部认可**。自己重跑：66 个生成器逐字节不变、
