@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Mirror the public CS101 problem catalog and problem pages locally."""
+import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from html.parser import HTMLParser
 import json
@@ -53,8 +54,54 @@ EXCLUDED_ENTRIES = {
 }
 
 
-def main():
+def parse_problem_spec(spec):
+    parts = spec.strip("/").split("/")
+    if len(parts) != 2 or parts[0] not in BOOKS or not re.fullmatch(r"[A-Za-z0-9_-]+", parts[1]):
+        raise ValueError(f"invalid problem spec {spec!r}; expected BOOK/ID")
+    return parts[0], parts[1]
+
+
+def refresh_problems(specs):
+    """Refresh selected detail pages and add newly published catalog entries."""
+    catalog_path = DATA / "catalog.json"
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    problems = catalog["problems"]
+    known = {(item["book"], item["id"]): item for item in problems}
+
+    for spec in specs:
+        book, problem_id = parse_problem_spec(spec)
+        if (book, problem_id) in EXCLUDED_ENTRIES:
+            raise ValueError(f"excluded problem {book}/{problem_id}: {EXCLUDED_ENTRIES[(book, problem_id)]}")
+        path = f"/{book}/{problem_id}/"
+        html = fetch(path)
+        (DATA / "pages" / f"{book}__{problem_id}.html").write_text(html, encoding="utf-8")
+        if (book, problem_id) not in known:
+            item = {"book": book, "id": problem_id, "path": path, "tests": False}
+            problems.append(item)
+            known[(book, problem_id)] = item
+        print(f"refreshed {book}/{problem_id}", flush=True)
+
+    catalog["updated"] = time.strftime("%Y-%m-%d")
+    catalog["count"] = len(problems)
+    catalog_path.write_text(json.dumps(catalog, ensure_ascii=False, indent=2), encoding="utf-8")
+    mirror_all()
+    print(f"refreshed {len(specs)} problem pages in {DATA}")
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--problem",
+        action="append",
+        default=[],
+        metavar="BOOK/ID",
+        help="refresh one problem page and add it to the catalog if missing; repeatable",
+    )
+    args = parser.parse_args(argv)
     DATA.mkdir(parents=True, exist_ok=True); (DATA / "pages").mkdir(exist_ok=True); (DATA / "books").mkdir(exist_ok=True)
+    if args.problem:
+        refresh_problems(args.problem)
+        return
     catalog = []
     for book in BOOKS:
         seen = set(); page = 1
