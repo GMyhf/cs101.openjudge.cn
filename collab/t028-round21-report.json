@@ -141,7 +141,7 @@
       "max_output_bytes": 3,
       "constraint": "a 1..10 by 1..10 grid has valid distinct locks including time 1 and disjoint blocked cells",
       "constraint_counterexample": "11 1 1 0\n1 1 1",
-      "multi_answer_exemption": "every generated instance is disconnected and every exact output is uniquely -1",
+      "requires_special_judge": "the statement accepts any feasible path; no-solution-only exact data has no discriminating power and remains offline",
       "input_domain": {
         "statement_quote": "HAL 是一个 N × M 的神经元矩阵（最多10x10）。",
         "generated_extremes": {

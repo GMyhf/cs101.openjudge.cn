@@ -9,8 +9,7 @@ import re
 
 NUMBERS = {27862, 30193, 30912, 4043, 16527, 18109, 20025, 20127, 30162, 30204,
            30901, 18167, 19961, 27699, 30179, 30283, 30550, 31086, 31087, 29468}
-EXEMPTIONS = {30193: "only disconnected no-solution instances are generated because feasible paths have multiple accepted outputs"}
-MULTI_ANSWER_EXEMPTIONS = {30193: "every generated instance is disconnected and every exact output is uniquely -1"}
+EXEMPTIONS = {}
 NO_ARCHIVE_REASONS = {
     30193: "legacy files use the current path-input format but expect token 0, which is not a valid output under the mirrored path-or--1 statement",
     18109: "legacy case 4 expects h although z and h both occur twice and z appears first, contradicting the mirrored first-on-tie rule",

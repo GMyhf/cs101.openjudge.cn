@@ -207,10 +207,6 @@ def check_multi_answer_problems():
     """
     made_paths = {number: path for number, path in active_dirs()}
     made = set(made_paths)
-    exemptions = {}
-    for _source, entry in report_entries():
-        if entry.get("multi_answer_exemption"):
-            exemptions[int(entry["local_number"])] = entry["multi_answer_exemption"]
     bad = []
     for page in sorted((ROOT / "data" / "openjudge" / "pages").glob("*.html")):
         match = re.search(r"__(\d+)\.html$", page.name)
@@ -222,14 +218,6 @@ def check_multi_answer_problems():
         window = text[start:start + 900] if start > 0 else text[:900]
         found = MULTI_ANSWER.search(window)
         if found:
-            outputs = sorted((made_paths[int(match.group(1))] / "data").glob("*.out"))
-            exemption = exemptions.get(int(match.group(1)))
-            unique_output = (exemption.get("unique_output_tokens")
-                             if isinstance(exemption, dict) else ["-1"])
-            if (exemption and isinstance(unique_output, list) and outputs and
-                    all(path.read_text(encoding="utf-8", errors="replace").split() == unique_output
-                        for path in outputs)):
-                continue
             bad.append(f"{int(match.group(1))}: 题面写着「{found.group(0)}」，"
                        f"却生成了精确比对数据（需 special judge，先排除）")
     return "多解题却生成了精确比对数据", sorted(set(bad))
@@ -317,8 +305,8 @@ def check_input_domain_is_anchored():
         的口径重算出来（防写一个好看的数字）。
     两半并排摆着，矛盾就藏不住了 —— 上面七条里有六条一眼可见。
 
-    只对 round20 及以后生效（外加任何已经填了这个字段的条目）：round15-19 那七题
-    要在返工时补上，其余轮次不追溯。
+    最初只对 round20 及以后生效；2026-07-30 发版收口时已回填 round15-19，现从
+    round15 起强制检查。更早轮次不追溯。
     """
     manifests = {}
     for path in sorted(ROOT.glob("collab/t028-round*-manifest.json")):
@@ -338,7 +326,7 @@ def check_input_domain_is_anchored():
             continue
         round_number = int(match.group(1))
         domain = entry.get("input_domain")
-        if round_number < 20 and not domain:
+        if round_number < 15 and not domain:
             continue
         number = entry.get("local_number")
         if not isinstance(domain, dict):

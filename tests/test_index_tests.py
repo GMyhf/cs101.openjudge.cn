@@ -49,16 +49,20 @@ class ArchiveExclusionTests(unittest.TestCase):
     def test_special_judge_problem_stays_unindexed_even_when_data_exists(self):
         selected = index_tests.exclude_special_judge_cases({
             27150: [{"input": "unsafe.in", "output": "unsafe.out"}],
+            30193: [{"input": "also-unsafe.in", "output": "also-unsafe.out"}],
             1678: [{"input": "safe.in", "output": "safe.out"}],
         })
-        self.assertNotIn(27150, selected)
+        self.assertTrue({27150, 30193}.isdisjoint(selected))
         self.assertIn(1678, selected)
-        entries = [row for row in self.catalog["problems"]
-                   if int(row["global_number"]) == 27150]
-        self.assertTrue(entries)
-        self.assertTrue(all(not row.get("test_cases") for row in entries))
+        for number in (27150, 30193):
+            entries = [row for row in self.catalog["problems"]
+                       if int(row["global_number"]) == number]
+            self.assertTrue(entries)
+            self.assertTrue(all(not row.get("test_cases") for row in entries))
         self.assertTrue((ROOT / "data/openjudge/tests/20000-29982/27150_made").is_dir(),
                         "离线参考数据应保留，但不能进入 catalog")
+        self.assertTrue((ROOT / "data/openjudge/tests/30000-/30193_made").is_dir(),
+                        "30193 离线参考数据应保留，但不能进入 catalog")
 
     def test_generated_data_replaces_legacy_data_for_the_same_global_problem(self):
         offenders = []

@@ -29,7 +29,7 @@ BUCKETS = {"1000-1999", "2000-2999", "3000-3682", "4000-8210", "10000-19963", "2
 ARCHIVE_BUCKETS = {"1000-1999", "2000-2999", "3000-3682"}
 # These problems permit multiple correct outputs, while judge.py currently does
 # exact token comparison. Keep every available corpus offline until an SPJ exists.
-SPECIAL_JUDGE_GLOBAL_NUMBERS = {27150}
+SPECIAL_JUDGE_GLOBAL_NUMBERS = {27150, 30193}
 
 
 def is_archive(bucket, directory_name):

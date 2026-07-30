@@ -17,6 +17,7 @@ import t028_phase2_round22 as round22  # noqa: E402
 import t028_phase2_round23 as round23  # noqa: E402
 import t028_phase2_round24 as round24  # noqa: E402
 import t028_phase2_round25 as round25  # noqa: E402
+import t028_phase2_common as common  # noqa: E402
 
 ROUNDS = ((15, round15), (16, round16), (17, round17), (18, round18),
           (19, round19), (20, round20), (21, round21), (22, round22),
@@ -88,6 +89,21 @@ class T028Phase2Tests(unittest.TestCase):
                        if entry["local_number"] == number)
             self.assertEqual(module.INPUT_DOMAINS[number],
                              row["input_domain"]["statement_quote"])
+
+    def test_round15_through_19_all_have_verbatim_input_domain_anchors(self):
+        for round_number, module in ROUNDS[:5]:
+            manifest = {int(row["local_number"]): row
+                        for row in self.manifests[round_number]["entries"]}
+            self.assertEqual(20, len(self.reports[round_number]["entries"]))
+            for row in self.reports[round_number]["entries"]:
+                number = int(row["local_number"])
+                entry = manifest[number]
+                domain = row["input_domain"]
+                self.assertEqual(common.input_domain_quote(entry, module, number),
+                                 domain["statement_quote"], number)
+                self.assertEqual(common.generated_extremes(
+                    ROOT / "data" / "openjudge" / entry["made_dir"] / "data"),
+                    domain["generated_extremes"], number)
 
     def test_reviewed_validator_holes_are_closed(self):
         bad_cases = {

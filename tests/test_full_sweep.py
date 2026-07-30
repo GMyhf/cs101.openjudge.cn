@@ -151,12 +151,11 @@ class InputDomainAnchorTests(unittest.TestCase):
 
     这条判据是 2026-07-30 复核 round15-19 抓到七题「生成数据越出题面保证范围」之后加的
     （18106 题面 `1<=n<=20`、数据到 100；27625 题面 `0<n<50`、数据到 1000 …）。
-    它只对 round20 起生效，所以**现在跑全库是绿的** —— 一条现在必然绿的判据，
-    必须在这里证明它真能红，否则就是我自己批评过的「永远不会红的检查」。
+    round15-19 已在发版前追溯补齐，因此现在从 round15 起强制生效。
     """
 
     def _entries(self, domain):
-        return [("t028-round20-report.json", {"local_number": 18106, "input_domain": domain})]
+        return [("t028-round15-report.json", {"local_number": 18106, "input_domain": domain})]
 
     def _manifest(self, tmp):
         return {"task": "T-028", "entries": [{"local_number": 18106, "submit_group": "practice",
@@ -175,7 +174,7 @@ class InputDomainAnchorTests(unittest.TestCase):
                 (data / f"{index}.in").write_text(case, encoding="utf-8")
             (root / "data" / "openjudge" / "pages" / "practice__18106.html").write_text(
                 f"<html><body><dd>{quote_text}</dd></body></html>", encoding="utf-8")
-            (root / "collab" / "t028-round20-manifest.json").write_text(
+            (root / "collab" / "t028-round15-manifest.json").write_text(
                 json.dumps(self._manifest(root)), encoding="utf-8")
             with mock.patch.object(full_sweep, "ROOT", root), \
                  mock.patch.object(full_sweep, "report_entries",
@@ -203,7 +202,7 @@ class InputDomainAnchorTests(unittest.TestCase):
         self.assertEqual(len(bad), 1)
         self.assertIn("重算是", bad[0])
 
-    def test_rejects_a_round20_entry_with_no_input_domain_at_all(self):
+    def test_rejects_a_round15_entry_with_no_input_domain_at_all(self):
         bad = self._run(None, "给定一个n(1&lt;=n&lt;=20)", ["3\n"])
         self.assertEqual(len(bad), 1)
         self.assertIn("没有 input_domain", bad[0])
@@ -224,7 +223,7 @@ class InputDomainAnchorTests(unittest.TestCase):
 
 
 class MultiAnswerUniqueFailureTests(unittest.TestCase):
-    def _run(self, output, *, number=30193, exemption="only unique no-solution cases",
+    def _run(self, output, *, number=30193, exemption=None,
              statement="输出任意一种即可。"):
         import tempfile
         with tempfile.TemporaryDirectory() as folder:
@@ -244,18 +243,18 @@ class MultiAnswerUniqueFailureTests(unittest.TestCase):
                                    return_value=iter([("t028-round21-report.json", entry)])):
                 return full_sweep.check_multi_answer_problems()[1]
 
-    def test_all_minus_one_outputs_are_unambiguous(self):
-        self.assertEqual([], self._run("-1\n"))
+    def test_all_minus_one_outputs_do_not_justify_exact_judging(self):
+        self.assertEqual(1, len(self._run("-1\n")))
 
     def test_a_path_output_reactivates_the_multi_answer_gate(self):
         self.assertEqual(1, len(self._run("1 1\n1 2\n")))
 
-    def test_custom_unique_no_token_is_enforced(self):
+    def test_custom_unique_no_token_cannot_bypass_the_gate(self):
         exemption = {"reason": "only the unique failure branch",
                      "unique_output_tokens": ["NO"]}
         statement = "输出移除某些数字的结果。"
-        self.assertEqual([], self._run("NO\n", number=27150, exemption=exemption,
-                                       statement=statement))
+        self.assertEqual(1, len(self._run("NO\n", number=27150, exemption=exemption,
+                                         statement=statement)))
         self.assertEqual(1, len(self._run("168\n", number=27150,
                                          exemption=exemption, statement=statement)))
 

@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 from datetime import datetime, timezone
+from html.parser import HTMLParser
 from pathlib import Path
 
 import t004_common as audit_common
@@ -36,6 +37,60 @@ def page_sample(entry: dict, label: str) -> str:
     value = re.split(r"<b>.*?</b>", value, maxsplit=1, flags=re.S | re.I)[0]
     value = html.unescape(re.sub(r"<[^>]+>", "", value)).replace("\r", "")
     return "" if value.strip() in {"", "无", "None"} else clean(value)
+
+
+class _InputSectionParser(HTMLParser):
+    """Extract the mirrored statement's complete ``输入`` definition list item."""
+
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.in_label = False
+        self.capture_input = False
+        self.expect_input = False
+        self.label_parts = []
+        self.input_parts = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == "dt":
+            self.in_label = True
+            self.label_parts = []
+        elif tag == "dd" and self.expect_input and not self.capture_input:
+            self.capture_input = True
+        elif self.capture_input and tag in {"br", "p", "pre", "li", "tr"}:
+            self.input_parts.append(" ")
+
+    def handle_endtag(self, tag):
+        if tag == "dt" and self.in_label:
+            self.in_label = False
+            self.expect_input = "".join(self.label_parts).strip() == "输入"
+        elif tag == "dd" and self.capture_input:
+            self.capture_input = False
+            self.expect_input = False
+
+    def handle_data(self, data):
+        if self.in_label:
+            self.label_parts.append(data)
+        elif self.capture_input:
+            self.input_parts.append(data)
+
+
+def page_input_domain(entry: dict) -> str:
+    """Return a normalized verbatim anchor for the page's complete input section."""
+    page = OPENJUDGE / "pages" / f"{entry['submit_group']}__{entry['submit_id']}.html"
+    raw = page.read_text(encoding="utf-8", errors="replace")
+    # Mirrored statements contain raw comparison signs such as ``1<=n<=20``.
+    raw = re.sub(r"<(?![/a-zA-Z!])", "&lt;", raw)
+    parser = _InputSectionParser()
+    parser.feed(raw)
+    return " ".join("".join(parser.input_parts).split())
+
+
+def input_domain_quote(entry: dict, generator_module, number: int) -> str:
+    explicit = getattr(generator_module, "INPUT_DOMAINS", {}).get(number)
+    quote = explicit or page_input_domain(entry)
+    if not quote:
+        raise ValueError(f"{number:05d}: mirrored statement has no input section")
+    return quote
 
 
 def compile_source(source: str, language: str, folder: Path) -> list[str]:
@@ -253,10 +308,11 @@ def build_round(round_number: int, generator_module) -> None:
                        **({"multi_answer_exemption":
                            generator_module.MULTI_ANSWER_EXEMPTIONS[number]}
                           if number in getattr(generator_module, "MULTI_ANSWER_EXEMPTIONS", {}) else {}),
-                       **({"input_domain": {
-                           "statement_quote": generator_module.INPUT_DOMAINS[number],
+                       "input_domain": {
+                           "statement_quote": input_domain_quote(
+                               entry, generator_module, number),
                            "generated_extremes": generated_extremes(data),
-                       }} if number in getattr(generator_module, "INPUT_DOMAINS", {}) else {}),
+                       },
                        "self_audit": audit})
         print(f"{number:05d} built ({language}, legacy={cross['cases']})", flush=True)
 
