@@ -505,6 +505,29 @@ const BOOK = "__BOOK__", PROBLEM = "__PROBLEM__";
 const SAMPLES = __SAMPLE_JSON__;
 const CLS = { "Accepted": "b-ac", "Wrong Answer": "b-wa" };
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const DRAFT_KEY = "cs101-submit-draft:" + BOOK + ":" + PROBLEM;
+const LOGIN_URL = "/auth/login/?next="
+  + encodeURIComponent(location.pathname + location.search + location.hash);
+function saveDraft() {
+  try {
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ source: src.value, language: form.language.value }));
+  } catch (err) { /* 隐私模式或存储已满时仍允许正常提交 */ }
+}
+function restoreDraft() {
+  try {
+    const draft = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || "null");
+    if (!draft || typeof draft.source !== "string") return false;
+    src.value = draft.source;
+    if (typeof draft.language === "string"
+        && Array.from(form.language.options).some(option => option.value === draft.language)) {
+      form.language.value = draft.language;
+    }
+    return true;
+  } catch (err) { return false; }
+}
+function clearDraft() {
+  try { sessionStorage.removeItem(DRAFT_KEY); } catch (err) {}
+}
 
 // ---- 面板拖拽 ----------------------------------------------------------
 // 横竖两条共用一套逻辑：差别只在读哪个坐标、写哪个 grid 轴。
@@ -616,7 +639,7 @@ copyStatement.addEventListener('click', async () => {
 fetch("/api/me", { credentials: "same-origin" }).then(r => r.json()).then(me => {
   auth.innerHTML = me.authenticated
     ? '已登录：<b>' + esc(me.user) + '</b>'
-    : '<a href="/auth/login/">请先登录后提交</a>';
+    : '<a href="' + LOGIN_URL + '">请先登录后提交</a>';
   loadHistory();
 });
 // ---- 语法高亮 / 括号匹配 / 自动缩进 -------------------------------------
@@ -779,12 +802,12 @@ function paintEditor() {
   hl.scrollTop = src.scrollTop; hl.scrollLeft = src.scrollLeft;
 }
 
-src.addEventListener("input", paintEditor);
+src.addEventListener("input", () => { saveDraft(); paintEditor(); });
 src.addEventListener("click", paintEditor);
 src.addEventListener("keyup", paintEditor);
 src.addEventListener("blur", paintEditor);
 src.addEventListener("scroll", () => { hl.scrollTop = src.scrollTop; hl.scrollLeft = src.scrollLeft; });
-form.language.addEventListener("change", paintEditor);
+form.language.addEventListener("change", () => { saveDraft(); paintEditor(); });
 src.addEventListener("keydown", e => {
   if (e.key === "Tab") {
     e.preventDefault();
@@ -815,7 +838,7 @@ function applySize(px) {
 }
 fontUp.onclick = () => applySize(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--code-size')) + 1);
 fontDown.onclick = () => applySize(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--code-size')) - 1);
-resetCode.onclick = () => { src.value = ""; paintEditor(); src.focus(); };
+resetCode.onclick = () => { src.value = ""; clearDraft(); paintEditor(); src.focus(); };
 try { const saved = Number(localStorage.getItem(SIZE_KEY)); if (saved) applySize(saved); } catch (err) {}
 
 // ---- 主题 --------------------------------------------------------------
@@ -829,6 +852,7 @@ function applyTheme(name) {
 theme.onclick = () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
 applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
 
+restoreDraft();
 paintEditor();
 
 function badge(status) {
@@ -941,6 +965,7 @@ run.addEventListener('click', async () => {
 form.onsubmit = async e => {
   e.preventDefault();
   if (busy) return;
+  saveDraft();
   setBusy(true, "判题中…");
   verdict.innerHTML = '<div class="placeholder">判题中，请稍候…</div>';
   showTab('verdict');
@@ -951,8 +976,8 @@ form.onsubmit = async e => {
       headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
     const data = await r.json();
     if (r.status === 401) verdict.innerHTML = '<div class="verdict-head">' + badge("需要登录")
-      + '</div><p class="placeholder"><a href="/auth/login/">先登录</a>后再提交。</p>';
-    else { renderVerdict(data); loadHistory(historyAll); }
+      + '</div><p class="placeholder"><a href="' + LOGIN_URL + '">先登录</a>后再提交，代码会保留。</p>';
+    else { if (r.ok) clearDraft(); renderVerdict(data); loadHistory(historyAll); }
   } catch (err) {
     verdict.innerHTML = '<div class="verdict-head">' + badge("提交失败") + '</div><pre class="msg">' + esc(err) + "</pre>";
   }
@@ -1622,6 +1647,18 @@ def public_base_url():
     """Return the address users on the LAN can open from emailed links."""
     return os.environ.get("CS101_PUBLIC_URL", DEFAULT_PUBLIC_URL).rstrip("/")
 
+
+def safe_return_path(value):
+    """Allow login redirects only to an ordinary path on this site."""
+    value = str(value or "")
+    if (not value.startswith("/") or value.startswith("//") or "\\" in value
+            or len(value) > 2048 or any(ord(character) < 32 for character in value)):
+        return "/"
+    parsed = urlparse(value)
+    if parsed.scheme or parsed.netloc:
+        return "/"
+    return value
+
 # 反向代理（Tailscale Funnel / Cloudflare / nginx）会把请求转成本机连接，
 # 只有来自这里的连接才允许用 X-Forwarded-For 覆盖来源地址 —— 否则任何人
 # 直接连上来加一个头就能伪造自己的 IP，限频形同虚设。
@@ -1788,7 +1825,7 @@ class Handler(BaseHTTPRequestHandler):
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:820px;margin:auto;padding:0 24px}.top{height:72px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;gap:11px;align-items:center;text-decoration:none;color:var(--ink);font-weight:750}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg)}.back{color:var(--green);text-decoration:none}.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:30px 34px;box-shadow:0 12px 34px rgba(34,63,45,.06)}h1{font-size:30px;margin:0 0 7px}h2{font-size:18px;margin:28px 0 8px;padding-top:20px;border-top:1px solid var(--line)}p{color:var(--muted)}.rule{padding:14px 16px;border-left:3px solid var(--warn);background:var(--soft);color:var(--ink)}code{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--soft);padding:2px 5px;border-radius:4px}@media(max-width:600px){.shell{padding:0 16px}.panel{padding:24px 20px}.top{height:62px}}
 </style></head><body><header class="top shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><a class="back" href="/">返回首页</a></header><main class="shell"><section class="panel"><h1>帮助/说明</h1><p>这里使用本机测试数据判题，提交页右侧选择语言后即可提交代码并查看每组数据的结果。</p><h2>时间与内存倍率</h2><div class="rule">Python ×10 · PyPy3 ×3 · C/C++/Swift/Objective-C ×1 · C#/F#/VB.NET ×2<br>C#/F#/VB.NET 内存 ×2</div><h2>题面限制的含义</h2><p>题面显示的时限按 C/C++ 计算，是全部测试点限时之和。其他语言按照上面的倍率执行；内存限制仅对 C#、F#、VB.NET 按 2 倍计算。</p><h2>提交结果</h2><p>提交记录会保留提交人、结果、语言、运行时间、内存和代码。出现错误时，判题详情会标出出错的数据组，并展示对应的输入、期望输出和实际输出。</p></section></main></body></html>"""
 
-    def account_page(self, register=False):
+    def account_page(self, register=False, next_path="/"):
         title = "注册 CS101 账号" if register else "登录 CS101"
         captcha_token, captcha_question = new_captcha() if register else ("", "")
         fields = f"""<label>邮箱地址<input name="email" type="email" required autocomplete="email" placeholder="name@example.com"></label>
@@ -1802,7 +1839,7 @@ class Handler(BaseHTTPRequestHandler):
         return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>
 <link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/theme.css"><script>(function(){{try{{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}}catch(e){{document.documentElement.dataset.theme='light';}}}})();</script><style>
 *{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}}.shell{{max-width:460px;margin:0 auto;padding:70px 20px}}.brand{{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:28px}}.mark{{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:15px}}.panel{{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}}h1{{font-size:28px;line-height:1.2;margin:0 0 6px}}.intro{{color:var(--muted);margin:0 0 23px}}label{{display:block;margin:16px 0 6px;font-weight:600}}input{{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font:inherit;outline:none}}input:focus{{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-soft)}}button{{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}}a{{color:var(--green)}}.links{{margin:19px 0 0;color:var(--muted);font-size:14px;text-align:center}}.error{{min-height:22px;color:var(--red);margin:12px 0 0}}.captcha-question{{display:inline-block;margin-left:5px;color:var(--green);font-family:ui-monospace,monospace}}@media(max-width:520px){{.shell{{padding:35px 16px}}.panel{{padding:24px}}}}
-</style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><h1>{title}</h1><p class="intro">{'创建账号后即可提交代码并查看判题记录。' if register else '登录后继续使用提交与判题功能。'}</p><form id="account">{fields}<p id="error" class="error"></p><button>提交</button></form><p class="links">{links} · <a href="/">返回首页</a></p></section></main><script>const form=document.querySelector('#account'),error=document.querySelector('#error');form.onsubmit=async e=>{{e.preventDefault();error.textContent='';const data=Object.fromEntries(new FormData(form));if(data.confirm_password!==undefined&&data.password!==data.confirm_password){{error.textContent='两次输入的密码不一致';return}}const r=await fetch('{endpoint}',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(data)}});const d=await r.json();if(r.ok){{if(d.activation_link){{error.style.color='#237a50';error.innerHTML='注册成功，请点击激活链接：<a href="'+d.activation_link+'">激活账号</a>';form.querySelector('button').disabled=true}}else location.href='/'}}else error.textContent=d.error||'操作失败'}};</script></body></html>"""
+</style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><h1>{title}</h1><p class="intro">{'创建账号后即可提交代码并查看判题记录。' if register else '登录后继续使用提交与判题功能。'}</p><form id="account">{fields}<p id="error" class="error"></p><button>提交</button></form><p class="links">{links} · <a href="/">返回首页</a></p></section></main><script>const form=document.querySelector('#account'),error=document.querySelector('#error'),AFTER_LOGIN={json.dumps(next_path)};form.onsubmit=async e=>{{e.preventDefault();error.textContent='';const data=Object.fromEntries(new FormData(form));if(data.confirm_password!==undefined&&data.password!==data.confirm_password){{error.textContent='两次输入的密码不一致';return}}const r=await fetch('{endpoint}',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(data)}});const d=await r.json();if(r.ok){{if(d.activation_link){{error.style.color='#237a50';error.innerHTML='注册成功，请点击激活链接：<a href="'+d.activation_link+'">激活账号</a>';form.querySelector('button').disabled=true}}else location.href=AFTER_LOGIN}}else error.textContent=d.error||'操作失败'}};</script></body></html>"""
 
     def activation_page(self, token):
         with sqlite3.connect(DB) as db:
@@ -1852,7 +1889,8 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
         if any(part == ".." for part in decoded_path.split("/")):
             self.send_json({"error": "Not found"}, 404); return
         if path == "/auth/login/":
-            self.send_html(self.account_page()); return
+            requested = parse_qs(parsed.query).get("next", [""])[0]
+            self.send_html(self.account_page(next_path=safe_return_path(requested))); return
         if path == "/register/":
             self.send_html(self.account_page(register=True)); return
         if path == "/auth/forgot/":

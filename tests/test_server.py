@@ -697,6 +697,7 @@ process.exit(byAccepted && byRate && rateAsc && byId && untouched ? 0 : 1);
         self.assertIn("Python3(", text)
         self.assertIn("PyPy3(", text)
         self.assertIn("查看判题详情", text)
+        self.assertIn("if (r.ok) clearDraft()", text)
 
         self.assertIn('value="csharp">C# (.NET SDK 10)', text)
         self.assertIn('value="fsharp">F# (.NET SDK 10)', text)
@@ -707,6 +708,60 @@ process.exit(byAccepted && byRate && rateAsc && byId && untouched ? 0 : 1);
         self.assertNotIn("Python ×10", text)
         for placeholder in ("__BOOK__", "__PROBLEM__"):
             self.assertNotIn(placeholder, text)      # 模板占位符必须已被替换
+
+    def test_login_returns_to_submit_page_without_allowing_external_redirects(self):
+        target = f"/{SUBMIT_BOOK}/{SUBMIT_PROBLEM}/"
+        status, _, body = request(self.port, "GET", "/auth/login/?next=" + target)
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8")
+        self.assertIn(f'AFTER_LOGIN="{target}"', text)
+        self.assertIn("location.href=AFTER_LOGIN", text)
+
+        for unsafe in ("https%3A%2F%2Fevil.example%2F", "%2F%2Fevil.example%2F",
+                       "%2F%5Cevil.example%2F"):
+            status, _, body = request(self.port, "GET", "/auth/login/?next=" + unsafe)
+            self.assertEqual(status, 200)
+            text = body.decode("utf-8")
+            self.assertIn('AFTER_LOGIN="/"', text)
+            self.assertNotIn("evil.example", text)
+
+    @unittest.skipUnless(shutil.which("node"), "需要 node 才能验证提交页草稿恢复")
+    def test_unauthenticated_submit_draft_survives_login_navigation(self):
+        status, _, body = request(self.port, "GET", f"/{SUBMIT_BOOK}/{SUBMIT_PROBLEM}/")
+        self.assertEqual(status, 200)
+        page = body.decode("utf-8")
+        script = page[page.index("<script>") + 8: page.rindex("</script>")]
+        core = script[script.index("const BOOK"):script.index("// ---- 面板拖拽")]
+        harness = """
+const values = new Map();
+const sessionStorage = {
+  setItem: (key, value) => values.set(key, value),
+  getItem: key => values.has(key) ? values.get(key) : null,
+  removeItem: key => values.delete(key),
+};
+const location = { pathname: '/pctbook/M01328/', search: '', hash: '' };
+const src = { value: '' };
+const form = { language: { value: 'python', options: [
+  { value: 'python' }, { value: 'cpp' }
+] } };
+""" + core + """
+src.value = 'print(\"draft survives\")';
+form.language.value = 'cpp';
+saveDraft();
+src.value = '';
+form.language.value = 'python';
+const restored = restoreDraft();
+const loginOk = LOGIN_URL === '/auth/login/?next=%2Fpctbook%2FM01328%2F';
+const draftOk = src.value === 'print(\"draft survives\")' && form.language.value === 'cpp';
+clearDraft();
+process.exit(restored && loginOk && draftOk && values.size === 0 ? 0 : 1);
+"""
+        with tempfile.NamedTemporaryFile("w", suffix=".mjs", encoding="utf-8", delete=False) as handle:
+            handle.write(harness)
+            path = handle.name
+        self.addCleanup(os.unlink, path)
+        result = subprocess.run(["node", path], capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
 
     def test_help_page_exposes_runtime_rules(self):
         status, _, body = request(self.port, "GET", "/help/")
