@@ -179,8 +179,11 @@ a { color: inherit }
   display: none;
 }
 
+/* 触屏没有 hover，`:focus-within` 也要等按钮真的拿到焦点才成立 —— 在手机上
+   点「账号」常常什么都不发生。所以再认一个由点击切换的 `.open`。 */
 .account-control:hover .account-menu,
-.account-control:focus-within .account-menu { display: block }
+.account-control:focus-within .account-menu,
+.account-control.open .account-menu { display: block }
 
 .account-menu-inner {
   background: var(--panel);
@@ -392,6 +395,11 @@ th { color: var(--muted); font-size: 12px; font-weight: 600 }
 
 td.num { font-variant-numeric: tabular-nums; white-space: nowrap }
 
+/* 窄屏上让表格自己横向滚，而不是把整个页面撑宽 —— 页面一横向滚动，
+   顶栏和正文就一起跑出视口。`history.html` / `book.html` 各自写过一份
+   同名规则，收到这里，`problems.html` / `admin.html` 直接套用。 */
+.table-wrap { overflow-x: auto }
+
 /* ---- 代码块 ------------------------------------------------------------ */
 
 pre.msg {
@@ -408,3 +416,34 @@ pre.msg {
 }
 
 pre.source { white-space: pre; max-height: 360px }
+
+/* ---- 键盘焦点 ---------------------------------------------------------- */
+/* 改动前只有 `.splitter` 定义了 `:focus-visible`，其余控件全靠浏览器默认描边：
+   Chrome 是黑白双色环，在深色面板上几乎看不见，而键盘用户只有这一个位置指示。
+   `:focus-visible` 只在键盘操作时出现，鼠标点击不会留下描边。 */
+
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* ---- 动效 -------------------------------------------------------------- */
+/* 系统里勾了「减少动态效果」的人，通常是因为动画会引起眩晕或偏头痛。
+   这里一次性关掉全站的过渡与位移，而不是逐个页面记得去关。 */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

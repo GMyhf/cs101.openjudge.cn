@@ -2,8 +2,7 @@
 <html lang="zh-CN">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/theme.css">
-<script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script>
+__THEME_HEAD__
 <title>提交记录 · CS101</title>
 <style>
   * { box-sizing:border-box; }
@@ -31,7 +30,7 @@
   a.pid:hover { text-decoration:underline; }
   .badge { display:inline-block; padding:1px 9px; border-radius:999px; font-size:12px; font-weight:600; white-space:nowrap; }
   .b-ac { background:var(--badge-ac-bg); color:var(--ok); }
-  .b-wa { background:var(--badge-wa-bg); color:var(--bad); }
+  .b-wa { background:var(--badge-wa-bg); color:var(--badge-wa-fg); }
   .b-other { background:var(--badge-other-bg); color:var(--badge-other-fg); }
   .b-info { background:var(--badge-info-bg); color:var(--badge-info-fg); }
   .muted { color:var(--muted); }

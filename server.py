@@ -233,6 +233,22 @@ def judging_slot(user):
             JUDGE_SLOTS.discard(key)
 
 
+# 图标 + 样式表 + 主题引导。改动前这三行在 `server.py` 里逐字复制了 9 份、
+# 5 个 `.html` 各一份 —— 一份写错就是某个页面在深色下闪白，而十几份里挑错的
+# 那一份只能靠肉眼。`send_html()` 统一把 `__THEME_HEAD__` 换成它，
+# 所以每个模板的 <head> 里只留这个占位符。
+THEME_HEAD = (
+    '<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">'
+    '<link rel="stylesheet" href="/static/theme.css">'
+    # 引导脚本必须在首屏绘制前跑完，否则深色用户会先看到一帧白。
+    # 也因为这里总会写上 data-theme，theme.css 里的深色才只需要一个块。
+    "<script>(function(){try{var t=localStorage.getItem('cs101-theme');"
+    "if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)')"
+    ".matches?'dark':'light';document.documentElement.dataset.theme=t;}"
+    "catch(e){document.documentElement.dataset.theme='light';}})();</script>"
+)
+THEME_HEAD_SLOT = "__THEME_HEAD__"
+
 STATIC_DIR = (ROOT / "static").resolve()
 STATIC_TYPES = {".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8",
                 ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg",
@@ -333,14 +349,7 @@ PROBLEMS = [
 SUBMIT_PAGE = r"""<!doctype html><html lang="zh-CN"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>__PROBLEM__ 提交代码 · CS101</title>
-<link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/theme.css">
-<script>
-// 主题引导必须在首屏绘制前跑完，否则深色用户会先看到一帧白。
-// 也因为这里总会写上 data-theme，theme.css 里的深色才只需要一个块。
-(function(){try{var t=localStorage.getItem('cs101-theme');
-if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
-document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();
-</script>
+__THEME_HEAD__
 <style>
  /* 全屏工作台：页面本身永不滚动，滚动只发生在 .pane-body 里。
     每一层 flex/grid 子项都要 min-height:0，少一处内容就会把面板撑破。 */
@@ -358,7 +367,7 @@ document.documentElement.dataset.theme=t;}catch(e){document.documentElement.data
    min-height:0;min-width:0}
 
  /* ---- 题面 ---- */
- .statement-panel h2{font-size:21px;line-height:1.3;margin:0 0 14px}
+ .statement-panel h1{font-size:21px;line-height:1.3;margin:0 0 14px}
  .statement-panel .problem-params{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 4px;
    margin:0 0 20px;padding:9px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);
    background:var(--soft);font-size:12.5px;color:var(--muted)}
@@ -485,7 +494,7 @@ document.documentElement.dataset.theme=t;}catch(e){document.documentElement.data
       <span class="pane-tools"><button id="copyStatement" class="ghost" type="button">复制 Markdown</button></span>
     </nav>
     <div class="pane-body statement-panel" id="paneStatement" role="tabpanel">
-      <h2>__STATEMENT_TITLE__</h2>
+      <h1>__STATEMENT_TITLE__</h1>
       <dl class="problem-params">__STATEMENT_PARAMS__</dl>
       <dl class="problem-content">__STATEMENT_CONTENT__</dl>
     </div>
@@ -527,13 +536,15 @@ document.documentElement.dataset.theme=t;}catch(e){document.documentElement.data
         <button class="pane-tab" type="button" role="tab" aria-selected="false" data-panel="samples">样例</button>
         <span class="pane-tools"><span class="editor-state">准备提交</span></span>
       </nav>
-      <div class="pane-body" id="verdict" role="tabpanel"><div class="placeholder">提交后在这里显示判题结果。</div></div>
+      <!-- aria-live：判题结果是异步替换进来的，屏幕阅读器不会自己发现。
+           polite 表示读完当前内容再播报，不打断用户正在听的东西。 -->
+      <div class="pane-body" id="verdict" role="tabpanel" aria-live="polite"><div class="placeholder">提交后在这里显示判题结果。</div></div>
       <div class="pane-body" id="samples" role="tabpanel" hidden>
         <div class="sample-tabs" id="sampleTabs" hidden></div>
         <div class="sample-grid">
           <div><div class="sample-h">输入<span class="muted">（可改）</span></div><textarea id="sampleIn" class="sample-box" spellcheck="false" autocomplete="off"></textarea></div>
           <div><div class="sample-h">预期输出</div><pre id="sampleExp" class="sample-box"></pre></div>
-          <div><div class="sample-h">实际输出<span id="sampleVerdict"></span></div><pre id="sampleGot" class="sample-box muted">点「运行样例」后显示。</pre></div>
+          <div><div class="sample-h">实际输出<span id="sampleVerdict" aria-live="polite"></span></div><pre id="sampleGot" class="sample-box muted">点「运行样例」后显示。</pre></div>
         </div>
       </div>
     </section>
@@ -1135,10 +1146,10 @@ async function loadStats() {
   ];
   statsbox.innerHTML = '<div class="stat-grid">'
     + cards.map(c => '<div class="stat-card"><b>' + esc(c[1]) + "</b><span>" + esc(c[0]) + "</span></div>").join("")
-    + '</div><table><thead><tr><th>结果</th><th>次数</th></tr></thead><tbody>'
+    + '</div><div class="table-wrap"><table><thead><tr><th>结果</th><th>次数</th></tr></thead><tbody>'
     + [...byStatus].sort((a, b) => b[1] - a[1]).map(([k, v]) =>
         "<tr><td>" + badge(k) + "</td><td class='num'>" + v + "</td></tr>").join("")
-    + "</tbody></table>";
+    + "</tbody></table></div>";
 }
 </script></html>"""
 
@@ -1925,6 +1936,9 @@ class Handler(BaseHTTPRequestHandler):
 
     def send_html(self, body):
         if isinstance(body, str): body = body.encode("utf-8")
+        # 所有页面都从这里出去（含读盘的 `.html` 与镜像题面），
+        # 所以主题引导只需在这一处注入。
+        body = body.replace(THEME_HEAD_SLOT.encode(), THEME_HEAD.encode())
         self.send_body(body, "text/html; charset=utf-8")
 
     def send_static(self, file, content_type):
@@ -2029,7 +2043,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def help_page(self):
         return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>说明 · CS101</title>
-<link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/theme.css"><script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script><style>
+__THEME_HEAD__<style>
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:820px;margin:auto;padding:0 24px}.top{height:72px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;gap:11px;align-items:center;text-decoration:none;color:var(--ink);font-weight:750}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg)}.back{color:var(--green);text-decoration:none}.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:30px 34px;box-shadow:0 12px 34px rgba(34,63,45,.06)}h1{font-size:30px;margin:0 0 7px}h2{font-size:18px;margin:28px 0 8px;padding-top:20px;border-top:1px solid var(--line)}p{color:var(--muted)}.rule{padding:14px 16px;border-left:3px solid var(--warn);background:var(--soft);color:var(--ink)}code{font:13px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--soft);padding:2px 5px;border-radius:4px}@media(max-width:600px){.shell{padding:0 16px}.panel{padding:24px 20px}.top{height:62px}}
 </style></head><body><header class="top shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><a class="back" href="/">返回首页</a></header><main class="shell"><section class="panel"><h1>帮助/说明</h1><p>这里使用本机测试数据判题，提交页右侧选择语言后即可提交代码并查看每组数据的结果。</p><h2>时间与内存倍率</h2><div class="rule">Python ×10 · PyPy3 ×3 · C/C++/Swift/Objective-C ×1 · C#/F#/VB.NET ×2<br>C#/F#/VB.NET 内存 ×2</div><h2>题面限制的含义</h2><p>题面显示的时限按 C/C++ 计算，是全部测试点限时之和。其他语言按照上面的倍率执行；内存限制仅对 C#、F#、VB.NET 按 2 倍计算。</p><h2>提交结果</h2><p>提交记录会保留提交人、结果、语言、运行时间、内存和代码。出现错误时，判题详情会标出出错的数据组，并展示对应的输入、期望输出和实际输出。</p><h2>文档</h2><p><a class="back" href="https://gmyhf.github.io/cs101.openjudge.cn/dev-handbook.html" target="_blank" rel="noopener">CS101 判题系统开发教学手册</a></p><p><a class="back" href="https://github.com/GMyhf/cs101.openjudge.cn/blob/main/docs/%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C.md" target="_blank" rel="noopener">使用手册</a></p><p><a class="back" href="https://github.com/GMyhf/cs101.openjudge.cn/blob/main/docs/%E7%AE%A1%E7%90%86%E5%91%98%E6%89%8B%E5%86%8C.md" target="_blank" rel="noopener">管理员手册</a></p></section></main></body></html>"""
 
@@ -2046,9 +2060,9 @@ class Handler(BaseHTTPRequestHandler):
         links = "<a href='/auth/login/'>已有账号？登录</a>" if register else "<a href='/auth/forgot/'>忘记密码？</a> · <a href='/register/'>点此注册</a>"
         after_login_json = json.dumps(next_path).replace("</", "<\\/")
         return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{title}</title>
-<link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/theme.css"><script>(function(){{try{{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}}catch(e){{document.documentElement.dataset.theme='light';}}}})();</script><style>
-*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}}.shell{{max-width:460px;margin:0 auto;padding:70px 20px}}.brand{{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:28px}}.mark{{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:15px}}.panel{{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}}h1{{font-size:28px;line-height:1.2;margin:0 0 6px}}.intro{{color:var(--muted);margin:0 0 23px}}label{{display:block;margin:16px 0 6px;font-weight:600}}input{{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font:inherit;outline:none}}input:focus{{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-soft)}}button{{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}}a{{color:var(--green)}}.links{{margin:19px 0 0;color:var(--muted);font-size:14px;text-align:center}}.error{{min-height:22px;color:var(--red);margin:12px 0 0}}.captcha-question{{display:inline-block;margin-left:5px;color:var(--green);font-family:ui-monospace,monospace}}@media(max-width:520px){{.shell{{padding:35px 16px}}.panel{{padding:24px}}}}
-</style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><h1>{title}</h1><p class="intro">{'创建账号后即可提交代码并查看判题记录。' if register else '登录后继续使用提交与判题功能。'}</p><form id="account">{fields}<p id="error" class="error"></p><button>提交</button></form><p class="links">{links} · <a href="/">返回首页</a></p></section></main><script>const form=document.querySelector('#account'),error=document.querySelector('#error'),AFTER_LOGIN={after_login_json};form.onsubmit=async e=>{{e.preventDefault();error.textContent='';const data=Object.fromEntries(new FormData(form));if(data.confirm_password!==undefined&&data.password!==data.confirm_password){{error.textContent='两次输入的密码不一致';return}}const r=await fetch('{endpoint}',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(data)}});const d=await r.json();if(r.ok){{if(d.activation_link){{error.style.color='#237a50';error.innerHTML='注册成功，请点击激活链接：<a href="'+d.activation_link+'">激活账号</a>';form.querySelector('button').disabled=true}}else location.href=AFTER_LOGIN}}else error.textContent=d.error||'操作失败'}};</script></body></html>"""
+__THEME_HEAD__<style>
+*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}}.shell{{max-width:460px;margin:0 auto;padding:70px 20px}}.brand{{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:28px}}.mark{{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:15px}}.panel{{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}}h1{{font-size:28px;line-height:1.2;margin:0 0 6px}}.intro{{color:var(--muted);margin:0 0 23px}}label{{display:block;margin:16px 0 6px;font-weight:600}}input{{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font:inherit;outline:none}}input:focus{{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-soft)}}button{{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}}a{{color:var(--green)}}.links{{margin:19px 0 0;color:var(--muted);font-size:14px;text-align:center}}.error{{min-height:22px;color:var(--danger);margin:12px 0 0}}.captcha-question{{display:inline-block;margin-left:5px;color:var(--green);font-family:ui-monospace,monospace}}@media(max-width:520px){{.shell{{padding:35px 16px}}.panel{{padding:24px}}}}
+</style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><h1>{title}</h1><p class="intro">{'创建账号后即可提交代码并查看判题记录。' if register else '登录后继续使用提交与判题功能。'}</p><form id="account">{fields}<p id="error" class="error"></p><button>提交</button></form><p class="links">{links} · <a href="/">返回首页</a></p></section></main><script>const form=document.querySelector('#account'),error=document.querySelector('#error'),AFTER_LOGIN={after_login_json};form.onsubmit=async e=>{{e.preventDefault();error.textContent='';const data=Object.fromEntries(new FormData(form));if(data.confirm_password!==undefined&&data.password!==data.confirm_password){{error.textContent='两次输入的密码不一致';return}}const r=await fetch('{endpoint}',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(data)}});const d=await r.json();if(r.ok){{if(d.activation_link){{error.style.color='var(--accent)';error.innerHTML='注册成功，请点击激活链接：<a href="'+d.activation_link+'">激活账号</a>';form.querySelector('button').disabled=true}}else location.href=AFTER_LOGIN}}else error.textContent=d.error||'操作失败'}};</script></body></html>"""
 
     def activation_page(self, token):
         with connect_db() as db:
@@ -2060,35 +2074,35 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 message, detail = "激活链接无效或已过期", "请重新注册或联系管理员。"
         return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{message} · CS101</title>
-<link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/theme.css"><script>(function(){{try{{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}}catch(e){{document.documentElement.dataset.theme='light';}}}})();</script><style>body{{margin:0;background:#f4f7f4;color:#16231d;font:15px/1.6 system-ui,sans-serif}}main{{max-width:460px;margin:70px auto;padding:0 20px}}section{{background:#fff;border:1px solid #dfe7e1;border-radius:10px;padding:30px}}h1{{margin:0 0 10px}}p{{color:#6c7b73}}a{{color:#237a50}}</style></head><body><main><section><h1>{message}</h1><p>{detail}</p><p><a href="/auth/login/">前往登录</a></p></section></main></body></html>"""
+__THEME_HEAD__<style>body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,sans-serif}}main{{max-width:460px;margin:70px auto;padding:0 20px}}section{{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:30px}}h1{{margin:0 0 10px}}p{{color:var(--muted)}}a{{color:var(--accent)}}</style></head><body><main><section><h1>{message}</h1><p>{detail}</p><p><a href="/auth/login/">前往登录</a></p></section></main></body></html>"""
 
     def forgot_page(self):
         return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>找回密码 · CS101</title>
-<link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/theme.css"><script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script><style>
+__THEME_HEAD__<style>
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:460px;margin:0 auto;padding:70px 20px}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:28px}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:15px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}h1{font-size:28px;line-height:1.2;margin:0 0 6px}.intro{color:var(--muted);margin:0 0 23px}label{display:block;margin:16px 0 6px;font-weight:600}input{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;font:inherit;outline:none}button{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}a{color:var(--green)}.message{color:var(--muted);margin-top:15px;word-break:break-word}@media(max-width:520px){.shell{padding:35px 16px}.panel{padding:24px}}
 </style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><h1>忘记密码？</h1><p class="intro">输入注册邮箱，我们会生成一次性密码重置链接。</p><form id="forgot"><label>邮箱地址<input name="email" type="email" required autocomplete="email"></label><button>发送重置链接</button></form><p id="message" class="message"></p><p><a href="/auth/login/">返回登录</a> · <a href="/register/">点此注册</a></p></section></main><script>forgot.onsubmit=async e=>{e.preventDefault();message.textContent='正在处理…';const r=await fetch('/api/user/forgot',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(forgot)))});const d=await r.json();message.innerHTML=d.reset_link?'邮件服务尚未配置，请使用本机重置链接：<a href="'+d.reset_link+'">立即重置密码</a>':'如果该邮箱已注册，重置链接已发送或正在等待管理员配置邮件服务。';}</script></body></html>"""
 
     def reset_page(self, token):
         return f"""<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>重置密码 · CS101</title>
-<link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/theme.css"><script>(function(){{try{{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}}catch(e){{document.documentElement.dataset.theme='light';}}}})();</script><style>body{{margin:0;background:#f4f7f4;color:#16231d;font:15px/1.6 system-ui,sans-serif}}main{{max-width:460px;margin:70px auto;padding:0 20px}}section{{background:#fff;border:1px solid #dfe7e1;border-radius:10px;padding:30px}}h1{{margin:0 0 20px}}label{{display:block;margin:14px 0 6px;font-weight:600}}input{{width:100%;padding:11px;box-sizing:border-box;border:1px solid var(--line);border-radius:6px;font:inherit}}button{{width:100%;margin-top:20px;padding:11px;background:#16231d;color:var(--bg);border:0;border-radius:6px;font:inherit}}a{{color:#237a50}}#message{{color:#b04f43}}</style></head><body><main><section><h1>设置新密码</h1><form id="reset"><label>新密码<input name="password" type="password" minlength="8" required autocomplete="new-password"></label><label>确认密码<input name="confirm_password" type="password" minlength="8" required autocomplete="new-password"></label><p id="message"></p><button>保存新密码</button></form><p><a href="/auth/login/">返回登录</a></p></section></main><script>reset.onsubmit=async e=>{{e.preventDefault();message.textContent='';const d=Object.fromEntries(new FormData(reset));if(d.password!==d.confirm_password){{message.textContent='两次输入的密码不一致';return}}d.token={json.dumps(token)};const r=await fetch('/api/user/reset',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(d)}});const x=await r.json();if(r.ok){{message.style.color='#237a50';message.textContent='密码已更新，请返回登录。';reset.querySelector('button').disabled=true}}else message.textContent=x.error||'重置失败'}};</script></body></html>"""
+__THEME_HEAD__<style>body{{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,sans-serif}}main{{max-width:460px;margin:70px auto;padding:0 20px}}section{{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:30px}}h1{{margin:0 0 20px}}label{{display:block;margin:14px 0 6px;font-weight:600}}input{{width:100%;padding:11px;box-sizing:border-box;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit}}button{{width:100%;margin-top:20px;padding:11px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;font:inherit}}a{{color:var(--accent)}}#message{{color:var(--danger)}}</style></head><body><main><section><h1>设置新密码</h1><form id="reset"><label>新密码<input name="password" type="password" minlength="8" required autocomplete="new-password"></label><label>确认密码<input name="confirm_password" type="password" minlength="8" required autocomplete="new-password"></label><p id="message"></p><button>保存新密码</button></form><p><a href="/auth/login/">返回登录</a></p></section></main><script>reset.onsubmit=async e=>{{e.preventDefault();message.textContent='';const d=Object.fromEntries(new FormData(reset));if(d.password!==d.confirm_password){{message.textContent='两次输入的密码不一致';return}}d.token={json.dumps(token)};const r=await fetch('/api/user/reset',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(d)}});const x=await r.json();if(r.ok){{message.style.color='var(--accent)';message.textContent='密码已更新，请返回登录。';reset.querySelector('button').disabled=true}}else message.textContent=x.error||'重置失败'}};</script></body></html>"""
 
     def account_settings_page(self):
         return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>账户设置 · CS101</title>
-<link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/theme.css"><script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script><style>
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:520px;margin:0 auto;padding:52px 20px}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:24px}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:15px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}.topline{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:22px}h1{font-size:28px;line-height:1.2;margin:0 0 5px}.muted{color:var(--muted);margin:0}.back{color:var(--green);text-decoration:none;font-size:14px}h2{font-size:16px;margin:0 0 14px;padding-top:22px;border-top:1px solid var(--line)}label{display:block;margin:14px 0 6px;font-weight:600}input{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;font:inherit;outline:none}input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-soft)}button{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}.message{min-height:22px;color:var(--red);margin:12px 0 0}.logout{display:block;width:100%;margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;cursor:pointer}@media(max-width:520px){.shell{padding:30px 16px}.panel{padding:24px}}
+__THEME_HEAD__<style>
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:520px;margin:0 auto;padding:52px 20px}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:24px}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:15px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}.topline{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:22px}h1{font-size:28px;line-height:1.2;margin:0 0 5px}.muted{color:var(--muted);margin:0}.back{color:var(--green);text-decoration:none;font-size:14px}h2{font-size:16px;margin:0 0 14px;padding-top:22px;border-top:1px solid var(--line)}label{display:block;margin:14px 0 6px;font-weight:600}input{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;font:inherit;outline:none}input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-soft)}button{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}.message{min-height:22px;color:var(--danger);margin:12px 0 0}.logout{display:block;width:100%;margin-top:12px;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;cursor:pointer}@media(max-width:520px){.shell{padding:30px 16px}.panel{padding:24px}}
 </style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><div class="topline"><div><h1>账户设置</h1><p id="user" class="muted">正在读取账户…</p></div><a class="back" href="/">返回首页</a></div><h2>修改密码</h2><form id="change"><label>当前密码<input name="current_password" type="password" required autocomplete="current-password"></label><label>新密码<input name="new_password" type="password" minlength="8" required autocomplete="new-password"></label><label>确认新密码<input name="confirm_password" type="password" minlength="8" required autocomplete="new-password"></label><p id="message" class="message"></p><button>保存新密码</button></form><button id="logout" class="logout">退出登录</button></section></main><script>
 fetch('/api/me').then(r=>r.json()).then(d=>{if(!d.authenticated)location.href='/auth/login/';else user.textContent='用户名：'+d.user}).catch(()=>location.href='/auth/login/');
-change.onsubmit=async e=>{e.preventDefault();message.textContent='';const d=Object.fromEntries(new FormData(change));if(d.new_password!==d.confirm_password){message.textContent='两次输入的新密码不一致';return}const r=await fetch('/api/user/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});const x=await r.json();if(r.ok){message.style.color='#237a50';message.textContent='密码已更新。';change.reset()}else message.textContent=x.error||'修改失败'};
+change.onsubmit=async e=>{e.preventDefault();message.textContent='';const d=Object.fromEntries(new FormData(change));if(d.new_password!==d.confirm_password){message.textContent='两次输入的新密码不一致';return}const r=await fetch('/api/user/change-password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});const x=await r.json();if(r.ok){message.style.color='var(--accent)';message.textContent='密码已更新。';change.reset()}else message.textContent=x.error||'修改失败'};
 logout.onclick=async()=>{await fetch('/api/logout',{method:'POST'});location.href='/'};
 </script></body></html>"""
 
     def profile_settings_page(self):
         return """<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>个人信息 · CS101</title>
-<link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/theme.css"><script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script><style>
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:520px;margin:0 auto;padding:52px 20px}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:24px}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:15px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}.topline{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:22px}h1{font-size:28px;line-height:1.2;margin:0 0 5px}.muted{color:var(--muted);margin:0}.back{color:var(--green);text-decoration:none;font-size:14px}label{display:block;margin:14px 0 6px;font-weight:600}input{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;outline:none}input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-soft)}input[readonly]{background:var(--panel);color:var(--muted)}button{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}.message{min-height:22px;color:var(--red);margin:12px 0 0}@media(max-width:520px){.shell{padding:30px 16px}.panel{padding:24px}}
+__THEME_HEAD__<style>
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}.shell{max-width:520px;margin:0 auto;padding:52px 20px}.brand{display:flex;align-items:center;gap:10px;color:var(--ink);text-decoration:none;font-weight:750;margin-bottom:24px}.mark{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:var(--ink);color:var(--bg);font-size:15px}.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 18px 45px rgba(34,63,45,.08)}.topline{display:flex;justify-content:space-between;align-items:start;gap:15px;margin-bottom:22px}h1{font-size:28px;line-height:1.2;margin:0 0 5px}.muted{color:var(--muted);margin:0}.back{color:var(--green);text-decoration:none;font-size:14px}label{display:block;margin:14px 0 6px;font-weight:600}input{display:block;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font:inherit;outline:none}input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--accent-soft)}input[readonly]{background:var(--panel);color:var(--muted)}button{width:100%;margin-top:20px;padding:11px 15px;background:var(--ink);color:var(--bg);border:0;border-radius:6px;font:inherit;font-weight:650;cursor:pointer}.message{min-height:22px;color:var(--danger);margin:12px 0 0}@media(max-width:520px){.shell{padding:30px 16px}.panel{padding:24px}}
 </style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><div class="topline"><div><h1>个人信息</h1><p class="muted">设置排名中显示的名字</p></div><a class="back" href="/">返回首页</a></div><form id="profile"><label>用户名<input id="username" readonly></label><label>昵称<input id="nickname" name="nickname" maxlength="32" required autocomplete="nickname"></label><p id="message" class="message"></p><button>保存个人信息</button></form></section></main><script>
 fetch('/api/profile').then(async r=>{if(r.status===401){location.href='/auth/login/';return null}const d=await r.json();if(!r.ok)throw new Error(d.error||'读取失败');return d}).then(d=>{if(d){username.value=d.username;nickname.value=d.nickname}}).catch(e=>message.textContent=e.message);
-profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=await fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nickname:nickname.value})});const d=await r.json();if(r.ok){nickname.value=d.nickname;message.style.color='var(--green)';message.textContent='个人信息已保存。'}else{message.style.color='var(--red)';message.textContent=d.error||'保存失败'}};
+profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=await fetch('/api/profile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({nickname:nickname.value})});const d=await r.json();if(r.ok){nickname.value=d.nickname;message.style.color='var(--green)';message.textContent='个人信息已保存。'}else{message.style.color='var(--danger)';message.textContent=d.error||'保存失败'}};
 </script></body></html>"""
 
     def do_GET(self):
@@ -2295,7 +2309,11 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
         if path in ("/", ""):
             file = ROOT / "index.html"
             if file.is_file():
-                self.send_static(file, "text/html; charset=utf-8"); return
+                # 走 send_html 而不是 send_static：页面里的 `__THEME_HEAD__` 要在这里
+                # 被换掉。首页原来是这条路上唯一一个当静态文件发的 HTML，
+                # 于是占位符原样印在了页面上（`test_every_page_gets_the_theme_boot_injected`
+                # 第一次跑就抓住了这个）。
+                self.send_html(file.read_text(encoding="utf-8")); return
         if decoded_path.startswith("/static/"):
             file = (STATIC_DIR / decoded_path[len("/static/"):]).resolve()
             # resolve() 之后再判包含，符号链接就指不出 static/ 了

@@ -599,6 +599,26 @@ class ServerApiTests(unittest.TestCase):
         import xml.dom.minidom
         xml.dom.minidom.parseString(body)
 
+    def test_every_page_gets_the_theme_boot_injected(self):
+        """占位符必须在发出去之前被换掉。
+
+        主题引导集中到 `THEME_HEAD` 之后，模板里留的是 `__THEME_HEAD__`。
+        哪个页面绕开了 `send_html()`，占位符就会**原样出现在页面上** ——
+        那不只是少了深色，是把一行内部标记印给用户看。
+        """
+        import server
+        for path in ("/", "/problems/", "/history/", "/admin/", "/book/pctbook/",
+                     "/pctbook/E03406/", "/pctbook/E03406/submit/", "/help/",
+                     "/auth/login/", "/register/", "/auth/forgot/", "/auth/reset/?token=x",
+                     "/auth/activate/?token=x"):
+            with self.subTest(page=path):
+                status, _, body = request(self.port, "GET", path)
+                self.assertEqual(status, 200)
+                text = body.decode("utf-8", errors="replace")
+                self.assertNotIn(server.THEME_HEAD_SLOT, text, "占位符没被替换")
+                self.assertIn("localStorage.getItem('cs101-theme')", text, "缺主题引导")
+                self.assertIn('href="/static/theme.css"', text)
+
     def test_mirror_pages_do_not_link_the_upstream_favicon(self):
         _, _, body = request(self.port, "GET", "/pctbook/")
         text = body.decode("utf-8", errors="replace")

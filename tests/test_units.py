@@ -12,10 +12,13 @@ systemd 其实说得很清楚：
 冒烟也全过，唯独那条限制**根本没生效**。不专门去看 journal 就发现不了。
 所以把它变成一条会红的检查。
 """
+import re
+import sys
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 DEPLOY = ROOT / "deploy"
 
 # 只列我们实际用到的键，避免把这份清单变成 systemd 文档的副本。
@@ -124,6 +127,122 @@ class HandbookBuildTests(unittest.TestCase):
             built.write_bytes(before)          # 测试不该改动工作区
             self.fail("dev-handbook.html 与 DEV_HANDBOOK.md 不同步："
                       "请跑 `python3 tools/build_handbook.py` 并提交产物")
+
+
+PAGES = ("index.html", "problems.html", "book.html", "history.html", "admin.html")
+THEME_CSS = ROOT / "static" / "theme.css"
+
+# 颜色字面量。`#f4f7f4` 这类必须落进 theme.css，页面里出现就是一次深色漏色。
+HEX_COLOR = re.compile(r"#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b")
+CSS_VAR_USE = re.compile(r"var\(\s*(--[a-z0-9-]+)")
+CSS_VAR_DEF = re.compile(r"(--[a-z0-9-]+)\s*:")
+STYLE_BLOCK = re.compile(r"<style[^>]*>(.*?)</style>", re.S)
+CSS_COMMENT = re.compile(r"/\*.*?\*/", re.S)
+CLASS_SELECTOR = re.compile(r"\.([a-zA-Z][\w-]*)")
+
+
+def page_sources():
+    """所有会被送给浏览器的页面文本：5 个 `.html` + `server.py` 里的模板。"""
+    for name in PAGES:
+        yield name, (ROOT / name).read_text(encoding="utf-8")
+    yield "server.py", (ROOT / "server.py").read_text(encoding="utf-8")
+
+
+class ThemeConsistencyTests(unittest.TestCase):
+    """页面配色必须全部走 theme.css 的变量。
+
+    这两条判据各自对应一次真实的漏网：
+    ①激活页与重置密码页 link 了 theme.css、也写了 `data-theme`，却又把
+      `#f4f7f4`/`#16231d`/`#fff` 硬编码在自己的 `<style>` 里 —— **深色模式下是白底**。
+    ②`server.py` 里 4 处 `var(--red)`、`history.html` 里 1 处 `var(--bad)` 指向
+      **theme.css 从未定义过的变量**，写了等于没写：错误提示不是红的，
+      WA 徽章的字和正文同色。悬空变量不会报错，只会安静地什么都不做。
+    """
+
+    def test_pages_hold_no_hardcoded_colors(self):
+        for name, text in page_sources():
+            with self.subTest(page=name):
+                found = sorted(set(HEX_COLOR.findall(text)))
+                self.assertEqual([], found, f"{name} 里有硬编码色，应改用 theme.css 的变量")
+
+    def test_pages_only_use_variables_theme_css_defines(self):
+        theme = THEME_CSS.read_text(encoding="utf-8")
+        defined = set(CSS_VAR_DEF.findall(theme))
+        self.assertIn("--danger", defined)          # 判据自身的自检：名单读出来了
+        for name, text in page_sources():
+            with self.subTest(page=name):
+                local = set(CSS_VAR_DEF.findall(text))
+                dangling = sorted(set(CSS_VAR_USE.findall(text)) - defined - local)
+                self.assertEqual([], dangling, f"{name} 用了 theme.css 没定义的变量")
+
+    def test_theme_boot_lives_in_exactly_one_place(self):
+        """主题引导脚本只有 `THEME_HEAD` 一份，页面里只留占位符。
+
+        改动前它在 `server.py` 里逐字复制了 9 份、5 个页面各一份。十几份里挑错
+        的那一份只能靠肉眼 —— 而写错的代价是那个页面在深色下闪一帧白。
+        """
+        import server
+        for name, text in page_sources():
+            with self.subTest(page=name):
+                copies = text.count("localStorage.getItem('cs101-theme')")
+                if name == "server.py":
+                    self.assertEqual(1, copies, "server.py 里应只剩 THEME_HEAD 那一份")
+                else:
+                    self.assertEqual(0, copies, f"{name} 应改用 __THEME_HEAD__ 占位符")
+                self.assertIn(server.THEME_HEAD_SLOT, text, f"{name} 缺主题引导占位符")
+        self.assertIn("data-theme", server.THEME_HEAD.replace("dataset.theme", "data-theme"))
+        self.assertIn('href="/static/theme.css"', server.THEME_HEAD)
+
+
+class PageStructureTests(unittest.TestCase):
+    """页面结构上的几条硬约束。"""
+
+    def test_style_blocks_define_no_dead_classes(self):
+        """CSS 里定义的类，markup 或 JS 里必须真的用得上。
+
+        起因：`index.html` 留着约 1.6KB 的 `.hero`/`.stats` 规则，而对应的
+        markup 早就删了 —— 谁来改这页都得先分辨哪些规则还活着。
+        动态拼出来的类名（``t-${kind}``）按前缀算用过，否则这条判据会误伤高亮器。
+        """
+        for name in PAGES:
+            text = (ROOT / name).read_text(encoding="utf-8")
+            styles = "\n".join(STYLE_BLOCK.findall(text))
+            markup = text.replace(styles, "")
+            dead = []
+            for cls in sorted(set(CLASS_SELECTOR.findall(CSS_COMMENT.sub("", styles)))):
+                if cls in markup:
+                    continue
+                if any(cls[:i] in markup for i in range(2, len(cls)) if cls[i - 1] == "-"):
+                    continue
+                dead.append(cls)
+            with self.subTest(page=name):
+                self.assertEqual([], dead, f"{name} 里这些类没人用了")
+
+    def test_tables_can_scroll_on_narrow_screens(self):
+        """表格要能自己横向滚，否则窄屏上会把整个页面撑宽、顶栏一起跑出视口。"""
+        self.assertIn(".table-wrap", THEME_CSS.read_text(encoding="utf-8"))
+        for name in PAGES:
+            text = (ROOT / name).read_text(encoding="utf-8")
+            segments = text.split("<table")
+            for index, before in enumerate(segments[:-1], start=1):
+                with self.subTest(page=name, table=index):
+                    self.assertIn("table-wrap", before[-200:],
+                                  f"{name} 第 {index} 个表格没放进 .table-wrap")
+
+    def test_theme_css_covers_keyboard_focus_and_reduced_motion(self):
+        """焦点环要覆盖真正能聚焦的那几类控件，而不只是某一个组件。"""
+        theme = THEME_CSS.read_text(encoding="utf-8")
+        self.assertIn("prefers-reduced-motion", theme)
+        for selector in ("a:focus-visible", "button:focus-visible",
+                         "input:focus-visible", "select:focus-visible"):
+            self.assertIn(selector, theme)
+
+    def test_each_page_has_exactly_one_top_level_heading(self):
+        """首页原先只有 h2/h3，没有 h1 —— 读屏和搜索引擎都拿不到页面主标题。"""
+        for name in PAGES:
+            text = (ROOT / name).read_text(encoding="utf-8")
+            with self.subTest(page=name):
+                self.assertEqual(1, len(re.findall(r"<h1[\s>]", text)), f"{name} 的 h1 数量不对")
 
 
 if __name__ == "__main__":

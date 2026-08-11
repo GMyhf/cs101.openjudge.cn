@@ -2,8 +2,7 @@
 <html lang="zh-CN">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" href="/static/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/static/theme.css">
-<script>(function(){try{var t=localStorage.getItem('cs101-theme');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;}catch(e){document.documentElement.dataset.theme='light';}})();</script>
+__THEME_HEAD__
 <title>判题设置 · CS101</title>
 <style>
   * { box-sizing:border-box; }
@@ -19,8 +18,7 @@
   .desc { color:var(--muted); font-size:14px; margin:6px 0 0; }
   .state { display:inline-block; padding:2px 10px; border-radius:999px; font-size:13px; font-weight:600; }
   .on { background:var(--badge-ac-bg); color:var(--ok); } .off { background:var(--badge-info-bg); color:var(--badge-info-fg); }
-  .alarm { background:var(--badge-wa-bg); color:var(--warn); }
-  button { padding:8px 14px; border:1px solid #17221d; border-radius:5px; font:inherit;
+  button { padding:8px 14px; border:1px solid var(--ink); border-radius:5px; font:inherit;
            background:var(--ink); color:var(--bg); cursor:pointer; white-space:nowrap; }
   button.ghost { background:var(--panel); color:var(--ink); }
   button[disabled] { opacity:.5; cursor:default; }
@@ -63,27 +61,27 @@
 
 <h2>按题库覆盖</h2>
 <p class="muted" style="margin:0 0 8px">未设置的题库跟随全局默认。</p>
-<table>
+<div class="table-wrap"><table>
   <thead><tr><th>题库</th><th>可判题数</th><th>策略</th><th>此刻生效</th></tr></thead>
   <tbody id="books"></tbody>
-</table>
+</table></div>
 
 <h2>频次限额</h2>
 <p class="muted" style="margin:0 0 8px">按滑动窗口计数。<b>次数填 0 表示不限</b>——
   考试当天提交会比平时密集得多，撞上限额时可以临时放开，改完立即生效、不用重启。
   运行与提交按<b>用户名</b>计数；注册按<b>来源地址</b>计数；找回密码同时按<b>邮箱</b>和<b>来源地址</b>两个维度计数（共用同一份额度）。未登录端点没有用户名可依据，
   一个班常在同一出口 IP 后面，集中注册时可能撞上，必要时调大或填 0。</p>
-<table>
+<div class="table-wrap"><table>
   <thead><tr><th>端点</th><th>次数</th><th>窗口（秒）</th><th>默认</th><th></th></tr></thead>
   <tbody id="quotas"></tbody>
-</table>
+</table></div>
 <span id="qerr" class="muted"></span>
 
 <h2>考试时段（时段内强制关闭）</h2>
-<table>
+<div class="table-wrap"><table>
   <thead><tr><th>开始</th><th>结束</th><th>备注</th><th></th></tr></thead>
   <tbody id="windows"></tbody>
-</table>
+</table></div>
 <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; align-items:center">
   <input type="datetime-local" id="ws"><span class="muted">至</span><input type="datetime-local" id="we">
   <input type="text" id="wn" placeholder="备注，如 期末考" maxlength="60">
