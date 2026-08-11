@@ -1359,12 +1359,14 @@ process.exit(restored && loginOk && draftOk && values.size === 0 ? 0 : 1);
     def test_submit_page_highlighter_runs(self):
         """在 node 里真跑一遍页面发出的高亮函数。
 
-        光看 `--check` 语法是不够的：`SUBMIT_PAGE` 若不是 raw 字符串，
-        JS 里的 `\\\\b` 会被 Python 吃成退格符，关键字正则**静默失效**——
-        页面照样能加载、语法照样合法，只是高亮不对。只有真跑才看得出来。
+        光看 `--check` 语法是不够的：高亮器的关键字正则里有 `\\b`，
+        这个页面还是 `server.py` 里的字符串常量时，少一个 `r` 前缀就会被 Python
+        吃成退格符、正则**静默失效**——页面照样能加载、语法照样合法，只是高亮不对。
+        搬进 `submit.html` 之后没有 Python 转义这一层了，但「只有真跑才看得出来」
+        对正则本身依然成立。
         """
         import server
-        page = server.SUBMIT_PAGE
+        page = server.submit_page_template()
         script = page[page.index("<script>") + 8: page.rindex("</script>")]
         core = script[script.index("const PY_KW"): script.index("function paintEditor")]
         harness = (
@@ -1414,7 +1416,7 @@ process.exit(restored && loginOk && draftOk && values.size === 0 ? 0 : 1);
 
     def test_submit_history_opens_selected_submission_in_the_right_panel(self):
         import server
-        page = server.SUBMIT_PAGE
+        page = server.submit_page_template()
         self.assertIn('id="historyDetail"', page)
         self.assertIn("pane-col.history-view", page)
         self.assertIn("function submissionDetail(row)", page)
@@ -1435,7 +1437,7 @@ process.exit(restored && loginOk && draftOk && values.size === 0 ? 0 : 1);
         漏掉 pypy3 就会按 C 系规则去看行尾的 `{`，冒号后不再缩进。
         """
         import server
-        page = server.SUBMIT_PAGE
+        page = server.submit_page_template()
         script = page[page.index("<script>") + 8: page.rindex("</script>")]
         core = script[script.index("const PY_KW"): script.index("function paintEditor")]
         harness = (

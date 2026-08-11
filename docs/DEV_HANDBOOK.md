@@ -79,8 +79,8 @@
 | 层 | 技术 | 关键文件 |
 | --- | --- | --- |
 | HTTP 服务 | Python 标准库 `ThreadingHTTPServer` | `server.py · Server` |
-| 页面 | 服务端拼字符串，零框架、零构建 | `server.py · SUBMIT_PAGE` |
-| 前端交互 | 手写语法高亮/括号匹配/拖拽，零依赖 | `SUBMIT_PAGE` 内联 `<script>` |
+| 页面 | 服务端填模板，零框架、零构建 | `submit.html` + `server.py · submission_page` |
+| 前端交互 | 手写语法高亮/括号匹配/拖拽，零依赖 | `submit.html` 内联 `<script>` |
 | 沙箱 | `subprocess` + `resource.setrlimit` | `judge.py · _limits / _run` |
 | 持久化 | SQLite（标准库 `sqlite3`） | `server.py`（参数化查询） |
 | 备份 | SQLite 在线备份 API + 异地校验 | `tools/backup_db.py` |
@@ -181,7 +181,7 @@ Python3 ×10    PyPy3 ×3    C/C++/Swift/ObjC ×1    C#/F#/VB.NET ×2
 
 ### 3.1 一次扫描，三种用途
 
-**锚点**：`server.py · SUBMIT_PAGE` 内 `function scan`（模板内约第 345 行）
+**锚点**：`submit.html · function scan`（约第 404 行）
 
 网页编辑器的语法高亮、括号匹配、自动缩进**共用同一次词法扫描**。
 为什么不各扫一遍？因为它们必须看到**同一份切分**：
@@ -199,7 +199,7 @@ Python3 ×10    PyPy3 ×3    C/C++/Swift/ObjC ×1    C#/F#/VB.NET ×2
 
 ### 3.2 括号匹配：不用栈也能做
 
-**锚点**：`SUBMIT_PAGE · function bracketMatch`（模板内约第 370 行）
+**锚点**：`submit.html · function bracketMatch`（约第 429 行）
 
 教科书解法是压栈。这里因为只需要**匹配光标处那一个括号**，用的是深度计数：
 
@@ -816,7 +816,7 @@ cs101.service:10: Unknown key name 'LimitNOFILE' in section 'Unit', ignoring.
 
 ### 10.2 数据结构与算法
 
-3. **实现一个词法高亮器**：参照 `SUBMIT_PAGE · scan`，为一门新语言（如 Java）加高亮规则。
+3. **实现一个词法高亮器**：参照 `submit.html · scan`，为一门新语言（如 Java）加高亮规则。
 4. **括号匹配两种解法**：分别用栈和深度计数实现，比较空间复杂度与适用场景。
 5. **滑动窗口限频器**：实现并用单元测试证明「窗口真的会滑动」——
    这一条比想象中难，见 §3.3 的真实教训。

@@ -129,7 +129,8 @@ class HandbookBuildTests(unittest.TestCase):
                       "请跑 `python3 tools/build_handbook.py` 并提交产物")
 
 
-PAGES = ("index.html", "problems.html", "book.html", "history.html", "admin.html")
+PAGES = ("index.html", "problems.html", "book.html", "history.html", "admin.html",
+         "submit.html")
 THEME_CSS = ROOT / "static" / "theme.css"
 
 # 颜色字面量。`#f4f7f4` 这类必须落进 theme.css，页面里出现就是一次深色漏色。
@@ -192,6 +193,67 @@ class ThemeConsistencyTests(unittest.TestCase):
                 self.assertIn(server.THEME_HEAD_SLOT, text, f"{name} 缺主题引导占位符")
         self.assertIn("data-theme", server.THEME_HEAD.replace("dataset.theme", "data-theme"))
         self.assertIn('href="/static/theme.css"', server.THEME_HEAD)
+
+
+class SubmitTemplateTests(unittest.TestCase):
+    """提交页是独立文件，不是 `server.py` 里的字符串。
+
+    它曾是一段 800 行的常量，占了 `server.py` 的三分之一。搬出来之后要保证
+    两件事：`server.py` 里不再长回一份，以及模板里的占位符和渲染处一一对应 ——
+    少替换一个，用户看到的就是 `__PROBLEM__` 这种内部标记。
+    """
+
+    PLACEHOLDERS = ("__BOOK__", "__BOOK_NAME__", "__PROBLEM__", "__LANGUAGE_OPTIONS__",
+                    "__STATEMENT_TITLE__", "__STATEMENT_PARAMS__", "__SAMPLE_JSON__",
+                    "__STATEMENT_CONTENT__", "__THEME_HEAD__")
+
+    def test_template_lives_on_disk(self):
+        """整页工作台不得再回到 `server.py` 里。
+
+        判据是「最长的字符串字面量有多少行」，不是「有没有 `<!doctype`」——
+        登录、找回密码这类小页面仍然内联（各一行），把它们一并禁掉是过度约束。
+        真正要防的是又长出一段几百行的页面常量：当前最长 16 行，留到 100。
+        """
+        import ast
+        import server
+        self.assertTrue(server.SUBMIT_TEMPLATE.is_file())
+        self.assertNotIn("workspace-layout", (ROOT / "server.py").read_text(encoding="utf-8"),
+                         "提交页的 markup 应该只在 submit.html 里")
+        tree = ast.parse((ROOT / "server.py").read_text(encoding="utf-8"))
+        longest = 0
+        for node in ast.walk(tree):
+            if isinstance(node, ast.JoinedStr) or (
+                    isinstance(node, ast.Constant) and isinstance(node.value, str)):
+                longest = max(longest, node.end_lineno - node.lineno + 1)
+        self.assertLess(longest, 100, f"server.py 里有 {longest} 行的字符串字面量")
+
+    def test_every_placeholder_is_filled_in(self):
+        """模板里出现的占位符，渲染代码里必须都有对应的 replace。"""
+        import re as _re
+        import server
+        template = server.submit_page_template()
+        source = (ROOT / "server.py").read_text(encoding="utf-8")
+        rendered = source[source.index("def submission_page"):]
+        rendered = rendered[:rendered.index("\n    def ", 1)]
+        for slot in _re.findall(r"__[A-Z_]+__", template):
+            with self.subTest(slot=slot):
+                filled = slot in rendered or slot == server.THEME_HEAD_SLOT
+                self.assertTrue(filled, f"{slot} 在模板里出现，却没人替换它")
+        for slot in self.PLACEHOLDERS:
+            self.assertIn(slot, template, f"{slot} 的占位符从模板里消失了")
+
+    def test_template_is_reread_when_it_changes(self):
+        """按 mtime 失效：改完页面不用重启服务。"""
+        import server
+        first = server.submit_page_template()
+        self.assertIs(first, server.submit_page_template())      # 没变就不重读
+        original = server.SUBMIT_TEMPLATE.read_bytes()
+        try:
+            server.SUBMIT_TEMPLATE.write_bytes(original + b"\n<!-- probe -->")
+            self.assertIn("<!-- probe -->", server.submit_page_template())
+        finally:
+            server.SUBMIT_TEMPLATE.write_bytes(original)
+        self.assertNotIn("<!-- probe -->", server.submit_page_template())
 
 
 class PageStructureTests(unittest.TestCase):

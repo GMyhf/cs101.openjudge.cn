@@ -1,0 +1,806 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__PROBLEM__ 提交代码 · CS101</title>
+__THEME_HEAD__
+<style>
+ /* 全屏工作台：页面本身永不滚动，滚动只发生在 .pane-body 里。
+    每一层 flex/grid 子项都要 min-height:0，少一处内容就会把面板撑破。 */
+ html,body{height:100%}
+ body.app{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+ .crumb{display:flex;align-items:baseline;gap:8px;min-width:0;color:var(--muted);font-size:13px}
+ .crumb-id{font:700 13px var(--font-mono);color:var(--accent)}
+ .crumb-title{color:var(--ink);font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .auth-chip{font-size:13px;white-space:nowrap}
+ .theme-toggle{padding:5px 10px;font-size:13px}
+
+ .workspace-layout{flex:1;min-height:0;display:grid;
+   grid-template-columns:minmax(320px,1fr) 10px minmax(420px,1.1fr);padding:var(--pane-gap)}
+ .pane-col{display:grid;grid-template-rows:minmax(140px,1fr) 10px minmax(96px,220px) auto;
+   min-height:0;min-width:0}
+
+ /* ---- 题面 ---- */
+ .statement-panel h1{font-size:21px;line-height:1.3;margin:0 0 14px}
+ .statement-panel .problem-params{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 4px;
+   margin:0 0 20px;padding:9px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);
+   background:var(--soft);font-size:12.5px;color:var(--muted)}
+ .statement-panel .problem-params dt{font-weight:600}
+ .statement-panel .problem-params dd{margin:0 16px 0 0;color:var(--ink);font-variant-numeric:tabular-nums}
+ .statement-panel .problem-content{display:block;margin:0}
+ .statement-panel .problem-content dt{font-size:15px;font-weight:700;margin:22px 0 8px;
+   padding-bottom:5px;border-bottom:1px solid var(--line)}
+ .statement-panel .problem-content dt:first-child{margin-top:0}
+ .statement-panel .problem-content dd{margin:0}
+ .statement-panel .problem-content img{max-width:100%;height:auto}
+ .statement-panel .problem-content pre{overflow:auto;margin:9px 0;padding:12px 14px;
+   border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--soft);
+   font:12.5px/1.6 var(--font-mono)}
+
+ /* ---- 编辑器 ---- */
+ /* 透明 textarea 叠在高亮层上。两层的字体/行高/padding 必须逐项一致，
+    差一点点光标就会和文字错位；字号由 --code-size 同时驱动两层。 */
+ .editor{flex:1;min-height:0;display:flex;overflow:hidden;background:var(--panel)}
+ .gutter{flex:0 0 auto;padding:12px 8px 12px 12px;text-align:right;color:var(--gutter-fg);
+   background:var(--gutter-bg);border-right:1px solid var(--line);user-select:none;
+   white-space:pre;overflow:hidden}
+ .codewrap{position:relative;flex:1;min-width:0}
+ .gutter,.codewrap pre,.codewrap textarea{font:var(--code-size)/1.5 var(--font-mono);tab-size:4}
+ .codewrap pre,.codewrap textarea{margin:0;padding:12px;border:0;white-space:pre;overflow:auto;
+   width:100%;height:100%;min-height:0}
+ .codewrap pre{position:absolute;inset:0;pointer-events:none;color:var(--ink);background:transparent}
+ .codewrap textarea{position:relative;background:transparent;color:transparent;caret-color:var(--ink);
+   resize:none;outline:none}
+ .t-com{color:var(--tok-com);font-style:italic}
+ .t-str{color:var(--tok-str)}
+ .t-num{color:var(--tok-num)}
+ .t-kw{color:var(--tok-kw);font-weight:600}
+ .t-pre{color:var(--tok-pre)}
+ .t-match{background:var(--tok-match-bg);border-radius:2px;box-shadow:0 0 0 1px var(--tok-match-ring)}
+ .pane-editor select{min-width:186px;padding:5px 9px;font-size:13px}
+ .pane-editor .pane-tools button{padding:5px 9px;font-size:12px}
+
+ /* ---- 判题结果 ---- */
+ .verdict-head{display:flex;align-items:center;gap:11px;flex-wrap:wrap}
+ .verdict-title{font-size:18px;font-weight:700;margin:0}
+ .metrics{display:flex;flex-wrap:wrap;gap:8px;margin-top:13px}
+ .snip{margin-top:13px}
+ .snip-h{color:var(--muted);font-size:12.5px;margin-bottom:4px}
+ .editor-state{font-size:12.5px;color:var(--muted)}
+ .placeholder{color:var(--muted);font-size:13.5px}
+
+ /* ---- 样例 ---- */
+ .sample-tabs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+ .sample-pick{cursor:pointer;font:inherit;font-size:12px}
+ .sample-pick.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+ .sample-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+ .sample-h{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);margin-bottom:5px}
+ .sample-box{margin:0;height:148px;overflow:auto;padding:10px;border:1px solid var(--line);
+   border-radius:var(--radius-sm);background:var(--soft);font:12.5px/1.55 var(--font-mono);
+   white-space:pre;width:100%;color:var(--ink)}
+ textarea.sample-box{resize:none;outline:none}
+ textarea.sample-box:focus{border-color:var(--accent)}
+
+ /* ---- 底部动作条 ---- */
+ .action-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 2px 0}
+ .action-buttons{display:flex;gap:10px}
+
+ /* ---- 提交记录 ---- */
+ .history-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+ .history-heading h2{font-size:16px;margin:0}
+ .history-heading button{padding:5px 10px;font-size:12.5px}
+ .pane-col.history-view{display:block}
+ .pane-col.history-view>:not(.history-detail){display:none}
+ .history-detail{height:100%;min-height:0;display:flex;flex-direction:column}
+ .history-detail[hidden]{display:none}
+ .history-detail .pane-body{flex:1;min-height:0}
+ .submission-list{display:grid;gap:6px}
+ .submission-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px 11px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel);color:var(--ink);text-align:left;font:inherit;cursor:pointer}
+ .submission-row:hover,.submission-row:focus-visible,.submission-row.on{border-color:var(--accent);background:var(--accent-soft)}
+ .submission-row-main{display:flex;align-items:center;gap:8px;min-width:0}
+ .submission-row-meta{color:var(--muted);font:12px var(--font-ui);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .submission-detail-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+ .submission-detail-head h2{font-size:18px;margin:0}
+ .submission-source-wrap{position:relative;display:flex;flex:1;min-height:0}
+ .submission-source{margin:0;flex:1;min-height:0;overflow:auto;padding:13px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--soft);font:var(--code-size)/1.55 var(--font-mono);white-space:pre}
+ .submission-source code{font:inherit}
+ .source-copy{position:absolute;top:8px;right:8px;width:28px;height:28px;padding:0;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--muted);cursor:pointer}
+ .source-copy::before,.source-copy::after{content:'';position:absolute;width:9px;height:11px;border:1.5px solid currentColor;border-radius:1px}
+ .source-copy::before{top:7px;left:9px}.source-copy::after{top:5px;left:7px;background:var(--panel)}
+ .source-copy:hover,.source-copy:focus-visible,.source-copy.copied{border-color:var(--accent);color:var(--accent)}
+ .source-copy-tip{position:absolute;top:42px;right:8px;z-index:1;padding:4px 7px;border-radius:4px;background:var(--ink);color:var(--bg);font:12px var(--font-ui);white-space:nowrap;opacity:0;transform:translateY(-3px);pointer-events:none;transition:opacity .12s,transform .12s}
+ .source-copy:hover+.source-copy-tip,.source-copy:focus-visible+.source-copy-tip,.source-copy.show-tip+.source-copy-tip{opacity:1;transform:translateY(0)}
+ .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px}
+ .stat-card{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--soft);padding:12px 14px}
+ .stat-card b{display:block;font-size:22px;line-height:1.15;font-variant-numeric:tabular-nums}
+ .stat-card span{color:var(--muted);font-size:12px}
+
+ @media(max-width:900px){
+   body.app{height:auto;overflow:auto}
+   .workspace-layout{grid-template-columns:1fr;gap:var(--pane-gap)}
+   .splitter{display:none}
+   .pane-col{grid-template-rows:none;gap:var(--pane-gap);order:1}
+   .pane-left{order:2}
+   .editor{flex:none;height:56vh}
+   .pane-body{max-height:72vh}
+   .crumb{display:none}
+   .sample-grid{grid-template-columns:1fr}
+ }
+</style>
+<body class="app">
+<header class="topbar">
+  <a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a>
+  <div class="crumb"><span class="crumb-id">__PROBLEM__</span><span>·</span><span class="crumb-title">__BOOK_NAME__</span></div>
+  <nav class="topnav">
+    <a href="/problems/">题库目录</a>
+    <a href="/history/">提交记录</a>
+    <a href="/help/">说明</a>
+    <button id="theme" type="button" class="ghost theme-toggle">深色</button>
+    <span id="auth" class="auth-chip muted">正在检查登录状态…</span>
+  </nav>
+</header>
+<main class="workspace-layout" id="workspace">
+  <section class="pane pane-left">
+    <nav class="pane-tabs" role="tablist">
+      <button class="pane-tab" type="button" role="tab" aria-selected="true" data-panel="paneStatement">题目描述</button>
+      <button class="pane-tab" type="button" role="tab" aria-selected="false" data-panel="paneHistory">提交记录</button>
+      <button class="pane-tab" type="button" role="tab" aria-selected="false" data-panel="paneStats">统计</button>
+      <span class="pane-tools"><button id="copyStatement" class="ghost" type="button">复制 Markdown</button></span>
+    </nav>
+    <div class="pane-body statement-panel" id="paneStatement" role="tabpanel">
+      <h1>__STATEMENT_TITLE__</h1>
+      <dl class="problem-params">__STATEMENT_PARAMS__</dl>
+      <dl class="problem-content">__STATEMENT_CONTENT__</dl>
+    </div>
+    <div class="pane-body" id="paneHistory" role="tabpanel" hidden>
+      <div class="history-heading"><h2>我的提交记录</h2><button id="historyToggle" class="ghost" type="button">看全部</button></div>
+      <div id="histbox" class="muted">…</div>
+    </div>
+    <div class="pane-body" id="paneStats" role="tabpanel" hidden>
+      <div id="statsbox" class="muted">…</div>
+    </div>
+  </section>
+  <div class="splitter splitter-v" id="splitter" role="separator" aria-orientation="vertical" aria-label="调整题面和编辑器宽度" tabindex="0"></div>
+  <form id="form" class="pane-col">
+    <section class="pane pane-editor">
+      <div class="pane-tabs">
+        <span class="pane-tab" aria-selected="true">代码</span>
+        <span class="pane-tools">
+          <select name="language" aria-label="选择语言">
+            __LANGUAGE_OPTIONS__
+          </select>
+          <button id="fontDown" class="ghost" type="button" title="缩小字号">A-</button>
+          <button id="fontUp" class="ghost" type="button" title="放大字号">A+</button>
+          <button id="resetCode" class="ghost" type="button" title="清空代码">清空</button>
+        </span>
+      </div>
+      <div class="editor">
+        <div class="gutter" id="gutter">1</div>
+        <div class="codewrap">
+          <pre id="hl" aria-hidden="true"></pre>
+          <textarea name="source" id="src" placeholder="在这里粘贴代码" spellcheck="false"
+                    autocomplete="off" autocapitalize="off"></textarea>
+        </div>
+      </div>
+    </section>
+    <div class="splitter splitter-h" id="splitterH" role="separator" aria-orientation="horizontal" aria-label="调整编辑器和结果高度" tabindex="0"></div>
+    <section class="pane pane-result">
+      <nav class="pane-tabs" role="tablist">
+        <button class="pane-tab" type="button" role="tab" aria-selected="true" data-panel="verdict">判题结果</button>
+        <button class="pane-tab" type="button" role="tab" aria-selected="false" data-panel="samples">样例</button>
+        <span class="pane-tools"><span class="editor-state">准备提交</span></span>
+      </nav>
+      <!-- aria-live：判题结果是异步替换进来的，屏幕阅读器不会自己发现。
+           polite 表示读完当前内容再播报，不打断用户正在听的东西。 -->
+      <div class="pane-body" id="verdict" role="tabpanel" aria-live="polite"><div class="placeholder">提交后在这里显示判题结果。</div></div>
+      <div class="pane-body" id="samples" role="tabpanel" hidden>
+        <div class="sample-tabs" id="sampleTabs" hidden></div>
+        <div class="sample-grid">
+          <div><div class="sample-h">输入<span class="muted">（可改）</span></div><textarea id="sampleIn" class="sample-box" spellcheck="false" autocomplete="off"></textarea></div>
+          <div><div class="sample-h">预期输出</div><pre id="sampleExp" class="sample-box"></pre></div>
+          <div><div class="sample-h">实际输出<span id="sampleVerdict" aria-live="polite"></span></div><pre id="sampleGot" class="sample-box muted">点「运行样例」后显示。</pre></div>
+        </div>
+      </div>
+    </section>
+    <div class="action-bar">
+      <span class="editor-state" id="runState"></span>
+      <span class="action-buttons">
+        <button id="run" type="button" class="ghost">运行样例</button>
+        <button id="go" type="submit" class="primary">提交并判题</button>
+      </span>
+    </div>
+    <section class="pane history-detail" id="historyDetail" hidden>
+      <div class="pane-tabs"><span class="pane-tab" aria-selected="true">提交详情</span><span class="pane-tools"><button id="historyBack" class="ghost" type="button">返回编辑器</button></span></div>
+      <div class="pane-body" id="historyDetailBody"><p class="placeholder">从左侧选择一次提交以查看详情。</p></div>
+    </section>
+  </form>
+</main>
+<script>
+const BOOK = "__BOOK__", PROBLEM = "__PROBLEM__";
+const SAMPLES = __SAMPLE_JSON__;
+const CLS = { "Accepted": "b-ac", "Wrong Answer": "b-wa" };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const DRAFT_KEY = "cs101-submit-draft:" + BOOK + ":" + PROBLEM;
+const LOGIN_URL = "/auth/login/?next="
+  + encodeURIComponent(location.pathname + location.search + location.hash);
+function saveDraft() {
+  try {
+    sessionStorage.setItem(DRAFT_KEY, JSON.stringify({ source: src.value, language: form.language.value }));
+  } catch (err) { /* 隐私模式或存储已满时仍允许正常提交 */ }
+}
+function restoreDraft() {
+  try {
+    const draft = JSON.parse(sessionStorage.getItem(DRAFT_KEY) || "null");
+    if (!draft || typeof draft.source !== "string") return false;
+    src.value = draft.source;
+    if (typeof draft.language === "string"
+        && Array.from(form.language.options).some(option => option.value === draft.language)) {
+      form.language.value = draft.language;
+    }
+    return true;
+  } catch (err) { return false; }
+}
+function clearDraft() {
+  try { sessionStorage.removeItem(DRAFT_KEY); } catch (err) {}
+}
+
+// ---- 面板拖拽 ----------------------------------------------------------
+// 横竖两条共用一套逻辑：差别只在读哪个坐标、写哪个 grid 轴。
+// 位置只存在本浏览器，存的是比例而不是像素，换个窗口大小才不会跑偏。
+function makeSplitter(bar, opts) {
+  const apply = value => {
+    const span = opts.span();
+    const size = Math.max(opts.min, Math.min(span - opts.minOther, value));
+    opts.write(size);
+    try { localStorage.setItem(opts.key, String(size / span)); } catch (err) {}
+    return size;
+  };
+  bar.addEventListener('pointerdown', e => {
+    bar.classList.add('dragging'); bar.setPointerCapture(e.pointerId); apply(opts.read(e));
+  });
+  bar.addEventListener('pointermove', e => { if (bar.hasPointerCapture(e.pointerId)) apply(opts.read(e)); });
+  bar.addEventListener('pointerup', e => { bar.releasePointerCapture(e.pointerId); bar.classList.remove('dragging'); });
+  // 元素本来就有 role="separator" 和 tabindex="0"，却一直没有键盘处理 —— 补上
+  bar.addEventListener('keydown', e => {
+    const step = { ArrowLeft: -16, ArrowRight: 16, ArrowUp: -16, ArrowDown: 16 }[e.key];
+    if (step === undefined && e.key !== 'Home') return;
+    e.preventDefault();
+    apply(e.key === 'Home' ? opts.span() * opts.home : opts.current() + step);
+  });
+  const saved = (() => { try { return Number(localStorage.getItem(opts.key)); } catch (err) { return NaN; } })();
+  requestAnimationFrame(() => apply(opts.span() * (saved > 0 && saved < 1 ? saved : opts.home)));
+}
+
+const workspace = document.querySelector('#workspace');
+const paneCol = document.querySelector('#form');
+const historyDetail = document.querySelector('#historyDetail');
+const historyDetailBody = document.querySelector('#historyDetailBody');
+const actionBar = document.querySelector('.action-bar');
+makeSplitter(document.querySelector('#splitter'), {
+  key: 'cs101-split-ratio', home: 0.44, min: 320, minOther: 430,
+  span: () => workspace.clientWidth,
+  read: e => e.clientX - workspace.getBoundingClientRect().left,
+  current: () => document.querySelector('.pane-left').getBoundingClientRect().width,
+  write: size => { workspace.style.gridTemplateColumns = size + 'px 10px minmax(0,1fr)'; },
+});
+makeSplitter(document.querySelector('#splitterH'), {
+  key: 'cs101-split-v', home: 0.3, min: 96, minOther: 190,
+  span: () => paneCol.clientHeight - actionBar.offsetHeight,
+  read: e => paneCol.getBoundingClientRect().bottom - actionBar.offsetHeight - e.clientY,
+  current: () => document.querySelector('.pane-result').getBoundingClientRect().height,
+  write: size => { paneCol.style.gridTemplateRows = 'minmax(0,1fr) 10px ' + size + 'px auto'; },
+});
+
+// ---- 标签页 ------------------------------------------------------------
+for (const group of document.querySelectorAll('.pane-tabs[role="tablist"]')) {
+  const tabs = group.querySelectorAll('.pane-tab[data-panel]');
+  for (const tab of tabs) tab.addEventListener('click', () => {
+    for (const other of tabs) {
+      const on = other === tab;
+      other.setAttribute('aria-selected', String(on));
+      document.querySelector('#' + other.dataset.panel).hidden = !on;
+    }
+    showHistoryWorkspace(tab.dataset.panel === 'paneHistory');
+    if (tab.dataset.panel === 'paneStats') loadStats();
+  });
+}
+function showTab(panel) {
+  const tab = document.querySelector('.pane-tab[data-panel="' + panel + '"]');
+  if (tab) tab.click();
+}
+
+function showHistoryWorkspace(on) {
+  paneCol.classList.toggle('history-view', on);
+  historyDetail.hidden = !on;
+}
+
+function markdownInline(node) {
+  if (node.nodeType === Node.TEXT_NODE) return node.nodeValue.replace(/[ \t]+/g, ' ');
+  if (node.nodeType !== Node.ELEMENT_NODE) return '';
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'br') return '\n';
+  if (tag === 'pre') return '\n```\n' + node.innerText.trimEnd() + '\n```\n';
+  const inner = Array.from(node.childNodes).map(markdownInline).join('');
+  if (tag === 'strong' || tag === 'b') return '**' + inner.trim() + '**';
+  if (tag === 'em' || tag === 'i') return '*' + inner.trim() + '*';
+  if (tag === 'code') return '`' + inner.trim() + '`';
+  if (tag === 'a') return '[' + inner.trim() + '](' + node.getAttribute('href') + ')';
+  return inner;
+}
+function statementMarkdown() {
+  const root = document.querySelector('.statement-panel');
+  const title = root.querySelector('h2').innerText.trim();
+  const params = [];
+  const paramNodes = root.querySelector('.problem-params');
+  if (paramNodes) {
+    const children = Array.from(paramNodes.children);
+    for (let i = 0; i < children.length; i += 2) {
+      if (children[i + 1]) params.push('- **' + children[i].innerText.trim() + '** ' + children[i + 1].innerText.trim());
+    }
+  }
+  const sections = [];
+  const content = root.querySelector('.problem-content');
+  for (const node of content.children) {
+    if (node.tagName.toLowerCase() === 'dt') sections.push('## ' + node.innerText.trim());
+    if (node.tagName.toLowerCase() === 'dd') {
+      const value = markdownInline(node).replace(/\n{3,}/g, '\n\n').trim();
+      if (value) sections.push(value);
+    }
+  }
+  return ['# ' + title, params.join('\n'), sections.join('\n\n')].filter(Boolean).join('\n\n') + '\n';
+}
+copyStatement.addEventListener('click', async () => {
+  const text = statementMarkdown();
+  try {
+    if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(text);
+    else { const box = document.createElement('textarea'); box.value = text; box.style.position = 'fixed'; box.style.opacity = '0'; document.body.appendChild(box); box.select(); document.execCommand('copy'); box.remove(); }
+    copyStatement.textContent = '已复制';
+    setTimeout(() => { copyStatement.textContent = '复制 Markdown'; }, 1400);
+  } catch (err) { copyStatement.textContent = '复制失败'; }
+});
+
+fetch("/api/me", { credentials: "same-origin" }).then(r => r.json()).then(me => {
+  auth.innerHTML = me.authenticated
+    ? '已登录：<b>' + esc(me.user) + '</b>'
+    : '<a href="' + LOGIN_URL + '">请先登录后提交</a>';
+  loadHistory();
+});
+// ---- 语法高亮 / 括号匹配 / 自动缩进 -------------------------------------
+// 不引外部库。三件事共用同一次扫描：高亮要知道 token 边界，括号匹配要跳过
+// 字符串和注释里的括号，缺了这层共享就会把 "(" 里的括号也配上。
+const PY_KW = "False|None|True|and|as|assert|async|await|break|class|continue|def|del|elif|else|"
+            + "except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|"
+            + "return|try|while|with|yield";
+const C_KW  = "auto|bool|break|case|char|class|const|constexpr|continue|default|delete|do|double|"
+            + "else|enum|extern|false|float|for|goto|if|inline|int|long|namespace|new|nullptr|"
+            + "operator|private|protected|public|return|short|signed|sizeof|static|struct|switch|"
+            + "template|this|throw|true|try|typedef|typename|union|unsigned|using|virtual|void|"
+            + "volatile|while";
+const NUM = /\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b/y;
+const SPECS = {
+  python: [
+    ["com", /#[^\n]*/y],
+    ["str", /(["]{3}|''')[\s\S]*?\1|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'/y],
+    ["num", NUM],
+    ["kw", new RegExp("\\b(?:" + PY_KW + ")\\b", "y")],
+  ],
+  c: [
+    ["com", /\/\/[^\n]*|\/\*[\s\S]*?\*\//y],
+    ["pre", /#[a-z]+/y],
+    ["str", /"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'/y],
+    ["num", NUM],
+    ["kw", new RegExp("\\b(?:" + C_KW + ")\\b", "y")],
+  ],
+};
+SPECS.cpp = SPECS.c;
+SPECS.pypy3 = SPECS.python;      // PyPy3 就是 Python 语法，高亮与缩进规则共用一套
+SPECS.vbnet = [
+  ["com", /'[^\n]*/y],
+  ["str", /"(?:""|[^"\n])*"/y],
+  ["num", NUM],
+  ["kw", /\b(?:And|As|Boolean|ByRef|ByVal|Case|Class|Const|Continue|Dim|Do|Double|Each|Else|ElseIf|End|Exit|False|For|Function|If|In|Integer|Is|Loop|Module|New|Next|Not|Nothing|Or|Private|Public|Return|Select|Shared|Single|String|Sub|Then|To|True|Until|While)\b/iy],
+];
+for (const language of ["csharp", "fsharp", "swift", "objc"]) SPECS[language] = SPECS.c;
+
+// 一次扫描出所有 token 区间；高亮和括号匹配都基于它，保证两者看到的是同一份切分。
+function scan(code, lang) {
+  const specs = SPECS[lang] || SPECS.python;
+  const tokens = [];
+  let i = 0;
+  while (i < code.length) {
+    let hit = null;
+    for (const spec of specs) {
+      spec[1].lastIndex = i;
+      const m = spec[1].exec(code);
+      if (m && m.index === i && m[0]) { hit = [spec[0], m[0]]; break; }
+    }
+    if (hit) { tokens.push([hit[0], i, i + hit[1].length]); i += hit[1].length; }
+    else i++;
+  }
+  return tokens;
+}
+
+function inToken(tokens, pos) {
+  for (const t of tokens) if (pos >= t[1] && pos < t[2]) return true;
+  return false;
+}
+
+const OPEN = "([{", CLOSE = ")]}";
+
+// 光标处（或其左侧）若是括号，返回它与配对括号的下标。字符串/注释里的括号一律不参与。
+function bracketMatch(code, pos, lang) {
+  const tokens = scan(code, lang);
+  for (const at of [pos, pos - 1]) {
+    if (at < 0 || at >= code.length) continue;
+    const ch = code[at];
+    if (inToken(tokens, at)) continue;
+    const o = OPEN.indexOf(ch), c = CLOSE.indexOf(ch);
+    if (o < 0 && c < 0) continue;
+    const step = o >= 0 ? 1 : -1;
+    const want = o >= 0 ? CLOSE[o] : OPEN[c];
+    let depth = 0;
+    for (let k = at; k >= 0 && k < code.length; k += step) {
+      if (inToken(tokens, k)) continue;
+      if (code[k] === ch) depth++;
+      else if (code[k] === want) { depth--; if (!depth) return [at, k].sort((x, y) => x - y); }
+    }
+    return null;                      // 有括号但没配上：不标，也不去标别的
+  }
+  return null;
+}
+
+// 回车后应插入的缩进：沿用本行缩进；python 行尾是 ":" 或 c 系行尾是 "{" 则多缩一级。
+function indentFor(code, pos, lang) {
+  const lineStart = code.lastIndexOf("\n", pos - 1) + 1;
+  const line = code.slice(lineStart, pos);
+  const base = (line.match(/^[ \t]*/) || [""])[0];
+  const trimmed = line.replace(/\s+$/, "");
+  const opens = (lang === "python" || lang === "pypy3") ? trimmed.endsWith(":") : trimmed.endsWith("{");
+  return base + (opens ? "    " : "");
+}
+
+// ---- 括号/引号自动补全 --------------------------------------------------
+// 纯函数：给定当前文本、选区和按下的键，返回要做的编辑，或 null 表示走浏览器默认行为。
+// 返回 {from, to, insert, caret}，caret 是应用后的绝对光标位置。
+const PAIRS = { "(": ")", "[": "]", "{": "}", '"': '"', "'": "'" };
+const CLOSERS = ")]}";
+
+// 右侧是这些时才自动补全：行尾、空白、右括号。避免把 f|oo 变成 f(|)oo。
+function closeOk(next) {
+  return next === undefined || next === "\n" || /\s/.test(next) || CLOSERS.indexOf(next) >= 0;
+}
+
+function pairAction(value, start, end, key) {
+  const next = value[start];
+
+  if (key === "Backspace" && start === end && start > 0) {
+    const left = value[start - 1];
+    if (PAIRS[left] && PAIRS[left] === next) {          // 空的一对，一次删掉两个
+      return { from: start - 1, to: start + 1, insert: "", caret: start - 1 };
+    }
+    return null;
+  }
+
+  if (start !== end) {                                  // 有选区：用这对把它裹起来
+    if (!PAIRS[key]) return null;
+    const picked = value.slice(start, end);
+    return { from: start, to: end, insert: key + picked + PAIRS[key], caret: end + 2 };
+  }
+
+  // 输入右括号而右边正好就是它：跳过去，不再插一个
+  if ((CLOSERS.indexOf(key) >= 0 || key === '"' || key === "'") && next === key) {
+    return { from: start, to: start, insert: "", caret: start + 1 };
+  }
+
+  if (PAIRS[key] && closeOk(next)) {
+    return { from: start, to: start, insert: key + PAIRS[key], caret: start + 1 };
+  }
+  return null;
+}
+
+function esc2(s) { return esc(s); }
+
+function highlight(code, lang, marks) {
+  const tokens = scan(code, lang);
+  const mark = marks || [];
+  let out = "", i = 0, ti = 0;
+  const wrap = (text, cls) => '<span class="' + cls + '">' + esc2(text) + "</span>";
+  while (i < code.length) {
+    if (ti < tokens.length && tokens[ti][1] === i) {
+      const t = tokens[ti++];
+      out += wrap(code.slice(t[1], t[2]), "t-" + t[0]);
+      i = t[2];
+      continue;
+    }
+    if (mark.indexOf(i) >= 0) { out += wrap(code[i], "t-match"); i++; continue; }
+    // 连续的普通字符整段转义，避免逐字符拼串
+    let j = i;
+    while (j < code.length && !(ti < tokens.length && tokens[ti][1] === j) && mark.indexOf(j) < 0) j++;
+    out += esc2(code.slice(i, j));
+    i = j;
+  }
+  return out;
+}
+
+function paintEditor() {
+  const code = src.value;
+  const lang = form.language.value;
+  const pair = document.activeElement === src ? bracketMatch(code, src.selectionStart, lang) : null;
+  // 末尾补一个换行：最后一行为空时高亮层会比 textarea 少一行高度，滚动就对不齐
+  hl.innerHTML = highlight(code + "\n", lang, pair);
+  gutter.textContent = Array.from({ length: code.split("\n").length }, (_, k) => k + 1).join("\n");
+  hl.scrollTop = src.scrollTop; hl.scrollLeft = src.scrollLeft;
+}
+
+src.addEventListener("input", () => { saveDraft(); paintEditor(); });
+src.addEventListener("click", paintEditor);
+src.addEventListener("keyup", paintEditor);
+src.addEventListener("blur", paintEditor);
+src.addEventListener("scroll", () => { hl.scrollTop = src.scrollTop; hl.scrollLeft = src.scrollLeft; });
+form.language.addEventListener("change", () => { saveDraft(); paintEditor(); });
+src.addEventListener("keydown", e => {
+  if (e.key === "Tab") {
+    e.preventDefault();
+    src.setRangeText("    ", src.selectionStart, src.selectionEnd, "end");
+    paintEditor();
+  } else if (e.key === "Enter") {
+    e.preventDefault();
+    const indent = indentFor(src.value, src.selectionStart, form.language.value);
+    src.setRangeText("\n" + indent, src.selectionStart, src.selectionEnd, "end");
+    paintEditor();
+  } else if (e.key === "Backspace" || PAIRS[e.key] || CLOSERS.indexOf(e.key) >= 0) {
+    const act = pairAction(src.value, src.selectionStart, src.selectionEnd, e.key);
+    if (!act) return;                        // 没命中就走浏览器默认行为（含撤销栈）
+    e.preventDefault();
+    src.setRangeText(act.insert, act.from, act.to, "end");
+    src.selectionStart = src.selectionEnd = act.caret;
+    paintEditor();
+  }
+});
+
+// ---- 字号 / 清空 --------------------------------------------------------
+const SIZE_KEY = "cs101-code-size";
+function applySize(px) {
+  const size = Math.max(11, Math.min(20, px));
+  document.documentElement.style.setProperty('--code-size', size + 'px');
+  try { localStorage.setItem(SIZE_KEY, String(size)); } catch (err) {}
+  paintEditor();
+}
+fontUp.onclick = () => applySize(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--code-size')) + 1);
+fontDown.onclick = () => applySize(parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--code-size')) - 1);
+resetCode.onclick = () => { src.value = ""; clearDraft(); paintEditor(); src.focus(); };
+try { const saved = Number(localStorage.getItem(SIZE_KEY)); if (saved) applySize(saved); } catch (err) {}
+
+// ---- 主题 --------------------------------------------------------------
+// 首屏那段引导脚本已经写好 data-theme，这里只负责切换和记住。
+const THEME_KEY = "cs101-theme";
+function applyTheme(name) {
+  document.documentElement.dataset.theme = name;
+  theme.textContent = name === "dark" ? "浅色" : "深色";
+  try { localStorage.setItem(THEME_KEY, name); } catch (err) { /* 隐私模式下忽略 */ }
+}
+theme.onclick = () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+
+restoreDraft();
+paintEditor();
+
+function badge(status) {
+  const cls = CLS[status] || (status === "No Test Data" || status === "Problem Not Found" ? "b-info" : "b-other");
+  return '<span class="badge ' + cls + '">' + esc(status) + "</span>";
+}
+function chip(label, value) {
+  return '<span class="chip">' + esc(label) + '<b>' + esc(value) + '</b></span>';
+}
+
+function renderVerdict(data) {
+  const metrics = [];
+  // 「错在哪组数据」是这个页面存在的理由，所以它排第一个
+  if (data.case !== undefined) metrics.push(chip("出错的数据组", "第 " + data.case + " 组"));
+  if (data.cases !== undefined) metrics.push(chip("通过", data.cases + " 组全过"));
+  if (data.time_ms !== undefined) metrics.push(chip("用时", data.time_ms + " ms"));
+  if (data.memory_kb !== undefined) metrics.push(chip("内存", data.memory_kb + " kB"));
+  if (data.expected_tokens !== undefined)
+    metrics.push(chip("输出规模", "期望 " + data.expected_tokens + " / 实际 " + data.actual_tokens + " token"));
+  if (data.source_bytes !== undefined) metrics.push(chip("代码长度", data.source_bytes + " B"));
+  if (data.language_version) metrics.push(chip("语言", data.language_version));
+  // failing_input 只在管理员打开开关时才由服务端下发；关着时这里根本收不到。
+  let snippet = "";
+  if (data.failing_input) {
+    const f = data.failing_input;
+    const tail = f.truncated ? "（共 " + f.total_lines + " 行 / " + f.total_chars + " 字符，已截断）" : "";
+    snippet = '<div class="snip"><div class="snip-h">第 ' + data.case + ' 组的输入 ' + tail
+            + '</div><pre class="msg">' + esc(f.text) + "</pre></div>";
+  }
+  if (data.expected_output) {
+    const o = data.expected_output;
+    const tail = o.truncated ? "（内容过长，已截断）" : "";
+    snippet += '<div class="snip"><div class="snip-h">第 ' + data.case + ' 组对应 .out 期望输出 ' + tail
+            + '</div><pre class="msg source">' + esc(o.text) + "</pre></div>";
+  }
+  verdict.innerHTML = '<div class="verdict-head">' + badge(data.status)
+    + '<span class="verdict-title">' + esc(data.status === "Accepted" ? "通过" : data.status) + '</span></div>'
+    + (metrics.length ? '<div class="metrics">' + metrics.join("") + "</div>" : "")
+    + (data.message ? '<pre class="msg">' + esc(data.message) + "</pre>" : "")
+    + snippet;
+  showTab('verdict');
+}
+
+// ---- 运行样例 ----------------------------------------------------------
+// 与提交走同一套沙箱，但不写 submissions 表、不计入统计。
+// 253 道题的题面把多组样例用 `sample1 in:` 这类行标注在一起，服务端已经切好，
+// 这里只负责让用户挑一组。只有一组时不显示切换条。
+const SAMPLE_CASES = (SAMPLES.cases && SAMPLES.cases.length)
+  ? SAMPLES.cases : [{ input: SAMPLES.input || "", output: SAMPLES.output || "" }];
+let sampleIdx = 0;
+function selectSample(i) {
+  sampleIdx = i;
+  sampleIn.value = SAMPLE_CASES[i].input;
+  sampleExp.textContent = SAMPLE_CASES[i].output;
+  sampleGot.textContent = "点「运行样例」后显示。";
+  sampleGot.classList.add("muted");
+  sampleVerdict.innerHTML = "";
+  if (SAMPLE_CASES.length > 1) {
+    sampleTabs.hidden = false;
+    sampleTabs.innerHTML = SAMPLE_CASES.map((c, k) =>
+      '<button type="button" class="chip sample-pick' + (k === i ? " on" : "") + '" data-i="' + k + '">样例 ' + (k + 1) + "</button>").join("");
+  }
+}
+sampleTabs.addEventListener("click", e => {
+  const hit = e.target.closest("[data-i]");
+  if (hit) selectSample(Number(hit.dataset.i));
+});
+selectSample(0);
+let busy = false;
+function setBusy(on, note) {
+  busy = on;
+  go.disabled = on; run.disabled = on;
+  for (const el of document.querySelectorAll('.editor-state')) el.textContent = note;
+}
+run.addEventListener('click', async () => {
+  if (busy) return;
+  showTab('samples');
+  setBusy(true, "运行中…");
+  sampleVerdict.innerHTML = "";
+  sampleGot.textContent = "";
+  sampleGot.classList.add("muted");
+  try {
+    const r = await fetch("/api/run", { method: "POST", credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ book: BOOK, problem: PROBLEM, language: form.language.value,
+                             source: src.value, stdin: sampleIn.value }) });
+    const data = await r.json();
+    if (r.status === 401) { sampleGot.textContent = "请先登录后再运行。"; }
+    else if (data.status !== "OK") {
+      sampleGot.classList.remove("muted");
+      sampleGot.textContent = data.message || data.status;
+      sampleVerdict.innerHTML = badge(data.status);
+    } else {
+      sampleGot.classList.remove("muted");
+      sampleGot.textContent = data.stdout || (data.stderr ? "" : "（没有输出）");
+      if (data.stderr) sampleGot.textContent += "\n--- stderr ---\n" + data.stderr;
+      // 与判题器同一条比对规则：按 token 比，不计空白差异
+      const want = SAMPLE_CASES[sampleIdx].output || "";
+      const same = data.stdout.trim().split(/\s+/).join(" ") === want.trim().split(/\s+/).join(" ");
+      sampleVerdict.innerHTML = '<span class="badge ' + (same ? "b-ac" : "b-wa") + '">'
+        + (same ? "与样例一致" : "与样例不一致") + "</span>";
+    }
+  } catch (err) {
+    sampleGot.classList.remove("muted");
+    sampleGot.textContent = String(err);
+  }
+  setBusy(false, "准备提交");
+});
+
+form.onsubmit = async e => {
+  e.preventDefault();
+  if (busy) return;
+  saveDraft();
+  setBusy(true, "判题中…");
+  verdict.innerHTML = '<div class="placeholder">判题中，请稍候…</div>';
+  showTab('verdict');
+  const body = Object.fromEntries(new FormData(form));
+  body.book = BOOK; body.problem = PROBLEM;
+  try {
+    const r = await fetch("/api/submit", { method: "POST", credentials: "same-origin",
+      headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const data = await r.json();
+    if (r.status === 401) verdict.innerHTML = '<div class="verdict-head">' + badge("需要登录")
+      + '</div><p class="placeholder"><a href="' + LOGIN_URL + '">先登录</a>后再提交，代码会保留。</p>';
+    else { if (r.ok) clearDraft(); renderVerdict(data); loadHistory(historyAll); }
+  } catch (err) {
+    verdict.innerHTML = '<div class="verdict-head">' + badge("提交失败") + '</div><pre class="msg">' + esc(err) + "</pre>";
+  }
+  setBusy(false, "准备提交");
+};
+
+let historyAll = false;
+let lastRows = [];
+let activeSubmissionId = null;
+const relativeTime = value => { const then = Date.parse(String(value).replace(" ", "T") + "Z"); if (Number.isNaN(then)) return value; const minutes = Math.max(0, Math.floor((Date.now() - then) / 60000)); if (minutes < 1) return "刚刚"; if (minutes < 60) return minutes + "分钟前"; const hours = Math.floor(minutes / 60); return hours < 24 ? hours + "小时前" : Math.floor(hours / 24) + "天前"; };
+
+function submissionDetail(row) {
+  activeSubmissionId = row.id;
+  const detail = row.detail || {}, metrics = [];
+  if (row.time_ms !== undefined && row.time_ms !== null) metrics.push(chip("用时", row.time_ms + " ms"));
+  if (row.memory_kb !== undefined && row.memory_kb !== null) metrics.push(chip("内存", row.memory_kb + " kB"));
+  if (row.source_bytes !== undefined && row.source_bytes !== null) metrics.push(chip("代码长度", row.source_bytes + " B"));
+  if (row.language_version || row.language) metrics.push(chip("语言", row.language_version || row.language));
+  if (detail.case !== undefined) metrics.push(chip("出错的数据组", "第 " + detail.case + " 组"));
+  if (detail.cases !== undefined) metrics.push(chip("通过", detail.cases + " 组全过"));
+  let diagnostic = detail.message ? '<pre class="msg">' + esc(detail.message) + '</pre>' : '';
+  if (detail.expected_tokens !== undefined) diagnostic += '<p class="muted">输出规模：期望 ' + esc(detail.expected_tokens) + ' 个 token，实际 ' + esc(detail.actual_tokens) + ' 个。</p>';
+  const code = row.source
+    ? '<div class="submission-source-wrap"><button class="source-copy" type="button" aria-label="复制代码" onclick="copySelectedSubmission(this)"></button><span class="source-copy-tip" role="status">复制代码</span><pre class="submission-source"><code>' + highlight(row.source, row.language) + '</code></pre></div>'
+    : '<p class="placeholder">这次提交的代码与判题详情仅对提交者和管理员可见。</p>';
+  historyDetailBody.innerHTML = '<div class="submission-detail-head"><div><h2>提交 #' + esc(row.id) + '</h2><p class="muted">' + esc(row.name || row.user || '') + ' · ' + esc(row.created) + '</p></div><div class="submission-detail-actions">' + badge(row.result) + '</div></div>'
+    + (metrics.length ? '<div class="metrics">' + metrics.join('') + '</div>' : '') + diagnostic + code;
+  renderHistoryList();
+}
+
+async function copySelectedSubmission(button) {
+  const source = lastRows.find(row => row.id === activeSubmissionId)?.source || '';
+  const tip = button.nextElementSibling;
+  try {
+    if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(source);
+    else { const box = document.createElement('textarea'); box.value = source; box.style.position = 'fixed'; box.style.opacity = '0'; document.body.appendChild(box); box.select(); document.execCommand('copy'); box.remove(); }
+    button.classList.add('copied', 'show-tip'); tip.textContent = '已复制';
+  } catch (error) { button.classList.add('show-tip'); tip.textContent = '复制失败'; }
+  clearTimeout(button.copyTipTimer);
+  button.copyTipTimer = setTimeout(() => { button.classList.remove('copied', 'show-tip'); tip.textContent = '复制代码'; }, 1400);
+}
+
+function renderHistoryList() {
+  histbox.innerHTML = '<div class="submission-list">' + lastRows.map(row => {
+    const language = row.language_version || row.language || '—';
+    const meta = language + ' · ' + relativeTime(row.created) + (historyAll ? ' · ' + (row.name || row.user || '') : '');
+    return '<button type="button" class="submission-row' + (row.id === activeSubmissionId ? ' on' : '') + '" data-submission-id="' + esc(row.id) + '"><span><span class="submission-row-main">' + badge(row.result) + '<b>#' + esc(row.id) + '</b></span><span class="submission-row-meta">' + esc(meta) + '</span></span><span class="muted">' + esc(row.time_ms == null ? '—' : row.time_ms + ' ms') + '</span></button>';
+  }).join('') + '</div>';
+}
+
+async function loadHistory(showAll = false) {
+  const params = new URLSearchParams({ book: BOOK, problem: PROBLEM });
+  if (!showAll) params.set("mine", "1");
+  const r = await fetch("/api/submissions?" + params, { credentials: "same-origin" });
+  if (r.status === 401) { histbox.textContent = "登录后可以看到提交记录。"; return; }
+  lastRows = (await r.json()).submissions;
+  if (!lastRows.length) { activeSubmissionId = null; histbox.textContent = showAll ? "这道题还没有提交记录。" : "你还没有提交这道题。"; return; }
+  if (!lastRows.some(row => row.id === activeSubmissionId)) activeSubmissionId = null;
+  renderHistoryList();
+}
+histbox.addEventListener('click', event => {
+  const row = event.target.closest('[data-submission-id]');
+  if (!row) return;
+  const submission = lastRows.find(item => item.id === Number(row.dataset.submissionId));
+  if (submission) submissionDetail(submission);
+});
+historyToggle.addEventListener('click', () => {
+  historyAll = !historyAll;
+  historyToggle.textContent = historyAll ? '只看我的' : '看全部';
+  loadHistory(historyAll);
+});
+historyBack.addEventListener('click', () => document.querySelector('[data-panel="paneStatement"]').click());
+
+// 统计只用这道题的提交记录算，不去拉整份 catalog（那是几百 KB）。
+async function loadStats() {
+  const params = new URLSearchParams({ book: BOOK, problem: PROBLEM, limit: "500" });
+  const r = await fetch("/api/submissions?" + params, { credentials: "same-origin" });
+  if (r.status === 401) { statsbox.textContent = "登录后可以看到统计。"; return; }
+  const rows = (await r.json()).submissions;
+  if (!rows.length) { statsbox.textContent = "这道题还没有提交记录。"; return; }
+  const accepted = rows.filter(s => s.result === "Accepted");
+  const solvers = new Set(accepted.map(s => (s.user || "").toLowerCase()));
+  const people = new Set(rows.map(s => (s.user || "").toLowerCase()));
+  const byStatus = new Map();
+  for (const s of rows) byStatus.set(s.result, (byStatus.get(s.result) || 0) + 1);
+  const cards = [
+    ["提交次数", rows.length], ["通过次数", accepted.length],
+    ["通过率", Math.round(accepted.length / rows.length * 100) + "%"],
+    ["提交人数", people.size], ["通过人数", solvers.size],
+  ];
+  statsbox.innerHTML = '<div class="stat-grid">'
+    + cards.map(c => '<div class="stat-card"><b>' + esc(c[1]) + "</b><span>" + esc(c[0]) + "</span></div>").join("")
+    + '</div><div class="table-wrap"><table><thead><tr><th>结果</th><th>次数</th></tr></thead><tbody>'
+    + [...byStatus].sort((a, b) => b[1] - a[1]).map(([k, v]) =>
+        "<tr><td>" + badge(k) + "</td><td class='num'>" + v + "</td></tr>").join("")
+    + "</tbody></table></div>";
+}
+</script></html>

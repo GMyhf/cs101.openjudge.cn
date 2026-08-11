@@ -131,13 +131,13 @@ footer{max-width:1180px;margin:0 auto;padding:26px 24px 60px;color:var(--muted);
 </tr>
 <tr>
 <td>页面</td>
-<td>服务端拼字符串，零框架、零构建</td>
-<td><a class="src" href="https://github.com/GMyhf/cs101.openjudge.cn/blob/main/server.py">server.py · SUBMIT_PAGE</a></td>
+<td>服务端填模板，零框架、零构建</td>
+<td><code>submit.html</code> + <a class="src" href="https://github.com/GMyhf/cs101.openjudge.cn/blob/main/server.py">server.py · submission_page</a></td>
 </tr>
 <tr>
 <td>前端交互</td>
 <td>手写语法高亮/括号匹配/拖拽，零依赖</td>
-<td><code>SUBMIT_PAGE</code> 内联 <code>&lt;script&gt;</code></td>
+<td><code>submit.html</code> 内联 <code>&lt;script&gt;</code></td>
 </tr>
 <tr>
 <td>沙箱</td>
@@ -274,7 +274,7 @@ Python3 ×10    PyPy3 ×3    C/C++/Swift/ObjC ×1    C#/F#/VB.NET ×2
 <hr>
 <h2 id="3-数据结构与算法"><a class="anchor" href="#3-数据结构与算法">#</a>3. 数据结构与算法</h2>
 <h3 id="31-一次扫描三种用途"><a class="anchor" href="#31-一次扫描三种用途">#</a>3.1 一次扫描，三种用途</h3>
-<p><strong>锚点</strong>：<a class="src" href="https://github.com/GMyhf/cs101.openjudge.cn/blob/main/server.py">server.py · SUBMIT_PAGE</a> 内 <code>function scan</code>（模板内约第 345 行）</p>
+<p><strong>锚点</strong>：<code>submit.html · function scan</code>（约第 404 行）</p>
 <p>网页编辑器的语法高亮、括号匹配、自动缩进<strong>共用同一次词法扫描</strong>。 为什么不各扫一遍？因为它们必须看到<strong>同一份切分</strong>：</p>
 <pre class="code" data-lang="javascript"><code>
 // 括号匹配要跳过字符串和注释里的括号，
@@ -283,7 +283,7 @@ Python3 ×10    PyPy3 ×3    C/C++/Swift/ObjC ×1    C#/F#/VB.NET ×2
 <p><code>SPECS</code> 是一张「语言 → 规则表」，用<strong>粘性正则</strong>（<code>/y</code> 标志，<code>lastIndex</code> 从当前位置匹配） 逐 token 推进。这是一个完整的、200 行能读完的<strong>手写词法分析器</strong>。</p>
 <p>📎 <strong>课堂讨论</strong>：为什么用粘性正则而不是 <code>String.indexOf</code> 循环？ 如果不用正则，你会用什么数据结构实现关键字识别（提示：Trie）？</p>
 <h3 id="32-括号匹配不用栈也能做"><a class="anchor" href="#32-括号匹配不用栈也能做">#</a>3.2 括号匹配：不用栈也能做</h3>
-<p><strong>锚点</strong>：<code>SUBMIT_PAGE · function bracketMatch</code>（模板内约第 370 行）</p>
+<p><strong>锚点</strong>：<code>submit.html · function bracketMatch</code>（约第 429 行）</p>
 <p>教科书解法是压栈。这里因为只需要<strong>匹配光标处那一个括号</strong>，用的是深度计数：</p>
 <pre class="code" data-lang="javascript"><code>
 let depth = 0;
@@ -707,7 +707,7 @@ cs101.service:10: Unknown key name &#x27;LimitNOFILE&#x27; in section &#x27;Unit
 <p>解释为什么倍率是 ×10 和 ×3，以及什么情况下换语言救不了（算法复杂度问题）。</p>
 <h3 id="102-数据结构与算法"><a class="anchor" href="#102-数据结构与算法">#</a>10.2 数据结构与算法</h3>
 <ol>
-<li><strong>实现一个词法高亮器</strong>：参照 <code>SUBMIT_PAGE · scan</code>，为一门新语言（如 Java）加高亮规则。</li>
+<li><strong>实现一个词法高亮器</strong>：参照 <code>submit.html · scan</code>，为一门新语言（如 Java）加高亮规则。</li>
 <li><strong>括号匹配两种解法</strong>：分别用栈和深度计数实现，比较空间复杂度与适用场景。</li>
 <li><strong>滑动窗口限频器</strong>：实现并用单元测试证明「窗口真的会滑动」——</li>
 </ol>
