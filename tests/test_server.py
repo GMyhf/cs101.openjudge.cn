@@ -506,12 +506,25 @@ class ServerApiTests(unittest.TestCase):
             "gzip, *;q=0": True,             # 显式条目优先于通配符
             "gzip;q=0, *": False,            # 反过来也一样
             "gzip;q=nonsense": False,        # 读不懂的 q 一律当作不接受
+            # RFC 9110 §12.4.2：q 只能落在 0..1，范围外的与「读不懂」同等对待。
+            # 注意 q=-1 / q=nan 会被 `q > 0` 顺带挡住 —— 那是巧合不是判据，
+            # 所以这里必须有 q>1 的用例，`q=2` 正是这么漏过第一轮的。
+            "gzip;q=2": False,
+            "gzip;q=1.1": False,
+            "gzip;q=inf": False,
+            "gzip;q=infinity": False,
+            "gzip;q=-1": False,
+            "gzip;q=nan": False,
+            "*;q=2": False,
+            "gzip;q=2, deflate": False,      # 畸形条目不因为旁边有别的就复活
+            "gzip;q=1.000": True,            # 合法的写法不能被误伤
+            "gzip;q=1e-3": True,             # 0.001，仍在范围内
         }
         for header, expected in cases.items():
             with self.subTest(header=header or "(缺)"):
                 self.assertEqual(expected, server.accepts_gzip(header))
 
-        for header in ("gzip;q=0", "*;q=0", "deflate"):
+        for header in ("gzip;q=0", "*;q=0", "deflate", "gzip;q=2", "gzip;q=inf"):
             with self.subTest(over_http=header):
                 _, headers, _ = request(self.port, "GET", "/api/catalog",
                                         extra_headers={"Accept-Encoding": header})

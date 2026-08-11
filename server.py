@@ -272,9 +272,11 @@ def accepts_gzip(header):
     客户端明确禁用压缩时照样会收到 `Content-Encoding: gzip`。
 
     规则：显式列出的 `gzip`（含 HTTP/1.0 遗留的 `x-gzip`）优先于通配符 `*`；
-    只有 q > 0 才算接受。没有这个头时**不压** —— 规范说此时任何编码都可接受，
-    但代理和老客户端在这上面不可靠，而不压的代价只是多几个字节。
-    解析不出来的 q 一律按 0 处理：拿不准的时候发原文，总比发一份对方解不开的强。
+    只有落在 0..1 之内且 > 0 的 q 才算接受。没有这个头时**不压** —— 规范说此时
+    任何编码都可接受，但代理和老客户端在这上面不可靠，而不压的代价只是多几个字节。
+    解析不出来或超出 0..1 的 q 一律按 0 处理：拿不准的时候发原文，
+    总比发一份对方解不开的强。（小数位数不按 `0*3DIGIT` 卡死 —— `q=0.5000` 多写
+    几个零不影响它到底是多少，而范围错了会直接改变「要还是不要」。）
     """
     if not header:
         return False
@@ -292,13 +294,19 @@ def accepts_gzip(header):
             try:
                 quality = float(value.strip())
             except ValueError:
-                quality = 0.0
+                quality = float("nan")         # 读不懂：交给下面那一道范围判断
         if token in ("gzip", "x-gzip"):
             explicit = quality if explicit is None else max(explicit, quality)
         elif token == "*":
             wildcard = quality if wildcard is None else max(wildcard, quality)
     quality = explicit if explicit is not None else wildcard
-    return quality is not None and quality > 0
+    # 「接受」只在这一处判定：合法的 qvalue 落在 0..1（RFC 9110 §12.4.2），
+    # 且必须真的大于 0。范围外的 `q=2` / `q=1.1` / `q=inf` 与读不懂的 q 同类 ——
+    # 不知道对方要什么，就当它不要。NaN 参与比较恒为 False，一并落在这里。
+    #
+    # 上一版把范围和正负拆成两处写，下界与 `> 0` 重复，**删掉下界测试照样绿** ——
+    # 冗余判断会让变异自检失真，所以两个边界都收在这一个表达式里。
+    return quality is not None and 0.0 < quality <= 1.0
 
 
 def gzip_if_worthwhile(body, content_type, accepts_gzip):
