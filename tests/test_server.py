@@ -863,6 +863,10 @@ process.exit(restored && loginOk && draftOk && values.size === 0 ? 0 : 1);
         text = body.decode("utf-8", errors="replace")
         self.assertIn("Python ×10", text)
         self.assertIn("C#/F#/VB.NET 内存 ×2", text)
+        self.assertIn("CS101 判题系统开发教学手册", text)
+        self.assertIn("https://gmyhf.github.io/cs101.openjudge.cn/dev-handbook.html", text)
+        self.assertIn("docs/%E7%94%A8%E6%88%B7%E6%89%8B%E5%86%8C.md", text)
+        self.assertIn("docs/%E7%AE%A1%E7%90%86%E5%91%98%E6%89%8B%E5%86%8C.md", text)
 
     def test_history_page_links_results_to_error_details(self):
         status, _, body = request(self.port, "GET", "/history/")
