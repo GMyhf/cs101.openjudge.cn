@@ -29,17 +29,19 @@ DB = Path(os.environ.get("CS101_DB", ROOT / "data" / "course.db"))
 MIRROR = ROOT / "data" / "openjudge"
 # 唯一对外分发的目录。白名单是后缀而不是「除了 xx 以外」——
 # 排除法每加一种新文件就要记得再排一次，迟早漏掉一个。
-# 253/1849 道题的样例是「手写标注」式的：题面把多组样例塞进两个 <dl> 里，
-# 用 `sample1 in:` 这样的行分段，而不是上游那种一组输入一组输出。
+# 题面会把多组样例塞进两个 <dl> 里，用 `sample1 in:` 或 `样例输入1` 这样的行
+# 分段，而不是上游那种一组输入一组输出。
 # 分隔行的写法在题库里散得很开（逐页统计过）：编号在关键词前（`Sample1 Input:`）
 # 或后（`Sample Input1:`、`Sample Input 1:`）；关键词有 in/input/out/output，
 # 还有一处把 Input 打成了 `Iutput`（routine__16530）；冒号有半角、全角、以及没有；
 # 编号用过罗马数字（practice__20163）；还有一页把编号和关键词拆成两行（practice__20125）。
 # 不能写 `sample\b`：`sample1` 里 e 和 1 之间没有词边界，最常见的那种写法反而匹配不上。
-SAMPLE_ANY = re.compile(r'^[ \t]*sample', re.I | re.M)
+SAMPLE_ANY = re.compile(r'^[ \t]*(?:sample|样例)', re.I | re.M)
 SAMPLE_MARKER = re.compile(r'^[ \t]*sample[ \t]*(?P<a>\d+)?[ \t]*'
                            r'(?P<kind>input|output|iutput|in|out)[ \t]*'
                            r'(?P<b>\d+|[ivx]+)?[ \t]*[:：]?[ \t]*$', re.I)
+SAMPLE_CHINESE_MARKER = re.compile(r'^[ \t]*样例[ \t]*(?P<kind>输入|输出)[ \t]*'
+                                   r'(?P<n>\d+|[ivx]+)?[ \t]*[:：]?[ \t]*$', re.I)
 SAMPLE_INDEX_ONLY = re.compile(r'^[ \t]*sample[ \t]*(?P<n>\d+)[ \t]*[:：]?[ \t]*$', re.I)
 SAMPLE_KIND_ONLY = re.compile(r'^[ \t]*(?P<kind>input|output|iutput)[ \t]*'
                               r'(?P<n>\d+)?[ \t]*[:：][ \t]*$', re.I)
@@ -66,18 +68,22 @@ def parse_sample_sections(text, truncate_explanations=True):
         if marker:
             kind, number = marker.group("kind"), marker.group("a") or marker.group("b")
         else:
-            index_only = SAMPLE_INDEX_ONLY.match(line)
-            if index_only:
-                pending, current = int(index_only.group("n")), None
-                continue
-            kind_only = SAMPLE_KIND_ONLY.match(line)
-            if kind_only:
-                kind, number = kind_only.group("kind"), kind_only.group("n")
+            chinese_marker = SAMPLE_CHINESE_MARKER.match(line)
+            if chinese_marker:
+                kind, number = chinese_marker.group("kind"), chinese_marker.group("n")
+            else:
+                index_only = SAMPLE_INDEX_ONLY.match(line)
+                if index_only:
+                    pending, current = int(index_only.group("n")), None
+                    continue
+                kind_only = SAMPLE_KIND_ONLY.match(line)
+                if kind_only:
+                    kind, number = kind_only.group("kind"), kind_only.group("n")
         if kind is None:
             if current is not None:
                 current["lines"].append(line)
             continue
-        kind = "input" if kind.lower() in ("in", "input", "iutput") else "output"
+        kind = "input" if kind.lower() in ("in", "input", "iutput", "输入") else "output"
         if number is None:
             index = pending
         elif number.isdigit():

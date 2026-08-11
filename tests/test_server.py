@@ -1575,6 +1575,20 @@ process.exit(restored && loginOk && draftOk && values.size === 0 ? 0 : 1);
         self.assertNotIn("sample", payload["input"].lower())
         self.assertNotIn("#", payload["cases"][0]["output"])
 
+    def test_submit_page_splits_chinese_multi_samples(self):
+        """28127 的 `样例输入1`/`样例输出1` 标题不能作为 stdin 传给程序。"""
+        status, _, body = request(self.port, "GET", "/practice/28127/submit/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        payload = json.loads(re.search(r"const SAMPLES = (\{.*?\});", text).group(1))
+        self.assertEqual(len(payload["cases"]), 3, payload)
+        self.assertEqual(payload["cases"][0]["input"].splitlines()[0], "9")
+        self.assertEqual(payload["cases"][1]["input"].splitlines()[0], "31")
+        self.assertEqual(payload["cases"][2]["input"].splitlines()[0], "14")
+        self.assertTrue(payload["cases"][0]["output"].startswith("1 Peking University 2 3"))
+        self.assertNotIn("样例输入", payload["input"])
+        self.assertNotIn("样例输出", payload["cases"][0]["output"])
+
     def test_static_sample_parser_handles_the_variants_found_in_the_library(self):
         """分隔行的写法在题库里散得很开，这些都是从 1849 个页面里实际扫出来的形状。"""
         import server
@@ -1603,6 +1617,9 @@ process.exit(restored && loginOk && draftOk && values.size === 0 ? 0 : 1);
         # 但输入段的 # 是真数据，不能动（practice__19949 的 ###John###）
         self.assertEqual(one("Sample1 Input:\n###John### .\nSample1 Output:\n2"),
                          [{"input": "###John### .", "output": "2"}])
+        # 中文标记是 28127 等题的实际写法
+        self.assertEqual(one("样例输入1\n1\n样例输出1\n2\n样例输入2：\n3\n样例输出2：\n4"),
+                         [{"input": "1", "output": "2"}, {"input": "3", "output": "4"}])
         # 没有标记就交回空列表，由调用方回落到「输入 dd / 输出 dd」的老行为
         self.assertEqual(one("1 6\n0 0"), [])
 
