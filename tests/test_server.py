@@ -480,6 +480,47 @@ class ServerApiTests(unittest.TestCase):
         self.assertIsNone(server.gzip_if_worthwhile(noisy, "text/plain", True),
                           "压不动就别压")
 
+    def test_content_negotiation_honours_quality_values(self):
+        """`Accept-Encoding: gzip;q=0` 的意思是**不要** gzip。
+
+        子串匹配读不出质量值：改动前 `"gzip" in header` 把明确禁用压缩的客户端
+        也当成「要」。这里连 HTTP 那一端一起验，免得只在纯函数上成立。
+        """
+        import server
+        cases = {
+            "": False,                       # 没有这个头就不压
+            "gzip": True,
+            "GZIP": True,                    # token 大小写不敏感
+            "x-gzip": True,                  # HTTP/1.0 的遗留别名
+            "gzip;q=0": False,               # 明确拒绝
+            "gzip; q=0": False,              # 分号后的空格是合法的
+            "gzip;q=0.000": False,
+            "gzip;q=0.5": True,
+            "gzip;q=1.0": True,
+            "deflate, gzip;q=0": False,      # 列了别的，唯独拒绝 gzip
+            "deflate, gzip": True,
+            "deflate": False,                # 没列 gzip 也没通配符
+            "*": True,                       # 通配符覆盖 gzip
+            "*;q=0": False,
+            "br, *;q=0.1": True,
+            "gzip, *;q=0": True,             # 显式条目优先于通配符
+            "gzip;q=0, *": False,            # 反过来也一样
+            "gzip;q=nonsense": False,        # 读不懂的 q 一律当作不接受
+        }
+        for header, expected in cases.items():
+            with self.subTest(header=header or "(缺)"):
+                self.assertEqual(expected, server.accepts_gzip(header))
+
+        for header in ("gzip;q=0", "*;q=0", "deflate"):
+            with self.subTest(over_http=header):
+                _, headers, _ = request(self.port, "GET", "/api/catalog",
+                                        extra_headers={"Accept-Encoding": header})
+                self.assertNotIn("Content-Encoding", headers)
+        _, headers, body = request(self.port, "GET", "/api/catalog",
+                                   extra_headers={"Accept-Encoding": "gzip;q=0.3"})
+        self.assertEqual("gzip", headers.get("Content-Encoding"))
+        self.assertTrue(json.loads(gzip.decompress(body))["problems"])
+
     def test_static_files_revalidate_with_an_etag(self):
         """静态文件带 ETag，命中就只回 304。
 

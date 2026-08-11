@@ -264,6 +264,43 @@ GZIP_MIN_BYTES = 1024
 GZIP_LEVEL = 6
 
 
+def accepts_gzip(header):
+    """按 RFC 9110 §12.5.3 判断客户端是否真的接受 gzip。
+
+    改动前这里是 `"gzip" in header` —— **`Accept-Encoding: gzip;q=0` 被当成「要」**，
+    而按规范 `q=0` 的意思恰恰是「不要」。子串匹配读不出质量值，
+    客户端明确禁用压缩时照样会收到 `Content-Encoding: gzip`。
+
+    规则：显式列出的 `gzip`（含 HTTP/1.0 遗留的 `x-gzip`）优先于通配符 `*`；
+    只有 q > 0 才算接受。没有这个头时**不压** —— 规范说此时任何编码都可接受，
+    但代理和老客户端在这上面不可靠，而不压的代价只是多几个字节。
+    解析不出来的 q 一律按 0 处理：拿不准的时候发原文，总比发一份对方解不开的强。
+    """
+    if not header:
+        return False
+    explicit = wildcard = None
+    for part in header.split(","):
+        token, _, params = part.strip().partition(";")
+        token = token.strip().lower()
+        if not token:
+            continue
+        quality = 1.0
+        for param in params.split(";"):
+            name, _, value = param.partition("=")
+            if name.strip().lower() != "q":
+                continue
+            try:
+                quality = float(value.strip())
+            except ValueError:
+                quality = 0.0
+        if token in ("gzip", "x-gzip"):
+            explicit = quality if explicit is None else max(explicit, quality)
+        elif token == "*":
+            wildcard = quality if wildcard is None else max(wildcard, quality)
+    quality = explicit if explicit is not None else wildcard
+    return quality is not None and quality > 0
+
+
 def gzip_if_worthwhile(body, content_type, accepts_gzip):
     """压得动就返回压好的正文，否则返回 None（照发原文）。
 
@@ -1088,9 +1125,6 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print("%s - %s" % (self.client_ip(), fmt % args))
 
-    def accepts_gzip(self):
-        return "gzip" in self.headers.get("Accept-Encoding", "").lower()
-
     def send_body(self, body, content_type, status=200, cache=None, etag=None):
         """统一出口：按需 gzip，带上缓存头。
 
@@ -1099,7 +1133,8 @@ class Handler(BaseHTTPRequestHandler):
         压过的响应必须带 `Vary: Accept-Encoding`，否则中间缓存会把 gzip 的那份
         发给不支持 gzip 的客户端。
         """
-        encoded = gzip_if_worthwhile(body, content_type, self.accepts_gzip())
+        encoded = gzip_if_worthwhile(body, content_type,
+                                     accepts_gzip(self.headers.get("Accept-Encoding", "")))
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         if cache:
