@@ -70,6 +70,9 @@
   .copy-code::before { top:7px; left:9px }
   .copy-code::after { top:5px; left:7px; background:var(--panel) }
   .copy-code:hover, .copy-code:focus-visible, .copy-code.copied { border-color:var(--accent); color:var(--accent) }
+  .copy-tip { position:absolute; top:42px; right:8px; z-index:1; padding:4px 7px; border-radius:4px; background:var(--ink); color:var(--bg);
+              font:12px var(--font-ui); white-space:nowrap; opacity:0; transform:translateY(-3px); pointer-events:none; transition:opacity .12s,transform .12s }
+  .copy-code:hover + .copy-tip, .copy-code:focus-visible + .copy-tip, .copy-code.show-tip + .copy-tip { opacity:1; transform:translateY(0) }
   .t-com { color:var(--tok-com); font-style:italic }
   .t-str { color:var(--tok-str) }
   .t-num { color:var(--tok-num) }
@@ -206,6 +209,7 @@ function highlightSource(code, language) {
 
 async function copySource(button) {
   const source = button.closest('.code-block').querySelector('code').textContent;
+  const tip = button.nextElementSibling;
   try {
     if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(source);
     else {
@@ -213,11 +217,12 @@ async function copySource(button) {
       box.value = source; box.style.position = 'fixed'; box.style.opacity = '0';
       document.body.appendChild(box); box.select(); document.execCommand('copy'); box.remove();
     }
-    button.classList.add('copied'); button.title = button.getAttribute('aria-label') = '已复制';
+    button.classList.add('copied', 'show-tip'); tip.textContent = '已复制';
   } catch (error) {
-    button.title = button.getAttribute('aria-label') = '复制失败';
+    button.classList.add('show-tip'); tip.textContent = '复制失败';
   }
-  setTimeout(() => { button.classList.remove('copied'); button.title = button.getAttribute('aria-label') = '复制代码'; }, 1400);
+  clearTimeout(button.copyTipTimer);
+  button.copyTipTimer = setTimeout(() => { button.classList.remove('copied', 'show-tip'); tip.textContent = '复制代码'; }, 1400);
 }
 
 const statusQuery = VIEW === 'status' ? location.search : '';
@@ -393,7 +398,7 @@ function renderSolution(data) {
     if (d.expected_output) lines.push(`<div><b>期望输出：</b></div><pre class="src">${esc(d.expected_output.text || '')}</pre>`);
     if (lines.length) blocks.push('<section class="block"><h2>判题详情</h2>' + lines.join('') + '</section>');
     const source = data.source || '（这次提交没有留下代码）';
-    blocks.push('<section class="block"><h2>代码</h2><div class="source-wrap"><button class="copy-code" type="button" aria-label="复制代码" title="复制代码" onclick="copySource(this)"></button>'
+    blocks.push('<section class="block code-block"><h2>代码</h2><div class="source-wrap"><button class="copy-code" type="button" aria-label="复制代码" onclick="copySource(this)"></button><span class="copy-tip" role="status">复制代码</span>'
       + `<pre class="src code"><code>${highlightSource(source, data.language)}</code></pre></div></section>`);
   }
   view.innerHTML = blocks.join('');

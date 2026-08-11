@@ -1209,6 +1209,8 @@ process.exit(restored && loginOk && draftOk && values.size === 0 ? 0 : 1);
         self.assertIn("function submissionDetail(row)", page)
         self.assertIn("highlight(row.source, row.language)", page)
         self.assertIn("copySelectedSubmission", page)
+        self.assertIn("source-copy-tip", page)
+        self.assertIn("show-tip", page)
         self.assertIn("data-submission-id", page)
         # 他人的 submission 仍由 API 抹去 source/detail；前端只说明权限边界，不能绕过。
         self.assertIn("仅对提交者和管理员可见", page)

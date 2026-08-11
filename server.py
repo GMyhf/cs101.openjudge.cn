@@ -420,6 +420,8 @@ document.documentElement.dataset.theme=t;}catch(e){document.documentElement.data
  .source-copy::before,.source-copy::after{content:'';position:absolute;width:9px;height:11px;border:1.5px solid currentColor;border-radius:1px}
  .source-copy::before{top:7px;left:9px}.source-copy::after{top:5px;left:7px;background:var(--panel)}
  .source-copy:hover,.source-copy:focus-visible,.source-copy.copied{border-color:var(--accent);color:var(--accent)}
+ .source-copy-tip{position:absolute;top:42px;right:8px;z-index:1;padding:4px 7px;border-radius:4px;background:var(--ink);color:var(--bg);font:12px var(--font-ui);white-space:nowrap;opacity:0;transform:translateY(-3px);pointer-events:none;transition:opacity .12s,transform .12s}
+ .source-copy:hover+.source-copy-tip,.source-copy:focus-visible+.source-copy-tip,.source-copy.show-tip+.source-copy-tip{opacity:1;transform:translateY(0)}
  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px}
  .stat-card{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--soft);padding:12px 14px}
  .stat-card b{display:block;font-size:22px;line-height:1.15;font-variant-numeric:tabular-nums}
@@ -1039,7 +1041,7 @@ function submissionDetail(row) {
   let diagnostic = detail.message ? '<pre class="msg">' + esc(detail.message) + '</pre>' : '';
   if (detail.expected_tokens !== undefined) diagnostic += '<p class="muted">输出规模：期望 ' + esc(detail.expected_tokens) + ' 个 token，实际 ' + esc(detail.actual_tokens) + ' 个。</p>';
   const code = row.source
-    ? '<div class="submission-source-wrap"><button class="source-copy" type="button" aria-label="复制代码" title="复制代码" onclick="copySelectedSubmission(this)"></button><pre class="submission-source"><code>' + highlight(row.source, row.language) + '</code></pre></div>'
+    ? '<div class="submission-source-wrap"><button class="source-copy" type="button" aria-label="复制代码" onclick="copySelectedSubmission(this)"></button><span class="source-copy-tip" role="status">复制代码</span><pre class="submission-source"><code>' + highlight(row.source, row.language) + '</code></pre></div>'
     : '<p class="placeholder">这次提交的代码与判题详情仅对提交者和管理员可见。</p>';
   historyDetailBody.innerHTML = '<div class="submission-detail-head"><div><h2>提交 #' + esc(row.id) + '</h2><p class="muted">' + esc(row.name || row.user || '') + ' · ' + esc(row.created) + '</p></div><div class="submission-detail-actions">' + badge(row.result) + '</div></div>'
     + (metrics.length ? '<div class="metrics">' + metrics.join('') + '</div>' : '') + diagnostic + code;
@@ -1048,12 +1050,14 @@ function submissionDetail(row) {
 
 async function copySelectedSubmission(button) {
   const source = lastRows.find(row => row.id === activeSubmissionId)?.source || '';
+  const tip = button.nextElementSibling;
   try {
     if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(source);
     else { const box = document.createElement('textarea'); box.value = source; box.style.position = 'fixed'; box.style.opacity = '0'; document.body.appendChild(box); box.select(); document.execCommand('copy'); box.remove(); }
-    button.classList.add('copied'); button.title = button.getAttribute('aria-label') = '已复制';
-  } catch (error) { button.title = button.getAttribute('aria-label') = '复制失败'; }
-  setTimeout(() => { button.classList.remove('copied'); button.title = button.getAttribute('aria-label') = '复制代码'; }, 1400);
+    button.classList.add('copied', 'show-tip'); tip.textContent = '已复制';
+  } catch (error) { button.classList.add('show-tip'); tip.textContent = '复制失败'; }
+  clearTimeout(button.copyTipTimer);
+  button.copyTipTimer = setTimeout(() => { button.classList.remove('copied', 'show-tip'); tip.textContent = '复制代码'; }, 1400);
 }
 
 function renderHistoryList() {
