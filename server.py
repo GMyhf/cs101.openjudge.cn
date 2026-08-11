@@ -401,6 +401,20 @@ document.documentElement.dataset.theme=t;}catch(e){document.documentElement.data
  .history-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
  .history-heading h2{font-size:16px;margin:0}
  .history-heading button{padding:5px 10px;font-size:12.5px}
+ .pane-col.history-view{display:block}
+ .pane-col.history-view>:not(.history-detail){display:none}
+ .history-detail{height:100%;min-height:0;display:flex;flex-direction:column}
+ .history-detail[hidden]{display:none}
+ .history-detail .pane-body{flex:1;min-height:0}
+ .submission-list{display:grid;gap:6px}
+ .submission-row{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:10px 11px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--panel);color:var(--ink);text-align:left;font:inherit;cursor:pointer}
+ .submission-row:hover,.submission-row:focus-visible,.submission-row.on{border-color:var(--accent);background:var(--accent-soft)}
+ .submission-row-main{display:flex;align-items:center;gap:8px;min-width:0}
+ .submission-row-meta{color:var(--muted);font:12px var(--font-ui);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ .submission-detail-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+ .submission-detail-head h2{font-size:18px;margin:0}
+ .submission-source{margin:0;flex:1;min-height:0;overflow:auto;padding:13px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--soft);font:var(--code-size)/1.55 var(--font-mono);white-space:pre}
+ .submission-source code{font:inherit}
  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px}
  .stat-card{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--soft);padding:12px 14px}
  .stat-card b{display:block;font-size:22px;line-height:1.15;font-variant-numeric:tabular-nums}
@@ -498,6 +512,10 @@ document.documentElement.dataset.theme=t;}catch(e){document.documentElement.data
         <button id="go" type="submit" class="primary">提交并判题</button>
       </span>
     </div>
+    <section class="pane history-detail" id="historyDetail" hidden>
+      <div class="pane-tabs"><span class="pane-tab" aria-selected="true">提交详情</span><span class="pane-tools"><button id="historyBack" class="ghost" type="button">返回编辑器</button></span></div>
+      <div class="pane-body" id="historyDetailBody"><p class="placeholder">从左侧选择一次提交以查看详情。</p></div>
+    </section>
   </form>
 </main>
 <script>
@@ -558,6 +576,8 @@ function makeSplitter(bar, opts) {
 
 const workspace = document.querySelector('#workspace');
 const paneCol = document.querySelector('#form');
+const historyDetail = document.querySelector('#historyDetail');
+const historyDetailBody = document.querySelector('#historyDetailBody');
 const actionBar = document.querySelector('.action-bar');
 makeSplitter(document.querySelector('#splitter'), {
   key: 'cs101-split-ratio', home: 0.44, min: 320, minOther: 430,
@@ -583,12 +603,18 @@ for (const group of document.querySelectorAll('.pane-tabs[role="tablist"]')) {
       other.setAttribute('aria-selected', String(on));
       document.querySelector('#' + other.dataset.panel).hidden = !on;
     }
+    showHistoryWorkspace(tab.dataset.panel === 'paneHistory');
     if (tab.dataset.panel === 'paneStats') loadStats();
   });
 }
 function showTab(panel) {
   const tab = document.querySelector('.pane-tab[data-panel="' + panel + '"]');
   if (tab) tab.click();
+}
+
+function showHistoryWorkspace(on) {
+  paneCol.classList.toggle('history-view', on);
+  historyDetail.hidden = !on;
 }
 
 function markdownInline(node) {
@@ -671,6 +697,13 @@ const SPECS = {
 };
 SPECS.cpp = SPECS.c;
 SPECS.pypy3 = SPECS.python;      // PyPy3 就是 Python 语法，高亮与缩进规则共用一套
+SPECS.vbnet = [
+  ["com", /'[^\n]*/y],
+  ["str", /"(?:""|[^"\n])*"/y],
+  ["num", NUM],
+  ["kw", /\b(?:And|As|Boolean|ByRef|ByVal|Case|Class|Const|Continue|Dim|Do|Double|Each|Else|ElseIf|End|Exit|False|For|Function|If|In|Integer|Is|Loop|Module|New|Next|Not|Nothing|Or|Private|Public|Return|Select|Shared|Single|String|Sub|Then|To|True|Until|While)\b/iy],
+];
+for (const language of ["csharp", "fsharp", "swift", "objc"]) SPECS[language] = SPECS.c;
 
 // 一次扫描出所有 token 区间；高亮和括号匹配都基于它，保证两者看到的是同一份切分。
 function scan(code, lang) {
@@ -986,44 +1019,69 @@ form.onsubmit = async e => {
 
 let historyAll = false;
 let lastRows = [];
+let activeSubmissionId = null;
+const relativeTime = value => { const then = Date.parse(String(value).replace(" ", "T") + "Z"); if (Number.isNaN(then)) return value; const minutes = Math.max(0, Math.floor((Date.now() - then) / 60000)); if (minutes < 1) return "刚刚"; if (minutes < 60) return minutes + "分钟前"; const hours = Math.floor(minutes / 60); return hours < 24 ? hours + "小时前" : Math.floor(hours / 24) + "天前"; };
+
+function submissionDetail(row) {
+  activeSubmissionId = row.id;
+  const detail = row.detail || {}, metrics = [];
+  if (row.time_ms !== undefined && row.time_ms !== null) metrics.push(chip("用时", row.time_ms + " ms"));
+  if (row.memory_kb !== undefined && row.memory_kb !== null) metrics.push(chip("内存", row.memory_kb + " kB"));
+  if (row.source_bytes !== undefined && row.source_bytes !== null) metrics.push(chip("代码长度", row.source_bytes + " B"));
+  if (row.language_version || row.language) metrics.push(chip("语言", row.language_version || row.language));
+  if (detail.case !== undefined) metrics.push(chip("出错的数据组", "第 " + detail.case + " 组"));
+  if (detail.cases !== undefined) metrics.push(chip("通过", detail.cases + " 组全过"));
+  let diagnostic = detail.message ? '<pre class="msg">' + esc(detail.message) + '</pre>' : '';
+  if (detail.expected_tokens !== undefined) diagnostic += '<p class="muted">输出规模：期望 ' + esc(detail.expected_tokens) + ' 个 token，实际 ' + esc(detail.actual_tokens) + ' 个。</p>';
+  const code = row.source
+    ? '<pre class="submission-source"><code>' + highlight(row.source, row.language) + '</code></pre>'
+    : '<p class="placeholder">这次提交的代码与判题详情仅对提交者和管理员可见。</p>';
+  const copy = row.source ? '<button class="ghost" type="button" onclick="copySelectedSubmission(this)">复制代码</button>' : '';
+  historyDetailBody.innerHTML = '<div class="submission-detail-head"><div><h2>提交 #' + esc(row.id) + '</h2><p class="muted">' + esc(row.name || row.user || '') + ' · ' + esc(row.created) + '</p></div><div class="submission-detail-actions">' + badge(row.result) + copy + '</div></div>'
+    + (metrics.length ? '<div class="metrics">' + metrics.join('') + '</div>' : '') + diagnostic + code;
+  renderHistoryList();
+}
+
+async function copySelectedSubmission(button) {
+  const source = lastRows.find(row => row.id === activeSubmissionId)?.source || '';
+  try {
+    if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(source);
+    else { const box = document.createElement('textarea'); box.value = source; box.style.position = 'fixed'; box.style.opacity = '0'; document.body.appendChild(box); box.select(); document.execCommand('copy'); box.remove(); }
+    button.textContent = '已复制';
+  } catch (error) { button.textContent = '复制失败'; }
+  setTimeout(() => { button.textContent = '复制代码'; }, 1400);
+}
+
+function renderHistoryList() {
+  histbox.innerHTML = '<div class="submission-list">' + lastRows.map(row => {
+    const language = row.language_version || row.language || '—';
+    const meta = language + ' · ' + relativeTime(row.created) + (historyAll ? ' · ' + (row.name || row.user || '') : '');
+    return '<button type="button" class="submission-row' + (row.id === activeSubmissionId ? ' on' : '') + '" data-submission-id="' + esc(row.id) + '"><span><span class="submission-row-main">' + badge(row.result) + '<b>#' + esc(row.id) + '</b></span><span class="submission-row-meta">' + esc(meta) + '</span></span><span class="muted">' + esc(row.time_ms == null ? '—' : row.time_ms + ' ms') + '</span></button>';
+  }).join('') + '</div>';
+}
+
 async function loadHistory(showAll = false) {
   const params = new URLSearchParams({ book: BOOK, problem: PROBLEM });
   if (!showAll) params.set("mine", "1");
   const r = await fetch("/api/submissions?" + params, { credentials: "same-origin" });
   if (r.status === 401) { histbox.textContent = "登录后可以看到提交记录。"; return; }
   lastRows = (await r.json()).submissions;
-  if (!lastRows.length) { histbox.textContent = showAll ? "这道题还没有提交记录。" : "你还没有提交这道题。"; return; }
-  const relativeTime = value => { const then = Date.parse(String(value).replace(" ", "T") + "Z"); if (Number.isNaN(then)) return value; const minutes = Math.max(0, Math.floor((Date.now() - then) / 60000)); if (minutes < 1) return "刚刚"; if (minutes < 60) return minutes + "分钟前"; const hours = Math.floor(minutes / 60); return hours < 24 ? hours + "小时前" : Math.floor(hours / 24) + "天前"; };
-  histbox.innerHTML = "<table><thead><tr><th>提交人</th><th>结果</th><th>内存</th><th>时间</th><th>代码长度</th><th>语言</th><th>提交时间</th><th>代码/详情</th></tr></thead><tbody>"
-    + lastRows.map(s => {
-        const d = s.detail || {};
-        const note = d.case !== undefined ? "第 " + d.case + " 组"
-                   : d.cases !== undefined ? d.cases + " 组全过" : "";
-        const memory = d.memory_kb !== undefined ? d.memory_kb + "kB" : "";
-        const elapsed = d.time_ms !== undefined ? d.time_ms + "ms" : "";
-        const size = d.source_bytes !== undefined ? d.source_bytes + " B" : (s.source ? new TextEncoder().encode(s.source).length + " B" : "");
-        const code = s.source ? "<details><summary>查看代码</summary><pre class='msg source'>" + esc(s.source) + "</pre></details>" : "";
-        const blocks = [];
-        if (d.case !== undefined) blocks.push("<div><b>出错的数据组：</b>第 " + esc(d.case) + " 组</div>");
-        if (d.expected_tokens !== undefined) blocks.push("<div><b>输出规模：</b>期望 " + esc(d.expected_tokens) + " 个 token，实际 " + esc(d.actual_tokens) + " 个</div>");
-        if (d.message) blocks.push("<pre class='msg source'>" + esc(d.message) + "</pre>");
-        if (d.failing_input) blocks.push("<pre class='msg source'>" + esc(d.failing_input.text || "") + "</pre>");
-        if (d.expected_output) blocks.push("<pre class='msg source'>" + esc(d.expected_output.text || "") + "</pre>");
-        const detail = blocks.length ? "<details" + (s.result === "Accepted" ? "" : " open") + "><summary>查看判题详情</summary>" + blocks.join("") + "</details>" : "";
-        // 改动前这里只输出 7 个 <td> 而表头有 8 列：算好的 size 从未渲染，
-        // 于是「代码长度」往右每一列都错位一格。补上它。
-        return "<tr><td>" + esc(s.user || "") + "</td><td>" + badge(s.result)
-             + "</td><td class='num muted'>" + esc(memory) + "</td><td class='num muted'>" + esc(elapsed)
-             + "</td><td class='num muted'>" + esc(size)
-             + "</td><td class='num muted'>" + esc((s.detail && s.detail.language_version) || s.language || "")
-             + "</td><td class='num' title='" + esc(s.created) + "'>" + esc(relativeTime(s.created)) + "</td><td>" + code + detail + "<div class='muted'>" + esc(note) + "</div></td></tr>";
-      }).join("") + "</tbody></table>";
+  if (!lastRows.length) { activeSubmissionId = null; histbox.textContent = showAll ? "这道题还没有提交记录。" : "你还没有提交这道题。"; return; }
+  if (!lastRows.some(row => row.id === activeSubmissionId)) activeSubmissionId = null;
+  renderHistoryList();
 }
+histbox.addEventListener('click', event => {
+  const row = event.target.closest('[data-submission-id]');
+  if (!row) return;
+  const submission = lastRows.find(item => item.id === Number(row.dataset.submissionId));
+  if (submission) submissionDetail(submission);
+});
 historyToggle.addEventListener('click', () => {
   historyAll = !historyAll;
   historyToggle.textContent = historyAll ? '只看我的' : '看全部';
   loadHistory(historyAll);
 });
+historyBack.addEventListener('click', () => document.querySelector('[data-panel="paneStatement"]').click());
 
 // 统计只用这道题的提交记录算，不去拉整份 catalog（那是几百 KB）。
 async function loadStats() {

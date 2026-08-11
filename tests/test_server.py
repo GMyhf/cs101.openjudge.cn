@@ -756,11 +756,12 @@ process.exit(byAccepted && byRate && rateAsc && byId && untouched ? 0 : 1);
         self.assertIn("100dvh", text)
         self.assertIn("pane-editor", text)
         self.assertNotIn("height:520px", text)
-        self.assertIn("查看代码", text)
+        self.assertIn("提交详情", text)
+        self.assertIn("复制代码", text)
         self.assertIn("G++(", text)
         self.assertIn("Python3(", text)
         self.assertIn("PyPy3(", text)
-        self.assertIn("查看判题详情", text)
+        self.assertIn("submissionDetail", text)
         self.assertIn("if (r.ok) clearDraft()", text)
 
         self.assertIn('value="csharp">C# (.NET SDK 10)', text)
@@ -1199,6 +1200,18 @@ process.exit(restored && loginOk && draftOk && values.size === 0 ? 0 : 1);
         self.assertIn('value="pypy3"', text)
         self.assertIn('value="python"', text)
         self.assertNotIn("__LANGUAGE_OPTIONS__", text)      # 占位符必须被替换掉
+
+    def test_submit_history_opens_selected_submission_in_the_right_panel(self):
+        import server
+        page = server.SUBMIT_PAGE
+        self.assertIn('id="historyDetail"', page)
+        self.assertIn("pane-col.history-view", page)
+        self.assertIn("function submissionDetail(row)", page)
+        self.assertIn("highlight(row.source, row.language)", page)
+        self.assertIn("copySelectedSubmission", page)
+        self.assertIn("data-submission-id", page)
+        # 他人的 submission 仍由 API 抹去 source/detail；前端只说明权限边界，不能绕过。
+        self.assertIn("仅对提交者和管理员可见", page)
 
     @unittest.skipUnless(shutil.which("node"), "需要 node 才能真跑页面里的编辑器代码")
     def test_editor_treats_pypy3_as_python(self):
