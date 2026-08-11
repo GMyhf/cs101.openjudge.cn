@@ -63,11 +63,13 @@
   pre.src { margin:8px 0 0; padding:11px 13px; border:1px solid var(--line); border-radius:var(--radius-sm);
             background:var(--soft); overflow:auto; max-height:420px;
             font:var(--code-size)/1.55 var(--font-mono); white-space:pre }
-  .code-block { position:relative }
-  .code-block h2 { padding-right:86px }
-  .copy-code { position:absolute; top:-3px; right:0; padding:5px 9px; border:1px solid var(--line);
-               border-radius:var(--radius-sm); background:var(--panel); color:var(--ink); font:600 12px var(--font-ui); cursor:pointer }
-  .copy-code:hover, .copy-code:focus-visible { border-color:var(--accent); color:var(--accent) }
+  .source-wrap { position:relative }
+  .copy-code { position:absolute; top:8px; right:8px; width:28px; height:28px; padding:0; border:1px solid var(--line);
+               border-radius:4px; background:var(--panel); color:var(--muted); cursor:pointer }
+  .copy-code::before, .copy-code::after { content:''; position:absolute; width:9px; height:11px; border:1.5px solid currentColor; border-radius:1px }
+  .copy-code::before { top:7px; left:9px }
+  .copy-code::after { top:5px; left:7px; background:var(--panel) }
+  .copy-code:hover, .copy-code:focus-visible, .copy-code.copied { border-color:var(--accent); color:var(--accent) }
   .t-com { color:var(--tok-com); font-style:italic }
   .t-str { color:var(--tok-str) }
   .t-num { color:var(--tok-num) }
@@ -211,11 +213,11 @@ async function copySource(button) {
       box.value = source; box.style.position = 'fixed'; box.style.opacity = '0';
       document.body.appendChild(box); box.select(); document.execCommand('copy'); box.remove();
     }
-    button.textContent = '已复制';
+    button.classList.add('copied'); button.title = button.getAttribute('aria-label') = '已复制';
   } catch (error) {
-    button.textContent = '复制失败';
+    button.title = button.getAttribute('aria-label') = '复制失败';
   }
-  setTimeout(() => { button.textContent = '复制代码'; }, 1400);
+  setTimeout(() => { button.classList.remove('copied'); button.title = button.getAttribute('aria-label') = '复制代码'; }, 1400);
 }
 
 const statusQuery = VIEW === 'status' ? location.search : '';
@@ -391,8 +393,8 @@ function renderSolution(data) {
     if (d.expected_output) lines.push(`<div><b>期望输出：</b></div><pre class="src">${esc(d.expected_output.text || '')}</pre>`);
     if (lines.length) blocks.push('<section class="block"><h2>判题详情</h2>' + lines.join('') + '</section>');
     const source = data.source || '（这次提交没有留下代码）';
-    blocks.push('<section class="block code-block"><h2>代码</h2><button class="copy-code" type="button" onclick="copySource(this)">复制代码</button>'
-      + `<pre class="src code"><code>${highlightSource(source, data.language)}</code></pre></section>`);
+    blocks.push('<section class="block"><h2>代码</h2><div class="source-wrap"><button class="copy-code" type="button" aria-label="复制代码" title="复制代码" onclick="copySource(this)"></button>'
+      + `<pre class="src code"><code>${highlightSource(source, data.language)}</code></pre></div></section>`);
   }
   view.innerHTML = blocks.join('');
 }

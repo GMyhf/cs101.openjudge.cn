@@ -757,7 +757,7 @@ process.exit(byAccepted && byRate && rateAsc && byId && untouched ? 0 : 1);
         self.assertIn("pane-editor", text)
         self.assertNotIn("height:520px", text)
         self.assertIn("提交详情", text)
-        self.assertIn("复制代码", text)
+        self.assertIn('aria-label="复制代码"', text)
         self.assertIn("G++(", text)
         self.assertIn("Python3(", text)
         self.assertIn("PyPy3(", text)

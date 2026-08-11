@@ -413,8 +413,13 @@ document.documentElement.dataset.theme=t;}catch(e){document.documentElement.data
  .submission-row-meta{color:var(--muted);font:12px var(--font-ui);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
  .submission-detail-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
  .submission-detail-head h2{font-size:18px;margin:0}
+ .submission-source-wrap{position:relative;display:flex;flex:1;min-height:0}
  .submission-source{margin:0;flex:1;min-height:0;overflow:auto;padding:13px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--soft);font:var(--code-size)/1.55 var(--font-mono);white-space:pre}
  .submission-source code{font:inherit}
+ .source-copy{position:absolute;top:8px;right:8px;width:28px;height:28px;padding:0;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--muted);cursor:pointer}
+ .source-copy::before,.source-copy::after{content:'';position:absolute;width:9px;height:11px;border:1.5px solid currentColor;border-radius:1px}
+ .source-copy::before{top:7px;left:9px}.source-copy::after{top:5px;left:7px;background:var(--panel)}
+ .source-copy:hover,.source-copy:focus-visible,.source-copy.copied{border-color:var(--accent);color:var(--accent)}
  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:18px}
  .stat-card{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--soft);padding:12px 14px}
  .stat-card b{display:block;font-size:22px;line-height:1.15;font-variant-numeric:tabular-nums}
@@ -1034,10 +1039,9 @@ function submissionDetail(row) {
   let diagnostic = detail.message ? '<pre class="msg">' + esc(detail.message) + '</pre>' : '';
   if (detail.expected_tokens !== undefined) diagnostic += '<p class="muted">输出规模：期望 ' + esc(detail.expected_tokens) + ' 个 token，实际 ' + esc(detail.actual_tokens) + ' 个。</p>';
   const code = row.source
-    ? '<pre class="submission-source"><code>' + highlight(row.source, row.language) + '</code></pre>'
+    ? '<div class="submission-source-wrap"><button class="source-copy" type="button" aria-label="复制代码" title="复制代码" onclick="copySelectedSubmission(this)"></button><pre class="submission-source"><code>' + highlight(row.source, row.language) + '</code></pre></div>'
     : '<p class="placeholder">这次提交的代码与判题详情仅对提交者和管理员可见。</p>';
-  const copy = row.source ? '<button class="ghost" type="button" onclick="copySelectedSubmission(this)">复制代码</button>' : '';
-  historyDetailBody.innerHTML = '<div class="submission-detail-head"><div><h2>提交 #' + esc(row.id) + '</h2><p class="muted">' + esc(row.name || row.user || '') + ' · ' + esc(row.created) + '</p></div><div class="submission-detail-actions">' + badge(row.result) + copy + '</div></div>'
+  historyDetailBody.innerHTML = '<div class="submission-detail-head"><div><h2>提交 #' + esc(row.id) + '</h2><p class="muted">' + esc(row.name || row.user || '') + ' · ' + esc(row.created) + '</p></div><div class="submission-detail-actions">' + badge(row.result) + '</div></div>'
     + (metrics.length ? '<div class="metrics">' + metrics.join('') + '</div>' : '') + diagnostic + code;
   renderHistoryList();
 }
@@ -1047,9 +1051,9 @@ async function copySelectedSubmission(button) {
   try {
     if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(source);
     else { const box = document.createElement('textarea'); box.value = source; box.style.position = 'fixed'; box.style.opacity = '0'; document.body.appendChild(box); box.select(); document.execCommand('copy'); box.remove(); }
-    button.textContent = '已复制';
-  } catch (error) { button.textContent = '复制失败'; }
-  setTimeout(() => { button.textContent = '复制代码'; }, 1400);
+    button.classList.add('copied'); button.title = button.getAttribute('aria-label') = '已复制';
+  } catch (error) { button.title = button.getAttribute('aria-label') = '复制失败'; }
+  setTimeout(() => { button.classList.remove('copied'); button.title = button.getAttribute('aria-label') = '复制代码'; }, 1400);
 }
 
 function renderHistoryList() {
