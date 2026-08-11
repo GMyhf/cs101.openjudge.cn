@@ -1,3 +1,4 @@
+import gzip
 import http.client
 import json
 import os
@@ -22,8 +23,17 @@ STATIC_DIR = ROOT / "static"
 SUBMIT_BOOK = "pctbook"
 SUBMIT_PROBLEM = "E03406"
 
+# 内容哈希命名的题面图片。取自镜像清单而不是写死一个文件名：
+# 清单变了这里跟着变，图片被换名也不会变成一条假绿的用例。
+MIRROR_IMAGE_PATH = next(
+    entry["path"] for entry in sorted(
+        json.loads((STATIC_DIR / "openjudge" / "images" / "manifest.json")
+                   .read_text(encoding="utf-8"))["assets"].values(),
+        key=lambda item: item["path"])
+    if "/images/mirror/" in entry["path"])
 
-def request(port, method, path, body=None, cookie=None):
+
+def request(port, method, path, body=None, cookie=None, extra_headers=None):
     # 8 秒对判题类请求太紧：一次提交要真的跑完全部测试点，编译型语言还要先编译，
     # 而闸门是全量跑（`full_sweep` 之后机器正忙）。2026-07-28 就这么假红过一次。
     # 服务端启动等待早已因同样的原因从 8 秒放宽到 30 秒，这里一直没跟上。
@@ -32,6 +42,8 @@ def request(port, method, path, body=None, cookie=None):
     headers = {"Content-Type": "application/json"}
     if cookie:
         headers["Cookie"] = cookie
+    if extra_headers:
+        headers.update(extra_headers)
     payload = json.dumps(body).encode() if body is not None else None
     connection.request(method, path, payload, headers)
     response = connection.getresponse()
@@ -372,8 +384,13 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual({(item["book"], item["id"]) for item in entries},
                          {("practice", "02977"), ("pctbook", "M02977")})
         self.assertEqual({item["test_count"] for item in entries}, {21})
+        # 「同一全局题号的两个别名指向同一份数据」这条性质在 catalog.json 上，
+        # 不在接口上 —— 接口刻意不再透出 `test_cases`（见下面那条用例）。
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        disk = [item for item in catalog["problems"] if item.get("global_number") == 1978]
+        self.assertEqual(len(disk), 2)
         case_sets = {tuple((case["input"], case["output"]) for case in item["test_cases"])
-                     for item in entries}
+                     for item in disk}
         self.assertEqual(len(case_sets), 1)
 
     def test_catalog_summary_is_small_and_contains_judgeable_titles(self):
@@ -385,6 +402,176 @@ class ServerApiTests(unittest.TestCase):
         self.assertTrue(all(item["test_count"] >= 5 for item in payload["problems"]))
         self.assertTrue(any(item["title"] for item in payload["problems"]))
         self.assertLess(int(headers["Content-Length"]), 500_000)
+
+    def test_catalog_response_omits_internal_test_case_paths(self):
+        """目录接口不再透出 `test_cases`。
+
+        那是每题逐组的数据文件路径清单，占整份响应的 90%（改动前实测 4.25MB，
+        其中 3.9MB 是它），而 `problems.html` 与 `admin.html` 一个字段都没读。
+        判题取数据走 `catalog_raw()`，不经这个响应，所以去掉它不影响任何功能，
+        顺带也不再把 `_made/` 与归档目录的内部布局透给访客。
+        """
+        status, headers, body = request(self.port, "GET", "/api/catalog")
+        self.assertEqual(status, 200)
+        payload = json.loads(body)
+        self.assertGreater(len(payload["problems"]), 1000)
+        self.assertEqual([], [item["id"] for item in payload["problems"] if "test_cases" in item])
+        # 页面真正要用的字段一个都不能少 —— 否则「瘦身」就成了删功能。
+        sample = payload["problems"][0]
+        for field in ("book", "id", "path", "title", "test_count",
+                      "pass_rate", "accepted_count", "attempt_count"):
+            self.assertIn(field, sample)
+        # 字段本身还在盘上（判题要用），只是不发出去。
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        self.assertTrue(any(item.get("test_cases") for item in catalog["problems"]))
+        # 改动前这里是 4,351,449 字节。留一个数量级的余量，只钉住「不再是几 MB」。
+        self.assertLess(int(headers["Content-Length"]), 1_000_000)
+
+    def test_text_responses_are_gzipped_only_when_the_client_accepts(self):
+        """大文本响应按 Accept-Encoding 压缩；小响应和图片不压。"""
+        _, plain_headers, plain_body = request(self.port, "GET", "/api/catalog")
+        self.assertNotIn("Content-Encoding", plain_headers)
+
+        status, headers, body = request(self.port, "GET", "/api/catalog",
+                                        extra_headers={"Accept-Encoding": "gzip"})
+        self.assertEqual(status, 200)
+        self.assertEqual(headers.get("Content-Encoding"), "gzip")
+        # 压过的响应必须声明 Vary，否则中间缓存会把 gzip 那份发给不支持的客户端。
+        self.assertEqual(headers.get("Vary"), "Accept-Encoding")
+        self.assertLess(len(body), len(plain_body) / 4)
+        self.assertEqual(json.loads(gzip.decompress(body)), json.loads(plain_body))
+
+        # 1KB 以下不压：压完常常更大，省下的字节还不够一个包。
+        _, small_headers, small_body = request(self.port, "GET", "/api/me",
+                                               extra_headers={"Accept-Encoding": "gzip"})
+        self.assertLess(len(small_body), 1024)
+        self.assertNotIn("Content-Encoding", small_headers)
+
+        # 图片本身已是压缩格式，再压一遍是纯 CPU 浪费。
+        _, image_headers, _ = request(self.port, "GET", MIRROR_IMAGE_PATH,
+                                      extra_headers={"Accept-Encoding": "gzip"})
+        self.assertNotIn("Content-Encoding", image_headers)
+
+    def test_compression_skips_what_it_cannot_help(self):
+        """压缩的四条规则各自可判。
+
+        走 HTTP 那条路验不到「1KB 以下不压」：小到触发阈值的响应通常也压不动，
+        两条规则效果重合 —— 把阈值删了用例照样绿（第一版就是这样）。
+        所以这里直接对决策函数验，正文自己造。
+        """
+        import server
+        big = b"print('hello world')\n" * 200          # 4200 字节，压得动
+        small = b"print('hello world')\n" * 30         # 630 字节，也压得动，但没到阈值
+        noisy = os.urandom(4096)                       # 够大但压不动
+
+        packed = server.gzip_if_worthwhile(big, "application/json; charset=utf-8", True)
+        self.assertIsNotNone(packed)
+        self.assertLess(len(packed), len(big))
+        self.assertEqual(gzip.decompress(packed), big)
+
+        self.assertIsNone(server.gzip_if_worthwhile(big, "application/json", False),
+                          "客户端没说支持 gzip 就不能压")
+        self.assertLess(len(gzip.compress(small, server.GZIP_LEVEL)), len(small),
+                        "这份样本本身是压得动的，下一条断言才有意义")
+        self.assertIsNone(server.gzip_if_worthwhile(small, "text/html; charset=utf-8", True),
+                          "1KB 以下不压")
+        self.assertIsNone(server.gzip_if_worthwhile(big, "image/png", True),
+                          "图片已是压缩格式")
+        self.assertIsNone(server.gzip_if_worthwhile(noisy, "text/plain", True),
+                          "压不动就别压")
+
+    def test_static_files_revalidate_with_an_etag(self):
+        """静态文件带 ETag，命中就只回 304。
+
+        改动前全站只有 favicon 跳转有一条缓存头，`theme.css` 每翻一页重下。
+        """
+        status, headers, body = request(self.port, "GET", "/static/theme.css")
+        self.assertEqual(status, 200)
+        self.assertEqual(headers.get("Cache-Control"), "no-cache")
+        etag = headers["ETag"]
+        self.assertTrue(body)
+
+        status, headers, cached = request(self.port, "GET", "/static/theme.css",
+                                          extra_headers={"If-None-Match": etag})
+        self.assertEqual(status, 304)
+        self.assertEqual(cached, b"")
+        self.assertEqual(headers.get("ETag"), etag)
+
+        # 对不上的 ETag 必须重新发正文，否则改完 CSS 上线看不到。
+        status, _, refreshed = request(self.port, "GET", "/static/theme.css",
+                                       extra_headers={"If-None-Match": 'W/"0-0"'})
+        self.assertEqual(status, 200)
+        self.assertEqual(refreshed, body)
+
+    def test_only_content_hashed_images_are_cached_as_immutable(self):
+        """`mirror/` 下的文件名就是内容哈希，同名文件内容不会变，所以可以 immutable。
+
+        判据落在**命名方式**上，不是「是不是图片」：`images/1003/hangover.jpg`
+        保留了上游路径名，同名文件将来可能换内容，它就只能走复验。
+        """
+        _, headers, _ = request(self.port, "GET", MIRROR_IMAGE_PATH)
+        self.assertEqual(headers.get("Cache-Control"), "public, max-age=31536000, immutable")
+
+        _, headers, _ = request(self.port, "GET", "/static/openjudge/images/1003/hangover.jpg")
+        self.assertEqual(headers.get("Cache-Control"), "no-cache")
+
+    def test_failing_snippets_read_the_catalog_through_the_cache(self):
+        """出错片段走 `catalog_raw()` 的缓存，不再自己解析 5.6MB 的 catalog。
+
+        改动前一次 WA 反馈要把整份目录解析两遍（输入一遍、期望输出一遍），
+        实测每遍 40ms。这里用替身计数 —— 谁要是改回直接读盘，替身就不会被调到。
+        """
+        import server
+        calls = []
+        original = server.catalog_raw
+
+        def counted():
+            calls.append(1)
+            return original()
+
+        server.catalog_raw = counted
+        try:
+            snippet = server.failing_input_snippet(SUBMIT_BOOK, SUBMIT_PROBLEM, 1)
+            expected = server.failing_output_snippet(SUBMIT_BOOK, SUBMIT_PROBLEM, 1)
+        finally:
+            server.catalog_raw = original
+        self.assertIsNotNone(snippet)
+        self.assertIsNotNone(expected)
+        self.assertEqual(len(calls), 2)
+        self.assertIsNone(server.failing_input_snippet(SUBMIT_BOOK, SUBMIT_PROBLEM, 9999))
+
+    def test_submissions_table_is_indexed_and_runs_in_wal(self):
+        """索引要真的被查询计划用上，不是建着好看。
+
+        每行提交都带整份源码（`source` 列），全表扫描扫的是代码正文。
+        这里对四个索引各挑一条**站上真在跑的**查询形状，断言计划里出现它的名字；
+        把哪条 `create index` 删掉，对应断言就会变成 SCAN。
+        """
+        import server
+        with tempfile.TemporaryDirectory() as workdir:
+            path = Path(workdir) / "course.db"
+            saved = server.DB
+            server.DB = path
+            try:
+                server.init_db()
+            finally:
+                server.DB = saved
+            with sqlite3.connect(path) as db:
+                self.assertEqual(db.execute("pragma journal_mode").fetchone()[0], "wal")
+                plans = {
+                    "submissions_book_problem_id":
+                        "select book, problem, count(*) from submissions group by book, problem",
+                    "submissions_book_user":
+                        "select min(user) from submissions where book = 'x' group by lower(user)",
+                    "submissions_user_id":
+                        "select id from submissions where lower(user) = lower('y')"
+                        " order by id desc limit 100",
+                    "submissions_result_problem":
+                        "select count(distinct problem) from submissions where result = 'Accepted'",
+                }
+                for index, query in plans.items():
+                    plan = " ".join(str(row) for row in db.execute("explain query plan " + query))
+                    self.assertIn(index, plan, query)
 
     def test_pages_declare_the_local_favicon(self):
         """标签页图标必须是本站的。

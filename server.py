@@ -4,6 +4,7 @@ from http import cookies
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import contextlib
+import gzip
 import socket
 import threading
 import json
@@ -238,6 +239,30 @@ STATIC_TYPES = {".css": "text/css; charset=utf-8", ".js": "text/javascript; char
                 ".jpeg": "image/jpeg", ".gif": "image/gif", ".bmp": "image/bmp",
                 ".webp": "image/webp", ".ico": "image/x-icon",
                 ".woff2": "font/woff2"}
+# 值得压的只有文本。JPEG/PNG/GIF/WOFF2 本身已是压缩格式，再压一遍是纯 CPU 浪费；
+# SVG 是文本，压缩比很高，所以它在名单里。1KB 以下不压：小响应压完常常更大，
+# 而且省下的字节还不够一个包。级别 6 是 zlib 默认，4.25MB 压一次 30ms、
+# 收口后的 395KB 只要几毫秒。
+GZIP_TYPES = ("text/", "application/json", "image/svg+xml")
+GZIP_MIN_BYTES = 1024
+GZIP_LEVEL = 6
+
+
+def gzip_if_worthwhile(body, content_type, accepts_gzip):
+    """压得动就返回压好的正文，否则返回 None（照发原文）。
+
+    单独抽出来是为了能直接验：走 HTTP 那条路验不到阈值 —— 小到能触发阈值的响应
+    通常也压不动，两条规则的效果重合，删掉阈值用例照样绿。
+    """
+    if not accepts_gzip or len(body) < GZIP_MIN_BYTES:
+        return None
+    if not content_type.startswith(GZIP_TYPES):
+        return None
+    encoded = gzip.compress(body, GZIP_LEVEL)
+    # 压不动就别压：省下客户端的解压，也避免 Content-Length 反而变大。
+    return encoded if len(encoded) < len(body) else None
+
+
 IMAGE_MANIFEST = STATIC_DIR / "openjudge" / "images" / "manifest.json"
 if IMAGE_MANIFEST.is_file():
     _image_assets = json.loads(IMAGE_MANIFEST.read_text(encoding="utf-8")).get("assets", {})
@@ -1118,9 +1143,41 @@ async function loadStats() {
 </script></html>"""
 
 
+# 默认 busy timeout 是 5 秒。一个班同时交时写会互相排队，超时抛的是
+# `database is locked` —— 学生看到的是「提交失败」，而那次判题其实已经跑完了。
+DB_BUSY_TIMEOUT_SECONDS = 15
+
+# 每行提交都带着整份源码（`source` 列），所以全表扫描扫的是代码正文，不是几个整数。
+# 索引列按各处 where/group by 的实际前缀选：
+#   (book, problem, id)  → 目录页的 group by book,problem；题库页的 where book=? group by problem；
+#                          提交记录按题过滤后 order by id desc
+#   (book, lower(user))  → 题库页的每人一行（where book=? and lower(user)=lower(?)、group by lower(user)）
+#   (lower(user), id)    → /api/submissions?mine=1 的 order by id desc limit
+#   (result, problem)    → /api/stats 的两条 where result='Accepted'（首页每 60 秒轮一次）
+SUBMISSION_INDEXES = (
+    ("submissions_book_problem_id", "submissions(book, problem, id desc)"),
+    ("submissions_book_user", "submissions(book, lower(user))"),
+    ("submissions_user_id", "submissions(lower(user), id desc)"),
+    ("submissions_result_problem", "submissions(result, problem)"),
+)
+
+
+def connect_db():
+    """统一的库连接。
+
+    只加 busy timeout：WAL 是写进库文件的持久设置，`init_db()` 开一次就够。
+    """
+    return sqlite3.connect(DB, timeout=DB_BUSY_TIMEOUT_SECONDS)
+
+
 def init_db():
     DB.parent.mkdir(exist_ok=True)
-    with sqlite3.connect(DB) as db:
+    with connect_db() as db:
+        # 默认的 rollback journal 下写者会挡住读者：判题写一条记录的工夫，
+        # 别人翻题库页就得等。WAL 让读写并行，代价是库旁边多两个 `-wal`/`-shm`
+        # 文件（已加进 .gitignore —— `data/*.db` 匹配不到它们）。
+        # 备份走 `Connection.backup()` 在线接口，WAL 下同样拿得到一致快照。
+        db.execute("pragma journal_mode=WAL")
         db.execute("create table if not exists submissions (id integer primary key, user text, problem text, result text, created text default current_timestamp)")
         db.execute("create table if not exists users (username text primary key, password_hash text not null, created text default current_timestamp)")
         db.execute("create table if not exists settings (key text primary key, value text not null)")
@@ -1135,6 +1192,9 @@ def init_db():
                 db.execute(f"alter table users add column {column}")
         db.execute("update users set active = 1 where activation_token_hash is null")
         db.execute("update users set nickname = username where nickname is null or trim(nickname) = ''")
+        # 索引建在补完列之后：`book` 是 ALTER 加上来的，提前建会 no such column。
+        for name, target in SUBMISSION_INDEXES:
+            db.execute(f"create index if not exists {name} on {target}")
 
 # 「出错那组的输入片段」开关。默认**关**：管理员忘了考前关掉是泄题，
 # 忘了课后打开只是少点帮助——两种疏忽的代价不对称，所以默认取保守的一侧。
@@ -1144,13 +1204,13 @@ SNIPPET_LINES = 12
 
 
 def get_setting(key, default=""):
-    with sqlite3.connect(DB) as db:
+    with connect_db() as db:
         row = db.execute("select value from settings where key = ?", (key,)).fetchone()
     return row[0] if row else default
 
 
 def set_setting(key, value):
-    with sqlite3.connect(DB) as db:
+    with connect_db() as db:
         db.execute("insert into settings(key, value) values (?, ?)"
                    " on conflict(key) do update set value = excluded.value", (key, value))
 
@@ -1181,7 +1241,7 @@ def site_stats():
     站上就会对学生显示编造的成绩。假数字不会因为暂时没人看就变得无害。
     `streak` 已删掉：没有任何数据能算出它，与其编一个不如不给。
     """
-    with sqlite3.connect(DB) as db:
+    with connect_db() as db:
         submissions = db.execute("select count(*) from submissions").fetchone()[0]
         accepted = db.execute(
             "select count(*) from submissions where result = 'Accepted'").fetchone()[0]
@@ -1249,18 +1309,26 @@ def reveal_effective(book, now=None):
     return reveal_enabled()
 
 
-def failing_input_snippet(book, problem_id, case_index):
-    """取出错那组的输入片段。只给输入，绝不给期望输出——那是答案。"""
-    catalog_path = MIRROR / "catalog.json"
-    if not catalog_path.is_file():
-        return None
-    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
-    item = next((p for p in catalog["problems"] if p["book"] == book and p["id"] == problem_id), None)
+def failing_case_file(book, problem_id, case_index, kind):
+    """出错那组的数据文件路径。`kind` 取 "input" / "output"。
+
+    改动前这两个取片段的函数各自 `json.loads` 整份 5.6MB 的 catalog（各 40ms），
+    而隔壁 `catalog_raw()` 就是带 mtime 失效的缓存 —— 一次 WA 反馈白解析两遍。
+    """
+    catalog = catalog_raw()
+    item = next((p for p in catalog.get("problems", [])
+                 if p.get("book") == book and p.get("id") == problem_id), None)
     cases = (item or {}).get("test_cases") or []
     if not 1 <= case_index <= len(cases):
         return None
-    path = MIRROR / cases[case_index - 1]["input"]
-    if not path.is_file():
+    path = MIRROR / cases[case_index - 1][kind]
+    return path if path.is_file() else None
+
+
+def failing_input_snippet(book, problem_id, case_index):
+    """取出错那组的输入片段。只给输入，绝不给期望输出——那是答案。"""
+    path = failing_case_file(book, problem_id, case_index, "input")
+    if path is None:
         return None
     text = path.read_text(encoding="utf-8", errors="replace")
     lines = text.splitlines()
@@ -1271,16 +1339,8 @@ def failing_input_snippet(book, problem_id, case_index):
 
 def failing_output_snippet(book, problem_id, case_index):
     """Read the expected .out for the failing case and cap only the UI payload."""
-    catalog_path = MIRROR / "catalog.json"
-    if not catalog_path.is_file():
-        return None
-    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
-    item = next((p for p in catalog["problems"] if p["book"] == book and p["id"] == problem_id), None)
-    cases = (item or {}).get("test_cases") or []
-    if not 1 <= case_index <= len(cases):
-        return None
-    path = MIRROR / cases[case_index - 1]["output"]
-    if not path.is_file():
+    path = failing_case_file(book, problem_id, case_index, "output")
+    if path is None:
         return None
     text = path.read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
     return {"text": text[:4000], "truncated": len(text) > 4000,
@@ -1316,6 +1376,14 @@ def catalog_raw():
     return CATALOG_RAW_CACHE
 
 
+# `catalog.json` 的 `test_cases` 是每题逐组的数据文件路径清单，占整份目录的 90%
+# （实测：整个响应 4.25MB，其中 3.9MB 是它）。**页面一个字段都没用到** ——
+# `problems.html` 与 `admin.html` 只读 book/id/path/title/test_count/pass_rate/
+# accepted_count/attempt_count。判题取数据走 `catalog_raw()`，不经这个响应。
+# 顺带也不再把 `_made/` 与归档目录的内部布局透给任何访客。
+CATALOG_INTERNAL_FIELDS = ("test_cases",)
+
+
 def catalog_full_payload():
     """Build the complete directory response only once per catalog version."""
     global CATALOG_FULL_CACHE
@@ -1329,12 +1397,13 @@ def catalog_full_payload():
         tested_keys = {problem_key(item) for item in problems if (item.get("test_count") or 0) > 0}
         CATALOG_FULL_CACHE = {
             **raw,
-            "problems": [{**item, "title": catalog_title(item)} for item in problems],
+            "problems": [{**{k: v for k, v in item.items() if k not in CATALOG_INTERNAL_FIELDS},
+                          "title": catalog_title(item)} for item in problems],
             "unique_total": len(all_keys),
             "unique_tested_count": len(tested_keys),
             "book_meta": BOOK_META,
         }
-    with sqlite3.connect(DB) as db:
+    with connect_db() as db:
         local_stats = {
             (row[0] or "", row[1] or ""): {
                 "accepted_count": row[3],
@@ -1421,7 +1490,7 @@ def book_user_payload(book, username):
     """
     catalog = {item.get("id", ""): item
                for item in catalog_raw().get("problems", []) if item.get("book") == book}
-    with sqlite3.connect(DB) as db:
+    with connect_db() as db:
         rows = db.execute(
             """select problem, count(*), max(created),
                       count(case when result = 'Accepted' then 1 end),
@@ -1471,7 +1540,7 @@ def book_solution_payload(book, submission_id, viewer):
     **代码与判题详情只有本人和管理员**。这跟 `/api/submissions` 是同一条判断，
     照抄而不是另写一份 —— 权限判断有两份，迟早只改一份。
     """
-    with sqlite3.connect(DB) as db:
+    with connect_db() as db:
         row = db.execute(
             """select id, user, problem, result, created, language, detail, source
                  from submissions where id = ? and book = ?""", (submission_id, book)).fetchone()
@@ -1515,7 +1584,7 @@ def book_page_payload(book, authenticated, status_problem="", status_name=""):
     """
     problems = [item for item in catalog_raw().get("problems", []) if item.get("book") == book]
     ranking, status = [], []
-    with sqlite3.connect(DB) as db:
+    with connect_db() as db:
         stats = {
             row[0]: {
                 "attempt_count": row[1],
@@ -1797,13 +1866,36 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         print("%s - %s" % (self.client_ip(), fmt % args))
 
-    def send_json(self, payload, status=200):
-        body = json.dumps(payload, ensure_ascii=False).encode()
+    def accepts_gzip(self):
+        return "gzip" in self.headers.get("Accept-Encoding", "").lower()
+
+    def send_body(self, body, content_type, status=200, cache=None, etag=None):
+        """统一出口：按需 gzip，带上缓存头。
+
+        压缩只对文本类型、且只在超过 `GZIP_MIN_BYTES` 时做 —— 小响应压完反而更大，
+        而图片/字体本身已经是压缩格式，再压一遍是纯 CPU 浪费。
+        压过的响应必须带 `Vary: Accept-Encoding`，否则中间缓存会把 gzip 的那份
+        发给不支持 gzip 的客户端。
+        """
+        encoded = gzip_if_worthwhile(body, content_type, self.accepts_gzip())
         self.send_response(status)
-        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.send_header("Content-Type", content_type)
+        if cache:
+            self.send_header("Cache-Control", cache)
+        if etag:
+            self.send_header("ETag", etag)
+        if content_type.startswith(GZIP_TYPES):
+            self.send_header("Vary", "Accept-Encoding")
+        if encoded is not None:
+            self.send_header("Content-Encoding", "gzip")
+            body = encoded
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
+
+    def send_json(self, payload, status=200):
+        body = json.dumps(payload, ensure_ascii=False).encode()
+        self.send_body(body, "application/json; charset=utf-8", status)
 
     def _touch(self, token_value):
         """记一次「这个会话此刻还活着」。在线数只认这个，不认 TOKENS 的大小。"""
@@ -1833,13 +1925,27 @@ class Handler(BaseHTTPRequestHandler):
 
     def send_html(self, body):
         if isinstance(body, str): body = body.encode("utf-8")
-        self.send_response(200); self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body)
+        self.send_body(body, "text/html; charset=utf-8")
 
     def send_static(self, file, content_type):
-        body = file.read_bytes()
-        self.send_response(200); self.send_header("Content-Type", content_type)
-        self.send_header("Content-Length", str(len(body))); self.end_headers(); self.wfile.write(body)
+        """静态分发。带 ETag 复验；镜像图片按不可变缓存。
+
+        改动前这里一个缓存头都没有：`theme.css` 每翻一页重下，题面里的图片
+        每次打开都重取（`static/openjudge/images/` 有 16MB）。
+        `mirror/` 下的文件名就是内容哈希，同名文件内容不可能变 —— 抓取脚本
+        换内容就换文件名 —— 所以对它用 immutable 是安全的。其余静态文件走
+        `no-cache`：每次仍来问一句，但命中 ETag 就只回一个 304，省掉正文。
+        """
+        stat = file.stat()
+        etag = f'W/"{stat.st_size:x}-{stat.st_mtime_ns:x}"'
+        immutable = file.parent == STATIC_DIR / "openjudge" / "images" / "mirror"
+        cache = "public, max-age=31536000, immutable" if immutable else "no-cache"
+        if self.headers.get("If-None-Match") == etag:
+            self.send_response(304)
+            self.send_header("Cache-Control", cache)
+            self.send_header("ETag", etag)
+            self.end_headers(); return
+        self.send_body(file.read_bytes(), content_type, cache=cache, etag=etag)
 
     def local_page(self, page):
         text = page.read_text(encoding="utf-8", errors="replace")
@@ -1945,7 +2051,7 @@ class Handler(BaseHTTPRequestHandler):
 </style></head><body><main class="shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><section class="panel"><h1>{title}</h1><p class="intro">{'创建账号后即可提交代码并查看判题记录。' if register else '登录后继续使用提交与判题功能。'}</p><form id="account">{fields}<p id="error" class="error"></p><button>提交</button></form><p class="links">{links} · <a href="/">返回首页</a></p></section></main><script>const form=document.querySelector('#account'),error=document.querySelector('#error'),AFTER_LOGIN={after_login_json};form.onsubmit=async e=>{{e.preventDefault();error.textContent='';const data=Object.fromEntries(new FormData(form));if(data.confirm_password!==undefined&&data.password!==data.confirm_password){{error.textContent='两次输入的密码不一致';return}}const r=await fetch('{endpoint}',{{method:'POST',headers:{{'Content-Type':'application/json'}},body:JSON.stringify(data)}});const d=await r.json();if(r.ok){{if(d.activation_link){{error.style.color='#237a50';error.innerHTML='注册成功，请点击激活链接：<a href="'+d.activation_link+'">激活账号</a>';form.querySelector('button').disabled=true}}else location.href=AFTER_LOGIN}}else error.textContent=d.error||'操作失败'}};</script></body></html>"""
 
     def activation_page(self, token):
-        with sqlite3.connect(DB) as db:
+        with connect_db() as db:
             row = db.execute("select username from users where activation_token_hash = ? and activation_expires > ? and active = 0",
                              (reset_token_hash(token), int(time.time()))).fetchone()
             if row:
@@ -2064,7 +2170,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             username = self.current_user()
             if username is None:
                 self.send_json({"error": "Unauthorized"}, 401); return
-            with sqlite3.connect(DB) as db:
+            with connect_db() as db:
                 row = db.execute(
                     "select coalesce(nullif(trim(nickname), ''), username) from users where username = ?",
                     (username,),
@@ -2102,7 +2208,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                 limit = min(max(int(query.get("limit", ["50"])[0]), 1), 500)
             except ValueError:
                 limit = 50
-            with sqlite3.connect(DB) as db:
+            with connect_db() as db:
                 filters, values = [], []
                 if query_book:
                     filters.append("book = ?"); values.append(query_book)
@@ -2264,7 +2370,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                 self.send_json({"error": "该用户名不可注册"}, 409); return
             activation_token = secrets.token_urlsafe(32)
             try:
-                with sqlite3.connect(DB) as db:
+                with connect_db() as db:
                     if db.execute("select 1 from users where lower(username) = lower(?) or lower(email) = ?", (username, email)).fetchone():
                         self.send_json({"error": "用户名或邮箱已存在"}, 409); return
                     db.execute("insert into users(username, password_hash, email, nickname, active, activation_token_hash, activation_expires) values (?, ?, ?, ?, 0, ?, ?)",
@@ -2295,7 +2401,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                         and hmac.compare_digest(password, ADMIN_PASSWORD))
             session_user = ADMIN_USER if accepted else None
             if not accepted:
-                with sqlite3.connect(DB) as db:
+                with connect_db() as db:
                     row = db.execute("select username, password_hash, active from users where lower(username) = lower(?)", (username,)).fetchone()
                     accepted = row is not None and valid_password(row[1], password)
                     if accepted:
@@ -2325,7 +2431,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                 self.send_json({"error": "密码至少需要 8 位"}, 400); return
             if new_password != str(data.get("confirm_password", "")):
                 self.send_json({"error": "两次输入的新密码不一致"}, 400); return
-            with sqlite3.connect(DB) as db:
+            with connect_db() as db:
                 row = db.execute("select password_hash from users where username = ?", (username,)).fetchone()
                 if not row or not valid_password(row[0], current):
                     self.send_json({"error": "当前密码不正确"}, 400); return
@@ -2340,7 +2446,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             nickname = str(data.get("nickname", "")).strip()
             if not nickname or len(nickname) > 32 or not nickname.isprintable():
                 self.send_json({"error": "昵称需为 1-32 个可见字符"}, 400); return
-            with sqlite3.connect(DB) as db:
+            with connect_db() as db:
                 # 昵称不能是**别人的**用户名。排名页显示的是昵称、链接才是用户名，
                 # 不拦这一条，任何人都能把自己在排行榜上显示成别的同学（或管理员）——
                 # 一个课程排行榜上的冒名，学生看不出来，看出来了也说不清。
@@ -2372,7 +2478,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                 self.send_json({"error": f"请求太频繁了，请 {retry_after} 秒后再试",
                                 "retry_after": retry_after}, 429); return
             generic = {"ok": True}
-            with sqlite3.connect(DB) as db:
+            with connect_db() as db:
                 row = db.execute("select username from users where email = ?", (email,)).fetchone()
                 if row:
                     token = secrets.token_urlsafe(32)
@@ -2404,7 +2510,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                 self.send_json({"error": "密码至少需要 8 位"}, 400); return
             if password != confirmation:
                 self.send_json({"error": "两次输入的密码不一致"}, 400); return
-            with sqlite3.connect(DB) as db:
+            with connect_db() as db:
                 row = db.execute("select username from users where reset_token_hash = ? and reset_expires > ?",
                                  (reset_token_hash(token), int(time.time()))).fetchone()
                 if not row:
@@ -2517,7 +2623,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                 # detail 存判题器返回的全部字段（case / expected_tokens / message…），
                 # 历史页要靠它回答「错在哪组数据」，只存 status 是答不了的。
                 detail = json.dumps({k: v for k, v in result.items() if k != "status"}, ensure_ascii=False)
-                with sqlite3.connect(DB) as db:
+                with connect_db() as db:
                     db.execute("insert into submissions(user, problem, result, book, language, detail, source) values (?, ?, ?, ?, ?, ?, ?)",
                                (self.current_user() or ADMIN_USER, problem, result["status"], book, language, detail,
                                 submitted_source))

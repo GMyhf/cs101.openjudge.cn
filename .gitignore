@@ -1,5 +1,9 @@
 __pycache__/
 data/*.db
+# WAL 模式下库旁边会多出这两个文件。`data/*.db` 匹配不到它们，
+# 而 `-wal` 里就躺着尚未合并回主库的提交记录（含口令哈希那张表的写入）。
+data/*.db-wal
+data/*.db-shm
 data/.admin_password
 data/.smtp.env
 # 抓取的第三方测试数据不入库；自产 *_made 与 GMyhf 自有 *_GMyhf 数据必须入库
