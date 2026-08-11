@@ -571,6 +571,32 @@ process.exit(byAccepted && byRate && rateAsc && byId && untouched ? 0 : 1);
         _, _, body = request(self.port, "GET", "/book/pctbook/user/ZHANGSan/")
         self.assertIn('SUBJECT = "ZHANGSan"', body.decode("utf-8", errors="replace"))
 
+    @unittest.skipUnless(shutil.which("node"), "需要 node 才能真跑提交详情页的高亮代码")
+    def test_solution_page_highlights_submitted_source_and_offers_copy(self):
+        page = (ROOT / "book.html").read_text(encoding="utf-8")
+        script = page[page.index("<script>") + 8: page.rindex("</script>")]
+        core = script[script.index("const PY_KW"): script.index("const statusQuery")]
+        harness = (
+            'const esc = s => String(s ?? "").replace(/[&<>"\\\']/g, '
+            'c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\\\"":"&quot;","\\\'":"&#39;"}[c]));\n'
+            + core + "\n"
+            + 'const python = highlightSource("def f(): # note\\n  return \'<b>\' + 1", "python");\n'
+            + 'const cpp = highlightSource("#include <x>\\nint main() { return 0; }", "cpp");\n'
+            + 'const vb = highlightSource("Dim answer As Integer\\n\' note", "vbnet");\n'
+            + 'const good = ["t-kw", "t-com", "t-str", "t-num"].every(c => python.includes(\'class="\' + c + \'"\'))'
+            + ' && cpp.includes(\'class="t-pre"\') && vb.includes(\'class="t-kw"\')'
+            + ' && !python.includes("<b>");\n'
+            + 'process.exit(good ? 0 : 1);\n'
+        )
+        with tempfile.NamedTemporaryFile("w", suffix=".mjs", encoding="utf-8", delete=False) as handle:
+            handle.write(harness)
+            path = handle.name
+        self.addCleanup(os.unlink, path)
+        result = subprocess.run(["node", path], capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        self.assertIn('onclick="copySource(this)"', script)
+        self.assertIn('navigator.clipboard', script)
+
     def test_ranking_and_status_link_to_the_new_pages(self):
         _, _, body = request(self.port, "GET", "/book/pctbook/ranking/")
         text = body.decode("utf-8", errors="replace")

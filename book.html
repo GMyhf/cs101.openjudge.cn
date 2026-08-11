@@ -63,6 +63,16 @@
   pre.src { margin:8px 0 0; padding:11px 13px; border:1px solid var(--line); border-radius:var(--radius-sm);
             background:var(--soft); overflow:auto; max-height:420px;
             font:var(--code-size)/1.55 var(--font-mono); white-space:pre }
+  .code-block { position:relative }
+  .code-block h2 { padding-right:86px }
+  .copy-code { position:absolute; top:-3px; right:0; padding:5px 9px; border:1px solid var(--line);
+               border-radius:var(--radius-sm); background:var(--panel); color:var(--ink); font:600 12px var(--font-ui); cursor:pointer }
+  .copy-code:hover, .copy-code:focus-visible { border-color:var(--accent); color:var(--accent) }
+  .t-com { color:var(--tok-com); font-style:italic }
+  .t-str { color:var(--tok-str) }
+  .t-num { color:var(--tok-num) }
+  .t-kw { color:var(--tok-kw); font-weight:600 }
+  .t-pre { color:var(--tok-pre) }
   @media (max-width:620px) {
     .wrap { padding:0 14px }
     .tabs { gap:18px }
@@ -156,6 +166,56 @@ function badge(result) {
 function note(html) { view.innerHTML = `<p class="note">${html}</p>`; }
 function loginNote(what) {
   note(`登录后可查看本题库的${what}。<a href="/auth/login/">去登录</a>`);
+}
+
+// 提交页和详情页共用同一套颜色，但详情页不载入编辑器；在这里按提交语言做轻量扫描。
+// token 自身和普通文本都经 esc 转义，提交源码不能借高亮变成 HTML。
+const PY_KW = 'False|None|True|and|as|assert|async|await|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield';
+const C_KW = 'auto|bool|break|case|char|class|const|constexpr|continue|default|delete|do|double|else|enum|extern|false|float|for|goto|if|inline|int|long|namespace|new|nullptr|operator|private|protected|public|return|short|signed|sizeof|static|struct|switch|template|this|throw|true|try|typedef|typename|union|unsigned|using|virtual|void|volatile|while';
+const VB_KW = 'And|As|Boolean|ByRef|ByVal|Case|Class|Const|Continue|Dim|Do|Double|Each|Else|ElseIf|End|Exit|False|For|Function|If|In|Integer|Is|Loop|Module|New|Next|Not|Nothing|Or|Private|Public|Return|Select|Shared|Single|String|Sub|Then|To|True|Until|While';
+const NUMBER = /\b\d+(?:\.\d+)?(?:[eE][+-]?\d+)?\b/y;
+const SOURCE_SPECS = {
+  python: [['com', /#[^\n]*/y], ['str', /(["]{3}|''')[\s\S]*?\1|"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'/y], ['num', NUMBER], ['kw', new RegExp('\\b(?:' + PY_KW + ')\\b', 'y')]],
+  c: [['com', /\/\/[^\n]*|\/\*[\s\S]*?\*\//y], ['pre', /#[a-z]+/iy], ['str', /"(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*'/y], ['num', NUMBER], ['kw', new RegExp('\\b(?:' + C_KW + ')\\b', 'y')]],
+  vbnet: [['com', /'[^\n]*/y], ['str', /"(?:""|[^"\n])*"/y], ['num', NUMBER], ['kw', new RegExp('\\b(?:' + VB_KW + ')\\b', 'iy')]],
+};
+SOURCE_SPECS.pypy3 = SOURCE_SPECS.python;
+for (const language of ['cpp', 'csharp', 'fsharp', 'swift', 'objc']) SOURCE_SPECS[language] = SOURCE_SPECS.c;
+
+function highlightSource(code, language) {
+  const specs = SOURCE_SPECS[language] || SOURCE_SPECS.c;
+  let output = '', index = 0;
+  while (index < code.length) {
+    let token = null;
+    for (const [kind, pattern] of specs) {
+      pattern.lastIndex = index;
+      const match = pattern.exec(code);
+      if (match && match.index === index && match[0]) { token = [kind, match[0]]; break; }
+    }
+    if (token) {
+      output += `<span class="t-${token[0]}">${esc(token[1])}</span>`;
+      index += token[1].length;
+    } else {
+      output += esc(code[index++]);
+    }
+  }
+  return output;
+}
+
+async function copySource(button) {
+  const source = button.closest('.code-block').querySelector('code').textContent;
+  try {
+    if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(source);
+    else {
+      const box = document.createElement('textarea');
+      box.value = source; box.style.position = 'fixed'; box.style.opacity = '0';
+      document.body.appendChild(box); box.select(); document.execCommand('copy'); box.remove();
+    }
+    button.textContent = '已复制';
+  } catch (error) {
+    button.textContent = '复制失败';
+  }
+  setTimeout(() => { button.textContent = '复制代码'; }, 1400);
 }
 
 const statusQuery = VIEW === 'status' ? location.search : '';
@@ -330,8 +390,9 @@ function renderSolution(data) {
     if (d.failing_input) lines.push(`<div><b>出错那组的输入：</b></div><pre class="src">${esc(d.failing_input.text || '')}</pre>`);
     if (d.expected_output) lines.push(`<div><b>期望输出：</b></div><pre class="src">${esc(d.expected_output.text || '')}</pre>`);
     if (lines.length) blocks.push('<section class="block"><h2>判题详情</h2>' + lines.join('') + '</section>');
-    blocks.push('<section class="block"><h2>代码</h2><pre class="src code">'
-      + esc(data.source || '（这次提交没有留下代码）') + '</pre></section>');
+    const source = data.source || '（这次提交没有留下代码）';
+    blocks.push('<section class="block code-block"><h2>代码</h2><button class="copy-code" type="button" onclick="copySource(this)">复制代码</button>'
+      + `<pre class="src code"><code>${highlightSource(source, data.language)}</code></pre></section>`);
   }
   view.innerHTML = blocks.join('');
 }
