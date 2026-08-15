@@ -24,6 +24,10 @@ python3 server.py                      # 起服务，默认 0.0.0.0:8000
 
 一个 PR 只做一件事。commit message 写「为什么」，不是「改了哪个文件」。
 
+**要新增一道题**（抓题面 → 插题库列表 → 造 `_made` 数据 → 重建索引 → 证明数据判得动），
+照 [管理员手册 · 新增一道题](docs/管理员手册.md#新增一道题) 那条流水线走，
+里面记着几个踩过的坑（整页重抓会抹掉别的题、生成器要按错法设计形状）。
+
 `main` 上的必需检查是 **`gate`**（`.github/workflows/ci.yml` 跑的 `tools/handoff.py --verify`）。
 PR 要合进来，`gate` 必须绿，外加维护者 1 次批准。
 **别把这个 job 改名叫 `build`** —— 仓库开着 GitHub Pages，它注入的

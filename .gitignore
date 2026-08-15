@@ -13,6 +13,10 @@ data/openjudge/tests/**
 !data/openjudge/tests/*/*_made/**
 !data/openjudge/tests/*/*_GMyhf/
 !data/openjudge/tests/*/*_GMyhf/**
+# 上面两组 `!…/**` 把开头那条 `__pycache__/` 也一并翻了回来（后匹配者胜），
+# 于是在 `_made` 目录里跑一次 `producecase.py` 就会有 .pyc 等着被 `git add -A` 收走。
+data/openjudge/tests/*/*_made/__pycache__/
+data/openjudge/tests/*/*_GMyhf/__pycache__/
 data/openjudge/__MACOSX/
 collab/review-input.md
 # 手工起服务时的日志（systemd 部署走 journal，不产生这个文件）。

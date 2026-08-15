@@ -345,7 +345,7 @@ MIRRORED_IMAGE_PATTERN = (
     if MIRRORED_IMAGE_URLS else None
 )
 BOOK_META = {
-    "practice": {"name": "题库（包括计概、数算题目）", "count": 986},
+    "practice": {"name": "题库（包括计概、数算题目）", "count": 987},
     "pctbook": {"name": "计算思维算法实践", "count": 215},
     "routine": {"name": "数算 2025Spring每日选作", "count": 203},
     "2025sp_routine": {"name": "数算 2025Spring每日选作", "count": 73},

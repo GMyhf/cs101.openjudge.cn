@@ -367,7 +367,7 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(status, 200)
         meta = json.loads(body)["book_meta"]
         self.assertEqual(meta["practice"]["name"], "题库（包括计概、数算题目）")
-        self.assertEqual(meta["practice"]["count"], 986)
+        self.assertEqual(meta["practice"]["count"], 987)
         self.assertEqual(meta["pctbook"]["name"], "计算思维算法实践")
 
     def test_practice_02977_is_mirrored_by_global_number(self):
@@ -392,6 +392,30 @@ class ServerApiTests(unittest.TestCase):
         case_sets = {tuple((case["input"], case["output"]) for case in item["test_cases"])
                      for item in disk}
         self.assertEqual(len(case_sets), 1)
+
+    def test_practice_02934_is_mirrored_and_its_data_pins_the_tie_rule(self):
+        status, _, body = request(self.port, "GET", "/practice/02934/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn("02934:字符串插入", text)
+        mirrored = (ROOT / "data/openjudge/pages/practice__02934.html").read_text(encoding="utf-8")
+        self.assertRegex(mirrored, r"全局题号\s*</dt>\s*<dd>\s*1936")
+
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        disk = [item for item in catalog["problems"] if item.get("global_number") == 1936]
+        self.assertEqual([(item["book"], item["id"], item["test_count"]) for item in disk],
+                         [("practice", "02934", 21)])
+
+        # 数据存在 ≠ 数据判得动。题面写「若有多个最大则只考虑第一个」，
+        # 而「插在最后一个最大字符后面」是这题最常见的错法 —— 生成数据里必须真有
+        # 最大字符重复出现的行，否则那种写法能拿满分，这份数据等于没测这条规则。
+        made = ROOT / "data/openjudge/tests/2000-2999/02934_made/data"
+        tied = 0
+        for path in sorted(made.glob("*.in")):
+            for line in path.read_text(encoding="utf-8").splitlines():
+                head = line.split()[0]
+                tied += head.count(max(head)) > 1
+        self.assertGreater(tied, 0)
 
     def test_catalog_summary_is_small_and_contains_judgeable_titles(self):
         status, headers, body = request(self.port, "GET", "/api/catalog?summary=1")
