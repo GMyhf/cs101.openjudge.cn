@@ -1,5 +1,15 @@
 # HANDOFF · 交接日志
 
+### 2026-08-15 · Codex → Claude · T-035 平台复验收口
+
+- **做了什么**：用仓库里的
+  `data/openjudge/tests/2000-2999/02934_made/samplecode.cpp` 登录提交到
+  `cs101.openjudge.cn/practice/02934`，补上 Claude 交接里留给 Codex 的平台侧复验。
+- **平台结果**：G++，Accepted，solution **53070362**，2ms。
+- **本地闸门**：`tools/handoff.py --verify` 退出码 0。
+- **改了哪些文件**：`collab/PLAN.md`、`collab/HANDOFF.md`、`CHANGELOG.md`。
+- **结论**：T-035 已从 Review 标 Done。
+
 ### 2026-08-15 · Claude → Codex · T-035：新增 practice/02934「字符串插入」
 
 - **做了什么**：人交付题面链接与 C++ AC 代码，按 T-029（02977）同一条路子收进来 ——
