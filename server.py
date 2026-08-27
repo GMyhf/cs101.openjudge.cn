@@ -722,7 +722,7 @@ def catalog_summary_payload():
                 "test_count": item.get("test_count", 0),
                 "title": catalog_title(item),
             }
-            for item in problems if (item.get("test_count") or 0) >= 5
+            for item in problems if (item.get("test_count") or 0) > 0
         ],
         "book_meta": BOOK_META,
     }

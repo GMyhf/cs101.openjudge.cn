@@ -423,8 +423,14 @@ class ServerApiTests(unittest.TestCase):
         payload = json.loads(body)
         self.assertGreater(payload["tested_count"], 0)
         self.assertTrue(payload["problems"])
-        self.assertTrue(all(item["test_count"] >= 5 for item in payload["problems"]))
+        self.assertTrue(all(item["test_count"] >= 1 for item in payload["problems"]))
         self.assertTrue(any(item["title"] for item in payload["problems"]))
+        self.assertEqual(
+            {(item["book"], item["id"], item["test_count"])
+             for item in payload["problems"]
+             if item["id"] in {"M29917", "29917"}},
+            {("pctbook", "M29917", 1), ("practice", "29917", 1)},
+        )
         self.assertLess(int(headers["Content-Length"]), 500_000)
 
     def test_catalog_response_omits_internal_test_case_paths(self):
