@@ -111,6 +111,49 @@ def parse_sample_sections(text, truncate_explanations=True):
             if case.get("input", "").strip() or case.get("output", "").strip()]
 
 
+def parse_embedded_html_samples(text):
+    """Extract samples stored as headings and code blocks inside the description."""
+    headings = list(re.finditer(r'<h(?P<level>[1-6])\b[^>]*>(?P<title>.*?)</h(?P=level)>',
+                                text, re.I | re.S))
+    blocks = []
+    sample_group_level = None
+
+    def plain(chunk):
+        chunk = re.sub(r"<br\s*/?>", "\n", chunk, flags=re.I)
+        return unescape(re.sub(r"<[^>]+>", "", chunk)).strip("\n")
+
+    for index, heading in enumerate(headings):
+        level = int(heading.group("level"))
+        title = re.sub(r"\s+", "", plain(heading.group("title")))
+        direct = re.fullmatch(r"样例(输入|输出)(?:\d+)?", title)
+        group = re.fullmatch(r"样例(?:\d+|[一二三四五六七八九十]+)", title)
+        kind = direct.group(1) if direct else None
+
+        if group:
+            sample_group_level = level
+            continue
+        if kind is None and sample_group_level is not None and level > sample_group_level:
+            kind = title if title in ("输入", "输出") else None
+        if kind is None:
+            if sample_group_level is not None and level <= sample_group_level:
+                sample_group_level = None
+            continue
+
+        end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
+        pre = re.search(r"<pre\b[^>]*>(.*?)</pre>", text[heading.end():end], re.I | re.S)
+        if pre:
+            blocks.append((kind, plain(pre.group(1))))
+
+    cases, pending_input = [], None
+    for kind, body in blocks:
+        if kind == "输入":
+            pending_input = body
+        elif pending_input is not None:
+            cases.append({"input": pending_input, "output": body})
+            pending_input = None
+    return cases
+
+
 JUDGE_SLOTS = set()
 JUDGE_SLOTS_LOCK = threading.Lock()
 
@@ -1277,6 +1320,10 @@ class Handler(BaseHTTPRequestHandler):
             return unescape(re.sub(r"<[^>]+>", "", chunk)).strip("\n")
         raw_input, raw_output = plain(match.group(1)), plain(match.group(2))
         cases = []
+        if raw_input.strip() == "见描述" and raw_output.strip() == "见描述":
+            content = re.search(r'<dl class="problem-content">(.*?)</dl>', text, re.S)
+            if content:
+                cases = parse_embedded_html_samples(content.group(1))
         if SAMPLE_ANY.search(raw_input) or SAMPLE_ANY.search(raw_output):
             # 标注式题面里两个 <dl> 的分工是乱的：T27237 把样例 1 的输入和输出
             # 一起塞进「样例输入」，样例 2 整组塞进「样例输出」。所以合起来再切。

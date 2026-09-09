@@ -1731,6 +1731,28 @@ process.exit(expected.every(value => out.includes(value)) && !out.includes('disp
         self.assertNotIn("样例输入", payload["input"])
         self.assertNotIn("样例输出", payload["cases"][0]["output"])
 
+    def test_submit_page_extracts_samples_embedded_in_description(self):
+        """外层写“见描述”时，运行样例必须提取描述区里的真实代码块。"""
+        status, _, body = request(self.port, "GET", "/practice/31184/submit/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        payload = json.loads(re.search(r"const SAMPLES = (\{.*?\});", text).group(1))
+        self.assertEqual(len(payload["cases"]), 9, payload)
+        self.assertEqual(payload["input"], "1\n-123")
+        self.assertEqual(payload["cases"][4], {
+            "input": "5\n4\n10 20 30 40",
+            "output": "10#20#30#40#",
+        })
+        self.assertNotEqual(payload["input"], "见描述")
+
+        status, _, body = request(self.port, "GET", "/practice/31185/submit/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        payload = json.loads(re.search(r"const SAMPLES = (\{.*?\});", text).group(1))
+        self.assertEqual(len(payload["cases"]), 12, payload)
+        self.assertEqual(payload["cases"][0]["input"], "1 1\n6\n4 1 7 -2 4 10")
+        self.assertEqual(payload["cases"][0]["output"], "-2 1 4 4 7 10\n10 -2")
+
     def test_static_sample_parser_handles_the_variants_found_in_the_library(self):
         """分隔行的写法在题库里散得很开，这些都是从 1849 个页面里实际扫出来的形状。"""
         import server
