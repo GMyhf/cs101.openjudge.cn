@@ -14,6 +14,8 @@ import unittest
 from pathlib import Path
 from urllib.parse import quote
 
+from judge import judge
+
 
 ROOT = Path(__file__).resolve().parents[1]
 STATIC_DIR = ROOT / "static"
@@ -449,10 +451,21 @@ class ServerApiTests(unittest.TestCase):
                             for path in input_cases.glob("*.in")))
 
         output_cases = ROOT / "data/openjudge/tests/30000-/31184_made/data"
+        output_inputs = [path.read_text(encoding="utf-8")
+                         for path in output_cases.glob("*.in")]
+        self.assertIn("5\n4\n10 20 30 40\n", output_inputs)
+        self.assertTrue(any(text.startswith("5\n100\n") for text in output_inputs))
         outputs = [path.read_text(encoding="utf-8") for path in output_cases.glob("*.out")]
         self.assertTrue(any("#\n" in output for output in outputs))
         self.assertTrue(any(re.fullmatch(r"-?\d+\.\d{3}\n", output) for output in outputs))
         self.assertTrue(any("," in output and not output.rstrip().endswith(",") for output in outputs))
+
+        reported_source = (ROOT / "tests/fixtures/regressions/31184_mode5_line_read.py").read_text(
+            encoding="utf-8")
+        verdict = judge("practice", "31184", "python", reported_source)
+        self.assertEqual(verdict["status"], "Runtime Error", verdict)
+        self.assertEqual(verdict["case"], 7, verdict)
+        self.assertIn("invalid literal for int()", verdict["message"])
 
         sort_cases = ROOT / "data/openjudge/tests/30000-/31185_made/data"
         headers = [path.read_text(encoding="utf-8").splitlines()[0]

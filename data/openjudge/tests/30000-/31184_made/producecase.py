@@ -22,7 +22,13 @@ def generate(number, seed):
         return f"{mode}\n" + " ".join(map(str, values)) + "\n"
     if mode == 4:
         return "4\nalpha beta gamma\n" if number < 12 else "4\na a z\n"
-    if mode in (5, 6, 9):
+    if mode == 5:
+        if number == 14:
+            return "5\n4\n10 20 30 40\n"
+        n = 100
+        values = [rng.randint(-1_000_000, 1_000_000) for _ in range(n)]
+        return f"5\n{n}\n" + " ".join(map(str, values)) + "\n"
+    if mode in (6, 9):
         n = 100 if number > 14 else 1
         values = [rng.randint(-1_000_000, 1_000_000) for _ in range(n)]
         return f"{mode}\n{n}\n" + " ".join(map(str, values)) + "\n"
