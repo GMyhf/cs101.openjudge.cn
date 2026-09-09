@@ -1603,8 +1603,8 @@ process.exit(restored && loginOk && draftOk && values.size === 0 ? 0 : 1);
                          + (result.stderr or result.stdout)[:400])
 
     @unittest.skipUnless(shutil.which("node"), "需要 node 才能真跑题面 Markdown 转换")
-    def test_statement_markdown_copies_rich_markdown_body(self):
-        """31183 的 gzip 脚本展开为 `.markdown-body`，不能只认旧题面的 dt/dd。"""
+    def test_statement_markdown_copies_rich_and_traditional_content(self):
+        """31183 富文本和 05443 传统 dt/dd 都必须能复制，且标题取真实的 h1。"""
         import server
         page = server.submit_page_template()
         script = page[page.index("<script>") + 8: page.rindex("</script>")]
@@ -1633,16 +1633,36 @@ const rich = element('div', [
 ]);
 const content = element('dl', [rich]);
 content.querySelector = selector => selector === '.markdown-body' ? rich : null;
-const title = element('h2', [], '31183:一道题搞懂输入');
+const title = element('h1', [], '31183:一道题搞懂输入');
 const params = element('dl');
 const root = {querySelector: selector => ({
-  'h2': title, '.problem-params': params, '.problem-content': content
+  'h1': title, '.problem-params': params, '.problem-content': content
 })[selector] || null};
-const document = {querySelector: selector => selector === '.statement-panel' ? root : null};
-const out = statementMarkdown();
-const expected = ['# 31183:一道题搞懂输入', '## 描述', '正确读取**标准输入**',
-                  '- 模式一', '- 模式二', '```', 'print(input())'];
-process.exit(expected.every(value => out.includes(value)) && !out.includes('display:none') ? 0 : 1);
+let currentRoot = root;
+const document = {querySelector: selector => selector === '.statement-panel' ? currentRoot : null};
+const richOut = statementMarkdown();
+const richExpected = ['# 31183:一道题搞懂输入', '## 描述', '正确读取**标准输入**',
+                      '- 模式一', '- 模式二', '```', 'print(input())'];
+
+const traditionalTitle = element('h1', [], '05443:兔子与樱花');
+const traditionalParams = element('dl', [
+  element('dt', [], '总时间限制:'), element('dd', [], '1000ms')
+]);
+const traditionalContent = element('dl', [
+  element('dt', [], '输入'), element('dd', [text('第一部分有P+1行（P<30）')]),
+  element('dt', [], '样例输入'), element('dd', [element('pre', [], '6\nGinza')])
+]);
+traditionalContent.querySelector = () => null;
+currentRoot = {querySelector: selector => ({
+  'h1': traditionalTitle, '.problem-params': traditionalParams,
+  '.problem-content': traditionalContent
+})[selector] || null};
+const traditionalOut = statementMarkdown();
+const traditionalExpected = ['# 05443:兔子与樱花', '**总时间限制:** 1000ms',
+  '## 输入', '第一部分有P+1行（P<30）', '## 样例输入', '```', '6\nGinza'];
+process.exit(richExpected.every(value => richOut.includes(value))
+  && !richOut.includes('display:none')
+  && traditionalExpected.every(value => traditionalOut.includes(value)) ? 0 : 1);
 '''
         with tempfile.NamedTemporaryFile("w", suffix=".mjs", encoding="utf-8", delete=False) as handle:
             handle.write(core + "\n" + harness)
@@ -1654,6 +1674,7 @@ process.exit(expected.every(value => out.includes(value)) && !out.includes('disp
         status, _, body = request(self.port, "GET", "/practice/31183/")
         self.assertEqual(status, 200)
         served = body.decode("utf-8", errors="replace")
+        self.assertIn("root.querySelector('h1')", served)
         self.assertIn("content.querySelector('.markdown-body')", served)
         self.assertIn("sections.push(markdownBlock(rich))", served)
 

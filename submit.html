@@ -348,7 +348,7 @@ function markdownBlock(node) {
 }
 function statementMarkdown() {
   const root = document.querySelector('.statement-panel');
-  const title = root.querySelector('h2').innerText.trim();
+  const title = root.querySelector('h1').innerText.trim();
   const params = [];
   const paramNodes = root.querySelector('.problem-params');
   if (paramNodes) {
