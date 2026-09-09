@@ -1,0 +1,571 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 31184:一道题搞懂输出</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>31184:一道题搞懂输出</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/31184/">查看</a></li>
+		<li ><a href="/practice/31184/submit/">提交</a></li>
+				<li ><a href="/practice/31184/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/31184/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>1898ms</dd>
+			<dt>单个测试点时间限制: </dt>
+		<dd>54ms</dd>
+			<dt>内存限制: </dt>
+		<dd>1898kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p>在 OpenJudge 中，仅仅&ldquo;计算结果正确&rdquo;是不够的。</p>
+<p>程序的<strong>输出格式</strong>也必须符合题目要求。</p>
+<p>例如，下面三种输出：</p>
+<pre><code class="language-text">1 2 3
+</code></pre>
+<pre><code class="language-text">1
+2
+3
+</code></pre>
+<pre><code class="language-text">1,2,3
+</code></pre>
+<p>虽然都包含数字 <code>1</code>、<code>2</code>、<code>3</code>，但它们是三种不同的输出。</p>
+<p>再例如，题目要求：</p>
+<pre><code class="language-text">12+34=46
+</code></pre>
+<p>如果程序输出：</p>
+<pre><code class="language-text">12 + 34 = 46
+</code></pre>
+<p>也不符合要求。</p>
+<p>本题设置了 9 种不同的输出模式。</p>
+<p>输入的第一行是一个整数 <code>mode</code>，表示本次需要完成哪一种任务。</p>
+<p>请根据 <code>mode</code> 的值读取后续数据，并<strong>严格按照对应模式规定的格式输出结果</strong>。</p>
+<hr />
+<h1>特别注意</h1>
+<p>在本题中：</p>
+<ul>
+<li>
+<p>空格和换行是不同的；</p>
+</li>
+<li>
+<p>英文逗号 <code>,</code>、井号 <code>#</code>、箭头 <code>-&gt;</code> 等符号必须正确输出；</p>
+</li>
+<li>
+<p>除题目要求的内容外，不要输出任何提示信息；</p>
+</li>
+<li>
+<p>不要输出列表的方括号；</p>
+</li>
+<li>
+<p>不要随意增加额外的空格；</p>
+</li>
+<li>
+<p>需要保留指定小数位数时，即使末尾是 <code>0</code> 也必须输出。</p>
+</li>
+</ul>
+<p>例如，题目要求：</p>
+<pre><code class="language-text">3.500
+</code></pre>
+<p>输出：</p>
+<pre><code class="language-text">3.5
+</code></pre>
+<p>是不符合要求的。</p>
+<hr />
+<h1>模式 1：输出一个值</h1>
+<p>当 <code>mode = 1</code> 时：</p>
+<p>第二行包含一个整数 <code>x</code>。</p>
+<p>请输出 <code>x</code> 的绝对值。</p>
+<h2>输入格式</h2>
+<pre><code class="language-text">1
+x
+</code></pre>
+<h2>输出格式</h2>
+<p>输出一个整数，表示 <code>x</code> 的绝对值。</p>
+<h2>样例输入</h2>
+<pre><code class="language-text">1
+-123
+</code></pre>
+<h2>样例输出</h2>
+<pre><code class="language-text">123
+</code></pre>
+<hr />
+<h1>模式 2：多个结果输出在同一行</h1>
+<p>当 <code>mode = 2</code> 时：</p>
+<p>第二行包含三个整数 <code>a</code>、<code>b</code>、<code>c</code>。</p>
+<p>请依次输出：</p>
+<ul>
+<li>
+<p><code>a+b</code></p>
+</li>
+<li>
+<p><code>b+c</code></p>
+</li>
+<li>
+<p><code>a+c</code></p>
+</li>
+</ul>
+<p>三个结果必须输出在<strong>同一行</strong>，相邻两个结果之间使用一个空格分隔。</p>
+<h2>输入格式</h2>
+<pre><code class="language-text">2
+a b c
+</code></pre>
+<h2>输出格式</h2>
+<pre><code class="language-text">a+b b+c a+c
+</code></pre>
+<h2>样例输入</h2>
+<pre><code class="language-text">2
+10 20 30
+</code></pre>
+<h2>样例输出</h2>
+<pre><code class="language-text">30 50 40
+</code></pre>
+<p>注意，正确输出是：</p>
+<pre><code class="language-text">30 50 40
+</code></pre>
+<p>而不是：</p>
+<pre><code class="language-text">30
+50
+40
+</code></pre>
+<hr />
+<h1>模式 3：多个结果分别输出</h1>
+<p>当 <code>mode = 3</code> 时：</p>
+<p>第二行包含三个整数 <code>a</code>、<code>b</code>、<code>c</code>。</p>
+<p>同样计算：</p>
+<ul>
+<li>
+<p><code>a+b</code></p>
+</li>
+<li>
+<p><code>b+c</code></p>
+</li>
+<li>
+<p><code>a+c</code></p>
+</li>
+</ul>
+<p>但是与模式 2 不同，本模式要求三个结果<strong>分别占一行</strong>。</p>
+<h2>输入格式</h2>
+<pre><code class="language-text">3
+a b c
+</code></pre>
+<h2>输出格式</h2>
+<p>第一行输出 <code>a+b</code>。</p>
+<p>第二行输出 <code>b+c</code>。</p>
+<p>第三行输出 <code>a+c</code>。</p>
+<h2>样例输入</h2>
+<pre><code class="language-text">3
+10 20 30
+</code></pre>
+<h2>样例输出</h2>
+<pre><code class="language-text">30
+50
+40
+</code></pre>
+<p>注意，正确输出是：</p>
+<pre><code class="language-text">30
+50
+40
+</code></pre>
+<p>而不是：</p>
+<pre><code class="language-text">30 50 40
+</code></pre>
+<hr />
+<h1>模式 4：使用指定分隔符输出</h1>
+<p>当 <code>mode = 4</code> 时：</p>
+<p>第二行包含三个不含空格的字符串 <code>a</code>、<code>b</code>、<code>c</code>。</p>
+<p>请按照输入顺序输出这三个字符串，并在相邻字符串之间输出：</p>
+<pre><code class="language-text">-&gt;
+</code></pre>
+<p>箭头两侧<strong>没有空格</strong>。</p>
+<h2>输入格式</h2>
+<pre><code class="language-text">4
+a b c
+</code></pre>
+<h2>输出格式</h2>
+<pre><code class="language-text">a-&gt;b-&gt;c
+</code></pre>
+<h2>样例输入</h2>
+<pre><code class="language-text">4
+Beijing Shanghai Guangzhou
+</code></pre>
+<h2>样例输出</h2>
+<pre><code class="language-text">Beijing-&gt;Shanghai-&gt;Guangzhou
+</code></pre>
+<p>例如，下面的输出是不正确的：</p>
+<pre><code class="language-text">Beijing -&gt; Shanghai -&gt; Guangzhou
+</code></pre>
+<hr />
+<h1>模式 5：循环输出并控制每次输出的结尾</h1>
+<p>当 <code>mode = 5</code> 时：</p>
+<p>第二行包含一个整数 <code>n</code>。</p>
+<p>第三行包含 <code>n</code> 个整数：</p>
+<pre><code class="language-text">a1 a2 ... an
+</code></pre>
+<p>请按照输入顺序输出这 <code>n</code> 个整数，并且<strong>每个整数后面都紧跟一个英文井号 <code>#</code></strong>。</p>
+<p>所有内容输出在同一行。</p>
+<h2>输入格式</h2>
+<pre><code class="language-text">5
+n
+a1 a2 ... an
+</code></pre>
+<h2>输出格式</h2>
+<pre><code class="language-text">a1#a2#...#an#
+</code></pre>
+<p>注意：</p>
+<p><strong>最后一个整数后面也要输出 <code>#</code>。</strong></p>
+<h2>样例输入</h2>
+<pre><code class="language-text">5
+4
+10 20 30 40
+</code></pre>
+<h2>样例输出</h2>
+<pre><code class="language-text">10#20#30#40#
+</code></pre>
+<p>下面的输出是不正确的：</p>
+<pre><code class="language-text">10#20#30#40
+</code></pre>
+<p>因为最后少了一个 <code>#</code>。</p>
+<p>下面的输出也不正确：</p>
+<pre><code class="language-text">10
+20
+30
+40
+</code></pre>
+<hr />
+<h1>模式 6：输出列表中的所有元素</h1>
+<p>当 <code>mode = 6</code> 时：</p>
+<p>第二行包含一个整数 <code>n</code>。</p>
+<p>第三行包含 <code>n</code> 个整数。</p>
+<p>请先将这些整数按照<strong>从大到小</strong>排序，然后把排序后的所有整数输出在同一行。</p>
+<p>相邻两个整数之间使用一个空格分隔。</p>
+<h2>输入格式</h2>
+<pre><code class="language-text">6
+n
+a1 a2 ... an
+</code></pre>
+<h2>输出格式</h2>
+<p>输出排序后的 <code>n</code> 个整数。</p>
+<h2>样例输入</h2>
+<pre><code class="language-text">6
+5
+8 3 1 7 9
+</code></pre>
+<h2>样例输出</h2>
+<pre><code class="language-text">9 8 7 3 1
+</code></pre>
+<p>注意，不能直接输出 Python 列表的形式。</p>
+<p>例如：</p>
+<pre><code class="language-text">[9, 8, 7, 3, 1]
+</code></pre>
+<p>是不正确的。</p>
+<hr />
+<h1>模式 7：按照指定格式拼接输出</h1>
+<p>当 <code>mode = 7</code> 时：</p>
+<p>第二行包含两个整数 <code>a</code> 和 <code>b</code>。</p>
+<p>请按照下面的格式输出：</p>
+<pre><code class="language-text">a*b=乘积
+</code></pre>
+<p>其中：</p>
+<ul>
+<li>
+<p><code>a</code> 和 <code>b</code> 替换为输入的整数；</p>
+</li>
+<li>
+<p><code>乘积</code> 替换为 <code>a*b</code> 的计算结果；</p>
+</li>
+<li>
+<p><code>*</code> 和 <code>=</code> 两侧都没有空格。</p>
+</li>
+</ul>
+<h2>输入格式</h2>
+<pre><code class="language-text">7
+a b
+</code></pre>
+<h2>输出格式</h2>
+<pre><code class="language-text">a*b=a与b的乘积
+</code></pre>
+<h2>样例输入</h2>
+<pre><code class="language-text">7
+12 34
+</code></pre>
+<h2>样例输出</h2>
+<pre><code class="language-text">12*34=408
+</code></pre>
+<p>下面的输出是不正确的：</p>
+<pre><code class="language-text">12 * 34 = 408
+</code></pre>
+<p>因为多出了空格。</p>
+<hr />
+<h1>模式 8：按照指定小数位数输出</h1>
+<p>当 <code>mode = 8</code> 时：</p>
+<p>第二行包含两个整数 <code>a</code> 和 <code>b</code>，保证：</p>
+<pre><code class="language-text">b != 0
+</code></pre>
+<p>请计算：</p>
+<pre><code class="language-text">a / b
+</code></pre>
+<p>并将结果输出为<strong>恰好 3 位小数</strong>。</p>
+<h2>输入格式</h2>
+<pre><code class="language-text">8
+a b
+</code></pre>
+<h2>输出格式</h2>
+<p>输出 <code>a/b</code> 的结果，保留 3 位小数。</p>
+<h2>样例输入</h2>
+<pre><code class="language-text">8
+10 4
+</code></pre>
+<h2>样例输出</h2>
+<pre><code class="language-text">2.500
+</code></pre>
+<p>注意：</p>
+<pre><code class="language-text">2.5
+</code></pre>
+<p>虽然数值相同，但输出格式不符合要求。</p>
+<hr />
+<h1>模式 9：输出序列，并且末尾不能有分隔符</h1>
+<p>当 <code>mode = 9</code> 时：</p>
+<p>第二行包含一个整数 <code>n</code>。</p>
+<p>第三行包含 <code>n</code> 个整数。</p>
+<p>请将这些整数按照输入顺序输出在同一行，相邻两个整数之间使用英文逗号：</p>
+<pre><code class="language-text">,
+</code></pre>
+<p>分隔。</p>
+<p><strong>最后一个整数后面不能出现逗号。</strong></p>
+<h2>输入格式</h2>
+<pre><code class="language-text">9
+n
+a1 a2 ... an
+</code></pre>
+<h2>输出格式</h2>
+<pre><code class="language-text">a1,a2,...,an
+</code></pre>
+<h2>样例输入</h2>
+<pre><code class="language-text">9
+5
+1 2 3 4 5
+</code></pre>
+<h2>样例输出</h2>
+<pre><code class="language-text">1,2,3,4,5
+</code></pre>
+<p>下面的输出是不正确的：</p>
+<pre><code class="language-text">1,2,3,4,5,
+</code></pre>
+<p>因为末尾多了一个逗号。</p>
+<p>下面的输出也不正确：</p>
+<pre><code class="language-text">1 2 3 4 5
+</code></pre>
+<p>因为题目要求使用英文逗号分隔。</p>
+<hr />
+<h1>数据范围</h1>
+<p>对于所有测试数据：</p>
+<pre><code class="language-text">1 &lt;= mode &lt;= 9
+</code></pre>
+<p>所有需要作为整数处理的数据，其绝对值不超过：</p>
+<pre><code class="language-text">10^6
+</code></pre>
+<p>此外：</p>
+<ul>
+<li>
+<p>模式 4 中的字符串均不含空格；</p>
+</li>
+<li>
+<p>模式 5 中 <code>1 &lt;= n &lt;= 100</code>；</p>
+</li>
+<li>
+<p>模式 6 中 <code>1 &lt;= n &lt;= 100</code>；</p>
+</li>
+<li>
+<p>模式 8 中保证 <code>b != 0</code>；</p>
+</li>
+<li>
+<p>模式 9 中 <code>1 &lt;= n &lt;= 100</code>。</p>
+</li>
+</ul></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>见描述</dd>
+		<dt>输出</dt>
+		<dd>见描述</dd>
+		<dt>样例输入</dt>
+		<dd><pre>见描述</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>见描述</pre></dd>
+				<dt>提示</dt>
+		<dd>完成本题后，应当能够理解和使用以下常见 Python 输出方式：<br />print(a)<br />print(a, b, c)<br />多次调用：<br />print(a)<br />print(b)<br />print(c)<br />指定分隔符：print(a, b, c, sep="->")<br />修改一次 print() 结束时输出的内容：print(a, end="#")<br />输出列表中的元素：print(*a)<br />格式化字符串：print(f"{a}*{b}={a*b}")<br />控制小数位数：print(f"{x:.3f}")<br />以及按照指定分隔符输出序列：print(*a, sep=",")<br /><br />本题的核心原则是：程序输出的不仅仅是“答案的数值”，还包括空格、换行、分隔符、小数位数等完整的输出格式。</dd>
+						<dt>来源</dt>
+		<dd>2026 TA-zzy</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/31184/">查看</a></li>
+		<li ><a href="/practice/31184/submit/">提交</a></li>
+				<li ><a href="/practice/31184/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/31184/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>31184</dd>
+					<dt>添加于</dt>
+			<dd>2026-09-08</dd>
+				<dt>提交次数</dt>
+		<dd>1</dd>
+		<dt>尝试人数</dt>
+	    <dd>1</dd>
+	    <dt>通过人数</dt>
+	    <dd>1</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>

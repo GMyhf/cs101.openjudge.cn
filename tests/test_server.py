@@ -367,7 +367,7 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(status, 200)
         meta = json.loads(body)["book_meta"]
         self.assertEqual(meta["practice"]["name"], "题库（包括计概、数算题目）")
-        self.assertEqual(meta["practice"]["count"], 987)
+        self.assertEqual(meta["practice"]["count"], 990)
         self.assertEqual(meta["pctbook"]["name"], "计算思维算法实践")
 
     def test_practice_02977_is_mirrored_by_global_number(self):
@@ -416,6 +416,50 @@ class ServerApiTests(unittest.TestCase):
                 head = line.split()[0]
                 tied += head.count(max(head)) > 1
         self.assertGreater(tied, 0)
+
+    def test_practice_31183_to_31185_are_mirrored_with_discriminating_data(self):
+        expected = {
+            "31183": ("一道题搞懂输入", set(range(1, 9))),
+            "31184": ("一道题搞懂输出", set(range(1, 10))),
+            "31185": ("一道题搞懂内置排序函数", set(range(1, 7))),
+        }
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        rows = {item["id"]: item for item in catalog["problems"]
+                if item["book"] == "practice" and item["id"] in expected}
+
+        self.assertEqual(set(rows), set(expected))
+        for problem_id, (title, modes) in expected.items():
+            status, _, body = request(self.port, "GET", f"/practice/{problem_id}/")
+            self.assertEqual(status, 200)
+            self.assertIn(f"{problem_id}:{title}", body.decode("utf-8", errors="replace"))
+            mirrored = (ROOT / f"data/openjudge/pages/practice__{problem_id}.html").read_text(
+                encoding="utf-8")
+            self.assertRegex(mirrored, rf"全局题号\s*</dt>\s*<dd>\s*{problem_id}")
+            self.assertEqual(rows[problem_id]["test_count"], 21)
+            data = ROOT / f"data/openjudge/tests/30000-/{problem_id}_made/data"
+            found_modes = {int(path.read_text(encoding="utf-8").split()[0])
+                           for path in data.glob("*.in")}
+            self.assertEqual(found_modes, modes)
+
+        input_cases = ROOT / "data/openjudge/tests/30000-/31183_made/data"
+        self.assertTrue(any("  " in path.read_text(encoding="utf-8").splitlines()[1]
+                            for path in input_cases.glob("*.in")
+                            if path.read_text(encoding="utf-8").startswith("1\n")))
+        self.assertTrue(any(path.read_text(encoding="utf-8") == "6\nEND\n"
+                            for path in input_cases.glob("*.in")))
+
+        output_cases = ROOT / "data/openjudge/tests/30000-/31184_made/data"
+        outputs = [path.read_text(encoding="utf-8") for path in output_cases.glob("*.out")]
+        self.assertTrue(any("#\n" in output for output in outputs))
+        self.assertTrue(any(re.fullmatch(r"-?\d+\.\d{3}\n", output) for output in outputs))
+        self.assertTrue(any("," in output and not output.rstrip().endswith(",") for output in outputs))
+
+        sort_cases = ROOT / "data/openjudge/tests/30000-/31185_made/data"
+        headers = [path.read_text(encoding="utf-8").splitlines()[0]
+                   for path in sort_cases.glob("*.in")]
+        self.assertEqual({int(header.split()[1]) for header in headers}, {1, 2})
+        self.assertTrue(any("2 3\n1 4\n" in path.read_text(encoding="utf-8")
+                            for path in sort_cases.glob("*.in")))
 
     def test_catalog_summary_is_small_and_contains_judgeable_titles(self):
         status, headers, body = request(self.port, "GET", "/api/catalog?summary=1")

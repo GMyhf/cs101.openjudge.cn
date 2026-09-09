@@ -1,0 +1,477 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 31185:一道题搞懂内置排序函数</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>31185:一道题搞懂内置排序函数</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/31185/">查看</a></li>
+		<li ><a href="/practice/31185/submit/">提交</a></li>
+				<li ><a href="/practice/31185/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/31185/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>10000ms</dd>
+			<dt>单个测试点时间限制: </dt>
+		<dd>1898ms</dd>
+			<dt>内存限制: </dt>
+		<dd>1898kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p class="md-end-block md-p"><span class="md-plain">完成本题所需的知识点如下。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">Python 提供了内置的排序功能：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="python" spellcheck="false"><span role="presentation"><span class="cm-variable">a</span>.<span class="cm-property">sort</span>()</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">以及：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="python" spellcheck="false"><span role="presentation"><span class="cm-variable">b</span> <span class="cm-operator">=</span> <span class="cm-builtin">sorted</span>(<span class="cm-variable">a</span>)</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">本题不要求自行编写冒泡排序、选择排序、插入排序等排序算法。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">你可以了解什么是稳定排序和不稳定排序。那么，Python 内置的排序是稳定排序吗？</span></p>
+<p class="md-end-block md-p"><span class="md-plain">你只需要根据题目要求，合理使用：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="python" spellcheck="false"><span role="presentation"><span class="cm-variable">sort</span>()</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">或：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="python" spellcheck="false"><span role="presentation"><span class="cm-builtin">sorted</span>()</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">以及必要时使用：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="python" spellcheck="false"><span role="presentation"><span class="cm-variable">key</span><span class="cm-operator">=</span></span></pre>
+<p class="md-end-block md-p"><span class="md-plain">和：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="python" spellcheck="false"><span role="presentation"><span class="cm-keyword">lambda</span></span></pre>
+<p class="md-end-block md-p"><span class="md-plain">完成各种不同的排列任务。</span></p>
+<div class="md-hr md-end-block" tabindex="-1"><hr /></div>
+<h1 class="md-end-block md-heading"><span class="md-plain">输入的第一行</span></h1>
+<p class="md-end-block md-p"><span class="md-plain">所有测试数据的第一行均包含两个整数：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">mode rule</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">其中：</span></p>
+<ul class="ul-list" data-mark="-">
+<li class="md-list-item">
+<p class="md-end-block md-p"><span class="md-pair-s" spellcheck="false"><code>mode</code></span><span class="md-plain"> 表示任务类型；</span></p>
+</li>
+<li class="md-list-item">
+<p class="md-end-block md-p"><span class="md-pair-s" spellcheck="false"><code>rule</code></span><span class="md-plain"> 只能是 </span><span class="md-pair-s" spellcheck="false"><code>1</code></span><span class="md-plain"> 或 </span><span class="md-pair-s" spellcheck="false"><code>2</code></span><span class="md-plain">，表示本次采用哪一种排列规则。</span></p>
+</li>
+</ul>
+<p class="md-end-block md-p"><span class="md-plain">不同 </span><span class="md-pair-s" spellcheck="false"><code>mode</code></span><span class="md-plain"> 中，</span><span class="md-pair-s" spellcheck="false"><code>rule=1</code></span><span class="md-plain"> 和 </span><span class="md-pair-s" spellcheck="false"><code>rule=2</code></span><span class="md-plain"> 的具体含义会分别说明。</span></p>
+<div class="md-hr md-end-block" tabindex="-1"><hr /></div>
+<h1 class="md-end-block md-heading"><span class="md-plain">模式 1：整数列表</span></h1>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">mode = 1</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时：</span></p>
+<p class="md-end-block md-p"><span class="md-plain">第二行输入一个整数 </span><span class="md-pair-s" spellcheck="false"><code>n</code></span><span class="md-plain">。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">第三行输入 </span><span class="md-pair-s" spellcheck="false"><code>n</code></span><span class="md-plain"> 个整数：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">a1 a2 ... an</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">需要重新排列这些整数。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">rule = 1</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时，数值较小的元素放在前面。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">rule = 2</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时，数值较大的元素放在前面。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">最后将排列后的所有整数输出在同一行，相邻元素之间用一个空格分隔。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">然后第二行，输出最大的数和最小的数，用空格隔开。</span></p>
+<h2 class="md-end-block md-heading"><span class="md-plain">输入格式</span></h2>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">1 rule</span><br /><span role="presentation">n</span><br /><span role="presentation">a1 a2 ... an</span></pre>
+<h2 class="md-end-block md-heading"><span class="md-plain">样例 1</span></h2>
+<h3 class="md-end-block md-heading"><span class="md-plain">输入</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">1 1</span><br /><span role="presentation">6</span><br /><span role="presentation">4 1 7 -2 4 10</span></pre>
+<h3 class="md-end-block md-heading"><span class="md-plain">输出</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">-2 1 4 4 7 10</span><br /><span role="presentation">10 -2</span></pre>
+<h2 class="md-end-block md-heading"><span class="md-plain">样例 2</span></h2>
+<h3 class="md-end-block md-heading"><span class="md-plain">输入</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">1 2</span><br /><span role="presentation">6</span><br /><span role="presentation">4 1 7 -2 4 10</span></pre>
+<h3 class="md-end-block md-heading"><span class="md-plain">输出</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">10 7 4 4 1 -2</span><br /><span role="presentation">10 -2</span></pre>
+<div class="md-hr md-end-block" tabindex="-1"><hr /></div>
+<h1 class="md-end-block md-heading"><span class="md-plain">模式 2：字符串列表</span></h1>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">mode = 2</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时：</span></p>
+<p class="md-end-block md-p"><span class="md-plain">第二行输入一个整数 </span><span class="md-pair-s" spellcheck="false"><code>n</code></span><span class="md-plain">。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">第三行输入 </span><span class="md-pair-s" spellcheck="false"><code>n</code></span><span class="md-plain"> 个只由小写英文字母组成的字符串。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">字符串之间使用空格分隔。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">本模式按照 Python 字符串的字典序比较规则进行排列。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">rule = 1</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时，字典序较小的字符串放在前面。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">rule = 2</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时，字典序较大的字符串放在前面。</span></p>
+<h2 class="md-end-block md-heading"><span class="md-plain">输入格式</span></h2>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">2 rule</span><br /><span role="presentation">n</span><br /><span role="presentation">s1 s2 ... sn</span></pre>
+<h2 class="md-end-block md-heading"><span class="md-plain">样例 1</span></h2>
+<h3 class="md-end-block md-heading"><span class="md-plain">输入</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">2 1</span><br /><span role="presentation">5</span><br /><span role="presentation">pear apple banana cat grape</span></pre>
+<h3 class="md-end-block md-heading"><span class="md-plain">输出</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">apple banana cat grape pear</span></pre>
+<h2 class="md-end-block md-heading"><span class="md-plain">样例 2</span></h2>
+<h3 class="md-end-block md-heading"><span class="md-plain">输入</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">2 2</span><br /><span role="presentation">5</span><br /><span role="presentation">pear apple banana cat grape</span></pre>
+<h3 class="md-end-block md-heading"><span class="md-plain">输出</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">pear grape cat banana apple</span></pre>
+<div class="md-hr md-end-block" tabindex="-1"><hr /></div>
+<h1 class="md-end-block md-heading"><span class="md-plain">模式 3：按照二元组两个元素之和排列</span></h1>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">mode = 3</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时：</span></p>
+<p class="md-end-block md-p"><span class="md-plain">第二行输入一个整数 </span><span class="md-pair-s" spellcheck="false"><code>n</code></span><span class="md-plain">。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">接下来 </span><span class="md-pair-s" spellcheck="false"><code>n</code></span><span class="md-plain"> 行，每行包含两个整数：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">a b</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">可以把每一行数据看成一个二元组：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="python" spellcheck="false"><span role="presentation">(<span class="cm-variable">a</span>, <span class="cm-variable">b</span>)</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">每个二元组对应一个值：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">a + b</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">rule = 1</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时，</span><span class="md-pair-s" spellcheck="false"><code>a+b</code></span><span class="md-plain"> 较小的二元组放在前面。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">rule = 2</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时，</span><span class="md-pair-s" spellcheck="false"><code>a+b</code></span><span class="md-plain"> 较大的二元组放在前面。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">如果两个二元组的 </span><span class="md-pair-s" spellcheck="false"><code>a+b</code></span><span class="md-plain"> 相同，则它们保持输入时的相对位置不变。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">排列完成后，每个二元组输出一行，格式为：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">a b</span></pre>
+<h2 class="md-end-block md-heading"><span class="md-plain">输入格式</span></h2>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">3 rule</span><br /><span role="presentation">n</span><br /><span role="presentation">a1 b1</span><br /><span role="presentation">a2 b2</span><br /><span role="presentation">...</span><br /><span role="presentation">an bn</span></pre>
+<h2 class="md-end-block md-heading"><span class="md-plain">样例 1</span></h2>
+<h3 class="md-end-block md-heading"><span class="md-plain">输入</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">3 1</span><br /><span role="presentation">4</span><br /><span role="presentation">2 3</span><br /><span role="presentation">1 4</span><br /><span role="presentation">0 9</span><br /><span role="presentation">-1 1</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">四个二元组对应的和分别为：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">5</span><br /><span role="presentation">5</span><br /><span role="presentation">9</span><br /><span role="presentation">0</span></pre>
+<h3 class="md-end-block md-heading"><span class="md-plain">输出</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">-1 1</span><br /><span role="presentation">2 3</span><br /><span role="presentation">1 4</span><br /><span role="presentation">0 9</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">注意：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">2 3</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">和：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">1 4</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">对应的和都是 </span><span class="md-pair-s" spellcheck="false"><code>5</code></span><span class="md-plain">，因此保持输入时的相对位置。</span></p>
+<h2 class="md-end-block md-heading"><span class="md-plain">样例 2</span></h2>
+<h3 class="md-end-block md-heading"><span class="md-plain">输入</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">3 2</span><br /><span role="presentation">4</span><br /><span role="presentation">2 3</span><br /><span role="presentation">1 4</span><br /><span role="presentation">0 9</span><br /><span role="presentation">-1 1</span></pre>
+<h3 class="md-end-block md-heading"><span class="md-plain">输出</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">0 9</span><br /><span role="presentation">2 3</span><br /><span role="presentation">1 4</span><br /><span role="presentation">-1 1</span></pre>
+<div class="md-hr md-end-block" tabindex="-1"><hr /></div>
+<h1 class="md-end-block md-heading"><span class="md-plain">模式 4：按照列表中的指定元素排列</span></h1>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">mode = 4</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时：</span></p>
+<p class="md-end-block md-p"><span class="md-plain">第二行输入一个整数 </span><span class="md-pair-s" spellcheck="false"><code>n</code></span><span class="md-plain">。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">接下来 </span><span class="md-pair-s" spellcheck="false"><code>n</code></span><span class="md-plain"> 行，每行包含三个整数：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">a b c</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">可以把每一行看成一个列表：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="python" spellcheck="false"><span role="presentation">[<span class="cm-variable">a</span>, <span class="cm-variable">b</span>, <span class="cm-variable">c</span>]</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">本模式只根据每个列表中的</span><span class="md-pair-s "><strong><span class="md-plain">第二个元素 </span><span class="md-pair-s" spellcheck="false"><code>b</code></span></strong></span><span class="md-plain">进行排列。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">rule = 1</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时，第二个元素较小的列表放在前面。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">rule = 2</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时，第二个元素较大的列表放在前面。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">如果两个列表的第二个元素相同，则它们保持输入时的相对位置不变。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">排列完成后，每个列表输出一行：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">a b c</span></pre>
+<h2 class="md-end-block md-heading"><span class="md-plain">输入格式</span></h2>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">4 rule</span><br /><span role="presentation">n</span><br /><span role="presentation">a1 b1 c1</span><br /><span role="presentation">a2 b2 c2</span><br /><span role="presentation">...</span><br /><span role="presentation">an bn cn</span></pre>
+<h2 class="md-end-block md-heading"><span class="md-plain">样例 1</span></h2>
+<h3 class="md-end-block md-heading"><span class="md-plain">输入</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">4 1</span><br /><span role="presentation">4</span><br /><span role="presentation">8 2 9</span><br /><span role="presentation">1 7 3</span><br /><span role="presentation">4 2 0</span><br /><span role="presentation">5 -1 6</span></pre>
+<h3 class="md-end-block md-heading"><span class="md-plain">输出</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">5 -1 6</span><br /><span role="presentation">8 2 9</span><br /><span role="presentation">4 2 0</span><br /><span role="presentation">1 7 3</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">其中：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">8 2 9</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">和：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">4 2 0</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">的第二个元素都是 </span><span class="md-pair-s" spellcheck="false"><code>2</code></span><span class="md-plain">，因此保持原来的相对位置。</span></p>
+<h2 class="md-end-block md-heading"><span class="md-plain">样例 2</span></h2>
+<h3 class="md-end-block md-heading"><span class="md-plain">输入</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">4 2</span><br /><span role="presentation">4</span><br /><span role="presentation">8 2 9</span><br /><span role="presentation">1 7 3</span><br /><span role="presentation">4 2 0</span><br /><span role="presentation">5 -1 6</span></pre>
+<h3 class="md-end-block md-heading"><span class="md-plain">输出</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">1 7 3</span><br /><span role="presentation">8 2 9</span><br /><span role="presentation">4 2 0</span><br /><span role="presentation">5 -1 6</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">本模式适合练习：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="python" spellcheck="false"><span role="presentation"><span class="cm-variable">key</span><span class="cm-operator">=</span><span class="cm-keyword">lambda</span> <span class="cm-variable">x</span>: <span class="cm-variable">x</span>[<span class="cm-number">1</span>]</span></pre>
+<div class="md-hr md-end-block" tabindex="-1"><hr /></div>
+<h1 class="md-end-block md-heading"><span class="md-plain">模式 5：保留原来的列表</span></h1>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">mode = 5</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时：</span></p>
+<p class="md-end-block md-p"><span class="md-plain">第二行输入一个整数 </span><span class="md-pair-s" spellcheck="false"><code>n</code></span><span class="md-plain">。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">第三行输入 </span><span class="md-pair-s" spellcheck="false"><code>n</code></span><span class="md-plain"> 个整数。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">你需要输出两行。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">第一行必须按照输入时的原始排列输出。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">第二行按照 </span><span class="md-pair-s" spellcheck="false"><code>rule</code></span><span class="md-plain"> 指定的规则重新排列。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">rule = 1</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时，第二行中数值较小的元素放在前面。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">rule = 2</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时，第二行中数值较大的元素放在前面。</span></p>
+<h2 class="md-end-block md-heading"><span class="md-plain">输入格式</span></h2>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">5 rule</span><br /><span role="presentation">n</span><br /><span role="presentation">a1 a2 ... an</span></pre>
+<h2 class="md-end-block md-heading"><span class="md-plain">输出格式</span></h2>
+<p class="md-end-block md-p"><span class="md-plain">第一行：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">原始数据</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">第二行：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">重新排列后的数据</span></pre>
+<h2 class="md-end-block md-heading"><span class="md-plain">样例 1</span></h2>
+<h3 class="md-end-block md-heading"><span class="md-plain">输入</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">5 1</span><br /><span role="presentation">6</span><br /><span role="presentation">4 1 7 -2 4 10</span></pre>
+<h3 class="md-end-block md-heading"><span class="md-plain">输出</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">4 1 7 -2 4 10</span><br /><span role="presentation">-2 1 4 4 7 10</span></pre>
+<h2 class="md-end-block md-heading"><span class="md-plain">样例 2</span></h2>
+<h3 class="md-end-block md-heading"><span class="md-plain">输入</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">5 2</span><br /><span role="presentation">6</span><br /><span role="presentation">4 1 7 -2 4 10</span></pre>
+<h3 class="md-end-block md-heading"><span class="md-plain">输出</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">4 1 7 -2 4 10</span><br /><span role="presentation">10 7 4 4 1 -2</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">本模式可以用来体会：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="python" spellcheck="false"><span role="presentation"><span class="cm-variable">a</span>.<span class="cm-property">sort</span>()</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">和：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="python" spellcheck="false"><span role="presentation"><span class="cm-variable">b</span> <span class="cm-operator">=</span> <span class="cm-builtin">sorted</span>(<span class="cm-variable">a</span>)</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">在使用方式上的区别。</span></p>
+<div class="md-hr md-end-block" tabindex="-1"><hr /></div>
+<h1 class="md-end-block md-heading"><span class="md-plain">模式 6：进行两次排序</span></h1>
+<p class="md-end-block md-p"><span class="md-plain">当：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">mode = 6</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">时：</span></p>
+<p class="md-end-block md-p"><span class="md-plain">第二行输入一个整数 </span><span class="md-pair-s" spellcheck="false"><code>n</code></span><span class="md-plain">。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">接下来 </span><span class="md-pair-s" spellcheck="false"><code>n</code></span><span class="md-plain"> 行，每行包含两个整数：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">a b</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">把每一行看作一个二元组：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="python" spellcheck="false"><span role="presentation">(<span class="cm-variable">a</span>, <span class="cm-variable">b</span>)</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">本模式要求按照两个步骤进行处理。</span></p>
+<div class="md-hr md-end-block" tabindex="-1"><hr /></div>
+<h2 class="md-end-block md-heading"><span class="md-plain">当 </span><span class="md-pair-s" spellcheck="false"><code>rule = 1</code></span></h2>
+<p class="md-end-block md-p"><span class="md-plain">第一步：</span></p>
+<p class="md-end-block md-p"><span class="md-plain">按照第二个元素 </span><span class="md-pair-s" spellcheck="false"><code>b</code></span><span class="md-plain"> 排列，</span><span class="md-pair-s" spellcheck="false"><code>b</code></span><span class="md-plain"> 较大的记录放在前面。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">第二步：</span></p>
+<p class="md-end-block md-p"><span class="md-plain">在第一步得到的结果上，再按照第一个元素 </span><span class="md-pair-s" spellcheck="false"><code>a</code></span><span class="md-plain"> 排列，</span><span class="md-pair-s" spellcheck="false"><code>a</code></span><span class="md-plain"> 较小的记录放在前面。</span></p>
+<div class="md-hr md-end-block" tabindex="-1"><hr /></div>
+<h2 class="md-end-block md-heading"><span class="md-plain">当 </span><span class="md-pair-s" spellcheck="false"><code>rule = 2</code></span></h2>
+<p class="md-end-block md-p"><span class="md-plain">第一步：</span></p>
+<p class="md-end-block md-p"><span class="md-plain">按照第二个元素 </span><span class="md-pair-s" spellcheck="false"><code>b</code></span><span class="md-plain"> 排列，</span><span class="md-pair-s" spellcheck="false"><code>b</code></span><span class="md-plain"> 较小的记录放在前面。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">第二步：</span></p>
+<p class="md-end-block md-p"><span class="md-plain">在第一步得到的结果上，再按照第一个元素 </span><span class="md-pair-s" spellcheck="false"><code>a</code></span><span class="md-plain"> 排列，</span><span class="md-pair-s" spellcheck="false"><code>a</code></span><span class="md-plain"> 较大的记录放在前面。</span></p>
+<div class="md-hr md-end-block" tabindex="-1"><hr /></div>
+<p class="md-end-block md-p"><span class="md-plain">Python 的 </span><span class="md-pair-s" spellcheck="false"><code>sort()</code></span><span class="md-plain"> 和 </span><span class="md-pair-s" spellcheck="false"><code>sorted()</code></span><span class="md-plain"> 都是</span><span class="md-pair-s "><strong><span class="md-plain">稳定排序</span></strong></span><span class="md-plain">。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">也就是说，第二次排序时，如果两个元素在第二次使用的关键字上相同，它们会保持第一次排序得到的相对位置。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">排列完成后，每个二元组输出一行：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">a b</span></pre>
+<h2 class="md-end-block md-heading"><span class="md-plain">输入格式</span></h2>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">6 rule</span><br /><span role="presentation">n</span><br /><span role="presentation">a1 b1</span><br /><span role="presentation">a2 b2</span><br /><span role="presentation">...</span><br /><span role="presentation">an bn</span></pre>
+<div class="md-hr md-end-block" tabindex="-1"><hr /></div>
+<h2 class="md-end-block md-heading"><span class="md-plain">样例 1</span></h2>
+<h3 class="md-end-block md-heading"><span class="md-plain">输入</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">6 1</span><br /><span role="presentation">6</span><br /><span role="presentation">2 5</span><br /><span role="presentation">1 7</span><br /><span role="presentation">2 9</span><br /><span role="presentation">1 3</span><br /><span role="presentation">3 6</span><br /><span role="presentation">2 5</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">第一步按照第二个元素处理后，可以得到：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">2 9</span><br /><span role="presentation">1 7</span><br /><span role="presentation">3 6</span><br /><span role="presentation">2 5</span><br /><span role="presentation">2 5</span><br /><span role="presentation">1 3</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">然后再按照第一个元素处理。</span></p>
+<h3 class="md-end-block md-heading"><span class="md-plain">输出</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">1 7</span><br /><span role="presentation">1 3</span><br /><span role="presentation">2 9</span><br /><span role="presentation">2 5</span><br /><span role="presentation">2 5</span><br /><span role="presentation">3 6</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">注意，对于第一个元素同样为 </span><span class="md-pair-s" spellcheck="false"><code>1</code></span><span class="md-plain"> 的：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">1 7</span><br /><span role="presentation">1 3</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">它们保留了第一次排序后形成的相对位置。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">同理，第一个元素都是 </span><span class="md-pair-s" spellcheck="false"><code>2</code></span><span class="md-plain"> 的三个记录依次为：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">2 9</span><br /><span role="presentation">2 5</span><br /><span role="presentation">2 5</span></pre>
+<div class="md-hr md-end-block" tabindex="-1"><hr /></div>
+<h2 class="md-end-block md-heading"><span class="md-plain">样例 2</span></h2>
+<h3 class="md-end-block md-heading"><span class="md-plain">输入</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">6 2</span><br /><span role="presentation">6</span><br /><span role="presentation">2 5</span><br /><span role="presentation">1 7</span><br /><span role="presentation">2 9</span><br /><span role="presentation">1 3</span><br /><span role="presentation">3 6</span><br /><span role="presentation">2 5</span></pre>
+<h3 class="md-end-block md-heading"><span class="md-plain">输出</span></h3>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">3 6</span><br /><span role="presentation">2 5</span><br /><span role="presentation">2 5</span><br /><span role="presentation">2 9</span><br /><span role="presentation">1 3</span><br /><span role="presentation">1 7</span></pre>
+<div class="md-hr md-end-block" tabindex="-1"><hr /></div>
+<h1 class="md-end-block md-heading"><span class="md-plain">数据范围</span></h1>
+<p class="md-end-block md-p"><span class="md-plain">对于所有测试数据：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">1 &lt;= mode &lt;= 6</span><br /><span role="presentation">rule = 1 或 rule = 2</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">对于所有模式：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">1 &lt;= n &lt;= 100</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">所有整数的绝对值不超过：</span></p>
+<pre class="md-fences md-end-block ty-contain-cm modeLoaded" lang="text" spellcheck="false"><span role="presentation">10^6</span></pre>
+<p class="md-end-block md-p"><span class="md-plain">模式 2 中：</span></p>
+<ul class="ul-list" data-mark="-">
+<li class="md-list-item">
+<p class="md-end-block md-p"><span class="md-plain">每个字符串长度不超过 20；</span></p>
+</li>
+<li class="md-list-item md-focus-container">
+<p class="md-end-block md-p md-focus"><span class="md-plain md-expand">字符串只包含小写英文字母。</span></p>
+</li>
+</ul></dd>
+				
+				
+				<dt>输入</dt>
+		<dd>见描述</dd>
+		<dt>输出</dt>
+		<dd>见描述</dd>
+		<dt>样例输入</dt>
+		<dd><pre>见描述</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>见描述</pre></dd>
+				<dt>提示</dt>
+		<dd>本题需要掌握的 Python 知识<br />最基本的列表排序：a.sort()<br />以及：b = sorted(a)<br />按照指定规则处理：a.sort(key=...)<br />例如：a.sort(key=lambda x: x[1])<br />或者：b = sorted(a, key=lambda x: x[0] + x[1])<br />还需要理解 Python 排序的一个重要性质：Python 的内置排序是稳定排序。<br />因此可以连续进行两次排序。例如：<br />a.sort(key=第一次使用的关键字)<br />a.sort(key=第二次使用的关键字)<br />第二次排序中关键字相同的元素，会保留第一次排序得到的相对位置。</dd>
+						<dt>来源</dt>
+		<dd>2026 TA-zzy</dd>
+				</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/31185/">查看</a></li>
+		<li ><a href="/practice/31185/submit/">提交</a></li>
+				<li ><a href="/practice/31185/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/31185/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>31185</dd>
+					<dt>添加于</dt>
+			<dd>2026-09-08</dd>
+				<dt>提交次数</dt>
+		<dd>1</dd>
+		<dt>尝试人数</dt>
+	    <dd>1</dd>
+	    <dt>通过人数</dt>
+	    <dd>1</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>
