@@ -1589,6 +1589,61 @@ process.exit(restored && loginOk && draftOk && values.size === 0 ? 0 : 1);
                          "编辑器没把 pypy3 当成 Python 处理："
                          + (result.stderr or result.stdout)[:400])
 
+    @unittest.skipUnless(shutil.which("node"), "需要 node 才能真跑题面 Markdown 转换")
+    def test_statement_markdown_copies_rich_markdown_body(self):
+        """31183 的 gzip 脚本展开为 `.markdown-body`，不能只认旧题面的 dt/dd。"""
+        import server
+        page = server.submit_page_template()
+        script = page[page.index("<script>") + 8: page.rindex("</script>")]
+        core = script[script.index("function markdownInline"):script.index("copyStatement.addEventListener")]
+        harness = r'''
+const Node = {TEXT_NODE: 3, ELEMENT_NODE: 1};
+const text = value => ({nodeType: Node.TEXT_NODE, nodeValue: value});
+function element(tag, children = [], ownText = null) {
+  const node = {
+    nodeType: Node.ELEMENT_NODE,
+    tagName: tag.toUpperCase(),
+    childNodes: children,
+    children: children.filter(child => child.nodeType === Node.ELEMENT_NODE),
+    getAttribute: () => null
+  };
+  Object.defineProperty(node, 'innerText', {get: () => ownText === null
+    ? children.map(child => child.nodeValue || child.innerText || '').join('') : ownText});
+  return node;
+}
+const rich = element('div', [
+  element('style', [text('body { display:none }')]),
+  element('h2', [text('描述')]),
+  element('p', [text('正确读取'), element('strong', [text('标准输入')])]),
+  element('ul', [element('li', [text('模式一')]), element('li', [text('模式二')])]),
+  element('pre', [], 'print(input())')
+]);
+const content = element('dl', [rich]);
+content.querySelector = selector => selector === '.markdown-body' ? rich : null;
+const title = element('h2', [], '31183:一道题搞懂输入');
+const params = element('dl');
+const root = {querySelector: selector => ({
+  'h2': title, '.problem-params': params, '.problem-content': content
+})[selector] || null};
+const document = {querySelector: selector => selector === '.statement-panel' ? root : null};
+const out = statementMarkdown();
+const expected = ['# 31183:一道题搞懂输入', '## 描述', '正确读取**标准输入**',
+                  '- 模式一', '- 模式二', '```', 'print(input())'];
+process.exit(expected.every(value => out.includes(value)) && !out.includes('display:none') ? 0 : 1);
+'''
+        with tempfile.NamedTemporaryFile("w", suffix=".mjs", encoding="utf-8", delete=False) as handle:
+            handle.write(core + "\n" + harness)
+            path = handle.name
+        self.addCleanup(os.unlink, path)
+        result = subprocess.run(["node", path], capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[:400])
+
+        status, _, body = request(self.port, "GET", "/practice/31183/")
+        self.assertEqual(status, 200)
+        served = body.decode("utf-8", errors="replace")
+        self.assertIn("content.querySelector('.markdown-body')", served)
+        self.assertIn("sections.push(markdownBlock(rich))", served)
+
     def test_history_page_and_limit(self):
         status, _, body = request(self.port, "GET", "/history/")
         self.assertEqual(status, 200)

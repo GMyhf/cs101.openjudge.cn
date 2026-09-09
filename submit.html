@@ -316,6 +316,7 @@ function markdownInline(node) {
   if (node.nodeType === Node.TEXT_NODE) return node.nodeValue.replace(/[ \t]+/g, ' ');
   if (node.nodeType !== Node.ELEMENT_NODE) return '';
   const tag = node.tagName.toLowerCase();
+  if (tag === 'style' || tag === 'script') return '';
   if (tag === 'br') return '\n';
   if (tag === 'pre') return '\n```\n' + node.innerText.trimEnd() + '\n```\n';
   const inner = Array.from(node.childNodes).map(markdownInline).join('');
@@ -324,6 +325,26 @@ function markdownInline(node) {
   if (tag === 'code') return '`' + inner.trim() + '`';
   if (tag === 'a') return '[' + inner.trim() + '](' + node.getAttribute('href') + ')';
   return inner;
+}
+function markdownBlock(node) {
+  if (node.nodeType === Node.TEXT_NODE) return markdownInline(node).trim();
+  if (node.nodeType !== Node.ELEMENT_NODE) return '';
+  const tag = node.tagName.toLowerCase();
+  if (tag === 'style' || tag === 'script') return '';
+  if (/^h[1-6]$/.test(tag)) return '#'.repeat(Number(tag[1])) + ' ' + markdownInline(node).trim();
+  if (tag === 'p') return markdownInline(node).trim();
+  if (tag === 'pre') return markdownInline(node).trim();
+  if (tag === 'hr') return '---';
+  if (tag === 'blockquote') {
+    return markdownInline(node).trim().split('\n').map(line => '> ' + line).join('\n');
+  }
+  if (tag === 'ul' || tag === 'ol') {
+    return Array.from(node.children).map((item, index) =>
+      (tag === 'ol' ? (index + 1) + '. ' : '- ') + markdownInline(item).trim()
+    ).join('\n');
+  }
+  const blocks = Array.from(node.children || []).map(markdownBlock).filter(Boolean);
+  return blocks.length ? blocks.join('\n\n') : markdownInline(node).trim();
 }
 function statementMarkdown() {
   const root = document.querySelector('.statement-panel');
@@ -338,11 +359,16 @@ function statementMarkdown() {
   }
   const sections = [];
   const content = root.querySelector('.problem-content');
-  for (const node of content.children) {
-    if (node.tagName.toLowerCase() === 'dt') sections.push('## ' + node.innerText.trim());
-    if (node.tagName.toLowerCase() === 'dd') {
-      const value = markdownInline(node).replace(/\n{3,}/g, '\n\n').trim();
-      if (value) sections.push(value);
+  const rich = content.querySelector('.markdown-body');
+  if (rich) {
+    sections.push(markdownBlock(rich));
+  } else {
+    for (const node of content.children) {
+      if (node.tagName.toLowerCase() === 'dt') sections.push('## ' + node.innerText.trim());
+      if (node.tagName.toLowerCase() === 'dd') {
+        const value = markdownInline(node).replace(/\n{3,}/g, '\n\n').trim();
+        if (value) sections.push(value);
+      }
     }
   }
   return ['# ' + title, params.join('\n'), sections.join('\n\n')].filter(Boolean).join('\n\n') + '\n';
