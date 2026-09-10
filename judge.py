@@ -362,6 +362,21 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "good_permutation":
+        try:
+            import math
+            input_tokens = list(map(int, input_data.decode().split()))
+            sizes = input_tokens[1:]
+            values = list(map(int, actual.split()))
+            cursor = 0
+            for n in sizes:
+                part = values[cursor:cursor+n]; cursor += n
+                bad = sum(math.gcd(a, b) == math.gcd(a, c) == math.gcd(b, c) == 1 for a, b, c in zip(part, part[1:], part[2:]))
+                if len(part) != n or sorted(part) != list(range(1, n + 1)) or bad > 6:
+                    return False
+            return cursor == len(values)
+        except (UnicodeDecodeError, ValueError, IndexError):
+            return False
     if kind == "weather_permutation":
         try:
             values = list(map(int, input_data.decode().split()))

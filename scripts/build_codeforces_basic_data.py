@@ -991,6 +991,20 @@ def case_2171d(r):
     return f"1\n{n}\n{' '.join(map(str,permutation))}\n",("YES" if answer else "NO")+"\n"
 
 
+def case_2171e(r):
+    from itertools import permutations
+    import math
+    def witness(n):
+        for permutation in permutations(range(1, n + 1)):
+            bad = sum(math.gcd(a, b) == math.gcd(a, c) == math.gcd(b, c) == 1
+                      for a, b, c in zip(permutation, permutation[1:], permutation[2:]))
+            if bad <= 6:
+                return permutation
+        raise RuntimeError("no good permutation")
+    sizes = [r.randint(3, 8), r.randint(3, 8)]
+    return "2\n" + "\n".join(map(str, sizes)) + "\n", "\n".join(" ".join(map(str, witness(n))) for n in sizes) + "\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -1037,6 +1051,7 @@ BUILDERS = {
     "1833B": case_1833b,
     "1843D": case_1843d,
     "2171D": case_2171d,
+    "2171E": case_2171e,
 }
 
 
@@ -1082,6 +1097,8 @@ def main():
             row["special_checker"] = "tile_jump_path"
         if problem == "1833B":
             row["special_checker"] = "weather_permutation"
+        if problem == "2171E":
+            row["special_checker"] = "good_permutation"
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"generated {len(BUILDERS)} problems x 21 cases")
 

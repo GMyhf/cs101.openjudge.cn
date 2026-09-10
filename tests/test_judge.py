@@ -248,6 +248,10 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertTrue(judge_module.special_output_matches("weather_permutation", data, "2 4 5\n"))
         self.assertFalse(judge_module.special_output_matches("weather_permutation", data, "5 4 2\n"))
 
+    def test_good_permutation_checker(self):
+        self.assertTrue(judge_module.special_output_matches("good_permutation", b"1\n3\n", "1 2 3\n"))
+        self.assertFalse(judge_module.special_output_matches("good_permutation", b"1\n3\n", "1 1 2\n"))
+
     def test_problem_exists_caches_until_catalog_changes(self):
         with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
             mirror = Path(temp)
