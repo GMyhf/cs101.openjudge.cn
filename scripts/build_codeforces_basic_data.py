@@ -615,6 +615,24 @@ def case_2132b(r):
     answers=sorted(set(answers))
     return f"1\n{value}\n",str(len(answers))+("\n"+" ".join(map(str,answers)) if answers else "")+"\n"
 
+def case_986b(r):
+    n=r.randint(3,100); perm=list(range(1,n+1)); r.shuffle(perm)
+    inversions=sum(perm[i]>perm[j] for i in range(n) for j in range(i+1,n))%2
+    return f"{n}\n{' '.join(map(str,perm))}\n",("Petr" if inversions==n%2 else "Um_nik")+"\n"
+
+def case_1000b(r):
+    limit=r.randint(3,200); points=sorted(r.sample(range(1,limit),r.randint(1,min(20,limit-1))))
+    def lit(sequence):
+        all_points=[0]+sequence+[limit]
+        return sum(all_points[i+1]-all_points[i] for i in range(0,len(all_points)-1,2))
+    answer=max(lit(points),*(lit(sorted(points+[time])) for time in range(1,limit) if time not in points))
+    return f"{len(points)} {limit}\n{' '.join(map(str,points))}\n",f"{answer}\n"
+
+def case_2196b(r):
+    values=[r.randint(1,100) for _ in range(r.randint(2,200))]
+    answer=sum(values[i]*values[j]==j-i for i in range(len(values)) for j in range(i+1,len(values)))
+    return f"1\n{len(values)}\n{' '.join(map(str,values))}\n",f"{answer}\n"
+
 
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
@@ -736,6 +754,7 @@ BUILDERS = {
     "1443C": case_1443c, "2033D": case_2033d,
     "508A": case_508a, "1163B2": case_1163b2, "1427B": case_1427b, "2075C": case_2075c,
     "2132B": case_2132b,
+    "986B": case_986b, "1000B": case_1000b, "2196B": case_2196b,
 }
 
 
