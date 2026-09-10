@@ -264,6 +264,10 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertTrue(judge_module.special_output_matches("max_median_blocks", b"1\n1\n", "1 2 3\n"))
         self.assertFalse(judge_module.special_output_matches("max_median_blocks", b"1\n2\n", "1 2 3 4 5 6\n"))
 
+    def test_distinct_adjacent_gcd_checker(self):
+        self.assertTrue(judge_module.special_output_matches("distinct_adjacent_gcd", b"1\n3\n", "3 15 35\n"))
+        self.assertFalse(judge_module.special_output_matches("distinct_adjacent_gcd", b"1\n3\n", "2 4 6\n"))
+
     def test_problem_exists_caches_until_catalog_changes(self):
         with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
             mirror = Path(temp)

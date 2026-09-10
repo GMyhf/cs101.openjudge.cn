@@ -362,6 +362,18 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "distinct_adjacent_gcd":
+        try:
+            import math
+            sizes = list(map(int, input_data.decode().split()))[1:]
+            values = list(map(int, actual.split())); cursor = 0
+            for n in sizes:
+                part = values[cursor:cursor+n]; cursor += n
+                if len(part) != n or any(value < 1 or value > 10**18 for value in part): return False
+                if len({math.gcd(a,b) for a,b in zip(part,part[1:])}) != n-1: return False
+            return cursor == len(values)
+        except (UnicodeDecodeError, ValueError):
+            return False
     if kind == "max_median_blocks":
         try:
             sizes = list(map(int, input_data.decode().split()))[1:]
