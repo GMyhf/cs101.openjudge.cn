@@ -548,6 +548,24 @@ def case_893c(r):
         answer += cheapest
     return f"{nodes} {len(pairs)}\n{' '.join(map(str,costs))}\n" + "".join(f"{a+1} {b+1}\n" for a,b in pairs), f"{answer}\n"
 
+def case_1443c(r):
+    a = [r.randint(1, 1000) for _ in range(r.randint(1, 100))]
+    b = [r.randint(1, 1000) for _ in a]
+    pairs = sorted(zip(a, b)); remaining = sum(b); answer = remaining; current = 0
+    for left, right in pairs:
+        current = max(current, left); remaining -= right; answer = min(answer, max(current, remaining))
+    return f"1\n{len(a)}\n{' '.join(map(str,a))}\n{' '.join(map(str,b))}\n", f"{answer}\n"
+
+def case_2033d(r):
+    values = [r.randint(-20, 20) for _ in range(r.randint(1, 200))]
+    prefixes, running, answer = {0}, 0, 0
+    for value in values:
+        running += value
+        if running in prefixes:
+            answer += 1; prefixes = {0}; running = value
+        prefixes.add(running)
+    return f"1\n{len(values)}\n{' '.join(map(str,values))}\n", f"{answer}\n"
+
 
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
@@ -666,6 +684,7 @@ BUILDERS = {
     "1881C": case_1881c,
     "1425A": case_1425a, "1526C1": case_1526c1, "1879B": case_1879b,
     "1B": case_1b, "460B": case_460b, "545C": case_545c, "580C": case_580c, "893C": case_893c,
+    "1443C": case_1443c, "2033D": case_2033d,
 }
 
 
