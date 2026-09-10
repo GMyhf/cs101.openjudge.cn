@@ -936,6 +936,15 @@ def case_1366d(r):
     return str(len(values))+"\n"+" ".join(map(str,values))+"\n"," ".join(map(str,first))+"\n"+" ".join(map(str,second))+"\n"
 
 
+def case_20c(r):
+    nodes=r.randint(2,30); edges=[]
+    for node in range(2,nodes+1): edges.append((r.randint(1,node-1),node,r.randint(1,100)))
+    extra=r.randint(0,30)
+    for _ in range(extra):
+        a,b=r.sample(range(1,nodes+1),2); edges.append((a,b,r.randint(1,100)))
+    return f"{nodes} {len(edges)}\n"+"".join(f"{a} {b} {w}\n" for a,b,w in edges),"\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -977,6 +986,7 @@ BUILDERS = {
     "584A": case_584a,
     "1352A": case_1352a,
     "1366D": case_1366d,
+    "20C": case_20c,
 }
 
 
@@ -1016,6 +1026,8 @@ def main():
             row["special_checker"] = "round_number_decomposition"
         if problem == "1366D":
             row["special_checker"] = "coprime_divisor_pairs"
+        if problem == "20C":
+            row["special_checker"] = "shortest_path"
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"generated {len(BUILDERS)} problems x 21 cases")
 

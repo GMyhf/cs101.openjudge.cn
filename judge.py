@@ -362,6 +362,27 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "shortest_path":
+        try:
+            import heapq
+            values = list(map(int, input_data.decode().split()))
+            nodes, edges = values[0], values[1]
+            graph = [[] for _ in range(nodes + 1)]; weights = {}
+            for index in range(edges):
+                a, b, w = values[2 + index * 3:5 + index * 3]
+                graph[a].append((b, w)); graph[b].append((a, w))
+                weights[a, b] = weights[b, a] = min(weights.get((a, b), w), w)
+            dist = [10**30] * (nodes + 1); dist[1] = 0; queue = [(0, 1)]
+            while queue:
+                cost, node = heapq.heappop(queue)
+                if cost != dist[node]: continue
+                for nxt, weight in graph[node]:
+                    if cost + weight < dist[nxt]: dist[nxt] = cost + weight; heapq.heappush(queue, (dist[nxt], nxt))
+            tokens = list(map(int, actual.split()))
+            if tokens == [-1]: return dist[nodes] == 10**30
+            return bool(tokens) and tokens[0] == 1 and tokens[-1] == nodes and all((a, b) in weights for a, b in zip(tokens, tokens[1:])) and sum(weights[a, b] for a, b in zip(tokens, tokens[1:])) == dist[nodes]
+        except (UnicodeDecodeError, ValueError, IndexError):
+            return False
     if kind == "coprime_divisor_pairs":
         try:
             values = list(map(int, input_data.decode().split()[1:]))

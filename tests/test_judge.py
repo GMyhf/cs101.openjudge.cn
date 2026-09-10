@@ -234,6 +234,11 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertTrue(judge_module.special_output_matches("coprime_divisor_pairs", b"2\n12 8\n", "2 -1\n3 -1\n"))
         self.assertFalse(judge_module.special_output_matches("coprime_divisor_pairs", b"1\n12\n", "2\n6\n"))
 
+    def test_shortest_path_checker(self):
+        data = b"3 3\n1 2 1\n2 3 1\n1 3 5\n"
+        self.assertTrue(judge_module.special_output_matches("shortest_path", data, "1 2 3\n"))
+        self.assertFalse(judge_module.special_output_matches("shortest_path", data, "1 3\n"))
+
     def test_problem_exists_caches_until_catalog_changes(self):
         with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
             mirror = Path(temp)
