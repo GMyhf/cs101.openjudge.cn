@@ -388,7 +388,7 @@ MIRRORED_IMAGE_PATTERN = (
     if MIRRORED_IMAGE_URLS else None
 )
 BOOK_META = {
-    "codeforces": {"name": "Codeforces 题库", "count": 1},
+    "codeforces": {"name": "Codeforces 题库", "count": 158},
     "practice": {"name": "题库（包括计概、数算题目）", "count": 990},
     "pctbook": {"name": "计算思维算法实践", "count": 215},
     "routine": {"name": "数算 2025Spring每日选作", "count": 203},

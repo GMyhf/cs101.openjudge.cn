@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2227H: Fallen Leaves](https://codeforces.com/contest/2227/problem/H)</title></head>
+<body><div id="pageTitle"><h2>2227H: Fallen Leaves](https://codeforces.com/contest/2227/problem/H)</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2227/H" rel="noopener">Codeforces 2227H</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：首先我们需要构建树的结构，并且记录每个节点的深度、父节点以及子节点。我们可以通过 BFS 来完成这个过程。值得注意的是，这里答案的最后结果和根节点的选取无关，只需要我们选取一个非叶子节点作为根节点即可。
+
+接下来，让我们思考究竟哪一些边会对最后的结果有贡献。如果一颗子树有偶数个叶子节点，那么这些叶子就可以**内部消化**，这个子树与其父节点的连接边不会对结果有贡献。如果一颗子树有奇数个叶子节点，那么这些叶子只能**外部消化**，这个子树与其父节点的连接边就会对结果有贡献。
+
+我们可以使用 dp 来记录以每个节点为根的子树中叶子节点的数量。对于一个节点，如果它的子树中有偶数个叶子节点，那么它就不需要外部消化；如果它的子树中有奇数个叶子节点，那么它就需要外部消化。即计算 $$ \texttt{leaf}[i] = \sum_{j \in \texttt{children}[i]} \texttt{leaf}[j] $$
+
+由此我们可以得到最后的结果为 $$ \sum_{i \neq \text{root}} \texttt{leaf}[i] \bmod 2 $$
+
+当叶子数为偶数时，所有叶子都能消除干净，上述结果自然是正确的。当叶子数为奇数时，我们需要移除一个叶子。那么移除一个叶子对结果的影响有多少呢？注意到移除一个叶子会导致所有包含它子树的节点奇偶性翻转。对于一个奇数节点，会导致贡献 $-1$，对于一个偶数节点，会导致贡献 $+1$。
+
+我们现在只需要再用一个 dp 计算出每个节点的贡献值。对于一个节点，如果它的子树中有偶数个叶子节点，那么它的贡献值和父节点相同；如果它的子树中有奇数个叶子节点，那么它的贡献值和父节点相反。即计算 $$ \texttt{even\_odd\_sum}[i] = \texttt{even\_odd\_sum}[\texttt{parent}[i]] + (-1)^{\texttt{leaf}[i]} $$
+
+由此，我们只需要找到 $\min \{\texttt{even\_odd\_sum}[i] \mid i \in \texttt{leafs}\}$，加上原先的结果，就得到了最终的答案。
+
+代码：</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2227/H" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

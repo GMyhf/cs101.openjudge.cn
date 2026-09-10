@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2205D: Simons and Beating Peaks</title></head>
+<body><div id="pageTitle"><h2>2205D: Simons and Beating Peaks</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2205/D" rel="noopener">Codeforces 2205D</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>data structures, divide and conquer, dp, greedy, implementation, trees, 1700
+
+
+*My loveliest wishes dissolved into the air; At eighteen, I poured my dreams into the mic to share.*
+
+— SHUN, *[720](https://open.spotify.com/track/3bhQrFuaaPk8pMMb7TcU2d)*
+
+We call an array 𝑏 of length 𝑚 *cool* if and only if:
+
+- There exists **no** index 𝑖 (1&lt;𝑖&lt;𝑚) such that 𝑏𝑖=max({𝑏𝑖−1,𝑏𝑖,𝑏𝑖+1}).
+
+Simons has an array 𝑎 of size 𝑛. Initially, the array is a permutation∗.
+
+He must perform the following operation until the array is *cool*:
+
+- Choose an index 𝑖 (1&lt;𝑖&lt;𝑛) such that 𝑎𝑖=max({𝑎𝑖−1,𝑎𝑖,𝑎𝑖+1}).
+- Then, he can remove either 𝑎𝑖−1 **or** 𝑎𝑖+1 from the array. After removal, a gap appears in the array, and the left and right sides of the gap will be rejoined.
+
+Find the minimum number of operations for Simons to perform.
+
+∗A permutation of length 𝑛 is an array consisting of 𝑛 distinct integers from 1 to 𝑛 in arbitrary order. For example, [2,3,1,5,4] is a permutation, but [1,2,2] is not a permutation (2 appears twice in the array), and [1,3,4] is also not a permutation (𝑛=3 but there is 4 in the array).
+
+**Input**
+
+Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤5⋅104). The description of the test cases follows.
+
+The first line contains an integer 𝑛 (3≤𝑛≤5⋅105) — the size of 𝑎.
+
+The second line contains 𝑛 integers 𝑎1,𝑎2,…,𝑎𝑛 (1≤𝑎𝑖≤𝑛, all 𝑎𝑖-s are distinct) — the array Simons has initially.
+
+It is guaranteed that the sum of 𝑛 over all test cases does not exceed 5⋅105.
+
+**Output**
+
+For each test case, print a single integer — the minimum number of operations for Simons to perform.
+
+Example
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2205/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

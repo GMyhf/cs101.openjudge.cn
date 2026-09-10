@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>1829E: The Lakes</title></head>
+<body><div id="pageTitle"><h2>1829E: The Lakes</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1829/E" rel="noopener">Codeforces 1829E</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Dfs and similar, dsu, graphs, implementation, 1100,
+
+
+You are given an 𝑛×𝑚 grid 𝑎 of non-negative integers. The value 𝑎𝑖,𝑗 represents the depth of water at the 𝑖-th row and 𝑗-th column.
+
+A lake is a set of cells such that:
+
+- each cell in the set has 𝑎𝑖,𝑗&gt;0, and
+- there exists a path between any pair of cells in the lake by going up, down, left, or right a number of times and without stepping on a cell with 𝑎𝑖,𝑗=0.
+
+The volume of a lake is the sum of depths of all the cells in the lake.
+
+Find the largest volume of a lake in the grid.
+
+**Input**
+
+The first line contains a single integer 𝑡 (1≤𝑡≤10^4^) — the number of test cases.
+
+The first line of each test case contains two integers 𝑛,𝑚 (1≤𝑛,𝑚≤1000) — the number of rows and columns of the grid, respectively.
+
+Then 𝑛 lines follow each with 𝑚 integers 𝑎𝑖,𝑗 (0≤𝑎𝑖,𝑗≤1000) — the depth of the water at each cell.
+
+It is guaranteed that the sum of 𝑛⋅𝑚 over all test cases does not exceed 10^6^.
+
+**Output**
+
+For each test case, output a single integer — the largest volume of a lake in the grid.
+
+Example
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1829/E" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

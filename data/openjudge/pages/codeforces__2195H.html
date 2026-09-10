@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2195H: Codeforces Heuristic Contest 001（Enhanced)</title></head>
+<body><div id="pageTitle"><h2>2195H: Codeforces Heuristic Contest 001（Enhanced)</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2195/H" rel="noopener">Codeforces 2195H</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Brute force, constructive algorithms, georgetry, implementation
+
+
+There is a grid of 3𝑛×3𝑛 points, consisting of all integer points (𝑥,𝑦) such that 1≤𝑥,𝑦≤3𝑛.
+
+Find a **largest** set of triangles satisfying the following conditions:
+
+- Each triangle has its vertices on **exactly three** points on the grid.
+- Each triangle has an area of exactly 12. Note that they **do not** have to be right triangles.
+- No two triangles share a common intersection point, including their vertices.
+
+If there exist multiple largest such sets of triangles, you may output any of them.
+
+Input
+
+Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤30). The description of the test cases follows.
+
+The only line of each test case contains a single integer 𝑛 (1≤𝑛≤166).
+
+It is guaranteed that the sum of 𝑛2 over all test cases does not exceed 1662.
+
+Output
+
+Output the **maximum** size 𝑚 of the set of triangles on one line (0≤𝑚≤3𝑛2).
+
+Then, output 𝑚 lines in the following format:
+
+- 𝑥𝑖,1𝑦𝑖,1𝑥𝑖,2𝑦𝑖,2𝑥𝑖,3𝑦𝑖,3: The vertices of the 𝑖-th triangle are (𝑥𝑖,1,𝑦𝑖,1), (𝑥𝑖,2,𝑦𝑖,2), (𝑥𝑖,3,𝑦𝑖,3).
+
+You may output the vertices of one triangle in any order (clockwise or counterclockwise).
+
+Your output will be accepted if it satisfies all conditions and the maximum size given is correct.
+
+Example
+
+input
+
+Copy</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2195/H" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2208D1: Tree Orientation (Easy Version)</title></head>
+<body><div id="pageTitle"><h2>2208D1: Tree Orientation (Easy Version)</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2208/D1" rel="noopener">Codeforces 2208D1</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>**This is the easy version of the problem. The difference between the versions is that in this version, the constraint on 𝑛 is lower. You can hack only if you solved all versions of this problem.**
+
+You once had an undirected tree with 𝑛 nodes. To make the tree look more interesting, you decided to assign an arbitary direction to each of the 𝑛−1 edges.
+
+As time goes by, you forgot the structure of your tree. However, you found a note which recorded **after** the direction of the edges have been assigned, whether 𝑢 can reach 𝑣∗ for all ordered pairs of (𝑢,𝑣) which satisfies 1≤𝑢,𝑣≤𝑛.
+
+You want to find out the structure of the tree and the direction of the edges from the information given by the note. Determine if there is possible solution and construct one. If there are multiple solutions, you only need to find one of them.
+
+∗For a directed graph, we say that 𝑥 can reach 𝑦 if and only if there exists a sequence of nodes 𝑢1,𝑢2,…,𝑢𝑘 such that 𝑢1=𝑥,𝑢𝑘=𝑦 and for all 𝑖 from 2 to 𝑘, the directed edge 𝑢𝑖−1→𝑢𝑖 exists. In particular, a node can always reach itself.
+
+**Input**
+
+Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤10^4). The description of the test cases follows.
+
+The first line of each test cases contain an integer 𝑛 (2≤𝑛≤500) denoting the number of nodes your tree have.
+
+The following 𝑛 lines contain a string 𝑠𝑖. 𝑠𝑖 is of length 𝑛 and consists only of 0 and 1. The 𝑗-th character of 𝑠𝑖 is 1 if and only if 𝑖 can reach 𝑗 after the edges are directed.
+
+It is guaranteed that the sum of 𝑛^3 over all test cases does not exceed 500^3.
+
+**Output**
+
+For each testcase, output 𝚈𝚎𝚜 if a solution exists, otherwise print 𝙽𝚘. If the answer is 𝚈𝚎𝚜, on the following lines output a description of the edges constructed.
+
+Output 𝑛−1 lines denoting the directed edges. Each line should contain two integers 𝑥 and 𝑦, denoting that after the edges are directed, the directed edge 𝑥→𝑦 exists. If there are multiple solutions, print any of them.
+
+You can output the answer in any case (upper or lower). For example, the strings &quot;yEs&quot;, &quot;yes&quot;, &quot;Yes&quot;, and &quot;YES&quot; will be recognized as positive responses.
+
+**Example**
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2208/D1" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

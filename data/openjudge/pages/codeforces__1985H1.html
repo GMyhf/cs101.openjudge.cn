@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>1985H1: Maximize the Largest Component (Easy Version)</title></head>
+<body><div id="pageTitle"><h2>1985H1: Maximize the Largest Component (Easy Version)</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1985/H1" rel="noopener">Codeforces 1985H1</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>brute force, data structures, dfs and similar, dsu, graphs, implementation, 1700,
+
+
+**Easy and hard versions are actually different problems, so read statements of both problems completely and carefully. The only difference between the two versions is the operation.**
+
+Alex has a grid with 𝑛 rows and 𝑚 columns consisting of &#x27;.&#x27; and &#x27;#&#x27; characters. A set of &#x27;#&#x27; cells forms a connected component if from any cell in this set, it is possible to reach any other cell in this set by only moving to another cell in the set that shares a **common side**. The size of a connected component is the number of cells in the set.
+
+In one operation, Alex selects any row 𝑟 (1≤𝑟≤𝑛) **or** any column 𝑐 (1≤𝑐≤𝑚), then sets every cell in row 𝑟 **or** column 𝑐 to be &#x27;#&#x27;. Help Alex find the maximum possible size of the largest connected component of &#x27;#&#x27; cells that he can achieve after performing the operation **at most once**.
+
+**Input**
+
+The first line of the input contains a single integer 𝑡 (1≤𝑡≤104) — the number of test cases.
+
+The first line of each test case contains two integers 𝑛 and 𝑚 (1≤𝑛⋅𝑚≤106) — the number of rows and columns of the grid.
+
+The next 𝑛 lines each contain 𝑚 characters. Each character is either &#x27;.&#x27; or &#x27;#&#x27;.
+
+It is guaranteed that the sum of 𝑛⋅𝑚 over all test cases does not exceed 106.
+
+**Output**
+
+For each test case, output a single integer — the maximum possible size of a connected component of &#x27;#&#x27; cells that Alex can achieve.
+
+Example
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1985/H1" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

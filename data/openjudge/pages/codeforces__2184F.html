@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2184F: Cherry Tree</title></head>
+<body><div id="pageTitle"><h2>2184F: Cherry Tree</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2184/F" rel="noopener">Codeforces 2184F</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>You are given a rooted tree with 𝑛 vertices∗. The vertices of the tree are numbered with integers from 1 to 𝑛. The root of the tree is vertex number 1.
+
+In each leaf† of the tree, there grows one cherry. You want to collect all the cherries, and to do this, you perform the following action several times:
+
+You choose any vertex of the tree 𝑣 (including the root or a leaf) and &quot;shake&quot; it. After that, cherries fall from all the leaves that are descendants‡ of vertex 𝑣 (if vertex 𝑣 itself is a leaf, then a cherry falls from it). If cherries have already fallen from any leaf before, the tree will break, so such a situation must be avoided.
+
+According to an ancient legend of the cherry orchard, the number of vertices you shake should be a multiple of three.
+
+Is it possible to collect all the cherries in this way?
+
+∗A tree with 𝑛 vertices is an undirected connected graph with 𝑛 vertices and 𝑛−1 edges. A rooted tree is a tree in which one of the vertices is special and is called the root.
+
+†A leaf is a vertex that has no descendants.
+
+‡The descendants of vertex 𝑣 are all vertices 𝑢≠𝑣 such that on the shortest path from the root to 𝑢, vertex 𝑣 is encountered.
+
+**Input**
+
+Each test consists of several test cases. The first line contains a single integer 𝑡 (1≤𝑡≤104) — the number of test cases. The following lines describe the test cases.
+
+The first line of each test case contains a single integer 𝑛 (2≤𝑛≤2⋅105).
+
+The next 𝑛−1 lines of each test case contain two integers 𝑢 and 𝑣 (1≤𝑢,𝑣≤𝑛,𝑢≠𝑣) — the vertices connected by the next edge of the tree.
+
+It is guaranteed that the graph in each data set is a tree.
+
+It is guaranteed that the sum of 𝑛 across all input data sets does not exceed 2⋅105.
+
+**Output**
+
+For each input data set, output &quot;YES&quot; on a separate line if it is possible to collect all the cherries. Otherwise, output &quot;NO&quot;.
+
+You can print each letter in any case (upper or lower). For example, &quot;YeS&quot;, &quot;no&quot; and &quot;yES&quot; are all acceptable.
+
+Example
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2184/F" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2218F: The 67th Tree Problem</title></head>
+<body><div id="pageTitle"><h2>2218F: The 67th Tree Problem</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2218/F" rel="noopener">Codeforces 2218F</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：构造即可，我的构造如下两图所示，
+
+&lt;img src=&quot;https://raw.githubusercontent.com/GMyhf/img/main/img/ff0d70993737532602975b71b84d1b6f.png&quot; alt=&quot;ff0d70993737532602975b71b84d1b6f&quot; style=&quot;zoom: 50%;&quot; /&gt;
+
+其中分别要求：当 $x+y$ 为奇数时，$y-x-1\ge 0$，当 $x+y$ 为偶数时，$x-1\ge 0, y-x+1\ge 0$。
+
+**Proof** 为什么这个条件是充分的？
+
+对于节点 $1$，其子树的大小即为 $x+y$，接下来分类讨论：
+
+- 若 $x+y$ 为偶数，则节点 $1$ 子树大小为偶数，因此要求 $\boxed{x\ge 1}$，还剩下 $x-1$ 个偶数节点。最小的正偶数为 $2$，因此构建这些偶数节点这里至少需要 $2(x-1)$ 个节点。因此给出不等式 $x+y \ge 2(x-1)+1$，即 $\boxed{y-x+1\ge 0}$。
+
+- 若 $x+y$ 为奇数，则节点 $1$ 子树大小为奇数，这要求 $\boxed{y\ge 1}$，还剩下 $y-1$ 个奇数节点。同样的，构建偶数节点至少需要 $2x$ 个节点。因此给出不等式 $x+y\ge 2x+1$，即 $\boxed{y-x-1\ge 0}$。注意到由于 $x\ge 0$，因此前者是冗余的。
+
+代码：</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2218/F" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

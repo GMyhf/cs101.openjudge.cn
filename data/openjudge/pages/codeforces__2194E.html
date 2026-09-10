@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2194E: The Turtle Strikes Back</title></head>
+<body><div id="pageTitle"><h2>2194E: The Turtle Strikes Back</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2194/E" rel="noopener">Codeforces 2194E</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>这个题和2025年计概的期末考试题 http://cs101.openjudge.cn/practice/30220/ 很像，但是区别是你要在别人开始走路线**之前**将一个值变成相反数，使得他获得的最大值最小。这样就变难了。
+
+首先，我们明确：假设在所有数都不改变的情况下，路径 $l$ （经过了 $n+m-1$ 个数）可取得最大值，那么我们要改变的点一定在路径 $l$ 上；如果我们不这样做，对手仍可以走路径 $l$ 取得与刚才相同的最大值，我们的数值改变就没有意义了。
+
+接着，我们考虑改变路径 $l$ 上一个点 $(i,j)$ （图中红色方块）的值后，此时对手能取得的最大值的变化。对手有两种方式可以选择：继续走路径 $l$ （图中**青色**路径），或者走一条**不经过**点 $(i,j)$ 的新路径（图中**红色**路径）（所有经过点 $(i,j)$ 的路径中最优路径一定有 $l$ ）。
+
+&lt;img src=&quot;https://raw.githubusercontent.com/GMyhf/img/main/img/msHkzyJ.png&quot; alt=&quot;666&quot; style=&quot;zoom: 50%;&quot; /&gt;
+
+对前者，我们可轻易计算；对于后者，我们可发现，这些路径一定都经过至少一个**绿色**格子 $(x&lt;i,j+1)$ 或 $(i+1,y&lt;j)$ 。对于每一个绿色格子 $(x,y)$，我们可计算从 $(0,0)$ 到 $(x,y)$ 的最大值（用数组 $f(x,y)$ 表示）和从 $(x,y)$ 到 $(n-1,m-1)$ 的最大值（用数组 $g(x,y)$ 表示）（两个数组都可以预计算）来计算出经过此点的路径能取得的最大值。记原数组值为 $a(x,y)$ ，则最大值为
+
+$$
+f(x,y)+g(x,y)-a(x,y)
+$$
+
+但是，对路径中每个点分别枚举每一个绿色格子的时间复杂度是 $O(n+m)$ ，仍会超时。所以我们需要用前缀的思想预计算。定义 $row(i,j)$ 和 $col(i,j)$ 数组分别表示经过 $(x&lt;i,j+1)$ 和 $(i+1,y&lt;j)$ 中每个点的路径的最大值，可得到转移方程。
+
+$$
+row(i,j) = \max (row(i,j-1),f(i,j)+g(i,j)-a(i,j))
+$$
+
+$$
+col(i,j) =\max(col(i-1,j),f(i,j)+g(i,j)-a(i,j))
+$$
+
+我们最终可得到，改变 $a(i,j)$ 为它的相反数之后，对手可得到的最大值是
+
+$$
+\max(f(n-1,m-1)-2a(i,j),row(i+1,j-1),col(i-1,j+1))
+$$
+
+我们只用遍历路径上所有点，找到所有最大值里面的最小值即可。</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2194/E" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

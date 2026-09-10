@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2171G: Sakura Adachi and Optimal Sequences</title></head>
+<body><div id="pageTitle"><h2>2171G: Sakura Adachi and Optimal Sequences</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2171/G" rel="noopener">Codeforces 2171G</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>bitmasks, combinatorics, greedy, math, 2000
+
+
+*Adachi is in the middle of a generational crashout... over, uh, this problem! Yep, that&#x27;s definitely it... anyways, please help her solve it!*
+
+You are given two arrays 𝑎 and 𝑏 of length 𝑛 (1≤𝑎𝑖≤𝑏𝑖).
+
+In one operation, you may either:
+
+- choose an index 𝑖 (1≤𝑖≤𝑛) and set 𝑎𝑖:=𝑎𝑖+1, or
+- double all elements of 𝑎.
+
+Let 𝑥 denote the minimum number of operations needed to make 𝑎=𝑏. Two arrays 𝑎 and 𝑏 of length 𝑛 are considered equal if 𝑎𝑖=𝑏𝑖for all 1≤𝑖≤𝑛.
+
+Find the value of 𝑥. Additionally, count the number of sequences of operations that make 𝑎=𝑏 using exactly 𝑥 operations. Two such sequences of operations are considered different if, for any 1≤𝑗≤𝑥, the 𝑗-th operation of each sequence differs (either in the type of operation selected or the index chosen, if applicable).
+
+Since the number of sequences may be large, output it modulo 106+3. Note that 106+3 is a prime number.
+
+**Input**
+
+The first line contains a single integer 𝑡 (1≤𝑡≤104)  — the number of test cases.
+
+The first line of each test case contains a single integer 𝑛 (2≤𝑛≤2⋅105).
+
+The second line of each test case contains 𝑛 integers, 𝑎1,𝑎2,…,𝑎𝑛 (1≤𝑎𝑖≤106).
+
+The third line of each test case contains 𝑛 integers, 𝑏1,𝑏2,…,𝑏𝑛 (𝑎𝑖≤𝑏𝑖≤106).
+
+It is guaranteed that the sum of 𝑛 over all test cases does not exceed 2⋅105.
+
+**Output**
+
+For each test case, output two integers, the value of 𝑥, and the number of sequences of operations that make 𝑎=𝑏 using exactly 𝑥operations, modulo 106+3. The value of 𝑥 should be printed exactly; that is, it should **not** be taken modulo 106+3.
+
+Example
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2171/G" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

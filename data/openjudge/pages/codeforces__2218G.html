@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2218G: The 67th Iteration of &quot;Counting is Fun&quot;</title></head>
+<body><div id="pageTitle"><h2>2218G: The 67th Iteration of &quot;Counting is Fun&quot;</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2218/G" rel="noopener">Codeforces 2218G</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：**这是一道非常有趣的题目！建议大家一起来思考！**
+
+&gt; 以下为 spoiler
+
+思考为什么一个人不在一开始坐下去，无非有两个原因：
+
+- 人数限制早早就达到了，旁边的人一坐下去诱导你坐下去；（表现为相邻两个人坐下去的时间差为 1，即 $b_i - b_{i-1} = 1$ 或 $b_i-b_{i+1} = 1$）
+- 旁边的人已经做下去，但是你的人数限制还没达到。（表现为相邻两个人做下去的时间差大于 1，即 $b_i-b_{i-1} &gt; 1$ 或 $b_i-b_{i+1} &gt; 1$）
+
+这两个原因导致了本质上不同的推论：
+
+- 如果是由于你苦苦等不到边上人坐下去，等到了才坐下去的话，你的尴尬等级 $a_i$ 可以最低取到 1；
+- 如果是由于人数限制还没达到，那么意味着只有在 $t=b_{i}-1$ 时刻，坐下的人数才将将超过你的尴尬等级 $a_i$，而在 $t=b_{i}-2$ 时刻，坐下的人数还没到你的尴尬等级。你的尴尬等级最低可以取到 $\# (b_{i}-2) 时刻坐下的人数+1$。
+
+由此给出了 $a_i$ 的下限。
+
+还有一点需要注意，你在 $b_i$ 时刻坐了下去，意味着 $t=b_i-1$ 时刻坐下人数超过了尴尬等级，因此 $a_i$ 有上限 $\# (b_i-1) 时刻坐下的人数$。由此给出了 $a_i$ 的上限。
+
+由此我们知道了所有 $a_i$ 的可取值，乘起来即可得到总可能数。
+
+由此你也能够理解什么情况下是无解的，即 $b_i$ 中出现了“局部非0极小值”，这意味着某一个人不在第一时刻，不知道为什么（没有两边任何一个人坐下）就坐下去了，这就意味着总可能数为 0。
+
+&gt; Gemini 说：
+&gt; 这段代码虽然在逻辑上接近 $\mathcal{O}(n)$，但在 Python 中频繁使用 `input().split()`、创建小列表（如 `neigh`）以及在大循环中执行多次算术运算，会导致常数项过大从而引起 TLE (Time Limit Exceeded)。
+&gt; 以下是针对性的优化方案：
+&gt;
+&gt; - **输入输出**：使用 `sys.stdin.read().split()` 一次性读取所有数据，比多次调用 `input()` 快得多。
+&gt; - **减少重复计算**：循环内的 `max([ls[i] - ls[q] for q in neigh])` 会创建新列表并迭代，开销很大。我们可以直接展开逻辑。
+&gt; - **模运算**： 尽量只在最后或者乘法可能溢出时取模，但在 Python 中，大数运算也费时，需保持平衡。
+&gt; - **避免冗余列表**： `sit_downs_at_t` 可以直接通过前缀和逻辑简化。</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2218/G" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

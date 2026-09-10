@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>433B: Kuriyama Mirai&#x27;s Stones</title></head>
+<body><div id="pageTitle"><h2>433B: Kuriyama Mirai&#x27;s Stones</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/433/B" rel="noopener">Codeforces 433B</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>dp, implementation, sorting, 1200
+
+
+Kuriyama Mirai has killed many monsters and got many (namely *n*) stones. She numbers the stones from 1 to *n*. The cost of the *i*-th stone is $v_i$. Kuriyama Mirai wants to know something about these stones so she will ask you two kinds of questions:
+
+1. She will tell you two numbers, *l* and *r* (1 ≤ *l* ≤ *r* ≤ *n*), and you should tell her $\sum\limits_{i=l}^rv_i$.
+2. Let $u_i$ be the cost of the *i*-th cheapest stone (the cost that will be on the *i*-th place if we arrange all the stone costs in non-decreasing order). This time she will tell you two numbers, *l* and *r* (1 ≤ *l* ≤ *r* ≤ *n*), and you should tell her $\sum\limits_{i=l}^ru_i$.
+
+For every question you should give the correct answer, or Kuriyama Mirai will say &quot;fuyukai desu&quot; and then become unhappy.
+
+**Input**
+
+The first line contains an integer *n* ($1 ≤ n ≤ 10^5$). The second line contains *n* integers: $v_1, v_2, ..., v_n (1 ≤ v_i ≤ 10^9)$ — costs of the stones.
+
+The third line contains an integer *m* ($1 ≤ m ≤ 10^5$) — the number of Kuriyama Mirai&#x27;s questions. Then follow *m* lines, each line contains three integers *type*, *l* and *r* (1 ≤ *l* ≤ *r* ≤ *n*; 1 ≤ *type* ≤ 2), describing a question. If *type* equal to 1, then you should output the answer for the first question, else you should output the answer for the second one.
+
+**Output**
+
+Print *m* lines. Each line must contain an integer — the answer to Kuriyama Mirai&#x27;s question. Print the answers to the questions in the order of input.
+
+Examples
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/433/B" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

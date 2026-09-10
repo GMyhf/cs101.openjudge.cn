@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2171E: Anisphia Wynn Palettia and Good Permutations</title></head>
+<body><div id="pageTitle"><h2>2171E: Anisphia Wynn Palettia and Good Permutations</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2171/E" rel="noopener">Codeforces 2171E</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>constructive algorithms,greedy,number theory,*2000
+
+
+*I&#x27;ve always loved the word magic. It has a way of making people happy, of putting a smile on their faces.*
+
+— Anisphia Wynn Palettia
+
+*Anis and her new assistant Euphie are improving the Witch&#x27;s Broom! Magicology requires great precision and care — in order to fly, the construction of the broom must have sufficiently few imperfections.*
+
+For an arbitrary array 𝑎 of length 𝑚, call an index 𝑖 (1≤𝑖≤𝑚−2) *bad* if 𝑎𝑖, 𝑎𝑖+1, and 𝑎𝑖+2 are all pairwise coprime. More formally, 𝑖 is a bad index if and only if gcd(𝑎𝑖,𝑎𝑖+1)=gcd(𝑎𝑖,𝑎𝑖+2)=gcd(𝑎𝑖+1,𝑎𝑖+2)=1∗. Furthermore, call 𝑎 *good* if it has at most 6 bad indices.
+
+You are given an integer 𝑛. Construct a good permutation† 𝑝 of length 𝑛. It can be shown that such a permutation always exists.
+
+Note that you do not have to minimize the number of bad indices.
+
+∗gcd(𝑥,𝑦) denotes the [greatest common divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor) of 𝑥 and 𝑦
+
+† A permutation of length 𝑛 is an array that contains every integer from 1 to 𝑛 exactly once, in any order.
+
+**Input**
+
+The first line contains a single integer 𝑡 (1≤𝑡≤10^4)  — the number of test cases.
+
+The only line of each test case contains a single integer 𝑛 (3≤𝑛≤2⋅10^5).
+
+It is guaranteed that the sum of 𝑛 over all test cases does not exceed 2⋅10^5.
+
+**Output**
+
+For each test case, output on a single line 𝑛 integers 𝑝1,𝑝2,…,𝑝𝑛, an example of a good permutation of length 𝑛. If there are multiple good permutations, you may output any of them.
+
+Example
+
+Input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2171/E" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

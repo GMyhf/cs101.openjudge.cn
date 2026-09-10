@@ -983,3 +983,12 @@
   `w=100`。Python 正解本地判题为 21/21 Accepted；把条件错误简化为「任意偶数均可分」的
   变异实现会在 `w=2` 的第 2 组得到 Wrong Answer。服务端回归测试固定题面、目录元数据、
   路由和上述 AC/WA 判别力。
+### 批量导入 2020fall Codeforces 题解中的标准题
+
+- 从 `2020fall_Codeforces_problems.md` 导入 157 道此前缺失的标准 Codeforces 题，连同
+  既有 `4A`，`codeforces` 题库现有 158 题。每题均有本地题解摘要页和官方原题链接；
+  不在运行时回源 Codeforces。除 `4A` 的 21 组判题数据外，其余条目明确标为待补数据，
+  不会误导为可精确判题。
+- 新增 `scripts/import_codeforces_markdown.py`，将给定题解 Markdown 作为可复现导入源；
+  `docs/codeforces-import.md` 固定记录源文件 SHA-256，以及未导入的 15 道 April Fools
+  题和排除理由。索引器继续跳过外部题库的 OpenJudge 全局题号映射。

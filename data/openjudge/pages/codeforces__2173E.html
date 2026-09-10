@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2173E: Shiro&#x27;s Mirror Duel</title></head>
+<body><div id="pageTitle"><h2>2173E: Shiro&#x27;s Mirror Duel</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2173/E" rel="noopener">Codeforces 2173E</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>constructive algorithms, greedy, interactive, probabilities, sortings, 2200,
+
+
+*There&#x27;s no such thing as luck in this world. The victor is decided before the game even starts.*
+
+— *No Game No Life*
+
+*This is an interactive problem.*
+
+One day, Sora and Shiro feel bored again, so they decide to settle it with a game.
+
+At the beginning, Sora gives Shiro a permutation∗ 𝑝1,𝑝2,…,𝑝𝑛 of length 𝑛. In each operation, Shiro may select two distinct indices 𝑥and 𝑦 (1≤𝑥≠𝑦≤𝑛). Then Sora flips a fair coin:
+
+- With probability 0.5, Sora swaps 𝑝𝑥 and 𝑝𝑦;
+- With probability 0.5, Sora swaps 𝑝𝑛−𝑥+1 and 𝑝𝑛−𝑦+1.
+
+After the operation, Sora replies with the actual pair of indices that were swapped, so that Shiro can update her local permutation accordingly.
+
+Shiro&#x27;s goal is to sort the permutation 𝑝 in ascending order by using at most ⌊2.5𝑛+800⌋ operations. Help her!
+
+∗A permutation of length 𝑛 is an array consisting of 𝑛 distinct integers from 1 to 𝑛 in arbitrary order. For example, [2,3,1,5,4] is a permutation, but [1,2,2] is not a permutation (2 appears twice in the array), and [1,3,4] is also not a permutation (𝑛=3 but there is 4 in the array).
+
+**Input**
+
+Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤100). The description of the test cases follows.
+
+The first line of each test case contains a single integer 𝑛 (1≤𝑛≤4000) — the length of 𝑝.
+
+The second line contains 𝑛 integers 𝑝1,𝑝2,…,𝑝𝑛 — the elements of 𝑝.
+
+It is guaranteed that the sum of 𝑛 over all test cases does not exceed 2⋅104.
+
+**It is guaranteed that there are 50 tests in this problem.**
+
+**Interaction**
+
+For each test case, you can use at most ⌊2.5𝑛+800⌋ moves to sort the permutation 𝑝 in ascending order.
+
+To make a move, you should print a new line in the following format:
+
+- ?𝑥𝑦 (1≤𝑥≠𝑦≤𝑛) — the two indices that Shiro selects in this move.
+
+As a response to the move, you will receive two integers 𝑢 and 𝑣 — the actual pair of indices that Sora swapped. It is guaranteed that (𝑢,𝑣) is randomly selected from (𝑥,𝑦) and (𝑛−𝑥+1,𝑛−𝑦+1) with equal probability.
+
+To report that the permutation has been sorted in ascending order, you should print a new line with a single character !. This does **not**count as one of the ⌊2.5𝑛+800⌋ moves.
+
+After that, proceed to the next test case or terminate the program if it was the last test case.
+
+After printing each query do not forget to output the end of line and flush∗ the output. Otherwise, you will get Idleness limit exceeded verdict.
+
+If, at any interaction step, you read −1 instead of valid data, your solution must exit immediately. This means that your solution will receive Wrong answer because of an invalid query or any other mistake. Failing to exit can result in an arbitrary verdict because your solution will continue to read from a closed stream.
+
+**Hacks are disabled in this problem.**
+
+∗To flush, use:
+
+- fflush(stdout) or cout.flush() in C++;
+- sys.stdout.flush() in Python;
+- see the documentation for other languages.
+
+Example
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2173/E" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

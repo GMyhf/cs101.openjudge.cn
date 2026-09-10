@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2209C: Find the Zero</title></head>
+<body><div id="pageTitle"><h2>2209C: Find the Zero</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2209/C" rel="noopener">Codeforces 2209C</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>*This is an interactive problem.*
+
+You are given an integer 𝑛. There is a hidden array 𝑎 of length 2𝑛. Each integer from 1 to 𝑛 appears **exactly once** in 𝑎. The rest of the elements are all 0.
+
+You can make the following type of query:
+
+- Choose two integers 𝑖 and 𝑗 (1≤𝑖,𝑗≤2𝑛, 𝑖≠𝑗). The judge will respond with 1 if 𝑎𝑖=𝑎𝑗, and will respond with 0 otherwise.
+
+Find any integer 𝑘 (1≤𝑘≤2𝑛) such that 𝑎𝑘=0 in no more than 𝑛+1 queries. Note that the interactor is **adaptive**, which means that the hidden array 𝑎 may change depending on your queries but will not contradict previous queries.
+
+**Input**
+
+Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤103). The description of the test cases follows.
+
+The first line of each test case contains an integer 𝑛 (2≤𝑛≤104). The length of the hidden array 𝑎 will be 2𝑛.
+
+It is guaranteed that the sum of 𝑛 over all test cases does not exceed 104.
+
+Interaction
+
+To make a query, output a line in the following format:
+
+- ?𝑖𝑗 (1≤𝑖,𝑗≤2𝑛, 𝑖≠𝑗)
+
+As a response to the query, you will get:
+
+- 1 if 𝑎𝑖=𝑎𝑗;
+- 0 if 𝑎𝑖≠𝑎𝑗;
+- −1 if you made an invalid query or if you exceed the limit of 𝑛+1 queries.
+
+To report the answer, output a line in the following format:
+
+- !𝑘 (1≤𝑘≤2𝑛)
+
+After this, proceed to the next test case or terminate if this is the last test case.
+
+Note that reporting the answer does not count towards the 𝑛+1 queries.
+
+The interactor is **adaptive**. This means that the hidden array 𝑎 may change depending on your queries but will not contradict previous queries.
+
+After printing each query do not forget to output the end of line and flush∗ the output. Otherwise, you will get Idleness limit exceeded verdict. If, at any interaction step, you read −1 instead of valid data, your solution must exit immediately. This means that your solution will receive Wrong answer because of an invalid query or any other mistake. Failing to exit can result in an arbitrary verdict because your solution will continue to read from a closed stream.
+
+**For this problem, hacks are disabled.**
+
+∗To flush, use:
+
+- fflush(stdout) or cout.flush() in C++;
+- sys.stdout.flush() in Python;
+- see the documentation for other languages.
+
+Example
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2209/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

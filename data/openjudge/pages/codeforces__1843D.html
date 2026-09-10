@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>1843D: Apple Tree</title></head>
+<body><div id="pageTitle"><h2>1843D: Apple Tree</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1843/D" rel="noopener">Codeforces 1843D</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Combinatorics, dfs and similar, dp, math, trees, 1200,
+
+
+Timofey has an apple tree growing in his garden; it is a rooted tree of 𝑛 vertices with the root in vertex 1 (the vertices are numbered from 1 to 𝑛). A tree is a connected graph without loops and multiple edges.
+
+This tree is very unusual — it grows with its root upwards. However, it&#x27;s quite normal for programmer&#x27;s trees.
+
+The apple tree is quite young, so only two apples will grow on it. Apples will grow in certain vertices (these vertices may be the same). After the apples grow, Timofey starts shaking the apple tree until the apples fall. Each time Timofey shakes the apple tree, the following happens to each of the apples:
+
+Let the apple now be at vertex 𝑢.
+
+- If a vertex 𝑢 has a child, the apple moves to it (if there are several such vertices, the apple can move to any of them).
+- Otherwise, the apple falls from the tree.
+
+It can be shown that after a finite time, both apples will fall from the tree.
+
+Timofey has 𝑞 assumptions in which vertices apples can grow. He assumes that apples can grow in vertices 𝑥 and 𝑦, and wants to know the number of pairs of vertices (𝑎, 𝑏) from which apples can fall from the tree, where 𝑎 — the vertex from which an apple from vertex 𝑥 will fall, 𝑏 — the vertex from which an apple from vertex 𝑦 will fall. Help him do this.
+
+**Input**
+
+The first line contains integer 𝑡 (1≤𝑡≤10^4^) — the number of test cases.
+
+The first line of each test case contains integer 𝑛 (2≤𝑛≤2⋅10^5^) — the number of vertices in the tree.
+
+Then there are 𝑛−1 lines describing the tree. In line 𝑖 there are two integers 𝑢𝑖 and 𝑣𝑖 (1≤𝑢𝑖,𝑣𝑖≤𝑛, 𝑢𝑖≠𝑣𝑖) — edge in tree.
+
+The next line contains a single integer 𝑞 (1≤𝑞≤2⋅10^5^) — the number of Timofey&#x27;s assumptions.
+
+Each of the next 𝑞 lines contains two integers 𝑥𝑖 and 𝑦𝑖 (1≤𝑥𝑖,𝑦𝑖≤𝑛) — the supposed vertices on which the apples will grow for the assumption .
+
+It is guaranteed that the sum of  𝑛 does not exceed 2⋅10^5^. Similarly, It is guaranteed that the sum of 𝑞 does not exceed 2⋅10^5^.
+
+**Output**
+
+For each Timofey&#x27;s assumption output the number of ordered pairs of vertices from which apples can fall from the tree if the assumption is true on a separate line.
+
+Examples
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1843/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

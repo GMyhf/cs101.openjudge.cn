@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2218E: The 67th XOR Problem</title></head>
+<body><div id="pageTitle"><h2>2218E: The 67th XOR Problem</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2218/E" rel="noopener">Codeforces 2218E</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：我们来观察一下连续两次，分别选取 $a_1, a_2$ 进行操作之后的列表。
+$$[a_1,a_2,a_3,a_4,\cdots,a_n] \mapsto [a_2\oplus a_1, a_3\oplus a_1, \cdots, a_n \oplus a_1]$$
+$$\mapsto [a_3\oplus a_1\oplus a_2\oplus a_1, \cdots a_n\oplus a_1\oplus a_2\oplus a_1]$$
+注意到 $a_1\oplus a_1=0$，因此操作第二次之后，$a_1$ 的效果就完全消失了，列表最后的结果只取决于最后一次操作，即 $\max_\text{op} (l) = \max_{i\ne j}a_i \oplus a_j$，直接遍历 $i,j$ 即可找到最大值，复杂度 $\mathcal{O}(n^2)$。
+
+代码：</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2218/E" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

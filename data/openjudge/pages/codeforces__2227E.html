@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2227E: It All Went Sideways](https://codeforces.com/contest/2227/problem/E)</title></head>
+<body><div id="pageTitle"><h2>2227E: It All Went Sideways](https://codeforces.com/contest/2227/problem/E)</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2227/E" rel="noopener">Codeforces 2227E</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：重力向右后，每个高度 $h$ 的立方体会滑到右边第一个高度&gt;=h的位置。`suffix_min[i]`表示从 $i$ 到 $n-1 $的最小高度，对于 $i$ 处的立方体，其在 `suffix_min[i]` 以上都能滑动。所以 `curr_movable = sum(arr) - sum(suffix_min)` 计算可移动的立方体数量（总立方体减去固定在原地的）。
+
+当我们移除一个立方体时，其所在的 `suffix_min` 平台上的立方体全都能额外移动。计算suffix相等时的最长连续段长度，而 `max(platforms) - 1` 表示通过移除一个立方体能额外移动的数量。答案是 `curr_movable + max(platforms) - 1`。
+
+整个过程复杂度是 $\mathcal{O}(n)$，主要来自于计算 `suffix_min` 和 `platforms`。
+
+代码：</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2227/E" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

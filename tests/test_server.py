@@ -382,7 +382,7 @@ class ServerApiTests(unittest.TestCase):
         status, _, body = request(self.port, "GET", "/api/catalog")
         payload = json.loads(body)
         self.assertEqual(payload["book_meta"]["codeforces"],
-                         {"name": "Codeforces 题库", "count": 1})
+                         {"name": "Codeforces 题库", "count": 158})
         row = next(item for item in payload["problems"]
                    if (item["book"], item["id"]) == ("codeforces", "4A"))
         self.assertEqual((row["title"], row["test_count"]), ("A. Watermelon", 21))
@@ -397,6 +397,25 @@ print(\"YES\" if w > 2 and w % 2 == 0 else \"NO\")
 print(\"YES\" if w % 2 == 0 else \"NO\")
 """)
         self.assertEqual((mutant["status"], mutant["case"]), ("Wrong Answer", 2), mutant)
+
+    def test_codeforces_markdown_import_keeps_standard_and_excluded_sets_separate(self):
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        entries = {item["id"]: item for item in catalog["problems"]
+                   if item.get("source") == "codeforces"}
+        self.assertEqual(len(entries), 158)
+        self.assertTrue({"1A", "2228D", "4A"}.issubset(entries))
+        self.assertFalse({"2095A", "2214A"} & set(entries))
+        self.assertEqual(entries["4A"]["test_count"], 21)
+        self.assertTrue(all(item["test_count"] == 0 for problem_id, item in entries.items()
+                            if problem_id != "4A"))
+        self.assertTrue((ROOT / "data/openjudge/pages/codeforces__1A.html").is_file())
+        report = (ROOT / "docs/codeforces-import.md").read_text(encoding="utf-8")
+        self.assertIn("| 2095A |", report)
+        self.assertIn("| 2214J |", report)
+
+        status, _, body = request(self.port, "GET", "/codeforces/1A/")
+        self.assertEqual(status, 200)
+        self.assertIn("Theatre Square", body.decode("utf-8", errors="replace"))
 
     def test_practice_02977_is_mirrored_by_global_number(self):
         status, _, body = request(self.port, "GET", "/practice/02977/")

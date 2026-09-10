@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>1970E3: Trails(Hard)</title></head>
+<body><div id="pageTitle"><h2>1970E3: Trails(Hard)</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1970/E3" rel="noopener">Codeforces 1970E3</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>【马铉钦25化院】题目描述与E1完全相同，n的取值改为1≤n≤$10^9$,m的取值改为1≤m≤$10^5$.
+由于m的取值增大，上面的方法无疑会TLE，我们需要另辟蹊径。
+由于$m\times m$方阵乘法需要$O(m^3$)，我们希望能够降低进行乘法的方阵的边长。
+观察方阵F的生成公式：$f_{ij}=b_ib_j+b_ic_j+c_ib_j=(b_i+b_j)(c_i+c_j)-c_ic_j$.
+这是一个秩为2的方阵，我们能不能把它的乘方化成一个$2\times 2$矩阵的乘方呢？
+其实是可以的。注意到$F=D\times E$,其中D是一个$n\times 2$矩阵，满足
+$$\begin{cases}
+\ d_{i0}=b_i+c_i
+\\ d_{i1}=c_i
+\end{cases}$$
+E是一个$2\times n$矩阵，满足
+$$\begin{cases}
+\ e_{0j}=b_j+c_j
+\\ e_{1j}=-c_j
+\end{cases}$$
+那么，我们有：$$F^n=(D\times E)(D\times E)(D\times E)...(D\times E)=D(E\times D)(E\times D)...(E\times D)E$$
+而这里的$E\times D$就是所需的$2\times 2$矩阵了。
+实现代码如下：</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1970/E3" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

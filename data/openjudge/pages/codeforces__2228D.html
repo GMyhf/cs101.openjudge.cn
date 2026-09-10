@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2228D: Sanae, Cross and Color</title></head>
+<body><div id="pageTitle"><h2>2228D: Sanae, Cross and Color</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2228/D" rel="noopener">Codeforces 2228D</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>*Faith Is for the Transient People*
+
+— Mountain of Faith
+
+Upon the mountain, Sanae gazes at the stars. Faith, for her, is where winds encounter one another and choices diverge, and it is the point where all directions meet. For the glory of the Holy Cross, let us trace the sign of faith together.
+
+There are 𝑛 distinct integer points in the plane, where the 𝑖-th point is located at (𝑥𝑖,𝑦𝑖). To color the points, choose two integers 𝑘1 and 𝑘2 such that each of the four regions divided by the lines 𝑥=𝑘1+0.5 and 𝑦=𝑘2+0.5 contains **at least one point**. Each point (𝑥,𝑦) is colored according to the region it lies in:
+
+- Top-left (𝑥≤𝑘1 and 𝑦&gt;𝑘2): the point is colored red.
+- Top-right (𝑥&gt;𝑘1 and 𝑦&gt;𝑘2): the point is colored green.
+- Bottom-left (𝑥≤𝑘1 and 𝑦≤𝑘2): the point is colored blue.
+- Bottom-right (𝑥&gt;𝑘1 and 𝑦≤𝑘2): the point is colored yellow.
+
+&lt;img src=&quot;https://raw.githubusercontent.com/GMyhf/img/main/img/c14fa777bd55929136b166c00b8db022.png&quot; alt=&quot;c14fa777bd55929136b166c00b8db022&quot; style=&quot;zoom: 25%;&quot; /&gt;
+
+A valid coloring of the third test case, where 𝑘1=4 and 𝑘2=5.
+
+Find the number of distinct colorings, where two colorings are considered distinct if and only if there exists at least one point colored differently, **regardless of the choice of 𝑘1 and 𝑘2.**
+
+**Input**
+
+Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤104). The description of the test cases follows.
+
+The first line of each test case contains an integer 𝑛 (4≤𝑛≤2⋅106).
+
+The following 𝑛 lines each contain two integers 𝑥𝑖, 𝑦𝑖 (1≤𝑥𝑖,𝑦𝑖≤𝑛), representing the coordinates of the 𝑖-th point.
+
+It is guaranteed that the points are pairwise distinct in each test case.
+
+It is guaranteed that the sum of 𝑛 over all test cases does not exceed 2⋅106.
+
+**Output**
+
+For each test case, output the number of distinct colorings.
+
+Example
+
+Input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2228/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

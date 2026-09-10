@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2167F: Tree, TREE!!!</title></head>
+<body><div id="pageTitle"><h2>2167F: Tree, TREE!!!</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2167/F" rel="noopener">Codeforces 2167F</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>直接考虑每个节点作为根时有多少节点满足条件比较困难，我们可以换个角度考虑：对于每个节点，有多少个根节点使得它满足条件？首先，它自己作为根节点肯定满足要求。对于根节点不是自己的情况，我们考虑与它直接连接的每一个点的子树大小。如果某一个子树的大小小于等于 $n-k$ ，那么这个子树中所有点都可以作为根节点（因为剩下点的数量不少于 $k$ ，必定可以满足条件：在 $k$ 个节点中包含自己即可）；反之不能作为根节点。
+
+&lt;img src=&quot;https://i.imgur.com/xehzsqx.png&quot; alt=&quot;666&quot; style=&quot;zoom: 33%;&quot; /&gt;
+（一个点与它的子树）
+
+统计每个点的子树大小，可以选一个点做根，然后dfs。</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2167/F" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

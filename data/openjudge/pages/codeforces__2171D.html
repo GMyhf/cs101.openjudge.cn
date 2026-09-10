@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2171D: Rae Taylor and Trees (easy version)</title></head>
+<body><div id="pageTitle"><h2>2171D: Rae Taylor and Trees (easy version)</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2171/D" rel="noopener">Codeforces 2171D</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>binary search,data structures,dp,dsu,greedy,implementation,trees,*1400
+
+
+*&quot;To think a commoner would even fathom sitting next to me. Know your place!&quot;*
+
+— Claire François
+
+**This is the easy version of the problem. The only difference between the easy and hard versions is that the hard version asks you to construct an example of a satisfactory tree.**
+
+*As an Earth mage, Rae has mastered the spell of growing trees! But Manaria brags that she can grow a more impressive species of trees. Rae remembers that the most rare type of tree can be grown using a formula represented by a certain permutation — please help her construct it!*
+
+You are given a permutation∗ 𝑝 of length 𝑛.
+
+Determine if there exists an undirected tree with 𝑛 vertices labeled 1,2,…,𝑛, satisfying the following condition:
+
+- Let 𝑢 and 𝑣 (1≤𝑢&lt;𝑣≤𝑛) be any two vertices connected by an edge. Then 𝑢 appears before 𝑣 in 𝑝.
+
+∗A permutation of length 𝑛 is an array that contains every integer from 1 to 𝑛 exactly once, in any order.
+
+**Input**
+
+The first line contains a single integer 𝑡 (1≤𝑡≤104)  — the number of test cases.
+
+The first line of each test case contains a single integer 𝑛 (2≤𝑛≤2⋅105).
+
+The second line of each test case contains 𝑛 integers, 𝑝1,𝑝2,…,𝑝𝑛 (1≤𝑝𝑖≤𝑛). It is guaranteed that all 𝑝𝑖 are distinct.
+
+It is guaranteed that the sum of 𝑛 over all test cases does not exceed 2⋅105.
+
+**Output**
+
+For each test case, output on a single line &quot;Yes&quot; if there exists a tree satisfying the given condition, and &quot;No&quot; otherwise.
+
+You may output the answer in any case (upper or lower). For example, the strings &quot;yEs&quot;, &quot;yes&quot;, &quot;YES&quot;, and &quot;yeS&quot; will be recognized as &quot;Yes&quot;.
+
+Example
+
+Input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2171/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

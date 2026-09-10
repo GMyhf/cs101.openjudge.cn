@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2109C2: Hacking Numbers (Medium Version)</title></head>
+<body><div id="pageTitle"><h2>2109C2: Hacking Numbers (Medium Version)</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2109/C2" rel="noopener">Codeforces 2109C2</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>consructive algorithms, interactive, math, number theory, 1700,
+
+
+**This is the medium version of the problem. In this version, you can send at most \**4\** commands. You can make hacks only if all versions of the problem are solved.**
+
+*This is an interactive problem.*
+
+Welcome, Duelists! In this interactive challenge, there is an unknown integer 𝑥 (1≤𝑥≤109). You must make it equal to a given integer in the input 𝑛. By harnessing the power of &quot;Mathmech&quot; monsters, you can send a command to do one of the following:
+
+| **Command** | **Constraint** | **Result** | **Case**       | **Update** | **Jury&#x27;s response** |
+| ----------- | -------------- | ---------- | -------------- | ---------- | ------------------- |
+| &quot;add 𝑦&quot;     | −1018≤𝑦≤1018   | res=𝑥+𝑦    | if 1≤res≤1018  | 𝑥←res      | &quot;1&quot;                 |
+| else        | 𝑥←𝑥            | &quot;0&quot;        |                |            |                     |
+| &quot;mul 𝑦&quot;     | 1≤𝑦≤1018       | res=𝑥⋅𝑦    | if 1≤res≤1018  | 𝑥←res      | &quot;1&quot;                 |
+| else        | 𝑥←𝑥            | &quot;0&quot;        |                |            |                     |
+| &quot;div 𝑦&quot;     | 1≤𝑦≤1018       | res=𝑥/𝑦    | if 𝑦 divides 𝑥 | 𝑥←res      | &quot;1&quot;                 |
+| else        | 𝑥←𝑥            | &quot;0&quot;        |                |            |                     |
+| &quot;digit&quot;     | —              | res=𝑆(𝑥)∗  | —              | 𝑥←res      | &quot;1&quot;                 |
+
+You have to make 𝑥 equal to 𝑛 using **at most** **4** commands.
+
+∗𝑆(𝑛) is a function that returns the sum of all the individual digits of a non-negative integer 𝑛. For example, 𝑆(123)=1+2+3=6
+
+**Input**
+
+Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤5000). The description of the test cases follows.
+
+The first and only line of each test case contains one integer 𝑛 (1≤𝑛≤109).
+
+**Interaction**
+
+The interaction for each test case begins by reading the integer 𝑛.
+
+To send a command, output a line in the following format:
+
+- &quot;add 𝑦&quot; Add some integer 𝑦 (−1018≤𝑦≤1018) to 𝑥.
+
+  The jury will output &quot;1&quot; if 𝑥+𝑦 is within [1,1018] (**successful**), and &quot;0&quot; otherwise. If successful, update 𝑥←𝑥+𝑦.
+
+- &quot;mul 𝑦&quot; Multiply 𝑥 by a positive integer 𝑦 (1≤𝑦≤1018).
+
+  The jury will output &quot;1&quot; if 𝑥⋅𝑦 is within [1,1018] (**successful**), and &quot;0&quot; otherwise. If successful, update 𝑥←𝑥⋅𝑦.
+
+- &quot;div 𝑦&quot; Divide 𝑥 by a positive integer 𝑦 (1≤𝑦≤1018).
+
+  The jury will output &quot;1&quot; if 𝑦 is a divisor of 𝑥 (**successful**), and &quot;0&quot; otherwise. If successful, update 𝑥←𝑥𝑦.
+
+- &quot;digit&quot; Make 𝑥 equal to the sum of its digits.
+
+  The jury will always output &quot;1&quot; and update 𝑥←𝑆(𝑥).
+
+Note that commands are **case sensitive**.
+
+When you have determined that 𝑥 is equal to 𝑛, output a line in the following format:
+
+- &quot;!&quot; — where the jury will output a &quot;1&quot; if 𝑛 is equal to 𝑥, and &quot;-1&quot; otherwise.
+
+Note that answering **does not count** toward your limit of **4** commands.
+
+If your program makes more than **4** commands for one test case, or makes an invalid command, then the response to the command will be &quot;-1&quot;. After receiving such a response, your program should immediately terminate to receive the verdict **Wrong Answer**. Otherwise, it may receive any other verdict.
+
+After printing a command, do not forget to output the end of the line and flush the output. Otherwise, you will get Idleness limit exceeded. To do this, use:
+
+- fflush(stdout) or cout.flush() in C++;
+- System.out.flush() in Java;
+- sys.stdout.flush() in Python;
+- std::io::stdout().flush() in Rust;
+- see the documentation for other languages.
+
+The interactor is **non-adaptive**. The unknown integer 𝑥 **does not change** during the interaction.
+
+**Hacks**
+
+To hack, use the following format.
+
+The first line should contain a single integer 𝑡 (1≤𝑡≤5000) — the number of test cases.
+
+The first line of each test case should contain two positive integers 𝑛 and 𝑥 (1≤𝑛,𝑥≤109) — denoting the unknown integer and the target value to which it should be made equal, respectively.
+
+Example
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2109/C2" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

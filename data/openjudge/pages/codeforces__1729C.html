@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>1729C: Jumping on Tiles</title></head>
+<body><div id="pageTitle"><h2>1729C: Jumping on Tiles</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1729/C" rel="noopener">Codeforces 1729C</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Polycarp was given a row of tiles. Each tile contains one lowercase letter of the Latin alphabet. The entire sequence of tiles forms the string 𝑠.
+
+In other words, you are given a string 𝑠 consisting of lowercase Latin letters.
+
+Initially, Polycarp is on the **first** tile of the row and wants to get to the **last** tile by jumping on the tiles. Jumping from 𝑖-th tile to 𝑗-th tile has a cost equal to $|𝑖𝑛𝑑𝑒𝑥(𝑠_𝑖)−𝑖𝑛𝑑𝑒𝑥(𝑠_𝑗)|$, where 𝑖𝑛𝑑𝑒𝑥(𝑐) is the index of the letter 𝑐 in the alphabet (for example, 𝑖𝑛𝑑𝑒𝑥(&#x27;a&#x27;)=1, 𝑖𝑛𝑑𝑒𝑥(&#x27;b&#x27;)=2, ..., 𝑖𝑛𝑑𝑒𝑥(&#x27;z&#x27;)=26) .
+
+Polycarp wants to get to the 𝑛-th tile for the minimum total cost, but at the same time make **maximum** number of jumps.
+
+In other words, among all possible ways to get to the last tile for the **minimum** total cost, he will choose the one with the **maximum** number of jumps.
+
+Polycarp can visit each tile **at most once**.
+
+Polycarp asks you to help — print the sequence of indices of string 𝑠s on which he should jump.
+
+**Input**
+
+The first line of the input contains an integer $𝑡 (1≤𝑡≤10^4)$ — the number of test cases in the test.
+
+Each test case is given by the string $𝑠 (2≤|𝑠|≤2⋅10^5)$, where |𝑠|— is the length of string 𝑠. The string 𝑠 consists of lowercase Latin letters.
+
+It is guaranteed that the sum of string lengths 𝑠 over all test cases does not exceed 2⋅10^5^.
+
+**Output**
+
+The answer to each test case consists of two lines.
+
+In the first line print two integers 𝑐𝑜𝑠𝑡, 𝑚, where 𝑐𝑜𝑠𝑡 is the minimum total cost of the path, and 𝑚 is the maximum number of visited tiles Polycarp can make to get to 𝑛n-th tiles for the minimum total cost 𝑐𝑜𝑠𝑡 (i.e. the number of jumps is 𝑚−1).
+
+In the next line print 𝑚 different numbers $𝑗_1,𝑗_2,…,𝑗_𝑚 (1≤𝑗_𝑖≤|𝑠|) $— the sequence of indices of the tiles Polycarp will jump on. The first number in the sequence must be 1 (that is, 𝑗~1~=1) and the last number must be the value of |𝑠| (that is, 𝑗~𝑚~=|𝑠|).
+
+If there are multiple answers, print any of them.
+
+Example
+
+**input**</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1729/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

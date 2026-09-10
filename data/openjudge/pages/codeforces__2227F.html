@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2227F: It Just Keeps Going Sideways](https://codeforces.com/contest/2227/problem/F)</title></head>
+<body><div id="pageTitle"><h2>2227F: It Just Keeps Going Sideways](https://codeforces.com/contest/2227/problem/F)</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2227/F" rel="noopener">Codeforces 2227F</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：计算初始和最终的重力势能，找到最大差异。对于一个列表排布，其重力势能为 $$ \sum_{i=0}^{n-1} (-i) a_i $$
+在初始状态下，重力势能为， $$ \sum_{i=0}^{n-1} (-i) \texttt{arr}[i] $$
+在最终状态下，重力势能为， $$ \sum_{i=0}^{n-1} (-i) \texttt{sortted\_arr}[i] $$
+若在 $i$ 处移除一个立方体，那么初始状态重力势能增加 $i$。在排序后，原先高度为 $\texttt{arr}[i]$ 的地方会有一个矮下去一格。那么是在哪里矮下去呢？实际上就是排序后列表高度为 $\texttt{arr}[i]$ 的第一个位置。我们可以遍历所有可能的 $i$，计算出最大的差异。
+
+整个过程的时间复杂度是 $\mathcal{O}(n \log n)$，主要来自于排序。
+
+代码：</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2227/F" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

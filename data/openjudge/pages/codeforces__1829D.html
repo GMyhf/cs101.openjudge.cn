@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>1829D: Gold Rush</title></head>
+<body><div id="pageTitle"><h2>1829D: Gold Rush</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1829/D" rel="noopener">Codeforces 1829D</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>brute force, dfs and similar, dp, implementation, *1000
+
+
+Initially you have a single pile with 𝑛 gold nuggets. In an operation you can do the following:
+
+- Take any pile and split it into two piles, so that one of the resulting piles has exactly twice as many gold nuggets as the other. (All piles should have an integer number of nuggets.)
+
+![img](https://espresso.codeforces.com/723dd5ce328f1a04932ecf7a71a71f198294eaa3.png)
+
+One possible move is to take a pile of size 6 and split it into piles of sizes 2 and 4, which is valid since 4 is twice as large as 2.
+
+Can you make a pile with **exactly** 𝑚 gold nuggets using zero or more operations?
+
+**Input**
+
+The first line contains an integer 𝑡 (1≤𝑡≤1000) — the number of test cases.
+
+The only line of each test case contains two integers 𝑛 and 𝑚 (1≤𝑛,𝑚≤10^7^) — the starting and target pile sizes, respectively.
+
+**Output**
+
+For each test case, output &quot;YES&quot; if you can make a pile of size exactly 𝑚, and &quot;NO&quot; otherwise.
+
+You can output the answer in any case (for example, the strings &quot;yEs&quot;, &quot;yes&quot;, &quot;Yes&quot; and &quot;YES&quot; will be recognized as a positive answer).
+
+Example
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1829/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

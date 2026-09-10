@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>1875D: Jellyfish and Mex</title></head>
+<body><div id="pageTitle"><h2>1875D: Jellyfish and Mex</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1875/D" rel="noopener">Codeforces 1875D</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>You are given an array of 𝑛 nonnegative integers 𝑎1,𝑎2,…,𝑎𝑛.
+
+Let 𝑚 be a variable that is initialized to 00, Jellyfish will perform the following operation 𝑛 times:
+
+- select an index 𝑖 (1≤𝑖≤|𝑎|) and delete 𝑎𝑖 from 𝑎.
+- add MEX(𝑎)† to 𝑚.
+
+Now Jellyfish wants to know the minimum possible final value of 𝑚 if he performs all the operations optimally.
+
+†† The MEX (minimum excluded) of an array is the smallest non-negative integer that does not belong to the array. For instance:
+
+- The MEX of \[2,2,1] is 0, because 0 does not belong to the array.
+- The MEX of \[3,1,0,1] is 2, because 0 and 1 belong to the array, but 2 does not.
+- The MEX of \[0,3,1,2] is 4 because 0, 1, 2, and 3 belong to the array, but 4 does not.
+
+**Input**
+
+Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤5000). The description of the test cases follows.
+
+The first line of each test case contains a single integer 𝑛 (1≤𝑛≤5000) — the size of the array.
+
+The second line of each test case contains 𝑛 integers 𝑎1,𝑎2,…,𝑎𝑛 (0≤𝑎𝑖≤10^9^) — the integers in the array.
+
+It is guaranteed that the sum of 𝑛 over all test cases does not exceed 50005000.
+
+**Output**
+
+For each test case, output a single integer — the minimum value of 𝑚 if the operations are performed optimally.
+
+Example
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1875/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

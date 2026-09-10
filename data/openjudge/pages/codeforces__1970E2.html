@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>1970E2: Trails(Medium)</title></head>
+<body><div id="pageTitle"><h2>1970E2: Trails(Medium)</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1970/E2" rel="noopener">Codeforces 1970E2</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>【马铉钦25化院】题目描述与E1完全相同，n的取值改为1≤n≤$10^9$.
+上面的$O(nm^2)$的方法不再能够满足要求。我们重新审视递推式：
+$$a(n+1,j)=\sum_{i=1} ^m a(n,i)(b_ib_j+b_ic_j+c_ib_j)$$
+对每一组$i,j$,后面$(b_ib_j+b_ic_j+c_ib_j)$都是一个整体，在固定$j$时只随$i$变化，不妨记作$f_{ij}$。
+那么$$a(n+1,j)=\sum_{i=1} ^m a(n,i)f_{ij}$$
+这个格式和matrices的tag不禁让人想到了矩阵的乘法。
+我们令$A_0=[1,0,...,0]$为第0天的走法数（只能在1盆地），那么我们有：
+$A_{i+1}=A_i\times F$  ，其中$F$是一个$m\times m$的方阵，满足$f_{ij}=b_ib_j+b_ic_j+c_ib_j$.
+那么，我们有：$A_n=A_0\times F^n$ ,只要求出$F^n$即可。
+利用快速幂的思想（联想OJ的T02706：麦森数），我们可以将求$F^n$的时间复杂度降到$O(m^3 log n$).
+代码如下：</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1970/E2" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

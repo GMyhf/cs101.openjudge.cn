@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2200G: Operation Permutation</title></head>
+<body><div id="pageTitle"><h2>2200G: Operation Permutation</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2200/G" rel="noopener">Codeforces 2200G</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Combinatorics, dp, math, probabilities
+
+
+AksLolCoding has an integer 𝑥 and a list of 𝑛 operations. Each operation is a string starting with one of the symbols +,-,x, or /(representing addition, subtraction, multiplication, and real number division respectively), followed immediately by a positive integer 𝑦 (1≤𝑦≤109). For example, the operation x3 represents multiplying 𝑥 by 3.
+
+AksLolCoding will randomly permute the operations and then apply all operations sequentially to 𝑥 in the permuted order. Help AksLolCoding compute the expected∗ final value of 𝑥 modulo 109+7.
+
+Formally, let 𝑀=109+7. It can be shown that the answer can be expressed as an irreducible fraction 𝑝𝑞, where 𝑝 and 𝑞 are integers and 𝑞≢0(mod𝑀). Output the integer equal to 𝑝⋅𝑞−1(mod𝑀). In other words, output such an integer 𝑎 that 0≤𝑎&lt;𝑀 and 𝑎⋅𝑞≡𝑝(mod𝑀).
+
+∗The expected final value of 𝑥 is the average of the final value of 𝑥 over all 𝑛! permutations.
+
+**Input**
+
+The first line contains a single integer 𝑡 (1≤𝑡≤1000), the number of test cases.
+
+For each test case, the first line contains two integers 𝑛 and 𝑥 (1≤𝑛≤3000, 1≤𝑥≤109).
+
+The second line of each test case contains 𝑛 strings, each representing an operation in the format described above.
+
+The sum of 𝑛2 over all test cases does not exceed 30002.
+
+**Note:** x is used to represent multiplication, not *
+
+**Output**
+
+For each test case, output a single integer: the expected final value of 𝑥 modulo 109+7.
+
+Example
+
+input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2200/G" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

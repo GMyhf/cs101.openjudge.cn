@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2209E: A Trivial String Problem</title></head>
+<body><div id="pageTitle"><h2>2209E: A Trivial String Problem</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2209/E" rel="noopener">Codeforces 2209E</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Define 𝑓(𝑡) as the maximum number of parts 𝑡 can be split into such that each part is a non-empty prefix of 𝑡. In other words, 𝑓(𝑡) is the maximum positive integer 𝑘 that satisfies the following condition:
+
+- There exist 𝑘 strings 𝑝1,𝑝2,…,𝑝𝑘, which are prefixes of 𝑡, such that 𝑡=𝑝1+𝑝2+…+𝑝𝑘. Here + denotes the string concatenation.
+
+You are given a string 𝑠 of length 𝑛, consisting of only lowercase English letters. Let 𝑠[𝑥..𝑦] represent the substring∗ of 𝑠 from the 𝑥-th to the 𝑦-th character (inclusive). You need to answer 𝑞 queries. The 𝑖-th query provides two integers 𝑙𝑖 and 𝑟𝑖, and you need to find
+
+$\sum_{j=l_i}^{r_i} f(s[l_i..j]).$
+
+∗A string 𝑎 is a substring of a string 𝑏 if 𝑎 can be obtained from 𝑏 by the deletion of several (possibly, zero or all) characters from the beginning and several (possibly, zero or all) characters from the end.
+
+**Input**
+
+Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤10^3). The description of the test cases follows.
+
+The first line of each test case contains two integers 𝑛 and 𝑞 (1≤𝑛≤10^6, 1≤𝑞≤100).
+
+The second line contains the string 𝑠 of length 𝑛, consisting of only lowercase English letters.
+
+The 𝑖-th of the next 𝑞 lines contains two integers 𝑙𝑖 and 𝑟𝑖 (1≤𝑙𝑖≤𝑟𝑖≤𝑛), representing the 𝑖-th query.
+
+It is guaranteed that the sum of 𝑛 over all test cases does not exceed 10^6.
+
+**Output**
+
+For each query, output an integer representing the value of the expression.
+
+Example
+
+Input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2209/E" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

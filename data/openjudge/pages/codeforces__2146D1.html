@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2146D1: Max Sum OR (Easy Version)</title></head>
+<body><div id="pageTitle"><h2>2146D1: Max Sum OR (Easy Version)</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2146/D1" rel="noopener">Codeforces 2146D1</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>bitmasks, constructive algorithms, divide and conquer, greedy, trees, *1500
+
+
+**This is the easy version of the problem. The difference between the versions is that in this version, 𝑙=0, and 𝑟&lt;2⋅105. You can hack only if you solved all versions of this problem.**
+
+You are given two integers 𝑙 and 𝑟 (𝑙≤𝑟).
+
+Let 𝑛=𝑟−𝑙+1. We will create two arrays 𝑎 and 𝑏, both consisting of 𝑛 integers. Initially, both 𝑎 and 𝑏 are equal to [𝑙,𝑙+1,…,𝑟]. You have to reorder the array 𝑎 arbitrarily to maximize the following value:
+
+
+
+∑𝑖=1𝑛(𝑎𝑖|𝑏𝑖).
+
+
+
+Here, | denotes the [bitwise OR operation](https://en.wikipedia.org/wiki/Bitwise_operation#OR).
+
+You also need to construct a possible way to reorder the array 𝑎.
+
+**Input**
+
+Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤104). The description of the test cases follows.
+
+The only line of each test case contains two integers 𝑙 and 𝑟 (0=𝑙≤𝑟&lt;2⋅10^5) — the minimum and maximum elements in 𝑎.
+
+Let 𝑛=𝑟−𝑙+1. It is guaranteed that the sum of 𝑛 over all test cases does not exceed 2⋅10^5.
+
+**Output**
+
+For each test case, print a single integer in the first line of output — the maximum value of ∑𝑖=1𝑛(𝑎𝑖|𝑏𝑖).
+
+Then, print 𝑛 distinct integers 𝑎1,𝑎2,…,𝑎𝑛 in the second line — the array 𝑎 after reordering.
+
+If there are multiple answers, you may print any of them.
+
+Example
+
+Input</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2146/D1" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>

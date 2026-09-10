@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>2227D: Palindromex](https://codeforces.com/contest/2227/problem/D)</title></head>
+<body><div id="pageTitle"><h2>2227D: Palindromex](https://codeforces.com/contest/2227/problem/D)</h2></div>
+<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2227/D" rel="noopener">Codeforces 2227D</a></dd>
+<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
+<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：找到数组中两个0的位置，计算以这些位置为中心的最长回文子数组的MEX。具体来说，一共有三种回文序列：
+
+1. `xxx0xxx`：以第一个0为中心的回文序列。
+2. `xxx0xxx`：以第二个0为中心的回文序列
+3. `xxx0xxx0xxx`：以两个0为中心的回文序列。
+
+如果你不用 0 作为回文序列的内容，那么直接 MEX = 0，显然不是最大的。
+
+代码：</pre></dd>
+<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2227/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+</body></html>
