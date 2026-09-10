@@ -346,6 +346,67 @@ def case_466c(r):
             if prefix == target: first += 1
     return str(len(values)) + "\n" + " ".join(map(str, values)) + "\n", f"{answer}\n"
 
+def case_230b(r):
+    import math
+    values = [r.randint(1, 10**12) for _ in range(r.randint(1, 80))]
+    def prime(value):
+        if value < 2: return False
+        for divisor in range(2, int(math.isqrt(value)) + 1):
+            if value % divisor == 0: return False
+        return True
+    answer = ["YES" if (root := math.isqrt(value)) ** 2 == value and prime(root) else "NO" for value in values]
+    return str(len(values)) + "\n" + " ".join(map(str, values)) + "\n", "\n".join(answer) + "\n"
+
+def case_474d(r):
+    k = r.randint(1, 30); queries = []
+    for _ in range(r.randint(1, 50)):
+        left = r.randint(1, 200); queries.append((left, r.randint(left, 200)))
+    mod = 1_000_000_007; dp = [0] * 201; dp[0] = 1
+    for value in range(1, 201): dp[value] = (dp[value - 1] + (dp[value - k] if value >= k else 0)) % mod
+    prefix = [0]
+    for value in dp[1:]: prefix.append((prefix[-1] + value) % mod)
+    return f"{len(queries)} {k}\n" + "".join(f"{a} {b}\n" for a, b in queries), "\n".join(str((prefix[b] - prefix[a - 1]) % mod) for a, b in queries) + "\n"
+
+def case_489b(r):
+    boys = [r.randint(1, 100) for _ in range(r.randint(1, 80))]; girls = [r.randint(1, 100) for _ in range(r.randint(1, 80))]
+    i = j = answer = 0
+    for boy in sorted(boys):
+        while j < len(girls) and sorted(girls)[j] < boy - 1: j += 1
+        if j < len(girls) and abs(sorted(girls)[j] - boy) <= 1: answer += 1; j += 1
+    return f"{len(boys)}\n{' '.join(map(str,boys))}\n{len(girls)}\n{' '.join(map(str,girls))}\n", f"{answer}\n"
+
+def case_1364a(r):
+    x = r.randint(1, 30); values = [r.randint(1, 100) for _ in range(r.randint(1, 100))]
+    total = sum(values)
+    if total % x: answer = len(values)
+    else:
+        left = next((i for i, value in enumerate(values) if value % x), None)
+        right = next((i for i, value in enumerate(reversed(values)) if value % x), None)
+        answer = -1 if left is None else len(values) - 1 - min(left, right)
+    return f"1\n{len(values)} {x}\n{' '.join(map(str,values))}\n", f"{answer}\n"
+
+def case_1374c(r):
+    text = "".join(r.choice("()") for _ in range(r.randint(1, 200)))
+    opened = removed = 0
+    for char in text:
+        if char == '(': opened += 1
+        elif opened: opened -= 1
+        else: removed += 1
+    return f"1\n{text}\n", f"{removed + opened}\n"
+
+def case_1398c(r):
+    text = "".join(str(r.randint(0, 9)) for _ in range(r.randint(1, 200)))
+    counts = {0: 1}; prefix = answer = 0
+    for index, char in enumerate(text, 1):
+        prefix += int(char); key = prefix - index; answer += counts.get(key, 0); counts[key] = counts.get(key, 0) + 1
+    return f"1\n{len(text)}\n{text}\n", f"{answer}\n"
+
+def case_1520d(r):
+    values = [r.randint(1, 1000) for _ in range(r.randint(1, 200))]; counts = {}; answer = 0
+    for index, value in enumerate(values):
+        key = value - index; answer += counts.get(key, 0); counts[key] = counts.get(key, 0) + 1
+    return f"1\n{len(values)}\n{' '.join(map(str,values))}\n", f"{answer}\n"
+
 
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
@@ -458,6 +519,8 @@ BUILDERS = {
     "1742A": case_1742a,
     "158B": case_158b, "189A": case_189a, "368B": case_368b, "431C": case_431c,
     "433B": case_433b, "466C": case_466c,
+    "230B": case_230b, "474D": case_474d, "489B": case_489b, "1364A": case_1364a,
+    "1374C": case_1374c, "1398C": case_1398c, "1520D": case_1520d,
 }
 
 
