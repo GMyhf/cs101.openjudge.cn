@@ -897,6 +897,13 @@ def case_2140b(r):
     raise RuntimeError("no witness found")
 
 
+def case_363b(r):
+    values = [r.randint(1, 1000) for _ in range(r.randint(1, 200))]
+    width = r.randint(1, len(values))
+    sums = [sum(values[index:index + width]) for index in range(len(values) - width + 1)]
+    return f"{len(values)} {width}\n{' '.join(map(str, values))}\n", f"{sums.index(min(sums)) + 1}\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -933,6 +940,7 @@ BUILDERS = {
     "2200G": case_2200g,
     "313B": case_313b, "1749C": case_1749c,
     "2140B": case_2140b,
+    "363B": case_363b,
 }
 
 
