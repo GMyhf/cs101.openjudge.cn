@@ -1060,6 +1060,19 @@ def case_2218d(r):
     return "2\n" + "\n".join(map(str, sizes)) + "\n", "\n".join(rows) + "\n"
 
 
+def case_2218f(r):
+    cases = [(r.randint(0, 6), r.randint(0, 6)), (r.randint(0, 6), r.randint(0, 6))]
+    cases = [(x, y) if x+y else (0, 1) for x, y in cases]
+    output = []
+    for x, y in cases:
+        n=x+y
+        if x > n//2 or (n%2==0 and x==0): output.append("NO"); continue
+        output.append("YES"); nxt=2; pairs=x if n%2 else x-1
+        for _ in range(pairs): output.append(f"1 {nxt}"); output.append(f"{nxt} {nxt+1}"); nxt+=2
+        while nxt<=n: output.append(f"1 {nxt}"); nxt+=1
+    return str(len(cases))+"\n"+"".join(f"{x} {y}\n" for x,y in cases),"\n".join(output)+"\n"
+
+
 def case_2227b(r):
     text = "".join(r.choice("()") for _ in range(r.randint(1,200)))
     return f"1\n{len(text)}\n{text}\n", ("YES" if text.count("(") == text.count(")") else "NO") + "\n"
@@ -1139,6 +1152,7 @@ BUILDERS = {
     "2218E": case_2218e,
     "2218C": case_2218c,
     "2218D": case_2218d,
+    "2218F": case_2218f,
     "2227B": case_2227b,
     "2227A": case_2227a,
     "2227C": case_2227c,
@@ -1195,6 +1209,8 @@ def main():
             row["special_checker"] = "max_median_blocks"
         if problem == "2218D":
             row["special_checker"] = "distinct_adjacent_gcd"
+        if problem == "2218F":
+            row["special_checker"] = "subtree_parity_tree"
         if problem == "2227C":
             row["special_checker"] = "min_divisible_by_six_subarrays"
         if problem == "2218A":

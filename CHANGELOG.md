@@ -184,6 +184,11 @@
 - 新增 `2218D` 的 21 组输入与 `distinct_adjacent_gcd` 专用验证器；构造题现为 120 题、
   2,520 组。
 
+### Codeforces 67th Tree 构造输出验证
+
+- 新增 `2218F` 的 21 组输入与 `subtree_parity_tree` 专用验证器；构造题现为 124 题、
+  2,604 组。
+
 ### Codeforces Party Monster 构造数据
 
 - 新增 `2227B` 的 21 组构造数据；构造题现为 121 题、2,541 组。

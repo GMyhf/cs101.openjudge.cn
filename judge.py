@@ -362,6 +362,34 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "subtree_parity_tree":
+        try:
+            values = list(map(int, input_data.decode().split())); queries = list(zip(values[1::2], values[2::2]))
+            tokens = actual.split(); cursor = 0
+            for even_count, odd_count in queries:
+                n = even_count + odd_count; possible = even_count <= n // 2 and not (n % 2 == 0 and even_count == 0)
+                if cursor >= len(tokens): return False
+                decision = tokens[cursor].upper(); cursor += 1
+                if decision == "NO":
+                    if possible: return False
+                    continue
+                if decision != "YES" or cursor + 2 * (n - 1) > len(tokens): return False
+                edges = [(int(tokens[cursor+i*2])-1, int(tokens[cursor+i*2+1])-1) for i in range(n-1)]; cursor += 2*(n-1)
+                graph = [[] for _ in range(n)]
+                for a,b in edges:
+                    if not (0 <= a < n and 0 <= b < n): return False
+                    graph[a].append(b); graph[b].append(a)
+                parent = [-2]*n; parent[0] = -1; order=[0]
+                for node in order:
+                    for nxt in graph[node]:
+                        if parent[nxt] == -2: parent[nxt]=node; order.append(nxt)
+                if len(order) != n: return False
+                size = [1]*n
+                for node in reversed(order[1:]): size[parent[node]] += size[node]
+                if sum(value % 2 == 0 for value in size) != even_count or sum(value % 2 for value in size) != odd_count: return False
+            return cursor == len(tokens)
+        except (UnicodeDecodeError, ValueError, IndexError):
+            return False
     if kind == "min_divisible_by_six_subarrays":
         try:
             from itertools import permutations

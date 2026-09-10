@@ -272,6 +272,10 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertTrue(judge_module.special_output_matches("distinct_adjacent_gcd", b"1\n3\n", "3 15 35\n"))
         self.assertFalse(judge_module.special_output_matches("distinct_adjacent_gcd", b"1\n3\n", "2 4 6\n"))
 
+    def test_subtree_parity_tree_checker(self):
+        self.assertTrue(judge_module.special_output_matches("subtree_parity_tree", b"1\n1 1\n", "YES\n1 2\n"))
+        self.assertFalse(judge_module.special_output_matches("subtree_parity_tree", b"1\n1 1\n", "NO\n"))
+
     def test_problem_exists_caches_until_catalog_changes(self):
         with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
             mirror = Path(temp)
