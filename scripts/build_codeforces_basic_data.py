@@ -407,6 +407,67 @@ def case_1520d(r):
         key = value - index; answer += counts.get(key, 0); counts[key] = counts.get(key, 0) + 1
     return f"1\n{len(values)}\n{' '.join(map(str,values))}\n", f"{answer}\n"
 
+def case_1195c(r):
+    top = [r.randint(1, 1000) for _ in range(r.randint(1, 100))]; bottom = [r.randint(1, 1000) for _ in top]
+    none = up = down = 0
+    for a, b in zip(top, bottom):
+        none, up, down = max(none, up, down), max(none, down) + a, max(none, up) + b
+    return str(len(top)) + "\n" + " ".join(map(str, top)) + "\n" + " ".join(map(str, bottom)) + "\n", f"{max(none, up, down)}\n"
+
+def case_1829d(r):
+    n, m = r.randint(1, 10**6), r.randint(1, 10**6)
+    def possible(value):
+        if value == m: return True
+        return value % 3 == 0 and (possible(value // 3) or possible(value // 3 * 2))
+    return f"1\n{n} {m}\n", ("YES" if possible(n) else "NO") + "\n"
+
+def case_1829e(r):
+    rows, cols = r.randint(1, 20), r.randint(1, 20)
+    grid = [[r.randint(0, 9) for _ in range(cols)] for _ in range(rows)]
+    seen, best = set(), 0
+    for i in range(rows):
+        for j in range(cols):
+            if not grid[i][j] or (i, j) in seen: continue
+            seen.add((i, j)); stack = [(i, j)]; total = 0
+            while stack:
+                x, y = stack.pop(); total += grid[x][y]
+                for dx, dy in ((1,0),(-1,0),(0,1),(0,-1)):
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < rows and 0 <= ny < cols and grid[nx][ny] and (nx, ny) not in seen:
+                        seen.add((nx, ny)); stack.append((nx, ny))
+            best = max(best, total)
+    return f"1\n{rows} {cols}\n" + "".join(" ".join(map(str,row)) + "\n" for row in grid), f"{best}\n"
+
+def case_1850h(r):
+    nodes, edges = r.randint(2, 30), r.randint(1, 60)
+    graph = [[] for _ in range(nodes)]; rows = []
+    for _ in range(edges):
+        a, b, weight = r.randrange(nodes), r.randrange(nodes), r.randint(-20, 20)
+        if a == b: b = (b + 1) % nodes
+        rows.append((a, b, weight)); graph[a].append((b, weight)); graph[b].append((a, -weight))
+    values, valid = {}, True
+    for root in range(nodes):
+        if root in values: continue
+        values[root] = 0; stack = [root]
+        while stack:
+            node = stack.pop()
+            for nxt, weight in graph[node]:
+                target = values[node] + weight
+                if nxt in values:
+                    valid &= values[nxt] == target
+                else: values[nxt] = target; stack.append(nxt)
+    return f"1\n{nodes} {len(rows)}\n" + "".join(f"{a+1} {b+1} {w}\n" for a,b,w in rows), ("YES" if valid else "NO") + "\n"
+
+def case_1881c(r):
+    n = r.choice((2, 4, 6, 8, 10)); grid = [[r.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(n)] for _ in range(n)]
+    answer = 0
+    for i in range(n // 2):
+        for j in range(i, n - i - 1):
+            cells = (grid[i][j], grid[j][n-1-i], grid[n-1-i][n-1-j], grid[n-1-j][i])
+            highest = max(cells)
+            answer += sum(ord(highest) - ord(char) for char in cells)
+    return f"1\n{n}\n" + "".join("".join(row) + "\n" for row in grid), f"{answer}\n"
+
 
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
@@ -521,6 +582,8 @@ BUILDERS = {
     "433B": case_433b, "466C": case_466c,
     "230B": case_230b, "474D": case_474d, "489B": case_489b, "1364A": case_1364a,
     "1374C": case_1374c, "1398C": case_1398c, "1520D": case_1520d,
+    "1195C": case_1195c, "1829D": case_1829d, "1829E": case_1829e, "1850H": case_1850h,
+    "1881C": case_1881c,
 }
 
 
