@@ -59,9 +59,7 @@ def request(port, method, path, body=None, cookie=None, extra_headers=None):
 # 其余 17 道是判别力为零 —— 21 组期望输出完全相同，或整题只有 1 组样例数据，
 # 一个不读输入、只 print 常量的程序就能拿 Accepted。集合本身也是判据：谁加谁减都要动这里。
 WITHHELD_CODEFORCES = {
-    "903C", "2140B",
-    "270A", "456A", "1374B", "1475A", "1742A", "1829D", "2227B",
-    "986D", "1764C", "1883D", "1970E1", "2171G", "2192D", "2195E", "2205D", "2208C", "2228D",
+    "986D", "2171G", "2192D", "2195E", "2205D", "2228D",
 }
 
 
@@ -496,7 +494,8 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertTrue(all(len({(ROOT / "data/openjudge" / case["input"]).read_bytes()
                                  for case in item["test_cases"]}) == 21 for item in generated))
         rebuilt = [item for item in entries if item.get("data_status") == "rebuilt_tests"]
-        self.assertEqual({item["id"] for item in rebuilt}, {"698A", "1374C"})
+        self.assertEqual({item["id"] for item in rebuilt},
+                         {"270A", "456A", "698A", "903C", "1374B", "1374C", "1475A", "1742A", "1764C", "1829D", "1883D", "1970E1", "2140B", "2208C", "2227B"})
         self.assertTrue(all(item["test_count"] == 21 for item in rebuilt))
         self.assertEqual(sum(item["test_count"] for item in entries if item["id"] != "4A"),
                          sum(item["test_count"] for item in sampled)
@@ -519,7 +518,7 @@ print(n // a * (m // a))
         恒等于 n；1374C 漏写题面要求的 n 行、答案还是正确值的两倍。所以这里钉的不是
         「有 21 组数据」，而是**参考解过、那两种坏口径挂**。见 collab/HANDOFF.md 的 T-038。
         """
-        for problem_id in ("698A", "1374C"):
+        for problem_id in ("698A", "903C", "1374C", "2140B"):
             reference = (ROOT / f"data/openjudge/tests/codeforces/{problem_id}_made"
                               / "samplecode.py").read_text(encoding="utf-8")
             verdict = judge("codeforces", problem_id, "python", reference)
@@ -560,6 +559,11 @@ for text in data[1:int(data[0]) + 1]:
 print("\\n".join(answers))
 """
         self.assertEqual("Wrong Answer", judge("codeforces", "1374C", "python", without_n)["status"])
+
+        self.assertEqual("Wrong Answer", judge("codeforces", "903C", "python", "print(1)\n")["status"])
+        # 2140B now contains multi-test input. A solver that only produces a
+        # witness for the first x must fail instead of silently passing t=1.
+        self.assertEqual("Wrong Answer", judge("codeforces", "2140B", "python", "print(1)\n")["status"])
 
     def test_codeforces_withheld_problems_stay_out_of_the_judge(self):
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))

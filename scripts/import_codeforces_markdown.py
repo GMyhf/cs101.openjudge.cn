@@ -21,6 +21,7 @@ CATALOG_PATH = MIRROR / "catalog.json"
 TEST_INDEX_PATH = MIRROR / "test_index.json"
 PAGES = MIRROR / "pages"
 REPORT_PATH = ROOT / "docs" / "codeforces-import.md"
+MIN_EXACT_CASES = 20
 
 URL = re.compile(
     r"https?://codeforces\.com/(?:problemset/problem/(\d+)/([A-Za-z]\d*)|"
@@ -153,10 +154,10 @@ def report(source, imported, excluded, data_status):
         "# Codeforces 题解导入记录", "",
         f"- 导入源：`{source}`", f"- 导入源 SHA-256：`{digest}`",
         f"- 标准题：{len(imported)} 道；其中已有条目保留、缺失条目补入 Codeforces 题库。",
-        "- 判题数据：仅已有数据的题目可提交判题；其余条目展示题解摘要和官方原题链接。", "",
+        f"- 判题数据：至少 {MIN_EXACT_CASES} 组互异、验证过的数据才可 token 精确判题；其余条目展示题解摘要和官方原题链接。", "",
         "## 测试数据状态", "",
-        "只导入原文中明确标记的 input/output 样例。交互和多解输出题不会被错误地接入",
-        "token 精确判题；无可提取样例的普通题也保留为待补完整数据。", "",
+        f"官方样例会保留，但少于 {MIN_EXACT_CASES} 组时只作离线参考，不接入 token 精确判题。",
+        "交互和多解输出题同样保留为待补完整数据。", "",
         "| 状态 | 数量 |", "| --- | ---: |",
     ]
     for status, count in sorted((name, sum(value == name for value in data_status.values()))
@@ -209,8 +210,13 @@ def main():
             record.setdefault("source", "codeforces")
             record.setdefault("source_url", item["url"])
         if problem_id != "4A":
-            if record.get("data_status") == "generated_tests":
-                data_status[problem_id] = "generated_tests"
+            if record.get("data_status") in {"generated_tests", "rebuilt_tests",
+                                             "withheld_pending_rework"}:
+                # A deterministic per-problem rebuild and an explicit safety
+                # withdrawal are both authoritative. Re-importing the source
+                # Markdown must never silently replace either with its few
+                # extracted examples.
+                data_status[problem_id] = record["data_status"]
             elif item["interactive"]:
                 data_status[problem_id] = "interactive_requires_judge"
                 record.update({"tests": False, "test_count": 0, "test_cases": [],
@@ -230,9 +236,17 @@ def main():
                     output_path.write_text(sample["output"] + "\n", encoding="utf-8")
                     cases.append({"input": str(input_path.relative_to(MIRROR)),
                                   "output": str(output_path.relative_to(MIRROR))})
-                record.update({"tests": True, "test_count": len(cases), "test_cases": cases,
-                               "data_status": "sample_tests"})
-                data_status[problem_id] = "sample_tests"
+                record["sample_count"] = len(cases)
+                if len(cases) >= MIN_EXACT_CASES:
+                    record.update({"tests": True, "test_count": len(cases), "test_cases": cases,
+                                   "data_status": "sample_tests"})
+                    data_status[problem_id] = "sample_tests"
+                else:
+                    # Keep extracted official samples on disk, but do not let
+                    # a small sample set pretend to be a judge data suite.
+                    record.update({"tests": False, "test_count": 0, "test_cases": [],
+                                   "data_status": "insufficient_sample_cases"})
+                    data_status[problem_id] = "insufficient_sample_cases"
             else:
                 data_status[problem_id] = "no_extractable_sample"
                 record["data_status"] = "no_extractable_sample"

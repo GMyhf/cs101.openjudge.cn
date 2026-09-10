@@ -1,5 +1,6 @@
 """Local multi-language judge for the mirrored OpenJudge test pairs."""
 import json
+import multiprocessing
 import os
 import resource
 import shutil
@@ -44,6 +45,7 @@ CASE_FLOOR_S = 4
 CASE_CAP_S = 20
 # 整次提交的墙钟硬顶。改动前这一项无界：组数最多的一题有 150 组，150 × 5s = 750 秒。
 TOTAL_HARD_CAP_S = 300
+SPECIAL_CHECKER_TIMEOUT_S = 1.0
 SAMPLE_STDIN_LIMIT = 64 * 1024
 SAMPLE_OUTPUT_LIMIT = 64 * 1024
 DOTNET_ADDRESS_SPACE = 2 * 768 * 1024 * 1024
@@ -361,7 +363,7 @@ def outputs_match(actual, expected, comparison="tokens"):
         return False
 
 
-def special_output_matches(kind, input_data, actual):
+def _special_output_matches_core(kind, input_data, actual):
     if kind == "subtree_parity_tree":
         try:
             values = list(map(int, input_data.decode().split())); queries = list(zip(values[1::2], values[2::2]))
@@ -573,26 +575,76 @@ def special_output_matches(kind, input_data, actual):
         except (UnicodeDecodeError, ValueError):
             return False
     if kind == "divisible_by_8_subsequence":
-        text = input_data.decode().split()[0]
-        tokens = actual.split()
-        if tokens == ["NO"]:
-            return not any(int("".join(text[index] for index in range(len(text)) if mask >> index & 1)) % 8 == 0
-                           for mask in range(1, 1 << len(text)))
-        if len(tokens) != 2 or tokens[0] != "YES":
+        try:
+            from itertools import combinations
+            text = input_data.decode().split()[0]
+            tokens = actual.split()
+            if tokens == ["NO"]:
+                # Divisibility by eight depends only on the last three digits.
+                # Any longer valid subsequence therefore has a valid suffix of
+                # length 1..3, so this is equivalent to the old 2**n search.
+                return not any(int("".join(chars)) % 8 == 0
+                               for length in range(1, min(3, len(text)) + 1)
+                               for chars in combinations(text, length))
+            if len(tokens) != 2 or tokens[0] != "YES":
+                return False
+            iterator = iter(text)
+            return tokens[1].isdigit() and int(tokens[1]) % 8 == 0 and all(char in iterator for char in tokens[1])
+        except (UnicodeDecodeError, IndexError):
             return False
-        iterator = iter(text)
-        return tokens[1].isdigit() and int(tokens[1]) % 8 == 0 and all(char in iterator for char in tokens[1])
     if kind != "concat_divisible":
         return False
     try:
-        x = int(input_data.decode().split()[1])
+        values = list(map(int, input_data.decode().split()))
+        count, xs = values[0], values[1:]
         tokens = actual.split()
-        if len(tokens) != 1:
+        if count < 1 or len(xs) != count or len(tokens) != count:
             return False
-        y = int(tokens[0])
+        ys = list(map(int, tokens))
     except (UnicodeDecodeError, ValueError, IndexError):
         return False
-    return 0 < y < 10**9 and int(str(x) + str(y)) % (x + y) == 0
+    return all(0 < y < 10**9 and int(str(x) + str(y)) % (x + y) == 0
+               for x, y in zip(xs, ys))
+
+
+def _special_checker_worker(connection, kind, input_data, actual):
+    try:
+        connection.send(bool(_special_output_matches_core(kind, input_data, actual)))
+    except BaseException:
+        connection.send(False)
+    finally:
+        connection.close()
+
+
+def special_output_matches(kind, input_data, actual):
+    """Run a special checker out of process with a non-negotiable wall limit.
+
+    Checkers validate untrusted output and some necessarily inspect a search
+    space. A malformed or future near-limit test must not be able to hold a
+    server request after the submitted program has already finished.
+    """
+    if not kind:
+        return False
+    parent, child = multiprocessing.get_context("fork").Pipe(duplex=False)
+    worker = multiprocessing.get_context("fork").Process(
+        target=_special_checker_worker, args=(child, kind, input_data, actual), daemon=True)
+    try:
+        worker.start()
+        child.close()
+        if not parent.poll(SPECIAL_CHECKER_TIMEOUT_S):
+            worker.terminate()
+            worker.join()
+            return False
+        matched = bool(parent.recv())
+        worker.join()
+        return matched and worker.exitcode == 0
+    except (EOFError, OSError):
+        return False
+    finally:
+        parent.close()
+        if worker.is_alive():
+            worker.terminate()
+            worker.join()
 
 
 def judge(book, problem_id, language, source, collect_case_times=False):

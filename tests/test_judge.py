@@ -9,6 +9,7 @@ import resource
 import shutil
 import subprocess
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest import mock
@@ -217,6 +218,19 @@ class ProblemLookupCacheTests(unittest.TestCase):
     def test_concat_divisible_special_checker(self):
         self.assertTrue(judge_module.special_output_matches("concat_divisible", b"1\n1\n", "8\n"))
         self.assertFalse(judge_module.special_output_matches("concat_divisible", b"1\n1\n", "1\n"))
+        self.assertTrue(judge_module.special_output_matches("concat_divisible", b"3\n1\n2\n3\n", "8\n7\n6\n"))
+        self.assertFalse(judge_module.special_output_matches("concat_divisible", b"3\n1\n2\n3\n", "8\n7\n"))
+
+    def test_special_checker_has_a_wall_clock_budget(self):
+        def never_returns(*_args):
+            time.sleep(judge_module.SPECIAL_CHECKER_TIMEOUT_S * 4)
+            return True
+
+        started = time.perf_counter()
+        with mock.patch.object(judge_module, "_special_output_matches_core", never_returns):
+            self.assertFalse(judge_module.special_output_matches("concat_divisible", b"1\n1\n", "8\n"))
+        self.assertLess(time.perf_counter() - started,
+                        judge_module.SPECIAL_CHECKER_TIMEOUT_S * 2)
 
     def test_divisible_by_eight_subsequence_checker(self):
         self.assertTrue(judge_module.special_output_matches("divisible_by_8_subsequence", b"1232\n", "YES\n32\n"))
