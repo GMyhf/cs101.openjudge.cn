@@ -260,6 +260,10 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertTrue(judge_module.special_output_matches("maximize_min", b"2\n-2\n3\n", "0\n3\n"))
         self.assertFalse(judge_module.special_output_matches("maximize_min", b"1\n3\n", "2\n"))
 
+    def test_max_median_block_checker(self):
+        self.assertTrue(judge_module.special_output_matches("max_median_blocks", b"1\n1\n", "1 2 3\n"))
+        self.assertFalse(judge_module.special_output_matches("max_median_blocks", b"1\n2\n", "1 2 3 4 5 6\n"))
+
     def test_problem_exists_caches_until_catalog_changes(self):
         with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
             mirror = Path(temp)

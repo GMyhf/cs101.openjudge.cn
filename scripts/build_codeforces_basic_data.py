@@ -1044,6 +1044,16 @@ def case_2218e(r):
     return f"1\n{len(values)}\n{' '.join(map(str, values))}\n", f"{answer}\n"
 
 
+def case_2218c(r):
+    sizes = [r.randint(1, 30), r.randint(1, 30)]
+    rows = []
+    for n in sizes:
+        values = []
+        for i in range(1, n + 1): values += [i, n + 2*i - 1, n + 2*i]
+        rows.append(" ".join(map(str, values)))
+    return "2\n" + "\n".join(map(str, sizes)) + "\n", "\n".join(rows) + "\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -1096,6 +1106,7 @@ BUILDERS = {
     "2218A": case_2218a,
     "2218B": case_2218b,
     "2218E": case_2218e,
+    "2218C": case_2218c,
 }
 
 
@@ -1145,6 +1156,8 @@ def main():
             row["special_checker"] = "good_permutation"
         if problem == "1868A":
             row["special_checker"] = "matrix_beauty"
+        if problem == "2218C":
+            row["special_checker"] = "max_median_blocks"
         if problem == "2218A":
             row["special_checker"] = "maximize_min"
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

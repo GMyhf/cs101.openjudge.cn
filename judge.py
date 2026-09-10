@@ -362,6 +362,19 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "max_median_blocks":
+        try:
+            sizes = list(map(int, input_data.decode().split()))[1:]
+            values = list(map(int, actual.split())); cursor = 0
+            for n in sizes:
+                part = values[cursor:cursor+3*n]; cursor += 3*n
+                if len(part) != 3*n or sorted(part) != list(range(1,3*n+1)):
+                    return False
+                if sum(sorted(part[index:index+3])[1] for index in range(0,3*n,3)) != 2*n*n:
+                    return False
+            return cursor == len(values)
+        except (UnicodeDecodeError, ValueError):
+            return False
     if kind == "maximize_min":
         try:
             values = list(map(int, input_data.decode().split()))[1:]
