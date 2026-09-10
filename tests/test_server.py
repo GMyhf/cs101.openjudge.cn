@@ -406,8 +406,6 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertTrue({"1A", "2228D", "4A"}.issubset(entries))
         self.assertFalse({"2095A", "2214A"} & set(entries))
         self.assertEqual(entries["4A"]["test_count"], 21)
-        self.assertEqual(sum(item["test_count"] for problem_id, item in entries.items()
-                             if problem_id != "4A"), 193)
         self.assertTrue((ROOT / "data/openjudge/pages/codeforces__1A.html").is_file())
         report = (ROOT / "docs/codeforces-import.md").read_text(encoding="utf-8")
         self.assertIn("| 2095A |", report)
@@ -417,27 +415,37 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertEqual(status, 200)
         self.assertIn("Theatre Square", body.decode("utf-8", errors="replace"))
 
-    def test_codeforces_imported_samples_are_complete_and_judgeable(self):
+    def test_codeforces_generated_data_has_twenty_one_distinct_cases(self):
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
         entries = [item for item in catalog["problems"] if item.get("source") == "codeforces"]
         sampled = [item for item in entries if item.get("data_status") == "sample_tests"]
-        self.assertEqual(len(sampled), 113)
-        self.assertEqual(sum(len(item["test_cases"]) for item in sampled), 193)
+        self.assertEqual(len(sampled), 98)
+        self.assertEqual(sum(len(item["test_cases"]) for item in sampled), 159)
         self.assertTrue(all((ROOT / "data/openjudge" / case["input"]).is_file()
                             and (ROOT / "data/openjudge" / case["output"]).is_file()
                             for item in sampled for case in item["test_cases"]))
         self.assertEqual({item["id"] for item in entries
-                          if item.get("data_status") == "interactive_requires_judge"},
+                         if item.get("data_status") == "interactive_requires_judge"},
                          {"2109C1", "2109C2", "2109C3", "2173E", "2209C"})
+
+        generated = [item for item in entries if item.get("data_status") == "generated_tests"]
+        self.assertEqual({item["id"] for item in generated},
+                         {"1A", "50A", "96A", "112A", "151A", "231A", "236A", "263A",
+                          "266A", "270A", "281A", "282A", "339A", "479A", "996A"})
+        self.assertTrue(all(item["test_count"] == 21 for item in generated))
+        self.assertTrue(all(len({(ROOT / "data/openjudge" / case["input"]).read_bytes()
+                                 for case in item["test_cases"]}) == 21 for item in generated))
+        self.assertEqual(sum(item["test_count"] for item in entries if item["id"] != "4A"),
+                         sum(item["test_count"] for item in sampled) + sum(item["test_count"] for item in generated))
 
         accepted = judge("codeforces", "1A", "python", """n, m, a = map(int, input().split())
 print((n + a - 1) // a * ((m + a - 1) // a))
 """)
-        self.assertEqual((accepted["status"], accepted["cases"]), ("Accepted", 1), accepted)
+        self.assertEqual((accepted["status"], accepted["cases"]), ("Accepted", 21), accepted)
         mutant = judge("codeforces", "1A", "python", """n, m, a = map(int, input().split())
 print(n // a * (m // a))
 """)
-        self.assertEqual((mutant["status"], mutant["case"]), ("Wrong Answer", 1), mutant)
+        self.assertEqual(mutant["status"], "Wrong Answer", mutant)
 
     def test_practice_02977_is_mirrored_by_global_number(self):
         status, _, body = request(self.port, "GET", "/practice/02977/")

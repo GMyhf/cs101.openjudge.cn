@@ -12,21 +12,37 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 
 | 状态 | 数量 |
 | --- | ---: |
+| generated_tests | 15 |
 | interactive_requires_judge | 5 |
 | multiple_output_requires_special_judge | 18 |
 | no_extractable_sample | 21 |
-| sample_tests | 113 |
+| sample_tests | 98 |
 
 ## 未接入精确判题数据
 
 | 题目 | 状态 | 官方链接 |
 | --- | --- | --- |
+| 1A | generated_tests | https://codeforces.com/problemset/problem/1/A |
 | 20C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/20/C |
 | 37C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/37/C |
+| 50A | generated_tests | https://codeforces.com/problemset/problem/50/A |
+| 96A | generated_tests | https://codeforces.com/problemset/problem/96/A |
+| 112A | generated_tests | https://codeforces.com/problemset/problem/112/A |
+| 151A | generated_tests | https://codeforces.com/problemset/problem/151/A |
+| 231A | generated_tests | https://codeforces.com/problemset/problem/231/A |
+| 236A | generated_tests | https://codeforces.com/problemset/problem/236/A |
+| 263A | generated_tests | https://codeforces.com/problemset/problem/263/A |
+| 266A | generated_tests | https://codeforces.com/problemset/problem/266/A |
+| 270A | generated_tests | https://codeforces.com/problemset/problem/270/A |
+| 281A | generated_tests | https://codeforces.com/problemset/problem/281/A |
+| 282A | generated_tests | https://codeforces.com/problemset/problem/282/A |
 | 313B | no_extractable_sample | https://codeforces.com/problemset/problem/313/B |
+| 339A | generated_tests | https://codeforces.com/problemset/problem/339/A |
 | 363B | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/363/B |
+| 479A | generated_tests | https://codeforces.com/problemset/problem/479/A |
 | 550C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/550/C |
 | 584A | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/584/A |
+| 996A | generated_tests | https://codeforces.com/problemset/problem/996/A |
 | 1352A | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1352/A |
 | 1366D | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1366/D |
 | 1729C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1729/C |

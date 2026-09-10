@@ -209,7 +209,9 @@ def main():
             record.setdefault("source", "codeforces")
             record.setdefault("source_url", item["url"])
         if problem_id != "4A":
-            if item["interactive"]:
+            if record.get("data_status") == "generated_tests":
+                data_status[problem_id] = "generated_tests"
+            elif item["interactive"]:
                 data_status[problem_id] = "interactive_requires_judge"
                 record.update({"tests": False, "test_count": 0, "test_cases": [],
                                "data_status": "interactive_requires_judge"})
