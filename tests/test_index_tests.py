@@ -56,7 +56,8 @@ class ArchiveExclusionTests(unittest.TestCase):
         self.assertIn(1678, selected)
         for number in (27150, 30193):
             entries = [row for row in self.catalog["problems"]
-                       if int(row["global_number"]) == number]
+                       if row.get("source", "openjudge") == "openjudge"
+                       and int(row["global_number"]) == number]
             self.assertTrue(entries)
             self.assertTrue(all(not row.get("test_cases") for row in entries))
         self.assertTrue((ROOT / "data/openjudge/tests/20000-29982/27150_made").is_dir(),
@@ -68,6 +69,8 @@ class ArchiveExclusionTests(unittest.TestCase):
         offenders = []
         by_global = {}
         for problem in self.catalog["problems"]:
+            if problem.get("source", "openjudge") != "openjudge":
+                continue
             by_global.setdefault(problem["global_number"], problem.get("test_cases", []))
         for global_number, cases in by_global.items():
             has_made = any(case["input"].split("/")[2].endswith("_made") for case in cases)
@@ -115,6 +118,8 @@ class ArchiveExclusionTests(unittest.TestCase):
         missing = []
         wrong = []
         for problem in self.catalog["problems"]:
+            if problem.get("source", "openjudge") != "openjudge":
+                continue
             key = (problem["book"], problem["id"])
             if "global_number" not in problem:
                 missing.append(key)

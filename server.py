@@ -388,6 +388,7 @@ MIRRORED_IMAGE_PATTERN = (
     if MIRRORED_IMAGE_URLS else None
 )
 BOOK_META = {
+    "codeforces": {"name": "Codeforces 题库", "count": 1},
     "practice": {"name": "题库（包括计概、数算题目）", "count": 990},
     "pctbook": {"name": "计算思维算法实践", "count": 215},
     "routine": {"name": "数算 2025Spring每日选作", "count": 203},
@@ -1450,7 +1451,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             if not self.authorized():
                 self.send_response(302); self.send_header("Location", "/auth/login/"); self.end_headers(); return
             self.send_html(self.profile_settings_page()); return
-        submit_page = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/([^/]+)/submit/", path)
+        submit_page = re.fullmatch(r"/(codeforces|pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/([^/]+)/submit/", path)
         if submit_page:
             book, problem_id = submit_page.groups()
             page = MIRROR / "pages" / f"{book}__{problem_id}.html"
@@ -1475,7 +1476,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             page = MIRROR / "books" / f"{local_book.group(1)}__{page_number}.html"
             if page.is_file():
                 self.send_html(self.local_page(page)); return
-        local_problem = re.fullmatch(r"/(pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/([^/]+)/", path)
+        local_problem = re.fullmatch(r"/(codeforces|pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/([^/]+)/", path)
         if local_problem:
             book, problem = local_problem.groups()
             page = MIRROR / "pages" / f"{book}__{problem}.html"

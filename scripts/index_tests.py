@@ -102,6 +102,10 @@ def catalog_global_numbers(catalog):
     per_entry = {}
     practice = {}
     for item in catalog["problems"]:
+        # OpenJudge's cross-book aliases use a global problem number. External
+        # sources keep their own IDs and their test data survives re-indexing.
+        if item.get("source", "openjudge") != "openjudge":
+            continue
         key = (item["book"], item["id"])
         page = MIRROR / "pages" / f"{item['book']}__{item['id']}.html"
         global_number = read_global_number(page)
@@ -223,9 +227,15 @@ def main():
     by_global_number = exclude_special_judge_cases(by_global_number)
 
     stats = book_stats()
-    matched = 0
+    # External-source records carry self-contained test data and are deliberately
+    # skipped below only because they lack an OpenJudge global number.
+    matched = sum(bool(item.get("test_cases")) for item in catalog["problems"]
+                  if item.get("source", "openjudge") != "openjudge")
     for item in catalog["problems"]:
-        global_number = per_entry_global[(item["book"], item["id"])]
+        key = (item["book"], item["id"])
+        if key not in per_entry_global:
+            continue
+        global_number = per_entry_global[key]
         cases = by_global_number.get(global_number, [])
         item["global_number"] = global_number
         item["tests"] = bool(cases)

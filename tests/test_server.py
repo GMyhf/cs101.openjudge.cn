@@ -372,6 +372,32 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(meta["practice"]["count"], 990)
         self.assertEqual(meta["pctbook"]["name"], "计算思维算法实践")
 
+    def test_codeforces_4a_is_a_local_judgeable_problem(self):
+        status, _, body = request(self.port, "GET", "/codeforces/4A/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn("A. Watermelon", text)
+        self.assertIn("Codeforces", text)
+
+        status, _, body = request(self.port, "GET", "/api/catalog")
+        payload = json.loads(body)
+        self.assertEqual(payload["book_meta"]["codeforces"],
+                         {"name": "Codeforces 题库", "count": 1})
+        row = next(item for item in payload["problems"]
+                   if (item["book"], item["id"]) == ("codeforces", "4A"))
+        self.assertEqual((row["title"], row["test_count"]), ("A. Watermelon", 21))
+        self.assertEqual((row["source"], row["source_url"]),
+                         ("codeforces", "https://codeforces.com/problemset/problem/4/A"))
+
+        accepted = judge("codeforces", "4A", "python", """w = int(input())
+print(\"YES\" if w > 2 and w % 2 == 0 else \"NO\")
+""")
+        self.assertEqual((accepted["status"], accepted["cases"]), ("Accepted", 21), accepted)
+        mutant = judge("codeforces", "4A", "python", """w = int(input())
+print(\"YES\" if w % 2 == 0 else \"NO\")
+""")
+        self.assertEqual((mutant["status"], mutant["case"]), ("Wrong Answer", 2), mutant)
+
     def test_practice_02977_is_mirrored_by_global_number(self):
         status, _, body = request(self.port, "GET", "/practice/02977/")
         self.assertEqual(status, 200)

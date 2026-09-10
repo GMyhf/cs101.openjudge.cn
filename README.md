@@ -14,8 +14,8 @@
 > 网页版由 `python3 tools/build_handbook.py` 从 Markdown 生成，**改完源文要重新构建并提交** ——
 > `tests/test_units.py` 会检查两者是否同步。
 
-CS101 题库镜像与本机判题服务。按 `data/openjudge/catalog.json` 现场核算（2026-08-27），
-当前有 **1,851 条目录记录**，其中 **1,833 条有测试数据**，共 **37,451 组测试数据**；
+CS101 题库镜像与本机判题服务。按 `data/openjudge/catalog.json` 现场核算（2026-09-10），
+当前有 **1,855 条目录记录**，其中 **1,837 条有测试数据**，共 **37,535 组测试数据**；
 目录记录包含不同题库/别名，同一全局题号可能对应多条记录。
 
 > 2026-07-29 起，`data/openjudge/tests/` 下 `1000-1999` / `2000-2999` / `3000-3682` 三个桶的
@@ -70,6 +70,9 @@ CS101 分组的题库详情、样例和分页目录保存在 `data/openjudge/`�
 python3 scripts/crawl_openjudge.py
 ```
 
+Codeforces 等外部题库也以本地题面和测试数据收录在同一目录；每条记录保留原题 URL，
+运行时不会代理外站。当前收录 [`codeforces/4A`](https://codeforces.com/problemset/problem/4/A)。
+
 抓取完成后脚本会扫描题面和题库 HTML 的所有远程 `<img>`，按内容哈希下载到
 `static/openjudge/images/` 并生成 URL 映射清单。可离线复核清单覆盖与文件完整性：
 
@@ -116,10 +119,10 @@ python3 -m unittest
 
 不在 MIT 范围内的只有两处：
 
-- **镜像内容**：`data/openjudge/pages/`（1,851 份题面记录）、`data/openjudge/books/`（目录页），
-  以及由它们派生的 `catalog.json` / `test_index.json` / `limits.json`（题目标题与上游统计）。
-  版权属 cs101.openjudge.cn 原作者。`data/openjudge/producecase_prompt/` 里每份 prompt
-  也整段嵌了题面。
+- **镜像内容**：`data/openjudge/pages/`（题面记录）、`data/openjudge/books/`（OpenJudge
+  目录页），以及由它们派生的 `catalog.json` / `test_index.json` / `limits.json`（题目标题与
+  上游统计）。OpenJudge 镜像版权属 cs101.openjudge.cn 原作者；Codeforces 条目保留原题链接，
+  题面版权属各自原作者。`data/openjudge/producecase_prompt/` 里每份 prompt 也整段嵌了题面。
 - **他人提交的参考实现**：凡文件头写着
   `License: not declared ... no license is inferred` 的源码，都取自 OpenJudge 上
   **别人的 Accepted 提交**，并注明统计页、提交号与源码链接。
