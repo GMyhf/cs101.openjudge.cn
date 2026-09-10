@@ -114,6 +114,11 @@
 - 新增 `584A` 的 21 组输入与 `n_digit_divisible` 专用验证器；构造题现为 105 题、
   2,205 组。
 
+### Codeforces Round Number 构造输出验证
+
+- 新增 `1352A` 的 21 组输入与 `round_number_decomposition` 专用验证器；构造题现为
+  106 题、2,226 组。
+
 ## 2026-09-09
 
 ### 修复传统题面的“复制 Markdown”按钮

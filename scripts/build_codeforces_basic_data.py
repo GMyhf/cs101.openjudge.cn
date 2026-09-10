@@ -919,6 +919,12 @@ def case_584a(r):
     return f"{digits} {divisor}\n", f"{value}\n"
 
 
+def case_1352a(r):
+    value = r.randint(1, 10**9)
+    parts = [int(char) * 10**index for index, char in enumerate(reversed(str(value))) if char != "0"]
+    return f"1\n{value}\n", str(len(parts)) + "\n" + " ".join(map(str, parts)) + "\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -958,6 +964,7 @@ BUILDERS = {
     "363B": case_363b,
     "550C": case_550c,
     "584A": case_584a,
+    "1352A": case_1352a,
 }
 
 
@@ -993,6 +1000,8 @@ def main():
             row["special_checker"] = "divisible_by_8_subsequence"
         if problem == "584A":
             row["special_checker"] = "n_digit_divisible"
+        if problem == "1352A":
+            row["special_checker"] = "round_number_decomposition"
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"generated {len(BUILDERS)} problems x 21 cases")
 

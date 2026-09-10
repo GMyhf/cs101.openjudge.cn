@@ -226,6 +226,10 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertTrue(judge_module.special_output_matches("n_digit_divisible", b"3 7\n", "105\n"))
         self.assertFalse(judge_module.special_output_matches("n_digit_divisible", b"3 7\n", "98\n"))
 
+    def test_round_number_decomposition_checker(self):
+        self.assertTrue(judge_module.special_output_matches("round_number_decomposition", b"1\n5009\n", "2\n9 5000\n"))
+        self.assertFalse(judge_module.special_output_matches("round_number_decomposition", b"1\n5009\n", "2\n9 500\n"))
+
     def test_problem_exists_caches_until_catalog_changes(self):
         with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
             mirror = Path(temp)

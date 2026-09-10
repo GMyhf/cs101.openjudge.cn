@@ -362,6 +362,16 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "round_number_decomposition":
+        try:
+            value = int(input_data.decode().split()[1])
+            tokens = list(map(int, actual.split()))
+            if not tokens or tokens[0] != len(tokens) - 1:
+                return False
+            parts = tokens[1:]
+            return sum(parts) == value and all(part > 0 and str(part).rstrip("0").isdigit() and len(str(part).rstrip("0")) == 1 for part in parts)
+        except (UnicodeDecodeError, ValueError, IndexError):
+            return False
     if kind == "n_digit_divisible":
         try:
             n, divisor = map(int, input_data.decode().split()[:2])

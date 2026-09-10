@@ -12,9 +12,9 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 
 | 状态 | 数量 |
 | --- | ---: |
-| generated_tests | 105 |
+| generated_tests | 106 |
 | interactive_requires_judge | 5 |
-| multiple_output_requires_special_judge | 15 |
+| multiple_output_requires_special_judge | 14 |
 | no_extractable_sample | 19 |
 | sample_tests | 13 |
 
@@ -98,7 +98,7 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 1327A | generated_tests | https://codeforces.com/problemset/problem/1327/A |
 | 1328A | generated_tests | https://codeforces.com/problemset/problem/1328/A |
 | 1335A | generated_tests | https://codeforces.com/problemset/problem/1335/A |
-| 1352A | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1352/A |
+| 1352A | generated_tests | https://codeforces.com/problemset/problem/1352/A |
 | 1352C | generated_tests | https://codeforces.com/problemset/problem/1352/C |
 | 1364A | generated_tests | https://codeforces.com/problemset/problem/1364/A |
 | 1366D | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1366/D |
