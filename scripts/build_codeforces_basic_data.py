@@ -1065,6 +1065,11 @@ def case_2227b(r):
     return f"1\n{len(text)}\n{text}\n", ("YES" if text.count("(") == text.count(")") else "NO") + "\n"
 
 
+def case_2227a(r):
+    x, y = r.randint(1, 10), r.randint(1, 10)
+    return f"1\n{x} {y}\n", ("NO" if x % 2 and y % 2 else "YES") + "\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -1120,6 +1125,7 @@ BUILDERS = {
     "2218C": case_2218c,
     "2218D": case_2218d,
     "2227B": case_2227b,
+    "2227A": case_2227a,
 }
 
 
