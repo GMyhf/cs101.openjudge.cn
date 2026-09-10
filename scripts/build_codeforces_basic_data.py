@@ -14,6 +14,97 @@ def case_1a(r):
     return f"{n} {m} {a}\n", f"{(n + a - 1) // a * ((m + a - 1) // a)}\n"
 
 
+def case_25a(r):
+    n = r.randrange(3, 52, 2)
+    parity = r.randrange(2)
+    values = [2 * r.randint(1, 100) + parity for _ in range(n - 1)]
+    outlier = 2 * r.randint(1, 100) + (1 - parity)
+    index = r.randrange(n)
+    values.insert(index, outlier)
+    return f"{n}\n{' '.join(map(str, values))}\n", f"{index + 1}\n"
+
+
+def case_58a(r):
+    alphabet = "abcdefghijklmnopqrstuvwxyz"
+    if r.randrange(2):
+        slots = [r.randint(0, 3) for _ in range(6)]
+        text = "".join("".join(r.choice(alphabet) for _ in range(slots[i])) + ("hello"[i] if i < 5 else "") for i in range(6))
+    else:
+        text = "".join(r.choice("abcdfgijkmnpqrstuvwxyz") for _ in range(r.randint(1, 30)))
+    pointer = 0
+    for char in text:
+        if pointer < 5 and char == "hello"[pointer]: pointer += 1
+    return text + "\n", ("YES" if pointer == 5 else "NO") + "\n"
+
+
+def case_69a(r):
+    n = r.randint(1, 30)
+    vectors = [[r.randint(-20, 20) for _ in range(3)] for _ in range(n)]
+    if r.randrange(2) and n > 1:
+        sums = [sum(row[column] for row in vectors[:-1]) for column in range(3)]
+        vectors[-1] = [-value for value in sums]
+    balanced = all(sum(row[column] for row in vectors) == 0 for column in range(3))
+    return str(n) + "\n" + "".join(" ".join(map(str, row)) + "\n" for row in vectors), ("YES" if balanced else "NO") + "\n"
+
+
+def case_71a(r):
+    words = []
+    for _ in range(r.randint(1, 20)):
+        words.append("".join(r.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(r.randint(1, 25))))
+    answer = [word if len(word) <= 10 else f"{word[0]}{len(word) - 2}{word[-1]}" for word in words]
+    return str(len(words)) + "\n" + "\n".join(words) + "\n", "\n".join(answer) + "\n"
+
+
+def case_118a(r):
+    text = "".join(r.choice("aoyeuiBCDFGHJKLMNPQRSTVWXYZ") for _ in range(r.randint(1, 80)))
+    answer = "".join("." + char.lower() for char in text if char.lower() not in "aoyeui")
+    return text + "\n", answer + "\n"
+
+
+def case_122a(r):
+    value = r.randint(1, 1000)
+    lucky = (4, 7, 44, 47, 74, 77, 444, 447, 474, 477, 744, 747, 774, 777)
+    return f"{value}\n", ("YES" if any(value % item == 0 for item in lucky) else "NO") + "\n"
+
+
+def case_131a(r):
+    text = r.choice("abcdefghijklmnopqrstuvwxyz") + "".join(r.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(r.randint(0, 12)))
+    mode = r.randrange(3)
+    if mode == 1: text = text.upper()
+    elif mode == 2: text = text[0].lower() + text[1:].upper()
+    answer = text.swapcase() if text.isupper() or (text[0].islower() and text[1:].isupper()) else text
+    return text + "\n", answer + "\n"
+
+
+def case_158a(r):
+    n, k = r.randint(1, 50), None
+    scores = sorted((r.randint(0, 100) for _ in range(n)), reverse=True)
+    k = r.randint(1, n)
+    answer = sum(score > 0 and score >= scores[k - 1] for score in scores)
+    return f"{n} {k}\n{' '.join(map(str, scores))}\n", f"{answer}\n"
+
+
+def case_160a(r):
+    coins = [r.randint(1, 100) for _ in range(r.randint(1, 50))]
+    total = sum(coins); taken = count = 0
+    for coin in sorted(coins, reverse=True):
+        taken += coin; count += 1
+        if taken > total - taken: break
+    return str(len(coins)) + "\n" + " ".join(map(str, coins)) + "\n", f"{count}\n"
+
+
+def case_230a(r):
+    strength, n = r.randint(1, 100), r.randint(1, 30)
+    dragons = [(r.randint(1, 150), r.randint(0, 100)) for _ in range(n)]
+    current = strength
+    for need, reward in sorted(dragons):
+        if current <= need: break
+        current += reward
+    else:
+        return f"{strength} {n}\n" + "".join(f"{need} {reward}\n" for need, reward in dragons), "YES\n"
+    return f"{strength} {n}\n" + "".join(f"{need} {reward}\n" for need, reward in dragons), "NO\n"
+
+
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
     return f"{m} {n}\n", f"{m * n // 2}\n"
@@ -107,10 +198,13 @@ def case_996a_fixed(r):
 
 
 BUILDERS = {
-    "1A": case_1a, "50A": case_50a, "96A": case_96a, "112A": case_112a,
+    "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
+    "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
+    "118A": case_118a, "122A": case_122a, "131A": case_131a,
     "151A": case_151a, "231A": case_231a, "236A": case_236a, "263A": case_263a,
     "266A": case_266a, "270A": case_270a, "281A": case_281a, "282A": case_282a,
-    "339A": case_339a, "479A": case_479a, "996A": case_996a_fixed,
+    "339A": case_339a, "479A": case_479a, "996A": case_996a_fixed, "158A": case_158a,
+    "160A": case_160a, "230A": case_230a,
 }
 
 

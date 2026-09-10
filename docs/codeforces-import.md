@@ -12,11 +12,11 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 
 | 状态 | 数量 |
 | --- | ---: |
-| generated_tests | 15 |
+| generated_tests | 25 |
 | interactive_requires_judge | 5 |
 | multiple_output_requires_special_judge | 18 |
 | no_extractable_sample | 21 |
-| sample_tests | 98 |
+| sample_tests | 88 |
 
 ## 未接入精确判题数据
 
@@ -24,11 +24,21 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | --- | --- | --- |
 | 1A | generated_tests | https://codeforces.com/problemset/problem/1/A |
 | 20C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/20/C |
+| 25A | generated_tests | https://codeforces.com/problemset/problem/25/A |
 | 37C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/37/C |
 | 50A | generated_tests | https://codeforces.com/problemset/problem/50/A |
+| 58A | generated_tests | https://codeforces.com/problemset/problem/58/A |
+| 69A | generated_tests | https://codeforces.com/problemset/problem/69/A |
+| 71A | generated_tests | https://codeforces.com/problemset/problem/71/A |
 | 96A | generated_tests | https://codeforces.com/problemset/problem/96/A |
 | 112A | generated_tests | https://codeforces.com/problemset/problem/112/A |
+| 118A | generated_tests | https://codeforces.com/problemset/problem/118/A |
+| 122A | generated_tests | https://codeforces.com/problemset/problem/122/A |
+| 131A | generated_tests | https://codeforces.com/problemset/problem/131/A |
 | 151A | generated_tests | https://codeforces.com/problemset/problem/151/A |
+| 158A | generated_tests | https://codeforces.com/problemset/problem/158/A |
+| 160A | generated_tests | https://codeforces.com/problemset/problem/160/A |
+| 230A | generated_tests | https://codeforces.com/problemset/problem/230/A |
 | 231A | generated_tests | https://codeforces.com/problemset/problem/231/A |
 | 236A | generated_tests | https://codeforces.com/problemset/problem/236/A |
 | 263A | generated_tests | https://codeforces.com/problemset/problem/263/A |
