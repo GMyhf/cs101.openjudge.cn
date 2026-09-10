@@ -1060,6 +1060,11 @@ def case_2218d(r):
     return "2\n" + "\n".join(map(str, sizes)) + "\n", "\n".join(rows) + "\n"
 
 
+def case_2227b(r):
+    text = "".join(r.choice("()") for _ in range(r.randint(1,200)))
+    return f"1\n{len(text)}\n{text}\n", ("YES" if text.count("(") == text.count(")") else "NO") + "\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -1114,6 +1119,7 @@ BUILDERS = {
     "2218E": case_2218e,
     "2218C": case_2218c,
     "2218D": case_2218d,
+    "2227B": case_2227b,
 }
 
 
