@@ -362,6 +362,15 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "n_digit_divisible":
+        try:
+            n, divisor = map(int, input_data.decode().split()[:2])
+            tokens = actual.split()
+            if tokens == ["-1"]:
+                return False
+            return len(tokens) == 1 and tokens[0].isdigit() and len(tokens[0]) == n and int(tokens[0]) % divisor == 0
+        except (UnicodeDecodeError, ValueError):
+            return False
     if kind == "divisible_by_8_subsequence":
         text = input_data.decode().split()[0]
         tokens = actual.split()

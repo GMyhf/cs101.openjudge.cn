@@ -222,6 +222,10 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertTrue(judge_module.special_output_matches("divisible_by_8_subsequence", b"1232\n", "YES\n32\n"))
         self.assertFalse(judge_module.special_output_matches("divisible_by_8_subsequence", b"1232\n", "YES\n16\n"))
 
+    def test_n_digit_divisible_special_checker(self):
+        self.assertTrue(judge_module.special_output_matches("n_digit_divisible", b"3 7\n", "105\n"))
+        self.assertFalse(judge_module.special_output_matches("n_digit_divisible", b"3 7\n", "98\n"))
+
     def test_problem_exists_caches_until_catalog_changes(self):
         with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
             mirror = Path(temp)
