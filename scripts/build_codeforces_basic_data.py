@@ -694,6 +694,26 @@ def case_803a(r):
     if best is None:return f"{n} {k}\n","-1\n"
     return f"{n} {k}\n","\n".join(" ".join(map(str,best[i*n:(i+1)*n])) for i in range(n))+"\n"
 
+def case_20b(r):
+    a,b,c=r.randint(-100,100),r.randint(-100,100),r.randint(-100,100)
+    if not a and not b:a=1
+    if not a:
+        root=-c/b; answer=f"1\n{root:.10f}\n"
+    else:
+        disc=b*b-4*a*c
+        if disc<0:answer="0\n"
+        elif disc==0:answer=f"1\n{-b/(2*a):.10f}\n"
+        else:
+            import math
+            roots=sorted(((-b-math.sqrt(disc))/(2*a),(-b+math.sqrt(disc))/(2*a)))
+            answer=f"2\n{roots[0]:.10f}\n{roots[1]:.10f}\n"
+    return f"{a} {b} {c}\n",answer
+
+def case_492b(r):
+    length=r.randint(1,10000); positions=sorted(r.sample(range(length+1),r.randint(1,min(100,length+1))))
+    gaps=[positions[0],length-positions[-1]]+[ (positions[i]-positions[i-1])/2 for i in range(1,len(positions))]
+    return f"{len(positions)} {length}\n{' '.join(map(str,positions))}\n",f"{max(gaps):.10f}\n"
+
 def case_2184f(r):
     nodes=r.randint(1,10); edges=[]
     for node in range(1,nodes):edges.append((r.randrange(node),node))
@@ -842,6 +862,7 @@ BUILDERS = {
     "986B": case_986b, "1000B": case_1000b, "2196B": case_2196b,
     "1875D": case_1875d, "1985H1": case_1985h1, "2193D": case_2193d,
     "803A": case_803a, "2184F": case_2184f,
+    "20B": case_20b, "492B": case_492b,
 }
 
 
@@ -869,6 +890,8 @@ def main():
         row = rows[("codeforces", problem)]
         row.update({"tests": True, "test_count": len(cases), "test_cases": cases,
                     "data_status": "generated_tests", "sample_count": row.get("sample_count", 0)})
+        if problem in {"20B", "492B"}:
+            row["comparison"] = "float_tokens"
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"generated {len(BUILDERS)} problems x 21 cases")
 

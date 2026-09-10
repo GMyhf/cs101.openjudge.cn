@@ -347,6 +347,20 @@ def problem_exists(book, problem_id):
         return (book, problem_id) in PROBLEM_KEYS_CACHE
 
 
+def outputs_match(actual, expected, comparison="tokens"):
+    """Compare output using a catalog-selected contract."""
+    actual_tokens, expected_tokens = actual.split(), expected.split()
+    if comparison != "float_tokens":
+        return actual_tokens == expected_tokens
+    if len(actual_tokens) != len(expected_tokens):
+        return False
+    try:
+        return all(abs(float(left) - float(right)) <= 1e-6
+                   for left, right in zip(actual_tokens, expected_tokens))
+    except ValueError:
+        return False
+
+
 def judge(book, problem_id, language, source, collect_case_times=False):
     catalog_path = MIRROR / "catalog.json"
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
@@ -409,7 +423,7 @@ def judge(book, problem_id, language, source, collect_case_times=False):
             if len(actual.encode()) > 2 * 1024 * 1024: return {"status": "Output Limit Exceeded", "case": index, **metrics}
             if result.returncode in {-signal.SIGXCPU, -signal.SIGKILL}: return {"status": "Time Limit Exceeded", "case": index, **metrics, "message": "单组测试超过 CPU 限制。"}
             if result.returncode != 0: return {"status": "Runtime Error", "case": index, **metrics, "message": result.stderr.decode(errors="replace")[-4000:]}
-            if actual.split() != expected.split(): return {"status": "Wrong Answer", "case": index, **metrics, "expected_tokens": len(expected.split()), "actual_tokens": len(actual.split())}
+            if not outputs_match(actual, expected, item.get("comparison", "tokens")): return {"status": "Wrong Answer", "case": index, **metrics, "expected_tokens": len(expected.split()), "actual_tokens": len(actual.split())}
     accepted = {"status": "Accepted", "cases": len(cases), **last_metrics}
     if collect_case_times:
         max_case = max(case_timings, key=lambda row: row["ratio"])

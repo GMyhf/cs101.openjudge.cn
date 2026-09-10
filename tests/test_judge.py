@@ -209,6 +209,11 @@ print(values[0] + values[1])
 
 
 class ProblemLookupCacheTests(unittest.TestCase):
+    def test_float_token_comparison_is_catalog_opt_in(self):
+        self.assertTrue(judge_module.outputs_match("1.0000001\n", "1.0\n", "float_tokens"))
+        self.assertFalse(judge_module.outputs_match("1.0000001\n", "1.0\n"))
+        self.assertFalse(judge_module.outputs_match("one\n", "1.0\n", "float_tokens"))
+
     def test_problem_exists_caches_until_catalog_changes(self):
         with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
             mirror = Path(temp)
