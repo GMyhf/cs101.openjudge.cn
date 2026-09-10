@@ -12,11 +12,11 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 
 | 状态 | 数量 |
 | --- | ---: |
-| generated_tests | 52 |
+| generated_tests | 58 |
 | interactive_requires_judge | 5 |
 | multiple_output_requires_special_judge | 18 |
 | no_extractable_sample | 21 |
-| sample_tests | 61 |
+| sample_tests | 55 |
 
 ## 未接入精确判题数据
 
@@ -38,7 +38,9 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 131A | generated_tests | https://codeforces.com/problemset/problem/131/A |
 | 151A | generated_tests | https://codeforces.com/problemset/problem/151/A |
 | 158A | generated_tests | https://codeforces.com/problemset/problem/158/A |
+| 158B | generated_tests | https://codeforces.com/problemset/problem/158/B |
 | 160A | generated_tests | https://codeforces.com/problemset/problem/160/A |
+| 189A | generated_tests | https://codeforces.com/problemset/problem/189/A |
 | 200B | generated_tests | https://codeforces.com/problemset/problem/200/B |
 | 230A | generated_tests | https://codeforces.com/problemset/problem/230/A |
 | 231A | generated_tests | https://codeforces.com/problemset/problem/231/A |
@@ -52,11 +54,15 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 339A | generated_tests | https://codeforces.com/problemset/problem/339/A |
 | 339B | generated_tests | https://codeforces.com/problemset/problem/339/B |
 | 363B | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/363/B |
+| 368B | generated_tests | https://codeforces.com/problemset/problem/368/B |
 | 427A | generated_tests | https://codeforces.com/problemset/problem/427/A |
+| 431C | generated_tests | https://codeforces.com/problemset/problem/431/C |
+| 433B | generated_tests | https://codeforces.com/problemset/problem/433/B |
 | 455A | generated_tests | https://codeforces.com/problemset/problem/455/A |
 | 456A | generated_tests | https://codeforces.com/problemset/problem/456/A |
 | 460A | generated_tests | https://codeforces.com/problemset/problem/460/A |
 | 466A | generated_tests | https://codeforces.com/problemset/problem/466/A |
+| 466C | generated_tests | https://codeforces.com/problemset/problem/466/C |
 | 474A | generated_tests | https://codeforces.com/problemset/problem/474/A |
 | 479A | generated_tests | https://codeforces.com/problemset/problem/479/A |
 | 545D | generated_tests | https://codeforces.com/problemset/problem/545/D |

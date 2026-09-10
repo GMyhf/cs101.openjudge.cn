@@ -292,6 +292,60 @@ def case_1742a(r):
     answer = any(values[index] == values[(index + 1) % 3] + values[(index + 2) % 3] for index in range(3))
     return "1\n" + " ".join(map(str, values)) + "\n", ("YES" if answer else "NO") + "\n"
 
+def case_158b(r):
+    groups = [r.randint(1, 4) for _ in range(r.randint(1, 100))]
+    counts = [groups.count(size) for size in range(5)]
+    taxis = counts[4] + counts[3]
+    counts[1] = max(0, counts[1] - counts[3])
+    taxis += counts[2] // 2
+    if counts[2] % 2:
+        taxis += 1; counts[1] = max(0, counts[1] - 2)
+    taxis += (counts[1] + 3) // 4
+    return str(len(groups)) + "\n" + " ".join(map(str, groups)) + "\n", f"{taxis}\n"
+
+def case_189a(r):
+    n, a, b, c = r.randint(1, 4000), r.randint(1, 100), r.randint(1, 100), r.randint(1, 100)
+    dp = [-10**9] * (n + 1); dp[0] = 0
+    for length in range(1, n + 1):
+        dp[length] = max((dp[length - cut] + 1 for cut in (a, b, c) if length >= cut), default=-10**9)
+    return f"{n} {a} {b} {c}\n", f"{dp[n]}\n"
+
+def case_368b(r):
+    values = [r.randint(1, 50) for _ in range(r.randint(1, 200))]
+    queries = [r.randint(1, len(values)) for _ in range(r.randint(1, 100))]
+    answer = [str(len(set(values[index - 1:]))) for index in queries]
+    return str(len(values)) + "\n" + " ".join(map(str, values)) + "\n" + str(len(queries)) + "\n" + "\n".join(map(str, queries)) + "\n", "\n".join(answer) + "\n"
+
+def case_431c(r):
+    n, k, d = r.randint(1, 100), r.randint(1, 100), r.randint(1, 100)
+    mod = 1_000_000_007
+    small = [0] * (n + 1); total = [0] * (n + 1); small[0] = total[0] = 1
+    for value in range(1, n + 1):
+        small[value] = sum(small[value - step] for step in range(1, min(k, d - 1, value) + 1)) % mod
+        total[value] = sum(total[value - step] for step in range(1, min(k, value) + 1)) % mod
+    return f"{n} {k} {d}\n", f"{(total[n] - small[n]) % mod}\n"
+
+def case_433b(r):
+    values = [r.randint(1, 1000) for _ in range(r.randint(1, 100))]
+    ordered = sorted(values); queries = []
+    for _ in range(r.randint(1, 100)):
+        kind = r.randint(1, 2); left = r.randint(1, len(values)); right = r.randint(left, len(values)); queries.append((kind, left, right))
+    answer = [str(sum((values if kind == 1 else ordered)[left - 1:right])) for kind, left, right in queries]
+    text = str(len(values)) + "\n" + " ".join(map(str, values)) + "\n" + str(len(queries)) + "\n" + "".join(f"{kind} {left} {right}\n" for kind, left, right in queries)
+    return text, "\n".join(answer) + "\n"
+
+def case_466c(r):
+    values = [r.randint(-20, 20) for _ in range(r.randint(1, 100))]
+    total = sum(values)
+    answer = 0
+    if total % 3 == 0:
+        target, prefix, first = total // 3, 0, 0
+        for value in values[:-1]:
+            prefix += value
+            if prefix == 2 * target: answer += first
+            if prefix == target: first += 1
+    return str(len(values)) + "\n" + " ".join(map(str, values)) + "\n", f"{answer}\n"
+
 
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
@@ -402,6 +456,8 @@ BUILDERS = {
     "1154A": case_1154a, "1221A": case_1221a, "1327A": case_1327a, "1328A": case_1328a,
     "1335A": case_1335a, "1352C": case_1352c, "1374B": case_1374b, "1475A": case_1475a,
     "1742A": case_1742a,
+    "158B": case_158b, "189A": case_189a, "368B": case_368b, "431C": case_431c,
+    "433B": case_433b, "466C": case_466c,
 }
 
 
