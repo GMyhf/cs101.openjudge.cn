@@ -487,6 +487,67 @@ def case_1879b(r):
     answer = len(first) * (min(first) + min(second))
     return f"1\n{len(first)}\n{' '.join(map(str, first))}\n{' '.join(map(str, second))}\n", f"{answer}\n"
 
+def case_1b(r):
+    row, column = r.randint(1, 10**6), r.randint(1, 10**6)
+    letters = ""; value = column
+    while value: value, remain = divmod(value - 1, 26); letters = chr(65 + remain) + letters
+    if r.randrange(2):
+        payload, answer = f"R{row}C{column}", f"{letters}{row}"
+    else:
+        payload, answer = f"{letters}{row}", f"R{row}C{column}"
+    return f"1\n{payload}\n", answer + "\n"
+
+def case_460b(r):
+    a, b, c = r.randint(1, 5), r.randint(1, 20), r.randint(-100, 100)
+    answers = []
+    for digit_sum in range(1, 82):
+        value = b * digit_sum ** a + c
+        if 0 < value < 10**9 and sum(map(int, str(value))) == digit_sum: answers.append(value)
+    return f"{a} {b} {c}\n", str(len(answers)) + ("\n" + " ".join(map(str, answers)) if answers else "\n")
+
+def case_545c(r):
+    count = r.randint(1, 100); positions = sorted(r.sample(range(1, 5000), count)); heights = [r.randint(1, 100) for _ in positions]
+    answer, right = 0, -10**9
+    for index, (position, height) in enumerate(zip(positions, heights)):
+        next_position = positions[index + 1] if index + 1 < count else 10**18
+        if position - height > right: answer += 1; right = position
+        elif position + height < next_position: answer += 1; right = position + height
+        else: right = position
+    return str(count) + "\n" + "".join(f"{p} {h}\n" for p,h in zip(positions,heights)), f"{answer}\n"
+
+def case_580c(r):
+    nodes, limit = r.randint(1, 100), r.randint(0, 10); cats = [r.randint(0, 1) for _ in range(nodes)]
+    edges = []
+    for node in range(1, nodes): edges.append((r.randrange(node), node))
+    graph = [[] for _ in range(nodes)]
+    for a,b in edges: graph[a].append(b); graph[b].append(a)
+    answer = 0; stack = [(0, -1, cats[0])]
+    while stack:
+        node, parent, consecutive = stack.pop()
+        if consecutive > limit: continue
+        children = [child for child in graph[node] if child != parent]
+        if not children: answer += 1
+        for child in children: stack.append((child, node, consecutive + 1 if cats[child] else 0))
+    return f"{nodes} {limit}\n{' '.join(map(str,cats))}\n" + "".join(f"{a+1} {b+1}\n" for a,b in edges), f"{answer}\n"
+
+def case_893c(r):
+    nodes, edges = r.randint(1, 100), r.randint(0, 150); costs = [r.randint(1, 1000) for _ in range(nodes)]
+    pairs = set()
+    while len(pairs) < min(edges, nodes * (nodes - 1) // 2):
+        a,b = r.sample(range(nodes),2); pairs.add(tuple(sorted((a,b))))
+    graph = [[] for _ in range(nodes)]
+    for a,b in pairs: graph[a].append(b); graph[b].append(a)
+    seen, answer = set(), 0
+    for root in range(nodes):
+        if root in seen: continue
+        seen.add(root); stack=[root]; cheapest=costs[root]
+        while stack:
+            node=stack.pop(); cheapest=min(cheapest,costs[node])
+            for nxt in graph[node]:
+                if nxt not in seen: seen.add(nxt); stack.append(nxt)
+        answer += cheapest
+    return f"{nodes} {len(pairs)}\n{' '.join(map(str,costs))}\n" + "".join(f"{a+1} {b+1}\n" for a,b in pairs), f"{answer}\n"
+
 
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
@@ -604,6 +665,7 @@ BUILDERS = {
     "1195C": case_1195c, "1829D": case_1829d, "1829E": case_1829e, "1850H": case_1850h,
     "1881C": case_1881c,
     "1425A": case_1425a, "1526C1": case_1526c1, "1879B": case_1879b,
+    "1B": case_1b, "460B": case_460b, "545C": case_545c, "580C": case_580c, "893C": case_893c,
 }
 
 
