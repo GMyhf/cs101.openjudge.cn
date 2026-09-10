@@ -468,6 +468,25 @@ def case_1881c(r):
             answer += sum(ord(highest) - ord(char) for char in cells)
     return f"1\n{n}\n" + "".join("".join(row) + "\n" for row in grid), f"{answer}\n"
 
+def case_1425a(r):
+    n, m = r.randint(1, 10**6), r.randint(1, 10**6)
+    return f"1\n{n} {m}\n", f"{(n - 1) * (m - 1)}\n"
+
+def case_1526c1(r):
+    import heapq
+    values = [r.randint(-1000, 1000) for _ in range(r.randint(1, 200))]
+    total = count = 0; chosen = []
+    for value in values:
+        total += value; count += 1; heapq.heappush(chosen, value)
+        if total < 0: total -= heapq.heappop(chosen); count -= 1
+    return f"{len(values)}\n{' '.join(map(str, values))}\n", f"{count}\n"
+
+def case_1879b(r):
+    first = [r.randint(1, 1000) for _ in range(r.randint(1, 100))]
+    second = [r.randint(1, 1000) for _ in first]
+    answer = len(first) * (min(first) + min(second))
+    return f"1\n{len(first)}\n{' '.join(map(str, first))}\n{' '.join(map(str, second))}\n", f"{answer}\n"
+
 
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
@@ -584,6 +603,7 @@ BUILDERS = {
     "1374C": case_1374c, "1398C": case_1398c, "1520D": case_1520d,
     "1195C": case_1195c, "1829D": case_1829d, "1829E": case_1829e, "1850H": case_1850h,
     "1881C": case_1881c,
+    "1425A": case_1425a, "1526C1": case_1526c1, "1879B": case_1879b,
 }
 
 

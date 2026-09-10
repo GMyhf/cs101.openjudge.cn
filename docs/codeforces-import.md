@@ -12,11 +12,11 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 
 | 状态 | 数量 |
 | --- | ---: |
-| generated_tests | 70 |
+| generated_tests | 73 |
 | interactive_requires_judge | 5 |
 | multiple_output_requires_special_judge | 18 |
 | no_extractable_sample | 21 |
-| sample_tests | 43 |
+| sample_tests | 40 |
 
 ## 未接入精确判题数据
 
@@ -93,8 +93,10 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 1374B | generated_tests | https://codeforces.com/problemset/problem/1374/B |
 | 1374C | generated_tests | https://codeforces.com/problemset/problem/1374/C |
 | 1398C | generated_tests | https://codeforces.com/problemset/problem/1398/C |
+| 1425A | generated_tests | https://codeforces.com/problemset/problem/1425/A |
 | 1475A | generated_tests | https://codeforces.com/problemset/problem/1475/A |
 | 1520D | generated_tests | https://codeforces.com/problemset/problem/1520/D |
+| 1526C1 | generated_tests | https://codeforces.com/problemset/problem/1526/C1 |
 | 1729C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1729/C |
 | 1742A | generated_tests | https://codeforces.com/problemset/problem/1742/A |
 | 1749C | no_extractable_sample | https://codeforces.com/problemset/problem/1749/C |
@@ -105,6 +107,7 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 1843D | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1843/D |
 | 1850H | generated_tests | https://codeforces.com/problemset/problem/1850/H |
 | 1868A | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1868/A |
+| 1879B | generated_tests | https://codeforces.com/problemset/problem/1879/B |
 | 1881C | generated_tests | https://codeforces.com/problemset/problem/1881/C |
 | 1970E2 | no_extractable_sample | https://codeforces.com/problemset/problem/1970/E2 |
 | 1970E3 | no_extractable_sample | https://codeforces.com/problemset/problem/1970/E3 |
