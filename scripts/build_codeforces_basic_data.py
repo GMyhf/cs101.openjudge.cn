@@ -1038,6 +1038,12 @@ def case_2218b(r):
     return "1\n" + " ".join(map(str, values)) + "\n", f"{2 * max(values) - sum(values)}\n"
 
 
+def case_2218e(r):
+    values = [r.randint(0, 10**6) for _ in range(r.randint(2, 100))]
+    answer = max(a ^ b for index, a in enumerate(values) for b in values[index+1:])
+    return f"1\n{len(values)}\n{' '.join(map(str, values))}\n", f"{answer}\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -1089,6 +1095,7 @@ BUILDERS = {
     "2196A": case_2196a,
     "2218A": case_2218a,
     "2218B": case_2218b,
+    "2218E": case_2218e,
 }
 
 
