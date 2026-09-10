@@ -925,6 +925,17 @@ def case_1352a(r):
     return f"1\n{value}\n", str(len(parts)) + "\n" + " ".join(map(str, parts)) + "\n"
 
 
+def case_1366d(r):
+    values = [r.choice((2**r.randint(1,10), 3**r.randint(1,8), 2**r.randint(1,6)*3**r.randint(1,6), 2**r.randint(1,5)*5**r.randint(1,5))) for _ in range(r.randint(1,30))]
+    first=[]; second=[]
+    for value in values:
+        factor=next((d for d in range(2,value+1) if value%d==0),value); rest=value
+        while rest%factor==0:rest//=factor
+        if rest==1:first.append(-1);second.append(-1)
+        else:first.append(factor);second.append(rest)
+    return str(len(values))+"\n"+" ".join(map(str,values))+"\n"," ".join(map(str,first))+"\n"+" ".join(map(str,second))+"\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -965,6 +976,7 @@ BUILDERS = {
     "550C": case_550c,
     "584A": case_584a,
     "1352A": case_1352a,
+    "1366D": case_1366d,
 }
 
 
@@ -1002,6 +1014,8 @@ def main():
             row["special_checker"] = "n_digit_divisible"
         if problem == "1352A":
             row["special_checker"] = "round_number_decomposition"
+        if problem == "1366D":
+            row["special_checker"] = "coprime_divisor_pairs"
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"generated {len(BUILDERS)} problems x 21 cases")
 

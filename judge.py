@@ -362,6 +362,33 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "coprime_divisor_pairs":
+        try:
+            values = list(map(int, input_data.decode().split()[1:]))
+            tokens = list(map(int, actual.split()))
+            if len(tokens) != 2 * len(values):
+                return False
+            first, second = tokens[:len(values)], tokens[len(values):]
+            import math
+            for value, left, right in zip(values, first, second):
+                if left == right == -1:
+                    # A prime power has no two nontrivial coprime divisors.
+                    temp, distinct, divisor = value, 0, 2
+                    while divisor * divisor <= temp:
+                        if temp % divisor == 0:
+                            distinct += 1
+                            while temp % divisor == 0:
+                                temp //= divisor
+                        divisor += 1
+                    if temp > 1:
+                        distinct += 1
+                    if distinct > 1:
+                        return False
+                elif left <= 1 or right <= 1 or math.gcd(left, right) != 1 or value % (left * right):
+                    return False
+            return True
+        except (UnicodeDecodeError, ValueError):
+            return False
     if kind == "round_number_decomposition":
         try:
             value = int(input_data.decode().split()[1])
