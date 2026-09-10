@@ -889,6 +889,14 @@ def case_996a_fixed(r):
     return f"{original}\n", f"{count}\n"
 
 
+def case_2140b(r):
+    x = r.randint(1, 1000)
+    for y in range(1, 100_000):
+        if int(str(x) + str(y)) % (x + y) == 0:
+            return f"1\n{x}\n", f"{y}\n"
+    raise RuntimeError("no witness found")
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -924,6 +932,7 @@ BUILDERS = {
     "2131C": case_2131c, "2193E": case_2193e, "2209E": case_2209e,
     "2200G": case_2200g,
     "313B": case_313b, "1749C": case_1749c,
+    "2140B": case_2140b,
 }
 
 
@@ -953,6 +962,8 @@ def main():
                     "data_status": "generated_tests", "sample_count": row.get("sample_count", 0)})
         if problem in {"20B", "492B"}:
             row["comparison"] = "float_tokens"
+        if problem == "2140B":
+            row["special_checker"] = "concat_divisible"
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"generated {len(BUILDERS)} problems x 21 cases")
 

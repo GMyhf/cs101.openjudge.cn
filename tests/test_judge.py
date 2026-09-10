@@ -214,6 +214,10 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertFalse(judge_module.outputs_match("1.0000001\n", "1.0\n"))
         self.assertFalse(judge_module.outputs_match("one\n", "1.0\n", "float_tokens"))
 
+    def test_concat_divisible_special_checker(self):
+        self.assertTrue(judge_module.special_output_matches("concat_divisible", b"1\n", "8\n"))
+        self.assertFalse(judge_module.special_output_matches("concat_divisible", b"1\n", "1\n"))
+
     def test_problem_exists_caches_until_catalog_changes(self):
         with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
             mirror = Path(temp)

@@ -361,6 +361,20 @@ def outputs_match(actual, expected, comparison="tokens"):
         return False
 
 
+def special_output_matches(kind, input_data, actual):
+    if kind != "concat_divisible":
+        return False
+    try:
+        x = int(input_data.decode().split()[0])
+        tokens = actual.split()
+        if len(tokens) != 1:
+            return False
+        y = int(tokens[0])
+    except (UnicodeDecodeError, ValueError, IndexError):
+        return False
+    return 0 < y < 10**9 and int(str(x) + str(y)) % (x + y) == 0
+
+
 def judge(book, problem_id, language, source, collect_case_times=False):
     catalog_path = MIRROR / "catalog.json"
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
@@ -423,7 +437,9 @@ def judge(book, problem_id, language, source, collect_case_times=False):
             if len(actual.encode()) > 2 * 1024 * 1024: return {"status": "Output Limit Exceeded", "case": index, **metrics}
             if result.returncode in {-signal.SIGXCPU, -signal.SIGKILL}: return {"status": "Time Limit Exceeded", "case": index, **metrics, "message": "单组测试超过 CPU 限制。"}
             if result.returncode != 0: return {"status": "Runtime Error", "case": index, **metrics, "message": result.stderr.decode(errors="replace")[-4000:]}
-            if not outputs_match(actual, expected, item.get("comparison", "tokens")): return {"status": "Wrong Answer", "case": index, **metrics, "expected_tokens": len(expected.split()), "actual_tokens": len(actual.split())}
+            checker = item.get("special_checker")
+            matched = special_output_matches(checker, input_data, actual) if checker else outputs_match(actual, expected, item.get("comparison", "tokens"))
+            if not matched: return {"status": "Wrong Answer", "case": index, **metrics, "expected_tokens": len(expected.split()), "actual_tokens": len(actual.split())}
     accepted = {"status": "Accepted", "cases": len(cases), **last_metrics}
     if collect_case_times:
         max_case = max(case_timings, key=lambda row: row["ratio"])
