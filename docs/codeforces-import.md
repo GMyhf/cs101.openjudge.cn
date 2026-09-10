@@ -12,11 +12,11 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 
 | 状态 | 数量 |
 | --- | ---: |
-| generated_tests | 95 |
+| generated_tests | 99 |
 | interactive_requires_judge | 5 |
 | multiple_output_requires_special_judge | 18 |
 | no_extractable_sample | 21 |
-| sample_tests | 18 |
+| sample_tests | 14 |
 
 ## 未接入精确判题数据
 
@@ -132,6 +132,7 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 2109C1 | interactive_requires_judge | https://codeforces.com/problemset/problem/2109/C1 |
 | 2109C2 | interactive_requires_judge | https://codeforces.com/problemset/problem/2109/C2 |
 | 2109C3 | interactive_requires_judge | https://codeforces.com/problemset/problem/2109/C3 |
+| 2131C | generated_tests | https://codeforces.com/problemset/problem/2131/C |
 | 2132B | generated_tests | https://codeforces.com/problemset/problem/2132/B |
 | 2146D1 | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2146/D1 |
 | 2167F | no_extractable_sample | https://codeforces.com/problemset/problem/2167/F |
@@ -140,13 +141,16 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 2173E | interactive_requires_judge | https://codeforces.com/problemset/problem/2173/E |
 | 2184F | generated_tests | https://codeforces.com/problemset/problem/2184/F |
 | 2193D | generated_tests | https://codeforces.com/problemset/problem/2193/D |
+| 2193E | generated_tests | https://codeforces.com/problemset/problem/2193/E |
 | 2194E | no_extractable_sample | https://codeforces.com/problemset/problem/2194/E |
 | 2195H | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2195/H |
 | 2196A | no_extractable_sample | https://codeforces.com/problemset/problem/2196/A |
 | 2196B | generated_tests | https://codeforces.com/problemset/problem/2196/B |
+| 2200G | generated_tests | https://codeforces.com/problemset/problem/2200/G |
 | 2201G | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2201/G |
 | 2208D1 | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2208/D1 |
 | 2209C | interactive_requires_judge | https://codeforces.com/problemset/problem/2209/C |
+| 2209E | generated_tests | https://codeforces.com/problemset/problem/2209/E |
 | 2218A | no_extractable_sample | https://codeforces.com/problemset/problem/2218/A |
 | 2218B | no_extractable_sample | https://codeforces.com/problemset/problem/2218/B |
 | 2218C | no_extractable_sample | https://codeforces.com/problemset/problem/2218/C |

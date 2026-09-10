@@ -714,6 +714,51 @@ def case_492b(r):
     gaps=[positions[0],length-positions[-1]]+[ (positions[i]-positions[i-1])/2 for i in range(1,len(positions))]
     return f"{len(positions)} {length}\n{' '.join(map(str,positions))}\n",f"{max(gaps):.10f}\n"
 
+def case_2131c(r):
+    n,k=r.randint(1,30),r.randint(1,20); first=[r.randint(0,100) for _ in range(n)]; second=[r.randint(0,100) for _ in range(n)]
+    key=lambda value:min(value%k,(-value)%k)
+    answer=sorted(map(key,first))==sorted(map(key,second))
+    return f"1\n{n} {k}\n{' '.join(map(str,first))}\n{' '.join(map(str,second))}\n",("YES" if answer else "NO")+"\n"
+
+def case_2193e(r):
+    n=r.randint(1,30); values=[r.randint(1,n) for _ in range(n)]; inf=10**9; dp=[inf]*(n+1)
+    if 1 in values:dp[1]=1
+    for target in range(2,n+1):
+        dp[target]=min((dp[target//value]+1 for value in values if value>1 and target%value==0),default=inf)
+    answer=[str(value if value<inf else -1) for value in dp[1:]]
+    return f"1\n{n}\n{' '.join(map(str,values))}\n", " ".join(answer)+"\n"
+
+def case_2209e(r):
+    text="".join(r.choice("abc") for _ in range(r.randint(1,25))); queries=[]
+    for _ in range(r.randint(1,30)):
+        left=r.randint(1,len(text)); queries.append((left,r.randint(left,len(text))))
+    def parts(word):
+        dp=[-10**9]*(len(word)+1);dp[0]=0
+        for index in range(len(word)):
+            for size in range(1,len(word)-index+1):
+                if word[index:index+size]==word[:size]:dp[index+size]=max(dp[index+size],dp[index]+1)
+        return dp[-1]
+    answer=[]
+    for left,right in queries:answer.append(str(sum(parts(text[left-1:end]) for end in range(left,right+1))))
+    return f"1\n{len(text)} {len(queries)}\n{text}\n"+"".join(f"{a} {b}\n" for a,b in queries),"\n".join(answer)+"\n"
+
+def case_2200g(r):
+    from fractions import Fraction
+    from itertools import permutations
+    operations=[(r.choice("+-x/"),r.randint(1,10)) for _ in range(r.randint(1,6))]; initial=r.randint(1,20)
+    total=Fraction(0)
+    for order in permutations(operations):
+        value=Fraction(initial)
+        for op,arg in order:
+            if op=='+':value+=arg
+            elif op=='-':value-=arg
+            elif op=='x':value*=arg
+            else:value/=arg
+        total+=value
+    average=total/Fraction(len(list(permutations(operations))))
+    mod=1_000_000_007; answer=(average.numerator%mod)*pow(average.denominator%mod,mod-2,mod)%mod
+    return f"1\n{len(operations)} {initial}\n"+"\n".join(op+str(arg) for op,arg in operations)+"\n",f"{answer}\n"
+
 def case_2184f(r):
     nodes=r.randint(1,10); edges=[]
     for node in range(1,nodes):edges.append((r.randrange(node),node))
@@ -863,6 +908,8 @@ BUILDERS = {
     "1875D": case_1875d, "1985H1": case_1985h1, "2193D": case_2193d,
     "803A": case_803a, "2184F": case_2184f,
     "20B": case_20b, "492B": case_492b,
+    "2131C": case_2131c, "2193E": case_2193e, "2209E": case_2209e,
+    "2200G": case_2200g,
 }
 
 
