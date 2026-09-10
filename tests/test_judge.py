@@ -252,6 +252,10 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertTrue(judge_module.special_output_matches("good_permutation", b"1\n3\n", "1 2 3\n"))
         self.assertFalse(judge_module.special_output_matches("good_permutation", b"1\n3\n", "1 1 2\n"))
 
+    def test_min_divisible_by_six_subarray_checker(self):
+        self.assertTrue(judge_module.special_output_matches("min_divisible_by_six_subarrays", b"1\n3\n1 2 3\n", "2 1 3\n"))
+        self.assertFalse(judge_module.special_output_matches("min_divisible_by_six_subarrays", b"1\n3\n1 2 3\n", "1 2 2\n"))
+
     def test_matrix_beauty_checker(self):
         self.assertTrue(judge_module.special_output_matches("matrix_beauty", b"1\n1 2\n", "2\n0 1\n"))
         self.assertFalse(judge_module.special_output_matches("matrix_beauty", b"1\n1 2\n", "2\n0 0\n"))

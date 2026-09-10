@@ -362,6 +362,24 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "min_divisible_by_six_subarrays":
+        try:
+            from itertools import permutations
+            values = list(map(int, input_data.decode().split()))[2:]
+            output = list(map(int, actual.split()))
+            if sorted(output) != sorted(values): return False
+            def score(sequence):
+                total = 0
+                for left in range(len(sequence)):
+                    product = 1
+                    for right in range(left, len(sequence)):
+                        product *= sequence[right]
+                        if product % 6 == 0: total += 1
+                return total
+            best = min(score(candidate) for candidate in permutations(values))
+            return score(output) == best
+        except (UnicodeDecodeError, ValueError):
+            return False
     if kind == "distinct_adjacent_gcd":
         try:
             import math

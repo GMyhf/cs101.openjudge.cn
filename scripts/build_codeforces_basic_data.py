@@ -1070,6 +1070,21 @@ def case_2227a(r):
     return f"1\n{x} {y}\n", ("NO" if x % 2 and y % 2 else "YES") + "\n"
 
 
+def case_2227c(r):
+    from itertools import permutations
+    values = [r.randint(1, 30) for _ in range(r.randint(1, 8))]
+    def score(sequence):
+        total = 0
+        for left in range(len(sequence)):
+            product = 1
+            for right in range(left, len(sequence)):
+                product *= sequence[right]
+                if product % 6 == 0: total += 1
+        return total
+    witness = min(permutations(values), key=score)
+    return f"1\n{len(values)}\n{' '.join(map(str, values))}\n", " ".join(map(str, witness)) + "\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -1126,6 +1141,7 @@ BUILDERS = {
     "2218D": case_2218d,
     "2227B": case_2227b,
     "2227A": case_2227a,
+    "2227C": case_2227c,
 }
 
 
@@ -1179,6 +1195,8 @@ def main():
             row["special_checker"] = "max_median_blocks"
         if problem == "2218D":
             row["special_checker"] = "distinct_adjacent_gcd"
+        if problem == "2227C":
+            row["special_checker"] = "min_divisible_by_six_subarrays"
         if problem == "2218A":
             row["special_checker"] = "maximize_min"
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
