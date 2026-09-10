@@ -5,6 +5,67 @@
 - 标准题：158 道；其中已有条目保留、缺失条目补入 Codeforces 题库。
 - 判题数据：仅已有数据的题目可提交判题；其余条目展示题解摘要和官方原题链接。
 
+## 测试数据状态
+
+只导入原文中明确标记的 input/output 样例。交互和多解输出题不会被错误地接入
+token 精确判题；无可提取样例的普通题也保留为待补完整数据。
+
+| 状态 | 数量 |
+| --- | ---: |
+| interactive_requires_judge | 5 |
+| multiple_output_requires_special_judge | 18 |
+| no_extractable_sample | 21 |
+| sample_tests | 113 |
+
+## 未接入精确判题数据
+
+| 题目 | 状态 | 官方链接 |
+| --- | --- | --- |
+| 20C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/20/C |
+| 37C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/37/C |
+| 313B | no_extractable_sample | https://codeforces.com/problemset/problem/313/B |
+| 363B | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/363/B |
+| 550C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/550/C |
+| 584A | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/584/A |
+| 1352A | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1352/A |
+| 1366D | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1366/D |
+| 1729C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1729/C |
+| 1749C | no_extractable_sample | https://codeforces.com/problemset/problem/1749/C |
+| 1793C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1793/C |
+| 1833B | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1833/B |
+| 1843D | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1843/D |
+| 1868A | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1868/A |
+| 1970E2 | no_extractable_sample | https://codeforces.com/problemset/problem/1970/E2 |
+| 1970E3 | no_extractable_sample | https://codeforces.com/problemset/problem/1970/E3 |
+| 2109C1 | interactive_requires_judge | https://codeforces.com/problemset/problem/2109/C1 |
+| 2109C2 | interactive_requires_judge | https://codeforces.com/problemset/problem/2109/C2 |
+| 2109C3 | interactive_requires_judge | https://codeforces.com/problemset/problem/2109/C3 |
+| 2146D1 | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2146/D1 |
+| 2167F | no_extractable_sample | https://codeforces.com/problemset/problem/2167/F |
+| 2171E | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2171/E |
+| 2171F | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2171/F |
+| 2173E | interactive_requires_judge | https://codeforces.com/problemset/problem/2173/E |
+| 2194E | no_extractable_sample | https://codeforces.com/problemset/problem/2194/E |
+| 2195H | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2195/H |
+| 2196A | no_extractable_sample | https://codeforces.com/problemset/problem/2196/A |
+| 2201G | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2201/G |
+| 2208D1 | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2208/D1 |
+| 2209C | interactive_requires_judge | https://codeforces.com/problemset/problem/2209/C |
+| 2218A | no_extractable_sample | https://codeforces.com/problemset/problem/2218/A |
+| 2218B | no_extractable_sample | https://codeforces.com/problemset/problem/2218/B |
+| 2218C | no_extractable_sample | https://codeforces.com/problemset/problem/2218/C |
+| 2218D | no_extractable_sample | https://codeforces.com/problemset/problem/2218/D |
+| 2218E | no_extractable_sample | https://codeforces.com/problemset/problem/2218/E |
+| 2218F | no_extractable_sample | https://codeforces.com/problemset/problem/2218/F |
+| 2218G | no_extractable_sample | https://codeforces.com/problemset/problem/2218/G |
+| 2227A | no_extractable_sample | https://codeforces.com/problemset/problem/2227/A |
+| 2227B | no_extractable_sample | https://codeforces.com/problemset/problem/2227/B |
+| 2227C | no_extractable_sample | https://codeforces.com/problemset/problem/2227/C |
+| 2227D | no_extractable_sample | https://codeforces.com/problemset/problem/2227/D |
+| 2227E | no_extractable_sample | https://codeforces.com/problemset/problem/2227/E |
+| 2227F | no_extractable_sample | https://codeforces.com/problemset/problem/2227/F |
+| 2227H | no_extractable_sample | https://codeforces.com/problemset/problem/2227/H |
+
 ## 未导入题目
 
 以下题目位于题解文档的 April Fools 专题。它们包含非标准或娱乐性判题机制，

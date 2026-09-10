@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## 2026-09-10
+
+### Codeforces 导入题补充官方样例测试数据
+
+- 从 `2020fall_Codeforces_problems.md` 自动提取 113 道普通 Codeforces 题的 193 组明确
+  标注的 input/output 样例，连同既有 `4A` 的 21 组，Codeforces 题库现有 114 道可精确
+  判题题目、214 组数据。`1A` 的正解通过样例，漏做向上取整的变异实现稳定 Wrong Answer。
+- 5 道交互题和 18 道多解输出题保持在精确判题器之外；21 道普通题在源文中未找到可验证
+  样例。三类题目均在 `docs/codeforces-import.md` 按题号和原因记录，避免把不可靠数据
+  接入 token 精确比较。
+
 ## 2026-09-09
 
 ### 修复传统题面的“复制 Markdown”按钮

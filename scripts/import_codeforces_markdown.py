@@ -27,6 +27,11 @@ URL = re.compile(
     r"contest/(\d+)/problem/([A-Za-z]\d*))", re.I)
 HEADING = re.compile(r"^(#{2,3})\s+(.*)$")
 HEADING_ID = re.compile(r"(?:\[)?(\d+)\s*([A-Za-z]\d*)(?:[.\]\s:]|$)")
+SAMPLE_LABEL = re.compile(r"^\s*(?:sample\s*)?(input|output)\s*:?\s*$", re.I)
+FENCE = re.compile(r"^\s*```[^`]*\s*$")
+INTERACTIVE = re.compile(r"\binteractive\b", re.I)
+MULTIPLE_OUTPUT = re.compile(
+    r"output any|any of them|multiple solutions|several solutions|not unique|multiple good", re.I)
 
 
 def canonical(match):
@@ -52,6 +57,39 @@ def markdown_excerpt(lines):
         kept.append(line.rstrip())
     text = "\n".join(kept).strip()
     return text[:12000] or "题解文档未提供可提取的题目摘要，请查看官方原题链接。"
+
+
+def fenced_block_after(lines, index):
+    """Return the fenced sample directly following a Markdown input/output label."""
+    for start in range(index + 1, min(index + 4, len(lines))):
+        if FENCE.match(lines[start]):
+            body = []
+            for line in lines[start + 1:]:
+                if FENCE.match(line):
+                    return "\n".join(body).strip("\n")
+                body.append(line.rstrip())
+            return None
+        if lines[start].strip():
+            return None
+    return None
+
+
+def sample_pairs(lines):
+    """Extract explicit sample input/output pairs, never solution code blocks."""
+    pending, pairs = None, []
+    for index, line in enumerate(lines):
+        label = SAMPLE_LABEL.match(line)
+        if label is None:
+            continue
+        block = fenced_block_after(lines, index)
+        if block is None:
+            continue
+        if label.group(1).lower() == "input":
+            pending = block
+        elif pending is not None:
+            pairs.append({"input": pending, "output": block})
+            pending = None
+    return pairs
 
 
 def parse_markdown(source):
@@ -82,6 +120,9 @@ def parse_markdown(source):
             "line": start + 1,
             "section": group,
             "score": score,
+            "samples": sample_pairs(lines[start:end]),
+            "interactive": bool(INTERACTIVE.search("\n".join(lines[start:end]))),
+            "multiple_output": bool(MULTIPLE_OUTPUT.search("\n".join(lines[start:end]))),
         })
 
     selected, excluded = {}, {}
@@ -106,18 +147,35 @@ def page_html(item):
            excerpt=escape(item["excerpt"]))
 
 
-def report(source, imported, excluded):
+def report(source, imported, excluded, data_status):
     digest = hashlib.sha256(source.read_bytes()).hexdigest()
     lines = [
         "# Codeforces 题解导入记录", "",
         f"- 导入源：`{source}`", f"- 导入源 SHA-256：`{digest}`",
         f"- 标准题：{len(imported)} 道；其中已有条目保留、缺失条目补入 Codeforces 题库。",
         "- 判题数据：仅已有数据的题目可提交判题；其余条目展示题解摘要和官方原题链接。", "",
-        "## 未导入题目", "",
+        "## 测试数据状态", "",
+        "只导入原文中明确标记的 input/output 样例。交互和多解输出题不会被错误地接入",
+        "token 精确判题；无可提取样例的普通题也保留为待补完整数据。", "",
+        "| 状态 | 数量 |", "| --- | ---: |",
+    ]
+    for status, count in sorted((name, sum(value == name for value in data_status.values()))
+                                for name in set(data_status.values())):
+        lines.append(f"| {status} | {count} |")
+    lines.extend([
+        "", "## 未接入精确判题数据", "",
+        "| 题目 | 状态 | 官方链接 |", "| --- | --- | --- |",
+    ])
+    for problem_id, status in sorted(data_status.items(), key=lambda pair: (int(re.match(r"\d+", pair[0]).group()), pair[0])):
+        if status == "sample_tests":
+            continue
+        lines.append(f"| {problem_id} | {status} | {imported[problem_id]['url']} |")
+    lines.extend([
+        "", "## 未导入题目", "",
         "以下题目位于题解文档的 April Fools 专题。它们包含非标准或娱乐性判题机制，",
         "在没有逐题 special judge 策略前不进入本站的精确输出判题库。", "",
         "| 题目 | 文档行号 | 专题 | 官方链接 |", "| --- | ---: | --- | --- |",
-    ]
+    ])
     for item in sorted(excluded.values(), key=lambda row: (int(re.match(r"\d+", row["id"]).group()), row["id"])):
         lines.append(f"| {item['id']} | {item['line']} | {item['section']} | {item['url']} |")
     REPORT_PATH.write_text("\n".join(lines) + "\n", encoding="utf-8")
@@ -135,6 +193,7 @@ def main():
     problems = catalog["problems"]
     existing = {(item.get("book"), item.get("id")): item for item in problems}
     added = 0
+    data_status = {}
     PAGES.mkdir(parents=True, exist_ok=True)
     for problem_id, item in sorted(imported.items(), key=lambda pair: (int(re.match(r"\d+", pair[0]).group()), pair[0])):
         key = ("codeforces", problem_id)
@@ -149,18 +208,45 @@ def main():
         else:
             record.setdefault("source", "codeforces")
             record.setdefault("source_url", item["url"])
+        if problem_id != "4A":
+            if item["interactive"]:
+                data_status[problem_id] = "interactive_requires_judge"
+                record.update({"tests": False, "test_count": 0, "test_cases": [],
+                               "data_status": "interactive_requires_judge"})
+            elif item["multiple_output"]:
+                data_status[problem_id] = "multiple_output_requires_special_judge"
+                record.update({"tests": False, "test_count": 0, "test_cases": [],
+                               "data_status": "multiple_output_requires_special_judge"})
+            elif item["samples"]:
+                cases = []
+                data_dir = MIRROR / "tests" / "codeforces" / problem_id / "data"
+                data_dir.mkdir(parents=True, exist_ok=True)
+                for index, sample in enumerate(item["samples"]):
+                    input_path = data_dir / f"{index}.in"
+                    output_path = data_dir / f"{index}.out"
+                    input_path.write_text(sample["input"] + "\n", encoding="utf-8")
+                    output_path.write_text(sample["output"] + "\n", encoding="utf-8")
+                    cases.append({"input": str(input_path.relative_to(MIRROR)),
+                                  "output": str(output_path.relative_to(MIRROR))})
+                record.update({"tests": True, "test_count": len(cases), "test_cases": cases,
+                               "data_status": "sample_tests"})
+                data_status[problem_id] = "sample_tests"
+            else:
+                data_status[problem_id] = "no_extractable_sample"
+                record["data_status"] = "no_extractable_sample"
         page = PAGES / f"codeforces__{problem_id}.html"
         if problem_id != "4A":
             page.write_text(page_html(item), encoding="utf-8")
 
     catalog["count"] = len(problems)
     CATALOG_PATH.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    report(args.source, imported, excluded)
+    report(args.source, imported, excluded, data_status)
     test_index = json.loads(TEST_INDEX_PATH.read_text(encoding="utf-8"))
     test_index["catalog"] = catalog
     test_index["matched_catalog_problems"] = sum(bool(row.get("test_cases")) for row in problems)
     TEST_INDEX_PATH.write_text(json.dumps(test_index, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"standard={len(imported)} added={added} excluded={len(excluded)} total={len(problems)}")
+    counts = {name: sum(value == name for value in data_status.values()) for name in set(data_status.values())}
+    print(f"standard={len(imported)} added={added} excluded={len(excluded)} total={len(problems)} data={counts}")
 
 
 if __name__ == "__main__":
