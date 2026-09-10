@@ -1033,6 +1033,11 @@ def case_2218a(r):
     return str(len(values)) + "\n" + "\n".join(map(str, values)) + "\n", "\n".join(map(str, values)) + "\n"
 
 
+def case_2218b(r):
+    values = [r.randint(-67, 67) for _ in range(7)]
+    return "1\n" + " ".join(map(str, values)) + "\n", f"{2 * max(values) - sum(values)}\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -1083,6 +1088,7 @@ BUILDERS = {
     "1868A": case_1868a,
     "2196A": case_2196a,
     "2218A": case_2218a,
+    "2218B": case_2218b,
 }
 
 
