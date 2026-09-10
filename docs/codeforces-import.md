@@ -12,10 +12,10 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 
 | 状态 | 数量 |
 | --- | ---: |
-| generated_tests | 99 |
+| generated_tests | 101 |
 | interactive_requires_judge | 5 |
 | multiple_output_requires_special_judge | 18 |
-| no_extractable_sample | 21 |
+| no_extractable_sample | 19 |
 | sample_tests | 14 |
 
 ## 未接入精确判题数据
@@ -53,7 +53,7 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 270A | generated_tests | https://codeforces.com/problemset/problem/270/A |
 | 281A | generated_tests | https://codeforces.com/problemset/problem/281/A |
 | 282A | generated_tests | https://codeforces.com/problemset/problem/282/A |
-| 313B | no_extractable_sample | https://codeforces.com/problemset/problem/313/B |
+| 313B | generated_tests | https://codeforces.com/problemset/problem/313/B |
 | 339A | generated_tests | https://codeforces.com/problemset/problem/339/A |
 | 339B | generated_tests | https://codeforces.com/problemset/problem/339/B |
 | 363B | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/363/B |
@@ -113,7 +113,7 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 1526C1 | generated_tests | https://codeforces.com/problemset/problem/1526/C1 |
 | 1729C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1729/C |
 | 1742A | generated_tests | https://codeforces.com/problemset/problem/1742/A |
-| 1749C | no_extractable_sample | https://codeforces.com/problemset/problem/1749/C |
+| 1749C | generated_tests | https://codeforces.com/problemset/problem/1749/C |
 | 1793C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1793/C |
 | 1829D | generated_tests | https://codeforces.com/problemset/problem/1829/D |
 | 1829E | generated_tests | https://codeforces.com/problemset/problem/1829/E |

@@ -759,6 +759,19 @@ def case_2200g(r):
     mod=1_000_000_007; answer=(average.numerator%mod)*pow(average.denominator%mod,mod-2,mod)%mod
     return f"1\n{len(operations)} {initial}\n"+"\n".join(op+str(arg) for op,arg in operations)+"\n",f"{answer}\n"
 
+def case_313b(r):
+    text="".join(r.choice(".#") for _ in range(r.randint(2,200))); queries=[]
+    for _ in range(r.randint(1,100)):
+        left=r.randint(1,len(text)-1);queries.append((left,r.randint(left+1,len(text))))
+    answer=[str(sum(text[i]==text[i+1] for i in range(a-1,b-1))) for a,b in queries]
+    return text+"\n"+str(len(queries))+"\n"+"".join(f"{a} {b}\n" for a,b in queries),"\n".join(answer)+"\n"
+
+def case_1749c(r):
+    values=[r.randint(1,100) for _ in range(r.randint(1,100))]; answer=0
+    for value in sorted(values):
+        if value>answer:answer+=1
+    return f"1\n{len(values)}\n{' '.join(map(str,values))}\n",f"{answer}\n"
+
 def case_2184f(r):
     nodes=r.randint(1,10); edges=[]
     for node in range(1,nodes):edges.append((r.randrange(node),node))
@@ -910,6 +923,7 @@ BUILDERS = {
     "20B": case_20b, "492B": case_492b,
     "2131C": case_2131c, "2193E": case_2193e, "2209E": case_2209e,
     "2200G": case_2200g,
+    "313B": case_313b, "1749C": case_1749c,
 }
 
 
