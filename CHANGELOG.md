@@ -134,6 +134,11 @@
 - 新增 `1729C` 的 21 组输入与 `tile_jump_path` 专用验证器；构造题现为 109 题、
   2,289 组。
 
+### Codeforces Weather Permutation 验证
+
+- 新增 `1833B` 的 21 组输入与 `weather_permutation` 专用验证器；构造题现为 110 题、
+  2,310 组。
+
 ## 2026-09-09
 
 ### 修复传统题面的“复制 Markdown”按钮

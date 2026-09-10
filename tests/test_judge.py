@@ -243,6 +243,11 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertTrue(judge_module.special_output_matches("tile_jump_path", b"1\nabc\n", "2 3\n1 2 3\n"))
         self.assertFalse(judge_module.special_output_matches("tile_jump_path", b"1\nabc\n", "2 2\n1 2\n"))
 
+    def test_weather_permutation_checker(self):
+        data = b"1\n3 2\n1 3 5\n2 5 4\n"
+        self.assertTrue(judge_module.special_output_matches("weather_permutation", data, "2 4 5\n"))
+        self.assertFalse(judge_module.special_output_matches("weather_permutation", data, "5 4 2\n"))
+
     def test_problem_exists_caches_until_catalog_changes(self):
         with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
             mirror = Path(temp)

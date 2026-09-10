@@ -362,6 +362,15 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "weather_permutation":
+        try:
+            values = list(map(int, input_data.decode().split()))
+            n, k = values[1], values[2]
+            forecast = values[3:3+n]; actual_values = values[3+n:3+2*n]
+            output = list(map(int, actual.split()))
+            return len(output) == n and sorted(output) == sorted(actual_values) and all(abs(a-b) <= k for a,b in zip(forecast,output))
+        except (UnicodeDecodeError, ValueError, IndexError):
+            return False
     if kind == "tile_jump_path":
         try:
             text = input_data.decode().split()[1]

@@ -952,6 +952,15 @@ def case_1729c(r):
     return f"1\n{text}\n",f"{abs(ord(text[0])-ord(text[-1]))} {len(indices)}\n"+" ".join(str(i+1) for i in indices)+"\n"
 
 
+def case_1833b(r):
+    n, limit = r.randint(1,100), r.randint(0,100)
+    forecast = [r.randint(-1000,1000) for _ in range(n)]
+    actual = [value+r.randint(-limit,limit) for value in forecast]
+    r.shuffle(actual)
+    # A valid witness exists by retaining the pre-shuffle assignment.
+    return f"1\n{n} {limit}\n{' '.join(map(str,forecast))}\n{' '.join(map(str,actual))}\n", "\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -995,6 +1004,7 @@ BUILDERS = {
     "1366D": case_1366d,
     "20C": case_20c,
     "1729C": case_1729c,
+    "1833B": case_1833b,
 }
 
 
@@ -1038,6 +1048,8 @@ def main():
             row["special_checker"] = "shortest_path"
         if problem == "1729C":
             row["special_checker"] = "tile_jump_path"
+        if problem == "1833B":
+            row["special_checker"] = "weather_permutation"
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"generated {len(BUILDERS)} problems x 21 cases")
 
