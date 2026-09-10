@@ -223,6 +223,25 @@ def case_903c(r):
     text = "".join(r.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(r.randint(1, 100)))
     return str(len(text)) + "\n" + text + "\n", f"{max(text.count(char) for char in set(text))}\n"
 
+def case_200b(r):
+    values = [r.randint(0, 100) for _ in range(r.randint(1, 100))]
+    return str(len(values)) + "\n" + " ".join(map(str, values)) + "\n", f"{sum(values) / len(values):.10f}\n"
+
+def case_474a(r):
+    keyboard = "qwertyuiopasdfghjkl;zxcvbnm,./"
+    direction = r.choice("LR")
+    typed = "".join(r.choice(keyboard[1:-1]) for _ in range(r.randint(1, 40)))
+    shift = -1 if direction == "R" else 1
+    answer = "".join(keyboard[keyboard.index(char) + shift] for char in typed)
+    return direction + "\n" + typed + "\n", answer + "\n"
+
+def case_545d(r):
+    times = [r.randint(1, 100) for _ in range(r.randint(1, 100))]
+    elapsed = count = 0
+    for value in sorted(times):
+        if elapsed <= value: count += 1; elapsed += value
+    return str(len(times)) + "\n" + " ".join(map(str, times)) + "\n", f"{count}\n"
+
 
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
@@ -329,6 +348,7 @@ BUILDERS = {
     "580A": case_580a,
     "615A": case_615a, "698A": case_698a, "705A": case_705a, "706B": case_706b,
     "723A": case_723a, "903C": case_903c,
+    "200B": case_200b, "474A": case_474a, "545D": case_545d,
 }
 
 

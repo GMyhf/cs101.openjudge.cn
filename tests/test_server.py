@@ -428,7 +428,7 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
                          {"2109C1", "2109C2", "2109C3", "2173E", "2209C"})
 
         generated = [item for item in entries if item.get("data_status") == "generated_tests"]
-        self.assertEqual(len(generated), 40)
+        self.assertEqual(len(generated), 43)
         self.assertTrue({"1A", "25A", "50A", "58A", "69A", "71A", "96A", "112A", "118A",
                          "122A", "131A", "151A", "158A", "160A", "230A"}.issubset(
                              {item["id"] for item in generated}))
@@ -436,6 +436,7 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
                              {item["id"] for item in generated}))
         self.assertTrue({"615A", "698A", "705A", "706B", "723A", "903C"}.issubset(
                              {item["id"] for item in generated}))
+        self.assertTrue({"200B", "474A", "545D"}.issubset({item["id"] for item in generated}))
         self.assertTrue(all(item["test_count"] == 21 for item in generated))
         self.assertTrue(all(len({(ROOT / "data/openjudge" / case["input"]).read_bytes()
                                  for case in item["test_cases"]}) == 21 for item in generated))
