@@ -904,6 +904,14 @@ def case_363b(r):
     return f"{len(values)} {width}\n{' '.join(map(str, values))}\n", f"{sums.index(min(sums)) + 1}\n"
 
 
+def case_550c(r):
+    text = "".join(str(r.randint(0, 9)) for _ in range(r.randint(1, 12)))
+    witness = next(("".join(text[index] for index in range(len(text)) if mask >> index & 1)
+                    for mask in range(1, 1 << len(text))
+                    if int("".join(text[index] for index in range(len(text)) if mask >> index & 1)) % 8 == 0), None)
+    return text + "\n", ("YES\n" + witness + "\n" if witness else "NO\n")
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -941,6 +949,7 @@ BUILDERS = {
     "313B": case_313b, "1749C": case_1749c,
     "2140B": case_2140b,
     "363B": case_363b,
+    "550C": case_550c,
 }
 
 
@@ -972,6 +981,8 @@ def main():
             row["comparison"] = "float_tokens"
         if problem == "2140B":
             row["special_checker"] = "concat_divisible"
+        if problem == "550C":
+            row["special_checker"] = "divisible_by_8_subsequence"
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"generated {len(BUILDERS)} problems x 21 cases")
 

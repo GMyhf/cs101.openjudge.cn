@@ -362,6 +362,16 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "divisible_by_8_subsequence":
+        text = input_data.decode().split()[0]
+        tokens = actual.split()
+        if tokens == ["NO"]:
+            return not any(int("".join(text[index] for index in range(len(text)) if mask >> index & 1)) % 8 == 0
+                           for mask in range(1, 1 << len(text)))
+        if len(tokens) != 2 or tokens[0] != "YES":
+            return False
+        iterator = iter(text)
+        return tokens[1].isdigit() and int(tokens[1]) % 8 == 0 and all(char in iterator for char in tokens[1])
     if kind != "concat_divisible":
         return False
     try:
