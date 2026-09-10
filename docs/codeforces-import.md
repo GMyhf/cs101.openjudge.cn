@@ -12,11 +12,11 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 
 | 状态 | 数量 |
 | --- | ---: |
-| generated_tests | 88 |
+| generated_tests | 91 |
 | interactive_requires_judge | 5 |
 | multiple_output_requires_special_judge | 18 |
 | no_extractable_sample | 21 |
-| sample_tests | 25 |
+| sample_tests | 22 |
 
 ## 未接入精确判题数据
 
@@ -118,10 +118,12 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 1843D | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1843/D |
 | 1850H | generated_tests | https://codeforces.com/problemset/problem/1850/H |
 | 1868A | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1868/A |
+| 1875D | generated_tests | https://codeforces.com/problemset/problem/1875/D |
 | 1879B | generated_tests | https://codeforces.com/problemset/problem/1879/B |
 | 1881C | generated_tests | https://codeforces.com/problemset/problem/1881/C |
 | 1970E2 | no_extractable_sample | https://codeforces.com/problemset/problem/1970/E2 |
 | 1970E3 | no_extractable_sample | https://codeforces.com/problemset/problem/1970/E3 |
+| 1985H1 | generated_tests | https://codeforces.com/problemset/problem/1985/H1 |
 | 2033D | generated_tests | https://codeforces.com/problemset/problem/2033/D |
 | 2075C | generated_tests | https://codeforces.com/problemset/problem/2075/C |
 | 2109C1 | interactive_requires_judge | https://codeforces.com/problemset/problem/2109/C1 |
@@ -133,6 +135,7 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 2171E | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2171/E |
 | 2171F | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2171/F |
 | 2173E | interactive_requires_judge | https://codeforces.com/problemset/problem/2173/E |
+| 2193D | generated_tests | https://codeforces.com/problemset/problem/2193/D |
 | 2194E | no_extractable_sample | https://codeforces.com/problemset/problem/2194/E |
 | 2195H | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2195/H |
 | 2196A | no_extractable_sample | https://codeforces.com/problemset/problem/2196/A |

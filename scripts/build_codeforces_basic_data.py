@@ -633,6 +633,54 @@ def case_2196b(r):
     answer=sum(values[i]*values[j]==j-i for i in range(len(values)) for j in range(i+1,len(values)))
     return f"1\n{len(values)}\n{' '.join(map(str,values))}\n",f"{answer}\n"
 
+def case_1875d(r):
+    from functools import lru_cache
+    values=tuple(r.randint(0,8) for _ in range(r.randint(1,9)))
+    @lru_cache(None)
+    def solve(state):
+        if not state:return 0
+        available=set(state); mex=0
+        while mex in available:mex+=1
+        return mex+min(solve(state[:i]+state[i+1:]) for i in range(len(state)))
+    return f"1\n{len(values)}\n{' '.join(map(str,values))}\n",f"{solve(values)}\n"
+
+def case_1985h1(r):
+    rows,cols=r.randint(1,8),r.randint(1,8); grid=[[r.choice('.#') for _ in range(cols)] for _ in range(rows)]
+    def largest(board):
+        seen=set(); best=0
+        for i in range(rows):
+            for j in range(cols):
+                if board[i][j]!='#' or (i,j) in seen:continue
+                seen.add((i,j)); stack=[(i,j)]; size=0
+                while stack:
+                    x,y=stack.pop(); size+=1
+                    for dx,dy in ((1,0),(-1,0),(0,1),(0,-1)):
+                        nx,ny=x+dx,y+dy
+                        if 0<=nx<rows and 0<=ny<cols and board[nx][ny]=='#' and (nx,ny) not in seen:seen.add((nx,ny));stack.append((nx,ny))
+                best=max(best,size)
+        return best
+    answer=largest(grid)
+    for index in range(rows+cols):
+        board=[row[:] for row in grid]
+        if index<rows:
+            for j in range(cols):board[index][j]='#'
+        else:
+            for i in range(rows):board[i][index-rows]='#'
+        answer=max(answer,largest(board))
+    return f"1\n{rows} {cols}\n"+"".join("".join(row)+"\n" for row in grid),f"{answer}\n"
+
+def case_2193d(r):
+    n=r.randint(1,50); swords=[r.randint(1,100) for _ in range(n)]; strikes=[r.randint(1,n) for _ in range(n)]
+    answer=0
+    for level in set(swords):
+        available=sum(value>=level for value in swords); used=completed=0
+        for required in strikes:
+            used+=required
+            if used>available:break
+            completed+=1
+        answer=max(answer,level*completed)
+    return f"1\n{n}\n{' '.join(map(str,swords))}\n{' '.join(map(str,strikes))}\n",f"{answer}\n"
+
 
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
@@ -755,6 +803,7 @@ BUILDERS = {
     "508A": case_508a, "1163B2": case_1163b2, "1427B": case_1427b, "2075C": case_2075c,
     "2132B": case_2132b,
     "986B": case_986b, "1000B": case_1000b, "2196B": case_2196b,
+    "1875D": case_1875d, "1985H1": case_1985h1, "2193D": case_2193d,
 }
 
 
