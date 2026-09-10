@@ -12,11 +12,11 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 
 | 状态 | 数量 |
 | --- | ---: |
-| generated_tests | 80 |
+| generated_tests | 85 |
 | interactive_requires_judge | 5 |
 | multiple_output_requires_special_judge | 18 |
 | no_extractable_sample | 21 |
-| sample_tests | 33 |
+| sample_tests | 28 |
 
 ## 未接入精确判题数据
 
@@ -70,6 +70,7 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 474D | generated_tests | https://codeforces.com/problemset/problem/474/D |
 | 479A | generated_tests | https://codeforces.com/problemset/problem/479/A |
 | 489B | generated_tests | https://codeforces.com/problemset/problem/489/B |
+| 508A | generated_tests | https://codeforces.com/problemset/problem/508/A |
 | 545C | generated_tests | https://codeforces.com/problemset/problem/545/C |
 | 545D | generated_tests | https://codeforces.com/problemset/problem/545/D |
 | 550C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/550/C |
@@ -86,6 +87,7 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 903C | generated_tests | https://codeforces.com/problemset/problem/903/C |
 | 996A | generated_tests | https://codeforces.com/problemset/problem/996/A |
 | 1154A | generated_tests | https://codeforces.com/problemset/problem/1154/A |
+| 1163B2 | generated_tests | https://codeforces.com/problemset/problem/1163/B2 |
 | 1195C | generated_tests | https://codeforces.com/problemset/problem/1195/C |
 | 1221A | generated_tests | https://codeforces.com/problemset/problem/1221/A |
 | 1327A | generated_tests | https://codeforces.com/problemset/problem/1327/A |
@@ -99,6 +101,7 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 1374C | generated_tests | https://codeforces.com/problemset/problem/1374/C |
 | 1398C | generated_tests | https://codeforces.com/problemset/problem/1398/C |
 | 1425A | generated_tests | https://codeforces.com/problemset/problem/1425/A |
+| 1427B | generated_tests | https://codeforces.com/problemset/problem/1427/B |
 | 1443C | generated_tests | https://codeforces.com/problemset/problem/1443/C |
 | 1475A | generated_tests | https://codeforces.com/problemset/problem/1475/A |
 | 1520D | generated_tests | https://codeforces.com/problemset/problem/1520/D |
@@ -118,9 +121,11 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 1970E2 | no_extractable_sample | https://codeforces.com/problemset/problem/1970/E2 |
 | 1970E3 | no_extractable_sample | https://codeforces.com/problemset/problem/1970/E3 |
 | 2033D | generated_tests | https://codeforces.com/problemset/problem/2033/D |
+| 2075C | generated_tests | https://codeforces.com/problemset/problem/2075/C |
 | 2109C1 | interactive_requires_judge | https://codeforces.com/problemset/problem/2109/C1 |
 | 2109C2 | interactive_requires_judge | https://codeforces.com/problemset/problem/2109/C2 |
 | 2109C3 | interactive_requires_judge | https://codeforces.com/problemset/problem/2109/C3 |
+| 2132B | generated_tests | https://codeforces.com/problemset/problem/2132/B |
 | 2146D1 | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2146/D1 |
 | 2167F | no_extractable_sample | https://codeforces.com/problemset/problem/2167/F |
 | 2171E | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2171/E |

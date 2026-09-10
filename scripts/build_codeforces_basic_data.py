@@ -566,6 +566,55 @@ def case_2033d(r):
         prefixes.add(running)
     return f"1\n{len(values)}\n{' '.join(map(str,values))}\n", f"{answer}\n"
 
+def case_508a(r):
+    rows, cols, moves = r.randint(1, 20), r.randint(1, 20), r.randint(1, 100)
+    plan = [(r.randint(0, rows - 1), r.randint(0, cols - 1)) for _ in range(moves)]; black=set(); answer=-1
+    for index,(x,y) in enumerate(plan,1):
+        black.add((x,y))
+        if any({(a,b),(a+1,b),(a,b+1),(a+1,b+1)} <= black for a in (x-1,x) for b in (y-1,y)): answer=index; break
+    return f"{rows} {cols} {moves}\n" + "".join(f"{x+1} {y+1}\n" for x,y in plan), f"{answer}\n"
+
+def case_1163b2(r):
+    values = [r.randint(1, 30) for _ in range(r.randint(1, 100))]; answer=0
+    from collections import Counter
+    for length in range(1,len(values)+1):
+        counts=Counter(values[:length]); good=False
+        for color in list(counts):
+            counts[color]-=1
+            if counts[color]==0: del counts[color]
+            if len(set(counts.values()))<=1: good=True
+            counts[color]=counts.get(color,0)+1
+            if good: answer=length; break
+    return str(len(values))+"\n"+" ".join(map(str,values))+"\n",f"{answer}\n"
+
+def case_1427b(r):
+    n,k=r.randint(1,100),r.randint(0,100); text="".join(r.choice("LW") for _ in range(n)); k=min(k,n); original_k=k
+    wins=[i for i,ch in enumerate(text) if ch=='W']
+    if not wins: answer=0 if not k else 2*min(n,k)-1
+    else:
+        score=len(wins)+sum(text[i]==text[i-1]=='W' for i in range(1,n)); gaps=sorted(wins[i]-wins[i-1]-1 for i in range(1,len(wins)))
+        for gap in gaps:
+            if k>=gap: k-=gap; score+=2*gap+1
+        score+=2*min(k, text.count('L')); answer=score
+    return f"1\n{n} {original_k}\n{text}\n",f"{answer}\n"
+
+def case_2075c(r):
+    n,m=r.randint(2,30),r.randint(2,20); capacity=[r.randint(1,n) for _ in range(m)]; answer=0
+    for split in range(1,n):
+        for i in range(m):
+            for j in range(m):
+                if i!=j and capacity[i]>=split and capacity[j]>=n-split: answer+=1
+    return f"1\n{n} {m}\n{' '.join(map(str,capacity))}\n",f"{answer}\n"
+
+def case_2132b(r):
+    value=r.randint(11,10**12); answers=[]; power=10
+    while power<=10**18:
+        divisor=power+1
+        if value%divisor==0 and value//divisor>0: answers.append(value//divisor)
+        power*=10
+    answers=sorted(set(answers))
+    return f"1\n{value}\n",str(len(answers))+("\n"+" ".join(map(str,answers)) if answers else "")+"\n"
+
 
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
@@ -685,6 +734,8 @@ BUILDERS = {
     "1425A": case_1425a, "1526C1": case_1526c1, "1879B": case_1879b,
     "1B": case_1b, "460B": case_460b, "545C": case_545c, "580C": case_580c, "893C": case_893c,
     "1443C": case_1443c, "2033D": case_2033d,
+    "508A": case_508a, "1163B2": case_1163b2, "1427B": case_1427b, "2075C": case_2075c,
+    "2132B": case_2132b,
 }
 
 
