@@ -1028,6 +1028,11 @@ def case_2196a(r):
     return f"1\n{p} {q}\n", winner + "\n"
 
 
+def case_2218a(r):
+    values = [r.randint(-67, 67) for _ in range(r.randint(1, 20))]
+    return str(len(values)) + "\n" + "\n".join(map(str, values)) + "\n", "\n".join(map(str, values)) + "\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -1077,6 +1082,7 @@ BUILDERS = {
     "2171E": case_2171e,
     "1868A": case_1868a,
     "2196A": case_2196a,
+    "2218A": case_2218a,
 }
 
 
@@ -1126,6 +1132,8 @@ def main():
             row["special_checker"] = "good_permutation"
         if problem == "1868A":
             row["special_checker"] = "matrix_beauty"
+        if problem == "2218A":
+            row["special_checker"] = "maximize_min"
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"generated {len(BUILDERS)} problems x 21 cases")
 

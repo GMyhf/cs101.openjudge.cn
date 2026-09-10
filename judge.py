@@ -362,6 +362,13 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "maximize_min":
+        try:
+            values = list(map(int, input_data.decode().split()))[1:]
+            output = list(map(int, actual.split()))
+            return len(values) == len(output) and all(-67 <= y <= 67 and y >= x for x, y in zip(values, output))
+        except (UnicodeDecodeError, ValueError):
+            return False
     if kind == "matrix_beauty":
         try:
             from itertools import product, permutations

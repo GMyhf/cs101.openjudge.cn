@@ -256,6 +256,10 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertTrue(judge_module.special_output_matches("matrix_beauty", b"1\n1 2\n", "2\n0 1\n"))
         self.assertFalse(judge_module.special_output_matches("matrix_beauty", b"1\n1 2\n", "2\n0 0\n"))
 
+    def test_maximize_min_checker(self):
+        self.assertTrue(judge_module.special_output_matches("maximize_min", b"2\n-2\n3\n", "0\n3\n"))
+        self.assertFalse(judge_module.special_output_matches("maximize_min", b"1\n3\n", "2\n"))
+
     def test_problem_exists_caches_until_catalog_changes(self):
         with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
             mirror = Path(temp)
