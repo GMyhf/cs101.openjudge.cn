@@ -681,6 +681,43 @@ def case_2193d(r):
         answer=max(answer,level*completed)
     return f"1\n{n}\n{' '.join(map(str,swords))}\n{' '.join(map(str,strikes))}\n",f"{answer}\n"
 
+def case_803a(r):
+    n=r.randint(1,4); k=r.randint(0,n*n); pairs=[(i,j) for i in range(n) for j in range(i,n)]
+    best=None
+    for mask in range(1<<len(pairs)):
+        board=[[0]*n for _ in range(n)]
+        for bit,(i,j) in enumerate(pairs):
+            if mask>>bit&1: board[i][j]=board[j][i]=1
+        if sum(map(sum,board))==k:
+            flat=tuple(value for row in board for value in row)
+            if best is None or flat>best:best=flat
+    if best is None:return f"{n} {k}\n","-1\n"
+    return f"{n} {k}\n","\n".join(" ".join(map(str,best[i*n:(i+1)*n])) for i in range(n))+"\n"
+
+def case_2184f(r):
+    nodes=r.randint(1,10); edges=[]
+    for node in range(1,nodes):edges.append((r.randrange(node),node))
+    children=[[] for _ in range(nodes)]
+    for a,b in edges:children[a].append(b)
+    subtree=[]
+    def visit(node):
+        found=[]
+        if not children[node]:found=[node]
+        for child in children[node]:found+=visit(child)
+        subtree.append(set(found)); return found
+    leaf_set=set(visit(0))
+    answer=False
+    for mask in range(1<<nodes):
+        if bin(mask).count("1")%3:continue
+        covered=set(); good=True
+        for node in range(nodes):
+            if mask>>node&1:
+                group=subtree[node]
+                if covered&group:good=False;break
+                covered|=group
+        if good and covered==leaf_set:answer=True;break
+    return f"1\n{nodes}\n"+"".join(f"{a+1} {b+1}\n" for a,b in edges),("YES" if answer else "NO")+"\n"
+
 
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
@@ -804,6 +841,7 @@ BUILDERS = {
     "2132B": case_2132b,
     "986B": case_986b, "1000B": case_1000b, "2196B": case_2196b,
     "1875D": case_1875d, "1985H1": case_1985h1, "2193D": case_2193d,
+    "803A": case_803a, "2184F": case_2184f,
 }
 
 

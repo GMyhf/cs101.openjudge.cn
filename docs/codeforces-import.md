@@ -12,11 +12,11 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 
 | 状态 | 数量 |
 | --- | ---: |
-| generated_tests | 91 |
+| generated_tests | 93 |
 | interactive_requires_judge | 5 |
 | multiple_output_requires_special_judge | 18 |
 | no_extractable_sample | 21 |
-| sample_tests | 22 |
+| sample_tests | 20 |
 
 ## 未接入精确判题数据
 
@@ -83,6 +83,7 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 705A | generated_tests | https://codeforces.com/problemset/problem/705/A |
 | 706B | generated_tests | https://codeforces.com/problemset/problem/706/B |
 | 723A | generated_tests | https://codeforces.com/problemset/problem/723/A |
+| 803A | generated_tests | https://codeforces.com/problemset/problem/803/A |
 | 893C | generated_tests | https://codeforces.com/problemset/problem/893/C |
 | 903C | generated_tests | https://codeforces.com/problemset/problem/903/C |
 | 986B | generated_tests | https://codeforces.com/problemset/problem/986/B |
@@ -135,6 +136,7 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 2171E | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2171/E |
 | 2171F | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2171/F |
 | 2173E | interactive_requires_judge | https://codeforces.com/problemset/problem/2173/E |
+| 2184F | generated_tests | https://codeforces.com/problemset/problem/2184/F |
 | 2193D | generated_tests | https://codeforces.com/problemset/problem/2193/D |
 | 2194E | no_extractable_sample | https://codeforces.com/problemset/problem/2194/E |
 | 2195H | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2195/H |
