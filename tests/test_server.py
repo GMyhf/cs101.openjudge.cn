@@ -407,6 +407,8 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertFalse({"2095A", "2214A"} & set(entries))
         self.assertEqual(entries["4A"]["test_count"], 21)
         self.assertEqual(sum(item["test_count"] for problem_id, item in entries.items()
+                             if problem_id != "4A"), 0)
+        self.assertEqual(sum(item.get("sample_count", 0) for problem_id, item in entries.items()
                              if problem_id != "4A"), 193)
         self.assertTrue((ROOT / "data/openjudge/pages/codeforces__1A.html").is_file())
         report = (ROOT / "docs/codeforces-import.md").read_text(encoding="utf-8")
@@ -417,27 +419,24 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertEqual(status, 200)
         self.assertIn("Theatre Square", body.decode("utf-8", errors="replace"))
 
-    def test_codeforces_imported_samples_are_complete_and_judgeable(self):
+    def test_codeforces_imported_samples_require_twenty_cases_for_exact_judging(self):
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
         entries = [item for item in catalog["problems"] if item.get("source") == "codeforces"]
-        sampled = [item for item in entries if item.get("data_status") == "sample_tests"]
+        sampled = [item for item in entries if item.get("data_status") == "insufficient_sample_cases"]
         self.assertEqual(len(sampled), 113)
-        self.assertEqual(sum(len(item["test_cases"]) for item in sampled), 193)
-        self.assertTrue(all((ROOT / "data/openjudge" / case["input"]).is_file()
-                            and (ROOT / "data/openjudge" / case["output"]).is_file()
-                            for item in sampled for case in item["test_cases"]))
+        self.assertEqual(sum(item["sample_count"] for item in sampled), 193)
+        self.assertTrue(all(item["test_count"] == 0 and not item["test_cases"] for item in sampled))
+        self.assertTrue(all(item["sample_count"] < 20 for item in sampled))
+        self.assertTrue(all((ROOT / "data/openjudge/tests/codeforces" / item["id"] / "data").is_dir()
+                            for item in sampled))
         self.assertEqual({item["id"] for item in entries
                           if item.get("data_status") == "interactive_requires_judge"},
                          {"2109C1", "2109C2", "2109C3", "2173E", "2209C"})
 
-        accepted = judge("codeforces", "1A", "python", """n, m, a = map(int, input().split())
+        result = judge("codeforces", "1A", "python", """n, m, a = map(int, input().split())
 print((n + a - 1) // a * ((m + a - 1) // a))
 """)
-        self.assertEqual((accepted["status"], accepted["cases"]), ("Accepted", 1), accepted)
-        mutant = judge("codeforces", "1A", "python", """n, m, a = map(int, input().split())
-print(n // a * (m // a))
-""")
-        self.assertEqual((mutant["status"], mutant["case"]), ("Wrong Answer", 1), mutant)
+        self.assertEqual(result["status"], "No Test Data", result)
 
     def test_practice_02977_is_mirrored_by_global_number(self):
         status, _, body = request(self.port, "GET", "/practice/02977/")

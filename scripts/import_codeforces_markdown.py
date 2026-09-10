@@ -21,6 +21,7 @@ CATALOG_PATH = MIRROR / "catalog.json"
 TEST_INDEX_PATH = MIRROR / "test_index.json"
 PAGES = MIRROR / "pages"
 REPORT_PATH = ROOT / "docs" / "codeforces-import.md"
+MIN_EXACT_CASES = 20
 
 URL = re.compile(
     r"https?://codeforces\.com/(?:problemset/problem/(\d+)/([A-Za-z]\d*)|"
@@ -155,8 +156,9 @@ def report(source, imported, excluded, data_status):
         f"- 标准题：{len(imported)} 道；其中已有条目保留、缺失条目补入 Codeforces 题库。",
         "- 判题数据：仅已有数据的题目可提交判题；其余条目展示题解摘要和官方原题链接。", "",
         "## 测试数据状态", "",
-        "只导入原文中明确标记的 input/output 样例。交互和多解输出题不会被错误地接入",
-        "token 精确判题；无可提取样例的普通题也保留为待补完整数据。", "",
+        f"每题至少 {MIN_EXACT_CASES} 组互异、已验证的数据才会接入 token 精确判题。原文",
+        "样例会保留，但不会因数量不足而被当作正式判题数据。交互、多解输出和无样例题",
+        "同样保留为待补完整数据。", "",
         "| 状态 | 数量 |", "| --- | ---: |",
     ]
     for status, count in sorted((name, sum(value == name for value in data_status.values()))
@@ -167,7 +169,7 @@ def report(source, imported, excluded, data_status):
         "| 题目 | 状态 | 官方链接 |", "| --- | --- | --- |",
     ])
     for problem_id, status in sorted(data_status.items(), key=lambda pair: (int(re.match(r"\d+", pair[0]).group()), pair[0])):
-        if status == "sample_tests":
+        if status == "exact_tests":
             continue
         lines.append(f"| {problem_id} | {status} | {imported[problem_id]['url']} |")
     lines.extend([
@@ -228,9 +230,15 @@ def main():
                     output_path.write_text(sample["output"] + "\n", encoding="utf-8")
                     cases.append({"input": str(input_path.relative_to(MIRROR)),
                                   "output": str(output_path.relative_to(MIRROR))})
-                record.update({"tests": True, "test_count": len(cases), "test_cases": cases,
-                               "data_status": "sample_tests"})
-                data_status[problem_id] = "sample_tests"
+                if len(cases) >= MIN_EXACT_CASES:
+                    record.update({"tests": True, "test_count": len(cases), "test_cases": cases,
+                                   "sample_count": len(cases), "data_status": "exact_tests"})
+                    data_status[problem_id] = "exact_tests"
+                else:
+                    record.update({"tests": False, "test_count": 0, "test_cases": [],
+                                   "sample_count": len(cases),
+                                   "data_status": "insufficient_sample_cases"})
+                    data_status[problem_id] = "insufficient_sample_cases"
             else:
                 data_status[problem_id] = "no_extractable_sample"
                 record["data_status"] = "no_extractable_sample"
