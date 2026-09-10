@@ -242,6 +242,56 @@ def case_545d(r):
         if elapsed <= value: count += 1; elapsed += value
     return str(len(times)) + "\n" + " ".join(map(str, times)) + "\n", f"{count}\n"
 
+def case_1154a(r):
+    values = [r.randint(1, 100) for _ in range(3)]
+    values.append(sum(values))
+    r.shuffle(values)
+    maximum = max(values)
+    answer = sorted(maximum - value for value in values if value != maximum)
+    return " ".join(map(str, values)) + "\n", " ".join(map(str, answer)) + "\n"
+
+def case_1221a(r):
+    values = [2 ** r.randint(0, 12) for _ in range(r.randint(1, 30))]
+    answer = "YES" if sum(value for value in values if value <= 2048) >= 2048 else "NO"
+    return "1\n" + str(len(values)) + "\n" + " ".join(map(str, values)) + "\n", answer + "\n"
+
+def case_1327a(r):
+    n, k = r.randint(1, 10**4), r.randint(1, 100)
+    answer = n >= k * k and (n - k * k) % 2 == 0
+    return f"1\n{n} {k}\n", ("YES" if answer else "NO") + "\n"
+
+def case_1328a(r):
+    n, k = r.randint(1, 10**6), r.randint(1, 10**6)
+    answer = (-n) % k
+    return f"1\n{n} {k}\n", f"{answer}\n"
+
+def case_1335a(r):
+    candies = r.randint(1, 10**9)
+    return f"1\n{candies}\n", f"{max(0, (candies - 1) // 2)}\n"
+
+def case_1352c(r):
+    n, k = r.randint(2, 1000), r.randint(1, 10**6)
+    return f"1\n{n} {k}\n", f"{k + (k - 1) // (n - 1)}\n"
+
+def case_1374b(r):
+    value = r.randint(1, 10**9)
+    original, twos, threes = value, 0, 0
+    while value % 2 == 0: value //= 2; twos += 1
+    while value % 3 == 0: value //= 3; threes += 1
+    answer = threes if value == 1 and threes >= twos else -1
+    return f"1\n{original}\n", f"{answer}\n"
+
+def case_1475a(r):
+    value = r.randint(1, 10**9)
+    reduced = value
+    while reduced % 2 == 0: reduced //= 2
+    return f"1\n{value}\n", ("YES" if reduced > 1 else "NO") + "\n"
+
+def case_1742a(r):
+    values = [r.randint(1, 100) for _ in range(3)]
+    answer = any(values[index] == values[(index + 1) % 3] + values[(index + 2) % 3] for index in range(3))
+    return "1\n" + " ".join(map(str, values)) + "\n", ("YES" if answer else "NO") + "\n"
+
 
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
@@ -349,6 +399,9 @@ BUILDERS = {
     "615A": case_615a, "698A": case_698a, "705A": case_705a, "706B": case_706b,
     "723A": case_723a, "903C": case_903c,
     "200B": case_200b, "474A": case_474a, "545D": case_545d,
+    "1154A": case_1154a, "1221A": case_1221a, "1327A": case_1327a, "1328A": case_1328a,
+    "1335A": case_1335a, "1352C": case_1352c, "1374B": case_1374b, "1475A": case_1475a,
+    "1742A": case_1742a,
 }
 
 
