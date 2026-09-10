@@ -105,6 +105,125 @@ def case_230a(r):
     return f"{strength} {n}\n" + "".join(f"{need} {reward}\n" for need, reward in dragons), "NO\n"
 
 
+def case_34b(r):
+    n, m = r.randint(1, 50), r.randint(1, 50)
+    prices = [r.randint(-100, 100) for _ in range(n)]
+    gain = -sum(value for value in sorted(prices)[:m] if value < 0)
+    return f"{n} {m}\n{' '.join(map(str, prices))}\n", f"{gain}\n"
+
+
+def case_339b(r):
+    n, m = r.randint(1, 1000), r.randint(1, 100)
+    houses = [r.randint(1, n) for _ in range(m)]
+    current, distance = 1, 0
+    for house in houses:
+        distance += house - current if house >= current else n - current + house
+        current = house
+    return f"{n} {m}\n{' '.join(map(str, houses))}\n", f"{distance}\n"
+
+
+def case_427a(r):
+    events = [r.randint(-5, 5) for _ in range(r.randint(1, 100))]
+    officers = missing = 0
+    for event in events:
+        if event > 0: officers += event
+        elif officers: officers -= 1
+        else: missing += 1
+    return str(len(events)) + "\n" + " ".join(map(str, events)) + "\n", f"{missing}\n"
+
+
+def case_455a(r):
+    values = [r.randint(1, 100) for _ in range(r.randint(1, 100))]
+    counts = [0] * 102
+    for value in values: counts[value] += value
+    previous, current = 0, 0
+    for value in counts:
+        previous, current = current, max(current, previous + value)
+    return str(len(values)) + "\n" + " ".join(map(str, values)) + "\n", f"{current}\n"
+
+
+def case_456a(r):
+    rows = [(r.randint(1, 1000), r.randint(1, 1000)) for _ in range(r.randint(2, 50))]
+    ordered, answer = sorted(rows), "Poor Alex"
+    for left, right in zip(ordered, ordered[1:]):
+        if left[0] < right[0] and left[1] > right[1]: answer = "Happy Alex"; break
+    return str(len(rows)) + "\n" + "".join(f"{price} {quality}\n" for price, quality in rows), answer + "\n"
+
+
+def case_460a_fixed(r):
+    initial, every = r.randint(1, 100), r.randint(2, 20)
+    socks, day = initial, 0
+    while socks:
+        day += 1; socks -= 1
+        if day % every == 0: socks += 1
+    return f"{initial} {every}\n", f"{day}\n"
+
+
+def case_466a(r):
+    rides, pack, single, pack_price = r.randint(1, 1000), r.randint(1, 1000), r.randint(1, 1000), r.randint(1, 1000)
+    answer = min(rides * single, (rides // pack) * pack_price + (rides % pack) * single,
+                 ((rides + pack - 1) // pack) * pack_price)
+    return f"{rides} {pack} {single} {pack_price}\n", f"{answer}\n"
+
+
+def case_579a(r):
+    value = r.randint(1, 10**9)
+    return f"{value}\n", f"{bin(value).count('1')}\n"
+
+
+def case_580a(r):
+    values = [r.randint(1, 1000) for _ in range(r.randint(1, 200))]
+    best = run = 1
+    for left, right in zip(values, values[1:]):
+        run = run + 1 if right >= left else 1; best = max(best, run)
+    return str(len(values)) + "\n" + " ".join(map(str, values)) + "\n", f"{best}\n"
+
+
+def case_615a(r):
+    bulbs, buttons = r.randint(1, 100), r.randint(1, 30)
+    groups = []
+    for _ in range(buttons):
+        chosen = sorted(r.sample(range(1, bulbs + 1), r.randint(0, bulbs)))
+        groups.append(chosen)
+    lit = set().union(*map(set, groups)) if groups else set()
+    text = f"{bulbs} {buttons}\n" + "".join(str(len(group)) + (" " + " ".join(map(str, group)) if group else "") + "\n" for group in groups)
+    return text, ("YES" if len(lit) == bulbs else "NO") + "\n"
+
+
+def case_698a(r):
+    days = [r.randint(0, 3) for _ in range(r.randint(1, 100))]
+    rest, contest, gym = 0, 10**9, 10**9
+    for value in days:
+        rest, contest, gym = min(rest, contest, gym), min(rest, gym) + 1 if value & 1 else 10**9, min(rest, contest) + 1 if value & 2 else 10**9
+    return str(len(days)) + "\n" + " ".join(map(str, days)) + "\n", f"{min(rest, contest, gym)}\n"
+
+
+def case_705a(r):
+    count = r.randint(1, 100)
+    pieces = ["I hate" if index % 2 == 0 else "I love" for index in range(count)]
+    return f"{count}\n", " that ".join(pieces) + " it\n"
+
+
+def case_706b(r):
+    prices = [r.randint(1, 1000) for _ in range(r.randint(1, 100))]
+    queries = [r.randint(1, 1200) for _ in range(r.randint(1, 100))]
+    ordered = sorted(prices)
+    import bisect
+    answer = [str(bisect.bisect_right(ordered, query)) for query in queries]
+    return str(len(prices)) + "\n" + " ".join(map(str, prices)) + "\n" + str(len(queries)) + "\n" + "\n".join(map(str, queries)) + "\n", "\n".join(answer) + "\n"
+
+
+def case_723a(r):
+    values = [r.randint(1, 100) for _ in range(3)]
+    ordered = sorted(values)
+    return " ".join(map(str, values)) + "\n", f"{ordered[2] - ordered[0]}\n"
+
+
+def case_903c(r):
+    text = "".join(r.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(r.randint(1, 100)))
+    return str(len(text)) + "\n" + text + "\n", f"{max(text.count(char) for char in set(text))}\n"
+
+
 def case_50a(r):
     m, n = r.randint(1, 16), r.randint(1, 16)
     return f"{m} {n}\n", f"{m * n // 2}\n"
@@ -205,6 +324,11 @@ BUILDERS = {
     "266A": case_266a, "270A": case_270a, "281A": case_281a, "282A": case_282a,
     "339A": case_339a, "479A": case_479a, "996A": case_996a_fixed, "158A": case_158a,
     "160A": case_160a, "230A": case_230a,
+    "34B": case_34b, "339B": case_339b, "427A": case_427a, "455A": case_455a,
+    "456A": case_456a, "460A": case_460a_fixed, "466A": case_466a, "579A": case_579a,
+    "580A": case_580a,
+    "615A": case_615a, "698A": case_698a, "705A": case_705a, "706B": case_706b,
+    "723A": case_723a, "903C": case_903c,
 }
 
 

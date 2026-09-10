@@ -12,11 +12,11 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 
 | 状态 | 数量 |
 | --- | ---: |
-| generated_tests | 25 |
+| generated_tests | 40 |
 | interactive_requires_judge | 5 |
 | multiple_output_requires_special_judge | 18 |
 | no_extractable_sample | 21 |
-| sample_tests | 88 |
+| sample_tests | 73 |
 
 ## 未接入精确判题数据
 
@@ -25,6 +25,7 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 1A | generated_tests | https://codeforces.com/problemset/problem/1/A |
 | 20C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/20/C |
 | 25A | generated_tests | https://codeforces.com/problemset/problem/25/A |
+| 34B | generated_tests | https://codeforces.com/problemset/problem/34/B |
 | 37C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/37/C |
 | 50A | generated_tests | https://codeforces.com/problemset/problem/50/A |
 | 58A | generated_tests | https://codeforces.com/problemset/problem/58/A |
@@ -48,10 +49,24 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 282A | generated_tests | https://codeforces.com/problemset/problem/282/A |
 | 313B | no_extractable_sample | https://codeforces.com/problemset/problem/313/B |
 | 339A | generated_tests | https://codeforces.com/problemset/problem/339/A |
+| 339B | generated_tests | https://codeforces.com/problemset/problem/339/B |
 | 363B | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/363/B |
+| 427A | generated_tests | https://codeforces.com/problemset/problem/427/A |
+| 455A | generated_tests | https://codeforces.com/problemset/problem/455/A |
+| 456A | generated_tests | https://codeforces.com/problemset/problem/456/A |
+| 460A | generated_tests | https://codeforces.com/problemset/problem/460/A |
+| 466A | generated_tests | https://codeforces.com/problemset/problem/466/A |
 | 479A | generated_tests | https://codeforces.com/problemset/problem/479/A |
 | 550C | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/550/C |
+| 579A | generated_tests | https://codeforces.com/problemset/problem/579/A |
+| 580A | generated_tests | https://codeforces.com/problemset/problem/580/A |
 | 584A | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/584/A |
+| 615A | generated_tests | https://codeforces.com/problemset/problem/615/A |
+| 698A | generated_tests | https://codeforces.com/problemset/problem/698/A |
+| 705A | generated_tests | https://codeforces.com/problemset/problem/705/A |
+| 706B | generated_tests | https://codeforces.com/problemset/problem/706/B |
+| 723A | generated_tests | https://codeforces.com/problemset/problem/723/A |
+| 903C | generated_tests | https://codeforces.com/problemset/problem/903/C |
 | 996A | generated_tests | https://codeforces.com/problemset/problem/996/A |
 | 1352A | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1352/A |
 | 1366D | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/1366/D |
