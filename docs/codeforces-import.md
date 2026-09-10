@@ -12,11 +12,11 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 
 | 状态 | 数量 |
 | --- | ---: |
-| generated_tests | 111 |
+| generated_tests | 112 |
 | interactive_requires_judge | 5 |
 | multiple_output_requires_special_judge | 9 |
 | no_extractable_sample | 19 |
-| sample_tests | 13 |
+| sample_tests | 12 |
 
 ## 未接入精确判题数据
 
@@ -137,6 +137,7 @@ token 精确判题；无可提取样例的普通题也保留为待补完整数�
 | 2140B | generated_tests | https://codeforces.com/problemset/problem/2140/B |
 | 2146D1 | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2146/D1 |
 | 2167F | no_extractable_sample | https://codeforces.com/problemset/problem/2167/F |
+| 2171D | generated_tests | https://codeforces.com/problemset/problem/2171/D |
 | 2171E | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2171/E |
 | 2171F | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2171/F |
 | 2173E | interactive_requires_judge | https://codeforces.com/problemset/problem/2173/E |

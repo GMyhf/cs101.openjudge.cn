@@ -975,6 +975,22 @@ def case_1843d(r):
     return f"1\n{nodes}\n"+"".join(f"{a+1} {b+1}\n" for a,b in edges)+str(len(queries))+"\n"+"".join(f"{a+1} {b+1}\n" for a,b in queries),"\n".join(str(leaves[a]*leaves[b]) for a,b in queries)+"\n"
 
 
+def case_2171d(r):
+    from itertools import product
+    n=r.randint(2,6); permutation=list(range(1,n+1));r.shuffle(permutation); position={value:index for index,value in enumerate(permutation)}
+    def edges(code):
+        degree=[1]*n
+        for value in code:degree[value]+=1
+        result=[]
+        for value in code:
+            leaf=next(i for i,d in enumerate(degree) if d==1);result.append((leaf,value));degree[leaf]-=1;degree[value]-=1
+        tail=[i for i,d in enumerate(degree) if d==1];result.append(tuple(tail));return result
+    answer=False
+    for code in product(range(n),repeat=n-2):
+        if all(position[min(a,b)+1]<position[max(a,b)+1] for a,b in edges(code)):answer=True;break
+    return f"1\n{n}\n{' '.join(map(str,permutation))}\n",("YES" if answer else "NO")+"\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -1020,6 +1036,7 @@ BUILDERS = {
     "1729C": case_1729c,
     "1833B": case_1833b,
     "1843D": case_1843d,
+    "2171D": case_2171d,
 }
 
 
