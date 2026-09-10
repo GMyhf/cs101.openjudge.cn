@@ -195,7 +195,7 @@ def case_698a(r):
     rest, contest, gym = 0, 10**9, 10**9
     for value in days:
         rest, contest, gym = min(rest, contest, gym), min(rest, gym) + 1 if value & 1 else 10**9, min(rest, contest) + 1 if value & 2 else 10**9
-    return str(len(days)) + "\n" + " ".join(map(str, days)) + "\n", f"{min(rest, contest, gym)}\n"
+    return str(len(days)) + "\n" + " ".join(map(str, days)) + "\n", f"{len(days) - min(rest, contest, gym)}\n"
 
 
 def case_705a(r):
@@ -220,8 +220,11 @@ def case_723a(r):
 
 
 def case_903c(r):
-    text = "".join(r.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(r.randint(1, 100)))
-    return str(len(text)) + "\n" + text + "\n", f"{max(text.count(char) for char in set(text))}\n"
+    values = [r.randint(1, 100) for _ in range(r.randint(1, 100))]
+    counts = {}
+    for value in values:
+        counts[value] = counts.get(value, 0) + 1
+    return str(len(values)) + "\n" + " ".join(map(str, values)) + "\n", f"{max(counts.values())}\n"
 
 def case_200b(r):
     values = [r.randint(0, 100) for _ in range(r.randint(1, 100))]
@@ -386,13 +389,15 @@ def case_1364a(r):
     return f"1\n{len(values)} {x}\n{' '.join(map(str,values))}\n", f"{answer}\n"
 
 def case_1374c(r):
-    text = "".join(r.choice("()") for _ in range(r.randint(1, 200)))
+    pairs = r.randint(1, 100)
+    text = "(" * pairs + ")" * pairs
+    text = "".join(r.sample(text, len(text)))
     opened = removed = 0
     for char in text:
         if char == '(': opened += 1
         elif opened: opened -= 1
         else: removed += 1
-    return f"1\n{text}\n", f"{removed + opened}\n"
+    return f"1\n{len(text)}\n{text}\n", f"{removed + opened}\n"
 
 def case_1398c(r):
     text = "".join(str(r.randint(0, 9)) for _ in range(r.randint(1, 200)))
@@ -1183,7 +1188,7 @@ def main():
         row = rows[("codeforces", problem)]
         row.update({"tests": True, "test_count": len(cases), "test_cases": cases,
                     "data_status": "generated_tests", "sample_count": row.get("sample_count", 0)})
-        if problem in {"20B", "492B"}:
+        if problem in {"20B", "200B", "492B"}:
             row["comparison"] = "float_tokens"
         if problem == "2140B":
             row["special_checker"] = "concat_divisible"

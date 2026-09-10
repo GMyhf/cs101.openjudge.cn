@@ -215,8 +215,8 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertFalse(judge_module.outputs_match("one\n", "1.0\n", "float_tokens"))
 
     def test_concat_divisible_special_checker(self):
-        self.assertTrue(judge_module.special_output_matches("concat_divisible", b"1\n", "8\n"))
-        self.assertFalse(judge_module.special_output_matches("concat_divisible", b"1\n", "1\n"))
+        self.assertTrue(judge_module.special_output_matches("concat_divisible", b"1\n1\n", "8\n"))
+        self.assertFalse(judge_module.special_output_matches("concat_divisible", b"1\n1\n", "1\n"))
 
     def test_divisible_by_eight_subsequence_checker(self):
         self.assertTrue(judge_module.special_output_matches("divisible_by_8_subsequence", b"1232\n", "YES\n32\n"))
@@ -225,6 +225,8 @@ class ProblemLookupCacheTests(unittest.TestCase):
     def test_n_digit_divisible_special_checker(self):
         self.assertTrue(judge_module.special_output_matches("n_digit_divisible", b"3 7\n", "105\n"))
         self.assertFalse(judge_module.special_output_matches("n_digit_divisible", b"3 7\n", "98\n"))
+        self.assertFalse(judge_module.special_output_matches("n_digit_divisible", b"4 6\n", "0006\n"))
+        self.assertTrue(judge_module.special_output_matches("n_digit_divisible", b"1 10\n", "-1\n"))
 
     def test_round_number_decomposition_checker(self):
         self.assertTrue(judge_module.special_output_matches("round_number_decomposition", b"1\n5009\n", "2\n9 5000\n"))
@@ -233,6 +235,7 @@ class ProblemLookupCacheTests(unittest.TestCase):
     def test_coprime_divisor_pair_checker(self):
         self.assertTrue(judge_module.special_output_matches("coprime_divisor_pairs", b"2\n12 8\n", "2 -1\n3 -1\n"))
         self.assertFalse(judge_module.special_output_matches("coprime_divisor_pairs", b"1\n12\n", "2\n6\n"))
+        self.assertFalse(judge_module.special_output_matches("coprime_divisor_pairs", b"1\n30\n", "2\n3\n"))
 
     def test_shortest_path_checker(self):
         data = b"3 3\n1 2 1\n2 3 1\n1 3 5\n"
@@ -242,6 +245,7 @@ class ProblemLookupCacheTests(unittest.TestCase):
     def test_tile_jump_path_checker(self):
         self.assertTrue(judge_module.special_output_matches("tile_jump_path", b"1\nabc\n", "2 3\n1 2 3\n"))
         self.assertFalse(judge_module.special_output_matches("tile_jump_path", b"1\nabc\n", "2 2\n1 2\n"))
+        self.assertFalse(judge_module.special_output_matches("tile_jump_path", b"1\nabcc\n", "2 2\n1 4\n"))
 
     def test_weather_permutation_checker(self):
         data = b"1\n3 2\n1 3 5\n2 5 4\n"

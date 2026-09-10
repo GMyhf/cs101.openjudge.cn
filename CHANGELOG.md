@@ -2,6 +2,16 @@
 
 ## 2026-09-10
 
+### Codeforces 判题复核止血与 checker 修复
+
+- 将复核确认会误判的 `698A`、`903C`、`1374C`、`2140B` 从判题队列撤出：catalog 记录为
+  `withheld_pending_rework`、不再引用测试用例，原数据保留作离线返工参考。四题真实
+  `judge()` 均返回 `No Test Data`；恢复前必须补齐逐题参考解、独立 oracle 与至少 20 组验证。
+- 修复 `2140B` checker 将首行测试数误读为 `x`，以及 `584A` 前导零/无解、`1366D` 互素条件、
+  `1729C` 最大跳数四处判题契约；`200B` 补上题面要求的 `float_tokens` 比较模式。
+- 生成数据审计跳过没有 OpenJudge 全局题号的外部来源；全库横扫识别字母题号目录并按 catalog
+  的浮点比较契约过滤，不再遗漏 Codeforces 数据或误报允许误差的题目。
+
 ### Codeforces 导入题补充官方样例测试数据
 
 - 从 `2020fall_Codeforces_problems.md` 自动提取 113 道普通 Codeforces 题的 193 组明确

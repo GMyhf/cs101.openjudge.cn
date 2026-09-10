@@ -46,6 +46,10 @@ class GMyhfDataArtifactTests(unittest.TestCase):
         self.assertEqual({18159, 27631, 27699, 28050, 28190, 28203, 30172,
                           30179, 30550, 30720, 30908, 30921, 30937}, problems)
         for item in self.catalog:
+            # This audit is about OpenJudge global-number materialization.
+            # Imported sources deliberately have no compatible global number.
+            if item.get("source", "openjudge") != "openjudge":
+                continue
             number = int(item["global_number"])
             paths = [case["input"] for case in item.get("test_cases", [])]
             if number in materialized:

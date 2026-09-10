@@ -322,6 +322,16 @@ class ActiveDataCoverageTests(unittest.TestCase):
         # `made_dirs()` 仍然只认 `_made` —— 第 9 条要拿它跟报告里的数字对账
         self.assertTrue(str(made[27150]).endswith("27150_made"))
 
+    def test_made_dirs_includes_alphanumeric_external_problem_ids(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            tests = Path(folder) / "data" / "openjudge" / "tests"
+            (tests / "codeforces" / "1A_made").mkdir(parents=True)
+            (tests / "codeforces" / "1B_made").mkdir(parents=True)
+            with mock.patch.object(full_sweep, "TESTS", tests):
+                made = dict(full_sweep.made_dirs())
+        self.assertEqual({"1A", "1B"}, set(made))
+
     def test_output_size_check_reads_the_active_copy(self):
         """2MB 上限判据必须看活数据：超限的 `.out` 放在 `_GMyhf` 里也要红。"""
         import tempfile

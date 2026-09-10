@@ -428,20 +428,20 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
                          {"2109C1", "2109C2", "2109C3", "2173E", "2209C"})
 
         generated = [item for item in entries if item.get("data_status") == "generated_tests"]
-        self.assertEqual(len(generated), 124)
+        self.assertEqual(len(generated), 120)
         self.assertTrue({"1A", "25A", "50A", "58A", "69A", "71A", "96A", "112A", "118A",
                          "122A", "131A", "151A", "158A", "160A", "230A"}.issubset(
                              {item["id"] for item in generated}))
         self.assertTrue({"34B", "339B", "427A", "455A", "456A", "460A", "466A", "579A", "580A"}.issubset(
                              {item["id"] for item in generated}))
-        self.assertTrue({"615A", "698A", "705A", "706B", "723A", "903C"}.issubset(
+        self.assertTrue({"615A", "705A", "706B", "723A"}.issubset(
                              {item["id"] for item in generated}))
         self.assertTrue({"200B", "474A", "545D"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"1154A", "1221A", "1327A", "1328A", "1335A", "1352C", "1374B", "1475A", "1742A"}.issubset(
                              {item["id"] for item in generated}))
         self.assertTrue({"158B", "189A", "368B", "431C", "433B", "466C"}.issubset(
                              {item["id"] for item in generated}))
-        self.assertTrue({"230B", "474D", "489B", "1364A", "1374C", "1398C", "1520D"}.issubset(
+        self.assertTrue({"230B", "474D", "489B", "1364A", "1398C", "1520D"}.issubset(
                              {item["id"] for item in generated}))
         self.assertTrue({"1195C", "1829D", "1829E", "1850H", "1881C"}.issubset(
                              {item["id"] for item in generated}))
@@ -455,10 +455,12 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertTrue({"1875D", "1985H1", "2193D"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"803A", "2184F"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"20B", "492B"}.issubset({item["id"] for item in generated}))
+        self.assertEqual({"20B", "200B", "492B"},
+                         {item["id"] for item in generated
+                          if item.get("comparison") == "float_tokens"})
         self.assertTrue({"2131C", "2193E", "2209E"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"2200G"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"313B", "1749C"}.issubset({item["id"] for item in generated}))
-        self.assertTrue({"2140B"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"363B"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"550C"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"584A"}.issubset({item["id"] for item in generated}))
@@ -495,6 +497,19 @@ print((n + a - 1) // a * ((m + a - 1) // a))
 print(n // a * (m // a))
 """)
         self.assertEqual(mutant["status"], "Wrong Answer", mutant)
+
+    def test_codeforces_withheld_problems_stay_out_of_the_judge(self):
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        entries = {item["id"]: item for item in catalog["problems"]
+                   if item.get("source") == "codeforces"}
+        for problem_id in {"698A", "903C", "1374C", "2140B"}:
+            item = entries[problem_id]
+            self.assertFalse(item["tests"])
+            self.assertEqual(0, item["test_count"])
+            self.assertEqual([], item["test_cases"])
+            self.assertEqual("withheld_pending_rework", item["data_status"])
+            self.assertEqual("No Test Data",
+                             judge("codeforces", problem_id, "python", "print(0)\n")["status"])
 
     def test_practice_02977_is_mirrored_by_global_number(self):
         status, _, body = request(self.port, "GET", "/practice/02977/")

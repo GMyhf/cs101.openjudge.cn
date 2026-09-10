@@ -1,5 +1,18 @@
 # HANDOFF · 交接日志
 
+### 2026-09-10 · Codex · T-038 Codeforces 导入批复核止血
+
+- **止血**：`698A`、`903C`、`1374C`、`2140B` 的构造数据分别存在错误答案、错误题目、
+  非法输入、checker 误读输入；已设为 `withheld_pending_rework`，清空 catalog 判题引用而
+  不删除离线数据。真实 `judge()` 对四题均返回 `No Test Data`，回归禁止重新接入。
+- **判题与闸门**：修复外部 Codeforces 记录没有 `global_number` 导致 GMyhf 审计崩溃；修复
+  2140B/584A/1366D/1729C checker 的已证实漏判，并让 full-sweep 识别字母题号目录和 catalog
+  声明的 `float_tokens`。`200B` 补齐浮点比较契约。
+- **验证**：`tests.test_audit_gmyhf_data`、`tests.test_judge`、`tests.test_full_sweep` 与
+  Codeforces catalog/server 回归通过；`tools/full_sweep.py` 为 1110 份在判数据、862 条报告记录，
+  无残留。后续返工不得用中央批量生成器直接恢复，须采用单题 samplecode/producecase、独立
+  oracle、固定种子、至少 20 个不同用例与变异 WA 验证。
+
 ### 2026-09-09 · Codex · T-037 修复富文本题面的 Markdown 复制
 
 - **根因**：31183 的内嵌 gzip 脚本将 `.problem-content` 替换为 `.markdown-body`；旧复制器

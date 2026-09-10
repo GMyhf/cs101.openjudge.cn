@@ -494,7 +494,13 @@ def special_output_matches(kind, input_data, actual):
             if length != len(path) or not path or path[0] != 1 or path[-1] != len(text): return False
             chars = [ord(text[index - 1]) for index in path]
             increasing = ord(text[0]) <= ord(text[-1])
-            return cost == abs(ord(text[0]) - ord(text[-1])) and all(min(ord(text[0]), ord(text[-1])) <= char <= max(ord(text[0]), ord(text[-1])) for char in chars) and all((a <= b if increasing else a >= b) for a,b in zip(chars,chars[1:])) and sum(abs(a-b) for a,b in zip(chars,chars[1:])) == cost
+            lo, hi = min(ord(text[0]), ord(text[-1])), max(ord(text[0]), ord(text[-1]))
+            maximum_length = sum(lo <= ord(char) <= hi for char in text)
+            return (len(set(path)) == len(path) and length == maximum_length
+                    and cost == abs(ord(text[0]) - ord(text[-1]))
+                    and all(lo <= char <= hi for char in chars)
+                    and all((a <= b if increasing else a >= b) for a,b in zip(chars,chars[1:]))
+                    and sum(abs(a-b) for a,b in zip(chars,chars[1:])) == cost)
         except (UnicodeDecodeError, ValueError, IndexError):
             return False
     if kind == "shortest_path":
@@ -540,7 +546,8 @@ def special_output_matches(kind, input_data, actual):
                         distinct += 1
                     if distinct > 1:
                         return False
-                elif left <= 1 or right <= 1 or math.gcd(left, right) != 1 or value % (left * right):
+                elif (left <= 1 or right <= 1 or value % left or value % right
+                      or math.gcd(left + right, value) != 1):
                     return False
             return True
         except (UnicodeDecodeError, ValueError):
@@ -560,8 +567,9 @@ def special_output_matches(kind, input_data, actual):
             n, divisor = map(int, input_data.decode().split()[:2])
             tokens = actual.split()
             if tokens == ["-1"]:
-                return False
-            return len(tokens) == 1 and tokens[0].isdigit() and len(tokens[0]) == n and int(tokens[0]) % divisor == 0
+                return n == 1 and divisor == 10
+            return (len(tokens) == 1 and tokens[0].isdigit() and tokens[0][0] != "0"
+                    and len(tokens[0]) == n and int(tokens[0]) % divisor == 0)
         except (UnicodeDecodeError, ValueError):
             return False
     if kind == "divisible_by_8_subsequence":
@@ -577,7 +585,7 @@ def special_output_matches(kind, input_data, actual):
     if kind != "concat_divisible":
         return False
     try:
-        x = int(input_data.decode().split()[0])
+        x = int(input_data.decode().split()[1])
         tokens = actual.split()
         if len(tokens) != 1:
             return False

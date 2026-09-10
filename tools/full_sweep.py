@@ -112,9 +112,13 @@ def report_entries():
 def made_dirs():
     """自产数据目录。**报告类判据用这个** —— 报告写的就是 `_made` 里的数字。"""
     for path in sorted(TESTS.glob("*/*_made")):
-        match = re.search(r"/0*(\d+)_made$", str(path))
+        match = re.search(r"/((?:0*\d+)(?:[A-Za-z]\d*)?)_made$", str(path))
         if match:
-            yield int(match.group(1)), path
+            identifier = match.group(1)
+            # Reports identify OpenJudge problems with integers. Keep external
+            # alphanumeric IDs intact so their directories are not skipped or
+            # conflated (for example, 1A and 1B).
+            yield (int(identifier) if identifier.isdigit() else identifier), path
 
 
 def active_dirs():
@@ -490,8 +494,31 @@ def check_repeating_decimals():
     像 1/6 = 0.166666667 这种值会误杀 —— 另一个同样正确、只是累加顺序不同的实现
     可能给出 0.166666666。数据这头躲开就没这问题。
     """
+    # A catalog opt-in to float_tokens is the established exception to exact
+    # token comparison. Derive it from the active contract rather than keeping
+    # a second hand-maintained problem-number exemption list.
+    float_directories = set()
+    catalog_path = ROOT / "data" / "openjudge" / "catalog.json"
+    try:
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        catalog = {"problems": []}
+    for problem in catalog.get("problems", []):
+        if problem.get("comparison") != "float_tokens":
+            continue
+        for case in problem.get("test_cases") or []:
+            parts = str(case.get("input", "")).split("/")
+            if len(parts) >= 3:
+                float_directories.add((parts[1], parts[2]))
+
     bad = []
     for number, made in made_dirs():
+        try:
+            directory_key = tuple(made.relative_to(TESTS).parts[:2])
+        except ValueError:
+            directory_key = ()
+        if directory_key in float_directories:
+            continue
         outs = sorted((made / "data").glob("*.out"))
         repeating = 0
         total = 0
