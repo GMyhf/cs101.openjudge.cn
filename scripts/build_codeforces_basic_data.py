@@ -1005,6 +1005,22 @@ def case_2171e(r):
     return "2\n" + "\n".join(map(str, sizes)) + "\n", "\n".join(" ".join(map(str, witness(n))) for n in sizes) + "\n"
 
 
+def case_1868a(r):
+    from itertools import product, permutations
+    def mex(values):
+        value = 0
+        while value in values: value += 1
+        return value
+    def solve(n, m):
+        best, witness = -1, None
+        for rows in product(list(permutations(range(m))), repeat=n):
+            beauty = mex([mex([rows[i][j] for i in range(n)]) for j in range(m)])
+            if beauty > best: best, witness = beauty, rows
+        return str(best) + "\n" + "\n".join(" ".join(map(str, row)) for row in witness) + "\n"
+    sizes = [(r.randint(1, 3), r.randint(1, 3)), (r.randint(1, 3), r.randint(1, 3))]
+    return "2\n" + "".join(f"{n} {m}\n" for n,m in sizes), "".join(solve(n,m) for n,m in sizes)
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -1052,6 +1068,7 @@ BUILDERS = {
     "1843D": case_1843d,
     "2171D": case_2171d,
     "2171E": case_2171e,
+    "1868A": case_1868a,
 }
 
 
@@ -1099,6 +1116,8 @@ def main():
             row["special_checker"] = "weather_permutation"
         if problem == "2171E":
             row["special_checker"] = "good_permutation"
+        if problem == "1868A":
+            row["special_checker"] = "matrix_beauty"
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"generated {len(BUILDERS)} problems x 21 cases")
 

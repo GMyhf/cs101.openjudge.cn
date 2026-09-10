@@ -362,6 +362,28 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "matrix_beauty":
+        try:
+            from itertools import product, permutations
+            tokens = list(map(int, input_data.decode().split()))
+            output = list(map(int, actual.split()))
+            def mex(values):
+                value = 0
+                while value in values: value += 1
+                return value
+            cursor = 0
+            for index in range(tokens[0]):
+                n, m = tokens[1 + index * 2:3 + index * 2]
+                if cursor + 1 + n * m > len(output): return False
+                beauty, flat = output[cursor], output[cursor+1:cursor+1+n*m]; cursor += 1+n*m
+                rows = [flat[row*m:(row+1)*m] for row in range(n)]
+                if any(sorted(row) != list(range(m)) for row in rows): return False
+                actual_beauty = mex([mex([rows[row][col] for row in range(n)]) for col in range(m)])
+                best = max(mex([mex([candidate[row][col] for row in range(n)]) for col in range(m)]) for candidate in product(list(permutations(range(m))), repeat=n))
+                if beauty != actual_beauty or beauty != best: return False
+            return cursor == len(output)
+        except (UnicodeDecodeError, ValueError, IndexError):
+            return False
     if kind == "good_permutation":
         try:
             import math
