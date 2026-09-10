@@ -1021,6 +1021,13 @@ def case_1868a(r):
     return "2\n" + "".join(f"{n} {m}\n" for n,m in sizes), "".join(solve(n,m) for n,m in sizes)
 
 
+def case_2196a(r):
+    p, q = r.randint(1, 10**12), r.randint(1, 10**12)
+    delta = q - p
+    winner = "Bob" if delta > 0 and p >= 2 * delta and q >= 3 * delta else "Alice"
+    return f"1\n{p} {q}\n", winner + "\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -1069,6 +1076,7 @@ BUILDERS = {
     "2171D": case_2171d,
     "2171E": case_2171e,
     "1868A": case_1868a,
+    "2196A": case_2196a,
 }
 
 
