@@ -961,6 +961,20 @@ def case_1833b(r):
     return f"1\n{n} {limit}\n{' '.join(map(str,forecast))}\n{' '.join(map(str,actual))}\n", "\n"
 
 
+def case_1843d(r):
+    nodes=r.randint(2,100); edges=[]
+    for node in range(1,nodes):edges.append((r.randrange(node),node))
+    graph=[[] for _ in range(nodes)]
+    for a,b in edges:graph[a].append(b);graph[b].append(a)
+    leaves=[0]*nodes
+    def dfs(node,parent):
+        children=[nxt for nxt in graph[node] if nxt!=parent]
+        leaves[node]=1 if not children else sum(dfs(nxt,node) for nxt in children)
+        return leaves[node]
+    dfs(0,-1); queries=[(r.randrange(nodes),r.randrange(nodes)) for _ in range(r.randint(1,100))]
+    return f"1\n{nodes}\n"+"".join(f"{a+1} {b+1}\n" for a,b in edges)+str(len(queries))+"\n"+"".join(f"{a+1} {b+1}\n" for a,b in queries),"\n".join(str(leaves[a]*leaves[b]) for a,b in queries)+"\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -1005,6 +1019,7 @@ BUILDERS = {
     "20C": case_20c,
     "1729C": case_1729c,
     "1833B": case_1833b,
+    "1843D": case_1843d,
 }
 
 
