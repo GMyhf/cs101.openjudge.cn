@@ -239,6 +239,10 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertTrue(judge_module.special_output_matches("shortest_path", data, "1 2 3\n"))
         self.assertFalse(judge_module.special_output_matches("shortest_path", data, "1 3\n"))
 
+    def test_tile_jump_path_checker(self):
+        self.assertTrue(judge_module.special_output_matches("tile_jump_path", b"1\nabc\n", "2 3\n1 2 3\n"))
+        self.assertFalse(judge_module.special_output_matches("tile_jump_path", b"1\nabc\n", "2 2\n1 2\n"))
+
     def test_problem_exists_caches_until_catalog_changes(self):
         with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
             mirror = Path(temp)

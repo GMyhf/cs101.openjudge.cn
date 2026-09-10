@@ -362,6 +362,17 @@ def outputs_match(actual, expected, comparison="tokens"):
 
 
 def special_output_matches(kind, input_data, actual):
+    if kind == "tile_jump_path":
+        try:
+            text = input_data.decode().split()[1]
+            tokens = list(map(int, actual.split()))
+            cost, length = tokens[:2]; path = tokens[2:]
+            if length != len(path) or not path or path[0] != 1 or path[-1] != len(text): return False
+            chars = [ord(text[index - 1]) for index in path]
+            increasing = ord(text[0]) <= ord(text[-1])
+            return cost == abs(ord(text[0]) - ord(text[-1])) and all(min(ord(text[0]), ord(text[-1])) <= char <= max(ord(text[0]), ord(text[-1])) for char in chars) and all((a <= b if increasing else a >= b) for a,b in zip(chars,chars[1:])) and sum(abs(a-b) for a,b in zip(chars,chars[1:])) == cost
+        except (UnicodeDecodeError, ValueError, IndexError):
+            return False
     if kind == "shortest_path":
         try:
             import heapq

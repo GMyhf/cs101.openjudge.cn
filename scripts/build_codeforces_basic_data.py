@@ -945,6 +945,13 @@ def case_20c(r):
     return f"{nodes} {len(edges)}\n"+"".join(f"{a} {b} {w}\n" for a,b,w in edges),"\n"
 
 
+def case_1729c(r):
+    text="".join(r.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(r.randint(2,100)))
+    increasing=text[0]<=text[-1]; indices=[0]+[i for i in range(1,len(text)-1) if min(text[0],text[-1])<=text[i]<=max(text[0],text[-1])]+[len(text)-1]
+    indices=sorted(indices,key=lambda i:ord(text[i]),reverse=not increasing)
+    return f"1\n{text}\n",f"{abs(ord(text[0])-ord(text[-1]))} {len(indices)}\n"+" ".join(str(i+1) for i in indices)+"\n"
+
+
 BUILDERS = {
     "1A": case_1a, "25A": case_25a, "50A": case_50a, "58A": case_58a,
     "69A": case_69a, "71A": case_71a, "96A": case_96a, "112A": case_112a,
@@ -987,6 +994,7 @@ BUILDERS = {
     "1352A": case_1352a,
     "1366D": case_1366d,
     "20C": case_20c,
+    "1729C": case_1729c,
 }
 
 
@@ -1028,6 +1036,8 @@ def main():
             row["special_checker"] = "coprime_divisor_pairs"
         if problem == "20C":
             row["special_checker"] = "shortest_path"
+        if problem == "1729C":
+            row["special_checker"] = "tile_jump_path"
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"generated {len(BUILDERS)} problems x 21 cases")
 
