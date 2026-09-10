@@ -55,6 +55,16 @@ def request(port, method, path, body=None, cookie=None, extra_headers=None):
     return response.status, response_headers, raw
 
 
+# 复核撤下、等返工的 Codeforces 题：903C/2140B 是数据或 checker 造错（2026-09-10 Codex 止血），
+# 其余 17 道是判别力为零 —— 21 组期望输出完全相同，或整题只有 1 组样例数据，
+# 一个不读输入、只 print 常量的程序就能拿 Accepted。集合本身也是判据：谁加谁减都要动这里。
+WITHHELD_CODEFORCES = {
+    "903C", "2140B",
+    "270A", "456A", "1374B", "1475A", "1742A", "1829D", "2227B",
+    "986D", "1764C", "1883D", "1970E1", "2171G", "2192D", "2195E", "2205D", "2208C", "2228D",
+}
+
+
 class ServerApiTests(unittest.TestCase):
     def registration_payload(self, username, password):
         return self.registration_payload_for(self.port, username, password)
@@ -428,22 +438,22 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
                          {"2109C1", "2109C2", "2109C3", "2173E", "2209C"})
 
         generated = [item for item in entries if item.get("data_status") == "generated_tests"]
-        self.assertEqual(len(generated), 120)
+        self.assertEqual(len(generated), 113)
         self.assertTrue({"1A", "25A", "50A", "58A", "69A", "71A", "96A", "112A", "118A",
                          "122A", "131A", "151A", "158A", "160A", "230A"}.issubset(
                              {item["id"] for item in generated}))
-        self.assertTrue({"34B", "339B", "427A", "455A", "456A", "460A", "466A", "579A", "580A"}.issubset(
+        self.assertTrue({"34B", "339B", "427A", "455A", "460A", "466A", "579A", "580A"}.issubset(
                              {item["id"] for item in generated}))
         self.assertTrue({"615A", "705A", "706B", "723A"}.issubset(
                              {item["id"] for item in generated}))
         self.assertTrue({"200B", "474A", "545D"}.issubset({item["id"] for item in generated}))
-        self.assertTrue({"1154A", "1221A", "1327A", "1328A", "1335A", "1352C", "1374B", "1475A", "1742A"}.issubset(
+        self.assertTrue({"1154A", "1221A", "1327A", "1328A", "1335A", "1352C"}.issubset(
                              {item["id"] for item in generated}))
         self.assertTrue({"158B", "189A", "368B", "431C", "433B", "466C"}.issubset(
                              {item["id"] for item in generated}))
         self.assertTrue({"230B", "474D", "489B", "1364A", "1398C", "1520D"}.issubset(
                              {item["id"] for item in generated}))
-        self.assertTrue({"1195C", "1829D", "1829E", "1850H", "1881C"}.issubset(
+        self.assertTrue({"1195C", "1829E", "1850H", "1881C"}.issubset(
                              {item["id"] for item in generated}))
         self.assertTrue({"1425A", "1526C1", "1879B"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"1B", "460B", "545C", "580C", "893C"}.issubset(
@@ -479,15 +489,19 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertTrue({"2218E"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"2218C"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"2218D"}.issubset({item["id"] for item in generated}))
-        self.assertTrue({"2227B"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"2227A"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"2227C"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"2218F"}.issubset({item["id"] for item in generated}))
         self.assertTrue(all(item["test_count"] == 21 for item in generated))
         self.assertTrue(all(len({(ROOT / "data/openjudge" / case["input"]).read_bytes()
                                  for case in item["test_cases"]}) == 21 for item in generated))
+        rebuilt = [item for item in entries if item.get("data_status") == "rebuilt_tests"]
+        self.assertEqual({item["id"] for item in rebuilt}, {"698A", "1374C"})
+        self.assertTrue(all(item["test_count"] == 21 for item in rebuilt))
         self.assertEqual(sum(item["test_count"] for item in entries if item["id"] != "4A"),
-                         sum(item["test_count"] for item in sampled) + sum(item["test_count"] for item in generated))
+                         sum(item["test_count"] for item in sampled)
+                         + sum(item["test_count"] for item in generated)
+                         + sum(item["test_count"] for item in rebuilt))
 
         accepted = judge("codeforces", "1A", "python", """n, m, a = map(int, input().split())
 print((n + a - 1) // a * ((m + a - 1) // a))
@@ -498,11 +512,63 @@ print(n // a * (m // a))
 """)
         self.assertEqual(mutant["status"], "Wrong Answer", mutant)
 
+    def test_codeforces_rebuilt_problems_discriminate(self):
+        """698A / 1374C 走单题流水线重建后必须真判得动。
+
+        这两题此前是中央批量生成器造坏的：698A 的期望答案先是全 0、修补后又变成
+        恒等于 n；1374C 漏写题面要求的 n 行、答案还是正确值的两倍。所以这里钉的不是
+        「有 21 组数据」，而是**参考解过、那两种坏口径挂**。见 collab/HANDOFF.md 的 T-038。
+        """
+        for problem_id in ("698A", "1374C"):
+            reference = (ROOT / f"data/openjudge/tests/codeforces/{problem_id}_made"
+                              / "samplecode.py").read_text(encoding="utf-8")
+            verdict = judge("codeforces", problem_id, "python", reference)
+            self.assertEqual((verdict["status"], verdict["cases"]), ("Accepted", 21), verdict)
+
+        # 698A：旧生成器的「永远 0」与修补后的「永远 n」都要挂
+        for source in ("import sys\nsys.stdin.read()\nprint(0)\n",
+                       "import sys\nprint(int(sys.stdin.read().split()[0]))\n"):
+            self.assertEqual("Wrong Answer", judge("codeforces", "698A", "python", source)["status"])
+
+        # 1374C：答案翻倍的写法要挂；不读 n 的写法（旧数据的格式）也要挂
+        doubled = """import sys
+data = sys.stdin.read().split()
+count, cursor, answers = int(data[0]), 1, []
+for _ in range(count):
+    text = data[cursor + 1]
+    cursor += 2
+    opened = removed = 0
+    for char in text:
+        if char == "(": opened += 1
+        elif opened: opened -= 1
+        else: removed += 1
+    answers.append(str(removed + opened))
+print("\\n".join(answers))
+"""
+        self.assertEqual("Wrong Answer", judge("codeforces", "1374C", "python", doubled)["status"])
+        without_n = """import sys
+data = sys.stdin.read().split()
+answers = []
+for text in data[1:int(data[0]) + 1]:
+    balance = moves = 0
+    for char in text:
+        balance += 1 if char == "(" else -1
+        if balance < 0:
+            moves += 1
+            balance = 0
+    answers.append(str(moves))
+print("\\n".join(answers))
+"""
+        self.assertEqual("Wrong Answer", judge("codeforces", "1374C", "python", without_n)["status"])
+
     def test_codeforces_withheld_problems_stay_out_of_the_judge(self):
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
         entries = {item["id"]: item for item in catalog["problems"]
                    if item.get("source") == "codeforces"}
-        for problem_id in {"698A", "903C", "1374C", "2140B"}:
+        self.assertEqual({item["id"] for item in catalog["problems"]
+                          if item.get("data_status") == "withheld_pending_rework"},
+                         WITHHELD_CODEFORCES)
+        for problem_id in sorted(WITHHELD_CODEFORCES):
             item = entries[problem_id]
             self.assertFalse(item["tests"])
             self.assertEqual(0, item["test_count"])

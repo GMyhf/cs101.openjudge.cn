@@ -1,5 +1,76 @@
 # HANDOFF · 交接日志
 
+### 2026-09-10 · Claude → Codex · T-038 返工第一步：两道重建、十七道撤出、生成器上保险
+
+- **做了什么**（人拍板「做」）：把我上一轮点名的两个仍然算错答案的生成器改掉，
+  并按 Codex 自己定的返工标准（单题 `samplecode`/`producecase` + 独立 oracle + ≥20 组 + 变异 WA）
+  重建 `698A` 与 `1374C`、恢复判题；把十七道判别力为零的题撤出判题；
+  给中央生成器加一道「撤下的题不许被重新打开」的保险。
+- **改了哪些文件**：`data/openjudge/tests/codeforces/698A_made/`、`1374C_made/`（各新增
+  `samplecode.py` + `producecase.py` + 21 组数据）、`scripts/build_codeforces_basic_data.py`、
+  `data/openjudge/catalog.json` + `test_index.json`、`tests/test_server.py`、
+  `docs/codeforces-import.md`、`CHANGELOG.md`、`README.md`、`collab/HANDOFF.md`、`collab/PLAN.md`
+
+- **① 两道重建，证据是实测的**
+  - `698A Vacations`：`samplecode.py` 是三状态 DP，`producecase.py` 八种形状轮转
+    （含 `n = 1` 与 `n = 100` 两端、只能写题/只能运动、以及**贪心陷阱**：
+    「只能写题」与「两样都行」交替，固定优先写题的贪心会被逼出多余休息）。
+    另写穷举 DFS 当第三方 oracle，对 9 组小规模用例逐组比对 **0 不一致**。
+    真实 `judge()`：参考解 **21/21 Accepted**；旧生成器的「恒 0」挂第 1 组、
+    一次修补的「恒 n」挂第 1 组、**固定优先写题的贪心挂第 8 组**、只数 0 天的写法挂第 1 组。
+  - `1374C Move Brackets`：`samplecode.py` 数失配右括号，`producecase.py` 覆盖
+    已合法/最坏/只错一处/`n = 2`/`n = 50`/多测试组六种形状。第三方 oracle 用**另一套算法**
+    （反复消去 `()`，剩下的右括号个数），对 21 组里的 **2,460 个测试用例**逐个比对 **0 不一致**。
+    真实 `judge()`：参考解 **21/21 Accepted**；「答案翻倍（`removed + opened`）」、
+    「不读 `n`」、「只处理第一组」三种错法全挂第 1 组。
+  - 两题**重跑 `producecase.py` 数据逐字节不变**；样例组用的是题面原样输入，
+    输出与 Codeforces 题面样例逐字对上（`1 0 1 3`）。
+  - **`1374C` 补上了 `t = 2000` 的上界组** —— 我上一轮指出整批数据 `t` 恒为 1，
+    多测试组这条路根本没被走过；现在 21 组里有 8 组是多测试组。
+
+- **② 十七道判别力为零的题撤出判题**（`data_status = withheld_pending_rework`）：
+  21 组期望输出**完全相同**的 `270A`（全 NO）、`456A`（全 Happy Alex）、`1374B`（全 -1）、
+  `1475A`（全 YES）、`1742A`/`1829D`/`2227B`（全 NO）；整题只有 **1 组**样例数据的
+  `986D`/`1764C`/`1883D`/`1970E1`/`2171G`/`2192D`/`2195E`/`2205D`/`2208C`/`2228D`。
+  实测：一个不读输入、只 `print` 常量的程序在这十七道上**全部 Accepted**。数据留作离线参考。
+  **`894E` 与 `1000E` 各只有 2 组，我没撤** —— 常量程序过不了，判别力不是零，
+  但同样低于 20 组的线，建议随「至少 20 组」那道闸门一起处理。
+
+- **③ 中央生成器上了保险，这条是顺着一个现场事故加的**
+  `scripts/build_codeforces_basic_data.py` 原来会把 `data_status` 已是
+  `withheld_pending_rework` 的题**连同坏数据一起重新打开** —— 谁跑一次脚本，止血就白做了。
+  我第一版把判断写在写盘之后，跑一遍发现 **`903C` 离线留档的原始数据被新数据覆盖了**
+  （已 `git checkout` 还原）。**所以保险必须挡在生成之前**：现在跳过的题不生成数据、
+  也不碰 catalog。`698A`/`1374C` 已从注册表摘除，两个算错的 `case_698a`/`case_1374c` 一并删掉。
+  现在跑一次脚本会打印 `generated 113 problems x 21 cases; skipped 9 withheld`，
+  **全库数据逐字节不变**。
+
+- **④ 顺手修掉 catalog 的两个写法打架**：`build_codeforces_basic_data.py` 给
+  `catalog.json` 结尾补了一个 `"\n"`，而 `scripts/index_tests.py` 不补 —— 两个脚本轮流跑
+  就会互相冒出无关 diff，这正是我上一轮报的「catalog 尾字节不是索引器产物」的根因。
+  已统一为索引器的规范产物，**生成器 + 索引器连跑两遍 catalog 逐字节不变**。
+
+- **验证**：`tools/handoff.py --verify` 见下方红线一节；`tests.test_server` **95 项全过**；
+  新增 `test_codeforces_rebuilt_problems_discriminate`（钉的是「参考解过、那两种坏口径挂」，
+  不是「有 21 组数据」），`test_codeforces_withheld_problems_stay_out_of_the_judge`
+  扩到 19 道并把**撤下集合本身**变成判据。**两条都做过变异自检**：
+  把 `270A` 重新接回 catalog → 前者红；把 `698A` 的期望答案改回全 0 → 后者红。
+  口径：Codeforces 在判 133 → **118** 道、2,555 → **2,440** 组；
+  全库 1,969 → **1,954** 条有数据、40,069 → **39,954** 组；`docs/codeforces-import.md`
+  的状态大表按 catalog 逐行重建（157 行，0 处不一致），README 数字同步。
+
+- **红线自检**：判题沙箱未动 ✅（`judge.py` 一行未改）｜口令未入库 ✅ ｜路径防线未动 ✅ ｜
+  只动 `_made` 数据、撤下题的离线留档已还原 ✅
+- **仍然挂着（不在本轮范围）**：`concat_divisible` 等 5 个 checker 仍假定单测试组；
+  浮点比较是纯绝对误差 1e-6、无相对项；`special_output_matches` 无超时且代价随输入规模增长，
+  与「数据要贴上界加大」直接冲突；全批仍缺 `samplecode`/`producecase`（除这两道）；
+  单组输入中位数 87 字节；`e3d450ab` 那道「至少 20 组」的闸门还没加回来；
+  136 道已开判的题题面页仍写「判题数据请按题目另行补充」；7 个页面标题有 markdown 残渣。
+- **下一步建议**：① 把「至少 20 组」的闸门加回来，顺带处理 `894E`/`1000E`；
+  ② `903C`/`2140B` 按同样的单题流水线重建（`903C` 的中央生成器逻辑已经是对的，
+  但按标准它该有自己的 `samplecode`/`producecase`）；③ 十七道撤下的题逐题重建；
+  ④ checker 的单测试组假定与无超时这两条一起定方案。
+
 ### 2026-09-10 · Claude → Codex · T-038 复核全文 + 对止血提交 `8bbadc1b` 的复验
 
 - **做了什么**：复核 09-09/09-10 的 46 个提交（`e6e7ed5a`..`7e3d5a07`，Codeforces 题解导入

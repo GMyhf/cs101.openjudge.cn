@@ -5,6 +5,8 @@ from pathlib import Path
 import random
 
 ROOT = Path(__file__).resolve().parents[1]
+# 复核撤下的题：这个脚本不许把它们重新接进判题队列。
+WITHHELD_STATUSES = {"withheld_pending_rework"}
 MIRROR = ROOT / "data" / "openjudge"
 CATALOG = MIRROR / "catalog.json"
 
@@ -188,14 +190,6 @@ def case_615a(r):
     lit = set().union(*map(set, groups)) if groups else set()
     text = f"{bulbs} {buttons}\n" + "".join(str(len(group)) + (" " + " ".join(map(str, group)) if group else "") + "\n" for group in groups)
     return text, ("YES" if len(lit) == bulbs else "NO") + "\n"
-
-
-def case_698a(r):
-    days = [r.randint(0, 3) for _ in range(r.randint(1, 100))]
-    rest, contest, gym = 0, 10**9, 10**9
-    for value in days:
-        rest, contest, gym = min(rest, contest, gym), min(rest, gym) + 1 if value & 1 else 10**9, min(rest, contest) + 1 if value & 2 else 10**9
-    return str(len(days)) + "\n" + " ".join(map(str, days)) + "\n", f"{len(days) - min(rest, contest, gym)}\n"
 
 
 def case_705a(r):
@@ -387,17 +381,6 @@ def case_1364a(r):
         right = next((i for i, value in enumerate(reversed(values)) if value % x), None)
         answer = -1 if left is None else len(values) - 1 - min(left, right)
     return f"1\n{len(values)} {x}\n{' '.join(map(str,values))}\n", f"{answer}\n"
-
-def case_1374c(r):
-    pairs = r.randint(1, 100)
-    text = "(" * pairs + ")" * pairs
-    text = "".join(r.sample(text, len(text)))
-    opened = removed = 0
-    for char in text:
-        if char == '(': opened += 1
-        elif opened: opened -= 1
-        else: removed += 1
-    return f"1\n{len(text)}\n{text}\n", f"{removed + opened}\n"
 
 def case_1398c(r):
     text = "".join(str(r.randint(0, 9)) for _ in range(r.randint(1, 200)))
@@ -1114,7 +1097,7 @@ BUILDERS = {
     "34B": case_34b, "339B": case_339b, "427A": case_427a, "455A": case_455a,
     "456A": case_456a, "460A": case_460a_fixed, "466A": case_466a, "579A": case_579a,
     "580A": case_580a,
-    "615A": case_615a, "698A": case_698a, "705A": case_705a, "706B": case_706b,
+    "615A": case_615a, "705A": case_705a, "706B": case_706b,
     "723A": case_723a, "903C": case_903c,
     "200B": case_200b, "474A": case_474a, "545D": case_545d,
     "1154A": case_1154a, "1221A": case_1221a, "1327A": case_1327a, "1328A": case_1328a,
@@ -1123,7 +1106,7 @@ BUILDERS = {
     "158B": case_158b, "189A": case_189a, "368B": case_368b, "431C": case_431c,
     "433B": case_433b, "466C": case_466c,
     "230B": case_230b, "474D": case_474d, "489B": case_489b, "1364A": case_1364a,
-    "1374C": case_1374c, "1398C": case_1398c, "1520D": case_1520d,
+    "1398C": case_1398c, "1520D": case_1520d,
     "1195C": case_1195c, "1829D": case_1829d, "1829E": case_1829e, "1850H": case_1850h,
     "1881C": case_1881c,
     "1425A": case_1425a, "1526C1": case_1526c1, "1879B": case_1879b,
@@ -1167,7 +1150,15 @@ BUILDERS = {
 def main():
     catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
     rows = {(item["book"], item["id"]): item for item in catalog["problems"]}
+    built = skipped = 0
     for problem, builder in BUILDERS.items():
+        if rows[("codeforces", problem)].get("data_status") in WITHHELD_STATUSES:
+            # 复核撤下的题只能走单题 samplecode/producecase 流水线回来。没有这道保险，
+            # 谁跑一次这个脚本就会把坏数据连同 catalog 引用一起重新打开 —— 而且是
+            # **先落盘再判断**，连离线留档的那份原始数据都会被覆盖掉。所以挡在最前面。
+            print(f"skip {problem}: {rows[('codeforces', problem)]['data_status']}")
+            skipped += 1
+            continue
         cases, seen = [], set()
         attempt = 0
         while len(cases) < 21:
@@ -1220,8 +1211,11 @@ def main():
             row["special_checker"] = "min_divisible_by_six_subarrays"
         if problem == "2218A":
             row["special_checker"] = "maximize_min"
-    CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"generated {len(BUILDERS)} problems x 21 cases")
+        built += 1
+    # 结尾**不要**补换行：`scripts/index_tests.py` 写出的规范产物最后一个字节就是 `}`，
+    # 多一个 "\n" 会让下一次重跑索引冒出一个无关 diff（2026-09-10 复核抓到过一次）。
+    CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"generated {built} problems x 21 cases; skipped {skipped} withheld")
 
 
 if __name__ == "__main__":
