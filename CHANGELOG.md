@@ -11,6 +11,15 @@
 - `judge()` 参考实现均 21/21 Accepted；位置/解计数/排序变异分别在第 1、2、1 组触发
   Wrong Answer。已重建 `catalog.json`、`test_index.json` 与 `limits.json`。
 
+### 新增 practice 题目 05444、03882
+
+- 镜像并收录「堆栈基本操作」(`05444`，全局题号 5444)与「中缀表达式的值」(`03882`，全局题号 3882)
+  的真实题面、样例与限制。
+- 两题各新增固定种子 `producecase.py`、参考 `samplecode.py` 和 21 组配对测试数据；覆盖非法/重复
+  出栈、括号优先级、负数中间结果、32 位有符号溢出及向零取整除法。
+- `judge()` 参考实现均 21/21 Accepted；堆栈恒定 `NO` 与中缀表达式取消 32 位语义的变异均触发
+  Wrong Answer。已重建 `catalog.json`、`test_index.json` 与 `limits.json`。
+
 ## 2026-09-10
 
 ### T-038 第二步：20 组闸门、checker 预算与两题重建
