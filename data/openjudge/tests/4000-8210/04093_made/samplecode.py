@@ -1,4 +1,16 @@
-# Source: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md
+#!/usr/bin/env python3
+# 04093 倒排索引查询 —— 参考实现。
+#
+# 来源：仓库交接件。算法与代码取自课程题解集
+# `/home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md`（人交付进本仓库的材料，
+# 不是平台提交，所以不写提交号、也不套用外部许可）。2026-09-12 只改了头部注释，
+# 算法一行没动。
+#
+# 注意一处**题面保证兜住的边界**：题面明写「数据保证每行至少出现一个 1」，所以
+# 「一个 1 都没有」的查询在合法输入里不存在。这份实现把它当 NOT FOUND，而「全集减去
+# 排除项」同样说得通 —— 两种写法在合法输入上完全等价。2026-09-12 之前生成器没有
+# `valid()`，真的生成了 22 条一个 1 都没有的查询，于是这份数据会把后一种写法判成
+# Wrong Answer（实测挂第 2 组）。数据已按题面重建，见 CHANGELOG。
 import sys
 input = sys.stdin.read
 data = input().split()

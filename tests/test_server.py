@@ -716,6 +716,82 @@ print("\\n".join(answers))
         self.assertIn(2, sizes)
         self.assertIn(100, counts)
 
+    def test_practice_04093_data_obeys_the_guarantees_the_statement_makes(self):
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        rows = [item for item in catalog["problems"] if item["id"] == "04093"]
+        self.assertEqual(sorted((item["book"], item["test_count"]) for item in rows),
+                         [("2024sp_routine", 21), ("practice", 21)])
+
+        made = ROOT / "data/openjudge/tests/4000-8210/04093_made/data"
+        self.assertEqual((made / "0.out").read_text(encoding="utf-8"), "NOT FOUND\n1 3\n1\n")
+
+        # **题面明写两条保证**（镜像页里这两处的裸 `<` 被原站当标签吃掉了，要看 HTML 源码）：
+        # `1 <= c_i <= 1000`，以及「数据保证每行至少出现一个1」。2026-09-12 之前生成器
+        # 没有 `valid()`，21 组里有 13 处 `c_i = 0`、22 条查询行一个 1 都没有 —— 后者让
+        # 「没有 1 就按全集减排除项」这种**同样正确**的写法挂了第 2 组。这里把两条保证
+        # 逐组钉死，再钉住题面的三个上界和「编号不一定有序」那条判别力。
+        shuffled = hits = misses = 0
+        sizes, counts, lists, ids = [], [], [], []
+        for path in sorted(made.glob("*.in")):
+            tokens = iter(path.read_text(encoding="utf-8").split())
+            words = int(next(tokens))
+            self.assertTrue(1 <= words <= 100, f"{path.name}: N={words}")
+            sizes.append(words)
+            for _ in range(words):
+                size = int(next(tokens))
+                self.assertTrue(1 <= size <= 1000, f"{path.name}: c_i={size} 越过题面的 1..1000")
+                lists.append(size)
+                docs = [int(next(tokens)) for _ in range(size)]
+                self.assertTrue(all(0 <= doc <= 2 ** 31 - 1 for doc in docs), path.name)
+                ids += docs
+                shuffled += docs != sorted(docs)
+            queries = int(next(tokens))
+            self.assertTrue(1 <= queries <= 100, f"{path.name}: M={queries}")
+            counts.append(queries)
+            for _ in range(queries):
+                row = [int(next(tokens)) for _ in range(words)]
+                self.assertTrue(set(row) <= {1, -1, 0}, path.name)
+                self.assertIn(1, row, f"{path.name}: 查询行 {row} 一个 1 都没有")
+            self.assertRaises(StopIteration, lambda: next(tokens))
+            answers = path.with_suffix(".out").read_text(encoding="utf-8").rstrip("\n").split("\n")
+            hits += sum(1 for answer in answers if answer != "NOT FOUND")
+            misses += sum(1 for answer in answers if answer == "NOT FOUND")
+
+        self.assertIn(100, sizes)                     # 题面上界 N = 100
+        self.assertIn(100, counts)                    # 题面上界 M = 100
+        self.assertIn(1000, lists)                    # 题面上界 c_i = 1000
+        self.assertGreater(max(ids), 2 ** 31 - 6000)  # 文档编号是 32 位整数
+        # 题面明写「编号不一定有序」：没有乱序的组，「完全不排序」的写法照样满分。
+        self.assertGreater(shuffled, 0)
+        self.assertGreater(hits, 0)
+        self.assertGreater(misses, 0)
+
+    def test_practice_02679_data_stays_inside_the_stated_range_for_k(self):
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        rows = [item for item in catalog["problems"] if item["id"] == "02679"]
+        self.assertEqual([(item["book"], item["test_count"]) for item in rows],
+                         [("practice", 8)])
+
+        # 题面（描述）明写 **1 < k < 10**，合法输入域就是 k = 2..9 这 8 个值 ——
+        # 所以这题**凑不出 21 组互异数据**，凑出来的必然越界，2026-09-12 之前就是这样：
+        # 生成器写 `r.randint(1, 10000)`，21 组里 20 组越界（最大 9982）。后果实测过：
+        # 一份用 `int` 的 C++ 解（k<=9 时立方和最大 2025，完全正确）溢出挂第 2 组，
+        # 一份 k=2..9 的查表解直接 Runtime Error。现在数据是**穷举整个合法域**，
+        # 这两条断言把「不越界」和「不漏」同时钉住 —— 少一条都会让旧那种数据溜回来。
+        made = ROOT / "data/openjudge/tests/2000-2999/02679_made/data"
+        values = []
+        for path in sorted(made.glob("*.in")):
+            token = path.read_text(encoding="utf-8").strip()
+            self.assertRegex(token, r"^\d+$", path.name)
+            value = int(token)
+            self.assertTrue(1 < value < 10, f"{path.name}: k={value} 越过题面的 1 < k < 10")
+            values.append(value)
+            expected = (value * (value + 1) // 2) ** 2          # 立方和的闭式
+            self.assertEqual(path.with_suffix(".out").read_text(encoding="utf-8").strip(),
+                             str(expected), path.name)
+        self.assertEqual(sorted(values), list(range(2, 10)))
+        self.assertEqual((made / "0.in").read_text(encoding="utf-8").strip(), "5")
+
     def test_practice_31183_to_31185_are_mirrored_with_discriminating_data(self):
         expected = {
             "31183": ("一道题搞懂输入", set(range(1, 9))),

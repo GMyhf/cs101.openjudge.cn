@@ -1659,9 +1659,9 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
-      "max_input_bytes": 5,
-      "max_output_bytes": 17,
+      "test_cases": 8,
+      "max_input_bytes": 2,
+      "max_output_bytes": 5,
       "constraints": [
         [
           "the cube-sum argument is a positive integer",
@@ -1671,17 +1671,18 @@
       "constraint_counterexample": "invalid-02679",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 19,
-          "threshold": 15,
-          "status": "passed"
+          "total": 7,
+          "distinct": 7,
+          "threshold": 7,
+          "status": "passed",
+          "threshold_note": "合法输入域只有 8 个元素（k=2..9），门槛从 round13 的 15 改成「穷举整个域」；判据由 tests/test_server.py 的回归用例钉住"
         },
         "constant_output_probe": {
-          "frequency": 2,
-          "total": 20,
+          "frequency": 1,
+          "total": 7,
           "status": "rejected",
           "exemption": null,
-          "share": 0.1
+          "share": 0.143
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -1690,7 +1691,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 8,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -1719,8 +1720,20 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "02679",
-        "merged_cases": 21,
-        "total_ms": 341
+        "merged_cases": 8,
+        "total_ms": 152
+      },
+      "data_rebuilt": {
+        "date": "2026-09-12",
+        "task": "T-042",
+        "reason": "round13 的中央生成器写的是 `r.randint(1, 10000)`，而题面（描述）明写 `1 < k < 10`；旧 21 组里 20 组的 k 越界（最大 9982），实测会把题面范围内完全正确的 C++ `int` 解判成 Wrong Answer（溢出，第 2 组）、把 k=2..9 的查表解判成 Runtime Error。合法输入域只有 8 个元素，凑不出 21 组互异数据 —— 现在改成穷举 k=2..9 共 8 组。本条目里的自检数字是对**重建后**的 data/ 重新实测的值，不是 round13 当时的测量。",
+        "superseded": {
+          "test_cases": 21,
+          "distinct_cases.total": 20,
+          "distinct_cases.distinct": 19,
+          "constant_output_probe.total": 20,
+          "constant_output_probe.frequency": 2
+        }
       }
     },
     {
