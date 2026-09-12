@@ -891,6 +891,22 @@ print("\\n".join(answers))
         self.assertTrue(any("2 3\n1 4\n" in path.read_text(encoding="utf-8")
                             for path in sort_cases.glob("*.in")))
 
+    def test_practice_31180_is_mirrored_with_statistics_data(self):
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        rows = [item for item in catalog["problems"] if item["book"] == "practice" and item["id"] == "31180"]
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["global_number"], 31180)
+        self.assertEqual(rows[0]["test_count"], 21)
+        page = (ROOT / "data/openjudge/pages/practice__31180.html").read_text(encoding="utf-8")
+        self.assertIn("31180:学生数据统计分析", page)
+        self.assertRegex(page, r"全局题号\s*</dt>\s*<dd>\s*31180")
+        made = ROOT / "data/openjudge/tests/30000-/31180_made/data"
+        self.assertEqual(len(list(made.glob("*.in"))), 21)
+        self.assertEqual((made / "0.out").read_text(encoding="utf-8"),
+                         "David 288\nQ1 2 165.5\nQ2 1 180.0\nQ3 1 165.2\nQ4 1 178.4\n1\nAlice 90 85 95 270\n")
+        headers = {tuple(path.read_text(encoding="utf-8").splitlines()[1].split()) for path in made.glob("*.in")}
+        self.assertGreater(len(headers), 5)
+
     def test_catalog_summary_is_small_and_contains_judgeable_titles(self):
         status, headers, body = request(self.port, "GET", "/api/catalog?summary=1")
         self.assertEqual(status, 200)
