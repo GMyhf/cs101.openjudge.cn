@@ -23,8 +23,10 @@
 - **判题数据这次一点没动。** 但抓回来的官方样例现在是一份现成的仓外 oracle：
   `data/openjudge/statements/*.json` 里每道题的官方样例，可以拿去核 `sample_tests` /
   `generated_tests` 那些数据的第 0 组对不对。**还没做**，留给下一轮。
-- 4A 的页面按 `--keep` 保留原样（人拿它当对照）。抓回来的 4A 原文其实比现页更全（现页的
-  Description 是改写过的摘要，缺 Note），要不要一并换成原文，等人定。
+- **4A 也换成原文了**（人定的）。先用它验抓取源 —— 抓回来的时限内存与那页逐字相同 ——
+  再重建：Description 从改写过的摘要换回 Codeforces 原文，补回 Note，样例和判题数据不变
+  （仍是 `tests/codeforces/4A/` 那 21 组，`test_codeforces_4a_is_a_local_judgeable_problem`
+  照常过）。`--keep` 默认值随之改成空，158 道口径一致。
 
 ### 2026-09-12 · Claude · 归档当自动 oracle：全库扫了一遍，**没有新缺陷**
 

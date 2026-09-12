@@ -342,7 +342,8 @@ def report(records):
         "python3 scripts/build_codeforces_pages.py                 # 重建题面页并刷新本文件",
         "python3 scripts/mirror_openjudge_images.py                # 新题面引入的插图要进本地镜像",
         "```", "",
-        f"`4A` 的页面不由本脚本覆盖（`--keep`），它是此前人工核对过的那一版。", "",
+        "全部 158 道都由本脚本渲染。4A 曾是唯一人工写的那页（也正是它让人看出其余 157 页不对），",
+        "现在也换成了抓回来的原文：官方限制与那一版逐字相同，正文补回 Codeforces 的原始表述和 Note。", "",
         "## 覆盖", "",
         f"- 题目：{len(records)} 道", 
         f"- 有 Note（官方样例解释）：{sum(1 for item in records if (item['statement'].get('hint') or '').strip())} 道",
@@ -362,7 +363,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("ids", nargs="*", help="problem ids; default: every cached statement")
     parser.add_argument("--out", type=Path, default=PAGES, help="write pages here instead of the mirror")
-    parser.add_argument("--keep", nargs="*", default=["4A"],
+    parser.add_argument("--keep", nargs="*", default=[],
                         help="ids whose existing page is left untouched")
     args = parser.parse_args()
     ids = args.ids or sorted(path.stem for path in CACHE.glob("*.json"))
