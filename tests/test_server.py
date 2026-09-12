@@ -628,6 +628,53 @@ print("\\n".join(answers))
                 tied += head.count(max(head)) > 1
         self.assertGreater(tied, 0)
 
+    def test_practice_01830_data_pins_the_self_toggle_diagonal(self):
+        status, _, body = request(self.port, "GET", "/practice/01830/")
+        self.assertEqual(status, 200)
+        self.assertIn("01830:开关问题", body.decode("utf-8", errors="replace"))
+        mirrored = (ROOT / "data/openjudge/pages/practice__01830.html").read_text(encoding="utf-8")
+        self.assertRegex(mirrored, r"全局题号\s*</dt>\s*<dd>\s*832")
+
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        disk = [item for item in catalog["problems"] if item.get("global_number") == 832]
+        self.assertEqual([(item["book"], item["id"], item["test_count"]) for item in disk],
+                         [("practice", "01830", 21)])
+
+        # 第 0 组是**唯一一组有外部答案**的数据。2026-09-11 那版正是漏了跟题面对照这一步：
+        # 参考实现没把「操作一个开关会翻转它自己」那条对角线放进方程，样例第一组从 4
+        # 变成 impossible，21 组数据自洽地全错。这条断言把题面样例的答案钉死在数据里。
+        made = ROOT / "data/openjudge/tests/1000-1999/01830_made/data"
+        self.assertEqual((made / "0.out").read_text(encoding="utf-8"),
+                         "4\nOh,it's impossible~!!\n")
+
+        # 数据存在 ≠ 判得动。这题的错法都落在三类组上：没有「多解」组，「解数恒为 1」
+        # 能满分；没有「无解」组，省掉相容性检查也能满分；N 不取到题面上界 28，规模那端
+        # 根本没被走过。
+        def group_sizes(text):
+            tokens = iter(text.split())
+            sizes = []
+            for _ in range(int(next(tokens))):
+                size = int(next(tokens))
+                sizes.append(size)
+                for _ in range(2 * size):
+                    next(tokens)
+                while True:
+                    first, second = int(next(tokens)), int(next(tokens))
+                    if first == 0 and second == 0:
+                        break
+            return sizes
+
+        multi = impossible = 0
+        sizes = []
+        for path in sorted(made.glob("*.in")):
+            sizes += group_sizes(path.read_text(encoding="utf-8"))
+            answers = path.with_suffix(".out").read_text(encoding="utf-8").split()
+            multi += sum(1 for answer in answers if answer.isdigit() and int(answer) > 1)
+            impossible += sum(1 for answer in answers if answer.startswith("Oh,"))
+        self.assertGreaterEqual(multi, 10)
+        self.assertGreaterEqual(impossible, 3)
+        self.assertIn(28, sizes)
+
     def test_practice_31183_to_31185_are_mirrored_with_discriminating_data(self):
         expected = {
             "31183": ("一道题搞懂输入", set(range(1, 9))),

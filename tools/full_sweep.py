@@ -14,6 +14,8 @@ round9 的 15291 —— 它们的 `self_audit.failed` 一直非空，只是当�
   3. `.out` 超过判题器 `RLIMIT_FSIZE` 2MB            （00000 因此被永久排除）
   4. 浮点输出里的循环小数                             （28748：题面允许 10^-6 容差，
                                                        我们却精确比对，会误杀）
+  5. 第 0 组是题面样例、期望输出却和题面对不上         （01830：参考实现漏了对角线，
+                                                       21 组自洽地全错，别的闸门全绿）
 
 **它不发现新的失败模式**，只保证旧的不复发。发现新模式这件事，到目前为止仍然靠人
 偶尔越出流程去看一眼 —— 这条我没能变成规则，也不打算假装它变成了。
@@ -571,8 +573,56 @@ def check_annotated_sample_outputs():
     return f"标记式样例输出的首行安全前提（已扫描 {marked} 题）", bad
 
 
+def check_sample_anchor():
+    """第 0 组若是题面样例，它的期望输出必须和题面的样例输出对得上。
+
+    2026-09-12 加的，对应 01830：参考实现漏掉「操作一个开关会翻转它自己」的对角线，
+    生成器拿它产 21 组答案，数据**自洽地全错** —— 参考解 21/21 Accepted、重跑逐字节
+    不变、组数够、判别力看着也有，所有既有闸门全绿。唯一能证伪它的是题面样例，
+    而「生成完先跟题面样例逐字对一遍」当时只写在手册里，没有任何东西在查。
+
+    判据只认**前缀冲突**：镜像页的样例输出块经常在答案后面接一段「解释：…」或
+    `# …` 的说明（37 题），02698 的样例输出则被原站截成「…以下省略」。这两种情况下
+    短的那一边是长的那一边的前缀，放过；答案本身就对不上才算残留。
+    """
+    catalog_path = ROOT / "data" / "openjudge" / "catalog.json"
+    try:
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return "第 0 组与题面样例输出的锚定", ["catalog.json 不可读"]
+    mirror = ROOT / "data" / "openjudge"
+    plain = lambda chunk: html.unescape(
+        re.sub(r"</?pre[^>]*>|<[^>]+>", "", chunk.strip())).strip("\n")
+    bad, anchored = [], 0
+    for problem in catalog.get("problems", []):
+        cases = problem.get("test_cases") or []
+        if not cases:
+            continue
+        first_in, first_out = mirror / str(cases[0]["input"]), mirror / str(cases[0]["output"])
+        page = mirror / "pages" / f"{problem.get('book')}__{problem['id']}.html"
+        if not (first_in.exists() and first_out.exists() and page.exists()):
+            continue
+        match = re.search(r"<dt>样例输入</dt>\s*<dd>(.*?)</dd>\s*<dt>样例输出</dt>\s*<dd>(.*?)</dd>",
+                          page.read_text(encoding="utf-8", errors="replace"), re.S)
+        if not match:
+            continue
+        sample_in, sample_out = plain(match.group(1)).split(), plain(match.group(2)).split()
+        if first_in.read_text(encoding="utf-8", errors="replace").split() != sample_in:
+            continue                       # 第 0 组不是题面样例，这条判据不适用
+        anchored += 1
+        if sample_out and sample_out[-1].endswith("以下省略"):
+            sample_out = sample_out[:-1]   # 原站自己截断的样例输出，只比对它给出的那截
+        expected = first_out.read_text(encoding="utf-8", errors="replace").split()
+        shared = min(len(expected), len(sample_out))
+        if expected[:shared] != sample_out[:shared]:
+            bad.append(f"{problem.get('book')}__{problem['id']}: "
+                       f"题面 {sample_out[:5]}… vs 数据 {expected[:5]}…")
+    return f"第 0 组与题面样例输出的锚定（已锚定 {anchored} 题）", bad
+
+
 CHECKS = (check_reported_failures, check_degenerate_constraints,
           check_output_size, check_repeating_decimals, check_annotated_sample_outputs,
+          check_sample_anchor,
           check_merged_judge, check_multi_answer_problems,
           check_archive_oracle_is_auditable, check_priority_gaps_are_recorded,
           check_self_audit_numbers_are_measured, check_input_domain_is_anchored)

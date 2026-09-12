@@ -395,3 +395,62 @@ class QuoteMustCarryABoundTests(unittest.TestCase):
         self.assertEqual([], self._run(number, "第一行一个正整数 N", "第一行一个正整数 N"))
         self.assertTrue(full_sweep.QUOTES_WITHOUT_BOUND[number],
                         "例外必须写明理由，不能是空字符串")
+
+
+class SampleAnchorTests(unittest.TestCase):
+    """第 0 组与题面样例的锚定判据，两头都得对。
+
+    这条判据 2026-09-12 才补上，起因是 `01830`：参考实现漏掉「操作一个开关会翻转
+    它自己」那条对角线，生成器拿它产答案，21 组数据**自洽地全错**而所有闸门全绿。
+    唯一能证伪它的外部事实就是题面样例。
+
+    但镜像页的「样例输出」块并不只有答案：37 道题在答案后面接了「解释：…」或
+    `# …` 的说明，02698 的样例输出被原站截成「…以下省略」。判据只认前缀冲突，
+    否则它一上线就会对着几十道好题喊狼来了，然后被人关掉。
+    """
+
+    def build(self, tmp, sample_out, stored_out, stored_in="3\n1 2 3\n"):
+        root = Path(tmp)
+        mirror = root / "data" / "openjudge"
+        data = mirror / "tests" / "demo_made" / "data"
+        data.mkdir(parents=True)
+        (data / "0.in").write_text(stored_in, encoding="utf-8")
+        (data / "0.out").write_text(stored_out, encoding="utf-8")
+        (mirror / "pages").mkdir(parents=True)
+        (mirror / "pages" / "practice__00001.html").write_text(
+            "<dl><dt>样例输入</dt><dd><pre>3\n1 2 3\n</pre></dd>"
+            f"<dt>样例输出</dt><dd><pre>{sample_out}</pre></dd></dl>", encoding="utf-8")
+        (mirror / "catalog.json").write_text(json.dumps({"problems": [{
+            "book": "practice", "id": "00001",
+            "test_cases": [{"input": "tests/demo_made/data/0.in",
+                            "output": "tests/demo_made/data/0.out"}]}]}), encoding="utf-8")
+        return root
+
+    def run_check(self, **kwargs):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root = self.build(tmp, **kwargs)
+            with mock.patch.object(full_sweep, "ROOT", root):
+                return full_sweep.check_sample_anchor()
+
+    def test_flags_an_answer_that_contradicts_the_statement(self):
+        label, bad = self.run_check(sample_out="4\n", stored_out="6\n")
+        self.assertIn("已锚定 1 题", label)
+        self.assertEqual(len(bad), 1)
+        self.assertIn("practice__00001", bad[0])
+
+    def test_accepts_an_explanation_appended_after_the_answer(self):
+        _label, bad = self.run_check(
+            sample_out="4\n\n解释：一共以下四种方法\n操作开关 1\n", stored_out="4\n")
+        self.assertEqual(bad, [])
+
+    def test_accepts_a_sample_output_the_upstream_site_truncated(self):
+        _label, bad = self.run_check(
+            sample_out="1 2 3\n...以下省略", stored_out="1 2 3\n4 5 6\n")
+        self.assertEqual(bad, [])
+
+    def test_skips_problems_whose_first_case_is_not_the_sample(self):
+        label, bad = self.run_check(sample_out="4\n", stored_out="6\n",
+                                    stored_in="9\n9 9 9\n")
+        self.assertIn("已锚定 0 题", label)
+        self.assertEqual(bad, [])
