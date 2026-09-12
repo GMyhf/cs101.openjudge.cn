@@ -1,49 +1,65 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2171F: Rae Taylor and Trees (hard version)</title></head>
-<body><div id="pageTitle"><h2>2171F: Rae Taylor and Trees (hard version)</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2171/F" rel="noopener">Codeforces 2171F</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>binary search,constructive algorithms,data structures,dp,dsu,greedy,implementation,trees,*1600
-
-
-*&quot;To think a commoner would even fathom sitting next to me. Know your place!&quot;*
-
-— Claire François
-
-**This is the hard version of the problem. The only difference between the easy and hard versions is that the hard version asks you to construct an example of a satisfactory tree.**
-
-*As an Earth mage, Rae has mastered the spell of growing trees! But Manaria brags that she can grow a more impressive species of trees. Rae remembers that the most rare type of tree can be grown using a formula represented by a certain permutation — please help her construct it!*
-
-You are given a permutation∗ 𝑝 of length 𝑛.
-
-Determine if there exists an undirected tree with 𝑛 vertices labeled 1,2,…,𝑛, satisfying the following condition:
-
-- Let 𝑢 and 𝑣 (1≤𝑢&lt;𝑣≤𝑛) be any two vertices connected by an edge. Then 𝑢 appears before 𝑣 in 𝑝.
-
-Additionally, if there exists such a tree, output any of them.
-
-∗A permutation of length 𝑛 is an array that contains every integer from 1 to 𝑛 exactly once, in any order.
-
-**Input**
-
-The first line contains a single integer 𝑡 (1≤𝑡≤104)  — the number of test cases.
-
-The first line of each test case contains a single integer 𝑛 (2≤𝑛≤2⋅105).
-
-The second line of each test case contains 𝑛 integers, 𝑝1,𝑝2,…,𝑝𝑛 (1≤𝑝𝑖≤𝑛). It is guaranteed that all 𝑝𝑖 are distinct.
-
-It is guaranteed that the sum of 𝑛 over all test cases does not exceed 2⋅105.
-
-**Output**
-
-For each test case, output on a single line &quot;Yes&quot; if there exists a tree satisfying the given condition, and &quot;No&quot; otherwise.
-
-Then, if the answer is &quot;Yes&quot;, output 𝑛−1 lines. The 𝑖-th of these lines should contain two integers 𝑢 and 𝑣, denoting an edge connecting vertices 𝑢 and 𝑣.
-
-You may output the answer in any case (upper or lower). For example, the strings &quot;yEs&quot;, &quot;yes&quot;, &quot;YES&quot;, and &quot;yeS&quot; will be recognized as &quot;Yes&quot;.
-
-Example
-
-Input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2171/F" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2171F: F. Rae Taylor and Trees (hard version)</title></head>
+<body><div id="pageTitle"><h2>F. Rae Taylor and Trees (hard version)</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2171/F" rel="noopener">Codeforces 2171F</a></dd>
+<dt>Time limit</dt><dd>3 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>"To think a commoner would even fathom sitting next to me. Know your place!"</p><p>— Claire François</p><p>This is the hard version of the problem. The only difference between the easy and hard versions is that the hard version asks you to construct an example of a satisfactory tree.</p><p>As an Earth mage, Rae has mastered the spell of growing trees! But Manaria brags that she can grow a more impressive species of trees. Rae remembers that the most rare type of tree can be grown using a formula represented by a certain permutation — please help her construct it!</p><p>You are given a permutation <em><sup>∗</sup></em>   <em>p</em>  of length  <em>n</em>.</p><p>Determine if there exists an undirected tree with  <em>n</em>  vertices labeled  <em>1, 2, …, n</em>, satisfying the following condition:</p><ul><li>Let  <em>u</em>  and  <em>v</em>  (<em>1≤ u &lt; v ≤ n</em>) be any two vertices connected by an edge. Then  <em>u</em>  appears before  <em>v</em>  in  <em>p</em>.</li></ul><p>Additionally, if there exists such a tree, output any of them.</p><p><em><sup>∗</sup></em> A permutation of length  <em>n</em>  is an array that contains every integer from  <em>1</em>  to  <em>n</em>  exactly once, in any order.</p></dd>
+<dt>Input</dt><dd><p>The first line contains a single integer  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>4</sup></em>) — the number of test cases.</p><p>The first line of each test case contains a single integer  <em>n</em>  (<em>2≤ n≤ 2· 10<sup>5</sup></em>).</p><p>The second line of each test case contains  <em>n</em>  integers,  <em>p<sub>1</sub>, p<sub>2</sub>, …, p<sub>n</sub></em>  (<em>1≤ p<sub>i</sub>≤ n</em>). It is guaranteed that all  <em>p<sub>i</sub></em>  are distinct.</p><p>It is guaranteed that the sum of  <em>n</em>  over all test cases does not exceed  <em>2· 10<sup>5</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output on a single line "Yes" if there exists a tree satisfying the given condition, and "No" otherwise.</p><p>Then, if the answer is "Yes", output  <em>n-1</em>  lines. The  <em>i</em> -th of these lines should contain two integers  <em>u</em>  and  <em>v</em>, denoting an edge connecting vertices  <em>u</em>  and  <em>v</em>.</p><p>You may output the answer in any case (upper or lower). For example, the strings "yEs", "yes", "YES", and "yeS" will be recognized as "Yes".</p></dd>
+<dt>样例输入</dt><dd><pre>9
+6
+1 3 4 5 2 6
+4
+3 4 1 2
+5
+4 3 5 1 2
+4
+1 2 3 4
+7
+4 3 5 7 6 2 1
+6
+2 4 6 1 3 5
+3
+2 1 3
+4
+2 4 1 3
+6
+4 2 6 5 1 3</pre></dd>
+<dt>样例输出</dt><dd><pre>Yes
+3 1
+4 1
+6 5
+6 2
+6 1
+No
+No
+Yes
+2 1
+4 3
+4 1
+No
+Yes
+4 2
+6 2
+3 1
+5 1
+5 2
+Yes
+3 2
+3 1
+Yes
+4 2
+3 1
+3 2
+Yes
+6 4
+6 2
+3 1
+5 4
+2 3</pre></dd>
+<dt>Note</dt><dd><p>In the first example, we can construct the tree given in the sample output. We have that</p><ul><li><em>1 &lt; 3</em>, and  <em>1</em>  appears before  <em>3</em>  in  <em>p</em>,</li><li><em>1 &lt; 4</em>, and  <em>1</em>  appears before  <em>4</em>  in  <em>p</em>,</li><li><em>5 &lt; 6</em>, and  <em>5</em>  appears before  <em>6</em>  in  <em>p</em>,</li><li><em>2 &lt; 6</em>, and  <em>2</em>  appears before  <em>6</em>  in  <em>p</em>,</li><li><em>1 &lt; 6</em>, and  <em>1</em>  appears before  <em>6</em>  in  <em>p</em>.</li></ul><p>In the second example, it can be shown that there does not exist a tree satisfying the given constraints.</p></dd>
+</dl>
 </body></html>

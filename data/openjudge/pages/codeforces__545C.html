@@ -1,26 +1,32 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>545C: Woodcutters</title></head>
-<body><div id="pageTitle"><h2>545C: Woodcutters</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/545/C" rel="noopener">Codeforces 545C</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Little Susie listens to fairy tales before bed every day. Today&#x27;s fairy tale was about wood cutters and the little girl immediately started imagining the choppers cutting wood. She imagined the situation that is described below.
-
-There are *n* trees located along the road at points with coordinates *x*~1~, *x*~2~, ..., *x~n~*. Each tree has its height *h~i~*. Woodcutters can cut down a tree and fell it to the left or to the right. After that it occupies one of the segments [*x~i~* - *h~i~*, *x~i~*] or [*x~i~*;*x~i~* + *h~i~*]. The tree that is not cut down occupies a single point with coordinate *x~i~*. Woodcutters can fell a tree if the segment to be occupied by the fallen tree doesn&#x27;t contain any occupied point. The woodcutters want to process as many trees as possible, so Susie wonders, what is the maximum number of trees to fell.
-
-**Input**
-
-The first line contains integer *n* (1 ≤ *n* ≤ 10^5^) — the number of trees.
-
-Next *n* lines contain pairs of integers *x~i~*, *h~i~* (1 ≤ *x~i~*, *h~i~* ≤ 10^9^) — the coordinate and the height of the *і*-th tree.
-
-The pairs are given in the order of ascending *x~i~*. No two trees are located at the point with the same coordinate.
-
-**Output**
-
-Print a single number — the maximum number of trees that you can cut down by the given rules.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/545/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 545C: C. Woodcutters</title></head>
+<body><div id="pageTitle"><h2>C. Woodcutters</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/545/C" rel="noopener">Codeforces 545C</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Little Susie listens to fairy tales before bed every day. Today's fairy tale was about wood cutters and the little girl immediately started imagining the choppers cutting wood. She imagined the situation that is described below.</p><p>There are <em>n</em> trees located along the road at points with coordinates <em>x<sub>1</sub>,x<sub>2</sub>,...,x<sub>n</sub></em>. Each tree has its height <em>h<sub>i</sub></em>. Woodcutters can cut down a tree and fell it to the left or to the right. After that it occupies one of the segments <em>[x<sub>i</sub>-h<sub>i</sub>,x<sub>i</sub>]</em> or <em>[x<sub>i</sub>;x<sub>i</sub>+h<sub>i</sub>]</em>. The tree that is not cut down occupies a single point with coordinate <em>x<sub>i</sub></em>. Woodcutters can fell a tree if the segment to be occupied by the fallen tree doesn't contain any occupied point. The woodcutters want to process as many trees as possible, so Susie wonders, what is the maximum number of trees to fell.</p></dd>
+<dt>Input</dt><dd><p>The first line contains integer <em>n</em> (<em>1≤n≤10<sup>5</sup></em>) — the number of trees.</p><p>Next <em>n</em> lines contain pairs of integers <em>x<sub>i</sub>,h<sub>i</sub></em> (<em>1≤x<sub>i</sub>,h<sub>i</sub>≤10<sup>9</sup></em>) — the coordinate and the height of the <em>і</em> -th tree.</p><p>The pairs are given in the order of ascending <em>x<sub>i</sub></em>. No two trees are located at the point with the same coordinate.</p></dd>
+<dt>Output</dt><dd><p>Print a single number — the maximum number of trees that you can cut down by the given rules.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+5
+1 2
+2 1
+5 10
+10 9
+19 1
+样例输出1
+3</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入2
+5
+1 2
+2 1
+5 10
+10 9
+20 1
+样例输出2
+4</pre></dd>
+<dt>Note</dt><dd><p>In the first sample you can fell the trees like that:</p><ul><li>fell the <em>1</em> -st tree to the left — now it occupies segment <em>[-1 1]</em></li><li>fell the <em>2</em> -nd tree to the right — now it occupies segment <em>[2 3]</em></li><li>leave the <em>3</em> -rd tree — it occupies point <em>5</em></li><li>leave the <em>4</em> -th tree — it occupies point <em>10</em></li><li>fell the <em>5</em> -th tree to the right — now it occupies segment <em>[19 20]</em></li></ul><p>In the second sample you can also fell <em>4</em> -th tree to the right, after that it will occupy segment <em>[10 19]</em>.</p></dd>
+</dl>
 </body></html>

@@ -1,10 +1,21 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2218C: The 67th Permutation Problem</title></head>
-<body><div id="pageTitle"><h2>2218C: The 67th Permutation Problem</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2218/C" rel="noopener">Codeforces 2218C</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：使用贪心的策略，尽可能让每一组的中位数最大，那么从 $3n$ 往下数，首先是 $(\text{很小的}, 3n-1, 3n)$，然后是 $(很小的, 3n-3, 3n-2)$，因此每一个triplet输出 $(i, 2i+n-1, 2i+n)$ 即可实现最优策略。
-
-代码：</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2218/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2218C: C. The 67th Permutation Problem</title></head>
+<body><div id="pageTitle"><h2>C. The 67th Permutation Problem</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2218/C" rel="noopener">Codeforces 2218C</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Upon arriving at school, Macaque was rather brusquely greeted by his friend, AG-88301, the latter having skived off his homework due to spending the entire night yapping to an unsuspecting stranger about his groundbreaking work on a proof of the Collatz conjecture and his  <em>67</em> -th unreciprocated love interest. So, as had become customary, AG-88301, with ever decreasing levels of gratitude or appreciation, made Macaque do his homework for him. At this point, Macaque had had enough, and turned to his minions (you guys!) to solve AG-88301's homework task.</p><p>You are given an integer  <em>n</em>. You must construct a permutation <em><sup>∗</sup></em>  of length  <em>3n</em>  such that, if you partition the permutation into  <em>n</em>  contiguous blocks with  <em>3</em>  elements, the sum of the medians <em><sup>†</sup></em>  of these blocks is maximised.</p><p>More formally, you must construct a permutation  <em>p</em>  of length  <em>3n</em>  such that  <em>∑<sub>i=0</sub><sup>n-1</sup>median(a<sub>3i+1</sub>,a<sub>3i+2</sub>,a<sub>3i+3</sub>)</em>  is maximised. If there are multiple possible  <em>p</em>, output any.</p><p><em><sup>∗</sup></em> A permutation of length  <em>n</em>  is an array consisting of  <em>n</em>  distinct integers from  <em>1</em>  to  <em>n</em>  in arbitrary order. For example,  <em>[2,3,1,5,4]</em>  is a permutation, but  <em>[1,2,2]</em>  is not a permutation (<em>2</em>  appears twice in the array), and  <em>[1,3,4]</em>  is also not a permutation (<em>n=3</em>  but there is  <em>4</em>  in the array).</p><p><em><sup>†</sup></em> The median of an array  <em>b</em>  containing  <em>3</em>  elements is the  <em>2</em> -nd element after  <em>b</em>  is sorted in non-decreasing order.</p></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains the number of test cases  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>4</sup></em>). The description of the test cases follows.</p><p>The first and only line of each test case contains an integer  <em>n</em>  (<em>1 ≤ n ≤ 10<sup>5</sup></em>).</p><p>It is guaranteed that the sum of  <em>3n</em>  does not exceed  <em>3 · 10<sup>5</sup></em>  over all test cases.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output a permutation  <em>p</em>  such that the sum of the medians of the contiguous blocks is maximised. If there are multiple possible  <em>p</em>, output any.</p></dd>
+<dt>样例输入</dt><dd><pre>3
+2
+1
+3</pre></dd>
+<dt>样例输出</dt><dd><pre>1 3 4 2 5 6 
+3 1 2
+5 2 4 8 3 9 7 1 6</pre></dd>
+<dt>Note</dt><dd><p>In the first test case,  <em>[1,3,4,2,5,6]</em>  is a possible answer because  <em>median(1,3,4) + median(2,5,6) = 3+5 = 8</em>, and it can be shown that  <em>8</em>  is the maximal possible sum of medians.</p><p>In the second test case,  <em>[3,1,2]</em>  is a possible answer because the only achievable sum of medians when  <em>n=1</em>  is  <em>2</em>.</p></dd>
+</dl>
 </body></html>

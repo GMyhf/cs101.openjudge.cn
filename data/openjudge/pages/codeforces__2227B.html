@@ -1,8 +1,33 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2227B: Party Monster](https://codeforces.com/contest/2227/problem/B)</title></head>
-<body><div id="pageTitle"><h2>2227B: Party Monster](https://codeforces.com/contest/2227/problem/B)</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2227/B" rel="noopener">Codeforces 2227B</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：检查括号序列是否平衡，即左括号和右括号数量相等，且长度为偶数。</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2227/B" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2227B: B. Party Monster</title></head>
+<body><div id="pageTitle"><h2>B. Party Monster</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2227/B" rel="noopener">Codeforces 2227B</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Yousef has given you a sequence  <em>s</em>  of length  <em>n</em>  consisting only of characters ' <em>(</em> ' and ' <em>)</em> '. You are allowed to perform the following operation at most once:</p><ul><li>Choose a substring <em><sup>∗</sup></em>  of  <em>s</em>  and remove it. Then, you may reinsert the removed characters back into the remaining string one by one. Each character can be placed at any arbitrary position, independently of the others.</li></ul><p>Yousef wants you to determine whether it is possible to obtain a regular bracket sequence <em><sup>†</sup></em>  after performing the operation at most once.</p><p><em><sup>∗</sup></em> A substring is a contiguous subsegment of a string. For example, "acab" is a substring of "abacaba" (it starts in position  <em>3</em>  and ends in position  <em>6</em>), but "aa" or "d" aren't substrings of this string. So the substring of the string  <em>s</em>  from position  <em>l</em>  to position  <em>r</em>  is  <em>s[l, r]= s<sub>l</sub> s<sub>l+1</sub> … s<sub>r</sub></em>.</p><p><em><sup>†</sup></em> A regular bracket sequence is a bracket sequence that can be transformed into a correct arithmetic expression by inserting the characters  <em>1</em>  and  <em>+</em>  between the original characters of the sequence. For example:</p><ul><li>bracket sequences  <em>()()</em>  and  <em>(())</em>  are regular (the resulting expressions are:  <em>(1)+(1)</em>  and  <em>((1+1)+1)</em>);</li><li>bracket sequences  <em>)(</em>,  <em>(</em>  and  <em>)</em>  are not.</li></ul></dd>
+<dt>Input</dt><dd><p>The first line contains an integer  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>4</sup></em>) — the number of test cases. The descriptions of the test cases follow.</p><p>The first line of each test case contains a single integer  <em>n</em>  (<em>1 ≤ n ≤ 2 · 10<sup>5</sup></em>) — the length of the string  <em>s</em>.</p><p>The second line of each test case contains a sequence  <em>s</em>  of length  <em>n</em>  consisting only of characters ' <em>(</em> ' and ' <em>)</em> '.</p><p>It is guaranteed that the sum of  <em>n</em>  over all test cases does not exceed  <em>2 · 10<sup>5</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output "YES" if the sequence can be made regular, and "NO" otherwise.</p><p>You can output the answer in any case (upper or lower). For example, the strings "yEs", "yes", "Yes", and "YES" will be recognized as positive responses.</p></dd>
+<dt>样例输入</dt><dd><pre>6
+2
+()
+2
+)(
+3
+(((
+6
+())(()
+4
+(()(
+5
+)()()</pre></dd>
+<dt>样例输出</dt><dd><pre>YES
+YES
+NO
+YES
+NO
+NO</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, the string  <em>s</em>  is already a regular bracket sequence, therefore the answer is "YES".</p><p>In the second test case, we can remove the substring  <em>s[2, 2] = (</em>  and reinsert it at the beginning of the string, making  <em>s = ()</em>, therefore the answer is "YES".</p><p>In the third test case, there is no way to do the operation and get a regular bracket sequence, so the answer is "NO".</p><p>In the fourth test case, we can choose the substring  <em>s[3, 4] = )(</em>, remove it, then reinsert the characters as follows:</p><p><em>())(() → ()() → (()())</em></p><p>Therefore we have made a regular bracket sequence, and the answer is "YES".</p></dd>
+</dl>
 </body></html>

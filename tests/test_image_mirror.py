@@ -17,7 +17,7 @@ class ImageMirrorTests(unittest.TestCase):
     def test_manifest_covers_every_remote_image_and_every_file_is_intact(self):
         payload = json.loads(mirror.MANIFEST.read_text(encoding="utf-8"))
         references = mirror.collect_remote_images()
-        self.assertEqual(payload["remote_urls"], 200)
+        self.assertEqual(payload["remote_urls"], 233)
         self.assertEqual(set(payload["assets"]), set(references))
         self.assertEqual(mirror.check_manifest(), [])
 

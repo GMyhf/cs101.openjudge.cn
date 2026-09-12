@@ -1,0 +1,29 @@
+{
+  "id": "20B",
+  "name": "Equation",
+  "source_url": "https://codeforces.com/problemset/problem/20/B",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF20B",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "You are given an equation:\n\n $ Ax^{2}+Bx+C=0 $ . Your task is to find the number of distinct roots of the equation and print all of them in ascending order.",
+    "formatI": "The first line contains three integer numbers $ A,B $ and $ C $ ( $ -10^{5}<=A,B,C<=10^{5} $ ). Any coefficient may be equal to 0.",
+    "formatO": "In case of infinite root count print the only integer -1. In case of no roots print the only integer 0. In other cases print the number of root on the first line and the roots on the following lines in the ascending order. Print roots with at least 5 digits after the decimal point.",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "### 题目大意\n\n给定 $A, B, C$，求方程 $Ax^2+Bx+C=0$ 的解的个数，如果有无穷个解，则输出 `-1`，如果无解，请输出`0`。",
+    "formatI": "第一行：三个整数表示上式的 $A, B, C$。",
+    "formatO": "第一行：一个整数，表示解的个数，如果有无数个解，请输出 `-1`。\n\n接下来若干行：每行一个解，请按大小顺序输出。",
+    "hint": null,
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "1 -5 6\n",
+      "output": "2\n2.0000000000\n3.0000000000"
+    }
+  ]
+}

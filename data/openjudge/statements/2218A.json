@@ -1,0 +1,29 @@
+{
+  "id": "2218A",
+  "name": "The 67th Integer Problem",
+  "source_url": "https://codeforces.com/problemset/problem/2218/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2218A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Welcome to the New World, O Esteemed Earthly Visitor. You've been summoned by Macaque, a primate with four legs, a god complex and a terminal addiction to the word \"trivial\". You are Undertaking a Journey of Great Importance. Such Incredible Importance. No Journey Will EVER be as IMPORTANT as this one (and nothing this narrator says will sound so distinctly... orange again). You are implored to cooperate with Macaque, for his wrath (and joblessness) are unending. There is no room for error or incompetence. Lousiness shall be met with the full force of the law.\n\nMacaque is given an integer  $ x $ . Your task is to choose an integer  $ y $  such that the value of  $ \\operatorname{min}(x, y) $  $ ^{\\text{∗}} $  is maximized.\n\nIf there are multiple valid  $ y $ , you may output any of them.\n\n $ ^{\\text{∗}} $  $ \\operatorname{min}(x, y) $  is defined as the minimum of integers  $ x $  and  $ y $ .",
+    "formatI": "Each test contains multiple test cases. The first line contains the number of test cases  $ t $  ( $ 1 \\le t \\le 6767 $ ). The description of the test cases follows.\n\nThe only line of each test case contains a single integer  $ x $  ( $ -67 \\le x \\le 67 $ ).",
+    "formatO": "For each test case, output one integer  $ y $  ( $ -67 \\le y \\le 67 $ ) such that  $ \\min(x, y) $  is maximized.",
+    "hint": "In the first case,  $ 2 $  is a possible answer because  $ \\min(1, 2) = 1 $ , which can be shown to be maximal.",
+    "background": null
+  },
+  "translation": {
+    "description": "欢迎来到新世界，尊贵的地球来客。你被“猕猴”召唤——一个有四条腿、拥有神灵情结并且对“trivial”一词有着终极依赖的灵长类动物。你正肩负一项极其重要的旅程。这项旅程如此重要，无与伦比，没有任何旅程能与之相提并论（而叙述者的话再也不会这么……橙色了）。你被要求配合“猕猴”，因为他的愤怒（以及失业）是永无止境的。没有犯错或无能的空间。不称职将会受到法律的全部制裁。\n\n“猕猴”给定一个整数 $x$。你的任务是选择一个整数 $y$，使得 $\\operatorname{min}(x, y)$ 的值最大。\n\n如果存在多个满足条件的 $y$，你可以输出其中任意一个。\n\n$^{\\text{∗}}$ 这里的 $\\operatorname{min}(x, y)$ 表示 $x$ 和 $y$ 两个整数中的较小值。",
+    "formatI": "每组测试包含多个测试用例。第一行包含一个整数 $t$（$1 \\le t \\le 6767$）。测试用例的描述如下。\n\n每个测试用例仅包含一行，一个整数 $x$（$-67 \\le x \\le 67$）。",
+    "formatO": "对于每个测试用例，输出一个整数 $y$（$-67 \\le y \\le 67$），使得 $\\min(x, y)$ 达到最大值。",
+    "hint": "在第一个样例中，$2$ 是可能的答案，因为 $\\min(1, 2) = 1$，可以证明这是最大值。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "3\n1\n3\n5",
+      "output": "2\n4\n6"
+    }
+  ]
+}

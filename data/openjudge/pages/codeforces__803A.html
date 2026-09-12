@@ -1,24 +1,29 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>803A: Maximal Binary Matrix</title></head>
-<body><div id="pageTitle"><h2>803A: Maximal Binary Matrix</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/803/A" rel="noopener">Codeforces 803A</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>You are given matrix with *n* rows and *n* columns filled with zeroes. You should put *k* ones in it in such a way that the resulting matrix is symmetrical with respect to the main diagonal (the diagonal that goes from the top left to the bottom right corner) and is lexicographically maximal.
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 803A: A. Maximal Binary Matrix</title></head>
+<body><div id="pageTitle"><h2>A. Maximal Binary Matrix</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/803/A" rel="noopener">Codeforces 803A</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>You are given matrix with <em>n</em> rows and <em>n</em> columns filled with zeroes. You should put <em>k</em> ones in it in such a way that the resulting matrix is symmetrical with respect to the main diagonal (the diagonal that goes from the top left to the bottom right corner) and is lexicographically maximal.</p><p>One matrix is lexicographically greater than the other if the first different number in the first different row from the top in the first matrix is greater than the corresponding number in the second one.</p><p>If there exists no such matrix then output -1.</p></dd>
+<dt>Input</dt><dd><p>The first line consists of two numbers <em>n</em> and <em>k</em> (<em>1≤n≤100</em>, <em>0≤k≤10<sup>6</sup></em>).</p></dd>
+<dt>Output</dt><dd><p>If the answer exists then output resulting matrix. Otherwise output -1.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+2 1
+样例输出1
+1 0 
+0 0 
 
-One matrix is lexicographically greater than the other if the first different number in the first different row from the top in the first matrix is greater than the corresponding number in the second one.
-
-If there exists no such matrix then output -1.
-
-**Input**
-
-The first line consists of two numbers *n* and *k* (1 ≤ *n* ≤ 100, 0 ≤ *k* ≤ 106).
-
-**Output**
-
-If the answer exists then output resulting matrix. Otherwise output -1.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/803/A" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+样例输入2
+3 2
+样例输出2
+1 0 0 
+0 1 0 
+0 0 0 </pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入3
+2 5
+样例输出3
+-1</pre></dd>
+</dl>
 </body></html>

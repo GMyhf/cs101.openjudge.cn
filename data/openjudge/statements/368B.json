@@ -1,0 +1,29 @@
+{
+  "id": "368B",
+  "name": "Sereja and Suffixes",
+  "source_url": "https://codeforces.com/problemset/problem/368/B",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF368B",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Sereja has an array $ a $ , consisting of $ n $ integers $ a_{1} $ , $ a_{2} $ , $ ... $ , $ a_{n} $ . The boy cannot sit and do nothing, he decided to study an array. Sereja took a piece of paper and wrote out $ m $ integers $ l_{1},l_{2},...,l_{m} $ $ (1<=l_{i}<=n) $ . For each number $ l_{i} $ he wants to know how many distinct numbers are staying on the positions $ l_{i} $ , $ l_{i}+1 $ , ..., $ n $ . Formally, he want to find the number of distinct numbers among $ a_{li},a_{li}+1,...,a_{n} $ .?\n\nSereja wrote out the necessary array elements but the array was so large and the boy was so pressed for time. Help him, find the answer for the described question for each $ l_{i} $ .",
+    "formatI": "The first line contains two integers $ n $ and $ m $ $ (1<=n,m<=10^{5}) $ . The second line contains $ n $ integers $ a_{1} $ , $ a_{2} $ , $ ... $ , $ a_{n} $ $ (1<=a_{i}<=10^{5}) $ — the array elements.\n\nNext $ m $ lines contain integers $ l_{1},l_{2},...,l_{m} $ . The $ i $ -th line contains integer $ l_{i} $ $ (1<=l_{i}<=n) $ .",
+    "formatO": "Print $ m $ lines — on the $ i $ -th line print the answer to the number $ l_{i} $ .",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "Sereja 有一个长度为 $n$ 的整数数组 $a$，其元素分别为 $a_{1}, a_{2}, \\ldots, a_{n}$。Sereja 觉得闲着没事做，决定来研究一下这个数组。他拿出一张纸，写下了 $m$ 个整数 $l_{1}, l_{2}, \\ldots, l_{m}$，其中 $1 \\leq l_{i} \\leq n$。对于每一个 $l_{i}$，他都想知道从第 $l_{i}$ 个位置一直到第 $n$ 个位置的区间 $a_{l_i}, a_{l_i+1}, \\ldots, a_n$ 中，有多少个不同的数字？\n\n由于数组太大，而且 Sereja 的时间有限，请你帮他计算每个 $l_{i}$ 对应的答案。",
+    "formatI": "第一行包含两个整数 $n$ 和 $m$，其中 $1 \\leq n, m \\leq 10^{5}$。  \n第二行包含 $n$ 个整数 $a_{1}, a_{2}, \\ldots, a_{n}$（$1 \\leq a_{i} \\leq 10^{5}$），表示数组的元素。\n\n接下来 $m$ 行，每行包含一个整数 $l_{i}$（$1 \\leq l_{i} \\leq n$），表示第 $i$ 个询问。",
+    "formatO": "输出共 $m$ 行，第 $i$ 行输出对应 $l_{i}$ 的答案，即区间 $a_{l_i}, a_{l_i+1}, \\ldots, a_n$ 内不同数字的个数。",
+    "hint": "\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "10 10\n1 2 3 4 1 2 3 4 100000 99999\n1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n",
+      "output": "6\n6\n6\n6\n6\n5\n4\n3\n2\n1\n"
+    }
+  ]
+}

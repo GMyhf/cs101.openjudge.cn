@@ -1,22 +1,28 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2132B: The Secret Number</title></head>
-<body><div id="pageTitle"><h2>2132B: The Secret Number</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2132/B" rel="noopener">Codeforces 2132B</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Vadim has thought of a number 𝑥. To ensure that no one can guess it, he appended a positive number of zeros to the right of it, thus obtaining a new number 𝑦. However, as a precaution, Vadim decided to spread the number 𝑛=𝑥+𝑦. Find all suitable 𝑥 that Vadim could have thought of for the given 𝑛.
-
-**Input**
-
-Each test consists of several test cases. The first line contains a single integer 𝑡 (1≤𝑡≤104) — the number of test cases. The following lines describe the test cases.
-
-In a single line of each test case, there is an integer 𝑛 — the number spread by Vadim (11≤𝑛≤1018).
-
-**Output**
-
-For each number 𝑛, output 0 if there are no suitable 𝑥. Otherwise, output the number of suitable 𝑥, followed by all suitable 𝑥 **in ascending order**.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2132/B" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2132B: B. The Secret Number</title></head>
+<body><div id="pageTitle"><h2>B. The Secret Number</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2132/B" rel="noopener">Codeforces 2132B</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Vadim has thought of a number <em>x</em>. To ensure that no one can guess it, he appended a positive number of zeros to the right of it, thus obtaining a new number <em>y</em>. However, as a precaution, Vadim decided to spread the number <em>n = x + y</em>. Find all suitable <em>x</em> that Vadim could have thought of for the given <em>n</em>.</p></dd>
+<dt>Input</dt><dd><p>Each test consists of several test cases. The first line contains a single integer <em>t</em> <em>(1 \≤ t \≤ 10<sup>4</sup>)</em> — the number of test cases. The following lines describe the test cases.</p><p>In a single line of each test case, there is an integer <em>n</em> — the number spread by Vadim <em>(11 \≤ n \≤ 10<sup>18</sup>)</em>.</p></dd>
+<dt>Output</dt><dd><p>For each number <em>n</em>, output <em>0</em> if there are no suitable <em>x</em>. Otherwise, output the number of suitable <em>x</em>, followed by all suitable <em>x</em> in ascending order.</p></dd>
+<dt>样例输入</dt><dd><pre>5
+1111
+12
+55
+999999999999999999
+1000000000000000000</pre></dd>
+<dt>样例输出</dt><dd><pre>2
+11 101
+0
+1
+5
+3
+999999999 999000999000999 90909090909090909
+0</pre></dd>
+<dt>Note</dt><dd><p>In the first sample, to <em>11</em> one can append two zeros to the right, then <em>11 + 1100 = 1111</em>, and to <em>101</em> one can append one zero to the right, then <em>101 + 1010 = 1111</em>.</p><p>In the second sample, it is impossible to obtain <em>12</em> through the described actions.</p></dd>
+</dl>
 </body></html>

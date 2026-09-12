@@ -1,0 +1,33 @@
+{
+  "id": "200B",
+  "name": "Drinks",
+  "source_url": "https://codeforces.com/problemset/problem/200/B",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF200B",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Little Vasya loves orange juice very much. That's why any food and drink in his kitchen necessarily contains orange juice. There are $ n $ drinks in his fridge, the volume fraction of orange juice in the $ i $ -th drink equals $ p_{i} $ percent.\n\nOne day Vasya decided to make himself an orange cocktail. He took equal proportions of each of the $ n $ drinks and mixed them. Then he wondered, how much orange juice the cocktail has.\n\nFind the volume fraction of orange juice in the final drink.",
+    "formatI": "The first input line contains a single integer $ n $ ( $ 1<=n<=100 $ ) — the number of orange-containing drinks in Vasya's fridge. The second line contains $ n $ integers $ p_{i} $ ( $ 0<=p_{i}<=100 $ ) — the volume fraction of orange juice in the $ i $ -th drink, in percent. The numbers are separated by a space.",
+    "formatO": "Print the volume fraction in percent of orange juice in Vasya's cocktail. The answer will be considered correct if the absolute or relative error does not exceed $ 10^{-4} $ .",
+    "hint": "Note to the first sample: let's assume that Vasya takes $ x $ milliliters of each drink from the fridge. Then the volume of pure juice in the cocktail will equal ![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF200B/7c2a6a8bbcdbfef1f9a32c2eb1f7549c3c17c619.png) milliliters. The total cocktail's volume equals $ 3·x $ milliliters, so the volume fraction of the juice in the cocktail equals ![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF200B/cc3d21395b67607dff0b7baa3b0b870221e3352d.png), that is, $ 66.(6) $ percent.",
+    "background": ""
+  },
+  "translation": {
+    "description": "小 Vasya 非常喜欢橙汁。因此，他厨房里的任何食物和饮料都一定含有橙汁。他冰箱里有 $n$ 种饮料，第 $i$ 种饮料中橙汁的体积分数为 $p_{i}$ 百分比。\n\n有一天，Vasya 决定自己调一杯橙子鸡尾酒。他从这 $n$ 种饮料中各取相同体积混合在一起。此时他想知道，这杯混合饮料中橙汁的体积分数是多少。\n\n请你计算混合后的饮料中，橙汁所占的体积分数是多少。",
+    "formatI": "第一行包含一个整数 $n$（$1 \\leq n \\leq 100$），表示 Vasya 冰箱中含有橙汁的饮料种数。第二行包含 $n$ 个整数 $p_{i}$（$0 \\leq p_{i} \\leq 100$），表示第 $i$ 种饮料中橙汁的体积分数，以百分数表示。各数字之间以空格分隔。",
+    "formatO": "输出 Vasya 调制的鸡尾酒中橙汁的体积分数（百分比）。当且仅当你的答案的绝对误差或相对误差不超过 $10^{-4}$ 时，才被视为正确。",
+    "hint": "对第一个样例的说明：假设 Vasya 每种饮料各取 $x$ 毫升，那么混合饮料中纯橙汁的体积为\n$$\n\\frac{p_1x}{100} + \\frac{p_2x}{100} + \\frac{p_3x}{100}\n$$\n毫升。混合饮料的总体积为 $3 \\times x$ 毫升，那么鸡尾酒中橙汁的体积分数为\n$$\n\\frac{p_1 + p_2 + p_3}{3}\n$$\n即 $66.(6)$ 百分比。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "3\n50 50 100\n",
+      "output": "66.666666666667\n"
+    },
+    {
+      "input": "4\n0 25 50 75\n",
+      "output": "37.500000000000\n"
+    }
+  ]
+}

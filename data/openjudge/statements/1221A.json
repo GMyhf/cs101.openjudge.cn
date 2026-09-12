@@ -1,0 +1,29 @@
+{
+  "id": "1221A",
+  "name": "2048 Game",
+  "source_url": "https://codeforces.com/problemset/problem/1221/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF1221A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "You are playing a variation of game 2048. Initially you have a multiset $ s $ of $ n $ integers. Every integer in this multiset is a power of two.\n\nYou may perform any number (possibly, zero) operations with this multiset.\n\nDuring each operation you choose two equal integers from $ s $ , remove them from $ s $ and insert the number equal to their sum into $ s $ .\n\nFor example, if $ s = \\{1, 2, 1, 1, 4, 2, 2\\} $ and you choose integers $ 2 $ and $ 2 $ , then the multiset becomes $ \\{1, 1, 1, 4, 4, 2\\} $ .\n\nYou win if the number $ 2048 $ belongs to your multiset. For example, if $ s = \\{1024, 512, 512, 4\\} $ you can win as follows: choose $ 512 $ and $ 512 $ , your multiset turns into $ \\{1024, 1024, 4\\} $ . Then choose $ 1024 $ and $ 1024 $ , your multiset turns into $ \\{2048, 4\\} $ and you win.\n\nYou have to determine if you can win this game.\n\nYou have to answer $ q $ independent queries.",
+    "formatI": "The first line contains one integer $ q $ ( $ 1 \\le q \\le 100 $ ) – the number of queries.\n\nThe first line of each query contains one integer $ n $ ( $ 1 \\le n \\le 100 $ ) — the number of elements in multiset.\n\nThe second line of each query contains $ n $ integers $ s_1, s_2, \\dots, s_n $ ( $ 1 \\le s_i \\le 2^{29} $ ) — the description of the multiset. It is guaranteed that all elements of the multiset are powers of two.",
+    "formatO": "For each query print YES if it is possible to obtain the number $ 2048 $ in your multiset, and NO otherwise.\n\nYou may print every letter in any case you want (so, for example, the strings yEs, yes, Yes and YES will all be recognized as positive answer).",
+    "hint": "In the first query you can win as follows: choose $ 512 $ and $ 512 $ , and $ s $ turns into $ \\{1024, 64, 1024\\} $ . Then choose $ 1024 $ and $ 1024 $ , and $ s $ turns into $ \\{2048, 64\\} $ and you win.\n\nIn the second query $ s $ contains $ 2048 $ initially.",
+    "background": ""
+  },
+  "translation": {
+    "description": "你正在玩一个变种的 2048 游戏。初始时，你有一个包含 $n$ 个整数的多重集合 $s$。这个多重集合中的每个整数都是 $2$ 的幂。\n\n你可以对这个多重集合进行任意次数（也可以为零）如下操作：\n\n每次操作时，你选择两个相等的整数，将它们从 $s$ 中移除，并将它们的和插入到 $s$ 中。\n\n例如，如果 $s = \\{1, 2, 1, 1, 4, 2, 2\\}$，你选择两个 $2$，则多重集合变为 $\\{1, 1, 1, 4, 4, 2\\}$。\n\n如果你的多重集合中包含数字 $2048$，你就获胜。例如，如果 $s = \\{1024, 512, 512, 4\\}$，你可以这样获胜：选择两个 $512$，多重集合变为 $\\{1024, 1024, 4\\}$。然后选择两个 $1024$，多重集合变为 $\\{2048, 4\\}$，你获胜。\n\n你需要判断是否可以获胜。\n\n你需要回答 $q$ 个独立的询问。",
+    "formatI": "第一行包含一个整数 $q$（$1 \\le q \\le 100$），表示询问的数量。\n\n每个询问的第一行包含一个整数 $n$（$1 \\le n \\le 100$），表示多重集合中的元素个数。\n\n每个询问的第二行包含 $n$ 个整数 $s_1, s_2, \\dots, s_n$（$1 \\le s_i \\le 2^{29}$），表示多重集合的元素。保证所有元素都是 $2$ 的幂。",
+    "formatO": "对于每个询问，如果可以在多重集合中得到 $2048$，输出 YES，否则输出 NO。\n\n你可以用任意大小写输出答案（例如 yEs、yes、Yes 和 YES 都被认为是正确的正答）。",
+    "hint": "在第一个询问中，你可以这样获胜：选择两个 $512$，$s$ 变为 $\\{1024, 64, 1024\\}$。然后选择两个 $1024$，$s$ 变为 $\\{2048, 64\\}$，你获胜。\n\n在第二个询问中，$s$ 初始就包含 $2048$。\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "6\n4\n1024 512 64 512\n1\n2048\n3\n64 512 2\n2\n4096 4\n7\n2048 2 2048 2048 2048 2048 2048\n2\n2048 4096\n",
+      "output": "YES\nYES\nNO\nNO\nYES\nYES\n"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "2075C",
+  "name": "Two Colors",
+  "source_url": "https://codeforces.com/problemset/problem/2075/C",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2075C",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Monocarp has installed a new fence at his summer house. The fence consists of $ n $ planks of the same size arranged in a row.\n\nMonocarp decided that he would paint his fence according to the following rules:\n\n- each plank of the fence will be painted in exactly one color;\n- the number of different colors that the planks will be painted in is exactly two;\n- the planks of the fence that are painted in the same color must form a continuous sequence, meaning that for all pairs of planks painted in the same color, there will be no planks painted in a different color between them.\n\nMonocarp has $ m $ different paints, and the paint of the $ i $ -th color is sufficient to paint no more than $ a_i $ planks of the fence. Monocarp will not buy any additional paints.\n\nYour task is to determine the number of different ways to paint the fence that satisfy all of Monocarp's described wishes. Two ways to paint are considered different if there exists a plank that is painted in different colors in these two ways.",
+    "formatI": "The first line contains a single integer $ t $ ( $ 1 \\le t \\le 10^4 $ ) — the number of test cases.\n\nThe first line of each test case contains two integers $ n $ and $ m $ ( $ 2 \\le n, m \\le 2 \\cdot 10^5 $ ) — the number of planks in the fence and the number of different colors of paint that Monocarp has.\n\nThe second line contains $ m $ integers $ a_1, a_2, \\dots, a_m $ ( $ 1 \\le a_i \\le n $ ), where $ a_i $ is the maximum number of planks that can be painted with the paint of color $ i $ .\n\nThe sum of $ n $ over all test cases does not exceed $ 2 \\cdot 10^5 $ . The sum of $ m $ over all test cases does not exceed $ 2 \\cdot 10^5 $ .",
+    "formatO": "For each test case, output the number of different ways to paint the fence that satisfy all of Monocarp's described wishes.",
+    "hint": "In the first test case, there are $ 4 $ different ways to paint the fence (the sequences of color numbers in which the planks can be painted from left to right are listed below):\n\n1. $ [1, 2, 2, 2, 2] $ ;\n2. $ [1, 1, 2, 2, 2] $ ;\n3. $ [2, 2, 2, 1, 1] $ ;\n4. $ [2, 2, 2, 2, 1] $ .\n\nIn the second test case, there are $ 6 $ different ways to paint the fence (the sequences of color numbers in which the planks can be painted from left to right are listed below):\n\n1. $ [1, 2, 2, 2, 2] $ ;\n2. $ [1, 1, 2, 2, 2] $ ;\n3. $ [1, 1, 1, 2, 2] $ ;\n4. $ [2, 2, 1, 1, 1] $ ;\n5. $ [2, 2, 2, 1, 1] $ ;\n6. $ [2, 2, 2, 2, 1] $ .",
+    "background": ""
+  },
+  "translation": {
+    "description": "Monocarp 决定按照以下规则粉刷围栏：\n- 每块木板必须被涂上恰好一种颜色；\n- 使用的不同颜色总数必须恰好为两种；\n- 相同颜色的木板必须形成连续序列，即对于所有被涂成同一颜色的木板对，它们之间不存在被涂成其他颜色的木板。\n\nMonocarp 有 $m$ 种不同的颜料，其中第 $i$ 种颜色的颜料最多可以涂 $a_i$ 块木板。Monocarp 不会购买额外颜料。\n\n你的任务是计算满足 Monocarp 所有描述的愿望的围栏涂色方式数目。两种涂色方式被认为是不同的，当且仅当存在至少一块木板在这两种方式中被涂成不同颜色。",
+    "formatI": "第一行包含一个整数 $t$（$1 \\le t \\le 10^4$）——测试用例的数量。\n\n每个测试用例的第一行包含两个整数 $n$ 和 $m$（$2 \\le n, m \\le 2 \\cdot 10^5$）——围栏的木板数量以及 Monocarp 拥有的不同颜色数量。\n\n第二行包含 $m$ 个整数 $a_1, a_2, \\dots, a_m$（$1 \\le a_i \\le n$），其中 $a_i$ 表示第 $i$ 种颜色最多可涂的木板数量。\n\n所有测试用例的 $n$ 之和不超过 $2 \\cdot 10^5$。所有测试用例的 $m$ 之和不超过 $2 \\cdot 10^5$。",
+    "formatO": "对于每个测试用例，输出满足条件的不同涂色方式数目。",
+    "hint": "第一个测试案例中，存在 $4$ 种不同的涂色方式（木板从左到右的颜色编号序列如下）：\n1. $[1, 2, 2, 2, 2]$；\n2. $[1, 1, 2, 2, 2]$；\n3. $[2, 2, 2, 1, 1]$；\n4. $[2, 2, 2, 2, 1]$。\n\n第二个测试案例中，存在 $6$ 种不同的涂色方式（木板从左到右的颜色编号序列如下）：\n1. $[1, 2, 2, 2, 2]$；\n2. $[1, 1, 2, 2, 2]$；\n3. $[1, 1, 1, 2, 2]$；\n4. $[2, 2, 1, 1, 1]$；\n5. $[2, 2, 2, 1, 1]$；\n6. $[2, 2, 2, 2, 1]$。\n\n翻译由 DeepSeek R1 完成",
+    "background": ""
+  },
+  "samples": [
+    {
+      "input": "3\n5 2\n2 4\n5 2\n3 4\n12 3\n5 9 8",
+      "output": "4\n6\n22"
+    }
+  ]
+}

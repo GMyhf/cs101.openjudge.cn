@@ -1,0 +1,37 @@
+{
+  "id": "1154A",
+  "name": "Restoring Three Numbers",
+  "source_url": "https://codeforces.com/problemset/problem/1154/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF1154A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Polycarp has guessed three positive integers $ a $ , $ b $ and $ c $ . He keeps these numbers in secret, but he writes down four numbers on a board in arbitrary order — their pairwise sums (three numbers) and sum of all three numbers (one number). So, there are four numbers on a board in random order: $ a+b $ , $ a+c $ , $ b+c $ and $ a+b+c $ .\n\nYou have to guess three numbers $ a $ , $ b $ and $ c $ using given numbers. Print three guessed integers in any order.\n\nPay attention that some given numbers $ a $ , $ b $ and $ c $ can be equal (it is also possible that $ a=b=c $ ).",
+    "formatI": "The only line of the input contains four positive integers $ x_1, x_2, x_3, x_4 $ ( $ 2 \\le x_i \\le 10^9 $ ) — numbers written on a board in random order. It is guaranteed that the answer exists for the given number $ x_1, x_2, x_3, x_4 $ .",
+    "formatO": "Print such positive integers $ a $ , $ b $ and $ c $ that four numbers written on a board are values $ a+b $ , $ a+c $ , $ b+c $ and $ a+b+c $ written in some order. Print $ a $ , $ b $ and $ c $ in any order. If there are several answers, you can print any. It is guaranteed that the answer exists.",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "Polycarp 猜测了三个正整数 $a$、$b$ 和 $c$。他将这三个数保密，但在黑板上以任意顺序写下了四个数——它们的两两和（三个数）以及三个数的总和（一个数）。因此，黑板上有四个随机顺序的数：$a+b$、$a+c$、$b+c$ 和 $a+b+c$。\n\n你需要根据给出的四个数，猜出这三个数 $a$、$b$ 和 $c$。请输出你猜测的三个整数，顺序不限。\n\n请注意，给定的某些数 $a$、$b$ 和 $c$ 可能相等（也可能 $a=b=c$）。",
+    "formatI": "输入仅一行，包含四个正整数 $x_1, x_2, x_3, x_4$（$2 \\le x_i \\le 10^9$），表示黑板上以任意顺序写下的四个数。保证对于给定的 $x_1, x_2, x_3, x_4$，一定存在符合条件的 $a$、$b$、$c$。",
+    "formatO": "输出三个正整数 $a$、$b$ 和 $c$，使得黑板上的四个数正好是 $a+b$、$a+c$、$b+c$ 和 $a+b+c$ 的某种顺序。输出顺序不限。如果有多组答案，可以输出任意一组。保证一定存在解。",
+    "hint": "\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "3 6 5 4\n",
+      "output": "2 1 3\n"
+    },
+    {
+      "input": "40 40 40 60\n",
+      "output": "20 20 20\n"
+    },
+    {
+      "input": "201 101 101 200\n",
+      "output": "1 100 100\n"
+    }
+  ]
+}

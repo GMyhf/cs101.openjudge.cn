@@ -1,0 +1,29 @@
+{
+  "id": "2227E",
+  "name": "It All Went Sideways",
+  "source_url": "https://codeforces.com/problemset/problem/2227/E",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2227E",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Yousef has  $ n $  columns of cubes standing side by side. The  $ i $ -th column contains  $ a_i $  identical unit cubes stacked vertically. Initially gravity pulls cubes downwards, so every column  $ i $  contains exactly  $ a_i $  cubes at heights  $ 1, 2, \\dots, a_i $ .\n\nSuddenly, gravity shifts to the right. Each cube slides horizontally as far to the right as possible. A cube cannot pass through or overlap other cubes, and it must remain at its original height. The final configuration is uniquely determined by the initial heights.\n\n ![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF2227E/fad162917342e980d1f1251226569013b552c9e960c29c3ae0ca499a952e02b9.png) Before and after applying rightward gravity.Before the gravity shift, Yousef may perform at most one operation: choose an index  $ i $  and decrease  $ a_i $  by  $ 1 $  (i.e. remove one cube from that column). He may also choose to do nothing.\n\nA cube is said to move if its column index after the gravity shift is different from its original column index.\n\nFind the maximum possible number of cubes that will move after the gravity shift, assuming Yousef applies the single decrease optimally (or chooses not to apply it).",
+    "formatI": "The first line contains an integer  $ t $  ( $ 1 \\le t \\le 10^4 $ ) — the number of test cases. The description of the test cases follows.\n\nThe first line of each test case contains a single integer  $ n $  ( $ 1 \\le n \\le 2 \\cdot 10^5 $ ) — the length of the array.\n\nThe second line of each test case contains  $ n $  integers  $ a_1, a_2, \\dots, a_n $  ( $ 1 \\le a_i \\le n $ ) — the elements of the array.\n\nIt is guaranteed that the sum of  $ n $  over all test cases does not exceed  $ 2 \\cdot 10^5 $ .",
+    "formatO": "For each test case, output a single integer — the maximum possible number of cubes that will move after the gravity shift, assuming Yousef applies the single decrease optimally (or chooses not to apply it).",
+    "hint": "In the first test case, it is optimal to perform the operation on index  $ 5 $ , making the array  $ a = [1, 2, 3, 2, 0] $ . After the gravity shift, every remaining cube will move. The answer is  $ 1+2+3+2 = 8 $ . It can be proven that a greater answer does not exist.\n\nIn the second test case, we can perform the operation on index  $ 6 $ , making the array  $ a = [5, 4, 1, 1, 1, 0, 3] $ . After the gravity shift,  $ 5+4+1+1+1 = 12 $  cubes will move. Note that the cubes at index  $ 7 $  do not move, since they are already at the rightmost end of the array.\n\nIn the third test case, there is no way to make any cube move.",
+    "background": null
+  },
+  "translation": {
+    "description": "Yousef 有 $n$ 列方块并排竖立。第 $i$ 列包含 $a_i$ 个完全相同的单元方块垂直堆叠而成。最初，重力向下作用，因此每一列 $i$ 恰好包含 $a_i$ 个方块，这些方块分别处于高度 $1, 2, \\dots, a_i$。\n\n突然间，重力转向右侧。每个方块会在保持原有高度不变的前提下，尽可能水平向右滑动。方块不能穿过或重叠在其它方块上。最终配置将唯一由初始高度决定。\n\n![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF2227E/fad162917342e980d1f1251226569013b552c9e960c29c3ae0ca499a952e02b9.png)\n\n在重力转向之前，Yousef 可以进行至多一次操作：选择一个下标 $i$，并将 $a_i$ 减少 $1$（即从该列移除一个方块）。他也可以选择不进行任何操作。\n\n如果一个方块在重力转向后所在的列下标与其原来的列下标不同，则称这个方块“发生了移动”。\n\n请你找出在 Yousef 最优地进行一次减少操作（或不操作）的情况下，重力转向后可能移动的方块的最大数量。",
+    "formatI": "第一行包含一个整数 $t$（$1 \\le t \\le 10^4$），表示测试用例的数量。接下来依次给出每个测试用例的描述。\n\n每个测试用例的第一行包含一个整数 $n$（$1 \\le n \\le 2 \\cdot 10^5$），表示数组长度。\n\n第二行包含 $n$ 个整数 $a_1, a_2, \\dots, a_n$（$1 \\le a_i \\le n$），表示数组的每个元素。\n\n保证所有测试用例中的 $n$ 之和不超过 $2 \\cdot 10^5$。",
+    "formatO": "对于每个测试用例，输出一个整数，表示在 Yousef 最优执行一次减少操作（或不操作）后，重力转向后最多有多少个方块发生了移动。",
+    "hint": "在第一个测试用例中，最优操作是对下标 $5$ 执行减少操作，此时数组变为 $a = [1, 2, 3, 2, 0]$。重力转向后，所有剩下的方块都会移动。答案为 $1+2+3+2=8$。可以证明不存在更大的答案。\n\n在第二个测试用例中，我们可以对下标 $6$ 执行减少操作，此时数组变为 $a = [5, 4, 1, 1, 1, 0, 3]$。重力转向后，$5+4+1+1+1=12$ 个方块会移动。注意第 $7$ 列的方块不会移动，因为它们本就在最右侧。\n\n在第三个测试用例中，无论如何操作，都没有方块会移动。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "5\n5\n1 2 3 2 1\n7\n5 4 1 1 1 1 3\n6\n1 2 3 4 5 6\n6\n4 1 6 3 2 6\n7\n1 3 2 7 2 3 1",
+      "output": "8\n12\n0\n10\n18"
+    }
+  ]
+}

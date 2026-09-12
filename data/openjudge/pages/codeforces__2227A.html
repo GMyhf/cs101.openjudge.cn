@@ -1,8 +1,27 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2227A: Koshary](https://codeforces.com/contest/2227/problem/A)</title></head>
-<body><div id="pageTitle"><h2>2227A: Koshary](https://codeforces.com/contest/2227/problem/A)</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2227/A" rel="noopener">Codeforces 2227A</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：简单数学题，由于你每一步走的步长都是 $2$，因此在行进过程中有 $x \mod 2$ 和 $y \mod 2$ 的不变性。注意到这个就简单了</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2227/A" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2227A: A. Koshary</title></head>
+<body><div id="pageTitle"><h2>A. Koshary</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2227/A" rel="noopener">Codeforces 2227A</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Yousef is at the coordinates  <em>(0, 0)</em>  and wants to reach a plate of Koshary at  <em>(x, y)</em>.</p><p>To get there, Yousef takes long steps. From any point  <em>(a, b)</em>, a long step moves him to:</p><ul><li><em>(a + 2, b)</em>  or  <em>(a, b + 2)</em></li></ul><p>However, Yousef is allowed to take at most one short step during his entire journey. A short step moves him to:</p><ul><li><em>(a + 1, b)</em>  or  <em>(a, b + 1)</em></li></ul><p>Can Yousef reach the exact coordinates  <em>(x, y)</em>  of the Koshary plate?</p></dd>
+<dt>Input</dt><dd><p>The first line contains an integer  <em>t</em>  (<em>1 ≤ t ≤ 100</em>) — the number of test cases.</p><p>Each test case contains two integers  <em>x</em>  and  <em>y</em>  (<em>1 ≤ x, y ≤ 10</em>) — the coordinates of the Koshary plate.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output "YES" if Yousef can reach the Koshary plate and "NO" otherwise.</p><p>You can output the answer in any case (upper or lower). For example, the strings "yEs", "yes", "Yes", and "YES" will be recognized as positive responses.</p></dd>
+<dt>样例输入</dt><dd><pre>6
+1 1
+1 2
+4 6
+5 9
+7 2
+10 10</pre></dd>
+<dt>样例输出</dt><dd><pre>NO
+YES
+YES
+NO
+YES
+YES</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, it is impossible to reach  <em>(1, 1)</em>  using the mentioned steps.</p><p>In the second test case, an optimal sequence of steps would be: <em>(0, 0) <sup>long</sup>→ (0, 2) <sup>short</sup>→ (1, 2)</em></p><p>In the third test case, an optimal sequence of steps would be: <em>(0, 0) <sup>long</sup>→ (0, 2) <sup>long</sup>→ (2, 2) <sup>long</sup>→ (2, 4) <sup>long</sup>→ (4, 4) <sup>long</sup>→ (4, 6)</em></p></dd>
+</dl>
 </body></html>

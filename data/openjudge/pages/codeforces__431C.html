@@ -1,41 +1,31 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>431C: k-Tree</title></head>
-<body><div id="pageTitle"><h2>431C: k-Tree</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/431/C" rel="noopener">Codeforces 431C</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>dp, implementation, trees, *1600
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 431C: C. k-Tree</title></head>
+<body><div id="pageTitle"><h2>C. k-Tree</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/431/C" rel="noopener">Codeforces 431C</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Quite recently a creative student Lesha had a lecture on trees. After the lecture Lesha was inspired and came up with the tree of his own which he called a <em>k</em> -tree.</p><p>A <em>k</em> -tree is an infinite rooted tree where:</p><ul><li>each vertex has exactly <em>k</em> children;</li><li>each edge has some weight;</li><li>if we look at the edges that goes from some vertex to its children (exactly <em>k</em> edges), then their weights will equal <em>1,2,3,...,k</em>.</li></ul><p>The picture below shows a part of a 3-tree.</p><p><img src="https://cdn.luogu.com.cn/upload/vjudge_pic/CF431C/83eea7df0a509cbc1e6d27ff0b5f74fa2e2e451c.png" alt="illustration"></p><p>As soon as Dima, a good friend of Lesha, found out about the tree, he immediately wondered: "How many paths of total weight <em>n</em> (the sum of all weights of the edges in the path) are there, starting from the root of a <em>k</em> -tree and also containing at least one edge of weight at least <em>d</em>?".Help Dima find an answer to his question. As the number of ways can be rather large, print it modulo <em>1000000007</em> (<em>10<sup>9</sup>+7</em>).</p></dd>
+<dt>Input</dt><dd><p>A single line contains three space-separated integers: <em>n</em>, <em>k</em> and <em>d</em> (<em>1≤n,k≤100</em> <em>1≤d≤k</em>).</p></dd>
+<dt>Output</dt><dd><p>Print a single integer — the answer to the problem modulo <em>1000000007</em> (<em>10<sup>9</sup>+7</em>).</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+3 3 2
+样例输出1
+3
 
+样例输入2
+3 3 3
+样例输出2
+1
 
-Quite recently a creative student Lesha had a lecture on trees. After the lecture Lesha was inspired and came up with the tree of his own which he called a *k*-tree.
-
-A *k*-tree is an infinite rooted tree where:
-
-- each vertex has exactly *k* children;
-- each edge has some weight;
-- if we look at the edges that goes from some vertex to its children (exactly *k* edges), then their weights will equal 1, 2, 3, ..., *k*.
-
-The picture below shows a part of a 3-tree.
-
-
-
-![img](https://espresso.codeforces.com/61ac5ac17c4d2f220968eff8fb59bb3c8dc77edf.png)
-
-
-
-As soon as Dima, a good friend of Lesha, found out about the tree, he immediately wondered: &quot;How many paths of total weight *n* (the sum of all weights of the edges in the path) are there, starting from the root of a *k*-tree and also containing at least one edge of weight at least *d*?&quot;.
-
-Help Dima find an answer to his question. As the number of ways can be rather large, print it modulo 1000000007 (10^9^ + 7).
-
-**Input**
-
-A single line contains three space-separated integers: *n*, *k* and *d* (1 ≤ *n*, *k* ≤ 100; 1 ≤ *d* ≤ *k*).
-
-**Output**
-
-Print a single integer — the answer to the problem modulo 1000000007 (10^9^ + 7).
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/431/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+样例输入3
+4 3 2
+样例输出3
+6</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入4
+4 5 2
+样例输出4
+7</pre></dd>
+</dl>
 </body></html>

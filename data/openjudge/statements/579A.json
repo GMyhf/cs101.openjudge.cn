@@ -1,0 +1,33 @@
+{
+  "id": "579A",
+  "name": "Raising Bacteria",
+  "source_url": "https://codeforces.com/problemset/problem/579/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF579A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "You are a lover of bacteria. You want to raise some bacteria in a box.\n\nInitially, the box is empty. Each morning, you can put any number of bacteria into the box. And each night, every bacterium in the box will split into two bacteria. You hope to see exactly $ x $ bacteria in the box at some moment.\n\nWhat is the minimum number of bacteria you need to put into the box across those days?",
+    "formatI": "The only line containing one integer $ x $ ( $ 1<=x<=10^{9} $ ).",
+    "formatO": "The only line containing one integer: the answer.",
+    "hint": "For the first sample, we can add one bacterium in the box in the first day morning and at the third morning there will be $ 4 $ bacteria in the box. Now we put one more resulting $ 5 $ in the box. We added $ 2 $ bacteria in the process so the answer is $ 2 $ .\n\nFor the second sample, we can put one in the first morning and in the 4-th morning there will be $ 8 $ in the box. So the answer is $ 1 $ .",
+    "background": ""
+  },
+  "translation": {
+    "description": "你是一名细菌爱好者。你希望在一个盒子里养一些细菌。\n\n起初，盒子是空的。每天早晨，你可以往盒子里放入任意数量的细菌。每到夜晚，盒子里的每个细菌都会分裂成两个细菌。你希望在某个时刻，盒子里正好有 $x$ 个细菌。\n\n你在这些天里总共最少需要往盒子里放入多少个细菌？",
+    "formatI": "一行包含一个整数 $x$（$1 \\leq x \\leq 10^{9}$）。",
+    "formatO": "一行包含一个整数，表示答案。",
+    "hint": "对于第一个样例，我们可以在第一天早上放入一个细菌，在第三天早上盒子里会有 $4$ 个细菌。现在我们再放入一个细菌，盒子里就有 $5$ 个细菌。整个过程中我们一共放入了 $2$ 个细菌，所以答案是 $2$。\n\n对于第二个样例，我们可以在第一天早上放入一个细菌，在第四天早上，盒子里会有 $8$ 个细菌。所以答案是 $1$。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "5\n",
+      "output": "2\n"
+    },
+    {
+      "input": "8\n",
+      "output": "1\n"
+    }
+  ]
+}

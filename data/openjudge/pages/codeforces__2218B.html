@@ -1,10 +1,23 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2218B: The 67th 6-7 Integer Problem</title></head>
-<body><div id="pageTitle"><h2>2218B: The 67th 6-7 Integer Problem</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2218/B" rel="noopener">Codeforces 2218B</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：懒得思考了，直接 brute force.
-
-代码：</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2218/B" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2218B: B. The 67th 6-7 Integer Problem</title></head>
+<body><div id="pageTitle"><h2>B. The 67th 6-7 Integer Problem</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2218/B" rel="noopener">Codeforces 2218B</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>So, Macaque has passed his first challenge (and is not acknowledging your help whatsoever). After all, it was only given to him so he could engage in his greatest pleasure — crunching on desiccated freezedried hamburgers and yelling 'trivial' at the screen. However, he has another, much more important task ahead of him, and he has once again enlisted you to help him.</p><p>You are given  <em>7</em>  integers  <em>a<sub>1</sub>, a<sub>2</sub>, …, a<sub>7</sub></em>.</p><p>You must negate  <em>6</em>  out of the  <em>7</em>  integers (that is, multiply them by  <em>-1</em>). Over all possible ways to negate  <em>6</em>  out of the  <em>7</em>  integers, find the maximum possible sum of  <em>a</em>.</p></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains the number of test cases  <em>t</em>  (<em>1 ≤ t ≤ 6767</em>). The description of the test cases follows.</p><p>The first and only line of each test case contains  <em>7</em>  space-separated integers  <em>a<sub>1</sub>, a<sub>2</sub>, …, a<sub>7</sub></em>  (<em>-67 ≤ a<sub>i</sub> ≤ 67</em>).</p></dd>
+<dt>Output</dt><dd><p>For each test case, output the maximum sum of  <em>a</em>  after negating  <em>6</em>  out of the  <em>7</em>  integers, on a new line.</p></dd>
+<dt>样例输入</dt><dd><pre>4
+41 41 41 41 41 41 41
+6 9 4 20 6 7 67
+1 2 3 4 5 6 7
+6 7 6 7 6 7 6</pre></dd>
+<dt>样例输出</dt><dd><pre>-205
+15
+-14
+-31</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, no matter which  <em>6</em>  integers we pick to negate, the maximum sum is  <em>-41-41-41-41-41-41+41=-205</em>.</p><p>In the second test case, we can negate all integers except  <em>a<sub>7</sub></em>  to obtain a sum of  <em>-6-9-4-20-6-7+67=15</em>.</p></dd>
+</dl>
 </body></html>

@@ -423,6 +423,50 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertEqual(status, 200)
         self.assertIn("Theatre Square", body.decode("utf-8", errors="replace"))
 
+    def test_codeforces_pages_carry_the_official_statement(self):
+        """每页都是抓回来的原题题面，而不是题解摘录。
+
+        旧页面把课程 Markdown 原样塞进 <pre>：正文停在第一个代码围栏（"Examples
+        input"），`**Input**`/`*n*` 全裸着，样例和官方限制根本没上页。这条守的是
+        那次回归不会再来：结构、限制、样例三样都要对得上抓回来的题面。
+        """
+        cache = ROOT / "data/openjudge/statements"
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        entries = [item for item in catalog["problems"] if item.get("source") == "codeforces"]
+        self.assertEqual({item["id"] for item in entries},
+                         {path.stem for path in cache.glob("*.json")})
+
+        for item in entries:
+            problem_id = item["id"]
+            statement = json.loads((cache / f"{problem_id}.json").read_text(encoding="utf-8"))
+            page = (ROOT / f"data/openjudge/pages/codeforces__{problem_id}.html").read_text(encoding="utf-8")
+            self.assertIn(f'<a href="{statement["source_url"]}"', page, problem_id)
+            self.assertIn("<dt>Time limit</dt>", page, problem_id)
+            self.assertIn("<dt>Memory limit</dt>", page, problem_id)
+            self.assertIn("<dt>Description</dt>", page, problem_id)
+            self.assertIn("<dt>样例输入</dt>", page, problem_id)
+            prose = re.sub(r"<pre>.*?</pre>", "", page[page.index('class="problem-content"'):], flags=re.S)
+            self.assertNotIn("$", prose, problem_id)
+            self.assertIsNone(re.search(r"\\[A-Za-z]+", prose), problem_id)
+            self.assertNotIn("题解摘要", page, problem_id)
+
+    def test_codeforces_pages_hand_every_official_sample_to_the_runner(self):
+        """页面上的样例要能被 `sample_io()` 原样切回来，多组样例也一样。"""
+        sys.path.insert(0, str(ROOT))
+        try:
+            import server
+        finally:
+            sys.path.pop(0)
+        handler = server.Handler.__new__(server.Handler)
+        cache = ROOT / "data/openjudge/statements"
+        for path in sorted(cache.glob("*.json")):
+            statement = json.loads(path.read_text(encoding="utf-8"))
+            page = ROOT / f"data/openjudge/pages/codeforces__{path.stem}.html"
+            cases = handler.sample_io(page)["cases"]
+            self.assertEqual([{"input": case["input"], "output": case["output"]} for case in cases],
+                             [{"input": sample["input"].strip("\n"), "output": sample["output"].strip("\n")}
+                              for sample in statement["samples"]], path.stem)
+
     def test_codeforces_generated_data_has_twenty_one_distinct_cases(self):
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
         entries = [item for item in catalog["problems"] if item.get("source") == "codeforces"]

@@ -1,24 +1,24 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>160A: Twins</title></head>
-<body><div id="pageTitle"><h2>160A: Twins</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/160/A" rel="noopener">Codeforces 160A</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Imagine that you have a twin brother or sister. Having another person that looks exactly like you seems very unusual. It&#x27;s hard to say if having something of an alter ego is good or bad. And if you do have a twin, then you very well know what it&#x27;s like.
-
-Now let&#x27;s imagine a typical morning in your family. You haven&#x27;t woken up yet, and Mom is already going to work. She has been so hasty that she has nearly forgotten to leave the two of her darling children some money to buy lunches in the school cafeteria. She fished in the purse and found some number of coins, or to be exact, *n* coins of arbitrary values $a_1, a_2, ..., a_n$. But as Mom was running out of time, she didn&#x27;t split the coins for you two. So she scribbled a note asking you to split the money equally.
-
-As you woke up, you found Mom&#x27;s coins and read her note. &quot;But why split the money equally?&quot; — you thought. After all, your twin is sleeping and he won&#x27;t know anything. So you decided to act like that: pick for yourself some subset of coins so that the sum of values of your coins is **strictly larger** than the sum of values of the remaining coins that your twin will have. However, you correctly thought that if you take too many coins, the twin will suspect the deception. So, you&#x27;ve decided to stick to the following strategy to avoid suspicions: you take the **minimum number of coins**, whose sum of values is strictly more than the sum of values of the remaining coins. On this basis, determine what **minimum** number of coins you need to take to divide them in the described manner.
-
-**Input**
-
-The first line contains integer *n* (1 ≤ *n* ≤ 100) — the number of coins. The second line contains a sequence of *n* integers $a_1, a_2, ..., a_n (1 ≤ a_i ≤ 100) $ — the coins&#x27; values. All numbers are separated with spaces.
-
-**Output**
-
-In the single line print the single number — the minimum needed number of coins.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/160/A" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 160A: A. Twins</title></head>
+<body><div id="pageTitle"><h2>A. Twins</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/160/A" rel="noopener">Codeforces 160A</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Imagine that you have a twin brother or sister. Having another person that looks exactly like you seems very unusual. It's hard to say if having something of an alter ego is good or bad. And if you do have a twin, then you very well know what it's like.</p><p>Now let's imagine a typical morning in your family. You haven't woken up yet, and Mom is already going to work. She has been so hasty that she has nearly forgotten to leave the two of her darling children some money to buy lunches in the school cafeteria. She fished in the purse and found some number of coins, or to be exact, <em>n</em> coins of arbitrary values <em>a<sub>1</sub>,a<sub>2</sub>,...,a<sub>n</sub></em>. But as Mom was running out of time, she didn't split the coins for you two. So she scribbled a note asking you to split the money equally.</p><p>As you woke up, you found Mom's coins and read her note. "But why split the money equally?" — you thought. After all, your twin is sleeping and he won't know anything. So you decided to act like that: pick for yourself some subset of coins so that the sum of values of your coins is strictly larger than the sum of values of the remaining coins that your twin will have. However, you correctly thought that if you take too many coins, the twin will suspect the deception. So, you've decided to stick to the following strategy to avoid suspicions: you take the minimum number of coins, whose sum of values is strictly more than the sum of values of the remaining coins. On this basis, determine what minimum number of coins you need to take to divide them in the described manner.</p></dd>
+<dt>Input</dt><dd><p>The first line contains integer <em>n</em> (<em>1≤n≤100</em>) — the number of coins. The second line contains a sequence of <em>n</em> integers <em>a<sub>1</sub></em>, <em>a<sub>2</sub></em>, ..., <em>a<sub>n</sub></em> (<em>1≤a<sub>i</sub>≤100</em>) — the coins' values. All numbers are separated with spaces.</p></dd>
+<dt>Output</dt><dd><p>In the single line print the single number — the minimum needed number of coins.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+2
+3 3
+样例输出1
+2</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入2
+3
+2 1 2
+样例输出2
+2</pre></dd>
+<dt>Note</dt><dd><p>In the first sample you will have to take <em>2</em> coins (you and your twin have sums equal to <em>6,0</em> correspondingly). If you take <em>1</em> coin, you get sums <em>3,3</em>. If you take <em>0</em> coins, you get sums <em>0,6</em>. Those variants do not satisfy you as your sum should be strictly more that your twins' sum.</p><p>In the second sample one coin isn't enough for us, too. You can pick coins with values <em>1,2</em> or <em>2,2</em>. In any case, the minimum number of coins equals <em>2</em>.</p></dd>
+</dl>
 </body></html>

@@ -1,0 +1,29 @@
+{
+  "id": "2173E",
+  "name": "Shiro's Mirror Duel",
+  "source_url": "https://codeforces.com/problemset/problem/2173/E",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2173E",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 3000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "There's no such thing as luck in this world. The victor is decided before the game even starts.\n\n— No Game No Life\n\n\n\nThis is an interactive problem.\n\nOne day, Sora and Shiro feel bored again, so they decide to settle it with a game.\n\nAt the beginning, Sora gives Shiro a permutation $ ^{\\text{∗}} $   $ p_1,p_2,\\ldots,p_n $  of length  $ n $ . In each operation, Shiro may select two distinct indices  $ x $  and  $ y $  ( $ 1\\le x\\ne y\\le n $ ). Then Sora flips a fair coin:\n\n- With probability  $ 0.5 $ , Sora swaps  $ p_x $  and  $ p_y $ ;\n- With probability  $ 0.5 $ , Sora swaps  $ p_{n-x+1} $  and  $ p_{n-y+1} $ .\n\nAfter the operation, Sora replies with the actual pair of indices that were swapped, so that Shiro can update her local permutation accordingly.\n\nShiro's goal is to sort the permutation  $ p $  in ascending order by using at most  $ \\lfloor 2.5n+800\\rfloor $  operations. Help her!\n\n $ ^{\\text{∗}} $ A permutation of length  $ n $  is an array consisting of  $ n $  distinct integers from  $ 1 $  to  $ n $  in arbitrary order. For example,  $ [2,3,1,5,4] $  is a permutation, but  $ [1,2,2] $  is not a permutation ( $ 2 $  appears twice in the array), and  $ [1,3,4] $  is also not a permutation ( $ n=3 $  but there is  $ 4 $  in the array).",
+    "formatI": "Each test contains multiple test cases. The first line contains the number of test cases  $ t $  ( $ 1 \\le t \\le 100 $ ). The description of the test cases follows.\n\nThe first line of each test case contains a single integer  $ n $  ( $ 1\\le n\\le 4000 $ ) — the length of  $ p $ .\n\nThe second line contains  $ n $  integers  $ p_1,p_2,\\ldots,p_n $  — the elements of  $ p $ .\n\nIt is guaranteed that the sum of  $ n $  over all test cases does not exceed  $ 2\\cdot 10^4 $ .\n\nIt is guaranteed that there are  $ 50 $  tests in this problem.",
+    "formatO": null,
+    "hint": "In the first test case,  $ n=5 $  and the initial permutation is  $ [5,1,3,4,2] $ .\n\n- We print ? 1 5. The judge replies 1 5, meaning positions  $ 1 $  and  $ 5 $  are swapped (no mirroring). The array becomes  $ [2,1,3,4,5] $ .\n- We print ? 4 5. The judge replies 2 1, which is the mirror of  $ {4,5} $  because with  $ n=5 $  we have  $ n-4+1=2 $  and  $ n-5+1=1 $ . Thus we must swap positions  $ 2 $  and  $ 1 $ . The array becomes  $ [1,2,3,4,5] $ .\n- The permutation is now sorted, so we print !. The answer line does not count toward the operation limit.\n\nIn the second test case, the given permutation is already increasing, so we just need to output !.",
+    "background": null
+  },
+  "translation": {
+    "description": "这个世界上没有所谓的幸运。胜者在游戏开始前就已经决定了。\n\n——《NO GAME NO LIFE》\n\n这是一个交互题。\n\n有一天，空与白又感到无聊，于是他们决定用一场游戏来解决。\n\n一开始，空给白一个长度为 $n$ 的排列 $p_1, p_2, \\ldots, p_n$。每进行一次操作，白可以选择两个不同的下标 $x$ 和 $y$（$1 \\leq x \\neq y \\leq n$）。然后空会抛一枚公正的硬币：\n\n- 有 $0.5$ 的概率，空会交换 $p_x$ 和 $p_y$；\n- 有 $0.5$ 的概率，空会交换 $p_{n-x+1}$ 和 $p_{n-y+1}$。\n\n操作后，空会回复实际被交换的下标对，使白可以相应地更新自己的排列。\n\n白的目标是在不超过 $\\lfloor 2.5n+800\\rfloor$ 次操作内，将排列 $p$ 升序排序。请你帮助她达成目标！\n\n$^{\\ast}$ 长度为 $n$ 的排列是指包含 $n$ 个从 $1$ 到 $n$ 的不同整数的数组。例如，$[2,3,1,5,4]$ 是一个排列，$[1,2,2]$ 不是（因为 $2$ 出现了两次），$[1,3,4]$ 也不是（因为 $n=3$ 但出现了 $4$）。",
+    "formatI": "每个测试包含多组数据。第一行包含测试数据组数 $t$（$1 \\leq t \\leq 100$）。每组测试数据描述如下：\n\n每组测试的第一行包含一个整数 $n$（$1 \\leq n \\leq 4000$），表示排列 $p$ 的长度。\n\n第二行包含 $n$ 个整数 $p_1, p_2, \\ldots, p_n$，表示排列 $p$ 的元素。\n\n保证所有测试数据中 $\\sum n \\leq 2\\cdot 10^4$。\n\n保证本题共有 50 组测试数据。",
+    "formatO": "（交互题，具体细节请参考题面或平台说明。）",
+    "hint": "在第一个测试用例中，$n=5$，初始排列是 $[5,1,3,4,2]$。\n\n- 我们输出 ? 1 5，交互器返回 1 5，表示 $1$ 和 $5$ 这两个位置的元素被交换（没有反射）。此时数组变为 $[2,1,3,4,5]$。\n- 我们输出 ? 4 5，交互器返回 2 1，这实际上是我们选的 ${4,5}$ 的“镜像”，因为 $n=5$，所以 $n-4+1=2$，$n-5+1=1$，我们就需要交换第 $2$、$1$ 位元素。数组变为 $[1,2,3,4,5]$。\n- 现在排列已经有序，所以我们输出 !。这行输出不计入操作次数限制。\n\n在第二个测试用例中，给定的排列本身就是升序排列，仅需输出 !。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "2\n5\n5 1 3 4 2\n\n1 5\n\n2 1\n\n2\n1 2",
+      "output": "? 1 5\n\n? 4 5\n\n!\n\n\n!"
+    }
+  ]
+}

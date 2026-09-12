@@ -1,31 +1,28 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>460B: Little Dima and Equation</title></head>
-<body><div id="pageTitle"><h2>460B: Little Dima and Equation</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/460/B" rel="noopener">Codeforces 460B</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>brute force, implementation, math, number theory, 1500
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 460B: B. Little Dima and Equation</title></head>
+<body><div id="pageTitle"><h2>B. Little Dima and Equation</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/460/B" rel="noopener">Codeforces 460B</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Little Dima misbehaved during a math lesson a lot and the nasty teacher Mr. Pickles gave him the following problem as a punishment.</p><p>Find all integer solutions <em>x</em> <em>(0&lt;x&lt;10<sup>9</sup>)</em> of the equation:</p><p><em>x=b·s(x)<sup>a</sup>+c,</em> where <em>a</em>, <em>b</em>, <em>c</em> are some predetermined constant values and function <em>s(x)</em> determines the sum of all digits in the decimal representation of number <em>x</em>.</p><p>The teacher gives this problem to Dima for each lesson. He changes only the parameters of the equation: <em>a</em>, <em>b</em>, <em>c</em>. Dima got sick of getting bad marks and he asks you to help him solve this challenging problem.</p></dd>
+<dt>Input</dt><dd><p>The first line contains three space-separated integers: <em>a,b,c</em> <em>(1≤a≤5 1≤b≤10000 -10000≤c≤10000)</em>.</p></dd>
+<dt>Output</dt><dd><p>Print integer <em>n</em> — the number of the solutions that you've found. Next print <em>n</em> integers in the increasing order — the solutions of the given equation. Print only integer solutions that are larger than zero and strictly less than <em>10<sup>9</sup></em>.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+3 2 8
+样例输出1
+3
+10 2008 13726 
 
-
-Little Dima misbehaved during a math lesson a lot and the nasty teacher Mr. Pickles gave him the following problem as a punishment.
-
-Find all integer solutions x ($0 &lt; x &lt; 10^9$) of the equation:
-
-$x = b·s(x)^a + c$,
-
-where *a*, *b*, *c* are some predetermined constant values and function *s*(*x*) determines the sum of all digits in the decimal representation of number *x*.
-
-The teacher gives this problem to Dima for each lesson. He changes only the parameters of the equation: *a*, *b*, *c*. Dima got sick of getting bad marks and he asks you to help him solve this challenging problem.
-
-**Input**
-
-The first line contains three space-separated integers: *a*, *b*, *c* (1 ≤ *a* ≤ 5; 1 ≤ *b* ≤ 10000; - 10000 ≤ *c* ≤ 10000).
-
-**Output**
-
-Print integer *n* — the number of the solutions that you&#x27;ve found. Next print *n* integers in the increasing order — the solutions of the given equation. Print only integer solutions that are larger than zero and strictly less than $10^9$.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/460/B" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+样例输入2
+1 2 -18
+样例输出2
+0</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入3
+2 2 -1
+样例输出3
+4
+1 31 337 967 </pre></dd>
+</dl>
 </body></html>

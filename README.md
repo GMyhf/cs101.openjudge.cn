@@ -74,6 +74,14 @@ Codeforces 等外部题库也以本地题面和测试数据收录在同一目录
 运行时不会代理外站。当前收录 158 道标准 Codeforces 题；导入源、排除的 April Fools
 题和数据覆盖状态见 [`docs/codeforces-import.md`](docs/codeforces-import.md)。
 
+Codeforces 的题面是抓回来的原题（含官方时限、内存和全部样例），抓取源、重建命令和
+逐题覆盖见 [`docs/codeforces-statements.md`](docs/codeforces-statements.md)：
+
+```bash
+python3 scripts/fetch_codeforces_statements.py   # 抓原题，落在 data/openjudge/statements/
+python3 scripts/build_codeforces_pages.py        # 重建 data/openjudge/pages/codeforces__*.html
+```
+
 抓取完成后脚本会扫描题面和题库 HTML 的所有远程 `<img>`，按内容哈希下载到
 `static/openjudge/images/` 并生成 URL 映射清单。可离线复核清单覆盖与文件完整性：
 

@@ -1,0 +1,37 @@
+{
+  "id": "266A",
+  "name": "Stones on the Table",
+  "source_url": "https://codeforces.com/problemset/problem/266/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF266A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "There are $ n $ stones on the table in a row, each of them can be red, green or blue. Count the minimum number of stones to take from the table so that any two neighboring stones had different colors. Stones in a row are considered neighboring if there are no other stones between them.",
+    "formatI": "The first line contains integer $ n $ $ (1<=n<=50) $ — the number of stones on the table.\n\nThe next line contains string $ s $ , which represents the colors of the stones. We'll consider the stones in the row numbered from $ 1 $ to $ n $ from left to right. Then the $ i $ -th character $ s $ equals \"R\", if the $ i $ -th stone is red, \"G\", if it's green and \"B\", if it's blue.",
+    "formatO": "Print a single integer — the answer to the problem.",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "桌子上有N个石头，每一块都可以是红的、绿的或蓝的。计算从桌子上取下的石头的最小数量，以便任何两块相邻的石头都有不同的颜色。如果没有其他石头，一排石头被认为是相邻的。",
+    "formatI": "第一行是一个整数n（1<=n<=50）--桌上石头的数量\n\n第二行是一个字符串s，代表着石头的颜色，石头的排法为从1到n，从左到右。s中的第i个字母如果是\"R\",那么第i个石头就是红色，\"G\"是绿色，\"B\"是蓝色",
+    "formatO": "输出一个整数——这个问题的答案\n\n感谢U91783提供的翻译",
+    "hint": "",
+    "background": ""
+  },
+  "samples": [
+    {
+      "input": "3\nRRG\n",
+      "output": "1\n"
+    },
+    {
+      "input": "5\nRRRRR\n",
+      "output": "4\n"
+    },
+    {
+      "input": "4\nBRBG\n",
+      "output": "0\n"
+    }
+  ]
+}

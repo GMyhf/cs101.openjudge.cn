@@ -1,32 +1,27 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2196B: Another Problem about Beautiful Pairs</title></head>
-<body><div id="pageTitle"><h2>2196B: Another Problem about Beautiful Pairs</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2196/B" rel="noopener">Codeforces 2196B</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>In the array 𝑎, we call a pair of indices 𝑖, 𝑗 *beautiful* if the following condition holds:
-
-- 𝑎𝑖⋅𝑎𝑗=𝑗−𝑖.
-
-Count the number of *beautiful* pairs in the array 𝑎.
-
-**Input**
-
-Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤10^4). The description of the test cases follows.
-
-The first line of each test case contains a single integer 𝑛 (2≤𝑛≤2⋅10^5).
-
-The second line of each test case contains 𝑛 integers 𝑎𝑖 (1≤𝑎𝑖≤10^9).
-
-Additional constraints on the input:
-
-- The sum of 𝑛 across all test cases does not exceed 2⋅10^5.
-
-**Output**
-
-For each test case, output a single integer — the answer to the problem.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2196/B" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2196B: B. Another Problem about Beautiful Pairs</title></head>
+<body><div id="pageTitle"><h2>B. Another Problem about Beautiful Pairs</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2196/B" rel="noopener">Codeforces 2196B</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>In the array  <em>a</em>, we call a pair of indices  <em>i</em>,  <em>j</em>  beautiful if the following condition holds:</p><ul><li><em>a<sub>i</sub> · a<sub>j</sub> = j - i</em>.</li></ul><p>Count the number of beautiful pairs in the array  <em>a</em>.</p></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains the number of test cases  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>4</sup></em>). The description of the test cases follows.</p><p>The first line of each test case contains a single integer  <em>n</em>  (<em>2 ≤ n ≤ 2 · 10<sup>5</sup></em>).</p><p>The second line of each test case contains  <em>n</em>  integers  <em>a<sub>i</sub></em>  (<em>1 ≤ a<sub>i</sub> ≤ 10<sup>9</sup></em>).</p><p>Additional constraints on the input:</p><ul><li>The sum of  <em>n</em>  across all test cases does not exceed  <em>2 · 10<sup>5</sup></em>.</li></ul></dd>
+<dt>Output</dt><dd><p>For each test case, output a single integer — the answer to the problem.</p></dd>
+<dt>样例输入</dt><dd><pre>4
+5
+1 1 2 100 4
+6
+2 2 1 1 2 2
+10
+1 1 2 3 4 1 1 7 3 9
+2
+1000000000 1000000000</pre></dd>
+<dt>样例输出</dt><dd><pre>3
+7
+10
+0</pre></dd>
+<dt>Note</dt><dd><p>In the first example, there are  <em>3</em>  beautiful pairs: (<em>1, 2</em>), (<em>1, 3</em>), and (<em>1, 5</em>).</p><p>In the second example, there are  <em>7</em>  beautiful pairs: (<em>1, 3</em>), (<em>1, 5</em>), (<em>2, 4</em>), (<em>2, 6</em>), (<em>3, 4</em>), (<em>3, 5</em>), and (<em>4, 6</em>).</p></dd>
+</dl>
 </body></html>

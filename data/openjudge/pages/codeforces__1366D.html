@@ -1,26 +1,18 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>1366D: Two Divisors</title></head>
-<body><div id="pageTitle"><h2>1366D: Two Divisors</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1366/D" rel="noopener">Codeforces 1366D</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>You are given 𝑛 integers 𝑎1,𝑎2,…,𝑎𝑛.
-
-For each 𝑎𝑖 find its **two divisors** 𝑑1&gt;1 and 𝑑2&gt;1 such that gcd(𝑑1+𝑑2,𝑎𝑖)=1 (where gcd(𝑎,𝑏) is the greatest common divisor of 𝑎 and 𝑏) or say that there is no such pair.
-
-**Input**
-
-The first line contains single integer 𝑛 (1≤𝑛≤5⋅10^5) — the size of the array 𝑎.
-
-The second line contains 𝑛 integers 𝑎1,𝑎2,…,𝑎𝑛 (2≤𝑎𝑖≤10^7) — the array 𝑎.
-
-**Output**
-
-To speed up the output, print two lines with 𝑛 integers in each line.
-
-The 𝑖-th integers in the first and second lines should be corresponding divisors 𝑑1&gt;1 and 𝑑2&gt;1 such that gcd(𝑑1+𝑑2,𝑎𝑖)=1 or −1 and −1 if there is no such pair. If there are multiple answers, print any of them.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1366/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 1366D: D. Two Divisors</title></head>
+<body><div id="pageTitle"><h2>D. Two Divisors</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/1366/D" rel="noopener">Codeforces 1366D</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>You are given <em>n</em> integers <em>a<sub>1</sub>, a<sub>2</sub>, …, a<sub>n</sub></em>.</p><p>For each <em>a<sub>i</sub></em> find its two divisors <em>d<sub>1</sub> &gt; 1</em> and <em>d<sub>2</sub> &gt; 1</em> such that <em>gcd(d<sub>1</sub> + d<sub>2</sub>, a<sub>i</sub>) = 1</em> (where <em>gcd(a, b)</em> is the greatest common divisor of <em>a</em> and <em>b</em>) or say that there is no such pair.</p></dd>
+<dt>Input</dt><dd><p>The first line contains single integer <em>n</em> (<em>1 ≤ n ≤ 5 · 10<sup>5</sup></em>) — the size of the array <em>a</em>.</p><p>The second line contains <em>n</em> integers <em>a<sub>1</sub>, a<sub>2</sub>, …, a<sub>n</sub></em> (<em>2 ≤ a<sub>i</sub> ≤ 10<sup>7</sup></em>) — the array <em>a</em>.</p></dd>
+<dt>Output</dt><dd><p>To speed up the output, print two lines with <em>n</em> integers in each line.</p><p>The <em>i</em> -th integers in the first and second lines should be corresponding divisors <em>d<sub>1</sub> &gt; 1</em> and <em>d<sub>2</sub> &gt; 1</em> such that <em>gcd(d<sub>1</sub> + d<sub>2</sub>, a<sub>i</sub>) = 1</em> or <em>-1</em> and <em>-1</em> if there is no such pair. If there are multiple answers, print any of them.</p></dd>
+<dt>样例输入</dt><dd><pre>10
+2 3 4 5 6 7 8 9 10 24</pre></dd>
+<dt>样例输出</dt><dd><pre>-1 -1 -1 -1 3 -1 -1 -1 2 2 
+-1 -1 -1 -1 2 -1 -1 -1 5 3</pre></dd>
+<dt>Note</dt><dd><p>Let's look at <em>a<sub>7</sub> = 8</em>. It has <em>3</em> divisors greater than <em>1</em>: <em>2</em>, <em>4</em>, <em>8</em>. As you can see, the sum of any pair of divisors is divisible by <em>2</em> as well as <em>a<sub>7</sub></em>.</p><p>There are other valid pairs of <em>d<sub>1</sub></em> and <em>d<sub>2</sub></em> for <em>a<sub>10</sub>=24</em>, like <em>(3, 4)</em> or <em>(8, 3)</em>. You can print any of them.</p></dd>
+</dl>
 </body></html>

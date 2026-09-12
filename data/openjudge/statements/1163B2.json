@@ -1,0 +1,45 @@
+{
+  "id": "1163B2",
+  "name": "Cat Party (Hard Edition)",
+  "source_url": "https://codeforces.com/problemset/problem/1163/B2",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF1163B2",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "This problem is same as the previous one, but has larger constraints.\n\nShiro's just moved to the new house. She wants to invite all friends of her to the house so they can play monopoly. However, her house is too small, so she can only invite one friend at a time.\n\nFor each of the $ n $ days since the day Shiro moved to the new house, there will be exactly one cat coming to the Shiro's house. The cat coming in the $ i $ -th day has a ribbon with color $ u_i $ . Shiro wants to know the largest number $ x $ , such that if we consider the streak of the first $ x $ days, it is possible to remove exactly one day from this streak so that every ribbon color that has appeared among the remaining $ x - 1 $ will have the same number of occurrences.\n\nFor example, consider the following sequence of $ u_i $ : $ [2, 2, 1, 1, 5, 4, 4, 5] $ . Then $ x = 7 $ makes a streak, since if we remove the leftmost $ u_i = 5 $ , each ribbon color will appear exactly twice in the prefix of $ x - 1 $ days. Note that $ x = 8 $ doesn't form a streak, since you must remove exactly one day.\n\nSince Shiro is just a cat, she is not very good at counting and needs your help finding the longest streak.",
+    "formatI": "The first line contains a single integer $ n $ ( $ 1 \\leq n \\leq 10^5 $ ) — the total number of days.\n\nThe second line contains $ n $ integers $ u_1, u_2, \\ldots, u_n $ ( $ 1 \\leq u_i \\leq 10^5 $ ) — the colors of the ribbons the cats wear.",
+    "formatO": "Print a single integer $ x $ — the largest possible streak of days.",
+    "hint": "In the first example, we can choose the longest streak of $ 13 $ days, since upon removing the last day out of the streak, all of the remaining colors $ 1 $ , $ 2 $ , $ 3 $ , and $ 4 $ will have the same number of occurrences of $ 3 $ . Note that the streak can also be $ 10 $ days (by removing the $ 10 $ -th day from this streak) but we are interested in the longest streak.\n\nIn the fourth example, if we take the streak of the first $ 6 $ days, we can remove the third day from this streak then all of the remaining colors $ 1 $ , $ 2 $ , $ 3 $ , $ 4 $ and $ 5 $ will occur exactly once.",
+    "background": null
+  },
+  "translation": {
+    "description": "本题与前一题相同，但数据范围更大。\n\nShiro 刚搬进新家。她想邀请所有朋友来家里玩大富翁。然而，她的房子太小了，所以每次只能邀请一个朋友。\n\n在 Shiro 搬进新家的第 $n$ 天内，每天恰好有一只猫来她家。第 $i$ 天来的猫带着颜色为 $u_i$ 的丝带。Shiro 想知道最大的整数 $x$，使得如果考虑前 $x$ 天的连续天数，可以恰好移除其中一天，使得剩下的 $x-1$ 天里，每种出现过的丝带颜色出现的次数都相同。\n\n例如，考虑如下 $u_i$ 序列：$[2, 2, 1, 1, 5, 4, 4, 5]$。那么 $x=7$ 是一个合法的连续天数，因为如果移除最左边的 $u_i=5$，那么剩下的 $x-1=6$ 天里，每种颜色的丝带都恰好出现了两次。注意 $x=8$ 不满足条件，因为你必须恰好移除一天。\n\n由于 Shiro 只是一只猫，她不太擅长计数，需要你的帮助来找出最长的连续天数。",
+    "formatI": "第一行包含一个整数 $n$（$1 \\leq n \\leq 10^5$）——天数总数。\n\n第二行包含 $n$ 个整数 $u_1, u_2, \\ldots, u_n$（$1 \\leq u_i \\leq 10^5$）——每只猫所带丝带的颜色。",
+    "formatO": "输出一个整数 $x$——最长的合法连续天数。",
+    "hint": "在第一个样例中，我们可以选择最长的 $13$ 天作为连续天数，因为移除最后一天后，剩下的颜色 $1$、$2$、$3$ 和 $4$ 都恰好出现了 $3$ 次。注意也可以选择 $10$ 天（移除第 $10$ 天），但我们要求最长的连续天数。\n\n在第四个样例中，如果我们取前 $6$ 天作为连续天数，移除第 $3$ 天后，剩下的颜色 $1$、$2$、$3$、$4$ 和 $5$ 都恰好出现一次。\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "13\n1 1 1 2 2 2 3 3 3 4 4 4 5\n",
+      "output": "13"
+    },
+    {
+      "input": "5\n10 100 20 200 1\n",
+      "output": "5"
+    },
+    {
+      "input": "1\n100000\n",
+      "output": "1"
+    },
+    {
+      "input": "7\n3 2 1 1 4 5 1\n",
+      "output": "6"
+    },
+    {
+      "input": "6\n1 1 1 2 2 2\n",
+      "output": "5"
+    }
+  ]
+}

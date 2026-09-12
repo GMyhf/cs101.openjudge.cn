@@ -1,0 +1,33 @@
+{
+  "id": "96A",
+  "name": "Football",
+  "source_url": "https://codeforces.com/problemset/problem/96/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF96A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Petya loves football very much. One day, as he was watching a football match, he was writing the players' current positions on a piece of paper. To simplify the situation he depicted it as a string consisting of zeroes and ones. A zero corresponds to players of one team; a one corresponds to players of another team. If there are at least $ 7 $ players of some team standing one after another, then the situation is considered dangerous. For example, the situation $ 00100110111111101 $ is dangerous and $ 11110111011101 $ is not. You are given the current situation. Determine whether it is dangerous or not.",
+    "formatI": "The first input line contains a non-empty string consisting of characters \"0\" and \"1\", which represents players. The length of the string does not exceed $ 100 $ characters. There's at least one player from each team present on the field.",
+    "formatO": "Print \"YES\" if the situation is dangerous. Otherwise, print \"NO\".",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "Petya 非常喜欢足球。一天，他在观看一场足球比赛时，把球员们当前的位置写在了一张纸上。为了简化情况，他用一个只包含数字 $0$ 和 $1$ 的字符串来表示球场。数字 $0$ 表示一队的球员；数字 $1$ 表示另一队的球员。如果有至少 $7$ 名同一队的球员连续站在一起，那么这种情况被认为是危险的。例如，情况 $00100110111111101$ 是危险的，而 $11110111011101$ 不是。现在给出当前情况的字符串，请判断场上是否危险。",
+    "formatI": "输入包含一行非空字符串，仅由字符 $0$ 和 $1$ 组成，表示球员的分布。字符串长度不超过 $100$。保证场上每队至少有一名球员。",
+    "formatO": "如果情况危险，输出 \"YES\"；否则输出 \"NO\"。",
+    "hint": "\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "001001\n",
+      "output": "NO\n"
+    },
+    {
+      "input": "1000000001\n",
+      "output": "YES\n"
+    }
+  ]
+}

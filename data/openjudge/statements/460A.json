@@ -1,0 +1,33 @@
+{
+  "id": "460A",
+  "name": "Vasya and Socks",
+  "source_url": "https://codeforces.com/problemset/problem/460/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF460A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Vasya has $ n $ pairs of socks. In the morning of each day Vasya has to put on a pair of socks before he goes to school. When he comes home in the evening, Vasya takes off the used socks and throws them away. Every $ m $ -th day (at days with numbers $ m,2m,3m,... $ ) mom buys a pair of socks to Vasya. She does it late in the evening, so that Vasya cannot put on a new pair of socks before the next day. How many consecutive days pass until Vasya runs out of socks?",
+    "formatI": "The single line contains two integers $ n $ and $ m $ $ (1<=n<=100; 2<=m<=100) $ , separated by a space.",
+    "formatO": "Print a single integer — the answer to the problem.",
+    "hint": "In the first sample Vasya spends the first two days wearing the socks that he had initially. Then on day three he puts on the socks that were bought on day two.\n\nIn the second sample Vasya spends the first nine days wearing the socks that he had initially. Then he spends three days wearing the socks that were bought on the third, sixth and ninth days. Than he spends another day wearing the socks that were bought on the twelfth day.",
+    "background": ""
+  },
+  "translation": {
+    "description": "**Vasya**有$n$双袜子。作为一个浪费的人**[浪费可耻]**，他每穿完一双袜子，就直接扔掉了。他的母亲每过$m$天就会买$1$双袜子。多少天过后他就没袜子穿了呢$?$",
+    "formatI": "一行，两个正整数 $n(1\\leq n\\leq100)$与 $m(2 \\leq m \\leq 100)$，用空格隔开。",
+    "formatO": "一个数，表示哪一天袜子用完了。",
+    "hint": "第一个例子中，他穿了两天原来有的袜子，第三天穿了妈妈买的那一双。\r\n\r\n第二个例子中，**Vasya**穿了$9$天原有的袜子，又穿了$3$天分别在$3,6,9$天妈妈买的。最后在第$13$天，他穿了在第$12$天买的袜子。\r\n\r\n**翻译来自@丁文涛2004**",
+    "background": ""
+  },
+  "samples": [
+    {
+      "input": "2 2\n",
+      "output": "3\n"
+    },
+    {
+      "input": "9 3\n",
+      "output": "13\n"
+    }
+  ]
+}

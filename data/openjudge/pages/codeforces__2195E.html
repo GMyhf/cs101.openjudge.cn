@@ -1,49 +1,34 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2195E: Idiot First Search</title></head>
-<body><div id="pageTitle"><h2>2195E: Idiot First Search</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2195/E" rel="noopener">Codeforces 2195E</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>There is a binary tree of 𝑛+1 vertices (**𝑛 is odd**), with vertices labeled 0,1,…,𝑛. **At most one letter** can be written on each vertex of the tree, and all vertices initially have nothing written on them. The root of the tree is vertex 0.
-
-In the tree, vertex 0 is the parent of vertex 1, while all other vertices have either 2 children or 0 children.
-
-Bob is lost in one vertex of the tree and wishes to escape the tree by reaching vertex 0. This is very easy for most people with common sense. However, since Bob is an idiot, he created a new way of traversing the tree; introducing the &quot;Idiot First Search&quot;.
-
-When Bob is on vertex 𝑣 (1≤𝑣≤𝑛), Bob&#x27;s movement is determined as follows:
-
-- If vertex 𝑣 is a leaf, Bob **always** moves to the parent of 𝑣; otherwise, check the next few conditions.
-- If nothing is written on vertex 𝑣, Bob writes &#x27;L&#x27; on vertex 𝑣 and moves to the left child of 𝑣;
-- If &#x27;L&#x27; is written on vertex 𝑣, Bob **overwrites it** to &#x27;R&#x27; and moves to the right child of 𝑣;
-- If &#x27;R&#x27; is written on vertex 𝑣, Bob **erases it** and moves to the parent of 𝑣.
-
-It takes exactly 1 second for Bob to move to an adjacent vertex, so Bob will take exactly 𝑥 seconds to perform 𝑥 moves.
-
-It has been shown that regardless of which vertex Bob starts on, Bob can reach vertex 0 in a finite (though possibly inexplicably large) amount of time. We don&#x27;t know who proved it; surely it can&#x27;t be Bob, but it is definitely proven.
-
-For each vertex 𝑘=1,2,…,𝑛, please determine the total time it takes to reach vertex 0 if Bob started on vertex 𝑘, in seconds. As the values may be huge, you are only asked to compute them modulo 109+7.
-
-**Input**
-
-Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤104). The description of the test cases follows.
-
-The first line of each test case contains a single integer 𝑛 (1≤𝑛≤300001, **𝑛 is odd**).
-
-Each of the next 𝑛 lines contains two integers 𝑙𝑖 and 𝑟𝑖 denoting the children of vertex 𝑖 (0≤𝑙𝑖,𝑟𝑖≤𝑛).
-
-For each vertex, 𝑙𝑖=𝑟𝑖=0 is given if the vertex has no children. Otherwise, 𝑙𝑖 and 𝑟𝑖 are the left and right children of vertex 𝑖.
-
-It is guaranteed that the input defines a valid binary tree satisfying the conditions given in the statement.
-
-It is guaranteed that the sum of 𝑛 over all test cases does not exceed 300001.
-
-**Output**
-
-For each test case, output 𝑛 integers 𝜏1,𝜏2,…,𝜏𝑛 separated by spaces.
-
-Here, 𝜏𝑘 denotes the total time it takes to reach vertex 0 if Bob started on vertex 𝑘, modulo 109+7.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2195/E" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2195E: E. Idiot First Search</title></head>
+<body><div id="pageTitle"><h2>E. Idiot First Search</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2195/E" rel="noopener">Codeforces 2195E</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>512 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>There is a binary tree of  <em>n+1</em>  vertices (<em>n</em>  is odd), with vertices labeled  <em>0,1,…,n</em>. At most one letter can be written on each vertex of the tree, and all vertices initially have nothing written on them. The root of the tree is vertex  <em>0</em>.</p><p>In the tree, vertex  <em>0</em>  is the parent of vertex  <em>1</em>, while all other vertices have either  <em>2</em>  children or  <em>0</em>  children.</p><p>Bob is lost in one vertex of the tree and wishes to escape the tree by reaching vertex  <em>0</em>. This is very easy for most people with common sense. However, since Bob is an idiot, he created a new way of traversing the tree; introducing the "Idiot First Search".</p><p>When Bob is on vertex  <em>v</em>  (<em>1 ≤ v ≤ n</em>), Bob's movement is determined as follows:</p><ul><li>If vertex  <em>v</em>  is a leaf, Bob always moves to the parent of  <em>v</em>; otherwise, check the next few conditions.</li><li>If nothing is written on vertex  <em>v</em>, Bob writes 'L' on vertex  <em>v</em>  and moves to the left child of  <em>v</em>;</li><li>If 'L' is written on vertex  <em>v</em>, Bob overwrites it to 'R' and moves to the right child of  <em>v</em>;</li><li>If 'R' is written on vertex  <em>v</em>, Bob erases it and moves to the parent of  <em>v</em>.</li></ul><p>It takes exactly  <em>1</em>  second for Bob to move to an adjacent vertex, so Bob will take exactly  <em>x</em>  seconds to perform  <em>x</em>  moves.</p><p>It has been shown that regardless of which vertex Bob starts on, Bob can reach vertex  <em>0</em>  in a finite (though possibly inexplicably large) amount of time. We don't know who proved it; surely it can't be Bob, but it is definitely proven.</p><p>For each vertex  <em>k=1,2,…,n</em>, please determine the total time it takes to reach vertex  <em>0</em>  if Bob started on vertex  <em>k</em>, in seconds. As the values may be huge, you are only asked to compute them modulo  <em>10<sup>9</sup>+7</em>.</p></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains the number of test cases  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>4</sup></em>). The description of the test cases follows.</p><p>The first line of each test case contains a single integer  <em>n</em>  (<em>1 ≤ n ≤ 300 001</em>,  <em>n</em>  is odd).</p><p>Each of the next  <em>n</em>  lines contains two integers  <em>l<sub>i</sub></em>  and  <em>r<sub>i</sub></em>  denoting the children of vertex  <em>i</em>  (<em>0 ≤ l<sub>i</sub>,r<sub>i</sub> ≤ n</em>).</p><p>For each vertex,  <em>l<sub>i</sub>=r<sub>i</sub>=0</em>  is given if the vertex has no children. Otherwise,  <em>l<sub>i</sub></em>  and  <em>r<sub>i</sub></em>  are the left and right children of vertex  <em>i</em>.</p><p>It is guaranteed that the input defines a valid binary tree satisfying the conditions given in the statement.</p><p>It is guaranteed that the sum of  <em>n</em>  over all test cases does not exceed  <em>300 001</em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output  <em>n</em>  integers  <em>τ<sub>1</sub>,τ<sub>2</sub>,…,τ<sub>n</sub></em>  separated by spaces.</p><p>Here,  <em>τ<sub>k</sub></em>  denotes the total time it takes to reach vertex  <em>0</em>  if Bob started on vertex  <em>k</em>, modulo  <em>10<sup>9</sup>+7</em>.</p></dd>
+<dt>样例输入</dt><dd><pre>3
+1
+0 0
+5
+2 3
+0 0
+4 5
+0 0
+0 0
+7
+2 3
+4 5
+0 0
+6 7
+0 0
+0 0
+0 0</pre></dd>
+<dt>样例输出</dt><dd><pre>1
+9 10 14 15 15
+13 22 14 27 23 28 28</pre></dd>
+<dt>Note</dt><dd><p>On the first test case, there are only two vertices, vertex  <em>0</em>  and vertex  <em>1</em>. It takes only  <em>1</em>  second for Bob to reach vertex  <em>0</em>  from vertex  <em>1</em>.</p><p>On the second test case, the tree is given as follows.</p><p><img src="https://cdn.luogu.com.cn/upload/vjudge_pic/CF2195E/b9af4b5eb3881b7f0241a963f67399f1eb870538206138765c87c81f3832a5a6.png" alt="illustration">It takes  <em>14</em>  seconds for Bob to reach vertex  <em>0</em>  from vertex  <em>3</em>. The moves are as follows:</p><p><em>3 <sup>L</sup>→ 4 <sup>X</sup>→ 3 <sup>R</sup>→ 5 <sup>X</sup>→ 3 <sup>X</sup>→ 1 <sup>L</sup>→ 2 <sup>X</sup>→ 1 <sup>R</sup>→ 3 <sup>L</sup>→ 4 <sup>X</sup>→ 3 <sup>R</sup>→ 5 <sup>X</sup>→ 3 <sup>X</sup>→ 1 <sup>X</sup>→ 0</em></p><p>Here, the letters above the arrows denote the letter on the vertex before moving to the adjacent vertex, where  <em>X</em>  denotes nothing written.</p></dd>
+</dl>
 </body></html>

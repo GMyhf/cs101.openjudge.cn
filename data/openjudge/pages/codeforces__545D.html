@@ -1,26 +1,17 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>545D: Queue</title></head>
-<body><div id="pageTitle"><h2>545D: Queue</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/545/D" rel="noopener">Codeforces 545D</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Little girl Susie went shopping with her mom and she wondered how to improve service quality.
-
-There are *n* people in the queue. For each person we know time $t_i$ needed to serve him. A person will be disappointed if the time he waits is more than the time needed to serve him. The time a person waits is the total time when all the people who stand in the queue in front of him are served. Susie thought that if we swap some people in the queue, then we can decrease the number of people who are disappointed.
-
-Help Susie find out what is the maximum number of not disappointed people can be achieved by swapping people in the queue.
-
-**Input**
-
-The first line contains integer $n (1 ≤ n ≤ 10^5)$.
-
-The next line contains *n* integers $t_i (1 ≤ ti ≤ 10^9)$, separated by spaces.
-
-**Output**
-
-Print a single number — the maximum number of not disappointed people in the queue.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/545/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 545D: D. Queue</title></head>
+<body><div id="pageTitle"><h2>D. Queue</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/545/D" rel="noopener">Codeforces 545D</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Little girl Susie went shopping with her mom and she wondered how to improve service quality.</p><p>There are <em>n</em> people in the queue. For each person we know time <em>t<sub>i</sub></em> needed to serve him. A person will be disappointed if the time he waits is more than the time needed to serve him. The time a person waits is the total time when all the people who stand in the queue in front of him are served. Susie thought that if we swap some people in the queue, then we can decrease the number of people who are disappointed.</p><p>Help Susie find out what is the maximum number of not disappointed people can be achieved by swapping people in the queue.</p></dd>
+<dt>Input</dt><dd><p>The first line contains integer <em>n</em> (<em>1≤n≤10<sup>5</sup></em>).</p><p>The next line contains <em>n</em> integers <em>t<sub>i</sub></em> (<em>1≤t<sub>i</sub>≤10<sup>9</sup></em>), separated by spaces.</p></dd>
+<dt>Output</dt><dd><p>Print a single number — the maximum number of not disappointed people in the queue.</p></dd>
+<dt>样例输入</dt><dd><pre>5
+15 2 1 5 3</pre></dd>
+<dt>样例输出</dt><dd><pre>4</pre></dd>
+<dt>Note</dt><dd><p>Value <em>4</em> is achieved at such an arrangement, for example: <em>1,2,3,5,15</em>. Thus, you can make everything feel not disappointed except for the person with time 5.</p></dd>
+</dl>
 </body></html>

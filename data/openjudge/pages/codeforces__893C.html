@@ -1,32 +1,37 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>893C: Rumor</title></head>
-<body><div id="pageTitle"><h2>893C: Rumor</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/893/C" rel="noopener">Codeforces 893C</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Vova promised himself that he would never play computer games... But recently Firestorm — a well-known game developing company — published their newest game, World of Farcraft, and it became really popular. Of course, Vova started playing it.
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 893C: C. Rumor</title></head>
+<body><div id="pageTitle"><h2>C. Rumor</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/893/C" rel="noopener">Codeforces 893C</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Vova promised himself that he would never play computer games... But recently Firestorm — a well-known game developing company — published their newest game, World of Farcraft, and it became really popular. Of course, Vova started playing it.</p><p>Now he tries to solve a quest. The task is to come to a settlement named Overcity and spread a rumor in it.</p><p>Vova knows that there are <em>n</em> characters in Overcity. Some characters are friends to each other, and they share information they got. Also Vova knows that he can bribe each character so he or she starts spreading the rumor; <em>i</em> -th character wants <em>c<sub>i</sub></em> gold in exchange for spreading the rumor. When a character hears the rumor, he tells it to all his friends, and they start spreading the rumor to their friends (for free), and so on.</p><p>The quest is finished when all <em>n</em> characters know the rumor. What is the minimum amount of gold Vova needs to spend in order to finish the quest?</p><p>Take a look at the notes if you think you haven't understood the problem completely.</p></dd>
+<dt>Input</dt><dd><p>The first line contains two integer numbers <em>n</em> and <em>m</em> (<em>1≤n≤10<sup>5</sup>,0≤m≤10<sup>5</sup></em>) — the number of characters in Overcity and the number of pairs of friends.</p><p>The second line contains <em>n</em> integer numbers <em>c<sub>i</sub></em> (<em>0≤c<sub>i</sub>≤10<sup>9</sup></em>) — the amount of gold <em>i</em> -th character asks to start spreading the rumor.</p><p>Then <em>m</em> lines follow, each containing a pair of numbers (<em>x<sub>i</sub>,y<sub>i</sub></em>) which represent that characters <em>x<sub>i</sub></em> and <em>y<sub>i</sub></em> are friends (<em>1≤x<sub>i</sub>,y<sub>i</sub>≤n</em>, <em>x<sub>i</sub>≠y<sub>i</sub></em>). It is guaranteed that each pair is listed at most once.</p></dd>
+<dt>Output</dt><dd><p>Print one number — the minimum amount of gold Vova has to spend in order to finish the quest.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+5 2
+2 5 3 4 8
+1 4
+4 5
+样例输出1
+10
 
-Now he tries to solve a quest. The task is to come to a settlement named Overcity and spread a rumor in it.
-
-Vova knows that there are *n* characters in Overcity. Some characters are friends to each other, and they share information they got. Also Vova knows that he can bribe each character so he or she starts spreading the rumor; *i*-th character wants ci gold in exchange for spreading the rumor. When a character hears the rumor, he tells it to all his friends, and they start spreading the rumor to their friends (for free), and so on.
-
-The quest is finished when all *n* characters know the rumor. What is the minimum amount of gold Vova needs to spend in order to finish the quest?
-
-Take a look at the notes if you think you haven&#x27;t understood the problem completely.
-
-**Input**
-
-The first line contains two integer numbers *n* and *m* (1 ≤ n ≤ 10^5, 0 ≤ m ≤ 10^5) — the number of characters in Overcity and the number of pairs of friends.
-
-The second line contains *n* integer numbers ci (0 ≤ ci ≤ 10^9) — the amount of gold *i*-th character asks to start spreading the rumor.
-
-Then *m* lines follow, each containing a pair of numbers (xi, yi) which represent that characters xi and yi are friends (1 ≤ xi, yi ≤ n, xi ≠ yi). It is guaranteed that each pair is listed at most once.
-
-**Output**
-
-Print one number — the minimum amount of gold Vova has to spend in order to finish the quest.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/893/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+样例输入2
+10 0
+1 2 3 4 5 6 7 8 9 10
+样例输出2
+55</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入3
+10 5
+1 6 2 7 3 8 4 9 5 10
+1 2
+3 4
+5 6
+7 8
+9 10
+样例输出3
+15</pre></dd>
+<dt>Note</dt><dd><p>In the first example the best decision is to bribe the first character (he will spread the rumor to fourth character, and the fourth one will spread it to fifth). Also Vova has to bribe the second and the third characters, so they know the rumor.</p><p>In the second example Vova has to bribe everyone.</p><p>In the third example the optimal decision is to bribe the first, the third, the fifth, the seventh and the ninth characters.</p></dd>
+</dl>
 </body></html>

@@ -2,6 +2,40 @@
 
 ## 2026-09-12
 
+### Codeforces 题面换成抓回来的原题：157 页从「题解摘要」改成真题面
+
+- **旧页面错在哪。** 除 4A 外的 157 道，页面是 `import_codeforces_markdown.py` 把课程题解
+  Markdown 原样塞进 `<pre>` 的结果：`**Input**`、`*M*` 全裸着不渲染，正文在第一个代码围栏处
+  被截断（每页都停在 "Examples input" 那一行），**官方样例和时限内存根本没上页**。
+  4A 是当初手工写的，所以只有它是对的 —— 人正是拿它作对照报的这个问题。
+- **题面从哪来。** `codeforces.com` 对本机一律 Cloudflare 403；`m1.codeforces.com` 镜像
+  能过它自己的 PoW 浏览器校验，但过了之后每个页面都 302 到 `/enter`（登录墙）。
+  最终取自洛谷的 Codeforces 远程评测镜像：页面数据里带 **Codeforces 英文原文**
+  （description / formatI / formatO / hint）、**全部官方样例**和**官方时限内存**。
+  158 道全部抓到，零失败；抓取限速 1.5 秒一题。
+- **新增 `scripts/fetch_codeforces_statements.py` 与 `scripts/build_codeforces_pages.py`。**
+  前者把原文落到 `data/openjudge/statements/<题号>.json`（同时记 `source_url` 与 `mirror_url`、
+  抓取日期），后者渲染成 4A 那种结构：`pageTitle` + `problem-params`（来源/时限/内存）+
+  `problem-content`（Description / Input / Output / 样例输入 / 样例输出 / Note）。
+  Codeforces 的题面是 LaTeX，页面没有数学渲染器，所以行内公式转成 Unicode 与
+  `<sub>`/`<sup>`（`\le`→≤、`\xrightarrow{L}`→上标箭头、`\pmod{M}`→(mod M)、
+  `$$$`/`$$`/`$` 三种分隔符统一、1881C 的 `\matrix{…}` 按行铺开）。
+  全 157 页扫过：**没有一个残留的 `$` 或 `\命令`**。
+- **交叉验证用的是仓外事实**：4A 抓回来的时限内存（1 秒 / 64 MB）与此前人工核对过的
+  4A 页面逐字相同。4A 的页面本身不覆盖（`--keep`），仍是人工核对的那一版。
+- **样例这次真的进了「运行样例」。** 多组样例按站内既有的标注式写法落盘
+  （`pctbook__E18188` 就是这么存的）：前 n-1 组在 `样例输入`、最后一组在 `样例输出`，
+  两段拼起来仍是一条有序的标注流。逐题验过 `server.py:sample_io()` 切回来的结果与官方样例
+  **158 道 0 差异**；50A 从「只有 1 组、还是从题解里抠的」变成官方 2 组。
+- **新题面引入 33 张插图**，已按既有流水线下载进 `static/openjudge/images/mirror/`
+  并更新清单（远程 URL 200 → 233），`test_image_mirror` 的两条断言随之更新。
+- `import_codeforces_markdown.py` 不再写题面页（只管目录与判题数据口径），
+  否则重跑导入会把真题面覆盖回旧摘要。
+- 新增两条守门用例：`test_codeforces_pages_carry_the_official_statement`（每页都有来源链接、
+  时限、内存、Description 和样例，且正文无 LaTeX 残留、无「题解摘要」字样）、
+  `test_codeforces_pages_hand_every_official_sample_to_the_runner`（逐题比对 `sample_io()`
+  与抓回来的官方样例）。抓取源与逐题覆盖表见 `docs/codeforces-statements.md`。
+
 ### 收口归档交叉验证的三处未决差异
 
 - 确认 30172 的 7 组 `n=2704` 输入越出题面 `n<=1000`；30720 的 10 组非 2 次幂归档输出与平台 Accepted 实现冲突；30921 的无后缀目录属于另一道“猫猫逛公园”草稿，现有报告排除项均保持不变。

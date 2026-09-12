@@ -1,35 +1,27 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2140B: Another Divisibility Problem</title></head>
-<body><div id="pageTitle"><h2>2140B: Another Divisibility Problem</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2140/B" rel="noopener">Codeforces 2140B</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>constructive algorithms, math, number theory
-
-
-Alice and Bob are playing a game in which Alice has given Bob a positive integer 𝑥&lt;108.
-
-To win the game, Bob has to find another positive integer 𝑦&lt;109 such that 𝑥#𝑦 is divisible by 𝑥+𝑦.
-
-Here 𝑥#𝑦 denotes the integer formed by **concatenating** the integers 𝑥 and 𝑦 in that order. For example, if 𝑥=835, 𝑦=47, then 𝑥#𝑦=83547.
-
-However, since Bob is dumb, he is unable to find such an integer. Please help him.
-
-It can be shown that such an integer always exists.
-
-**Input**
-
-Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤104). The description of the test cases follows.
-
-The only line of each test case contains a single integer 𝑥 (1≤𝑥&lt;108) — the integer that Alice has given to Bob.
-
-**Output**
-
-For each test case, print a single integer 𝑦 (1≤𝑦&lt;109) so that Bob can win the game.
-
-If there are multiple answers, print any one of them.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2140/B" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2140B: B. Another Divisibility Problem</title></head>
+<body><div id="pageTitle"><h2>B. Another Divisibility Problem</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2140/B" rel="noopener">Codeforces 2140B</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Alice and Bob are playing a game in which Alice has given Bob a positive integer <em>x≤10<sup>8</sup></em>.</p><p>To win the game, Bob has to find another positive integer <em>y≤10<sup>9</sup></em> such that <em>x \# y</em> is divisible by <em>x + y</em>.</p><p>Here <em>x\#y</em> denotes the integer formed by concatenating the integers <em>x</em> and <em>y</em> in that order. For example, if <em>x = 835</em>, <em>y = 47</em>, then <em>x \# y = 83 547</em>.</p><p>However, since Bob is dumb, he is unable to find such an integer. Please help him.</p><p>It can be shown that such an integer always exists.</p></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains the number of test cases <em>t</em> (<em>1 ≤ t ≤ 10<sup>4</sup></em>). The description of the test cases follows.</p><p>The only line of each test case contains a single integer <em>x</em> (<em>1 ≤ x ≤ 10<sup>8</sup></em>) — the integer that Alice has given to Bob.</p></dd>
+<dt>Output</dt><dd><p>For each test case, print a single integer <em>y</em> (<em>1 ≤ y ≤ 10<sup>9</sup></em>) so that Bob can win the game.</p><p>If there are multiple answers, print any one of them.</p></dd>
+<dt>样例输入</dt><dd><pre>6
+8
+42
+1000
+66666
+106344
+9876543</pre></dd>
+<dt>样例输出</dt><dd><pre>1
+12
+998
+7872
+8190
+174036</pre></dd>
+<dt>Note</dt><dd><p>For the first test case, <em>x = 8</em>, we can choose <em>y = 1</em>, and we have <em>x \# y = 81</em>, which is divisible by <em>x + y = 9</em>.</p><p>For the second test case, <em>x = 42</em>, we can choose <em>y = 12</em>, and we have <em>x \# y = 4212</em>, which is divisible by <em>x + y = 54</em>.</p></dd>
+</dl>
 </body></html>

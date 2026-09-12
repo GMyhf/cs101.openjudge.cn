@@ -1,0 +1,33 @@
+{
+  "id": "37C",
+  "name": "Old Berland Language",
+  "source_url": "https://codeforces.com/problemset/problem/37/C",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF37C",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Berland scientists know that the Old Berland language had exactly $ n $ words. Those words had lengths of $ l_{1},l_{2},...,l_{n} $ letters. Every word consisted of two letters, $ 0 $ and $ 1 $ . Ancient Berland people spoke quickly and didn’t make pauses between the words, but at the same time they could always understand each other perfectly. It was possible because no word was a prefix of another one. The prefix of a string is considered to be one of its substrings that starts from the initial symbol.\n\nHelp the scientists determine whether all the words of the Old Berland language can be reconstructed and if they can, output the words themselves.",
+    "formatI": "The first line contains one integer $ N $ ( $ 1<=N<=1000 $ ) — the number of words in Old Berland language. The second line contains $ N $ space-separated integers — the lengths of these words. All the lengths are natural numbers not exceeding $ 1000 $ .",
+    "formatO": "If there’s no such set of words, in the single line output NO. Otherwise, in the first line output YES, and in the next $ N $ lines output the words themselves in the order their lengths were given in the input file. If the answer is not unique, output any.",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "$Berland$ 的科学家知道，古老的 $Berland$ 语言中有 $n$ 个单词。这些单词的长度为 $l_1,l_2, \\ldots ,l_n$。每个单词由 $0$ 和 $1$ 组成。\n\n尽管古代 $Berland$ 人语速很快并且说话不停顿，但同时他们也能很好地理解对方。\n\n可能的原因是：没有一个单词是另一个单词的前缀。字符串的前缀被认为是子串的其中一个开端。\n\n请你帮助科学家确定，是否所有的古$Berland$语的单词都可以被重构。如果可以，输出单词本身。",
+    "formatI": "第一行：一个整数 $n$ ，表示古 $Berland$ 语言的单词个数，其中 $1 \\le n\\le 10^3$。\n\n第二行，有 $n$ 个由空格隔开的整数 $len$，分别为这$n$个单词的长度。其中 $1 \\le len \\le 10^3$。",
+    "formatO": "如果没有任何符合的单词，只输出 `NO`；\n\n否则，在第一行输出 `YES` ，并在接下来的 $n$ 行，按照输入顺序输出单词本身。\n\n如果答案不唯一，输出任意一种。",
+    "hint": null,
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "3\n1 2 3\n",
+      "output": "YES\n0\n10\n110\n"
+    },
+    {
+      "input": "3\n1 1 1\n",
+      "output": "NO\n"
+    }
+  ]
+}

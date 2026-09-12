@@ -1,22 +1,27 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>151A: Soft Drinking</title></head>
-<body><div id="pageTitle"><h2>151A: Soft Drinking</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/151/A" rel="noopener">Codeforces 151A</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>This winter is so cold in Nvodsk! A group of *n* friends decided to buy *k* bottles of a soft drink called &quot;Take-It-Light&quot; to warm up a bit. Each bottle has *l* milliliters of the drink. Also they bought *c* limes and cut each of them into *d* slices. After that they found *p* grams of salt.
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 151A: A. Soft Drinking</title></head>
+<body><div id="pageTitle"><h2>A. Soft Drinking</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/151/A" rel="noopener">Codeforces 151A</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>This winter is so cold in Nvodsk! A group of <em>n</em> friends decided to buy <em>k</em> bottles of a soft drink called "Take-It-Light" to warm up a bit. Each bottle has <em>l</em> milliliters of the drink. Also they bought <em>c</em> limes and cut each of them into <em>d</em> slices. After that they found <em>p</em> grams of salt.</p><p>To make a toast, each friend needs <em>nl</em> milliliters of the drink, a slice of lime and <em>np</em> grams of salt. The friends want to make as many toasts as they can, provided they all drink the same amount. How many toasts can each friend make?</p></dd>
+<dt>Input</dt><dd><p>The first and only line contains positive integers <em>n</em>, <em>k</em>, <em>l</em>, <em>c</em>, <em>d</em>, <em>p</em>, <em>nl</em>, <em>np</em>, not exceeding <em>1000</em> and no less than <em>1</em>. The numbers are separated by exactly one space.</p></dd>
+<dt>Output</dt><dd><p>Print a single integer — the number of toasts each friend can make.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+3 4 5 10 8 100 3 1
+样例输出1
+2
 
-To make a toast, each friend needs *nl* milliliters of the drink, a slice of lime and *np* grams of salt. The friends want to make as many toasts as they can, provided they all drink the same amount. How many toasts can each friend make?
-
-**Input**
-
-The first and only line contains **positive** integers *n*, *k*, *l*, *c*, *d*, *p*, *nl*, *np*, not exceeding 1000 and no less than 1. The numbers are separated by exactly one space.
-
-**Output**
-
-Print a single integer — the number of toasts each friend can make.
-
-Examples
-
-Input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/151/A" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+样例输入2
+5 100 10 1 19 90 4 3
+样例输出2
+3</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入3
+10 1000 1000 25 23 1 50 1
+样例输出3
+0</pre></dd>
+<dt>Note</dt><dd><p>A comment to the first sample:</p><p>Overall the friends have <em>4*5=20</em> milliliters of the drink, it is enough to make <em>20/3=6</em> toasts. The limes are enough for <em>10*8=80</em> toasts and the salt is enough for <em>100/1=100</em> toasts. However, there are 3 friends in the group, so the answer is <em>min(6,80,100)/3=2</em>.</p></dd>
+</dl>
 </body></html>

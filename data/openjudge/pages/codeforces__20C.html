@@ -1,22 +1,21 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>20C: Dijkstra?</title></head>
-<body><div id="pageTitle"><h2>20C: Dijkstra?</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/20/C" rel="noopener">Codeforces 20C</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>You are given a weighted undirected graph. The vertices are enumerated from 1 to *n*. Your task is to find the shortest path between the vertex 1 and the vertex *n*.
-
-**Input**
-
-The first line contains two integers *n* and $m (2 ≤ n ≤ 10^5, m ≤ 10^5)$, where *n* is the number of vertices and *m* is the number of edges. Following *m* lines contain one edge each in form ai, bi and wi (1 ≤ ai, bi ≤ *n*, 1 ≤ wi ≤ 10^6^), where ai, bi are edge endpoints and wi is the length of the edge.
-
-It is possible that the graph has loops and multiple edges between pair of vertices.
-
-**Output**
-
-Write the only integer -1 in case of no path. Write the shortest path in opposite case. If there are many solutions, print any of them.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/20/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 20C: C. Dijkstra?</title></head>
+<body><div id="pageTitle"><h2>C. Dijkstra?</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/20/C" rel="noopener">Codeforces 20C</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>64 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>You are given a weighted undirected graph. The vertices are enumerated from 1 to <em>n</em>. Your task is to find the shortest path between the vertex <em>1</em> and the vertex <em>n</em>.</p></dd>
+<dt>Input</dt><dd><p>The first line contains two integers <em>n</em> and <em>m</em> (<em>2≤n≤10<sup>5</sup>,0≤m≤10<sup>5</sup></em>), where <em>n</em> is the number of vertices and <em>m</em> is the number of edges. Following <em>m</em> lines contain one edge each in form <em>a<sub>i</sub></em>, <em>b<sub>i</sub></em> and <em>w<sub>i</sub></em> (<em>1≤a<sub>i</sub>,b<sub>i</sub>≤n,1≤w<sub>i</sub>≤10<sup>6</sup></em>), where <em>a<sub>i</sub>,b<sub>i</sub></em> are edge endpoints and <em>w<sub>i</sub></em> is the length of the edge.</p><p>It is possible that the graph has loops and multiple edges between pair of vertices.</p></dd>
+<dt>Output</dt><dd><p>Write the only integer -1 in case of no path. Write the shortest path in opposite case. If there are many solutions, print any of them.</p></dd>
+<dt>样例输入</dt><dd><pre>5 6
+1 2 2
+2 5 5
+2 3 4
+1 4 1
+4 3 3
+3 5 1</pre></dd>
+<dt>样例输出</dt><dd><pre>1 4 3 5 </pre></dd>
+</dl>
 </body></html>

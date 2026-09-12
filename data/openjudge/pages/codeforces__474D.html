@@ -1,28 +1,21 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>474D: Flowers</title></head>
-<body><div id="pageTitle"><h2>474D: Flowers</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/474/D" rel="noopener">Codeforces 474D</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>We saw the little game Marmot made for Mole&#x27;s lunch. Now it&#x27;s Marmot&#x27;s dinner time and, as we all know, Marmot eats flowers. At every dinner he eats some red and white flowers. Therefore a dinner can be represented as a sequence of several flowers, some of them white and some of them red.
-
-But, for a dinner to be tasty, there is a rule: Marmot wants to eat white flowers only in groups of size *k*.
-
-Now Marmot wonders in how many ways he can eat between *a* and *b* flowers. As the number of ways could be very large, print it modulo $1000000007 (10^9 + 7)$.
-
-**Input**
-
-Input contains several test cases.
-
-The first line contains two integers *t* and *k* ($1 ≤ t, k ≤ 10^5$), where *t* represents the number of test cases.
-
-The next *t* lines contain two integers $a_i$ and $b_i$ ($1 ≤ a_i ≤ b_i ≤ 10^5$), describing the *i*-th test.
-
-**Output**
-
-Print *t* lines to the standard output. The *i*-th line should contain the number of ways in which Marmot can eat between $a_i$ and $b_i$ flowers at dinner modulo $1000000007 (10^9 + 7)$.
-
-Examples
-
-Input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/474/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 474D: D. Flowers</title></head>
+<body><div id="pageTitle"><h2>D. Flowers</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/474/D" rel="noopener">Codeforces 474D</a></dd>
+<dt>Time limit</dt><dd>1.5 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>We saw the little game Marmot made for Mole's lunch. Now it's Marmot's dinner time and, as we all know, Marmot eats flowers. At every dinner he eats some red and white flowers. Therefore a dinner can be represented as a sequence of several flowers, some of them white and some of them red.</p><p>But, for a dinner to be tasty, there is a rule: Marmot wants to eat white flowers only in groups of size <em>k</em>.</p><p>Now Marmot wonders in how many ways he can eat between <em>a</em> and <em>b</em> flowers. As the number of ways could be very large, print it modulo <em>1000000007</em> (<em>10<sup>9</sup>+7</em>).</p></dd>
+<dt>Input</dt><dd><p>Input contains several test cases.</p><p>The first line contains two integers <em>t</em> and <em>k</em> (<em>1 ≤ t, k ≤ 10<sup>5</sup></em>), where <em>t</em> represents the number of test cases.</p><p>The next <em>t</em> lines contain two integers <em>a<sub>i</sub></em> and <em>b<sub>i</sub></em> (<em>1 ≤ a<sub>i</sub> ≤ b<sub>i</sub> ≤ 10<sup>5</sup></em>), describing the <em>i</em>-th test.</p></dd>
+<dt>Output</dt><dd><p>Print <em>t</em> lines to the standard output. The <em>i</em>-th line should contain the number of ways in which Marmot can eat between <em>a<sub>i</sub></em> and <em>b<sub>i</sub></em> flowers at dinner modulo <em>1000000007</em> (<em>10<sup>9</sup> + 7</em>).</p></dd>
+<dt>样例输入</dt><dd><pre>3 2
+1 3
+2 3
+4 4</pre></dd>
+<dt>样例输出</dt><dd><pre>6
+5
+5</pre></dd>
+<dt>Note</dt><dd><ul><li>For <em>K</em> = <em>2</em> and length <em>1</em> Marmot can eat (<em>R</em>).</li><li>For <em>K</em> = <em>2</em> and length <em>2</em> Marmot can eat (<em>RR</em>) and (<em>WW</em>).</li><li>For <em>K</em> = <em>2</em> and length <em>3</em> Marmot can eat (<em>RRR</em>), (<em>RWW</em>) and (<em>WWR</em>).</li><li>For <em>K</em> = <em>2</em> and length <em>4</em> Marmot can eat, for example, (<em>WWWW</em>) or (<em>RWWR</em>), but for example he can't eat (<em>WWWR</em>).</li></ul></dd>
+</dl>
 </body></html>

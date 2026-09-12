@@ -1,26 +1,39 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>313B: Ilya and Queries</title></head>
-<body><div id="pageTitle"><h2>313B: Ilya and Queries</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/313/B" rel="noopener">Codeforces 313B</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Ilya the Lion wants to help all his friends with passing exams. They need to solve the following problem to pass the IT exam.
-
-You&#x27;ve got string *s* = s~1~s~2~... s~n~ (*n* is the length of the string), consisting only of characters &quot;.&quot; and &quot;#&quot; and *m* queries. Each query is described by a pair of integers $l_i, r_i (1 ≤ l_i &lt; r_i ≤ n)$. The answer to the query $l_i, r_i$ is the number of such integers $i (l_i ≤ i &lt; r_i)$, that $s_i = s_i + 1$.
-
-Ilya the Lion wants to help his friends but is there anyone to help him? Help Ilya, solve the problem.
-
-**Input**
-
-The first line contains string *s* of length *n* (2 ≤ *n* ≤ 10^5^). It is guaranteed that the given string only consists of characters &quot;.&quot; and &quot;#&quot;.
-
-The next line contains integer *m* (1 ≤ *m* ≤ 10^5^) — the number of queries. Each of the next *m* lines contains the description of the corresponding query. The *i*-th line contains integers $l_i, r_i (1 ≤ l_i &lt; r_i ≤ n)$.
-
-**Output**
-
-Print *m* integers — the answers to the queries in the order in which they are given in the input.
-
-Examples
-
-sample1 input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/313/B" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 313B: B. Ilya and Queries</title></head>
+<body><div id="pageTitle"><h2>B. Ilya and Queries</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/313/B" rel="noopener">Codeforces 313B</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Ilya the Lion wants to help all his friends with passing exams. They need to solve the following problem to pass the IT exam.</p><p>You've got string <em>s=s<sub>1</sub>s<sub>2</sub>...\ s<sub>n</sub></em> (<em>n</em> is the length of the string), consisting only of characters "." and "#" and <em>m</em> queries. Each query is described by a pair of integers <em>l<sub>i</sub>,r<sub>i</sub></em> <em>(1≤l<sub>i</sub>&lt;r<sub>i</sub>≤n)</em>. The answer to the query <em>l<sub>i</sub>,r<sub>i</sub></em> is the number of such integers <em>i</em> <em>(l<sub>i</sub>≤i&lt;r<sub>i</sub>)</em>, that <em>s<sub>i</sub>=s<sub>i+1</sub></em>.</p><p>Ilya the Lion wants to help his friends but is there anyone to help him? Help Ilya, solve the problem.</p></dd>
+<dt>Input</dt><dd><p>The first line contains string <em>s</em> of length <em>n</em> <em>(2≤n≤10<sup>5</sup>)</em>. It is guaranteed that the given string only consists of characters "." and "#".</p><p>The next line contains integer <em>m</em> <em>(1≤m≤10<sup>5</sup>)</em> — the number of queries. Each of the next <em>m</em> lines contains the description of the corresponding query. The <em>i</em> -th line contains integers <em>l<sub>i</sub>,r<sub>i</sub></em> <em>(1≤l<sub>i</sub>&lt;r<sub>i</sub>≤n)</em>.</p></dd>
+<dt>Output</dt><dd><p>Print <em>m</em> integers — the answers to the queries in the order in which they are given in the input.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+......
+4
+3 4
+2 3
+1 6
+2 6
+样例输出1
+1
+1
+5
+4</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入2
+#..###
+5
+1 3
+5 6
+1 5
+3 6
+3 4
+样例输出2
+1
+1
+2
+2
+0</pre></dd>
+</dl>
 </body></html>

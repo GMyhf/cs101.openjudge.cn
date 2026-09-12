@@ -1,0 +1,29 @@
+{
+  "id": "2131C",
+  "name": "Make it Equal",
+  "source_url": "https://codeforces.com/problemset/problem/2131/C",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2131C",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Given two [multisets](https://en.wikipedia.org/wiki/Multiset) $$$S$$$ and $$$T$$$ of size $$$n$$$ and a positive integer $$$k$$$, you may perform the following operations any number (including zero) of times on $$$S$$$:\n\n- Select an element $$$x$$$ in $$$S$$$, and remove one occurrence of $$$x$$$ in $$$S$$$. Then, either insert $$$x+k$$$ into $$$S$$$, or insert $$$|x-k|$$$ into $$$S$$$.\n\nDetermine if it is possible to make $$$S$$$ equal to $$$T$$$. Two multisets $$$S$$$ and $$$T$$$ are equal if every element appears the same number of times in $$$S$$$ and $$$T$$$.",
+    "formatI": "Each test contains multiple test cases. The first line contains an integer $$$t$$$ ($$$1 \\\\le t \\\\le 10^4$$$) — the number of test cases. The description of the test cases follows.\n\nThe first line contains two integers $$$n$$$ and $$$k$$$ ($$$1 \\\\le n \\\\le 2 \\\\cdot 10^5$$$, $$$ 1 \\\\le k \\\\le 10^9$$$) — the size of $$$S$$$ and the constant, respectively.\n\nThe second line contains $$$n$$$ integers $$$S\\_1,S\\_2,\\\\ldots,S\\_n$$$ ($$$0 \\\\le S\\_i \\\\le 10^9$$$) — the elements in $$$S$$$.\n\nThe third line contains $$$n$$$ integers $$$T\\_1,T\\_2,\\\\ldots,T\\_n$$$ ($$$0 \\\\le T\\_i \\\\le 10^9$$$) — the elements in $$$T$$$.\n\nIt is guaranteed that the sum of $$$n$$$ over all test cases does not exceed $$$2 \\\\cdot 10^5$$$.",
+    "formatO": "For each test case, output \"YES\" if it is possible to make $$$S$$$ equal to $$$T$$$, and \"NO\" otherwise.\n\nYou can output the answer in any case (upper or lower). For example, the strings \"yEs\", \"yes\", \"Yes\", and \"YES\" will be recognized as positive responses.",
+    "hint": "In the first test case, we can remove one occurrence of $$$1$$$ from $$$S$$$ and insert $$$|1-k|=|1-3|=2$$$ into $$$S$$$, making $$$S$$$ equal to $$$T$$$.\n\nIn the second test case, we can remove one occurrence of $$$4$$$ from $$$S$$$ and insert $$$4+k=4+8=12$$$ into $$$S$$$, making $$$S$$$ equal to $$$T$$$.\n\nIn the last test case, we can show that it is impossible to make $$$S$$$ equal to $$$T$$$.",
+    "background": null
+  },
+  "translation": {
+    "description": "给定两个大小为 $n$ 的多重集 $S$ 和 $T$，以及一个正整数 $k$，你可以对 $S$ 进行如下操作任意次（包括零次）：\n\n- 选择 $S$ 中的一个元素 $x$，移除 $S$ 中的一个 $x$，然后可以将 $x+k$ 或 $|x-k|$ 插入到 $S$ 中。\n\n请判断是否有可能通过若干次操作使 $S$ 等于 $T$。当且仅当 $S$ 和 $T$ 中每个元素出现的次数都相同，两个多重集才相等。",
+    "formatI": "每组测试数据包含多组测试用例。第一行为一个整数 $t$（$1 \\le t \\le 10^4$），表示测试用例的组数。每组测试用例描述如下：\n\n第一行包含两个整数 $n$ 和 $k$（$1 \\le n \\le 2 \\cdot 10^5$，$1 \\le k \\le 10^9$），分别表示 $S$ 和 $T$ 的大小以及常数 $k$。\n\n第二行包含 $n$ 个整数 $S_1, S_2, \\ldots, S_n$（$0 \\le S_i \\le 10^9$），表示 $S$ 中的元素。\n\n第三行包含 $n$ 个整数 $T_1, T_2, \\ldots, T_n$（$0 \\le T_i \\le 10^9$），表示 $T$ 中的元素。\n\n保证所有测试用例中 $n$ 的总和不超过 $2 \\cdot 10^5$。",
+    "formatO": "对于每组测试用例，如果可以通过若干次操作使 $S$ 等于 $T$，输出 \"YES\"；否则输出 \"NO\"。\n\n你可以用任意大小写输出答案（如 \"yEs\", \"yes\", \"Yes\", \"YES\" 都会被识别为肯定回答）。",
+    "hint": "在第一个测试用例中，我们可以从 $S$ 中移除一个 $1$，并插入 $|1-k|=|1-3|=2$，此时 $S$ 就等于 $T$。\n\n在第二个测试用例中，我们可以从 $S$ 中移除一个 $4$，并插入 $4+k=4+8=12$，此时 $S$ 就等于 $T$。\n\n在最后一个测试用例中，可以证明无法通过操作使 $S$ 等于 $T$。\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "5\n1 3\n1\n2\n1 8\n4\n12\n3 5\n6 2 9\n8 4 11\n2 7\n2 8\n2 9\n3 2\n0 1 0\n1 0 1",
+      "output": "YES\nYES\nYES\nNO\nNO"
+    }
+  ]
+}

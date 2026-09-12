@@ -1,0 +1,33 @@
+{
+  "id": "158B",
+  "name": "Taxi",
+  "source_url": "https://codeforces.com/problemset/problem/158/B",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF158B",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 3000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "After the lessons $ n $ groups of schoolchildren went outside and decided to visit Polycarpus to celebrate his birthday. We know that the $ i $ -th group consists of $ s_{i} $ friends ( $ 1<=s_{i}<=4 $ ), and they want to go to Polycarpus together. They decided to get there by taxi. Each car can carry at most four passengers. What minimum number of cars will the children need if all members of each group should ride in the same taxi (but one taxi can take more than one group)?",
+    "formatI": "The first line contains integer $ n $ ( $ 1<=n<=10^{5} $ ) — the number of groups of schoolchildren. The second line contains a sequence of integers $ s_{1},s_{2},...,s_{n} $ ( $ 1<=s_{i}<=4 $ ). The integers are separated by a space, $ s_{i} $ is the number of children in the $ i $ -th group.",
+    "formatO": "Print the single number — the minimum number of taxis necessary to drive all children to Polycarpus.",
+    "hint": "In the first test we can sort the children into four cars like this:\n\n- the third group (consisting of four children),\n- the fourth group (consisting of three children),\n- the fifth group (consisting of three children),\n- the first and the second group (consisting of one and two children, correspondingly).\n\nThere are other ways to sort the groups into four cars.",
+    "background": ""
+  },
+  "translation": {
+    "description": "放学后，$n$ 个学生小组决定一起去拜访 Polycarpus，庆祝他的生日。已知第 $i$ 个小组有 $s_i$ 名朋友（$1 \\leq s_i \\leq 4$），并且他们希望在一起前往 Polycarpus 家。他们决定打出租车去。每辆出租车最多可乘坐 $4$ 人。请问为了让每个小组的成员都能坐在同一辆出租车里（但一辆出租车可以载多个小组），最少需要几辆出租车？",
+    "formatI": "第一行包含一个整数 $n$（$1 \\leq n \\leq 10^{5}$），表示小组的数量。第二行包含一组整数 $s_1, s_2, ..., s_n$（$1 \\leq s_i \\leq 4$），整数之间用空格分隔，$s_i$ 表示第 $i$ 个小组中的孩子数量。",
+    "formatO": "输出一个整数，表示将所有孩子送到 Polycarpus 家所需的最少出租车数。",
+    "hint": "在第一个测试样例中，我们可以通过以下方式将孩子们安排到四辆车中：\n\n- 第三个小组（4 个孩子一组）\n- 第四个小组（3 个孩子一组）\n- 第五个小组（3 个孩子一组）\n- 第一个与第二个小组（分别有 1 个和 2 个孩子）\n\n当然，还有其它将小组安排到四辆车的方案。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "5\n1 2 4 3 3\n",
+      "output": "4\n"
+    },
+    {
+      "input": "8\n2 3 4 4 2 1 3 1\n",
+      "output": "5\n"
+    }
+  ]
+}

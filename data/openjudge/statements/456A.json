@@ -1,0 +1,29 @@
+{
+  "id": "456A",
+  "name": "Laptops",
+  "source_url": "https://codeforces.com/problemset/problem/456/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF456A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "One day Dima and Alex had an argument about the price and quality of laptops. Dima thinks that the more expensive a laptop is, the better it is. Alex disagrees. Alex thinks that there are two laptops, such that the price of the first laptop is less (strictly smaller) than the price of the second laptop but the quality of the first laptop is higher (strictly greater) than the quality of the second laptop.\n\nPlease, check the guess of Alex. You are given descriptions of $ n $ laptops. Determine whether two described above laptops exist.",
+    "formatI": "The first line contains an integer $ n $ ( $ 1<=n<=10^{5} $ ) — the number of laptops.\n\nNext $ n $ lines contain two integers each, $ a_{i} $ and $ b_{i} $ $ (1<=a_{i},b_{i}<=n) $ , where $ a_{i} $ is the price of the $ i $ -th laptop, and $ b_{i} $ is the number that represents the quality of the $ i $ -th laptop (the larger the number is, the higher is the quality).\n\nAll $ a_{i} $ are distinct. All $ b_{i} $ are distinct.",
+    "formatO": "If Alex is correct, print \"Happy Alex\", otherwise print \"Poor Alex\" (without the quotes).",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "有一天Dima和Alex正在讨论关于 $n$ 台笔记本电脑的价格与质量。Dima认为价格高的笔记本质量也高，而Alex认为笔记本是物美价廉，价格低的笔记本质量反而高。\n\n正当他们争（吵）论得不可开交之时，您过来了。现在您需要写出一个程序去确认谁是谁非。",
+    "formatI": "第一行输入笔记本个数 $n$ $(n \\leqslant 10^5)$ 。\n\n接下来的 $n$ 行输入两个数,分别是第 $n$ 个笔记本的价值 $a_i$ 与质量 $b_i$。\n\n保证所有的 $a_i$ 与 $b_i$ 不同，且属于 $int$ 范围。",
+    "formatO": "如果存在符合Alex的要求的两台笔记本电脑（即一台的价格比另一台低且质量比另一台高），则输出\"Happy Alex\"，否则输出\"Poor Alex\"。\n\n翻译提供者：Black_white_tony",
+    "hint": "",
+    "background": ""
+  },
+  "samples": [
+    {
+      "input": "2\n1 2\n2 1\n",
+      "output": "Happy Alex\n"
+    }
+  ]
+}

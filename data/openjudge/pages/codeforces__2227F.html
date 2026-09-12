@@ -1,15 +1,30 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2227F: It Just Keeps Going Sideways](https://codeforces.com/contest/2227/problem/F)</title></head>
-<body><div id="pageTitle"><h2>2227F: It Just Keeps Going Sideways](https://codeforces.com/contest/2227/problem/F)</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2227/F" rel="noopener">Codeforces 2227F</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：计算初始和最终的重力势能，找到最大差异。对于一个列表排布，其重力势能为 $$ \sum_{i=0}^{n-1} (-i) a_i $$
-在初始状态下，重力势能为， $$ \sum_{i=0}^{n-1} (-i) \texttt{arr}[i] $$
-在最终状态下，重力势能为， $$ \sum_{i=0}^{n-1} (-i) \texttt{sortted\_arr}[i] $$
-若在 $i$ 处移除一个立方体，那么初始状态重力势能增加 $i$。在排序后，原先高度为 $\texttt{arr}[i]$ 的地方会有一个矮下去一格。那么是在哪里矮下去呢？实际上就是排序后列表高度为 $\texttt{arr}[i]$ 的第一个位置。我们可以遍历所有可能的 $i$，计算出最大的差异。
-
-整个过程的时间复杂度是 $\mathcal{O}(n \log n)$，主要来自于排序。
-
-代码：</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2227/F" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2227F: F. It Just Keeps Going Sideways</title></head>
+<body><div id="pageTitle"><h2>F. It Just Keeps Going Sideways</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2227/F" rel="noopener">Codeforces 2227F</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Yousef has  <em>n</em>  columns of cubes standing side by side. The  <em>i</em> -th column contains  <em>a<sub>i</sub></em>  identical unit cubes stacked vertically. Initially gravity pulls cubes downwards, so every column  <em>i</em>  contains exactly  <em>a<sub>i</sub></em>  cubes at heights  <em>1, 2, …, a<sub>i</sub></em>.</p><p>Suddenly, gravity shifts to the right. Each cube slides horizontally as far to the right as possible. A cube cannot pass through or overlap other cubes, and it must remain at its original height. The final configuration is uniquely determined by the initial heights.</p><p><img src="https://cdn.luogu.com.cn/upload/vjudge_pic/CF2227F/fad162917342e980d1f1251226569013b552c9e960c29c3ae0ca499a952e02b9.png" alt="illustration"> Before and after applying rightward gravity.Before the gravity shift, Yousef may perform at most one operation: choose an index  <em>i</em>  and decrease  <em>a<sub>i</sub></em>  by  <em>1</em>  (i.e. remove one cube from that column). He may also choose to do nothing.</p><p>A cube's movement distance is defined as  <em>|j - i|</em>, where  <em>i</em>  is its original column index and  <em>j</em>  is its column index after the gravity shift.</p><p>Find the maximum possible total movement distance (the sum of the movement distances of all remaining cubes) Yousef can achieve.</p></dd>
+<dt>Input</dt><dd><p>The first line contains an integer  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>4</sup></em>) — the number of test cases. The description of the test cases follows.</p><p>The first line of each test case contains a single integer  <em>n</em>  (<em>1 ≤ n ≤ 2 · 10<sup>5</sup></em>) — the length of the array.</p><p>The second line of each test case contains  <em>n</em>  integers  <em>a<sub>1</sub>, a<sub>2</sub>, …, a<sub>n</sub></em>  (<em>1 ≤ a<sub>i</sub> ≤ n</em>) — the elements of the array.</p><p>It is guaranteed that the sum of  <em>n</em>  over all test cases does not exceed  <em>2 · 10<sup>5</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output a single integer — the maximum possible total movement distance (the sum of the movement distances of all remaining cubes) Yousef can achieve.</p></dd>
+<dt>样例输入</dt><dd><pre>5
+5
+1 2 3 2 1
+7
+5 4 1 1 1 1 3
+6
+1 2 3 4 5 6
+6
+4 1 6 3 2 6
+7
+1 3 2 7 2 3 1</pre></dd>
+<dt>样例输出</dt><dd><pre>9
+37
+0
+17
+29</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, the initial total movement distance is  <em>5</em>. If Yousef removes the cube at index  <em>5</em>, the array becomes  <em>[1, 2, 3, 2, 0]</em>. Because the fifth column is now empty, all cubes from the first four columns are able to slide further to the right than they could originally. This results in a new total distance of  <em>9</em>.</p><p>In the third test case, the initial total movement distance is  <em>0</em>. Even if Yousef removes any cube, no remaining cube will be able to move. This results in a total distance of  <em>0</em>.</p></dd>
+</dl>
 </body></html>

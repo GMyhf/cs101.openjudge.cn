@@ -2,13 +2,13 @@
 """Import standard Codeforces entries described by a local course Markdown file.
 
 The source document is a solution collection, not an authoritative Codeforces
-mirror. We therefore preserve its explanatory excerpt and link every entry to
-the official problem page, while keeping the local catalog independent of live
-upstream requests. April Fools sections are intentionally excluded: their
-custom/non-algorithmic tasks do not have a dependable exact-output policy.
+mirror, so it decides only which problems the local Codeforces book carries and
+what judge data they may use. The statements themselves come from Codeforces
+(see `scripts/fetch_codeforces_statements.py`). April Fools sections are
+intentionally excluded: their custom/non-algorithmic tasks do not have a
+dependable exact-output policy.
 """
 import argparse
-from html import escape
 import hashlib
 import json
 from pathlib import Path
@@ -19,7 +19,6 @@ ROOT = Path(__file__).resolve().parents[1]
 MIRROR = ROOT / "data" / "openjudge"
 CATALOG_PATH = MIRROR / "catalog.json"
 TEST_INDEX_PATH = MIRROR / "test_index.json"
-PAGES = MIRROR / "pages"
 REPORT_PATH = ROOT / "docs" / "codeforces-import.md"
 MIN_EXACT_CASES = 20
 
@@ -135,17 +134,12 @@ def parse_markdown(source):
     return selected, excluded
 
 
-def page_html(item):
-    return """<!doctype html>
-<html lang=\"zh-CN\"><head><meta charset=\"utf-8\"><title>{id}: {title}</title></head>
-<body><div id=\"pageTitle\"><h2>{id}: {title}</h2></div>
-<dl class=\"problem-params\"><dt>来源</dt><dd><a href=\"{url}\" rel=\"noopener\">Codeforces {id}</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class=\"problem-content\"><dt>题解摘要</dt><dd><pre>{excerpt}</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href=\"{url}\" rel=\"noopener\">Codeforces 原题</a>。</p></dd></dl>
-</body></html>
-""".format(id=escape(item["id"]), title=escape(item["title"]), url=escape(item["url"], quote=True),
-           excerpt=escape(item["excerpt"]))
+# The statement pages are no longer built here. This script only ever had the
+# course Markdown to work with, so its page was the raw excerpt inside a <pre>:
+# unrendered markup, cut at the first code fence, with the samples and the
+# official limits missing. `scripts/fetch_codeforces_statements.py` fetches the
+# real statements and `scripts/build_codeforces_pages.py` renders them, so a
+# re-import must not overwrite those pages with the excerpt again.
 
 
 def report(source, imported, excluded, data_status):
@@ -195,7 +189,6 @@ def main():
     existing = {(item.get("book"), item.get("id")): item for item in problems}
     added = 0
     data_status = {}
-    PAGES.mkdir(parents=True, exist_ok=True)
     for problem_id, item in sorted(imported.items(), key=lambda pair: (int(re.match(r"\d+", pair[0]).group()), pair[0])):
         key = ("codeforces", problem_id)
         record = existing.get(key)
@@ -250,9 +243,6 @@ def main():
             else:
                 data_status[problem_id] = "no_extractable_sample"
                 record["data_status"] = "no_extractable_sample"
-        page = PAGES / f"codeforces__{problem_id}.html"
-        if problem_id != "4A":
-            page.write_text(page_html(item), encoding="utf-8")
 
     catalog["count"] = len(problems)
     CATALOG_PATH.write_text(json.dumps(catalog, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

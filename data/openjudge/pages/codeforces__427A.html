@@ -1,28 +1,30 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>427A: Police Recruits</title></head>
-<body><div id="pageTitle"><h2>427A: Police Recruits</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/427/A" rel="noopener">Codeforces 427A</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>The police department of your city has just started its journey. Initially, they don’t have any manpower. So, they started hiring new recruits in groups.
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 427A: A. Police Recruits</title></head>
+<body><div id="pageTitle"><h2>A. Police Recruits</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/427/A" rel="noopener">Codeforces 427A</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>The police department of your city has just started its journey. Initially, they don’t have any manpower. So, they started hiring new recruits in groups.</p><p>Meanwhile, crimes keeps occurring within the city. One member of the police force can investigate only one crime during his/her lifetime.</p><p>If there is no police officer free (isn't busy with crime) during the occurrence of a crime, it will go untreated.</p><p>Given the chronological order of crime occurrences and recruit hirings, find the number of crimes which will go untreated.</p></dd>
+<dt>Input</dt><dd><p>The first line of input will contain an integer <em>n (1≤n≤10<sup>5</sup>)</em>, the number of events. The next line will contain <em>n</em> space-separated integers.</p><p>If the integer is -1 then it means a crime has occurred. Otherwise, the integer will be positive, the number of officers recruited together at that time. No more than 10 officers will be recruited at a time.</p></dd>
+<dt>Output</dt><dd><p>Print a single integer, the number of crimes which will go untreated.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+3
+-1 -1 1
+样例输出1
+2
 
-Meanwhile, crimes keeps occurring within the city. One member of the police force can investigate only one crime during his/her lifetime.
-
-If there is no police officer free (isn&#x27;t busy with crime) during the occurrence of a crime, it will go untreated.
-
-Given the chronological order of crime occurrences and recruit hirings, find the number of crimes which will go untreated.
-
-**Input**
-
-The first line of input will contain an integer $n (1 ≤ n ≤ 10^5)$, the number of events. The next line will contain *n* space-separated integers.
-
-If the integer is -1 then it means a crime has occurred. Otherwise, the integer will be positive, the number of officers recruited together at that time. No more than 10 officers will be recruited at a time.
-
-**Output**
-
-Print a single integer, the number of crimes which will go untreated.
-
-Examples
-
-Input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/427/A" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+样例输入2
+8
+1 -1 1 -1 -1 1 1 1
+样例输出2
+1</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入3
+11
+-1 -1 2 -1 -1 -1 -1 -1 -1 -1 -1
+样例输出3
+8</pre></dd>
+<dt>Note</dt><dd><p>Lets consider the second example:</p><ol><li>Firstly one person is hired.</li><li>Then crime appears, the last hired person will investigate this crime.</li><li>One more person is hired.</li><li>One more crime appears, the last hired person will investigate this crime.</li><li>Crime appears. There is no free policeman at the time, so this crime will go untreated.</li><li>One more person is hired.</li><li>One more person is hired.</li><li>One more person is hired.</li></ol><p>The answer is one, as one crime (on step 5) will go untreated.</p></dd>
+</dl>
 </body></html>

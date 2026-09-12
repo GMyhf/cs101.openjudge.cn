@@ -1,44 +1,26 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>1833B: Restore the Weather</title></head>
-<body><div id="pageTitle"><h2>1833B: Restore the Weather</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1833/B" rel="noopener">Codeforces 1833B</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>You are given an array $𝑎_i$ containing the weather forecast for Berlandia for the last 𝑛 days. That is, $𝑎_𝑖$ — is the estimated air temperature on day 𝑖 (1≤𝑖≤𝑛).
-
-You are also given an array 𝑏 — the air temperature that was actually present on each of the days. However, all the values in array 𝑏 are mixed up.
-
-Determine which day was which temperature, if you know that the weather never differs from the forecast by more than 𝑘 degrees. In other words, if on day 𝑖 the real air temperature was 𝑐, then the equality $|𝑎_𝑖−𝑐|≤𝑘$ is always true.
-
-For example, let an array 𝑎 = [1,3,5,3,9] of length 𝑛=5 and 𝑘=2 be given and an array 𝑏 = [2,5,11,2,4]. Then, so that the value of $𝑏_𝑖$ corresponds to the air temperature on day 𝑖, we can rearrange the elements of the array 𝑏 so: [2,2,5,4,11]. Indeed:
-
-- On the 11st day, |𝑎1−𝑏1|=|1−2|=1, 1≤2=𝑘 is satisfied;
-- On the 22nd day |𝑎2−𝑏2|=|3−2|=1, 1≤2=𝑘 is satisfied;
-- On the 33rd day, |𝑎3−𝑏3|=|5−5|=0, 0≤2=𝑘 is satisfied;
-- On the 44th day, |𝑎4−𝑏4|=|3−4|=1, 1≤2=𝑘 is satisfied;
-- On the 55th day, |𝑎5−𝑏5|=|9−11|=2, 2≤2=𝑘 is satisfied.
-
-**Input**
-
-The first line of input data contains a single integer 𝑡 (1≤𝑡≤10^4^) — the number of test cases.
-
-The description of the test cases follows.
-
-The first line of each test case contains two integers 𝑛 (1≤𝑛≤10^5^) and 𝑘 (0≤𝑘≤10^9^) — the number of days and the maximum difference between the expected and actual air temperature on each day.
-
-The second line of each test case contains exactly 𝑛 integers — elements of array 𝑎 ($−10^9≤𝑎_𝑖≤10^9$).
-
-The third line of each test case contains exactly 𝑛 integers — elements of array 𝑏 ($−10^9≤𝑏_𝑖≤10^9$).
-
-It is guaranteed that the sum of 𝑛 over all test cases does not exceed 10^5^, and that the elements of array 𝑏 can always be rearranged so that the equality |𝑎𝑖−𝑏𝑖|≤𝑘 is true for all 𝑖.
-
-**Output**
-
-On a separate line for each test case, output exactly  numbers — the values of air temperature on each of the days in the correct order.
-
-If there is more than one answer — output any of them.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1833/B" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 1833B: B. Restore the Weather</title></head>
+<body><div id="pageTitle"><h2>B. Restore the Weather</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/1833/B" rel="noopener">Codeforces 1833B</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>You are given an array <em>a</em> containing the weather forecast for Berlandia for the last <em>n</em> days. That is, <em>a<sub>i</sub></em> — is the estimated air temperature on day <em>i</em> (<em>1 ≤ i ≤ n</em>).</p><p>You are also given an array <em>b</em> — the air temperature that was actually present on each of the days. However, all the values in array <em>b</em> are mixed up.</p><p>Determine which day was which temperature, if you know that the weather never differs from the forecast by more than <em>k</em> degrees. In other words, if on day <em>i</em> the real air temperature was <em>c</em>, then the equality <em>|a<sub>i</sub> - c| ≤ k</em> is always true.</p><p>For example, let an array <em>a</em> = [<em>1, 3, 5, 3, 9</em>] of length <em>n = 5</em> and <em>k = 2</em> be given and an array <em>b</em> = [<em>2, 5, 11, 2, 4</em>]. Then, so that the value of <em>b<sub>i</sub></em> corresponds to the air temperature on day <em>i</em>, we can rearrange the elements of the array <em>b</em> so: [<em>2, 2, 5, 4, 11</em>]. Indeed:</p><ul><li>On the <em>1</em> st day, <em>|a<sub>1</sub> - b<sub>1</sub>| = |1 - 2| = 1</em>, <em>1 ≤ 2 = k</em> is satisfied;</li><li>On the <em>2</em> nd day <em>|a<sub>2</sub> - b<sub>2</sub>| = |3 - 2| = 1</em>, <em>1 ≤ 2 = k</em> is satisfied;</li><li>On the <em>3</em> rd day, <em>|a<sub>3</sub> - b<sub>3</sub>| = |5 - 5| = 0</em>, <em>0 ≤ 2 = k</em> is satisfied;</li><li>On the <em>4</em> th day, <em>|a<sub>4</sub> - b<sub>4</sub>| = |3 - 4| = 1</em>, <em>1 ≤ 2 = k</em> is satisfied;</li><li>On the <em>5</em> th day, <em>|a<sub>5</sub> - b<sub>5</sub>| = |9 - 11| = 2</em>, <em>2 ≤ 2 = k</em> is satisfied.</li></ul></dd>
+<dt>Input</dt><dd><p>The first line of input data contains a single integer <em>t</em> (<em>1 ≤ t ≤ 10<sup>4</sup></em>) — the number of test cases.</p><p>The description of the test cases follows.</p><p>The first line of each test case contains two integers <em>n</em> (<em>1 ≤ n ≤ 10<sup>5</sup></em>) and <em>k</em> (<em>0 ≤ k ≤10<sup>9</sup></em>) — the number of days and the maximum difference between the expected and actual air temperature on each day.</p><p>The second line of each test case contains exactly <em>n</em> integers — elements of array <em>a</em> (<em>-10<sup>9</sup> ≤ a<sub>i</sub> ≤ 10<sup>9</sup></em>).</p><p>The third line of each test case contains exactly <em>n</em> integers — elements of array <em>b</em> (<em>-10<sup>9</sup> ≤ b<sub>i</sub> ≤ 10<sup>9</sup></em>).</p><p>It is guaranteed that the sum of <em>n</em> over all test cases does not exceed <em>10<sup>5</sup></em>, and that the elements of array <em>b</em> can always be rearranged so that the equality <em>|a<sub>i</sub> - b<sub>i</sub>| ≤ k</em> is true for all <em>i</em>.</p></dd>
+<dt>Output</dt><dd><p>On a separate line for each test case, output exactly <em>n</em> numbers — the values of air temperature on each of the days in the correct order.</p><p>If there is more than one answer — output any of them.</p></dd>
+<dt>样例输入</dt><dd><pre>3
+5 2
+1 3 5 3 9
+2 5 11 2 4
+6 1
+-1 3 -2 0 -5 -1
+-4 0 -1 4 0 0
+3 3
+7 7 7
+9 4 8</pre></dd>
+<dt>样例输出</dt><dd><pre>2 2 5 4 11
+0 4 -1 0 -4 0
+8 4 9</pre></dd>
+</dl>
 </body></html>

@@ -1,0 +1,29 @@
+{
+  "id": "2196A",
+  "name": "Game with a Fraction",
+  "source_url": "https://codeforces.com/problemset/problem/2196/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2196A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Alice and Bob have two integers  $ p $  and  $ q $ , and they are playing a game with these numbers. The players take turns, with Alice going first. On their turn, a player can do one of two actions:\n\n- decrease  $ p $  by one (this action is possible if  $ p  \\gt  0 $ );\n- decrease  $ q $  by one (this action is possible if  $ q  \\gt  1 $ ).\n\nThe game ends when  $ p = 0 $  and  $ q = 1 $ .\n\nBob wins if at any point during the game the fraction  $ \\frac{p}{q} $  is equal to in value the fraction  $ \\frac{2}{3} $ . Otherwise, Alice wins.\n\nGiven the initial values of  $ p $  and  $ q $ , determine the winner of the game if both players play optimally.",
+    "formatI": "Each test contains multiple test cases. The first line contains the number of test cases  $ t $  ( $ 1 \\le t \\le 10^4 $ ). The description of the test cases follows.\n\nEach input case consists of a single line containing two integers  $ p $  and  $ q $  ( $ 1 \\le p, q \\le 10^{18} $ ).",
+    "formatO": "For each input case, output:\n\n- \"Alice\" if Alice wins;\n- \"Bob\" if Bob wins.",
+    "hint": "In the first input case, the fraction is already equal to  $ \\frac{2}{3} $  by value, so Bob wins.\n\nIn the second input case, one possible sequence of the game is as follows:\n\n- initially  $ p = 10, q = 14 $ ;\n- after Alice's turn  $ p = 9, q = 14 $ ;\n- after Bob's turn  $ p = 9, q = 13 $ ;\n- after Alice's turn  $ p = 9, q = 12 $ ;\n- after Bob's turn  $ p = 8, q = 12 $ .\n\nBob wins, as  $ \\frac{8}{12} $  is equal to  $ \\frac{2}{3} $ . It can be shown that in this example, with optimal play from both players, Bob always wins.\n\nFor the third input case, Alice's optimal strategy will be to decrease  $ q $  as long as possible. In this case, the game will end in favor of Alice regardless of Bob's actions.",
+    "background": null
+  },
+  "translation": {
+    "description": "Alice 和 Bob 有两个整数 $p$ 和 $q$，他们用这两个数玩一个游戏。两人轮流行动，Alice 先手。在自己的回合中，玩家可以执行以下两种操作之一：\n\n- 让 $p$ 减 $1$（当前 $p>0$ 时可以执行该操作）；\n- 让 $q$ 减 $1$（当前 $q>1$ 时可以执行该操作）。\n\n当 $p=0$ 且 $q=1$ 时，游戏结束。\n\n如果在游戏过程中，分数 $\\frac{p}{q}$ 的值等于 $\\frac{2}{3}$，则 Bob 获胜；否则，Alice 获胜。\n\n给定 $p$ 和 $q$ 的初始值，假设双方都以最优策略进行游戏，判断谁会获胜。",
+    "formatI": "输入包含多组测试数据。第一行为测试用例组数 $t$，其中 $1 \\le t \\le 10^4$。\n\n每组测试数据占一行，包含两个整数 $p$ 和 $q$，满足 $1 \\le p, q \\le 10^{18}$。",
+    "formatO": "对于每组输入，输出以下内容之一：\n\n- 如果 Alice 获胜，输出 \"Alice\"；\n- 如果 Bob 获胜，输出 \"Bob\"。",
+    "hint": "在第一个输入用例中，分数已经等于 $\\frac{2}{3}$，因此 Bob 获胜。\n\n在第二个输入用例中，游戏可能经过如下步骤：\n\n- 初始时 $p = 10, q = 14$；\n- Alice 行动后 $p = 9, q = 14$；\n- Bob 行动后 $p = 9, q = 13$；\n- Alice 行动后 $p = 9, q = 12$；\n- Bob 行动后 $p = 8, q = 12$。\n\n这时 Bob 获胜，因为 $\\frac{8}{12} = \\frac{2}{3}$。事实上，在这个例子中，双方都以最优策略下，Bob 总会获胜。\n\n在第三个输入用例中，Alice 的最优策略是尽量让 $q$ 减小。在本例中，不论 Bob 如何行动，最后都将是 Alice 获胜。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "6\n4 6\n10 14\n15 15\n7 12\n7000000000000000 10487275715782582\n1000000000000000000 1000000000000000000",
+      "output": "Bob\nBob\nAlice\nAlice\nBob\nAlice"
+    }
+  ]
+}

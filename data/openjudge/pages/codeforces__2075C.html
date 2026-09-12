@@ -1,36 +1,24 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2075C: Two Colors</title></head>
-<body><div id="pageTitle"><h2>2075C: Two Colors</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2075/C" rel="noopener">Codeforces 2075C</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Monocarp has installed a new fence at his summer house. The fence consists of 𝑛 planks of the same size arranged in a row.
-
-Monocarp decided that he would paint his fence according to the following rules:
-
-- each plank of the fence will be painted in exactly one color;
-- the number of different colors that the planks will be painted in is **exactly** two;
-- the planks of the fence that are painted in the same color must form a continuous sequence, meaning that for all pairs of planks painted in the same color, there will be no planks painted in a different color between them.
-
-Monocarp has 𝑚 different paints, and the paint of the 𝑖-th color is sufficient to paint no more than 𝑎𝑖 planks of the fence. Monocarp will not buy any additional paints.
-
-Your task is to determine the number of different ways to paint the fence that satisfy all of Monocarp&#x27;s described wishes. Two ways to paint are considered different if there exists a plank that is painted in different colors in these two ways.
-
-**Input**
-
-The first line contains a single integer 𝑡 (1≤𝑡≤10^4) — the number of test cases.
-
-The first line of each test case contains two integers 𝑛 and 𝑚 (2≤𝑛,𝑚≤2⋅10^5) — the number of planks in the fence and the number of different colors of paint that Monocarp has.
-
-The second line contains 𝑚 integers 𝑎1,𝑎2,…,𝑎𝑚 (1≤𝑎𝑖≤𝑛), where 𝑎𝑖 is the maximum number of planks that can be painted with the paint of color 𝑖.
-
-The sum of 𝑛 over all test cases does not exceed 2⋅10^5. The sum of 𝑚 over all test cases does not exceed 2⋅10^5.
-
-**Output**
-
-For each test case, output the number of different ways to paint the fence that satisfy all of Monocarp&#x27;s described wishes.
-
-Example
-
-Input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2075/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2075C: C. Two Colors</title></head>
+<body><div id="pageTitle"><h2>C. Two Colors</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2075/C" rel="noopener">Codeforces 2075C</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Monocarp has installed a new fence at his summer house. The fence consists of <em>n</em> planks of the same size arranged in a row.</p><p>Monocarp decided that he would paint his fence according to the following rules:</p><ul><li>each plank of the fence will be painted in exactly one color;</li><li>the number of different colors that the planks will be painted in is exactly two;</li><li>the planks of the fence that are painted in the same color must form a continuous sequence, meaning that for all pairs of planks painted in the same color, there will be no planks painted in a different color between them.</li></ul><p>Monocarp has <em>m</em> different paints, and the paint of the <em>i</em> -th color is sufficient to paint no more than <em>a<sub>i</sub></em> planks of the fence. Monocarp will not buy any additional paints.</p><p>Your task is to determine the number of different ways to paint the fence that satisfy all of Monocarp's described wishes. Two ways to paint are considered different if there exists a plank that is painted in different colors in these two ways.</p></dd>
+<dt>Input</dt><dd><p>The first line contains a single integer <em>t</em> (<em>1 ≤ t ≤ 10<sup>4</sup></em>) — the number of test cases.</p><p>The first line of each test case contains two integers <em>n</em> and <em>m</em> (<em>2 ≤ n, m ≤ 2 · 10<sup>5</sup></em>) — the number of planks in the fence and the number of different colors of paint that Monocarp has.</p><p>The second line contains <em>m</em> integers <em>a<sub>1</sub>, a<sub>2</sub>, …, a<sub>m</sub></em> (<em>1 ≤ a<sub>i</sub> ≤ n</em>), where <em>a<sub>i</sub></em> is the maximum number of planks that can be painted with the paint of color <em>i</em>.</p><p>The sum of <em>n</em> over all test cases does not exceed <em>2 · 10<sup>5</sup></em>. The sum of <em>m</em> over all test cases does not exceed <em>2 · 10<sup>5</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output the number of different ways to paint the fence that satisfy all of Monocarp's described wishes.</p></dd>
+<dt>样例输入</dt><dd><pre>3
+5 2
+2 4
+5 2
+3 4
+12 3
+5 9 8</pre></dd>
+<dt>样例输出</dt><dd><pre>4
+6
+22</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, there are <em>4</em> different ways to paint the fence (the sequences of color numbers in which the planks can be painted from left to right are listed below):</p><ol><li><em>[1, 2, 2, 2, 2]</em>;</li><li><em>[1, 1, 2, 2, 2]</em>;</li><li><em>[2, 2, 2, 1, 1]</em>;</li><li><em>[2, 2, 2, 2, 1]</em>.</li></ol><p>In the second test case, there are <em>6</em> different ways to paint the fence (the sequences of color numbers in which the planks can be painted from left to right are listed below):</p><ol><li><em>[1, 2, 2, 2, 2]</em>;</li><li><em>[1, 1, 2, 2, 2]</em>;</li><li><em>[1, 1, 1, 2, 2]</em>;</li><li><em>[2, 2, 1, 1, 1]</em>;</li><li><em>[2, 2, 2, 1, 1]</em>;</li><li><em>[2, 2, 2, 2, 1]</em>.</li></ol></dd>
+</dl>
 </body></html>

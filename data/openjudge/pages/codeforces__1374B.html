@@ -1,26 +1,29 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>1374B: Multiply by 2, divide by 6</title></head>
-<body><div id="pageTitle"><h2>1374B: Multiply by 2, divide by 6</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1374/B" rel="noopener">Codeforces 1374B</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>You are given an integer *n*. In one move, you can either multiply *n* by two or divide *n* by *6* (if it is divisible by *6* without the remainder).
-
-Your task is to find the minimum number of moves needed to obtain *1* from *n* or determine if it&#x27;s impossible to do that.
-
-You have to answer *t* independent test cases.
-
-**Input**
-
-The first line of the input contains one integer *t*(1≤t≤2⋅10^4^) — the number of test cases. Then t test cases follow.
-
-The only line of the test case contains one integer *n* (1≤n≤10^9^).
-
-**Output**
-
-For each test case, print the answer — the minimum number of moves needed to obtain 1 from *n* if it&#x27;s possible to do that or -1 if it&#x27;s impossible to obtain 1 from *n*.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1374/B" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 1374B: B. Multiply by 2, divide by 6</title></head>
+<body><div id="pageTitle"><h2>B. Multiply by 2, divide by 6</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/1374/B" rel="noopener">Codeforces 1374B</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>You are given an integer <em>n</em>. In one move, you can either multiply <em>n</em> by two or divide <em>n</em> by <em>6</em> (if it is divisible by <em>6</em> without the remainder).</p><p>Your task is to find the minimum number of moves needed to obtain <em>1</em> from <em>n</em> or determine if it's impossible to do that.</p><p>You have to answer <em>t</em> independent test cases.</p></dd>
+<dt>Input</dt><dd><p>The first line of the input contains one integer <em>t</em> (<em>1 ≤ t ≤ 2 · 10<sup>4</sup></em>) — the number of test cases. Then <em>t</em> test cases follow.</p><p>The only line of the test case contains one integer <em>n</em> (<em>1 ≤ n ≤ 10<sup>9</sup></em>).</p></dd>
+<dt>Output</dt><dd><p>For each test case, print the answer — the minimum number of moves needed to obtain <em>1</em> from <em>n</em> if it's possible to do that or -1 if it's impossible to obtain <em>1</em> from <em>n</em>.</p></dd>
+<dt>样例输入</dt><dd><pre>7
+1
+2
+3
+12
+12345
+15116544
+387420489</pre></dd>
+<dt>样例输出</dt><dd><pre>0
+-1
+2
+-1
+-1
+12
+36</pre></dd>
+<dt>Note</dt><dd><p>Consider the sixth test case of the example. The answer can be obtained by the following sequence of moves from the given integer <em>15116544</em>:</p><ol><li>Divide by <em>6</em> and get <em>2519424</em>;</li><li>divide by <em>6</em> and get <em>419904</em>;</li><li>divide by <em>6</em> and get <em>69984</em>;</li><li>divide by <em>6</em> and get <em>11664</em>;</li><li>multiply by <em>2</em> and get <em>23328</em>;</li><li>divide by <em>6</em> and get <em>3888</em>;</li><li>divide by <em>6</em> and get <em>648</em>;</li><li>divide by <em>6</em> and get <em>108</em>;</li><li>multiply by <em>2</em> and get <em>216</em>;</li><li>divide by <em>6</em> and get <em>36</em>;</li><li>divide by <em>6</em> and get <em>6</em>;</li><li>divide by <em>6</em> and get <em>1</em>.</li></ol></dd>
+</dl>
 </body></html>

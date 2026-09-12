@@ -1,0 +1,29 @@
+{
+  "id": "2184F",
+  "name": "Cherry Tree",
+  "source_url": "https://codeforces.com/problemset/problem/2184/F",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2184F",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "You are given a rooted tree with  $ n $  vertices $ ^{\\text{∗}} $ . The vertices of the tree are numbered with integers from  $ 1 $  to  $ n $ . The root of the tree is vertex number  $ 1 $ .\n\nIn each leaf $ ^{\\text{†}} $  of the tree, there grows one cherry. You want to collect all the cherries, and to do this, you perform the following action several times:\n\nYou choose any vertex of the tree  $ v $  (including the root or a leaf) and \"shake\" it. After that, cherries fall from all the leaves that are descendants $ ^{\\text{‡}} $  of vertex  $ v $  (if vertex  $ v $  itself is a leaf, then a cherry falls from it). If cherries have already fallen from any leaf before, the tree will break, so such a situation must be avoided.\n\nAccording to an ancient legend of the cherry orchard, the number of vertices you shake should be a multiple of three.\n\nIs it possible to collect all the cherries in this way?\n\n $ ^{\\text{∗}} $ A tree with  $ n $  vertices is an undirected connected graph with  $ n $  vertices and  $ n - 1 $  edges. A rooted tree is a tree in which one of the vertices is special and is called the root.\n\n $ ^{\\text{†}} $ A leaf is a vertex that has no descendants.\n\n $ ^{\\text{‡}} $ The descendants of vertex  $ v $  are all vertices  $ u \\neq v $  such that on the shortest path from the root to  $ u $ , vertex  $ v $  is encountered.",
+    "formatI": "Each test consists of several test cases. The first line contains a single integer  $ t $   $ (1 \\le t \\le 10^4) $  — the number of test cases. The following lines describe the test cases.\n\nThe first line of each test case contains a single integer  $ n $  ( $ 2 \\leq n \\leq 2 \\cdot 10^5 $ ).\n\nThe next  $ n - 1 $  lines of each test case contain two integers  $ u $  and  $ v $  ( $ 1 \\leq u, v \\leq n, u \\neq v $ ) — the vertices connected by the next edge of the tree.\n\nIt is guaranteed that the graph in each data set is a tree.\n\nIt is guaranteed that the sum of  $ n $  across all input data sets does not exceed  $ 2 \\cdot 10^5 $ .",
+    "formatO": "For each input data set, output \"YES\" on a separate line if it is possible to collect all the cherries. Otherwise, output \"NO\".\n\nYou can print each letter in any case (upper or lower). For example, \"YeS\", \"no\" and \"yES\" are all acceptable.",
+    "hint": "In the first test case, you can shake vertices  $ 2, 3, 4 $ .\n\nIn the second test case, the only way to shake a number of vertices that is a multiple of three is to shake all the vertices. However, doing so would break the tree, so this is not allowed.\n\nIn the third test case, you can, for example, shake vertices  $ 2, 7, 9 $ .",
+    "background": null
+  },
+  "translation": {
+    "description": "给定一棵有 $n$ 个结点的有根树 $^{\\text{∗}}$，树的结点编号为 $1$ 到 $n$。树的根结点是 $1$ 号结点。\n\n每一片叶子 $^{\\text{†}}$ 上都结有一颗樱桃。你想采集所有的樱桃，为此你需要多次执行如下操作：\n\n你可以选择树上的任意一个结点 $v$（可以是根或叶子），并“摇晃”它。之后，所有以 $v$ 为祖先的叶子上的樱桃都会掉下来（如果 $v$ 自身是叶子，则自身的樱桃会掉下）。若某片叶子的樱桃被摇落过多次，树就会损坏，因此要避免这种情况。\n\n据传樱桃园的古老传说，你摇晃的结点数必须是 $3$ 的倍数。\n\n你能否用这种方式采集所有的樱桃？\n\n$^{\\text{∗}}$ 一棵有 $n$ 个结点的树是一个含 $n$ 个结点、$n-1$ 条边的无向连通图。有根树是指定一个特殊结点为根的树。\n\n$^{\\text{†}}$ 叶子是没有子结点的结点。\n\n$^{\\text{‡}}$ 结点 $v$ 的后代是所有路径从根到 $u \\neq v$，且路径上必经 $v$ 的所有结点 $u$。",
+    "formatI": "每组测试数据包含若干个测试用例。第一行为单个整数 $t$ $(1 \\le t \\le 10^4)$，表示测试用例的组数。以下为各组测试用例的数据。\n\n每组数据的第一行为一个整数 $n$（$2 \\leq n \\leq 2 \\cdot 10^5$）。\n\n随后 $n-1$ 行，每行两个整数 $u$ 与 $v$（$1 \\leq u, v \\leq n, u \\neq v$），表示一条树上的边，连接结点 $u$ 和 $v$。\n\n保证每组数据的图都是一棵树。\n\n保证所有测试用例中 $n$ 的总和不超过 $2 \\times 10^5$。",
+    "formatO": "对于每组测试数据，若可以采集所有樱桃，则在单独一行输出 “YES”；否则输出 “NO”。\n\n可以以任意大小写输出答案（例如 “YeS”、“no”、“yES” 都是可接受的）。",
+    "hint": "在第一个测试用例中，你可以摇晃结点 $2, 3, 4$。\n\n在第二个测试用例中，唯一能摇晃的结点数量是 $3$ 的倍数时，只能摇晃所有结点，但这样会让树损坏，所以不允许。\n\n在第三个测试用例中，你可以例如摇晃结点 $2, 7, 9$。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "3\n4\n1 2\n1 3\n1 4\n3\n1 2\n1 3\n9\n1 2\n3 1\n2 4\n5 2\n5 6\n3 7\n8 3\n8 9",
+      "output": "YES\nNO\nYES"
+    }
+  ]
+}

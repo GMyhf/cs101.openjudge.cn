@@ -1,0 +1,29 @@
+{
+  "id": "2171G",
+  "name": "Sakura Adachi and Optimal Sequences",
+  "source_url": "https://codeforces.com/problemset/problem/2171/G",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2171G",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 4000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "\"What a pain...\"\n\n— Hougetsu Shimamura\n\n\n\nAdachi is in the middle of a generational crashout... over, uh, this problem! Yep, that's definitely it... anyways, please help her solve it!\n\nYou are given two arrays  $ a $  and  $ b $  of length  $ n $  ( $ 1\\leq a_i\\leq b_i $ ).\n\nIn one operation, you may either:\n\n- choose an index  $ i $  ( $ 1\\leq i\\leq n $ ) and set  $ a_i := a_i + 1 $ , or\n- double all elements of  $ a $ .\n\nLet  $ x $  denote the minimum number of operations needed to make  $ a = b $ . Two arrays  $ a $  and  $ b $  of length  $ n $  are considered equal if  $ a_i = b_i $  for all  $ 1\\leq i\\leq n $ .\n\nFind the value of  $ x $ . Additionally, count the number of sequences of operations that make  $ a = b $  using exactly  $ x $  operations. Two such sequences of operations are considered different if, for any  $ 1\\leq j\\leq x $ , the  $ j $ -th operation of each sequence differs (either in the type of operation selected or the index chosen, if applicable).\n\nSince the number of sequences may be large, output it modulo  $ {\\color{red}{10^6+3}} $ . Note that  $ 10^6+3 $  is a prime number.",
+    "formatI": "The first line contains a single integer  $ t $  ( $ 1\\leq t\\leq 10^4 $ ) — the number of test cases.\n\nThe first line of each test case contains a single integer  $ n $  ( $ 2\\leq n\\leq 2\\cdot 10^5 $ ).\n\nThe second line of each test case contains  $ n $  integers,  $ a_1, a_2, \\dots, a_n $  ( $ 1\\leq a_i\\leq 10^6 $ ).\n\nThe third line of each test case contains  $ n $  integers,  $ b_1, b_2, \\dots, b_n $  ( $ a_i\\leq b_i\\leq 10^6 $ ).\n\nIt is guaranteed that the sum of  $ n $  over all test cases does not exceed  $ 2\\cdot 10^5 $ .",
+    "formatO": "For each test case, output two integers, the value of  $ x $ , and the number of sequences of operations that make  $ a = b $  using exactly  $ x $  operations, modulo  $ 10^6+3 $ . The value of  $ x $  should be printed exactly; that is, it should not be taken modulo  $ 10^6 + 3 $ .",
+    "hint": "In the second sample, it is possible to convert  $ a $  into  $ b $  using only three operations. There is only one way to do so, namely:\n\n- Add  $ 1 $  to  $ a_1 $ , yielding  $ a = [2, 1] $ . Then double all elements of  $ a $ , yielding  $ a = [4, 2] $ . Then add  $ 1 $  to  $ a_2 $ , yielding  $ a = [4, 3] $ . Then we have that  $ a = b $ , as desired.\n\nIt can be shown that it is impossible to convert  $ a $  into  $ b $  using fewer than three operations.",
+    "background": null
+  },
+  "translation": {
+    "description": "“真令人头疼……”\n\n—— Hougetsu Shimamura\n\nAdachi 正在为一道世代传承的难题抓耳挠腮……呃，对，就是这道题！反正，请你帮她解决吧！\n\n你有两个长度为 $n$ 的数组 $a$ 和 $b$，满足 $1\\leq a_i\\leq b_i$。\n\n每次操作，你可以：\n\n- 选择一个下标 $i$（$1 \\leq i \\leq n$），令 $a_i := a_i + 1$，或者\n- 使 $a$ 的所有元素都乘以 $2$。\n\n记 $x$ 为将 $a$ 变为 $b$ 所需的最少操作次数。长度为 $n$ 的两个数组 $a$ 和 $b$，当且仅当对于所有 $1 \\leq i \\leq n$ 都有 $a_i = b_i$ 时，认为 $a = b$。\n\n求 $x$ 的值。此外，计算用恰好 $x$ 次操作将 $a$ 变为 $b$ 的不同操作序列数量。若对于任意 $1 \\leq j \\leq x$，两条操作序列第 $j$ 步所选的操作类型或下标不同，则认为这两条操作序列不同。\n\n由于方案数可能很大，请将答案对 $10^6+3$ 取模输出。注意 $10^6+3$ 是一个质数。",
+    "formatI": "第一行包含一个整数 $t$（$1\\leq t\\leq 10^4$），表示测试用例数量。\n\n每个测试用例的第一行包含一个整数 $n$（$2 \\leq n \\leq 2 \\cdot 10^5$）。\n\n第二行包含 $n$ 个整数 $a_1, a_2, \\dots, a_n$（$1\\leq a_i\\leq 10^6$）。\n\n第三行包含 $n$ 个整数 $b_1, b_2, \\dots, b_n$（$a_i \\leq b_i \\leq 10^6$）。\n\n保证所有测试用例中 $n$ 的总和不超过 $2 \\cdot 10^5$。",
+    "formatO": "对于每个测试用例，输出两个整数 $x$，以及用恰好 $x$ 次操作将 $a$ 变为 $b$ 的不同操作序列数量，对 $10^6+3$ 取模。$x$ 的值应按通常方式输出，不需要取模。",
+    "hint": "在第二个样例中，只需三步即可将 $a$ 变为 $b$，并且只有一种做法，具体为：\n\n- 对 $a_1$ 加 $1$，得到 $a = [2, 1]$。然后将所有元素乘 $2$，得到 $a = [4, 2]$。然后对 $a_2$ 加 $1$，得到 $a = [4, 3]$。此时 $a = b$，达成目标。\n\n可以证明，无法通过少于三次操作将 $a$ 变为 $b$。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "8\n6\n1 3 6 4 3 2\n3 7 10 4 4 8\n2\n1 1\n4 3\n5\n2 3 2 5 1\n18 13 10 30 7\n5\n5 4 3 6 2\n100 125 231 113 107\n4\n2 2 2 2\n2 2 2 2\n4\n1 1 1 1\n2 2 2 2\n7\n1 1 1 1 1 1 200000\n200000 200000 200000 200000 200000 200000 200000\n3\n542264 174876 441510\n641112 325241 995342",
+      "output": "17 827116\n3 1\n12 288\n35 567812\n0 1\n1 1\n1199994 0\n803045 366998"
+    }
+  ]
+}

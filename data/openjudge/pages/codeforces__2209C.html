@@ -1,60 +1,40 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2209C: Find the Zero</title></head>
-<body><div id="pageTitle"><h2>2209C: Find the Zero</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2209/C" rel="noopener">Codeforces 2209C</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>*This is an interactive problem.*
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2209C: C. Find the Zero</title></head>
+<body><div id="pageTitle"><h2>C. Find the Zero</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2209/C" rel="noopener">Codeforces 2209C</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>This is an interactive problem.</p><p>You are given an integer  <em>n</em>. There is a hidden array  <em>a</em>  of length  <em>2n</em>. Each integer from  <em>1</em>  to  <em>n</em>  appears exactly once in  <em>a</em>. The rest of the elements are all  <em>0</em>.</p><p>You can make the following type of query:</p><ul><li>Choose two integers  <em>i</em>  and  <em>j</em>  (<em>1 ≤ i,j ≤ 2n</em>,  <em>i ≠ j</em>). The judge will respond with  <em>1</em>  if  <em>a<sub>i</sub>=a<sub>j</sub></em>, and will respond with  <em>0</em>  otherwise.</li></ul><p>Find any integer  <em>k</em>  (<em>1 ≤ k ≤ 2n</em>) such that  <em>a<sub>k</sub>=0</em>  in no more than  <em>n+1</em>  queries. Note that the interactor is adaptive, which means that the hidden array  <em>a</em>  may change depending on your queries but will not contradict previous queries.</p></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains the number of test cases  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>3</sup></em>). The description of the test cases follows.</p><p>The first line of each test case contains an integer  <em>n</em>  (<em>2 ≤ n ≤ 10<sup>4</sup></em>). The length of the hidden array  <em>a</em>  will be  <em>2n</em>.</p><p>It is guaranteed that the sum of  <em>n</em>  over all test cases does not exceed  <em>10<sup>4</sup></em>.</p></dd>
+<dt>样例输入</dt><dd><pre>2
+2
 
-You are given an integer 𝑛. There is a hidden array 𝑎 of length 2𝑛. Each integer from 1 to 𝑛 appears **exactly once** in 𝑎. The rest of the elements are all 0.
+0
 
-You can make the following type of query:
+1
 
-- Choose two integers 𝑖 and 𝑗 (1≤𝑖,𝑗≤2𝑛, 𝑖≠𝑗). The judge will respond with 1 if 𝑎𝑖=𝑎𝑗, and will respond with 0 otherwise.
+3
 
-Find any integer 𝑘 (1≤𝑘≤2𝑛) such that 𝑎𝑘=0 in no more than 𝑛+1 queries. Note that the interactor is **adaptive**, which means that the hidden array 𝑎 may change depending on your queries but will not contradict previous queries.
+1
 
-**Input**
+0
 
-Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤103). The description of the test cases follows.
+0</pre></dd>
+<dt>样例输出</dt><dd><pre>? 1 2
 
-The first line of each test case contains an integer 𝑛 (2≤𝑛≤104). The length of the hidden array 𝑎 will be 2𝑛.
+? 3 1
 
-It is guaranteed that the sum of 𝑛 over all test cases does not exceed 104.
+! 3
 
-Interaction
+? 5 6
 
-To make a query, output a line in the following format:
+? 2 4
 
-- ?𝑖𝑗 (1≤𝑖,𝑗≤2𝑛, 𝑖≠𝑗)
+? 1 3
 
-As a response to the query, you will get:
-
-- 1 if 𝑎𝑖=𝑎𝑗;
-- 0 if 𝑎𝑖≠𝑎𝑗;
-- −1 if you made an invalid query or if you exceed the limit of 𝑛+1 queries.
-
-To report the answer, output a line in the following format:
-
-- !𝑘 (1≤𝑘≤2𝑛)
-
-After this, proceed to the next test case or terminate if this is the last test case.
-
-Note that reporting the answer does not count towards the 𝑛+1 queries.
-
-The interactor is **adaptive**. This means that the hidden array 𝑎 may change depending on your queries but will not contradict previous queries.
-
-After printing each query do not forget to output the end of line and flush∗ the output. Otherwise, you will get Idleness limit exceeded verdict. If, at any interaction step, you read −1 instead of valid data, your solution must exit immediately. This means that your solution will receive Wrong answer because of an invalid query or any other mistake. Failing to exit can result in an arbitrary verdict because your solution will continue to read from a closed stream.
-
-**For this problem, hacks are disabled.**
-
-∗To flush, use:
-
-- fflush(stdout) or cout.flush() in C++;
-- sys.stdout.flush() in Python;
-- see the documentation for other languages.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2209/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+! 6</pre></dd>
+<dt>Note</dt><dd><p>In the first example test case, the hidden array  <em>a</em>  is  <em>[0,1,0,2]</em>:</p><ul><li>In the first query,  <em>(i,j)=(1,2)</em>. Since  <em>a<sub>1</sub>=0</em>,  <em>a<sub>2</sub>=1</em>,  <em>a<sub>1</sub> ≠ a<sub>2</sub></em>, the judge responds with  <em>0</em>.</li><li>In the second query,  <em>(i,j)=(3,1)</em>. Since  <em>a<sub>3</sub>=0</em>,  <em>a<sub>1</sub>=0</em>,  <em>a<sub>3</sub> = a<sub>1</sub></em>, the judge responds with  <em>1</em>.</li><li>The program reports  <em>k=3</em>  as an answer. Since  <em>a<sub>3</sub>=0</em>, the answer is correct.</li></ul><p>In the second example test case, the hidden array  <em>a</em>  is  <em>[3,2,0,1,0,0]</em>:</p><ul><li>In the first query,  <em>(i,j)=(5,6)</em>. Since  <em>a<sub>5</sub>=0</em>,  <em>a<sub>6</sub>=0</em>,  <em>a<sub>5</sub> = a<sub>6</sub></em>, the judge responds with  <em>1</em>.</li><li>In the second query,  <em>(i,j)=(2,4)</em>. Since  <em>a<sub>2</sub>=2</em>,  <em>a<sub>4</sub>=1</em>,  <em>a<sub>2</sub> ≠ a<sub>4</sub></em>, the judge responds with  <em>0</em>.</li><li>In the third query,  <em>(i,j)=(1,3)</em>. Since  <em>a<sub>1</sub>=3</em>,  <em>a<sub>3</sub>=0</em>,  <em>a<sub>1</sub> ≠ a<sub>3</sub></em>, the judge responds with  <em>0</em>.</li><li>The program reports  <em>k=6</em>  as an answer. Since  <em>a<sub>6</sub>=0</em>, the answer is correct.</li></ul></dd>
+</dl>
 </body></html>

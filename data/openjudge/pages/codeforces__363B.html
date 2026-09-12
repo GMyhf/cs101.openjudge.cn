@@ -1,30 +1,17 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>363B: Fence</title></head>
-<body><div id="pageTitle"><h2>363B: Fence</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/363/B" rel="noopener">Codeforces 363B</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>原题目给出的tag是brute force, dp，应该是 sliding window, prefix sum
-
-There is a fence in front of Polycarpus&#x27;s home. The fence consists of *n* planks of the same width which go one after another from left to right. The height of the *i*-th plank is *h**i* meters, distinct planks can have distinct heights.
-
-![e670a72caaa33bad302d556ab498edd2](https://raw.githubusercontent.com/GMyhf/img/main/img/e670a72caaa33bad302d556ab498edd2.png)
-
-Fence for *n* = 7 and *h* = [1, 2, 6, 1, 1, 7, 1]
-
-Polycarpus has bought a posh piano and is thinking about how to get it into the house. In order to carry out his plan, he needs to take exactly *k* consecutive planks from the fence. Higher planks are harder to tear off the fence, so Polycarpus wants to find such *k*consecutive planks that the sum of their heights is minimal possible.
-
-Write the program that finds the indexes of *k* consecutive planks with minimal total height. Pay attention, the fence is not around Polycarpus&#x27;s home, it is in front of home (in other words, the fence isn&#x27;t cyclic).
-
-**Input**
-
-The first line of the input contains integers *n* and *k* (1 ≤ *n* ≤ 1.5·10^5, 1 ≤ *k* ≤ *n*) — the number of planks in the fence and the width of the hole for the piano. The second line contains the sequence of integers *h*1, *h*2, ..., hn (1 ≤ hi ≤ 100), where hi is the height of the *i*-th plank of the fence.
-
-**Output**
-
-Print such integer *j* that the sum of the heights of planks *j*, *j* + 1, ..., *j* + *k* - 1 is the minimum possible. If there are multiple such *j*&#x27;s, print any of them.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/363/B" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 363B: B. Fence</title></head>
+<body><div id="pageTitle"><h2>B. Fence</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/363/B" rel="noopener">Codeforces 363B</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>There is a fence in front of Polycarpus's home. The fence consists of <em>n</em> planks of the same width which go one after another from left to right. The height of the <em>i</em> -th plank is <em>h<sub>i</sub></em> meters, distinct planks can have distinct heights.</p><p><img src="https://cdn.luogu.com.cn/upload/vjudge_pic/CF363B/89891f9a8aa0dbd268db12cc4f373a8fc8629b6b.png" alt="illustration">Fence for <em>n=7</em> and <em>h=[1,2,6,1,1,7,1]</em> Polycarpus has bought a posh piano and is thinking about how to get it into the house. In order to carry out his plan, he needs to take exactly <em>k</em> consecutive planks from the fence. Higher planks are harder to tear off the fence, so Polycarpus wants to find such <em>k</em> consecutive planks that the sum of their heights is minimal possible.</p><p>Write the program that finds the indexes of <em>k</em> consecutive planks with minimal total height. Pay attention, the fence is not around Polycarpus's home, it is in front of home (in other words, the fence isn't cyclic).</p></dd>
+<dt>Input</dt><dd><p>The first line of the input contains integers <em>n</em> and <em>k</em> (<em>1≤n≤1.5·10<sup>5</sup>,1≤k≤n</em>) — the number of planks in the fence and the width of the hole for the piano. The second line contains the sequence of integers <em>h<sub>1</sub>,h<sub>2</sub>,...,h<sub>n</sub></em> (<em>1≤h<sub>i</sub>≤100</em>), where <em>h<sub>i</sub></em> is the height of the <em>i</em> -th plank of the fence.</p></dd>
+<dt>Output</dt><dd><p>Print such integer <em>j</em> that the sum of the heights of planks <em>j</em>, <em>j+1</em>, ..., <em>j+k-1</em> is the minimum possible. If there are multiple such <em>j</em> 's, print any of them.</p></dd>
+<dt>样例输入</dt><dd><pre>7 3
+1 2 6 1 1 7 1</pre></dd>
+<dt>样例输出</dt><dd><pre>3</pre></dd>
+<dt>Note</dt><dd><p>In the sample, your task is to find three consecutive planks with the minimum sum of heights. In the given case three planks with indexes 3, 4 and 5 have the required attribute, their total height is 8.</p></dd>
+</dl>
 </body></html>

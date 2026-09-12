@@ -1,31 +1,21 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>131A: cAPS lOCK</title></head>
-<body><div id="pageTitle"><h2>131A: cAPS lOCK</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/131/A" rel="noopener">Codeforces 131A</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>wHAT DO WE NEED cAPS LOCK FOR?
-
-Caps lock is a computer keyboard key. Pressing it sets an input mode in which typed letters are capital by default. If it is pressed by accident, it leads to accidents like the one we had in the first passage.
-
-Let&#x27;s consider that a word has been typed with the Caps lock key accidentally switched on, if:
-
-- either it only contains uppercase letters;
-- or all letters except for the first one are uppercase.
-
-In this case we should automatically change the case of all letters. For example, the case of the letters that form words &quot;hELLO&quot;, &quot;HTTP&quot;, &quot;z&quot; should be changed.
-
-Write a program that applies the rule mentioned above. If the rule cannot be applied, the program should leave the word unchanged.
-
-**Input**
-
-The first line of the input data contains a word consisting of uppercase and lowercase Latin letters. The word&#x27;s length is from 1 to 100 characters, inclusive.
-
-**Output**
-
-Print the result of the given word&#x27;s processing.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/131/A" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 131A: A. cAPS lOCK</title></head>
+<body><div id="pageTitle"><h2>A. cAPS lOCK</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/131/A" rel="noopener">Codeforces 131A</a></dd>
+<dt>Time limit</dt><dd>0.5 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>wHAT DO WE NEED cAPS LOCK FOR?</p><p>Caps lock is a computer keyboard key. Pressing it sets an input mode in which typed letters are capital by default. If it is pressed by accident, it leads to accidents like the one we had in the first passage.</p><p>Let's consider that a word has been typed with the Caps lock key accidentally switched on, if:</p><ul><li>either it only contains uppercase letters;</li><li>or all letters except for the first one are uppercase.</li></ul><p>In this case we should automatically change the case of all letters. For example, the case of the letters that form words "hELLO", "HTTP", "z" should be changed.</p><p>Write a program that applies the rule mentioned above. If the rule cannot be applied, the program should leave the word unchanged.</p></dd>
+<dt>Input</dt><dd><p>The first line of the input data contains a word consisting of uppercase and lowercase Latin letters. The word's length is from 1 to 100 characters, inclusive.</p></dd>
+<dt>Output</dt><dd><p>Print the result of the given word's processing.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+cAPS
+样例输出1
+Caps</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入2
+Lock
+样例输出2
+Lock</pre></dd>
+</dl>
 </body></html>

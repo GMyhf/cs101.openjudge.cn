@@ -1,39 +1,20 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2201G: Codeforces Heuristic Contest 1001</title></head>
-<body><div id="pageTitle"><h2>2201G: Codeforces Heuristic Contest 1001</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2201/G" rel="noopener">Codeforces 2201G</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>There is a graph of 𝑛^2 vertices, where vertices are labeled by integer pairs (𝑟,𝑐) such that 1≤𝑟,𝑐≤𝑛. Vertices (𝑟1,𝑐1) and (𝑟2,𝑐2) are **directly** connected if and only if (𝑟1−𝑟2)^2+(𝑐1−𝑐2)^2=13. This graph is called the **Zebra Graph** of dimensions 𝑛×𝑛.
-
-Please find a subset of vertices 𝑆 in the Zebra Graph of dimensions 𝑛×𝑛, which satisfies the following condition.
-
-- The graph induced∗ by the subset 𝑆 is isomorphic to a cycle graph of at least ⌊𝑛2𝑒⌋ vertices†.
-
-It can be shown that such a subset of vertices exists under the constraints of this problem.
-
-∗The induced graph of a subset of vertices 𝑋 is a graph that contains all vertices in 𝑋 and all edges whose both endpoints are in 𝑋.
-
-†Here, 𝑒 is the mathematical constant equal to the limit lim𝑛→∞(1+1/𝑛)^𝑛≈2.71828182. Note that the value of 1/𝑒 is approximately 0.36787944.
-
-**Input**
-
-The first and only line of input contains a single integer 𝑛 (𝑛∈{5,1001}).
-
-**There are only two input files for this problem**:
-
-- The first input file (the example input) has 𝑛=5;
-- The second input file has 𝑛=1001.
-
-**Hacks are disabled for this problem.**
-
-**Output**
-
-Output 𝑛 lines, each containing a string 𝑠𝑖 of length 𝑛 denoting the 𝑖-th row of the graph. If the vertex (𝑟,𝑐) is an element of 𝑆, then the 𝑐-th letter of 𝑠𝑟 should be &#x27;1&#x27;. Otherwise, the 𝑐-th letter of 𝑠𝑟 should be &#x27;0&#x27;.
-
-If there are multiple solutions, print any of them.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2201/G" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2201G: G. Codeforces Heuristic Contest 1001</title></head>
+<body><div id="pageTitle"><h2>G. Codeforces Heuristic Contest 1001</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2201/G" rel="noopener">Codeforces 2201G</a></dd>
+<dt>Time limit</dt><dd>9 seconds</dd><dt>Memory limit</dt><dd>1001 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>There is a graph of  <em>n<sup>2</sup></em>  vertices, where vertices are labeled by integer pairs  <em>(r,c)</em>  such that  <em>1 ≤ r,c ≤ n</em>. Vertices  <em>(r<sub>1</sub>,c<sub>1</sub>)</em>  and  <em>(r<sub>2</sub>,c<sub>2</sub>)</em>  are directly connected if and only if  <em>(r<sub>1</sub>-r<sub>2</sub>)<sup>2</sup>+(c<sub>1</sub>-c<sub>2</sub>)<sup>2</sup>=13</em>. This graph is called the Zebra Graph of dimensions  <em>n × n</em>.</p><p>Please find a subset of vertices  <em>S</em>  in the Zebra Graph of dimensions  <em>n × n</em>, which satisfies the following condition.</p><ul><li>The graph induced <em><sup>∗</sup></em>  by the subset  <em>S</em>  is isomorphic to a cycle graph of at least  <em>⌊n<sup>2</sup>/e⌋</em>  vertices <em><sup>†</sup></em>.</li></ul><p>It can be shown that such a subset of vertices exists under the constraints of this problem.</p><p><em><sup>∗</sup></em> The induced graph of a subset of vertices  <em>X</em>  is a graph that contains all vertices in  <em>X</em>  and all edges whose both endpoints are in  <em>X</em>.</p><p><em><sup>†</sup></em> Here,  <em>e</em>  is the mathematical constant equal to the limit  <em>lim <sub>n → ∞</sub> (1 + 1/n )<sup>n</sup> ≈ 2.71828182</em>. Note that the value of  <em>1/e</em>  is approximately  <em>0.36787944</em>.</p></dd>
+<dt>Input</dt><dd><p>The first and only line of input contains a single integer  <em>n</em>  (<em>n∈ {5,1001}</em>).</p><p>There are only two input files for this problem:</p><ul><li>The first input file (the example input) has  <em>n=5</em>;</li><li>The second input file has  <em>n=1001</em>.</li></ul><p>Hacks are disabled for this problem.</p></dd>
+<dt>Output</dt><dd><p>Output  <em>n</em>  lines, each containing a string  <em>s<sub>i</sub></em>  of length  <em>n</em>  denoting the  <em>i</em> -th row of the graph. If the vertex  <em>(r,c)</em>  is an element of  <em>S</em>, then the  <em>c</em> -th letter of  <em>s<sub>r</sub></em>  should be '1'. Otherwise, the  <em>c</em> -th letter of  <em>s<sub>r</sub></em>  should be '0'.</p><p>If there are multiple solutions, print any of them.</p></dd>
+<dt>样例输入</dt><dd><pre>5</pre></dd>
+<dt>样例输出</dt><dd><pre>01110
+11011
+10001
+11011
+01110</pre></dd>
+<dt>Note</dt><dd><p>For the example output, the induced graph corresponding to the subset  <em>S</em>  is shown below.</p><p><img src="https://cdn.luogu.com.cn/upload/vjudge_pic/CF2201G/a4314cb7035c0308055fb010a1142145ee83133033b4192be6493fe655e8e8c2.png" alt="illustration">This graph is isomorphic to the cycle graph  <em>C<sub>16</sub></em>  consisting of  <em>16</em>  vertices. As  <em>16 ≥ ⌊n<sup>2</sup>/e⌋ = 9</em>, the output satisfies the problem's condition.</p></dd>
+</dl>
 </body></html>

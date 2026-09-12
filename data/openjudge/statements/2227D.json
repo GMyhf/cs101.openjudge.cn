@@ -1,0 +1,29 @@
+{
+  "id": "2227D",
+  "name": "Palindromex",
+  "source_url": "https://codeforces.com/problemset/problem/2227/D",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2227D",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Yousef has given you an array  $ a $  of  $ 2n $  integers. Every integer  $ x \\in [0, n - 1] $  appears exactly twice in the array.\n\nYour task is to find a subarray  $ a_l, a_{l + 1}, \\dots, a_r $  that is a palindrome $ ^{\\text{∗}} $  such that its  $ \\operatorname{mex}(a_l, a_{l + 1}, \\dots, a_r) $  $ ^{\\text{†}} $  is maximized. Output this maximum possible value.\n\n $ ^{\\text{∗}} $ A palindrome is a string that reads the same backward as forward, for example strings \"z\", \"aaa\", \"aba\", \"abccba\" are palindromes, but strings \"codeforces\", \"reality\", \"ab\" are not.\n\n $ ^{\\text{†}} $ The  $ \\operatorname{mex} $  (minimum excludant) of an array of integers is defined as the smallest non-negative integer which does not occur in the array. For example:\n\n- The  $ \\operatorname{mex} $  of  $ [2,2,1] $  is  $ 0 $ , because  $ 0 $  does not belong to the array.\n- The  $ \\operatorname{mex} $  of  $ [3,1,0,1] $  is  $ 2 $ , because  $ 0 $  and  $ 1 $  belong to the array, but  $ 2 $  does not.\n- The  $ \\operatorname{mex} $  of  $ [0,3,1,2] $  is  $ 4 $ , because  $ 0 $ ,  $ 1 $ ,  $ 2 $  and  $ 3 $  belong to the array, but  $ 4 $  does not.",
+    "formatI": "The first line contains a single integer  $ t $  ( $ 1 \\le t \\le 10^4 $ ) — the number of test cases.\n\nThe first line of each test case contains a single integer  $ n $  ( $ 1 \\le n \\le 10^5 $ ).\n\nThe second line of each test case contains  $ 2n $  integers  $ a_1, a_2, \\dots, a_{2n} $  ( $ 0 \\le a_i \\le n-1 $ ). It is guaranteed that every integer in the range  $ [0, n-1] $  appears exactly twice.\n\nIt is guaranteed that the sum of  $ 2n $  over all test cases does not exceed  $ 2 \\cdot 10^5 $ .",
+    "formatO": "For each test case, output a single integer — the maximum  $ \\operatorname{mex} $  of any palindromic subarray.",
+    "hint": "In the first test case, the only optimal subarray to choose is  $ a[1, 8] = [1, 2, 0, 3, 3, 0, 2, 1] $ , which is palindromic and has a  $ \\operatorname{mex} $  of  $ 4 $ .\n\nIn the second test case, one of the optimal subarrays to choose is  $ a[2, 4] = [1, 0, 1] $ , which is palindromic and has a  $ \\operatorname{mex} $  of  $ 2 $ .\n\nIn the third test case, we can choose  $ a[3, 3] = [0] $ , which is palindromic and has a  $ \\operatorname{mex} $  of  $ 1 $ . No other palindromic subarray has a  $ \\operatorname{mex} $  greater than  $ 1 $ .",
+    "background": null
+  },
+  "translation": {
+    "description": "Yousef 给了你一个包含 $2n$ 个整数的数组 $a$。数组中每个整数 $x \\in [0, n-1]$ 恰好出现两次。\n\n你的任务是找到一个子数组 $a_l, a_{l+1}, \\dots, a_r$，该子数组是一个回文串 $^{\\text{∗}}$，并且其 $\\operatorname{mex}(a_l, a_{l+1}, \\dots, a_r)$ $^{\\text{†}}$ 最大。请输出该最大可能的值。\n\n$^{\\text{∗}}$ 回文串是指正着和反着读都相同的字符串。例如 \"z\"、\"aaa\"、\"aba\"、\"abccba\" 都是回文串，但是 \"codeforces\"、\"reality\"、\"ab\" 不是回文串。\n\n$^{\\text{†}}$ 一个数组的 $\\operatorname{mex}$（最小不可达数）定义为未出现在该数组中的最小非负整数。例如：\n\n- 数组 $[2,2,1]$ 的 $\\operatorname{mex}$ 为 $0$，因为 $0$ 没有出现在数组中。\n- 数组 $[3,1,0,1]$ 的 $\\operatorname{mex}$ 为 $2$，因为 $0$ 和 $1$ 都在数组中，但 $2$ 没有。\n- 数组 $[0,3,1,2]$ 的 $\\operatorname{mex}$ 为 $4$，因为 $0,\\ 1,\\ 2,\\ 3$ 都在数组中，但 $4$ 没有。",
+    "formatI": "第一行包含一个整数 $t$（$1 \\le t \\le 10^4$）——表示测试用例的数量。\n\n每个测试用例的第一行包含一个整数 $n$（$1 \\le n \\le 10^5$）。\n\n每个测试用例的第二行包含 $2n$ 个整数 $a_1, a_2, \\dots, a_{2n}$（$0 \\le a_i \\le n-1$）。保证区间 $[0, n-1]$ 内的每个数恰好出现两次。\n\n所有测试用例中 $2n$ 的总和不超过 $2 \\cdot 10^5$。",
+    "formatO": "对于每个测试用例，输出一行，一个整数，表示任意回文子数组的最大 $\\operatorname{mex}$。",
+    "hint": "在第一个测试用例中，唯一最优的子数组是 $a[1,8]=[1, 2, 0, 3, 3, 0, 2, 1]$，它是回文串，$\\operatorname{mex}$ 为 $4$。\n\n在第二个测试用例中，其中一个最优子数组是 $a[2, 4]=[1, 0, 1]$，它是回文串，$\\operatorname{mex}$ 为 $2$。\n\n在第三个测试用例中，可以选择 $a[3, 3]=[0]$，它是回文串，$\\operatorname{mex}$ 为 $1$。没有其他回文子数组的 $\\operatorname{mex}$ 大于 $1$。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "6\n4\n1 2 0 3 3 0 2 1\n2\n0 1 0 1\n2\n1 1 0 0\n3\n2 0 2 1 1 0\n4\n0 1 3 0 3 1 2 2\n3\n0 1 2 1 0 2",
+      "output": "4\n2\n1\n1\n2\n3"
+    }
+  ]
+}

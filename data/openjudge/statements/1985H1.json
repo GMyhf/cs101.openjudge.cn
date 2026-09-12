@@ -1,0 +1,29 @@
+{
+  "id": "1985H1",
+  "name": "Maximize the Largest Component (Easy Version)",
+  "source_url": "https://codeforces.com/problemset/problem/1985/H1",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF1985H1",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 512000,
+  "statement": {
+    "description": "Easy and hard versions are actually different problems, so read statements of both problems completely and carefully. The only difference between the two versions is the operation.\n\nAlex has a grid with $ n $ rows and $ m $ columns consisting of '.' and '\\#' characters. A set of '\\#' cells forms a connected component if from any cell in this set, it is possible to reach any other cell in this set by only moving to another cell in the set that shares a common side. The size of a connected component is the number of cells in the set.\n\nIn one operation, Alex selects any row $ r $ ( $ 1 \\le r \\le n $ ) or any column $ c $ ( $ 1 \\le c \\le m $ ), then sets every cell in row $ r $ or column $ c $ to be '\\#'. Help Alex find the maximum possible size of the largest connected component of '\\#' cells that he can achieve after performing the operation at most once.",
+    "formatI": "The first line of the input contains a single integer $ t $ ( $ 1 \\leq t \\leq 10^4 $ ) — the number of test cases.\n\nThe first line of each test case contains two integers $ n $ and $ m $ ( $ 1 \\le n \\cdot m \\le 10^6 $ ) — the number of rows and columns of the grid.\n\nThe next $ n $ lines each contain $ m $ characters. Each character is either '.' or '\\#'.\n\nIt is guaranteed that the sum of $ n \\cdot m $ over all test cases does not exceed $ 10^6 $ .",
+    "formatO": "For each test case, output a single integer — the maximum possible size of a connected component of '\\#' cells that Alex can achieve.",
+    "hint": "In the second test case, it is optimal for Alex to set all cells in column $ 2 $ to be '\\#'. Doing so will lead to the largest connected component of '\\#' having a size of $ 6 $ .\n\nIn the third test case, it is optimal for Alex to set all cells in row $ 2 $ to be '\\#'. Doing so will lead to the largest connected component of '\\#' having a size of $ 9 $ .\n\nIn the fourth test case, it is optimal for Alex to set all cells in row $ 4 $ to be '\\#'. Doing so will lead to the largest connected component of '\\#' having a size of $ 11 $ .",
+    "background": ""
+  },
+  "translation": {
+    "description": "简单版和困难版实际上是不同的问题，请完整且仔细阅读两个版本的题目描述。两者唯一的区别在于操作方式。\n\nAlex 有一个由 $n$ 行 $m$ 列组成的网格，网格中的每个格子要么是 '.'，要么是 '\\#'。一组 '\\#' 格子构成一个连通块，如果从该集合中的任意一个格子出发，只通过与集合中其他格子相邻的格子（共享一条边），可以到达集合中的任意其他格子。连通块的大小指的是该集合中格子的数量。\n\n每次操作中，Alex 可以任选一行 $r$（$1 \\le r \\le n$）或一列 $c$（$1 \\le c \\le m$），然后将第 $r$ 行或第 $c$ 列的所有格子都设置为 '\\#'。请你帮助 Alex 求出，在最多进行一次操作后，'\\#' 连通块的最大可能大小是多少。",
+    "formatI": "输入的第一行为一个整数 $t$（$1 \\leq t \\leq 10^4$），表示测试用例的数量。\n\n每个测试用例的第一行为两个整数 $n$ 和 $m$（$1 \\le n \\cdot m \\le 10^6$），分别表示网格的行数和列数。\n\n接下来的 $n$ 行，每行包含 $m$ 个字符，每个字符为 '.' 或 '\\#'。\n\n保证所有测试用例中 $n \\cdot m$ 的总和不超过 $10^6$。",
+    "formatO": "对于每个测试用例，输出一个整数，表示 Alex 能够获得的 '\\#' 连通块的最大可能大小。",
+    "hint": "在第二个测试用例中，Alex 最优的做法是将第 $2$ 列的所有格子都设置为 '\\#'。这样，最大的 '\\#' 连通块大小为 $6$。\n\n在第三个测试用例中，Alex 最优的做法是将第 $2$ 行的所有格子都设置为 '\\#'。这样，最大的 '\\#' 连通块大小为 $9$。\n\n在第四个测试用例中，Alex 最优的做法是将第 $4$ 行的所有格子都设置为 '\\#'。这样，最大的 '\\#' 连通块大小为 $11$。\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "6\n1 1\n.\n4 2\n..\n#.\n#.\n.#\n3 5\n.#.#.\n..#..\n.#.#.\n5 5\n#...#\n....#\n#...#\n.....\n...##\n6 6\n.#..#.\n#..#..\n.#...#\n#.#.#.\n.#.##.\n###..#\n6 8\n..#....#\n.####.#.\n###.#..#\n.##.#.##\n.#.##.##\n#..##.#.",
+      "output": "1\n6\n9\n11\n15\n30"
+    }
+  ]
+}

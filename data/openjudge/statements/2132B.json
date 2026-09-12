@@ -1,0 +1,29 @@
+{
+  "id": "2132B",
+  "name": "The Secret Number",
+  "source_url": "https://codeforces.com/problemset/problem/2132/B",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2132B",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Vadim has thought of a number $$$x$$$. To ensure that no one can guess it, he appended a positive number of zeros to the right of it, thus obtaining a new number $$$y$$$. However, as a precaution, Vadim decided to spread the number $$$n = x + y$$$. Find all suitable $$$x$$$ that Vadim could have thought of for the given $$$n$$$.",
+    "formatI": "Each test consists of several test cases. The first line contains a single integer $$$t$$$ $$$(1 \\\\le t \\\\le 10^4)$$$ — the number of test cases. The following lines describe the test cases.\n\nIn a single line of each test case, there is an integer $$$n$$$ — the number spread by Vadim $$$(11 \\\\le n \\\\le 10^{18})$$$.",
+    "formatO": "For each number $$$n$$$, output $$$0$$$ if there are no suitable $$$x$$$. Otherwise, output the number of suitable $$$x$$$, followed by all suitable $$$x$$$ in ascending order.",
+    "hint": "In the first sample, to $$$11$$$ one can append two zeros to the right, then $$$11 + 1100 = 1111$$$, and to $$$101$$$ one can append one zero to the right, then $$$101 + 1010 = 1111$$$.\n\nIn the second sample, it is impossible to obtain $$$12$$$ through the described actions.",
+    "background": null
+  },
+  "translation": {
+    "description": "Vadim 想出了一个数字 $x$。为了确保没人能猜到它，他在 $x$ 的右侧添加了若干个零（至少一个），从而得到了一个新数字 $y$。然而，为了以防万一，Vadim 决定传播数字 $n = x + y$。对于给定的 $n$，请找出所有可能的 $x$。",
+    "formatI": "每组测试包含若干个测试用例。第一行包含一个整数 $t$（$1 \\le t \\le 10^4$）——测试用例的数量。  \n接下来的每一行描述一个测试用例，每行包含一个整数 $n$——Vadim 传播的数字（$11 \\le n \\le 10^{18}$）。",
+    "formatO": "对于每个数字 $n$，如果不存在合适的 $x$，输出 $0$。否则，输出合适的 $x$ 的个数，随后按升序输出所有合适的 $x$。",
+    "hint": "在第一个样例中，可以在 $11$ 后面添加两个零，此时 $11 + 1100 = 1111$；也可以在 $101$ 后面添加一个零，此时 $101 + 1010 = 1111$。\n\n在第二个样例中，无法通过上述操作得到 $12$。\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "5\n1111\n12\n55\n999999999999999999\n1000000000000000000",
+      "output": "2\n11 101\n0\n1\n5\n3\n999999999 999000999000999 90909090909090909\n0"
+    }
+  ]
+}

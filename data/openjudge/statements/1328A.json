@@ -1,0 +1,29 @@
+{
+  "id": "1328A",
+  "name": "Divisibility Problem",
+  "source_url": "https://codeforces.com/problemset/problem/1328/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF1328A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "You are given two positive integers $ a $ and $ b $ . In one move you can increase $ a $ by $ 1 $ (replace $ a $ with $ a+1 $ ). Your task is to find the minimum number of moves you need to do in order to make $ a $ divisible by $ b $ . It is possible, that you have to make $ 0 $ moves, as $ a $ is already divisible by $ b $ . You have to answer $ t $ independent test cases.",
+    "formatI": "The first line of the input contains one integer $ t $ ( $ 1 \\le t \\le 10^4 $ ) — the number of test cases. Then $ t $ test cases follow.\n\nThe only line of the test case contains two integers $ a $ and $ b $ ( $ 1 \\le a, b \\le 10^9 $ ).",
+    "formatO": "For each test case print the answer — the minimum number of moves you need to do in order to make $ a $ divisible by $ b $ .",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "给定两个正整数 $a$ 和 $b$。每次操作你可以将 $a$ 增加 $1$（即用 $a+1$ 替换 $a$）。你的任务是求出最少需要多少次操作才能使 $a$ 能被 $b$ 整除。如果 $a$ 已经能被 $b$ 整除，则可能不需要进行任何操作。你需要回答 $t$ 个独立的测试用例。",
+    "formatI": "输入的第一行包含一个整数 $t$（$1 \\le t \\le 10^4$），表示测试用例的数量。接下来有 $t$ 行，每行包含两个整数 $a$ 和 $b$（$1 \\le a, b \\le 10^9$）。",
+    "formatO": "对于每个测试用例，输出一个答案，即使 $a$ 能被 $b$ 整除所需的最少操作次数。",
+    "hint": "\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "5\n10 4\n13 9\n100 13\n123 456\n92 46",
+      "output": "2\n5\n4\n333\n0"
+    }
+  ]
+}

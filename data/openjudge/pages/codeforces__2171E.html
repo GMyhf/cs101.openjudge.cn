@@ -1,41 +1,23 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2171E: Anisphia Wynn Palettia and Good Permutations</title></head>
-<body><div id="pageTitle"><h2>2171E: Anisphia Wynn Palettia and Good Permutations</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2171/E" rel="noopener">Codeforces 2171E</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>constructive algorithms,greedy,number theory,*2000
-
-
-*I&#x27;ve always loved the word magic. It has a way of making people happy, of putting a smile on their faces.*
-
-— Anisphia Wynn Palettia
-
-*Anis and her new assistant Euphie are improving the Witch&#x27;s Broom! Magicology requires great precision and care — in order to fly, the construction of the broom must have sufficiently few imperfections.*
-
-For an arbitrary array 𝑎 of length 𝑚, call an index 𝑖 (1≤𝑖≤𝑚−2) *bad* if 𝑎𝑖, 𝑎𝑖+1, and 𝑎𝑖+2 are all pairwise coprime. More formally, 𝑖 is a bad index if and only if gcd(𝑎𝑖,𝑎𝑖+1)=gcd(𝑎𝑖,𝑎𝑖+2)=gcd(𝑎𝑖+1,𝑎𝑖+2)=1∗. Furthermore, call 𝑎 *good* if it has at most 6 bad indices.
-
-You are given an integer 𝑛. Construct a good permutation† 𝑝 of length 𝑛. It can be shown that such a permutation always exists.
-
-Note that you do not have to minimize the number of bad indices.
-
-∗gcd(𝑥,𝑦) denotes the [greatest common divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor) of 𝑥 and 𝑦
-
-† A permutation of length 𝑛 is an array that contains every integer from 1 to 𝑛 exactly once, in any order.
-
-**Input**
-
-The first line contains a single integer 𝑡 (1≤𝑡≤10^4)  — the number of test cases.
-
-The only line of each test case contains a single integer 𝑛 (3≤𝑛≤2⋅10^5).
-
-It is guaranteed that the sum of 𝑛 over all test cases does not exceed 2⋅10^5.
-
-**Output**
-
-For each test case, output on a single line 𝑛 integers 𝑝1,𝑝2,…,𝑝𝑛, an example of a good permutation of length 𝑛. If there are multiple good permutations, you may output any of them.
-
-Example
-
-Input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2171/E" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2171E: E. Anisphia Wynn Palettia and Good Permutations</title></head>
+<body><div id="pageTitle"><h2>E. Anisphia Wynn Palettia and Good Permutations</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2171/E" rel="noopener">Codeforces 2171E</a></dd>
+<dt>Time limit</dt><dd>3 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>I've always loved the word magic. It has a way of making people happy, of putting a smile on their faces.</p><p>— Anisphia Wynn Palettia</p><p>Anis and her new assistant Euphie are improving the Witch's Broom! Magicology requires great precision and care — in order to fly, the construction of the broom must have sufficiently few imperfections.</p><p>For an arbitrary array  <em>a</em>  of length  <em>m</em>, call an index  <em>i</em>  (<em>1≤ i≤ m-2</em>) bad if  <em>a<sub>i</sub></em>,  <em>a<sub>i+1</sub></em>, and  <em>a<sub>i+2</sub></em>  are all pairwise coprime. More formally,  <em>i</em>  is a bad index if and only if  <em>gcd(a<sub>i</sub>, a<sub>i+1</sub>) = gcd(a<sub>i</sub>, a<sub>i+2</sub>) = gcd(a<sub>i+1</sub>, a<sub>i+2</sub>) = 1</em>  <em><sup>∗</sup></em>. Furthermore, call  <em>a</em>  good if it has at most  <em>6</em>  bad indices.</p><p>You are given an integer  <em>n</em>. Construct a good permutation <em><sup>†</sup></em>   <em>p</em>  of length  <em>n</em>. It can be shown that such a permutation always exists.</p><p>Note that you do not have to minimize the number of bad indices.</p><p><em><sup>∗</sup></em>  <em>gcd(x, y)</em>  denotes the <a href="https://en.wikipedia.org/wiki/Greatest_common_divisor" rel="noopener">greatest common divisor</a> of  <em>x</em>  and  <em>y</em></p><p><em><sup>†</sup></em>  A permutation of length  <em>n</em>  is an array that contains every integer from  <em>1</em>  to  <em>n</em>  exactly once, in any order.</p></dd>
+<dt>Input</dt><dd><p>The first line contains a single integer  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>4</sup></em>) — the number of test cases.</p><p>The only line of each test case contains a single integer  <em>n</em>  (<em>3≤ n ≤ 2· 10<sup>5</sup></em>).</p><p>It is guaranteed that the sum of  <em>n</em>  over all test cases does not exceed  <em>2· 10<sup>5</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output on a single line  <em>n</em>  integers  <em>p<sub>1</sub>, p<sub>2</sub>, …, p<sub>n</sub></em>, an example of a good permutation of length  <em>n</em>. If there are multiple good permutations, you may output any of them.</p></dd>
+<dt>样例输入</dt><dd><pre>4
+3
+6
+8
+9</pre></dd>
+<dt>样例输出</dt><dd><pre>2 1 3
+4 1 6 3 5 2
+4 1 6 3 5 2 8 7
+5 4 8 1 9 3 6 2 7</pre></dd>
+<dt>Note</dt><dd><p>For <em>n=9</em>, we have</p><p>| <em>i</em> | <em>p<sub>i</sub></em> | <em>p<sub>i+1</sub></em> | <em>p<sub>i+2</sub></em> | <em>gcd(p<sub>i</sub>, p<sub>i+1</sub>)</em> | <em>gcd(p<sub>i</sub>, p<sub>i+2</sub>)</em> | <em>gcd(p<sub>i+1</sub>, p<sub>i+2</sub>)</em> | |  --- | --- | --- | --- | --- | --- | ---  | | <em>1</em> | <em>5</em> | <em>4</em> | <em>8</em> | <em>1</em> | <em>1</em> | <em>4</em> | | <em>2</em> | <em>4</em> | <em>8</em> | <em>1</em> | <em>4</em> | <em>1</em> | <em>1</em> | | <em>3</em> | <em>8</em> | <em>1</em> | <em>9</em> | <em>1</em> | <em>1</em> | <em>1</em> | | <em>4</em> | <em>1</em> | <em>9</em> | <em>3</em> | <em>1</em> | <em>1</em> | <em>3</em> | | <em>5</em> | <em>9</em> | <em>3</em> | <em>6</em> | <em>3</em> | <em>3</em> | <em>3</em> | | <em>6</em> | <em>3</em> | <em>6</em> | <em>2</em> | <em>3</em> | <em>1</em> | <em>2</em> | | <em>7</em> | <em>6</em> | <em>2</em> | <em>7</em> | <em>2</em> | <em>1</em> | <em>1</em> |</p><p>The only bad index is <em>3</em>. Since <em>1≤ 6</em>, <em>p</em> is a good permutation.</p></dd>
+</dl>
 </body></html>

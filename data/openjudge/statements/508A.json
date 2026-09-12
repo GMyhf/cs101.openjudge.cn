@@ -1,0 +1,37 @@
+{
+  "id": "508A",
+  "name": "Pasha and Pixels",
+  "source_url": "https://codeforces.com/problemset/problem/508/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF508A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Pasha loves his phone and also putting his hair up... But the hair is now irrelevant.\n\nPasha has installed a new game to his phone. The goal of the game is following. There is a rectangular field consisting of $ n $ row with $ m $ pixels in each row. Initially, all the pixels are colored white. In one move, Pasha can choose any pixel and color it black. In particular, he can choose the pixel that is already black, then after the boy's move the pixel does not change, that is, it remains black. Pasha loses the game when a $ 2×2 $ square consisting of black pixels is formed.\n\nPasha has made a plan of $ k $ moves, according to which he will paint pixels. Each turn in his plan is represented as a pair of numbers $ i $ and $ j $ , denoting respectively the row and the column of the pixel to be colored on the current move.\n\nDetermine whether Pasha loses if he acts in accordance with his plan, and if he does, on what move the $ 2×2 $ square consisting of black pixels is formed.",
+    "formatI": "The first line of the input contains three integers $ n,m,k $ ( $ 1<=n,m<=1000 $ , $ 1<=k<=10^{5} $ ) — the number of rows, the number of columns and the number of moves that Pasha is going to perform.\n\nThe next $ k $ lines contain Pasha's moves in the order he makes them. Each line contains two integers $ i $ and $ j $ ( $ 1<=i<=n $ , $ 1<=j<=m $ ), representing the row number and column number of the pixel that was painted during a move.",
+    "formatO": "If Pasha loses, print the number of the move when the $ 2×2 $ square consisting of black pixels is formed.\n\nIf Pasha doesn't lose, that is, no $ 2×2 $ square consisting of black pixels is formed during the given $ k $ moves, print $ 0 $ .",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "Pasha 很喜欢他的手机，也喜欢把头发扎起来……但头发现在和这题无关。\n\nPasha 在他的手机上安装了一个新游戏。游戏的目标如下：有一个由 $n$ 行、每行 $m$ 个像素组成的矩形区域。最初，所有像素都是白色的。在一次操作中，Pasha 可以选择任意一个像素，将其涂成黑色。特别地，他也可以选择已经是黑色的像素，这样在他的操作后该像素仍然保持黑色不变。当出现一个由黑色像素组成的 $2\\times 2$ 正方形时，Pasha 就会输掉游戏。\n\nPasha 已经制定了一个共 $k$ 步的操作计划，依次指定他要涂黑的像素。每一步都由一对数字 $i$ 和 $j$ 表示，分别代表当前操作要涂黑的像素所在的行和列。\n\n请你判断如果 Pasha 按照他的计划进行操作，是否会输掉游戏。如果会，请输出首次出现由黑色像素组成的 $2\\times 2$ 正方形是在第几步操作时发生的。",
+    "formatI": "输入第一行包含三个整数 $n, m, k$（$1 \\leq n, m \\leq 1000$，$1 \\leq k \\leq 10^{5}$），分别表示行数、列数和操作步数。\n\n接下来的 $k$ 行，每行包含两个整数 $i$ 和 $j$（$1 \\leq i \\leq n$，$1 \\leq j \\leq m$），表示每一步操作中要涂黑的像素所在的行和列。",
+    "formatO": "如果 Pasha 输了，输出第一次出现由黑色像素组成的 $2\\times 2$ 正方形是在第几步操作时发生的。\n\n如果在给定的 $k$ 步操作中始终没有出现这样的 $2\\times 2$ 黑色正方形，输出 $0$。",
+    "hint": "\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "2 2 4\n1 1\n1 2\n2 1\n2 2\n",
+      "output": "4\n"
+    },
+    {
+      "input": "2 3 6\n2 3\n2 2\n1 3\n2 2\n1 2\n1 1\n",
+      "output": "5\n"
+    },
+    {
+      "input": "5 3 7\n2 3\n1 2\n1 1\n4 1\n3 1\n5 3\n3 2\n",
+      "output": "0\n"
+    }
+  ]
+}

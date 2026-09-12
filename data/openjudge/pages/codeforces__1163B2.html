@@ -1,30 +1,42 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>1163B2: Cat Party (Hard Edition)</title></head>
-<body><div id="pageTitle"><h2>1163B2: Cat Party (Hard Edition)</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1163/B2" rel="noopener">Codeforces 1163B2</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>*This problem is same as the previous one, but has larger constraints.*
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 1163B2: B2. Cat Party (Hard Edition)</title></head>
+<body><div id="pageTitle"><h2>B2. Cat Party (Hard Edition)</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/1163/B2" rel="noopener">Codeforces 1163B2</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>This problem is same as the previous one, but has larger constraints.</p><p>Shiro's just moved to the new house. She wants to invite all friends of her to the house so they can play monopoly. However, her house is too small, so she can only invite one friend at a time.</p><p>For each of the <em>n</em> days since the day Shiro moved to the new house, there will be exactly one cat coming to the Shiro's house. The cat coming in the <em>i</em> -th day has a ribbon with color <em>u<sub>i</sub></em>. Shiro wants to know the largest number <em>x</em>, such that if we consider the streak of the first <em>x</em> days, it is possible to remove exactly one day from this streak so that every ribbon color that has appeared among the remaining <em>x - 1</em> will have the same number of occurrences.</p><p>For example, consider the following sequence of <em>u<sub>i</sub></em>: <em>[2, 2, 1, 1, 5, 4, 4, 5]</em>. Then <em>x = 7</em> makes a streak, since if we remove the leftmost <em>u<sub>i</sub> = 5</em>, each ribbon color will appear exactly twice in the prefix of <em>x - 1</em> days. Note that <em>x = 8</em> doesn't form a streak, since you must remove exactly one day.</p><p>Since Shiro is just a cat, she is not very good at counting and needs your help finding the longest streak.</p></dd>
+<dt>Input</dt><dd><p>The first line contains a single integer <em>n</em> (<em>1 ≤ n ≤ 10<sup>5</sup></em>) — the total number of days.</p><p>The second line contains <em>n</em> integers <em>u<sub>1</sub>, u<sub>2</sub>, …, u<sub>n</sub></em> (<em>1 ≤ u<sub>i</sub> ≤ 10<sup>5</sup></em>) — the colors of the ribbons the cats wear.</p></dd>
+<dt>Output</dt><dd><p>Print a single integer <em>x</em> — the largest possible streak of days.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+13
+1 1 1 2 2 2 3 3 3 4 4 4 5
+样例输出1
+13
 
-Shiro&#x27;s just moved to the new house. She wants to invite all friends of her to the house so they can play monopoly. However, her house is too small, so she can only invite one friend at a time.
+样例输入2
+5
+10 100 20 200 1
+样例输出2
+5
 
-For each of the 𝑛 days since the day Shiro moved to the new house, there will be exactly one cat coming to the Shiro&#x27;s house. The cat coming in the 𝑖-th day has a ribbon with color 𝑢𝑖. Shiro wants to know the largest number 𝑥, such that if we consider the streak of the first 𝑥 days, it is possible to remove **exactly one** day from this streak so that every ribbon color *that has appeared* among the remaining 𝑥−1−1 will have the same number of occurrences.
+样例输入3
+1
+100000
+样例输出3
+1
 
-For example, consider the following sequence of 𝑢𝑖: \[2,2,1,1,5,4,4,5]. Then 𝑥=7 makes a streak, since if we remove the leftmost 𝑢𝑖=5, each ribbon color will appear exactly twice in the prefix of 𝑥−1 days. Note that 𝑥=8 doesn&#x27;t form a streak, since you must remove exactly one day.
-
-Since Shiro is just a cat, she is not very good at counting and needs your help finding the longest streak.
-
-**Input**
-
-The first line contains a single integer 𝑛 (1≤𝑛≤10^5^) — the total number of days.
-
-The second line contains 𝑛 integers 𝑢1,𝑢2,…,𝑢𝑛 (1≤𝑢𝑖≤10^5^) — the colors of the ribbons the cats wear.
-
-**Output**
-
-Print a single integer 𝑥 — the largest possible streak of days.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1163/B2" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+样例输入4
+7
+3 2 1 1 4 5 1
+样例输出4
+6</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入5
+6
+1 1 1 2 2 2
+样例输出5
+5</pre></dd>
+<dt>Note</dt><dd><p>In the first example, we can choose the longest streak of <em>13</em> days, since upon removing the last day out of the streak, all of the remaining colors <em>1</em>, <em>2</em>, <em>3</em>, and <em>4</em> will have the same number of occurrences of <em>3</em>. Note that the streak can also be <em>10</em> days (by removing the <em>10</em> -th day from this streak) but we are interested in the longest streak.</p><p>In the fourth example, if we take the streak of the first <em>6</em> days, we can remove the third day from this streak then all of the remaining colors <em>1</em>, <em>2</em>, <em>3</em>, <em>4</em> and <em>5</em> will occur exactly once.</p></dd>
+</dl>
 </body></html>

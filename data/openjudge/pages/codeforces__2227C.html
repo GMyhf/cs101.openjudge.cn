@@ -1,10 +1,30 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2227C: Snowfall](https://codeforces.com/contest/2227/problem/C)</title></head>
-<body><div id="pageTitle"><h2>2227C: Snowfall](https://codeforces.com/contest/2227/problem/C)</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2227/C" rel="noopener">Codeforces 2227C</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：重新排列数组，使得6的倍数在前，2的倍数其次，其他数再次，3的倍数最后。
-
-代码：</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2227/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2227C: C. Snowfall</title></head>
+<body><div id="pageTitle"><h2>C. Snowfall</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2227/C" rel="noopener">Codeforces 2227C</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Yousef has given you an array  <em>a</em>  of  <em>n</em>  positive integers.</p><p>Let  <em>f(a)</em>  denote the number of subarrays <em><sup>∗</sup></em>  of  <em>a</em>  whose product is divisible by  <em>6</em>.</p><p>More formally, for every pair of indices  <em>l</em>  and  <em>r</em>  such that  <em>1 ≤ l ≤ r ≤ n</em>, consider the subarray  <em>a<sub>l</sub>, a<sub>l+1</sub>, …, a<sub>r</sub></em>. This subarray is counted if the product of its elements is divisible by  <em>6</em>.</p><p>For example, if  <em>a = [1, 6, 2]</em>, then the subarrays whose products are divisible by  <em>6</em>  are  <em>[6]</em>,  <em>[1, 6]</em>,  <em>[6, 2]</em>, and  <em>[1, 6, 2]</em>, so  <em>f(a) = 4</em>.</p><p>Your task is to reorder the elements of the array  <em>a</em>  so that  <em>f(a)</em>  is minimized. If there are multiple ways to do this, you may output any of them.</p><p><em><sup>∗</sup></em> An array  <em>b</em>  is a subarray of an array  <em>a</em>  if  <em>b</em>  can be obtained from  <em>a</em>  by deleting several (possibly zero or all) elements from the beginning and several (possibly zero or all) elements from the end.</p></dd>
+<dt>Input</dt><dd><p>The first line of the input contains an integer  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>4</sup></em>) — the number of test cases.</p><p>The first line of each test case contains an integer  <em>n</em>  (<em>1 ≤ n ≤ 2 · 10<sup>5</sup></em>) — the size of the array.</p><p>The second line of each test case contains  <em>n</em>  integers  <em>a<sub>1</sub>, a<sub>2</sub>, …, a<sub>n</sub></em>  (<em>1 ≤ a<sub>i</sub> ≤ 10<sup>9</sup></em>) — the elements of the array.</p><p>It is guaranteed that the sum of  <em>n</em>  over all test cases does not exceed  <em>2 · 10<sup>5</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output the array after reordering it in such a way that  <em>f(a)</em>  is minimized. If there are multiple answers, you may output any of them.</p></dd>
+<dt>样例输入</dt><dd><pre>5
+6
+12 7 9 4 18 5
+4
+3 6 2 8
+7
+1 10 15 20 3 6 9
+5
+11 14 21 2 5
+3
+6 6 6</pre></dd>
+<dt>样例输出</dt><dd><pre>12 18 4 7 5 9
+2 8 3 6
+6 10 20 1 15 3 9
+21 5 11 2 14
+6 6 6</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, an optimal arrangement is  <em>a = [12, 18, 4, 7, 5, 9]</em>. The subarrays whose products are divisible by  <em>6</em>  are:</p><ul><li><em>[12]</em></li><li><em>[18]</em></li><li><em>[12, 18]</em></li><li><em>[18, 4]</em></li><li><em>[12, 18, 4]</em></li><li><em>[18, 4, 7]</em></li><li><em>[12, 18, 4, 7]</em></li><li><em>[18, 4, 7, 5]</em></li><li><em>[4, 7, 5, 9]</em></li><li><em>[12, 18, 4, 7, 5]</em></li><li><em>[18, 4, 7, 5, 9]</em></li><li><em>[12, 18, 4, 7, 5, 9]</em></li></ul><p>Therefore,  <em>f(a) = 12</em>. It can be proven that no other arrangement yields a smaller value of  <em>f(a)</em>.</p></dd>
+</dl>
 </body></html>

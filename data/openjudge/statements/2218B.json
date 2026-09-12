@@ -1,0 +1,29 @@
+{
+  "id": "2218B",
+  "name": "The 67th 6-7 Integer Problem",
+  "source_url": "https://codeforces.com/problemset/problem/2218/B",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2218B",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "So, Macaque has passed his first challenge (and is not acknowledging your help whatsoever). After all, it was only given to him so he could engage in his greatest pleasure — crunching on desiccated freezedried hamburgers and yelling 'trivial' at the screen. However, he has another, much more important task ahead of him, and he has once again enlisted you to help him.\n\nYou are given  $ 7 $  integers  $ a_1, a_2, \\ldots, a_7 $ .\n\nYou must negate  $ 6 $  out of the  $ 7 $  integers (that is, multiply them by  $ -1 $ ). Over all possible ways to negate  $ 6 $  out of the  $ 7 $  integers, find the maximum possible sum of  $ a $ .",
+    "formatI": "Each test contains multiple test cases. The first line contains the number of test cases  $ t $  ( $ 1 \\le t \\le 6767 $ ). The description of the test cases follows.\n\nThe first and only line of each test case contains  $ 7 $  space-separated integers  $ a_1, a_2, \\ldots, a_7 $  ( $ -67 \\le a_i \\le 67 $ ).",
+    "formatO": "For each test case, output the maximum sum of  $ a $  after negating  $ 6 $  out of the  $ 7 $  integers, on a new line.",
+    "hint": "In the first test case, no matter which  $ 6 $  integers we pick to negate, the maximum sum is  $ -41-41-41-41-41-41+41=-205 $ .\n\nIn the second test case, we can negate all integers except  $ a_7 $  to obtain a sum of  $ -6-9-4-20-6-7+67=15 $ .",
+    "background": null
+  },
+  "translation": {
+    "description": "所以，Macaque 已经通过了他的第一个挑战（而且他完全没有承认你的帮助）。毕竟，他之所以被给予这个挑战，只是为了让他投入他最大的乐趣——啃干燥的冻干汉堡包，并对着屏幕喊 “trivial”。不过，他还有一个更重要的任务等着他，这一次他又一次请你帮忙。\n\n现在，给你 $7$ 个整数 $a_1, a_2, \\ldots, a_7$。\n\n你必须将这 $7$ 个整数中的 $6$ 个取相反数（即将其乘以 $-1$）。在所有可能的取法中，请你求出 $a$ 的最大可能和。",
+    "formatI": "每个测试点包含多个测试用例。第一行为测试用例个数 $t$（$1 \\leq t \\leq 6767$）。  \n每个测试用例的第一行包含 $7$ 个用空格分隔的整数 $a_1, a_2, \\ldots, a_7$（$-67 \\leq a_i \\leq 67$）。",
+    "formatO": "对于每个测试用例，输出取反后 $a$ 的最大可能和，每组结果占一行。",
+    "hint": "在第一个测试用例中，无论我们选择哪 $6$ 个整数取相反数，最大和都是 $-41-41-41-41-41-41+41=-205$。\n\n在第二个测试用例中，我们可以除了 $a_7$ 外将其他数都取相反数，得到的和为 $-6-9-4-20-6-7+67=15$。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "4\n41 41 41 41 41 41 41\n6 9 4 20 6 7 67\n1 2 3 4 5 6 7\n6 7 6 7 6 7 6",
+      "output": "-205\n15\n-14\n-31"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "2205D",
+  "name": "Simons and Beating Peaks",
+  "source_url": "https://codeforces.com/problemset/problem/2205/D",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2205D",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 512000,
+  "statement": {
+    "description": "My loveliest wishes dissolved into the air; At eighteen, I poured my dreams into the mic to share.\n\n— SHUN, [720](https://open.spotify.com/track/3bhQrFuaaPk8pMMb7TcU2d)\n\n\n\nWe call an array  $ b $  of length  $ m $  cool if and only if:\n\n- There exists no index  $ i $  ( $ 1 \\lt i \\lt m $ ) such that  $ b_i=\\max(\\{b_{i-1}, b_i, b_{i+1}\\}) $ .\n\nSimons has an array  $ a $  of size  $ n $ . Initially, the array is a permutation $ ^{\\text{∗}} $ .\n\nHe must perform the following operation until the array is cool:\n\n- Choose an index  $ i $  ( $ 1 \\lt i \\lt n $ ) such that  $ a_i=\\max(\\{a_{i-1}, a_i, a_{i+1}\\}) $ .\n- Then, he can remove either  $ a_{i-1} $  or  $ a_{i+1} $  from the array. After removal, a gap appears in the array, and the left and right sides of the gap will be rejoined.\n\nFind the minimum number of operations for Simons to perform.\n\n $ ^{\\text{∗}} $ A permutation of length  $ n $  is an array consisting of  $ n $  distinct integers from  $ 1 $  to  $ n $  in arbitrary order. For example,  $ [2,3,1,5,4] $  is a permutation, but  $ [1,2,2] $  is not a permutation ( $ 2 $  appears twice in the array), and  $ [1,3,4] $  is also not a permutation ( $ n=3 $  but there is  $ 4 $  in the array).",
+    "formatI": "Each test contains multiple test cases. The first line contains the number of test cases  $ t $  ( $ 1 \\le t \\le 5\\cdot 10^4 $ ). The description of the test cases follows.\n\nThe first line contains an integer  $ n $  ( $ 3\\le n\\le 5\\cdot 10^5 $ ) — the size of  $ a $ .\n\nThe second line contains  $ n $  integers  $ a_1,a_2,\\ldots,a_n $  ( $ 1\\le a_i\\le n $ , all  $ a_i $ -s are distinct) — the array Simons has initially.\n\nIt is guaranteed that the sum of  $ n $  over all test cases does not exceed  $ 5\\cdot 10^5 $ .",
+    "formatO": "For each test case, print a single integer — the minimum number of operations for Simons to perform.",
+    "hint": "In the first test case, the array is cool initially, so Simons can't perform any operation. The answer is  $ 0 $ .\n\nIn the second test case, Simons can perform as follows:\n\n- Choose index  $ 3 $ , because  $ a_3=\\max(\\{a_2,a_3,a_4\\}) $ . Then, he removes  $ a_{2} $  from the array. The array becomes  $ [4,3,2,5] $ .\n\nWe can see the array is cool now. Thus, the answer is  $ 1 $ .\n\nIn the third test case, Simons can perform as follows:\n\n- Choose index  $ 2 $ . Then, he removes  $ a_1 $  from the array. The array becomes  $ [5,3,6,2,1] $ .\n- Choose index  $ 3 $ . Then, he removes  $ a_2 $  from the array. The array becomes  $ [5,6,2,1] $ .\n- Choose index  $ 2 $ . Then, he removes  $ a_1 $  from the array. The array becomes  $ [6,2,1] $ .\n\nThus, Simons makes the array cool in  $ 3 $  operations.",
+    "background": null
+  },
+  "translation": {
+    "description": "我最美好的愿望随风消散；十八岁时，我将梦想倾注于麦克风，与你们分享。\n\n—— SHUN，[720](https://open.spotify.com/track/3bhQrFuaaPk8pMMb7TcU2d)\n\n我们称长度为 $m$ 的数组 $b$ 为“cool”（酷），当且仅当：\n\n- 不存在下标 $i$（$1 < i < m$），使得 $b_i = \\max(\\{b_{i-1}, b_i, b_{i+1}\\})$。\n\nSimons 有一个大小为 $n$ 的数组 $a$。最初，该数组是一个排列$^{\\text{∗}}$。\n\n他需要持续进行如下操作，直到数组变为cool：\n\n- 选择一个下标 $i$（$1 < i < n$），满足 $a_i = \\max(\\{a_{i-1}, a_i, a_{i+1}\\})$。\n- 然后，他可以从数组中删除 $a_{i-1}$ 或 $a_{i+1}$。删除后，数组的左右部分会重新拼接起来形成一个新数组。\n\n请你求出 Simons 至少需要进行多少次操作。\n\n$^{\\text{∗}}$ 长度为 $n$ 的排列是指一个包含 $1$ 到 $n$、且每个数恰好出现一次的数组。比如 $[2,3,1,5,4]$ 是一个排列，但 $[1,2,2]$ 不是（$2$ 出现了两次），$[1,3,4]$ 也不是（$n=3$，但出现了 $4$）。",
+    "formatI": "每组测试数据包含多个测试用例。第一行包含测试用例个数 $t$（$1 \\leq t \\leq 5 \\cdot 10^4$）。接下来描述各组测试数据。\n\n第一行包含一个整数 $n$（$3 \\leq n \\leq 5 \\cdot 10^5$）——$a$ 的长度。\n\n第二行包含 $n$ 个整数 $a_1,a_2,\\ldots,a_n$（$1 \\leq a_i \\leq n$，且所有 $a_i$ 都互不相同），表示 Simons 最初拥有的数组。\n\n保证所有测试用例中 $n$ 的总和不超过 $5 \\cdot 10^5$。",
+    "formatO": "对于每个测试用例，输出一行一个整数，表示 Simons 至少需要多少次操作。",
+    "hint": "在第一个测试用例中，数组一开始就是 cool 的，因此 Simons 不需要任何操作。答案为 $0$。\n\n在第二个测试用例中，Simons 可以这样操作：\n\n- 选择下标 $3$，因为 $a_3 = \\max(\\{a_2, a_3, a_4\\})$。然后，他删除 $a_2$。数组变为 $[4,3,2,5]$。\n\n可以发现，数组现在已经 cool。于是答案为 $1$。\n\n在第三个测试用例中，Simons 可以这样操作：\n\n- 选择下标 $2$，然后删除 $a_1$，数组变为 $[5,3,6,2,1]$。\n- 选择下标 $3$，然后删除 $a_2$，数组变为 $[5,6,2,1]$。\n- 选择下标 $2$，然后删除 $a_1$，数组变为 $[6,2,1]$。\n\n因此，Simons 一共进行了 $3$ 次操作使数组变为 cool。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "5\n3\n1 2 3\n5\n4 1 3 2 5\n6\n4 5 3 6 2 1\n7\n6 5 1 7 4 2 3\n15\n7 4 10 12 9 14 5 3 8 11 1 15 2 13 6",
+      "output": "0\n1\n3\n3\n9"
+    }
+  ]
+}

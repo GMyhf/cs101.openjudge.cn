@@ -1,0 +1,29 @@
+{
+  "id": "474D",
+  "name": "Flowers",
+  "source_url": "https://codeforces.com/problemset/problem/474/D",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF474D",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1500,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "We saw the little game Marmot made for Mole's lunch. Now it's Marmot's dinner time and, as we all know, Marmot eats flowers. At every dinner he eats some red and white flowers. Therefore a dinner can be represented as a sequence of several flowers, some of them white and some of them red.\n\nBut, for a dinner to be tasty, there is a rule: Marmot wants to eat white flowers only in groups of size $ k $ .\n\nNow Marmot wonders in how many ways he can eat between $ a $ and $ b $ flowers. As the number of ways could be very large, print it modulo $ 1000000007 $ ( $ 10^{9}+7 $ ).",
+    "formatI": "Input contains several test cases.\n\nThe first line contains two integers $ t $ and $ k $ ( $ 1 \\le t, k \\le 10^5 $ ), where $ t $ represents the number of test cases.\n\nThe next $t$ lines contain two integers $ a_i $ and $ b_i $ ( $ 1 \\le a_i \\le b_i \\le 10^5 $ ), describing the $ i $-th test.",
+    "formatO": "Print $ t $ lines to the standard output. The $ i $-th line should contain the number of ways in which Marmot can eat between $ a_i $ and $ b_i $ flowers at dinner modulo $ 1000000007 $ ($ 10^9 + 7$ ).",
+    "hint": "- For $ K $ = $ 2 $ and length $ 1 $ Marmot can eat ( $ R $ ).\n- For $ K $ = $ 2 $ and length $ 2 $ Marmot can eat ( $ RR $ ) and ( $ WW $ ).\n- For $ K $ = $ 2 $ and length $ 3 $ Marmot can eat ( $ RRR $ ), ( $ RWW $ ) and ( $ WWR $ ).\n- For $ K $ = $ 2 $ and length $ 4 $ Marmot can eat, for example, ( $ WWWW $ ) or ( $ RWWR $ ), but for example he can't eat ( $ WWWR $ ).",
+    "background": ""
+  },
+  "translation": {
+    "description": "我们已经看过了旱獭为鼹鼠午餐准备的小游戏。现在轮到旱獭的晚餐时间了，众所周知，旱獭喜欢吃花。在每顿晚餐时，他会吃一些红花和一些白花。因此，一顿晚餐可以表示为一串若干花朵序列，其中有些是白花，有些是红花。\n\n但是，为了让晚餐变得美味，有一个规则：旱獭只想以每组 $k$ 朵的形式吃白花。\n\n现在，旱獭想知道，他能以多少种方式吃下 $a$ 到 $b$ 朵花。由于方案总数可能非常大，请输出结果对 $1000000007$（$10^{9}+7$）取模后的值。",
+    "formatI": "输入包含多个测试用例。\n第一行包含两个整数 $t$ 和 $k$（ $1 \\leq t, k \\leq 10^5$ ），其中 $t$ 表示测试用例的数量。\n\n接下来的 $t$ 行包含两个整数 $a_i$ 和 $b_i$（$1 \\leq a_i \\leq b_i \\leq 10^5$），描述了第 $i$ 次测试。",
+    "formatO": "打印 $t$ 行到标准输出。第 $i$ 行应该包含土拨鼠晚餐吃 $a_i$ 到 $b_i$ 朵花的方式数对 $1000000007$（$10^9 + 7$ ）取模后的值。",
+    "hint": "- 当 $k=2$ 且长度为 $1$ 时，旱獭只能吃（$R$）。\n- 当 $k=2$ 且长度为 $2$ 时，旱獭可以吃（$RR$）和（$WW$）。\n- 当 $k=2$ 且长度为 $3$ 时，旱獭可以吃（$RRR$）、（$RWW$）和（$WWR$）。\n- 当 $k=2$ 且长度为 $4$ 时，旱獭可以吃例如（$WWWW$）或（$RWWR$），但不能吃（$WWWR$）。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "3 2\n1 3\n2 3\n4 4\n",
+      "output": "6\n5\n5\n"
+    }
+  ]
+}

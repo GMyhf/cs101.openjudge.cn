@@ -1,45 +1,24 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2146D1: Max Sum OR (Easy Version)</title></head>
-<body><div id="pageTitle"><h2>2146D1: Max Sum OR (Easy Version)</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2146/D1" rel="noopener">Codeforces 2146D1</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>bitmasks, constructive algorithms, divide and conquer, greedy, trees, *1500
-
-
-**This is the easy version of the problem. The difference between the versions is that in this version, 𝑙=0, and 𝑟&lt;2⋅105. You can hack only if you solved all versions of this problem.**
-
-You are given two integers 𝑙 and 𝑟 (𝑙≤𝑟).
-
-Let 𝑛=𝑟−𝑙+1. We will create two arrays 𝑎 and 𝑏, both consisting of 𝑛 integers. Initially, both 𝑎 and 𝑏 are equal to [𝑙,𝑙+1,…,𝑟]. You have to reorder the array 𝑎 arbitrarily to maximize the following value:
-
-
-
-∑𝑖=1𝑛(𝑎𝑖|𝑏𝑖).
-
-
-
-Here, | denotes the [bitwise OR operation](https://en.wikipedia.org/wiki/Bitwise_operation#OR).
-
-You also need to construct a possible way to reorder the array 𝑎.
-
-**Input**
-
-Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤104). The description of the test cases follows.
-
-The only line of each test case contains two integers 𝑙 and 𝑟 (0=𝑙≤𝑟&lt;2⋅10^5) — the minimum and maximum elements in 𝑎.
-
-Let 𝑛=𝑟−𝑙+1. It is guaranteed that the sum of 𝑛 over all test cases does not exceed 2⋅10^5.
-
-**Output**
-
-For each test case, print a single integer in the first line of output — the maximum value of ∑𝑖=1𝑛(𝑎𝑖|𝑏𝑖).
-
-Then, print 𝑛 distinct integers 𝑎1,𝑎2,…,𝑎𝑛 in the second line — the array 𝑎 after reordering.
-
-If there are multiple answers, you may print any of them.
-
-Example
-
-Input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2146/D1" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2146D1: D1. Max Sum OR (Easy Version)</title></head>
+<body><div id="pageTitle"><h2>D1. Max Sum OR (Easy Version)</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2146/D1" rel="noopener">Codeforces 2146D1</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>This is the easy version of the problem. The difference between the versions is that in this version,  <em>l=0</em>, and  <em>r&lt;2· 10<sup>5</sup></em>. You can hack only if you solved all versions of this problem.</p><p>You are given two integers  <em>l</em>  and  <em>r</em>  (<em>l≤ r</em>).</p><p>Let  <em>n = r - l + 1</em>. We will create two arrays  <em>a</em>  and  <em>b</em>, both consisting of  <em>n</em>  integers. Initially, both  <em>a</em>  and  <em>b</em>  are equal to  <em>[l, l+1, …, r]</em>. You have to reorder the array  <em>a</em>  arbitrarily to maximize the following value:</p><p><em>∑<sub>i=1</sub><sup>n</sup> (a<sub>i</sub>\ |\;b<sub>i</sub> ).</em></p><p>Here,  <em>|</em>  denotes the <a href="https://en.wikipedia.org/wiki/Bitwise_operation#OR" rel="noopener">bitwise OR operation</a>.</p><p>You also need to construct a possible way to reorder the array  <em>a</em>.</p></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains the number of test cases  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>4</sup></em>). The description of the test cases follows.</p><p>The only line of each test case contains two integers  <em>l</em>  and  <em>r</em>  (<em>0=l≤ r&lt;2· 10<sup>5</sup></em>) — the minimum and maximum elements in  <em>a</em>.</p><p>Let  <em>n = r - l + 1</em>. It is guaranteed that the sum of  <em>n</em>  over all test cases does not exceed  <em>2· 10<sup>5</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, print a single integer in the first line of output — the maximum value of  <em>∑<sub>i=1</sub><sup>n</sup> (a<sub>i</sub>\ |\;b<sub>i</sub> )</em>.</p><p>Then, print  <em>n</em>  distinct integers  <em>a<sub>1</sub>, a<sub>2</sub>, …,a<sub>n</sub></em>  in the second line — the array  <em>a</em>  after reordering.</p><p>If there are multiple answers, you may print any of them.</p></dd>
+<dt>样例输入</dt><dd><pre>3
+0 3
+0 9
+0 15</pre></dd>
+<dt>样例输出</dt><dd><pre>12
+3 2 1 0 
+90
+7 8 5 4 3 2 9 0 1 6
+240
+15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, the reordered array  <em>a</em>  is  <em>[3,2,1,0]</em>. The value of the expression is  <em>(3\ |\ 0)+(2\ |\ 1)+(1\ |\ 2)+(0\ |\ 3)=3+3+3+3=12</em>. It can be proved that this is the maximum possible value of the expression.</p><p>In the second test case, the reordered array  <em>a</em>  is  <em>[7,8,5,4,3,2,9,0,1,6]</em>. The value of the expression is  <em>90</em>. It can be proved that this is the maximum possible value of the expression.</p></dd>
+</dl>
 </body></html>

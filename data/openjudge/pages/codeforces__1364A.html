@@ -1,26 +1,24 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>1364A: XXXXX</title></head>
-<body><div id="pageTitle"><h2>1364A: XXXXX</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1364/A" rel="noopener">Codeforces 1364A</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Ehab loves number theory, but for some reason he hates the number 𝑥. Given an array 𝑎, find the length of its longest subarray such that the sum of its elements **isn&#x27;t** divisible by 𝑥, or determine that such subarray doesn&#x27;t exist.
-
-An array 𝑎 is a subarray of an array 𝑏 if 𝑎 can be obtained from 𝑏 by deletion of several (possibly, zero or all) elements from the beginning and several (possibly, zero or all) elements from the end.
-
-**Input**
-
-The first line contains an integer 𝑡 (1≤𝑡≤5) — the number of test cases you need to solve. The description of the test cases follows.
-
-The first line of each test case contains 2 integers 𝑛 and 𝑥 (1≤𝑛≤10^5^, 1≤𝑥≤10^4^) — the number of elements in the array 𝑎 and the number that Ehab hates.
-
-The second line contains 𝑛 space-separated integers $a_1, a_2, \dots, a_n (0 \le a_i \le 10^4)$ — the elements of the array 𝑎.
-
-**Output**
-
-For each testcase, print the length of the longest subarray whose sum isn&#x27;t divisible by 𝑥. If there&#x27;s no such subarray, print −1.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1364/A" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 1364A: A. XXXXX</title></head>
+<body><div id="pageTitle"><h2>A. XXXXX</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/1364/A" rel="noopener">Codeforces 1364A</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Ehab loves number theory, but for some reason he hates the number <em>x</em>. Given an array <em>a</em>, find the length of its longest subarray such that the sum of its elements isn't divisible by <em>x</em>, or determine that such subarray doesn't exist.</p><p>An array <em>a</em> is a subarray of an array <em>b</em> if <em>a</em> can be obtained from <em>b</em> by deletion of several (possibly, zero or all) elements from the beginning and several (possibly, zero or all) elements from the end.</p></dd>
+<dt>Input</dt><dd><p>The first line contains an integer <em>t</em> <em>(1 ≤ t ≤ 5)</em> — the number of test cases you need to solve. The description of the test cases follows.</p><p>The first line of each test case contains 2 integers <em>n</em> and <em>x</em> (<em>1 ≤ n ≤ 10<sup>5</sup></em>, <em>1 ≤ x ≤ 10<sup>4</sup></em>) — the number of elements in the array <em>a</em> and the number that Ehab hates.</p><p>The second line contains <em>n</em> space-separated integers <em>a<sub>1</sub></em>, <em>a<sub>2</sub></em>, <em>…</em>, <em>a<sub>n</sub></em> (<em>0 ≤ a<sub>i</sub> ≤ 10<sup>4</sup></em>) — the elements of the array <em>a</em>.</p></dd>
+<dt>Output</dt><dd><p>For each testcase, print the length of the longest subarray whose sum isn't divisible by <em>x</em>. If there's no such subarray, print <em>-1</em>.</p></dd>
+<dt>样例输入</dt><dd><pre>3
+3 3
+1 2 3
+3 4
+1 2 3
+2 2
+0 6</pre></dd>
+<dt>样例输出</dt><dd><pre>2
+3
+-1</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, the subarray <em>[2,3]</em> has sum of elements <em>5</em>, which isn't divisible by <em>3</em>.</p><p>In the second test case, the sum of elements of the whole array is <em>6</em>, which isn't divisible by <em>4</em>.</p><p>In the third test case, all subarrays have an even sum, so the answer is <em>-1</em>.</p></dd>
+</dl>
 </body></html>

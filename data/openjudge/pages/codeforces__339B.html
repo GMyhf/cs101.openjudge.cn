@@ -1,24 +1,24 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>339B: Xenia and Ringroad</title></head>
-<body><div id="pageTitle"><h2>339B: Xenia and Ringroad</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/339/B" rel="noopener">Codeforces 339B</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Xenia lives in a city that has *n* houses built along the main ringroad. The ringroad houses are numbered 1 through *n* in the clockwise order. The ringroad traffic is one way and also is clockwise.
-
-Xenia has recently moved into the ringroad house number 1. As a result, she&#x27;s got *m* things to do. In order to complete the *i*-th task, she needs to be in the house number ai and complete all tasks with numbers less than *i*. Initially, Xenia is in the house number 1, find the minimum time she needs to complete all her tasks if moving from a house to a neighboring one along the ringroad takes one unit of time.
-
-**Input**
-
-The first line contains two integers *n* and *m* (2 ≤ *n* ≤ 10^5, 1 ≤ m ≤ 10^5). The second line contains *m* integers *a*1, *a*2, ..., am (1 ≤ ai ≤ *n*). Note that Xenia can have multiple consecutive tasks in one house.
-
-**Output**
-
-Print a single integer — the time Xenia needs to complete all tasks.
-
-Please, do not use the %lld specifier to read or write 64-bit integers in С++. It is preferred to use the cin, cout streams or the %I64dspecifier.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/339/B" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 339B: B. Xenia and Ringroad</title></head>
+<body><div id="pageTitle"><h2>B. Xenia and Ringroad</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/339/B" rel="noopener">Codeforces 339B</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Xenia lives in a city that has <em>n</em> houses built along the main ringroad. The ringroad houses are numbered 1 through <em>n</em> in the clockwise order. The ringroad traffic is one way and also is clockwise.</p><p>Xenia has recently moved into the ringroad house number 1. As a result, she's got <em>m</em> things to do. In order to complete the <em>i</em> -th task, she needs to be in the house number <em>a<sub>i</sub></em> and complete all tasks with numbers less than <em>i</em>. Initially, Xenia is in the house number 1, find the minimum time she needs to complete all her tasks if moving from a house to a neighboring one along the ringroad takes one unit of time.</p></dd>
+<dt>Input</dt><dd><p>The first line contains two integers <em>n</em> and <em>m</em> <em>(2≤n≤10<sup>5</sup>,1≤m≤10<sup>5</sup>)</em>. The second line contains <em>m</em> integers <em>a<sub>1</sub>,a<sub>2</sub>,...,a<sub>m</sub></em> <em>(1≤a<sub>i</sub>≤n)</em>. Note that Xenia can have multiple consecutive tasks in one house.</p></dd>
+<dt>Output</dt><dd><p>Print a single integer — the time Xenia needs to complete all tasks.</p><p>Please, do not use the %lld specifier to read or write 64-bit integers in С++. It is preferred to use the cin, cout streams or the %I64d specifier.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+4 3
+3 2 3
+样例输出1
+6</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入2
+4 3
+2 3 3
+样例输出2
+2</pre></dd>
+<dt>Note</dt><dd><p>In the first test example the sequence of Xenia's moves along the ringroad looks as follows: <em>1→2→3→4→1→2→3</em>. This is optimal sequence. So, she needs 6 time units.</p></dd>
+</dl>
 </body></html>

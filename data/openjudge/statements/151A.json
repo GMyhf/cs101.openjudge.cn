@@ -1,0 +1,37 @@
+{
+  "id": "151A",
+  "name": "Soft Drinking",
+  "source_url": "https://codeforces.com/problemset/problem/151/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF151A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "This winter is so cold in Nvodsk! A group of $ n $ friends decided to buy $ k $ bottles of a soft drink called \"Take-It-Light\" to warm up a bit. Each bottle has $ l $ milliliters of the drink. Also they bought $ c $ limes and cut each of them into $ d $ slices. After that they found $ p $ grams of salt.\n\nTo make a toast, each friend needs $ nl $ milliliters of the drink, a slice of lime and $ np $ grams of salt. The friends want to make as many toasts as they can, provided they all drink the same amount. How many toasts can each friend make?",
+    "formatI": "The first and only line contains positive integers $ n $ , $ k $ , $ l $ , $ c $ , $ d $ , $ p $ , $ nl $ , $ np $ , not exceeding $ 1000 $ and no less than $ 1 $ . The numbers are separated by exactly one space.",
+    "formatO": "Print a single integer — the number of toasts each friend can make.",
+    "hint": "A comment to the first sample:\n\nOverall the friends have $ 4*5=20 $ milliliters of the drink, it is enough to make $ 20/3=6 $ toasts. The limes are enough for $ 10*8=80 $ toasts and the salt is enough for $ 100/1=100 $ toasts. However, there are 3 friends in the group, so the answer is $ min(6,80,100)/3=2 $ .",
+    "background": ""
+  },
+  "translation": {
+    "description": "这个冬天，Nvodsk 非常寒冷！有 $n$ 个朋友决定购买 $k$ 瓶名为 “Take-It-Light” 的软饮来暖和一下。每瓶饮料有 $l$ 毫升。他们还买了 $c$ 个柠檬，把每个柠檬切成 $d$ 片。之后他们找到了 $p$ 克盐。\n\n每位朋友每次举杯需要 $nl$ 毫升饮料、一片柠檬和 $np$ 克盐。朋友们希望尽可能多地举杯，而且每个人举杯的次数要相同。请问每位朋友最多能举杯多少次？",
+    "formatI": "第一行包含正整数 $n$、$k$、$l$、$c$、$d$、$p$、$nl$、$np$，数值范围为 $1$ 到 $1000$，各数之间用一个空格隔开。",
+    "formatO": "输出一个整数，表示每位朋友最多能够举杯的次数。",
+    "hint": "关于第一组样例的说明：\n\n朋友们一共有 $4 \\times 5 = 20$ 毫升饮料，能够制作 $20/3=6$ 次举杯。柠檬总共够 $10 \\times 8=80$ 次举杯，盐的话可以制作 $100/1=100$ 次。由于总共有 $3$ 位朋友，所以答案是 $\\min(6,80,100)/3=2$。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "3 4 5 10 8 100 3 1\n",
+      "output": "2\n"
+    },
+    {
+      "input": "5 100 10 1 19 90 4 3\n",
+      "output": "3\n"
+    },
+    {
+      "input": "10 1000 1000 25 23 1 50 1\n",
+      "output": "0\n"
+    }
+  ]
+}

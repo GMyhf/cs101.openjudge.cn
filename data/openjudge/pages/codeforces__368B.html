@@ -1,24 +1,35 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>368B: Sereja and Suffixes</title></head>
-<body><div id="pageTitle"><h2>368B: Sereja and Suffixes</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/368/B" rel="noopener">Codeforces 368B</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Sereja has an array *a*, consisting of *n* integers a~1~, a~2~, ..., a~n~. The boy cannot sit and do nothing, he decided to study an array. Sereja took a piece of paper and wrote out *m* integers $l_1, l_2, ..., l_m~$ (1 ≤ $l_i$ ≤ *n*). For each number $l_i$ he wants to know how many distinct numbers are staying on the positions $l_i, l_{i + 1}, ..., n$. Formally, he want to find the number of distinct numbers among $a_{l_i}, a_{l_{i + 1}}, ..., a_n$.?
-
-Sereja wrote out the necessary array elements but the array was so large and the boy was so pressed for time. Help him, find the answer for the described question for each $l_i$.
-
-**Input**
-
-The first line contains two integers *n* and *m* (1 ≤ *n*, *m* ≤ 10^5^). The second line contains *n* integers $a_1, a_2, ..., a_n (1 ≤ a_i ≤ 10^5)$ — the array elements.
-
-Next *m* lines contain integers $l_1, l_2, ..., l_m$. The *i*-th line contains integer $l_i$ (1 ≤ $l_i$ ≤ *n*).
-
-**Output**
-
-Print *m* lines — on the *i*-th line print the answer to the number $l_i$.
-
-**Examples**
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/368/B" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 368B: B. Sereja and Suffixes</title></head>
+<body><div id="pageTitle"><h2>B. Sereja and Suffixes</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/368/B" rel="noopener">Codeforces 368B</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Sereja has an array <em>a</em>, consisting of <em>n</em> integers <em>a<sub>1</sub></em>, <em>a<sub>2</sub></em>, <em>...</em>, <em>a<sub>n</sub></em>. The boy cannot sit and do nothing, he decided to study an array. Sereja took a piece of paper and wrote out <em>m</em> integers <em>l<sub>1</sub>,l<sub>2</sub>,...,l<sub>m</sub></em> <em>(1≤l<sub>i</sub>≤n)</em>. For each number <em>l<sub>i</sub></em> he wants to know how many distinct numbers are staying on the positions <em>l<sub>i</sub></em>, <em>l<sub>i</sub>+1</em>, ..., <em>n</em>. Formally, he want to find the number of distinct numbers among <em>a<sub>li</sub>,a<sub>li</sub>+1,...,a<sub>n</sub></em>.?</p><p>Sereja wrote out the necessary array elements but the array was so large and the boy was so pressed for time. Help him, find the answer for the described question for each <em>l<sub>i</sub></em>.</p></dd>
+<dt>Input</dt><dd><p>The first line contains two integers <em>n</em> and <em>m</em> <em>(1≤n,m≤10<sup>5</sup>)</em>. The second line contains <em>n</em> integers <em>a<sub>1</sub></em>, <em>a<sub>2</sub></em>, <em>...</em>, <em>a<sub>n</sub></em> <em>(1≤a<sub>i</sub>≤10<sup>5</sup>)</em> — the array elements.</p><p>Next <em>m</em> lines contain integers <em>l<sub>1</sub>,l<sub>2</sub>,...,l<sub>m</sub></em>. The <em>i</em> -th line contains integer <em>l<sub>i</sub></em> <em>(1≤l<sub>i</sub>≤n)</em>.</p></dd>
+<dt>Output</dt><dd><p>Print <em>m</em> lines — on the <em>i</em> -th line print the answer to the number <em>l<sub>i</sub></em>.</p></dd>
+<dt>样例输入</dt><dd><pre>10 10
+1 2 3 4 1 2 3 4 100000 99999
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10</pre></dd>
+<dt>样例输出</dt><dd><pre>6
+6
+6
+6
+6
+5
+4
+3
+2
+1</pre></dd>
+</dl>
 </body></html>

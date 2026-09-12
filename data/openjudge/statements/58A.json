@@ -1,0 +1,33 @@
+{
+  "id": "58A",
+  "name": "Chat room",
+  "source_url": "https://codeforces.com/problemset/problem/58/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF58A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Vasya has recently learned to type and log on to the Internet. He immediately entered a chat room and decided to say hello to everybody. Vasya typed the word $ s $ . It is considered that Vasya managed to say hello if several letters can be deleted from the typed word so that it resulted in the word \"hello\". For example, if Vasya types the word \"ahhellllloou\", it will be considered that he said hello, and if he types \"hlelo\", it will be considered that Vasya got misunderstood and he didn't manage to say hello. Determine whether Vasya managed to say hello by the given word $ s $ .",
+    "formatI": "The first and only line contains the word $ s $ , which Vasya typed. This word consisits of small Latin letters, its length is no less that 1 and no more than 100 letters.",
+    "formatO": "If Vasya managed to say hello, print \"YES\", otherwise print \"NO\".",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "Vasya 最近学会了打字并登录了互联网。他马上进入了一个聊天室，并决定向大家打招呼。Vasya 输入了一个单词 $s$。如果通过删除若干个字母（可以为零个），能从他输入的单词中得到 “hello” 这个单词，则认为 Vasya 成功地打了招呼。例如，如果 Vasya 输入的是 “ahhellllloou”，则认为他成功打了招呼；如果他输入的是 “hlelo”，则认为别人没能理解他，他没有成功打招呼。请根据给定的单词 $s$ 判断 Vasya 是否成功打了招呼。",
+    "formatI": "输入仅一行，为 Vasya 输入的单词 $s$。$s$ 只包含小写拉丁字母，长度不少于 $1$ 且不超过 $100$。",
+    "formatO": "如果 Vasya 成功打了招呼，输出 \"YES\"；否则输出 \"NO\"。",
+    "hint": "\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "ahhellllloou\n",
+      "output": "YES\n"
+    },
+    {
+      "input": "hlelo\n",
+      "output": "NO\n"
+    }
+  ]
+}

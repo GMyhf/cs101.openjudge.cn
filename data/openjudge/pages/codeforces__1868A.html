@@ -1,38 +1,36 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>1868A: Fill in the Matrix</title></head>
-<body><div id="pageTitle"><h2>1868A: Fill in the Matrix</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1868/A" rel="noopener">Codeforces 1868A</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>There is an empty matrix 𝑀 of size 𝑛×𝑚.
-
-Zhongkao examination is over, and Daniel would like to do some puzzle games. He is going to fill in the matrix  using permutations of length 𝑚. That is, each row of 𝑀 must be a permutation of length 𝑚†.
-
-Define the *value* of the 𝑖-th column in 𝑀 as $𝑣𝑖=MEX(𝑀_{1,𝑖},𝑀_{2,𝑖},…,𝑀_{𝑛,𝑖})$‡. Since Daniel likes diversity, the *beauty* of 𝑀 is $𝑠=MEX(𝑣_1,𝑣_2,⋯,𝑣_𝑚)$.
-
-You have to help Daniel fill in the matrix 𝑀 and **maximize** its beauty.
-
-†† A permutation of length 𝑚 is an array consisting of 𝑚 distinct integers from 0 to 𝑚−1 in arbitrary order. For example, \[1,2,0,4,3] is a permutation, but \[0,1,1] is not a permutation (1 appears twice in the array), and \[0,1,3] is also not a permutation (𝑚−1=2 but there is 3 in the array).
-
-‡‡ The MEXMEX of an array is the smallest non-negative integer that does not belong to the array. For example, MEX(2,2,1)=0 because 0 does not belong to the array, and MEX(0,3,1,2)=4 because 0, 1, 2 and 3 appear in the array, but 4 does not.
-
-**Input**
-
-The first line of input contains a single integer 𝑡 (1≤𝑡≤1000) — the number of test cases. The description of test cases follows.
-
-The only line of each test case contains two integers 𝑛 and 𝑚 (1≤𝑛,𝑚≤2⋅10^5^) — the size of the matrix.
-
-It is guaranteed that the sum of 𝑛⋅𝑚 over all test cases does not exceed 2⋅10^5^.
-
-**Output**
-
-For each test case, in the first line output a single integer — the maximum beauty of 𝑀.
-
-Then output the matrix 𝑀 of size 𝑛×𝑚 — the matrix you find.
-
-If there are multiple solutions, you may output any of them.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1868/A" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 1868A: A. Fill in the Matrix</title></head>
+<body><div id="pageTitle"><h2>A. Fill in the Matrix</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/1868/A" rel="noopener">Codeforces 1868A</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>There is an empty matrix <em>M</em> of size <em>n× m</em>.</p><p>Zhongkao examination is over, and Daniel would like to do some puzzle games. He is going to fill in the matrix <em>M</em> using permutations of length <em>m</em>. That is, each row of <em>M</em> must be a permutation of length <em>m<sup>†</sup></em>.</p><p>Define the value of the <em>i</em> -th column in <em>M</em> as <em>v<sub>i</sub>=MEX(M<sub>1,i</sub>,M<sub>2,i</sub>,…,M<sub>n,i</sub>)<sup>‡</sup></em>. Since Daniel likes diversity, the beauty of <em>M</em> is <em>s=MEX(v<sub>1</sub>,v<sub>2</sub>,…,v<sub>m</sub>)</em>.</p><p>You have to help Daniel fill in the matrix <em>M</em> and maximize its beauty.</p><p><em><sup>†</sup></em> A permutation of length <em>m</em> is an array consisting of <em>m</em> distinct integers from <em>0</em> to <em>m-1</em> in arbitrary order. For example, <em>[1,2,0,4,3]</em> is a permutation, but <em>[0,1,1]</em> is not a permutation (<em>1</em> appears twice in the array), and <em>[0,1,3]</em> is also not a permutation (<em>m-1=2</em> but there is <em>3</em> in the array).</p><p><em><sup>‡</sup></em> The <em>MEX</em> of an array is the smallest non-negative integer that does not belong to the array. For example, <em>MEX(2,2,1)=0</em> because <em>0</em> does not belong to the array, and <em>MEX(0,3,1,2)=4</em> because <em>0</em>, <em>1</em>, <em>2</em> and <em>3</em> appear in the array, but <em>4</em> does not.</p></dd>
+<dt>Input</dt><dd><p>The first line of input contains a single integer <em>t</em> (<em>1≤ t≤ 1000</em>) — the number of test cases. The description of test cases follows.</p><p>The only line of each test case contains two integers <em>n</em> and <em>m</em> (<em>1≤ n,m≤ 2· 10<sup>5</sup></em>) — the size of the matrix.</p><p>It is guaranteed that the sum of <em>n· m</em> over all test cases does not exceed <em>2· 10<sup>5</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, in the first line output a single integer — the maximum beauty of <em>M</em>.</p><p>Then output the matrix <em>M</em> of size <em>n× m</em> — the matrix you find.</p><p>If there are multiple solutions, you may output any of them.</p></dd>
+<dt>样例输入</dt><dd><pre>4
+4 3
+1 16
+6 6
+2 1</pre></dd>
+<dt>样例输出</dt><dd><pre>3
+1 0 2
+0 2 1
+1 0 2
+0 2 1
+2
+14 7 15 4 10 0 8 6 1 2 3 5 9 11 12 13 
+6
+3 0 1 4 2 5 
+5 2 1 0 4 3 
+1 3 2 4 5 0 
+4 1 3 2 5 0 
+4 2 5 3 0 1 
+2 4 0 5 1 3
+0
+0
+0</pre></dd>
+<dt>Note</dt><dd><p>In the first test case:</p><ul><li><em>v<sub>1</sub>=MEX(1,0,1,0)=2</em>;</li><li><em>v<sub>2</sub>=MEX(0,2,0,2)=1</em>;</li><li><em>v<sub>3</sub>=MEX(2,1,2,1)=0</em>.</li></ul><p>Therefore, <em>s=MEX(2,1,0)=3</em>.</p><p>It can be shown that <em>3</em> is the maximum possible beauty of <em>M</em>.</p><p>In the second test case, any permutation will make <em>s=2</em>.</p><p>In the third test case:</p><ul><li><em>v<sub>1</sub>=MEX(3,5,1,4,4,2)=0</em>;</li><li><em>v<sub>2</sub>=MEX(0,2,3,1,2,4)=5</em>;</li><li><em>v<sub>3</sub>=MEX(1,1,2,3,5,0)=4</em>;</li><li><em>v<sub>4</sub>=MEX(4,0,4,2,3,5)=1</em>;</li><li><em>v<sub>5</sub>=MEX(2,4,5,5,0,1)=3</em>;</li><li><em>v<sub>6</sub>=MEX(5,3,0,0,1,3)=2</em>.</li></ul><p>Therefore, <em>s=MEX(0,5,4,1,3,2)=6</em>.</p></dd>
+</dl>
 </body></html>

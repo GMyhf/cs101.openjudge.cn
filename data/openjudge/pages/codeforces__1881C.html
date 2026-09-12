@@ -1,48 +1,45 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>1881C: Perfect Square</title></head>
-<body><div id="pageTitle"><h2>1881C: Perfect Square</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1881/C" rel="noopener">Codeforces 1881C</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Kristina has a matrix of size 𝑛 by 𝑛, filled with lowercase Latin letters. The value of 𝑛 is **even**.
-
-She wants to change some characters so that her matrix becomes a *perfect square*. A matrix is called a *perfect square* if it remains unchanged when rotated 90∘90∘ clockwise **once**.
-
-Here is an example of rotating a matrix by 90^∘^:
-
-![img](https://espresso.codeforces.com/f31ca811677514ff724a6af677d2e4a129b8fcfb.png)
-
-In one operation, Kristina can choose any cell and replace its value with the next character in the alphabet. If the character is equal to &quot;z&quot;, its value **does not change**.
-
-Find the **minimum** number of operations required to make the matrix a *perfect square*.
-
-For example, if the 4 by 4 matrix looks like this:
-
-
-
-$\matrix{ a &amp; b &amp; b &amp; a \cr b &amp; c &amp; \textbf{b} &amp; b \cr b &amp; c &amp; c &amp; b\cr a &amp; b &amp; b &amp; a \cr }$
-
-
-
-then it is enough to apply 11 operation to the letter **b**, highlighted in bold.
-
-**Input**
-
-The first line of the input contains a single integer 𝑡 (1≤𝑡≤100) — the number of test cases.
-
-Then follows the description of each test case.
-
-The first line of each test case contains a single **even** integer 𝑛 (2≤𝑛≤1000) — the number of rows and columns in the matrix.
-
-Then follows 𝑛 lines, each containing exactly 𝑛 lowercase Latin letters.
-
-It is guaranteed that the sum of 𝑛 over all test cases does not exceed 1000.
-
-**Output**
-
-For each test case, output a single number on a separate line: the **minimum** number of operations required for Kristina to obtain a *perfect square*.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1881/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 1881C: C. Perfect Square</title></head>
+<body><div id="pageTitle"><h2>C. Perfect Square</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/1881/C" rel="noopener">Codeforces 1881C</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Kristina has a matrix of size <em>n</em> by <em>n</em>, filled with lowercase Latin letters. The value of <em>n</em> is even.</p><p>She wants to change some characters so that her matrix becomes a perfect square. A matrix is called a perfect square if it remains unchanged when rotated <em>90<sup>∘</sup></em> clockwise once.</p><p>Here is an example of rotating a matrix by <em>90<sup>∘</sup></em>:</p><p><img src="https://cdn.luogu.com.cn/upload/vjudge_pic/CF1881C/4b38bf84bcab0c377c4a504ebb049a6239821153.png" alt="illustration">In one operation, Kristina can choose any cell and replace its value with the next character in the alphabet. If the character is equal to "z", its value does not change.</p><p>Find the minimum number of operations required to make the matrix a perfect square.</p><p>For example, if the <em>4</em> by <em>4</em> matrix looks like this:</p><p>a b b a / b c b b / b c c b / a b b a</p><p>then it is enough to apply  <em>1</em> operation to the letter b, highlighted in bold.</p></dd>
+<dt>Input</dt><dd><p>The first line of the input contains a single integer <em>t</em> (<em>1 ≤ t ≤ 10<sup>2</sup></em>) — the number of test cases.</p><p>Then follows the description of each test case.</p><p>The first line of each test case contains a single even integer <em>n</em> (<em>2 ≤ n ≤ 10<sup>3</sup></em>) — the number of rows and columns in the matrix.</p><p>Then follows <em>n</em> lines, each containing exactly <em>n</em> lowercase Latin letters.</p><p>It is guaranteed that the sum of <em>n</em> over all test cases does not exceed <em>10<sup>3</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output a single number on a separate line: the minimum number of operations required for Kristina to obtain a perfect square.</p></dd>
+<dt>样例输入</dt><dd><pre>5
+4
+abba
+bcbb
+bccb
+abba
+2
+ab
+ba
+6
+codefo
+rcesco
+deforc
+escode
+forces
+codefo
+4
+baaa
+abba
+baba
+baab
+4
+bbaa
+abba
+aaba
+abba</pre></dd>
+<dt>样例输出</dt><dd><pre>1
+2
+181
+5
+9</pre></dd>
+<dt>Note</dt><dd><p>The first test case is explained in the problem statement.</p></dd>
+</dl>
 </body></html>

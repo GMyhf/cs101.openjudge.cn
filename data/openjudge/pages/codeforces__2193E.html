@@ -1,30 +1,33 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2193E: Product Queries</title></head>
-<body><div id="pageTitle"><h2>2193E: Product Queries</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2193/E" rel="noopener">Codeforces 2193E</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Today, Sabyrzhan was called to the board with an array 𝑎 of length 𝑛 and was assigned an officer&#x27;s task — to answer 𝑛 questions.
-
-In the 𝑖-th question, it is required to determine the minimum number of elements from the array that need to be selected from the board (it is allowed to use the same element multiple times) so that their product is exactly equal to 𝑖, or to report that it is impossible to achieve such a product.
-
-Note that at least one element must be selected.
-
-**Input**
-
-Each test consists of several test cases. The first line contains one integer 𝑡 (1≤𝑡≤104) — the number of test cases. The description of the test cases follows.
-
-The first line of each test case contains one integer 𝑛 (1≤𝑛≤3⋅105).
-
-The second line of each test case contains 𝑛 integers 𝑎1,𝑎2,…,𝑎𝑛 (1≤𝑎𝑖≤𝑛).
-
-It is guaranteed that the sum of the values of 𝑛 across all test cases does not exceed 3⋅105.
-
-**Output**
-
-For the 𝑖-th question, output one integer — the minimum number of elements from the array required to obtain a product equal to 𝑖, or −1 if it is impossible to achieve such a product.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2193/E" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2193E: E. Product Queries</title></head>
+<body><div id="pageTitle"><h2>E. Product Queries</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2193/E" rel="noopener">Codeforces 2193E</a></dd>
+<dt>Time limit</dt><dd>3 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Today, Sabyrzhan was called to the board with an array  <em>a</em>  of length  <em>n</em>  and was assigned an officer's task — to answer  <em>n</em>  questions.</p><p>In the  <em>i</em> -th question, it is required to determine the minimum number of elements from the array that need to be selected from the board (it is allowed to use the same element multiple times) so that their product is exactly equal to  <em>i</em>, or to report that it is impossible to achieve such a product.</p><p>Note that at least one element must be selected.</p></dd>
+<dt>Input</dt><dd><p>Each test consists of several test cases. The first line contains one integer  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>4</sup></em>) — the number of test cases. The description of the test cases follows.</p><p>The first line of each test case contains one integer  <em>n</em>  (<em>1 ≤ n ≤ 3 · 10 ^ 5</em>).</p><p>The second line of each test case contains  <em>n</em>  integers  <em>a<sub>1</sub>, a<sub>2</sub>, …, a<sub>n</sub></em>  (<em>1 ≤ a<sub>i</sub> ≤ n</em>).</p><p>It is guaranteed that the sum of the values of  <em>n</em>  across all test cases does not exceed  <em>3 · 10 ^ 5</em>.</p></dd>
+<dt>Output</dt><dd><p>For the  <em>i</em> -th question, output one integer — the minimum number of elements from the array required to obtain a product equal to  <em>i</em>, or  <em>−1</em>  if it is impossible to achieve such a product.</p></dd>
+<dt>样例输入</dt><dd><pre>6
+8
+3 2 2 3 7 3 6 7
+5
+1 2 3 4 5
+3
+1 1 1
+10
+2 1 2 1 3 5 5 7 7 7
+4
+1 1 2 2
+1
+1</pre></dd>
+<dt>样例输出</dt><dd><pre>-1 1 1 2 -1 1 1 3
+1 1 1 1 1
+1 -1 -1
+1 1 1 2 1 2 1 3 2 2
+1 1 -1 2
+1</pre></dd>
+<dt>Note</dt><dd><p>Consider the first test case. The products can be obtained as follows:</p><ul><li><em>1</em>  cannot be obtained.</li><li><em>2</em>  can be obtained by selecting  <em>a<sub>2</sub></em>.</li><li><em>3</em>  can be obtained by selecting  <em>a<sub>1</sub></em>.</li><li><em>4</em>  can be obtained by selecting  <em>a<sub>2</sub></em>  twice.</li><li><em>5</em>  cannot be obtained.</li><li><em>6</em>  can be obtained by selecting  <em>a<sub>7</sub></em>.</li><li><em>7</em>  can be obtained by selecting  <em>a<sub>5</sub></em>.</li><li><em>8</em>  can be obtained by selecting  <em>a<sub>2</sub></em>  three times.</li></ul></dd>
+</dl>
 </body></html>

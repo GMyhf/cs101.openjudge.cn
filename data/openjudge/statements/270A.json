@@ -1,0 +1,29 @@
+{
+  "id": "270A",
+  "name": "Fancy Fence",
+  "source_url": "https://codeforces.com/problemset/problem/270/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF270A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Emuskald needs a fence around his farm, but he is too lazy to build it himself. So he purchased a fence-building robot.\n\nHe wants the fence to be a regular polygon. The robot builds the fence along a single path, but it can only make fence corners at a single angle $ a $ .\n\nWill the robot be able to build the fence Emuskald wants? In other words, is there a regular polygon which angles are equal to $ a $ ?",
+    "formatI": "The first line of input contains an integer $ t $ ( $ 0&lt;t&lt;180 $ ) — the number of tests. Each of the following $ t $ lines contains a single integer $ a $ ( $ 0&lt;a&lt;180 $ ) — the angle the robot can make corners at measured in degrees.",
+    "formatO": "For each test, output on a single line \"YES\" (without quotes), if the robot can build a fence Emuskald wants, and \"NO\" (without quotes), if it is impossible.",
+    "hint": "In the first test case, it is impossible to build the fence, since there is no regular polygon with angle ![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF270A/0bc9695322431ed07d3e711343afe48991039a08.png).\n\nIn the second test case, the fence is a regular triangle, and in the last test case — a square.",
+    "background": ""
+  },
+  "translation": {
+    "description": "Emuskald 想在他的农场周围造一圈栅栏，但是他太懒了，不想自己动手。于是，他买了一个栅栏机器人。\n\nEmuskald 想把栅栏围成正多边形。机器人每次造一个边，之后只能转动 $a^\\circ$ 继续建造下一个边。\n\nEmuskald 能造出他想要的围栏吗？也就是说，有没有一种正多边形的每一个角都为 $a^\\circ$。",
+    "formatI": "第一行输入一个整数 $t$，表示有 $t$ 组样例输入。\n\n之后的 $t$ 行，每行一个整数 $a$，表示转动的角度。",
+    "formatO": "如果围得出正多边形，输出 `YES`（不要定义）。否则，输出 `NO`（同上）。\n\n（输入均不超过 `int` 类型）",
+    "hint": "第一组样例中，转动角度为 $30^\\circ$，围不出正多边形。\n\n第二组转动角度为 $60^\\circ$，围出三角形。\n\n第三组转动角度为 $90^\\circ$，围出正方形。\n\n感谢 @PaulHunter 提供的翻译，[jiangyunuo](https://www.luogu.com.cn/user/1061050) 修复",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "3\n30\n60\n90\n",
+      "output": "NO\nYES\nYES\n"
+    }
+  ]
+}

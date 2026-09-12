@@ -1,0 +1,33 @@
+{
+  "id": "894E",
+  "name": "Ralph and Mushrooms",
+  "source_url": "https://codeforces.com/problemset/problem/894/E",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF894E",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2500,
+  "memory_limit_kb": 512000,
+  "statement": {
+    "description": "Ralph is going to collect mushrooms in the Mushroom Forest.\n\nThere are $ m $ directed paths connecting $ n $ trees in the Mushroom Forest. On each path grow some mushrooms. When Ralph passes a path, he collects all the mushrooms on the path. The Mushroom Forest has a magical fertile ground where mushrooms grow at a fantastic speed. New mushrooms regrow as soon as Ralph finishes mushroom collection on a path. More specifically, after Ralph passes a path the $ i $ -th time, there regrow $ i $ mushrooms less than there was before this pass. That is, if there is initially $ x $ mushrooms on a path, then Ralph will collect $ x $ mushrooms for the first time, $ x-1 $ mushrooms the second time, $ x-1-2 $ mushrooms the third time, and so on. However, the number of mushrooms can never be less than $ 0 $ .\n\nFor example, let there be $ 9 $ mushrooms on a path initially. The number of mushrooms that can be collected from the path is $ 9 $ , $ 8 $ , $ 6 $ and $ 3 $ when Ralph passes by from first to fourth time. From the fifth time and later Ralph can't collect any mushrooms from the path (but still can pass it).\n\nRalph decided to start from the tree $ s $ . How many mushrooms can he collect using only described paths?",
+    "formatI": "The first line contains two integers $ n $ and $ m $ ( $ 1<=n<=10^{6} $ , $ 0<=m<=10^{6} $ ), representing the number of trees and the number of directed paths in the Mushroom Forest, respectively.\n\nEach of the following $ m $ lines contains three integers $ x $ , $ y $ and $ w $ ( $ 1<=x,y<=n $ , $ 0<=w<=10^{8} $ ), denoting a path that leads from tree $ x $ to tree $ y $ with $ w $ mushrooms initially. There can be paths that lead from a tree to itself, and multiple paths between the same pair of trees.\n\nThe last line contains a single integer $ s $ ( $ 1<=s<=n $ ) — the starting position of Ralph.",
+    "formatO": "Print an integer denoting the maximum number of the mushrooms Ralph can collect during his route.",
+    "hint": "In the first sample Ralph can pass three times on the circle and collect $ 4+4+3+3+1+1=16 $ mushrooms. After that there will be no mushrooms for Ralph to collect.\n\nIn the second sample, Ralph can go to tree $ 3 $ and collect $ 8 $ mushrooms on the path from tree $ 1 $ to tree $ 3 $ .",
+    "background": ""
+  },
+  "translation": {
+    "description": "Ralph 要去蘑菇森林采蘑菇。\n\n蘑菇森林中有 $n$ 棵树，通过 $m$ 条有向路径相互连接。在每条路径上都生长着一些蘑菇。当 Ralph 经过一条路径时，他会采摘路径上的所有蘑菇。蘑菇森林拥有神奇而肥沃的土地，蘑菇会以惊人的速度重新生长。具体来说，每当 Ralph 采摘完一条路径上的蘑菇后，这条路径上的蘑菇会立即重新生长，但是数量会比上一次经过时少 $i$ 个（第 $i$ 次经过时）。也就是说，如果一开始有 $x$ 个蘑菇，Ralph 第一次经过时采集到 $x$ 个，第二次经过时采集到 $x-1$ 个，第三次经过时采集到 $x-1-2$ 个，以此类推。但是，路径上的蘑菇数量永远不会少于 $0$。\n\n例如，若某路径上最初有 $9$ 个蘑菇，那么 Ralph 从第一次到第四次途经时依次能采摘 $9,\\,8,\\,6,\\,3$ 个蘑菇。从第五次及以后，Ralph 将无法再从这条路径上采到蘑菇（但仍然可以经过该路径）。\n\nRalph 决定从树 $s$ 开始出发。请问只利用上述路径，Ralph 最多能采集多少个蘑菇？",
+    "formatI": "第一行包含两个整数 $n$ 和 $m$（$1 \\leq n \\leq 10^{6}$，$0 \\leq m \\leq 10^{6}$），分别表示蘑菇森林中的树的数量和有向路径的数量。\n\n接下来的 $m$ 行，每行包含三个整数 $x$、$y$ 和 $w$（$1 \\leq x, y \\leq n$，$0 \\leq w \\leq 10^{8}$），表示一条从树 $x$ 到树 $y$ 的有向路径，路径上最初有 $w$ 个蘑菇。允许从某棵树到自身的路径，也允许同一对树之间存在多条路径。\n\n最后一行包含一个整数 $s$（$1 \\leq s \\leq n$），表示 Ralph 的起始位置。",
+    "formatO": "输出一个整数，表示 Ralph 在他的旅途中最多能够采集到的蘑菇数量。",
+    "hint": "在第一个样例中，Ralph 可以在环上通过三次，采集的蘑菇数量为 $4+4+3+3+1+1=16$。此后，路径上将再也没有蘑菇可以采摘。\n\n在第二个样例中，Ralph 可以直接前往树 $3$，并采集从树 $1$ 到树 $3$ 的路径上的 $8$ 个蘑菇。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "2 2\n1 2 4\n2 1 4\n1\n",
+      "output": "16"
+    },
+    {
+      "input": "3 3\n1 2 4\n2 3 3\n1 3 8\n1\n",
+      "output": "8"
+    }
+  ]
+}

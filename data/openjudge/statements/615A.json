@@ -1,0 +1,33 @@
+{
+  "id": "615A",
+  "name": "Bulbs",
+  "source_url": "https://codeforces.com/problemset/problem/615/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF615A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Vasya wants to turn on Christmas lights consisting of $ m $ bulbs. Initially, all bulbs are turned off. There are $ n $ buttons, each of them is connected to some set of bulbs. Vasya can press any of these buttons. When the button is pressed, it turns on all the bulbs it's connected to. Can Vasya light up all the bulbs?\n\nIf Vasya presses the button such that some bulbs connected to it are already turned on, they do not change their state, i.e. remain turned on.",
+    "formatI": "The first line of the input contains integers $ n $ and $ m $ ( $ 1<=n,m<=100 $ ) — the number of buttons and the number of bulbs respectively.\n\nEach of the next $ n $ lines contains $ x_{i} $ ( $ 0<=x_{i}<=m $ ) — the number of bulbs that are turned on by the $ i $ -th button, and then $ x_{i} $ numbers $ y_{ij} $ ( $ 1<=y_{ij}<=m $ ) — the numbers of these bulbs.",
+    "formatO": "If it's possible to turn on all $ m $ bulbs print \"YES\", otherwise print \"NO\".",
+    "hint": "In the first sample you can press each button once and turn on all the bulbs. In the 2 sample it is impossible to turn on the 3-rd lamp.",
+    "background": ""
+  },
+  "translation": {
+    "description": "Vasya 想要点亮一串由 $m$ 只灯泡组成的圣诞彩灯。起初，所有灯泡都是关闭的。有 $n$ 个按钮，每个按钮连接着某些灯泡。Vasya 可以按下其中任意一个按钮。当按下某个按钮时，与该按钮连接的所有灯泡都会被点亮。如果某只灯泡已经被点亮，再次按下与其相连的按钮不会改变它的状态，即它仍然保持点亮状态。请问 Vasya 能否通过按下按钮使所有灯泡都被点亮？",
+    "formatI": "输入的第一行包含两个整数 $n$ 和 $m$（$1 \\leq n, m \\leq 100$），分别表示按钮的数量和灯泡的数量。\n\n接下来的 $n$ 行，每行描述一个按钮。第 $i$ 行先给出一个整数 $x_{i}$ ($0 \\leq x_{i} \\leq m$)，表示第 $i$ 个按钮能点亮的灯泡数量，随后跟着 $x_{i}$ 个整数 $y_{ij}$ ($1 \\leq y_{ij} \\leq m$)，表示这些灯泡的编号。",
+    "formatO": "如果能够点亮所有 $m$ 只灯泡，输出 \"YES\"；否则输出 \"NO\"。",
+    "hint": "在第一个样例中，每个按钮都按下一次，可以点亮所有灯泡。在第二个样例中，第 $3$ 只灯泡无法被点亮。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "3 4\n2 1 4\n3 1 3 1\n1 2\n",
+      "output": "YES\n"
+    },
+    {
+      "input": "3 3\n1 1\n1 2\n1 1\n",
+      "output": "NO\n"
+    }
+  ]
+}

@@ -1,25 +1,29 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>263A: Beautiful Matrix</title></head>
-<body><div id="pageTitle"><h2>263A: Beautiful Matrix</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/263/A" rel="noopener">Codeforces 263A</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>You&#x27;ve got a 5 × 5 matrix, consisting of 24 zeroes and a single number one. Let&#x27;s index the matrix rows by numbers from 1 to 5 from top to bottom, let&#x27;s index the matrix columns by numbers from 1 to 5 from left to right. In one move, you are allowed to apply one of the two following transformations to the matrix:
-
-1. Swap two neighboring matrix rows, that is, rows with indexes *i* and *i* + 1 for some integer *i* (1 ≤ *i* &lt; 5).
-2. Swap two neighboring matrix columns, that is, columns with indexes *j* and *j* + 1 for some integer *j* (1 ≤ *j* &lt; 5).
-
-You think that a matrix looks *beautiful*, if the single number one of the matrix is located in its middle (in the cell that is on the intersection of the third row and the third column). Count the minimum number of moves needed to make the matrix beautiful.
-
-**Input**
-
-The input consists of five lines, each line contains five integers: the *j*-th integer in the *i*-th line of the input represents the element of the matrix that is located on the intersection of the *i*-th row and the *j*-th column. It is guaranteed that the matrix consists of 24 zeroes and a single number one.
-
-**Output**
-
-Print a single integer — the minimum number of moves needed to make the matrix beautiful.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/263/A" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 263A: A. Beautiful Matrix</title></head>
+<body><div id="pageTitle"><h2>A. Beautiful Matrix</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/263/A" rel="noopener">Codeforces 263A</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>You've got a <em>5×5</em> matrix, consisting of <em>24</em> zeroes and a single number one. Let's index the matrix rows by numbers from <em>1</em> to <em>5</em> from top to bottom, let's index the matrix columns by numbers from <em>1</em> to <em>5</em> from left to right. In one move, you are allowed to apply one of the two following transformations to the matrix:</p><ol><li>Swap two neighboring matrix rows, that is, rows with indexes <em>i</em> and <em>i+1</em> for some integer <em>i</em> <em>(1≤i&lt;5)</em>.</li><li>Swap two neighboring matrix columns, that is, columns with indexes <em>j</em> and <em>j+1</em> for some integer <em>j</em> <em>(1≤j&lt;5)</em>.</li></ol><p>You think that a matrix looks beautiful, if the single number one of the matrix is located in its middle (in the cell that is on the intersection of the third row and the third column). Count the minimum number of moves needed to make the matrix beautiful.</p></dd>
+<dt>Input</dt><dd><p>The input consists of five lines, each line contains five integers: the <em>j</em> -th integer in the <em>i</em> -th line of the input represents the element of the matrix that is located on the intersection of the <em>i</em> -th row and the <em>j</em> -th column. It is guaranteed that the matrix consists of <em>24</em> zeroes and a single number one.</p></dd>
+<dt>Output</dt><dd><p>Print a single integer — the minimum number of moves needed to make the matrix beautiful.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+0 0 0 0 0
+0 0 0 0 1
+0 0 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+样例输出1
+3</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入2
+0 0 0 0 0
+0 0 0 0 0
+0 1 0 0 0
+0 0 0 0 0
+0 0 0 0 0
+样例输出2
+1</pre></dd>
+</dl>
 </body></html>

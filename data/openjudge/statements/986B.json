@@ -1,0 +1,29 @@
+{
+  "id": "986B",
+  "name": "Petr and Permutations",
+  "source_url": "https://codeforces.com/problemset/problem/986/B",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF986B",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Petr likes to come up with problems about randomly generated data. This time problem is about random permutation. He decided to generate a random permutation this way: he takes identity permutation of numbers from $ 1 $ to $ n $ and then $ 3n $ times takes a random pair of different elements and swaps them. Alex envies Petr and tries to imitate him in all kind of things. Alex has also come up with a problem about random permutation. He generates a random permutation just like Petr but swaps elements $ 7n+1 $ times instead of $ 3n $ times. Because it is more random, OK?!\n\nYou somehow get a test from one of these problems and now you want to know from which one.",
+    "formatI": "In the first line of input there is one integer $ n $ ( $ 10^{3} \\le n \\le 10^{6} $ ).\n\nIn the second line there are $ n $ distinct integers between $ 1 $ and $ n $ — the permutation of size $ n $ from the test.\n\nIt is guaranteed that all tests except for sample are generated this way: First we choose $ n $ — the size of the permutation. Then we randomly choose a method to generate a permutation — the one of Petr or the one of Alex. Then we generate a permutation using chosen method.",
+    "formatO": "If the test is generated via Petr's method print \"Petr\" (without quotes). If the test is generated via Alex's method print \"Um\\_nik\" (without quotes).",
+    "hint": "Please note that the sample is not a valid test (because of limitations for $ n $ ) and is given only to illustrate input/output format. Your program still has to print correct answer to this test to get AC.\n\nDue to randomness of input hacks in this problem are forbidden.",
+    "background": ""
+  },
+  "translation": {
+    "description": "Petr 喜欢设计关于随机生成数据的问题。这一次，他的问题与随机排列有关。他决定这样生成一个随机排列：他取 $1$ 到 $n$ 的升序排列（即初始排列），然后随机选择一对不同的元素并交换它们，重复 $3n$ 次。Alex 很羡慕 Petr，喜欢模仿他的一切。Alex 也想出了一个关于随机排列的问题。他生成随机排列的方法与 Petr 相同，只不过他将元素交换 $7n+1$ 次，而不是 $3n$ 次。因为这样“更随机”，对吧？！\n\n你现在拿到了一组测试数据，这组数据是用上述两种方法之一生成的。你需要判断它是用哪种方法生成的。",
+    "formatI": "输入的第一行包含一个整数 $n$（$10^{3} \\le n \\le 10^{6}$）。\n\n第二行包含 $n$ 个不同的整数，表示一个 $1$ 到 $n$ 的排列。\n\n保证所有正式测试数据（除了样例）都是这样生成的：首先选定排列的大小 $n$，然后随机选择一种生成方法（Petr 或 Alex），再用选定的方法生成排列。",
+    "formatO": "如果测试数据是用 Petr 的方法生成的，输出 \"Petr\"（不带引号）；如果是用 Alex 的方法生成的，输出 \"Um_nik\"（不带引号）。",
+    "hint": "请注意，样例并不是一个有效的测试数据（因为 $n$ 的限制），仅用于说明输入输出格式。你的程序仍需对该样例输出正确答案才能通过评测。\n\n由于输入的随机性，本题禁止 Hack。\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "5\n2 4 5 1 3\n",
+      "output": "Petr\n"
+    }
+  ]
+}

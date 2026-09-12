@@ -1,0 +1,29 @@
+{
+  "id": "2227A",
+  "name": "Koshary",
+  "source_url": "https://codeforces.com/problemset/problem/2227/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2227A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Yousef is at the coordinates  $ (0, 0) $  and wants to reach a plate of Koshary at  $ (x, y) $ .\n\nTo get there, Yousef takes long steps. From any point  $ (a, b) $ , a long step moves him to:\n\n- $ (a + 2, b) $  or  $ (a, b + 2) $\n\nHowever, Yousef is allowed to take at most one short step during his entire journey. A short step moves him to:\n\n- $ (a + 1, b) $  or  $ (a, b + 1) $\n\nCan Yousef reach the exact coordinates  $ (x, y) $  of the Koshary plate?",
+    "formatI": "The first line contains an integer  $ t $  ( $ 1 \\le t \\le 100 $ ) — the number of test cases.\n\nEach test case contains two integers  $ x $  and  $ y $  ( $ 1 \\le x, y \\le 10 $ ) — the coordinates of the Koshary plate.",
+    "formatO": "For each test case, output \"YES\" if Yousef can reach the Koshary plate and \"NO\" otherwise.\n\nYou can output the answer in any case (upper or lower). For example, the strings \"yEs\", \"yes\", \"Yes\", and \"YES\" will be recognized as positive responses.",
+    "hint": "In the first test case, it is impossible to reach  $ (1, 1) $  using the mentioned steps.\n\nIn the second test case, an optimal sequence of steps would be: \n$$\n(0, 0) \\xrightarrow{\\texttt{long}} (0, 2) \\xrightarrow{\\texttt{short}} (1, 2)\n$$\n\nIn the third test case, an optimal sequence of steps would be: \n$$\n(0, 0) \\xrightarrow{\\texttt{long}} (0, 2) \\xrightarrow{\\texttt{long}} (2, 2) \\xrightarrow{\\texttt{long}} (2, 4) \\xrightarrow{\\texttt{long}} (4, 4) \\xrightarrow{\\texttt{long}} (4, 6)\n$$",
+    "background": null
+  },
+  "translation": {
+    "description": "Yousef 现在位于坐标 $ (0, 0) $，他想要到达坐标 $ (x, y) $ 的 Koshary 餐盘处。\n\n为了到达那里，Yousef 采取大步行走。从任意点 $ (a, b) $，一次大步可以移动到：\n\n- $ (a + 2, b) $ 或 $ (a, b + 2) $\n\n但在整个旅程中，Yousef 最多只能走一步小步。一次小步可以移动到：\n\n- $ (a + 1, b) $ 或 $ (a, b + 1) $\n\nYousef 能否精确到达 Koshary 餐盘所在的坐标 $ (x, y) $？",
+    "formatI": "第一行包含一个整数 $ t $（$ 1 \\le t \\le 100 $），表示测试用例的数量。\n\n每个测试用例包含两个整数 $ x $ 和 $ y $（$ 1 \\le x, y \\le 10 $），表示 Koshary 餐盘的坐标。",
+    "formatO": "对于每个测试用例，如果 Yousef 能到达餐盘，请输出 \"YES\"，否则输出 \"NO\"。\n\n你可以以任意字母大小写输出答案。例如，\"yEs\"、\"yes\"、\"Yes\" 和 \"YES\" 都将被识别为肯定回答。",
+    "hint": "在第一个测试用例里，无法使用上述步伐到达 $ (1, 1) $。\n\n在第二个测试用例里，一种最优的行走序列如下：\n$$\n(0, 0) \\xrightarrow{\\texttt{long}} (0, 2) \\xrightarrow{\\texttt{short}} (1, 2)\n$$\n\n在第三个测试用例里，一种最优的行走序列如下：\n$$\n(0, 0) \\xrightarrow{\\texttt{long}} (0, 2) \\xrightarrow{\\texttt{long}} (2, 2) \\xrightarrow{\\texttt{long}} (2, 4) \\xrightarrow{\\texttt{long}} (4, 4) \\xrightarrow{\\texttt{long}} (4, 6)\n$$\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "6\n1 1\n1 2\n4 6\n5 9\n7 2\n10 10",
+      "output": "NO\nYES\nYES\nNO\nYES\nYES"
+    }
+  ]
+}

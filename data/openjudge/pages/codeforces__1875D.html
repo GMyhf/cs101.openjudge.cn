@@ -1,39 +1,27 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>1875D: Jellyfish and Mex</title></head>
-<body><div id="pageTitle"><h2>1875D: Jellyfish and Mex</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1875/D" rel="noopener">Codeforces 1875D</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>You are given an array of 𝑛 nonnegative integers 𝑎1,𝑎2,…,𝑎𝑛.
-
-Let 𝑚 be a variable that is initialized to 00, Jellyfish will perform the following operation 𝑛 times:
-
-- select an index 𝑖 (1≤𝑖≤|𝑎|) and delete 𝑎𝑖 from 𝑎.
-- add MEX(𝑎)† to 𝑚.
-
-Now Jellyfish wants to know the minimum possible final value of 𝑚 if he performs all the operations optimally.
-
-†† The MEX (minimum excluded) of an array is the smallest non-negative integer that does not belong to the array. For instance:
-
-- The MEX of \[2,2,1] is 0, because 0 does not belong to the array.
-- The MEX of \[3,1,0,1] is 2, because 0 and 1 belong to the array, but 2 does not.
-- The MEX of \[0,3,1,2] is 4 because 0, 1, 2, and 3 belong to the array, but 4 does not.
-
-**Input**
-
-Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤5000). The description of the test cases follows.
-
-The first line of each test case contains a single integer 𝑛 (1≤𝑛≤5000) — the size of the array.
-
-The second line of each test case contains 𝑛 integers 𝑎1,𝑎2,…,𝑎𝑛 (0≤𝑎𝑖≤10^9^) — the integers in the array.
-
-It is guaranteed that the sum of 𝑛 over all test cases does not exceed 50005000.
-
-**Output**
-
-For each test case, output a single integer — the minimum value of 𝑚 if the operations are performed optimally.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1875/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 1875D: D. Jellyfish and Mex</title></head>
+<body><div id="pageTitle"><h2>D. Jellyfish and Mex</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/1875/D" rel="noopener">Codeforces 1875D</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>You are given an array of <em>n</em> nonnegative integers <em>a<sub>1</sub>, a<sub>2</sub>, …, a<sub>n</sub></em>.</p><p>Let <em>m</em> be a variable that is initialized to <em>0</em>, Jellyfish will perform the following operation <em>n</em> times:</p><ul><li>select an index <em>i</em> (<em>1 ≤ i ≤ |a|</em>) and delete <em>a<sub>i</sub></em> from <em>a</em>.</li><li>add <em>MEX(a)<sup>†</sup></em> to <em>m</em>.</li></ul><p>Now Jellyfish wants to know the minimum possible final value of <em>m</em> if he performs all the operations optimally.</p><p><em><sup>†</sup></em> The MEX (minimum excluded) of an array is the smallest non-negative integer that does not belong to the array. For instance:</p><ul><li>The MEX of <em>[2,2,1]</em> is <em>0</em>, because <em>0</em> does not belong to the array.</li><li>The MEX of <em>[3,1,0,1]</em> is <em>2</em>, because <em>0</em> and <em>1</em> belong to the array, but <em>2</em> does not.</li><li>The MEX of <em>[0,3,1,2]</em> is <em>4</em> because <em>0</em>, <em>1</em>, <em>2</em>, and <em>3</em> belong to the array, but <em>4</em> does not.</li></ul></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains the number of test cases <em>t</em> (<em>1 ≤ t ≤ 5000</em>). The description of the test cases follows.</p><p>The first line of each test case contains a single integer <em>n</em> (<em>1 ≤ n ≤ 5000</em>) — the size of the array.</p><p>The second line of each test case contains <em>n</em> integers <em>a<sub>1</sub>, a<sub>2</sub>, …, a<sub>n</sub></em> (<em>0 ≤ a<sub>i</sub> ≤ 10<sup>9</sup></em>) — the integers in the array.</p><p>It is guaranteed that the sum of <em>n</em> over all test cases does not exceed <em>5000</em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output a single integer — the minimum value of <em>m</em> if the operations are performed optimally.</p></dd>
+<dt>样例输入</dt><dd><pre>4
+8
+5 2 1 0 3 0 4 0
+2
+1 2
+5
+1 0 2 114514 0
+8
+0 1 2 0 1 2 0 3</pre></dd>
+<dt>样例输出</dt><dd><pre>3
+0
+2
+7</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, we delete elements from <em>a</em> in the following order: <em>[5,2,1,0,3,0,4,0] → [5,2,0,3,0,4,0] → [5,2,0,3,4,0] → [5,2,3,4,0] → [5,2,3,4] → [5,2,4] → [2,4] → [4] → [~]</em>. The value of <em>m</em> will be <em>1+1+1+0+0+0+0+0=3</em>.</p></dd>
+</dl>
 </body></html>

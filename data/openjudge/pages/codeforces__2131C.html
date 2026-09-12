@@ -1,34 +1,35 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2131C: Make it Equal</title></head>
-<body><div id="pageTitle"><h2>2131C: Make it Equal</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2131/C" rel="noopener">Codeforces 2131C</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Given two [multisets](https://en.wikipedia.org/wiki/Multiset) 𝑆 and 𝑇 of size 𝑛 and a positive integer 𝑘, you may perform the following operations any number (including zero) of times on 𝑆:
-
-- Select an element 𝑥 in 𝑆, and remove one occurrence of 𝑥 in 𝑆. Then, either insert 𝑥+𝑘 into 𝑆, or insert |𝑥−𝑘| into 𝑆.
-
-Determine if it is possible to make 𝑆 equal to 𝑇. Two multisets 𝑆 and 𝑇 are equal if every element appears the same number of times in 𝑆 and 𝑇.
-
-**Input**
-
-Each test contains multiple test cases. The first line contains an integer 𝑡 (1≤𝑡≤104) — the number of test cases. The description of the test cases follows.
-
-The first line contains two integers 𝑛 and 𝑘 (1≤𝑛≤2⋅105, 1≤𝑘≤109) — the size of 𝑆 and the constant, respectively.
-
-The second line contains 𝑛 integers 𝑆1,𝑆2,…,𝑆𝑛 (0≤𝑆𝑖≤109) — the elements in 𝑆.
-
-The third line contains 𝑛 integers 𝑇1,𝑇2,…,𝑇𝑛 (0≤𝑇𝑖≤109) — the elements in 𝑇.
-
-It is guaranteed that the sum of 𝑛 over all test cases does not exceed 2⋅105.
-
-**Output**
-
-For each test case, output &quot;YES&quot; if it is possible to make 𝑆 equal to 𝑇, and &quot;NO&quot; otherwise.
-
-You can output the answer in any case (upper or lower). For example, the strings &quot;yEs&quot;, &quot;yes&quot;, &quot;Yes&quot;, and &quot;YES&quot; will be recognized as positive responses.
-
-Example
-
-Input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2131/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2131C: C. Make it Equal</title></head>
+<body><div id="pageTitle"><h2>C. Make it Equal</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2131/C" rel="noopener">Codeforces 2131C</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Given two <a href="https://en.wikipedia.org/wiki/Multiset" rel="noopener">multisets</a> <em>S</em> and <em>T</em> of size <em>n</em> and a positive integer <em>k</em>, you may perform the following operations any number (including zero) of times on <em>S</em>:</p><ul><li>Select an element <em>x</em> in <em>S</em>, and remove one occurrence of <em>x</em> in <em>S</em>. Then, either insert <em>x+k</em> into <em>S</em>, or insert <em>|x-k|</em> into <em>S</em>.</li></ul><p>Determine if it is possible to make <em>S</em> equal to <em>T</em>. Two multisets <em>S</em> and <em>T</em> are equal if every element appears the same number of times in <em>S</em> and <em>T</em>.</p></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains an integer <em>t</em> (<em>1 \≤ t \≤ 10<sup>4</sup></em>) — the number of test cases. The description of the test cases follows.</p><p>The first line contains two integers <em>n</em> and <em>k</em> (<em>1 \≤ n \≤ 2 \· 10<sup>5</sup></em>, <em>1 \≤ k \≤ 10<sup>9</sup></em>) — the size of <em>S</em> and the constant, respectively.</p><p>The second line contains <em>n</em> integers <em>S\<sub>1</sub>,S\<sub>2</sub>,\…,S\<sub>n</sub></em> (<em>0 \≤ S\<sub>i</sub> \≤ 10<sup>9</sup></em>) — the elements in <em>S</em>.</p><p>The third line contains <em>n</em> integers <em>T\<sub>1</sub>,T\<sub>2</sub>,\…,T\<sub>n</sub></em> (<em>0 \≤ T\<sub>i</sub> \≤ 10<sup>9</sup></em>) — the elements in <em>T</em>.</p><p>It is guaranteed that the sum of <em>n</em> over all test cases does not exceed <em>2 \· 10<sup>5</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output "YES" if it is possible to make <em>S</em> equal to <em>T</em>, and "NO" otherwise.</p><p>You can output the answer in any case (upper or lower). For example, the strings "yEs", "yes", "Yes", and "YES" will be recognized as positive responses.</p></dd>
+<dt>样例输入</dt><dd><pre>5
+1 3
+1
+2
+1 8
+4
+12
+3 5
+6 2 9
+8 4 11
+2 7
+2 8
+2 9
+3 2
+0 1 0
+1 0 1</pre></dd>
+<dt>样例输出</dt><dd><pre>YES
+YES
+YES
+NO
+NO</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, we can remove one occurrence of <em>1</em> from <em>S</em> and insert <em>|1-k|=|1-3|=2</em> into <em>S</em>, making <em>S</em> equal to <em>T</em>.</p><p>In the second test case, we can remove one occurrence of <em>4</em> from <em>S</em> and insert <em>4+k=4+8=12</em> into <em>S</em>, making <em>S</em> equal to <em>T</em>.</p><p>In the last test case, we can show that it is impossible to make <em>S</em> equal to <em>T</em>.</p></dd>
+</dl>
 </body></html>

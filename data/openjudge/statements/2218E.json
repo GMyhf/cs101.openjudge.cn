@@ -1,0 +1,29 @@
+{
+  "id": "2218E",
+  "name": "The 67th XOR Problem",
+  "source_url": "https://codeforces.com/problemset/problem/2218/E",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2218E",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 3000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "The PMOI wasn't even that awful - word on the street was that the problems were decent, and even (heaven forbid) enjoyable! To Macaque's dismay, however, three unruly participants (Cloud, ChatGBT and Grook) started cheating using their perfect memory of the OEIS. What utter rapscallions! Suddenly, Macaque had to act fast, and devise a problem that these three could not feasibly cheat on. You, demoted from the rank of his companion to his wretched slave, have been enlisted to test.\n\nYou are given an array  $ a $ , initially containing  $ n $  non-negative integers.\n\nYou perform the following operation exactly  $ n-1 $  times:\n\n1. Select an index  $ i $  of  $ a $  ( $ 1 \\leq i \\leq |a| $ , where  $ |a| $  denotes the current length of  $ a $ ). Let  $ x = a_i $ .\n2. Set  $ a_j = a_j \\oplus x $  for all  $ 1 \\leq j \\leq |a| $ , where  $ \\oplus $  denotes the [bitwise XOR operation](https://en.wikipedia.org/wiki/Bitwise_operation#XOR).\n3. Remove  $ a_i $  from the array.\n\nIt can be shown that after  $ n-1 $  operations, exactly one element remains in the array. Your task is to determine the maximum possible value of this final remaining element if you perform the operations optimally.",
+    "formatI": "Each test contains multiple test cases. The first line contains the number of test cases  $ t $  ( $ 1 \\le t \\le 100 $ ). The description of the test cases follows.\n\nThe first line of each test case contains a single integer  $ n $  ( $ 2 \\le n \\le 3105 $ ) — the initial length of the array.\n\nThe second line of each test case contains  $ n $  integers  $ a_1, a_2, \\dots, a_n $  ( $ 0 \\le a_i \\le 10^9 $ ) — the elements of the array.\n\nIt is guaranteed that the sum of  $ n $  over all test cases does not exceed  $ 3105 $ .",
+    "formatO": "For each test case, output a single integer — the maximum possible value of the final element.",
+    "hint": "In the second test case, the array is  $ [1, 2, 3] $ . One optimal sequence of operations is:\n\n1. Select the element  $ 3 $ . Remove it. The remaining elements become  $ [1 \\oplus 3, 2 \\oplus 3] = [2, 1] $ .\n2. Select the element  $ 2 $ . Remove it. The remaining element becomes  $ [1 \\oplus 2] = [3] $ .\n\n The final value is  $ 3 $ .",
+    "background": null
+  },
+  "translation": {
+    "description": "PMOI 比赛其实并没有那么糟糕 —— 坊间都说题目质量不错，甚至（老天保佑）还挺有意思的！但让 Macaque 沮丧的是，三位不守规矩的选手（Cloud、ChatGBT 和 Grook）仗着自己对 OEIS 过目不忘开始作弊。真是一群无赖！情急之下，Macaque 必须赶紧想出一道这三个人没法靠作弊解决的题目。而你，从他的同伴被贬为可怜的仆从，被拉来参与验题。\n\n给定一个初始包含 $n$ 个非负整数的数组 $a$。\n你需要恰好执行 $n−1$ 次如下操作：\n1. 选择数组的一个下标 $i$（$1 \\le i \\le |a|$，$|a|$ 为当前数组长度），记 $x = a_i$。\n2. 对数组中所有下标 $j$（$1 \\le j \\le |a|$），令 $a_j = a_j \\oplus x$（$\\oplus$ 为按位异或）。\n3. 从数组中删除 $a_i$。\n\n可以证明，执行 $n−1$ 次操作后，数组中恰好只剩下一个元素。你的任务是：以最优方式选择操作顺序，使得最后剩下的元素尽可能大，并求出这个最大值。",
+    "formatI": "每个测试点包含多组测试数据。\n\n第一行一个整数 $t（1 \\le t \\le 100）$，表示测试数据组数。\n\n每组数据格式如下：\n\n第一行一个整数 $n（2 \\le n \\le 3105）$，表示数组初始长度。\n\n第二行 $n$ 个整数 $a_1,a_2,\\ldots,a_n（0 \\le a_i \\le 10^9）$，表示数组元素。\n\n保证所有测试数据的 $n$ 之和不超过 $3105$。",
+    "formatO": "对于每组数据，输出一行一个整数，表示最终剩余元素的最大可能值。",
+    "hint": null,
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "3\n2\n67 67\n3\n1 2 3\n10\n67 667 167 867 267 467 367 567 767 967",
+      "output": "0\n3\n1012"
+    }
+  ]
+}

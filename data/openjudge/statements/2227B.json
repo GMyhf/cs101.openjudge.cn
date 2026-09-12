@@ -1,0 +1,29 @@
+{
+  "id": "2227B",
+  "name": "Party Monster",
+  "source_url": "https://codeforces.com/problemset/problem/2227/B",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2227B",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Yousef has given you a sequence  $ s $  of length  $ n $  consisting only of characters ' $ \\texttt{(} $ ' and ' $ \\texttt{)} $ '. You are allowed to perform the following operation at most once:\n\n- Choose a substring $ ^{\\text{∗}} $  of  $ s $  and remove it. Then, you may reinsert the removed characters back into the remaining string one by one. Each character can be placed at any arbitrary position, independently of the others.\n\nYousef wants you to determine whether it is possible to obtain a regular bracket sequence $ ^{\\text{†}} $  after performing the operation at most once.\n\n $ ^{\\text{∗}} $ A substring is a contiguous subsegment of a string. For example, \"acab\" is a substring of \"abacaba\" (it starts in position  $ 3 $  and ends in position  $ 6 $ ), but \"aa\" or \"d\" aren't substrings of this string. So the substring of the string  $ s $  from position  $ l $  to position  $ r $  is  $ s[l, r]= s_l s_{l+1} \\dots s_r $ .\n\n $ ^{\\text{†}} $ A regular bracket sequence is a bracket sequence that can be transformed into a correct arithmetic expression by inserting the characters  $ 1 $  and  $ + $  between the original characters of the sequence. For example:\n\n- bracket sequences  $ \\texttt{()()} $  and  $ \\texttt{(())} $  are regular (the resulting expressions are:  $ \\texttt{(1)+(1)} $  and  $ \\texttt{((1+1)+1)} $ );\n- bracket sequences  $ \\texttt{)(} $ ,  $ \\texttt{(} $  and  $ \\texttt{)} $  are not.",
+    "formatI": "The first line contains an integer  $ t $  ( $ 1 \\le t \\le 10^4 $ ) — the number of test cases. The descriptions of the test cases follow.\n\nThe first line of each test case contains a single integer  $ n $  ( $ 1 \\le n \\le 2 \\cdot 10^5 $ ) — the length of the string  $ s $ .\n\nThe second line of each test case contains a sequence  $ s $  of length  $ n $  consisting only of characters ' $ \\texttt{(} $ ' and ' $ \\texttt{)} $ '.\n\nIt is guaranteed that the sum of  $ n $  over all test cases does not exceed  $ 2 \\cdot 10^5 $ .",
+    "formatO": "For each test case, output \"YES\" if the sequence can be made regular, and \"NO\" otherwise.\n\nYou can output the answer in any case (upper or lower). For example, the strings \"yEs\", \"yes\", \"Yes\", and \"YES\" will be recognized as positive responses.",
+    "hint": "In the first test case, the string  $ s $  is already a regular bracket sequence, therefore the answer is \"YES\".\n\nIn the second test case, we can remove the substring  $ s[2, 2] = \\texttt{(} $  and reinsert it at the beginning of the string, making  $ s = \\texttt{()} $ , therefore the answer is \"YES\".\n\nIn the third test case, there is no way to do the operation and get a regular bracket sequence, so the answer is \"NO\".\n\nIn the fourth test case, we can choose the substring  $ s[3, 4] = \\texttt{)(} $ , remove it, then reinsert the characters as follows:\n\n$$$\n \\texttt{()}{\\color{red}{\\texttt{)(}}}\\texttt{()} \\to \\texttt{()()} \\to {\\color{green}{\\texttt{(}}}\\texttt{()()}{\\color{green}{\\texttt{)}}}\n$$$\n\nTherefore we have made a regular bracket sequence, and the answer is \"YES\".",
+    "background": null
+  },
+  "translation": {
+    "description": "Yousef 给了你一个长度为 $n$ 的序列 $s$，该序列仅由字符 '(' 和 ')' 组成。你最多可以执行以下操作一次：\n\n- 选择 $s$ 的一个子串 $^*$ 并将其移除。然后，你可以将移除的字符逐个重新插入到剩下的字符串中的任意位置，每个字符的位置可任意选择，互不影响。\n\nYousef 想让你判断，是否可以通过最多执行一次上述操作之后，使得序列变为一个合法括号序列 $^\\dagger$。\n\n$^*$ 子串是字符串的一个连续子段。例如，\"acab\" 是 \"abacaba\" 的一个子串（从第 $3$ 位开始到第 $6$ 位结束），但 \"aa\" 或 \"d\" 不是该字符串的子串。所以，字符串 $s$ 从第 $l$ 位到第 $r$ 位的子串用 $s[l, r]= s_l s_{l+1} \\dots s_r$ 表示。\n\n$^\\dagger$ 合法括号序列是可以通过在原括号序列各处插入若干个 $1$ 和 $+$，使其变为正确算数表达式的括号序列。例如：\n\n- 括号序列 $\\texttt{()()}$ 和 $\\texttt{(())}$ 是合法的（插入后可得到：$\\texttt{(1)+(1)}$ 和 $\\texttt{((1+1)+1)}$）；\n- 括号序列 $\\texttt{)(}$、$\\texttt{(}$ 和 $\\texttt{)}$ 都不是合法的。",
+    "formatI": "第一行包含一个整数 $t$（$1 \\le t \\le 10^4$），表示测试用例组数。接下来的每组测试用例描述如下。\n\n每组测试用例的第一行包含一个整数 $n$（$1 \\le n \\le 2 \\cdot 10^5$），表示字符串 $s$ 的长度。\n\n第二行包含一个长度为 $n$ 仅由 '(' 和 ')' 组成的序列 $s$。\n\n保证所有测试用例中 $n$ 的总和不超过 $2 \\cdot 10^5$。",
+    "formatO": "每组测试用例，对于每个序列，如果能够通过最多一次操作使其变为合法括号序列，输出 \"YES\"；否则输出 \"NO\"。\n\n你可以输出任意大小写形式，例如 \"yEs\"、\"yes\"、\"Yes\" 和 \"YES\" 都会被识别为正确答案。",
+    "hint": "在第一个测试用例中，字符串 $s$ 已经是一个合法括号序列，因此输出 \"YES\"。\n\n在第二个测试用例中，我们可以移除子串 $s[2, 2] = \\texttt{(}$，并将其插入到字符串的开头，得到 $s = \\texttt{()}$，因此输出 \"YES\"。\n\n在第三个测试用例中，无论如何操作都无法得到一个合法括号序列，因此输出 \"NO\"。\n\n在第四个测试用例中，我们可以选择子串 $s[3, 4] = \\texttt{)(}$，将其移除，然后如下方式将字符重新插入：\n\n$$\n \\texttt{()}{\\color{red}{\\texttt{)(}}}\\texttt{()} \\to \\texttt{()()} \\to {\\color{green}{\\texttt{(}}}\\texttt{()()}{\\color{green}{\\texttt{)}}}\n$$\n\n因此我们得到了一个合法括号序列，答案为 \"YES\"。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "6\n2\n()\n2\n)(\n3\n(((\n6\n())(()\n4\n(()(\n5\n)()()",
+      "output": "YES\nYES\nNO\nYES\nNO\nNO"
+    }
+  ]
+}

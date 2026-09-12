@@ -1,22 +1,29 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>266A: Stones on the Table</title></head>
-<body><div id="pageTitle"><h2>266A: Stones on the Table</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/266/A" rel="noopener">Codeforces 266A</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>There are *n* stones on the table in a row, each of them can be red, green or blue. Count the minimum number of stones to take from the table so that any two neighboring stones had different colors. Stones in a row are considered neighboring if there are no other stones between them.
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 266A: A. Stones on the Table</title></head>
+<body><div id="pageTitle"><h2>A. Stones on the Table</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/266/A" rel="noopener">Codeforces 266A</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>There are <em>n</em> stones on the table in a row, each of them can be red, green or blue. Count the minimum number of stones to take from the table so that any two neighboring stones had different colors. Stones in a row are considered neighboring if there are no other stones between them.</p></dd>
+<dt>Input</dt><dd><p>The first line contains integer <em>n</em> <em>(1≤n≤50)</em> — the number of stones on the table.</p><p>The next line contains string <em>s</em>, which represents the colors of the stones. We'll consider the stones in the row numbered from <em>1</em> to <em>n</em> from left to right. Then the <em>i</em> -th character <em>s</em> equals "R", if the <em>i</em> -th stone is red, "G", if it's green and "B", if it's blue.</p></dd>
+<dt>Output</dt><dd><p>Print a single integer — the answer to the problem.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+3
+RRG
+样例输出1
+1
 
-**Input**
-
-The first line contains integer *n* (1 ≤ *n* ≤ 50) — the number of stones on the table.
-
-The next line contains string *s*, which represents the colors of the stones. We&#x27;ll consider the stones in the row numbered from 1 to *n* from left to right. Then the *i*-th character *s* equals &quot;R&quot;, if the *i*-th stone is red, &quot;G&quot;, if it&#x27;s green and &quot;B&quot;, if it&#x27;s blue.
-
-**Output**
-
-Print a single integer — the answer to the problem.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/266/A" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+样例输入2
+5
+RRRRR
+样例输出2
+4</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入3
+4
+BRBG
+样例输出3
+0</pre></dd>
+</dl>
 </body></html>

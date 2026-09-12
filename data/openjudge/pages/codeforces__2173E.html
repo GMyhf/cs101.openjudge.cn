@@ -1,70 +1,31 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2173E: Shiro&#x27;s Mirror Duel</title></head>
-<body><div id="pageTitle"><h2>2173E: Shiro&#x27;s Mirror Duel</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2173/E" rel="noopener">Codeforces 2173E</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>constructive algorithms, greedy, interactive, probabilities, sortings, 2200,
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2173E: E. Shiro&#x27;s Mirror Duel</title></head>
+<body><div id="pageTitle"><h2>E. Shiro&#x27;s Mirror Duel</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2173/E" rel="noopener">Codeforces 2173E</a></dd>
+<dt>Time limit</dt><dd>3 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>There's no such thing as luck in this world. The victor is decided before the game even starts.</p><p>— No Game No Life</p><p>This is an interactive problem.</p><p>One day, Sora and Shiro feel bored again, so they decide to settle it with a game.</p><p>At the beginning, Sora gives Shiro a permutation <em><sup>∗</sup></em>   <em>p<sub>1</sub>,p<sub>2</sub>,…,p<sub>n</sub></em>  of length  <em>n</em>. In each operation, Shiro may select two distinct indices  <em>x</em>  and  <em>y</em>  (<em>1≤ x≠ y≤ n</em>). Then Sora flips a fair coin:</p><ul><li>With probability  <em>0.5</em>, Sora swaps  <em>p<sub>x</sub></em>  and  <em>p<sub>y</sub></em>;</li><li>With probability  <em>0.5</em>, Sora swaps  <em>p<sub>n-x+1</sub></em>  and  <em>p<sub>n-y+1</sub></em>.</li></ul><p>After the operation, Sora replies with the actual pair of indices that were swapped, so that Shiro can update her local permutation accordingly.</p><p>Shiro's goal is to sort the permutation  <em>p</em>  in ascending order by using at most  <em>⌊ 2.5n+800⌋</em>  operations. Help her!</p><p><em><sup>∗</sup></em> A permutation of length  <em>n</em>  is an array consisting of  <em>n</em>  distinct integers from  <em>1</em>  to  <em>n</em>  in arbitrary order. For example,  <em>[2,3,1,5,4]</em>  is a permutation, but  <em>[1,2,2]</em>  is not a permutation (<em>2</em>  appears twice in the array), and  <em>[1,3,4]</em>  is also not a permutation (<em>n=3</em>  but there is  <em>4</em>  in the array).</p></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains the number of test cases  <em>t</em>  (<em>1 ≤ t ≤ 100</em>). The description of the test cases follows.</p><p>The first line of each test case contains a single integer  <em>n</em>  (<em>1≤ n≤ 4000</em>) — the length of  <em>p</em>.</p><p>The second line contains  <em>n</em>  integers  <em>p<sub>1</sub>,p<sub>2</sub>,…,p<sub>n</sub></em>  — the elements of  <em>p</em>.</p><p>It is guaranteed that the sum of  <em>n</em>  over all test cases does not exceed  <em>2· 10<sup>4</sup></em>.</p><p>It is guaranteed that there are  <em>50</em>  tests in this problem.</p></dd>
+<dt>样例输入</dt><dd><pre>2
+5
+5 1 3 4 2
+
+1 5
+
+2 1
+
+2
+1 2</pre></dd>
+<dt>样例输出</dt><dd><pre>? 1 5
+
+? 4 5
+
+!
 
 
-*There&#x27;s no such thing as luck in this world. The victor is decided before the game even starts.*
-
-— *No Game No Life*
-
-*This is an interactive problem.*
-
-One day, Sora and Shiro feel bored again, so they decide to settle it with a game.
-
-At the beginning, Sora gives Shiro a permutation∗ 𝑝1,𝑝2,…,𝑝𝑛 of length 𝑛. In each operation, Shiro may select two distinct indices 𝑥and 𝑦 (1≤𝑥≠𝑦≤𝑛). Then Sora flips a fair coin:
-
-- With probability 0.5, Sora swaps 𝑝𝑥 and 𝑝𝑦;
-- With probability 0.5, Sora swaps 𝑝𝑛−𝑥+1 and 𝑝𝑛−𝑦+1.
-
-After the operation, Sora replies with the actual pair of indices that were swapped, so that Shiro can update her local permutation accordingly.
-
-Shiro&#x27;s goal is to sort the permutation 𝑝 in ascending order by using at most ⌊2.5𝑛+800⌋ operations. Help her!
-
-∗A permutation of length 𝑛 is an array consisting of 𝑛 distinct integers from 1 to 𝑛 in arbitrary order. For example, [2,3,1,5,4] is a permutation, but [1,2,2] is not a permutation (2 appears twice in the array), and [1,3,4] is also not a permutation (𝑛=3 but there is 4 in the array).
-
-**Input**
-
-Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤100). The description of the test cases follows.
-
-The first line of each test case contains a single integer 𝑛 (1≤𝑛≤4000) — the length of 𝑝.
-
-The second line contains 𝑛 integers 𝑝1,𝑝2,…,𝑝𝑛 — the elements of 𝑝.
-
-It is guaranteed that the sum of 𝑛 over all test cases does not exceed 2⋅104.
-
-**It is guaranteed that there are 50 tests in this problem.**
-
-**Interaction**
-
-For each test case, you can use at most ⌊2.5𝑛+800⌋ moves to sort the permutation 𝑝 in ascending order.
-
-To make a move, you should print a new line in the following format:
-
-- ?𝑥𝑦 (1≤𝑥≠𝑦≤𝑛) — the two indices that Shiro selects in this move.
-
-As a response to the move, you will receive two integers 𝑢 and 𝑣 — the actual pair of indices that Sora swapped. It is guaranteed that (𝑢,𝑣) is randomly selected from (𝑥,𝑦) and (𝑛−𝑥+1,𝑛−𝑦+1) with equal probability.
-
-To report that the permutation has been sorted in ascending order, you should print a new line with a single character !. This does **not**count as one of the ⌊2.5𝑛+800⌋ moves.
-
-After that, proceed to the next test case or terminate the program if it was the last test case.
-
-After printing each query do not forget to output the end of line and flush∗ the output. Otherwise, you will get Idleness limit exceeded verdict.
-
-If, at any interaction step, you read −1 instead of valid data, your solution must exit immediately. This means that your solution will receive Wrong answer because of an invalid query or any other mistake. Failing to exit can result in an arbitrary verdict because your solution will continue to read from a closed stream.
-
-**Hacks are disabled in this problem.**
-
-∗To flush, use:
-
-- fflush(stdout) or cout.flush() in C++;
-- sys.stdout.flush() in Python;
-- see the documentation for other languages.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2173/E" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+!</pre></dd>
+<dt>Note</dt><dd><p>In the first test case,  <em>n=5</em>  and the initial permutation is  <em>[5,1,3,4,2]</em>.</p><ul><li>We print ? 1 5. The judge replies 1 5, meaning positions  <em>1</em>  and  <em>5</em>  are swapped (no mirroring). The array becomes  <em>[2,1,3,4,5]</em>.</li><li>We print ? 4 5. The judge replies 2 1, which is the mirror of  <em>4,5</em>  because with  <em>n=5</em>  we have  <em>n-4+1=2</em>  and  <em>n-5+1=1</em>. Thus we must swap positions  <em>2</em>  and  <em>1</em>. The array becomes  <em>[1,2,3,4,5]</em>.</li><li>The permutation is now sorted, so we print !. The answer line does not count toward the operation limit.</li></ul><p>In the second test case, the given permutation is already increasing, so we just need to output !.</p></dd>
+</dl>
 </body></html>

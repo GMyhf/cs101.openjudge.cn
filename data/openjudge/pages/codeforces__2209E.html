@@ -1,36 +1,55 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2209E: A Trivial String Problem</title></head>
-<body><div id="pageTitle"><h2>2209E: A Trivial String Problem</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2209/E" rel="noopener">Codeforces 2209E</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Define 𝑓(𝑡) as the maximum number of parts 𝑡 can be split into such that each part is a non-empty prefix of 𝑡. In other words, 𝑓(𝑡) is the maximum positive integer 𝑘 that satisfies the following condition:
-
-- There exist 𝑘 strings 𝑝1,𝑝2,…,𝑝𝑘, which are prefixes of 𝑡, such that 𝑡=𝑝1+𝑝2+…+𝑝𝑘. Here + denotes the string concatenation.
-
-You are given a string 𝑠 of length 𝑛, consisting of only lowercase English letters. Let 𝑠[𝑥..𝑦] represent the substring∗ of 𝑠 from the 𝑥-th to the 𝑦-th character (inclusive). You need to answer 𝑞 queries. The 𝑖-th query provides two integers 𝑙𝑖 and 𝑟𝑖, and you need to find
-
-$\sum_{j=l_i}^{r_i} f(s[l_i..j]).$
-
-∗A string 𝑎 is a substring of a string 𝑏 if 𝑎 can be obtained from 𝑏 by the deletion of several (possibly, zero or all) characters from the beginning and several (possibly, zero or all) characters from the end.
-
-**Input**
-
-Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤10^3). The description of the test cases follows.
-
-The first line of each test case contains two integers 𝑛 and 𝑞 (1≤𝑛≤10^6, 1≤𝑞≤100).
-
-The second line contains the string 𝑠 of length 𝑛, consisting of only lowercase English letters.
-
-The 𝑖-th of the next 𝑞 lines contains two integers 𝑙𝑖 and 𝑟𝑖 (1≤𝑙𝑖≤𝑟𝑖≤𝑛), representing the 𝑖-th query.
-
-It is guaranteed that the sum of 𝑛 over all test cases does not exceed 10^6.
-
-**Output**
-
-For each query, output an integer representing the value of the expression.
-
-Example
-
-Input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2209/E" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2209E: E. A Trivial String Problem</title></head>
+<body><div id="pageTitle"><h2>E. A Trivial String Problem</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2209/E" rel="noopener">Codeforces 2209E</a></dd>
+<dt>Time limit</dt><dd>4 seconds</dd><dt>Memory limit</dt><dd>1024 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Define  <em>f(t)</em>  as the maximum number of parts  <em>t</em>  can be split into such that each part is a non-empty prefix of  <em>t</em>. In other words,  <em>f(t)</em>  is the maximum positive integer  <em>k</em>  that satisfies the following condition:</p><ul><li>There exist  <em>k</em>  strings  <em>p<sub>1</sub>,p<sub>2</sub>,…,p<sub>k</sub></em>, which are prefixes of  <em>t</em>, such that  <em>t=p<sub>1</sub>+p<sub>2</sub>+…+p<sub>k</sub></em>. Here  <em>+</em>  denotes the string concatenation.</li></ul><p>You are given a string  <em>s</em>  of length  <em>n</em>, consisting of only lowercase English letters. Let  <em>s[x..y]</em>  represent the substring <em><sup>∗</sup></em>  of  <em>s</em>  from the  <em>x</em> -th to the  <em>y</em> -th character (inclusive). You need to answer  <em>q</em>  queries. The  <em>i</em> -th query provides two integers  <em>l<sub>i</sub></em>  and  <em>r<sub>i</sub></em>, and you need to find</p><p><em>∑<sub>j=l_i</sub><sup>r_i</sup> f(s[l<sub>i</sub>..j]).</em></p><p><em><sup>∗</sup></em> A string  <em>a</em>  is a substring of a string  <em>b</em>  if  <em>a</em>  can be obtained from  <em>b</em>  by the deletion of several (possibly, zero or all) characters from the beginning and several (possibly, zero or all) characters from the end.</p></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains the number of test cases  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>3</sup></em>). The description of the test cases follows.</p><p>The first line of each test case contains two integers  <em>n</em>  and  <em>q</em>  (<em>1 ≤ n ≤ 10<sup>6</sup></em>,  <em>1 ≤ q ≤ 100</em>).</p><p>The second line contains the string  <em>s</em>  of length  <em>n</em>, consisting of only lowercase English letters.</p><p>The  <em>i</em> -th of the next  <em>q</em>  lines contains two integers  <em>l<sub>i</sub></em>  and  <em>r<sub>i</sub></em>  (<em>1 ≤ l<sub>i</sub> ≤ r<sub>i</sub> ≤ n</em>), representing the  <em>i</em> -th query.</p><p>It is guaranteed that the sum of  <em>n</em>  over all test cases does not exceed  <em>10<sup>6</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each query, output an integer representing the value of the expression.</p></dd>
+<dt>样例输入</dt><dd><pre>6
+1 1
+a
+1 1
+5 2
+aaaaa
+1 5
+2 4
+6 2
+abcdef
+1 6
+3 5
+6 3
+abaaba
+1 6
+1 3
+2 6
+7 3
+abcabca
+1 7
+2 7
+4 7
+8 3
+aababaac
+1 8
+2 8
+3 7</pre></dd>
+<dt>样例输出</dt><dd><pre>1
+15
+6
+6
+3
+14
+4
+7
+12
+9
+5
+13
+14
+7</pre></dd>
+<dt>Note</dt><dd><p>In the first test case,  <em>f(a)=1</em>.</p><p>In the second test case,  <em>f(a)+f(aa)+f(aaa)+f(aaaa)+f(aaaaa)=1+2+3+4+5=15</em>  and  <em>f(a)+f(aa)+f(aaa)=1+2+3=6</em>.</p><p>In the third test case,  <em>f(a)+f(ab)+f(abc)+f(abcd)+f(abcde)+f(abcdef)=1+1+1+1+1+1=6</em>  and  <em>f(c)+f(cd)+f(cde)=1+1+1=3</em>.</p></dd>
+</dl>
 </body></html>

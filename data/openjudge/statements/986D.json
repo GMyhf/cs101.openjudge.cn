@@ -1,0 +1,37 @@
+{
+  "id": "986D",
+  "name": "Perfect Encoding",
+  "source_url": "https://codeforces.com/problemset/problem/986/D",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF986D",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "You are working as an analyst in a company working on a new system for big data storage. This system will store $ n $ different objects. Each object should have a unique ID.\n\nTo create the system, you choose the parameters of the system — integers $ m \\ge 1 $ and $ b_{1}, b_{2}, \\ldots, b_{m} $ . With these parameters an ID of some object in the system is an array of integers $ [a_{1}, a_{2}, \\ldots, a_{m}] $ where $ 1 \\le a_{i} \\le b_{i} $ holds for every $ 1 \\le i \\le m $ .\n\nDevelopers say that production costs are proportional to $ \\sum_{i=1}^{m} b_{i} $ . You are asked to choose parameters $ m $ and $ b_{i} $ so that the system will be able to assign unique IDs to $ n $ different objects and production costs are minimized. Note that you don't have to use all available IDs.",
+    "formatI": "In the only line of input there is one positive integer $ n $ . The length of the decimal representation of $ n $ is no greater than $ 1.5 \\cdot 10^{6} $ . The integer does not contain leading zeros.",
+    "formatO": "Print one number — minimal value of $ \\sum_{i=1}^{m} b_{i} $ .",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "你在一家致力于大数据存储新系统的公司担任分析师。该系统将存储 $n$ 个不同的对象。每个对象都应有一个唯一的 ID。\n\n为了设计该系统，你需要选择系统的参数——整数 $m \\ge 1$ 和 $b_{1}, b_{2}, \\ldots, b_{m}$。在这些参数下，某个对象的 ID 表示为一个整数数组 $[a_{1}, a_{2}, \\ldots, a_{m}]$，其中对于每个 $1 \\le i \\le m$，都有 $1 \\le a_{i} \\le b_{i}$。\n\n开发人员表示，生产成本与 $\\sum_{i=1}^{m} b_{i}$ 成正比。你的任务是选择参数 $m$ 和 $b_{i}$，使得系统能够为 $n$ 个不同的对象分配唯一的 ID，并且生产成本最小。注意，你不需要用完所有可用的 ID。",
+    "formatI": "输入仅一行，包含一个正整数 $n$。$n$ 的十进制表示长度不超过 $1.5 \\cdot 10^{6}$，且没有前导零。",
+    "formatO": "输出一个数，表示最小的 $\\sum_{i=1}^{m} b_{i}$ 的值。",
+    "hint": "\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "36\n",
+      "output": "10\n"
+    },
+    {
+      "input": "37\n",
+      "output": "11\n"
+    },
+    {
+      "input": "12345678901234567890123456789\n",
+      "output": "177\n"
+    }
+  ]
+}

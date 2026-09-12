@@ -1,0 +1,33 @@
+{
+  "id": "131A",
+  "name": "cAPS lOCK",
+  "source_url": "https://codeforces.com/problemset/problem/131/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF131A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 500,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "wHAT DO WE NEED cAPS LOCK FOR?\n\nCaps lock is a computer keyboard key. Pressing it sets an input mode in which typed letters are capital by default. If it is pressed by accident, it leads to accidents like the one we had in the first passage.\n\nLet's consider that a word has been typed with the Caps lock key accidentally switched on, if:\n\n- either it only contains uppercase letters;\n- or all letters except for the first one are uppercase.\n\nIn this case we should automatically change the case of all letters. For example, the case of the letters that form words \"hELLO\", \"HTTP\", \"z\" should be changed.\n\nWrite a program that applies the rule mentioned above. If the rule cannot be applied, the program should leave the word unchanged.",
+    "formatI": "The first line of the input data contains a word consisting of uppercase and lowercase Latin letters. The word's length is from 1 to 100 characters, inclusive.",
+    "formatO": "Print the result of the given word's processing.",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "我们为什么需要大写锁定键（Caps Lock）？\n\nCaps Lock 是计算机键盘上的一个按键。按下它后，输入模式会变为默认输入大写字母。如果不小心按下了它，就会导致像第一段中那样的“事故”。\n\n我们认为，如果一个单词是在不小心打开 Caps Lock 的情况下输入的，那么它应满足以下条件之一：\n\n- 要么它只包含大写字母；\n- 要么除第一个字母外，其余所有字母都是大写字母。\n\n在这种情况下，我们应该自动将所有字母的大小写进行转换。例如，像 \"hELLO\"、\"HTTP\"、\"z\" 这样的单词，其字母的大小写都应该被改变。\n\n请编写一个程序，按照上述规则处理输入的单词。如果不满足上述规则，则保持单词不变。",
+    "formatI": "输入数据的第一行包含一个仅由大写和小写拉丁字母组成的单词。单词长度为 $1$ 到 $100$ 个字符（包含 $1$ 和 $100$）。",
+    "formatO": "输出处理后的单词结果。",
+    "hint": "\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "cAPS\n",
+      "output": "Caps"
+    },
+    {
+      "input": "Lock\n",
+      "output": "Lock\n"
+    }
+  ]
+}

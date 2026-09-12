@@ -1,0 +1,37 @@
+{
+  "id": "122A",
+  "name": "Lucky Division",
+  "source_url": "https://codeforces.com/problemset/problem/122/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF122A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Petya loves lucky numbers. Everybody knows that lucky numbers are positive integers whose decimal representation contains only the lucky digits 4 and 7. For example, numbers 47, 744, 4 are lucky and 5, 17, 467 are not.\n\nPetya calls a number almost lucky if it could be evenly divided by some lucky number. Help him find out if the given number $ n $ is almost lucky.",
+    "formatI": "The single line contains an integer $ n $ $ (1<=n<=1000) $ — the number that needs to be checked.",
+    "formatO": "In the only line print \"YES\" (without the quotes), if number $ n $ is almost lucky. Otherwise, print \"NO\" (without the quotes).",
+    "hint": "Note that all lucky numbers are almost lucky as any number is evenly divisible by itself.\n\nIn the first sample $ 47 $ is a lucky number. In the second sample $ 16 $ is divisible by $ 4 $ .",
+    "background": ""
+  },
+  "translation": {
+    "description": "Petya 喜欢幸运数。幸运数是十进制表示中，只包含数码 $4$ 和 $7$ 的正整数。比如，$47$，$744$ 和 $4$ 是幸运的，而 $5$，$17$ 和 $467$ 不是。\n\nPetya 称可以被幸运数整除的数为近似幸运数。你需要判断给定的数 $n$ 是否是近似幸运数。",
+    "formatI": "一行一个整数 $n$（$1\\le n\\le 1000$），表示需要被判断的数。",
+    "formatO": "输出一行一个字符串，如果 $n$ 是近似幸运数则输出 `YES`，否则输出 `NO`。",
+    "hint": "注意所有幸运数都是近似幸运的，因为任何数都能被自己整除。\n\n在第一个样例中，$47$ 是幸运数。在第二个样例中，$16$ 可以被 $4$ 整除。",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "47\n",
+      "output": "YES\n"
+    },
+    {
+      "input": "16\n",
+      "output": "YES\n"
+    },
+    {
+      "input": "78\n",
+      "output": "NO\n"
+    }
+  ]
+}

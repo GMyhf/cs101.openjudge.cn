@@ -1,0 +1,29 @@
+{
+  "id": "2218D",
+  "name": "The 67th OEIS Problem",
+  "source_url": "https://codeforces.com/problemset/problem/2218/D",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2218D",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Macaque, being a terrible problemsetter, decided to search for funny sequences on the OEIS $ ^{\\text{∗}} $  one day, so he could gain inspiration for his doomed problemsetting job for the Pan-Mammalian Olympiad in Informatics (PMOI). To his delight, he found one, and thought it would be funny to make you, his loyal tester, solve it:\n\nConstruct a sequence  $ a $  containing  $ n $  integers such that  $ \\operatorname{gcd}(a_i, a_{i+1}) $   $ ^{\\text{†}} $  is distinct over all  $ 1 \\leq i \\leq n - 1 $ . It is guaranteed that at least one sequence  $ a $  exists.\n\n $ ^{\\text{∗}} $ Online Encyclopedia of Integer Sequences, the favourite website of math nerds, overly astute testers, and insufficiently rigorous coordinators.\n\n $ ^{\\text{†}} $  $ \\operatorname{gcd}(x,y) $  refers to the [greatest common divisor](https://en.wikipedia.org/wiki/Greatest_common_divisor) of integers  $ x $  and  $ y $ .",
+    "formatI": "Each test contains multiple test cases. The first line contains the number of test cases  $ t $  ( $ 1 \\le t \\le 100 $ ). The description of the test cases follows.\n\nThe following  $ t $  lines contain one integer  $ n $  ( $ 2 \\leq n \\leq 10^4 $ ) — the desired length of the sequence.\n\nIt is guaranteed the sum of  $ n $  over all test cases does not exceed  $ 10^4 $ .",
+    "formatO": "For each query, output your answer — a sequence  $ a $  of  $ n $  space-separated integers ( $ 1 \\le a_i \\le 10^{18} $ ).",
+    "hint": "In the first test case, the sequence  $ [1, 6, 2] $  is a possible answer. This is because  $ \\gcd(1, 6) $  is not equal to  $ \\gcd(6, 2) $ .\n\nIn the second test case, the sequence  $ [134, 67, 69, 207, 414] $  is a possible answer. This is because the values of  $ \\gcd(a_i, a_{i+1}) $  for all  $ i $  between  $ 1 $  and  $ n-1 $  are distinct. For reference, they are  $ 67 $ ,  $ 1 $ ,  $ 69 $  and  $ 207 $ .",
+    "background": null
+  },
+  "translation": {
+    "description": "一只名叫 Macaque 的猕猴是个糟糕的出题人。某天，他为了给注定失败的“泛哺乳类信息学奥林匹克（PMOI）”出题而寻找灵感，便开始在 OEIS$^{\\text{∗}}$ 上翻找有趣的数列。他乐坏了，并觉得如果让你（他忠诚的测试员）来解这道题会很有趣：\n\n请构造一个包含 $n$ 个整数的序列 $a$，使得 $\\operatorname{gcd}(a_i, a_{i+1})^{\\text{†}}$ 在所有 $1 \\leq i \\leq n-1$ 的情况下各不相同。保证至少存在一个合法的序列 $a$。\n\n$^{\\text{∗}}$ 整数数列在线百科（OEIS），这是数学宅、顶级测试员和不够严谨的协调员们最爱的一个网站。\n\n$^{\\text{†}}$ $\\operatorname{gcd}(x,y)$ 指的是整数 $x$ 与 $y$ 的[最大公约数](https://en.wikipedia.org/wiki/Greatest_common_divisor)。",
+    "formatI": "每组测试包含多组数据。第一行包含一个整数 $t$（$1 \\le t \\le 100$）。接下来有 $t$ 行，每行一个整数 $n$（$2 \\leq n \\leq 10^4$）——表示所需的序列长度。\n\n保证所有测试用例中 $n$ 的总和不超过 $10^4$。",
+    "formatO": "对于每组测试，输出一组答案——$n$ 个用空格隔开的整数，表示一个满足条件的序列 $a$（$1 \\le a_i \\le 10^{18}$）。",
+    "hint": "在第一个样例中，序列 $[1, 6, 2]$ 是一个可行解。因为 $\\gcd(1, 6)$ 和 $\\gcd(6, 2)$ 不相等。\n\n在第二个样例中，序列 $[134, 67, 69, 207, 414]$ 是一个可行解。因为对于所有 $i$，$1 \\le i \\le n-1$，其 $\\gcd(a_i, a_{i+1})$ 分别为 $67$、$1$、$69$ 和 $207$，且都是不同的。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "2\n3\n5",
+      "output": "1 6 2\n134 67 69 207 414"
+    }
+  ]
+}

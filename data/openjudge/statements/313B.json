@@ -1,0 +1,33 @@
+{
+  "id": "313B",
+  "name": "Ilya and Queries",
+  "source_url": "https://codeforces.com/problemset/problem/313/B",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF313B",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Ilya the Lion wants to help all his friends with passing exams. They need to solve the following problem to pass the IT exam.\n\nYou've got string $ s=s_{1}s_{2}...\\ s_{n} $ ( $ n $ is the length of the string), consisting only of characters \".\" and \"\\#\" and $ m $ queries. Each query is described by a pair of integers $ l_{i},r_{i} $ $ (1<=l_{i}&lt;r_{i}<=n) $ . The answer to the query $ l_{i},r_{i} $ is the number of such integers $ i $ $ (l_{i}<=i&lt;r_{i}) $ , that $ s_{i}=s_{i+1} $ .\n\nIlya the Lion wants to help his friends but is there anyone to help him? Help Ilya, solve the problem.",
+    "formatI": "The first line contains string $ s $ of length $ n $ $ (2<=n<=10^{5}) $ . It is guaranteed that the given string only consists of characters \".\" and \"\\#\".\n\nThe next line contains integer $ m $ $ (1<=m<=10^{5}) $ — the number of queries. Each of the next $ m $ lines contains the description of the corresponding query. The $ i $ -th line contains integers $ l_{i},r_{i} $ $ (1<=l_{i}&lt;r_{i}<=n) $ .",
+    "formatO": "Print $ m $ integers — the answers to the queries in the order in which they are given in the input.",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "llya的朋友要参加IT考试，可他有一些不会的题目，你要帮帮他！\n他得到了一个长度为n的字符串(s=s1s2s3s4...sn，其中只包含.和#)，还有m个问题，每个问题包含两个数a，b。\n你的任务是找出每个问题的答案，每个问题的答案各包含一个整数p，代表字符串由a位到b位有几位满足s i​=si+1​",
+    "formatI": "长度为n的字符串(2<=n<=10^5），m个问题(1<=n<=10^5），接下来m行每行两个整数a，b（1<=a<b<=n）。",
+    "formatO": "m行，每行一个整数p。\n## 注意\n字符串首位被记为第一位而非第零位！",
+    "hint": "",
+    "background": ""
+  },
+  "samples": [
+    {
+      "input": "......\n4\n3 4\n2 3\n1 6\n2 6\n",
+      "output": "1\n1\n5\n4\n"
+    },
+    {
+      "input": "#..###\n5\n1 3\n5 6\n1 5\n3 6\n3 4\n",
+      "output": "1\n1\n2\n2\n0\n"
+    }
+  ]
+}

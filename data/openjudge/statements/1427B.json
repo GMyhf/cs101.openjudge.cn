@@ -1,0 +1,29 @@
+{
+  "id": "1427B",
+  "name": "Chess Cheater",
+  "source_url": "https://codeforces.com/problemset/problem/1427/B",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF1427B",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "You like playing chess tournaments online.\n\nIn your last tournament you played $ n $ games. For the sake of this problem, each chess game is either won or lost (no draws). When you lose a game you get $ 0 $ points. When you win you get $ 1 $ or $ 2 $ points: if you have won also the previous game you get $ 2 $ points, otherwise you get $ 1 $ point. If you win the very first game of the tournament you get $ 1 $ point (since there is not a \"previous game\").\n\nThe outcomes of the $ n $ games are represented by a string $ s $ of length $ n $ : the $ i $ -th character of $ s $ is W if you have won the $ i $ -th game, while it is L if you have lost the $ i $ -th game.\n\nAfter the tournament, you notice a bug on the website that allows you to change the outcome of at most $ k $ of your games (meaning that at most $ k $ times you can change some symbol L to W, or W to L). Since your only goal is to improve your chess rating, you decide to cheat and use the bug.\n\nCompute the maximum score you can get by cheating in the optimal way.",
+    "formatI": "Each test contains multiple test cases. The first line contains an integer $ t $ ( $ 1\\le t \\le 20,000 $ ) — the number of test cases. The description of the test cases follows.\n\nThe first line of each testcase contains two integers $ n, k $ ( $ 1\\le n\\le 100,000 $ , $ 0\\le k\\le n $ ) – the number of games played and the number of outcomes that you can change.\n\nThe second line contains a string $ s $ of length $ n $ containing only the characters W and L. If you have won the $ i $ -th game then $ s_i=\\, $ W, if you have lost the $ i $ -th game then $ s_i=\\, $ L.\n\nIt is guaranteed that the sum of $ n $ over all testcases does not exceed $ 200,000 $ .",
+    "formatO": "For each testcase, print a single integer – the maximum score you can get by cheating in the optimal way.",
+    "hint": "Explanation of the first testcase. Before changing any outcome, the score is $ 2 $ . Indeed, you won the first game, so you got $ 1 $ point, and you won also the third, so you got another $ 1 $ point (and not $ 2 $ because you lost the second game).\n\nAn optimal way to cheat is to change the outcomes of the second and fourth game. Doing so, you end up winning the first four games (the string of the outcomes becomes WWWWL). Hence, the new score is $ 7=1+2+2+2 $ : $ 1 $ point for the first game and $ 2 $ points for the second, third and fourth game.\n\nExplanation of the second testcase. Before changing any outcome, the score is $ 3 $ . Indeed, you won the fourth game, so you got $ 1 $ point, and you won also the fifth game, so you got $ 2 $ more points (since you won also the previous game).\n\nAn optimal way to cheat is to change the outcomes of the first, second, third and sixth game. Doing so, you end up winning all games (the string of the outcomes becomes WWWWWW). Hence, the new score is $ 11 = 1+2+2+2+2+2 $ : $ 1 $ point for the first game and $ 2 $ points for all the other games.",
+    "background": ""
+  },
+  "translation": {
+    "description": "你喜欢在线参加国际象棋锦标赛。\n\n在你最近的一次锦标赛中，你总共下了 $n$ 局棋。对于本题而言，每一局棋的结果要么是胜利，要么是失败（没有平局）。如果你输了这一局，你得 $0$ 分。如果你赢了这一局，你可以获得 $1$ 或 $2$ 分：如果你上一局也赢了，这一局你得 $2$ 分，否则你得 $1$ 分。如果你赢的是锦标赛的第一局，你只能得 $1$ 分（因为没有“上一局”）。\n\n这 $n$ 局棋的结果用一个长度为 $n$ 的字符串 $s$ 表示：第 $i$ 个字符为 W 表示你赢了第 $i$ 局，为 L 表示你输了第 $i$ 局。\n\n赛后，你发现网站有一个漏洞，允许你最多修改 $k$ 局棋的结果（即最多 $k$ 次将某个 L 改为 W，或 W 改为 L）。由于你唯一的目标是提升你的国际象棋等级分，你决定作弊并利用这个漏洞。\n\n请计算在最优作弊方式下，你最多能获得多少分。",
+    "formatI": "每个测试点包含多个测试用例。第一行包含一个整数 $t$（$1\\le t \\le 20\\,000$）——表示测试用例的数量。接下来是每个测试用例的描述。\n\n每个测试用例的第一行包含两个整数 $n, k$（$1\\le n\\le 100\\,000$，$0\\le k\\le n$）——表示下了 $n$ 局棋，以及你最多可以修改的局数。\n\n第二行包含一个长度为 $n$ 的字符串 $s$，仅包含字符 W 和 L。如果你赢了第 $i$ 局，则 $s_i$ 为 W，否则为 L。\n\n保证所有测试用例中 $n$ 的总和不超过 $200\\,000$。",
+    "formatO": "对于每个测试用例，输出一个整数，表示在最优作弊方式下你能获得的最大分数。",
+    "hint": "第一个测试用例的解释：在不修改任何结果的情况下，得分为 $2$。你赢了第一局，得 $1$ 分，第三局也赢了，得 $1$ 分（不是 $2$ 分，因为第二局输了）。\n\n最优的作弊方式是将第二局和第四局的结果修改。这样，你前四局都赢了（结果字符串变为 WWWWL）。新的得分为 $7=1+2+2+2$：第一局 $1$ 分，第二、三、四局各 $2$ 分。\n\n第二个测试用例的解释：在不修改任何结果的情况下，得分为 $3$。你赢了第四局，得 $1$ 分，第五局也赢了，且上一局也赢了，所以再得 $2$ 分。\n\n最优的作弊方式是将第一、二、三和第六局的结果修改。这样，你每局都赢了（结果字符串变为 WWWWWW）。新的得分为 $11=1+2+2+2+2+2$：第一局 $1$ 分，其余每局各 $2$ 分。\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "8\n5 2\nWLWLL\n6 5\nLLLWWL\n7 1\nLWLWLWL\n15 5\nWWWLLLWWWLLLWWW\n40 7\nLLWLWLWWWLWLLWLWWWLWLLWLLWLLLLWLLWWWLWWL\n1 0\nL\n1 1\nL\n6 1\nWLLWLW",
+      "output": "7\n11\n6\n26\n46\n0\n1\n6"
+    }
+  ]
+}

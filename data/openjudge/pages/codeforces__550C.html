@@ -1,28 +1,28 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>550C: Divisibility by Eight</title></head>
-<body><div id="pageTitle"><h2>550C: Divisibility by Eight</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/550/C" rel="noopener">Codeforces 550C</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>You are given a non-negative integer *n*, its decimal representation consists of at most 100 digits and doesn&#x27;t contain leading zeroes.
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 550C: C. Divisibility by Eight</title></head>
+<body><div id="pageTitle"><h2>C. Divisibility by Eight</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/550/C" rel="noopener">Codeforces 550C</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>You are given a non-negative integer <em>n</em>, its decimal representation consists of at most <em>100</em> digits and doesn't contain leading zeroes.</p><p>Your task is to determine if it is possible in this case to remove some of the digits (possibly not remove any digit at all) so that the result contains at least one digit, forms a non-negative integer, doesn't have leading zeroes and is divisible by 8. After the removing, it is forbidden to rearrange the digits.</p><p>If a solution exists, you should print it.</p></dd>
+<dt>Input</dt><dd><p>The single line of the input contains a non-negative integer <em>n</em>. The representation of number <em>n</em> doesn't contain any leading zeroes and its length doesn't exceed <em>100</em> digits.</p></dd>
+<dt>Output</dt><dd><p>Print "NO" (without quotes), if there is no such way to remove some digits from number <em>n</em>.</p><p>Otherwise, print "YES" in the first line and the resulting number after removing digits from number <em>n</em> in the second line. The printed number must be divisible by <em>8</em>.</p><p>If there are multiple possible answers, you may print any of them.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+3454
+样例输出1
+YES
+344
 
-Your task is to determine if it is possible in this case to remove some of the digits (possibly not remove any digit at all) so that the result contains at least one digit, forms a non-negative integer, doesn&#x27;t have leading zeroes and is divisible by 8. After the removing, it is forbidden to rearrange the digits.
-
-If a solution exists, you should print it.
-
-**Input**
-
-The single line of the input contains a non-negative integer *n*. The representation of number *n* doesn&#x27;t contain any leading zeroes and its length doesn&#x27;t exceed 100 digits.
-
-**Output**
-
-Print &quot;NO&quot; (without quotes), if there is no such way to remove some digits from number *n*.
-
-Otherwise, print &quot;YES&quot; in the first line and the resulting number after removing digits from number *n* in the second line. The printed number must be divisible by 8.
-
-If there are multiple possible answers, you may print any of them.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/550/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+样例输入2
+10
+样例输出2
+YES
+0</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入3
+111111
+样例输出3
+NO</pre></dd>
+</dl>
 </body></html>

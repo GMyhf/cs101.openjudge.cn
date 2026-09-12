@@ -1,0 +1,29 @@
+{
+  "id": "2140B",
+  "name": "Another Divisibility Problem",
+  "source_url": "https://codeforces.com/problemset/problem/2140/B",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2140B",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Alice and Bob are playing a game in which Alice has given Bob a positive integer $x\\le10^8$.\n\nTo win the game, Bob has to find another positive integer $y\\le10^9$ such that $x \\operatorname{\\#} y$ is divisible by $x + y$.\n\nHere $x\\operatorname{\\#}y$ denotes the integer formed by concatenating the integers $x$ and $y$ in that order. For example, if $x = 835$, $y = 47$, then $x \\operatorname{\\#} y = 83\\,547$.\n\nHowever, since Bob is dumb, he is unable to find such an integer. Please help him.\n\nIt can be shown that such an integer always exists.",
+    "formatI": "Each test contains multiple test cases. The first line contains the number of test cases $t$ ($1 \\le t \\le 10^4$). The description of the test cases follows.\n\nThe only line of each test case contains a single integer $x$ ($1 \\le x \\le 10^8$) — the integer that Alice has given to Bob.",
+    "formatO": "For each test case, print a single integer $y$ ($1 \\le y \\le 10^9$) so that Bob can win the game.\n\nIf there are multiple answers, print any one of them.",
+    "hint": "For the first test case, $x = 8$, we can choose $y = 1$, and we have $x \\operatorname{\\#} y = 81$, which is divisible by $x + y = 9$.\n\nFor the second test case, $x = 42$, we can choose $y = 12$, and we have $x \\operatorname{\\#} y = 4212$, which is divisible by $x + y = 54$.",
+    "background": null
+  },
+  "translation": {
+    "description": "Alice 和 Bob 玩一个游戏，Alice 给 Bob 一个正整数 $x \\le 10^8$。\n\n为了赢得游戏，Bob 需要找到另一个正整数 $y \\le 10^9$，使得 $x \\operatorname{\\#} y$ 能被 $x + y$ 整除。\n\n这里 $x\\operatorname{\\#}y$ 表示将整数 $x$ 和 $y$ 按顺序拼接形成的新整数。例如，如果 $x = 835$，$y = 47$，则 $x \\operatorname{\\#} y = 83\\,547$。\n\n然而，由于 Bob 太笨，无法找到这样的整数。请你帮助他。\n\n可以证明，满足条件的整数 $y$ 总是存在。",
+    "formatI": "每个测试点包含多组测试用例。第一行包含测试用例数 $t$，其中 $1 \\le t \\le 10^4$。接下来每组测试用例包含一行，一个整数 $x$，其中 $1 \\le x \\le 10^8$。",
+    "formatO": "对于每组测试用例，输出一个正整数 $y$，满足 $1 \\le y \\le 10^9$，使得 Bob 能赢得游戏。\n\n如果有多种答案，输出其中任意一个即可。",
+    "hint": "对于第一个测试用例，$x = 8$，可以选择 $y = 1$，则 $x \\operatorname{\\#} y = 81$，$x + y = 9$，确实 $81$ 能被 $9$ 整除。\n\n对于第二个测试用例，$x = 42$，可以选择 $y = 12$，则 $x \\operatorname{\\#} y = 4212$，$x + y = 54$，确实 $4212$ 能被 $54$ 整除。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "6\n8\n42\n1000\n66666\n106344\n9876543",
+      "output": "1\n12\n998\n7872\n8190\n174036"
+    }
+  ]
+}

@@ -1,37 +1,36 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2218G: The 67th Iteration of &quot;Counting is Fun&quot;</title></head>
-<body><div id="pageTitle"><h2>2218G: The 67th Iteration of &quot;Counting is Fun&quot;</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2218/G" rel="noopener">Codeforces 2218G</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：**这是一道非常有趣的题目！建议大家一起来思考！**
-
-&gt; 以下为 spoiler
-
-思考为什么一个人不在一开始坐下去，无非有两个原因：
-
-- 人数限制早早就达到了，旁边的人一坐下去诱导你坐下去；（表现为相邻两个人坐下去的时间差为 1，即 $b_i - b_{i-1} = 1$ 或 $b_i-b_{i+1} = 1$）
-- 旁边的人已经做下去，但是你的人数限制还没达到。（表现为相邻两个人做下去的时间差大于 1，即 $b_i-b_{i-1} &gt; 1$ 或 $b_i-b_{i+1} &gt; 1$）
-
-这两个原因导致了本质上不同的推论：
-
-- 如果是由于你苦苦等不到边上人坐下去，等到了才坐下去的话，你的尴尬等级 $a_i$ 可以最低取到 1；
-- 如果是由于人数限制还没达到，那么意味着只有在 $t=b_{i}-1$ 时刻，坐下的人数才将将超过你的尴尬等级 $a_i$，而在 $t=b_{i}-2$ 时刻，坐下的人数还没到你的尴尬等级。你的尴尬等级最低可以取到 $\# (b_{i}-2) 时刻坐下的人数+1$。
-
-由此给出了 $a_i$ 的下限。
-
-还有一点需要注意，你在 $b_i$ 时刻坐了下去，意味着 $t=b_i-1$ 时刻坐下人数超过了尴尬等级，因此 $a_i$ 有上限 $\# (b_i-1) 时刻坐下的人数$。由此给出了 $a_i$ 的上限。
-
-由此我们知道了所有 $a_i$ 的可取值，乘起来即可得到总可能数。
-
-由此你也能够理解什么情况下是无解的，即 $b_i$ 中出现了“局部非0极小值”，这意味着某一个人不在第一时刻，不知道为什么（没有两边任何一个人坐下）就坐下去了，这就意味着总可能数为 0。
-
-&gt; Gemini 说：
-&gt; 这段代码虽然在逻辑上接近 $\mathcal{O}(n)$，但在 Python 中频繁使用 `input().split()`、创建小列表（如 `neigh`）以及在大循环中执行多次算术运算，会导致常数项过大从而引起 TLE (Time Limit Exceeded)。
-&gt; 以下是针对性的优化方案：
-&gt;
-&gt; - **输入输出**：使用 `sys.stdin.read().split()` 一次性读取所有数据，比多次调用 `input()` 快得多。
-&gt; - **减少重复计算**：循环内的 `max([ls[i] - ls[q] for q in neigh])` 会创建新列表并迭代，开销很大。我们可以直接展开逻辑。
-&gt; - **模运算**： 尽量只在最后或者乘法可能溢出时取模，但在 Python 中，大数运算也费时，需保持平衡。
-&gt; - **避免冗余列表**： `sit_downs_at_t` 可以直接通过前缀和逻辑简化。</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2218/G" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2218G: G. The 67th Iteration of &quot;Counting is Fun&quot;</title></head>
+<body><div id="pageTitle"><h2>G. The 67th Iteration of &quot;Counting is Fun&quot;</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2218/G" rel="noopener">Codeforces 2218G</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Macaque has taken you to his habitat, shown you his job, and even forced you to do his homework for him. While it might have not been easy for you, Macaque has grown to like you and even, possibly, harbour some gratitude towards you. However, all is not finished, for Macaque has to solve his most difficult problem yet. Solving this is a matter of life or death, and determines whether Macaque can finally reach enlightenment and retreat to solitude in an organ loft for the rest of eternity. Good luck.</p><p>You are given two integers  <em>n</em>  and  <em>m</em>, and an array  <em>b</em>  of length  <em>n</em>  (<em>0 ≤ b<sub>i</sub> &lt; m</em>). It is guaranteed that every integer from  <em>0</em>  to  <em>m-1</em>  appears in  <em>b</em>  at least once.</p><p>A group of  <em>n</em>  people are standing in a line, in fixed positions numbered  <em>1, 2, …, n</em>. They all want to sit down, but some are too socially awkward to do so immediately.</p><p>For some arbitrary array  <em>a</em>  of length  <em>n</em>  (<em>0 ≤ a<sub>i</sub> &lt; n</em>), each person  <em>i</em>  has a social awkwardness level  <em>a<sub>i</sub></em>. Consider the seating process which evolves in discrete units of time  <em>0, 1, 2, …</em>  as follows:</p><ul><li>If  <em>a<sub>i</sub> = 0</em>, person  <em>i</em>  will sit down at time  <em>0</em>.</li><li>Otherwise (<em>a<sub>i</sub> &gt; 0</em>), person  <em>i</em>  will sit down at the beginning of a time unit  <em>t</em>  if both of the following conditions are satisfied:</li><li>At least  <em>a<sub>i</sub></em>  people have already sat down strictly before time  <em>t</em>.</li><li>At least one of their neighbors (person  <em>i - 1</em>  or  <em>i + 1</em>, if they exist) has already sat down strictly before time  <em>t</em>.</li></ul><p>At the beginning of every unit of time, each standing person checks these conditions. All people for whom the conditions are satisfied sit down simultaneously, and then the process advances to the next unit of time.</p><p>For each  <em>i</em>, the value  <em>b<sub>i</sub></em>  denotes the time unit at which person  <em>i</em>  sits down. Your task is to determine how many distinct arrays  <em>a</em>  are consistent with the given array  <em>b</em>. Since this number can be very large, output it modulo  <em>676767677</em>.</p><p>Please note that this problem uses an unusual modulo, and that  <em>676767677</em>  is prime.</p></dd>
+<dt>Input</dt><dd><p>The first line contains an integer  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>4</sup></em>) — the number of test cases.</p><p>The description of each test case follows:</p><ul><li>The first line contains two integers  <em>n</em>  and  <em>m</em>  (<em>1 ≤ m ≤ n ≤ 2 · 10<sup>5</sup></em>) — the number of people and the total duration of the process.</li><li>The second line contains  <em>n</em>  integers  <em>b<sub>1</sub>, b<sub>2</sub>, …, b<sub>n</sub></em>  (<em>0 ≤ b<sub>i</sub> &lt; m</em>), where  <em>b<sub>i</sub></em>  is the time unit at which person  <em>i</em>  sits down.</li></ul><p>It is guaranteed that the sum of  <em>n</em>  over all test cases does not exceed  <em>2 · 10<sup>5</sup></em>. It is guaranteed that each provided array  <em>b</em>  contains every integer from  <em>0</em>  to  <em>m-1</em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output a single integer — the number of distinct arrays  <em>a</em>  that result in the given array  <em>b</em>, modulo  <em>676767677</em>.</p></dd>
+<dt>样例输入</dt><dd><pre>7
+4 3
+0 1 2 0
+8 4
+0 1 2 3 1 2 0 1
+9 5
+1 0 1 3 4 3 2 1 0
+15 14
+3 0 1 2 3 4 5 6 7 8 9 10 11 12 13
+5 5
+4 3 0 1 2
+5 2
+0 1 1 1 0
+3 2
+0 1 1</pre></dd>
+<dt>样例输出</dt><dd><pre>2
+0
+1920
+138007136
+8
+0
+0</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, the only 2 valid arrays are  <em>[0, 1, 3, 0]</em>  and  <em>[0, 2, 3, 0]</em>. At time  <em>0</em>, the  <em>1</em> -st and  <em>4</em> -th people sit down. Then person  <em>2</em>  sits down at time  <em>1</em>. If  <em>a<sub>2</sub></em>  were  <em>0</em>, person  <em>2</em>  would have sat down at time  <em>0</em>, and if  <em>a<sub>2</sub></em>  were greater than  <em>2</em>, person  <em>2</em>  would not have been able to sit down at time  <em>1</em>  since only  <em>2</em>  people were sat down before time  <em>1</em>. It can be shown that the only value possible for  <em>a<sub>3</sub></em>  is  <em>3</em>.</p><p>In the second test case, there are no valid arrays because it is impossible for person  <em>5</em>  to sit down before either of their neighbours.</p></dd>
+</dl>
 </body></html>

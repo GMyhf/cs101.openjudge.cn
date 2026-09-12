@@ -1,5 +1,31 @@
 # HANDOFF · 交接日志
 
+### 2026-09-12 · Claude · Codeforces 题面改成抓回来的原题（157 页）
+
+人报的是显示问题：`/codeforces/4A/` 是对的，50A、1A、231A 这些「题解摘要」不对，要求
+**抓 Codeforces 原题题面更正**。
+
+- **旧页面的来路**：`scripts/import_codeforces_markdown.py` 只有课程题解 Markdown 可用，
+  它把摘录塞进 `<pre>` 就完事 —— markdown 不渲染、正文截在第一个代码围栏（全都停在
+  "Examples input"）、样例和时限内存缺席。4A 例外是因为那页当初手写。
+- **抓取路径找了三层**：`codeforces.com` → Cloudflare 403（curl 和 WebFetch 都是）；
+  `m1.codeforces.com` → 能解它的 `pow` cookie + SHA1 前导四个 0 的 PoW，但过了校验后
+  所有页面 302 到 `/enter`，匿名取不到；最终用**洛谷的 CF 远程评测镜像**，它的页面数据里
+  是 Codeforces 英文原文 + 官方样例 + 官方时限内存。158 道全抓到，零失败。
+  抓取脚本、渲染脚本、逐题覆盖表分别是 `scripts/fetch_codeforces_statements.py`、
+  `scripts/build_codeforces_pages.py`、`docs/codeforces-statements.md`。
+- **为什么敢信这份镜像**：4A 抓回来的时限内存（1 秒 / 64 MB）与本站此前人工核对过的 4A
+  页面逐字相同 —— 拿仓外事实对的，不是自洽检查。另外 158 道的样例全部能被
+  `server.py:sample_io()` 原样切回官方样例（0 差异）。
+- **两处要留心的下游**：①`import_codeforces_markdown.py` 已停止写题面页，重跑导入不会再把
+  真题面覆盖回摘要；②新题面带来 33 张插图，已走 `mirror_openjudge_images.py` 进本地镜像
+  （远程 URL 200 → 233），`test_image_mirror` 里那个硬编码计数同步改了。
+- **判题数据这次一点没动。** 但抓回来的官方样例现在是一份现成的仓外 oracle：
+  `data/openjudge/statements/*.json` 里每道题的官方样例，可以拿去核 `sample_tests` /
+  `generated_tests` 那些数据的第 0 组对不对。**还没做**，留给下一轮。
+- 4A 的页面按 `--keep` 保留原样（人拿它当对照）。抓回来的 4A 原文其实比现页更全（现页的
+  Description 是改写过的摘要，缺 Note），要不要一并换成原文，等人定。
+
 ### 2026-09-12 · Claude · 归档当自动 oracle：全库扫了一遍，**没有新缺陷**
 
 人问「为什么有的题测试数据没重新构造，例如 `tests/2000-2999/2406`」。答案先放前面：

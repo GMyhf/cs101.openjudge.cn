@@ -1,28 +1,22 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>71A: Way Too Long Words</title></head>
-<body><div id="pageTitle"><h2>71A: Way Too Long Words</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/71/A" rel="noopener">Codeforces 71A</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Sometimes some words like &quot;*localization*&quot; or &quot;*internationalization*&quot; are so long that writing them many times in one text is quite tiresome.
-
-Let&#x27;s consider a word *too long*, if its length is **strictly more** than 10 characters. All too long words should be replaced with a special abbreviation.
-
-This abbreviation is made like this: we write down the first and the last letter of a word and between them we write the number of letters between the first and the last letters. That number is in decimal system and doesn&#x27;t contain any leading zeroes.
-
-Thus, &quot;*localization*&quot; will be spelt as &quot;*l10n*&quot;, and &quot;*internationalization*&quot; will be spelt as &quot;i18n&quot;.
-
-You are suggested to automatize the process of changing the words with abbreviations. At that all too long words should be replaced by the abbreviation and the words that are not too long should not undergo any changes.
-
-**Input**
-
-The first line contains an integer *n* (1 ≤ *n* ≤ 100). Each of the following *n* lines contains one word. All the words consist of lowercase Latin letters and possess the lengths of from 1 to 100 characters.
-
-**Output**
-
-Print *n* lines. The *i*-th line should contain the result of replacing of the *i*-th word from the input data.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/71/A" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 71A: A. Way Too Long Words</title></head>
+<body><div id="pageTitle"><h2>A. Way Too Long Words</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/71/A" rel="noopener">Codeforces 71A</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Sometimes some words like "localization" or "internationalization" are so long that writing them many times in one text is quite tiresome.</p><p>Let's consider a word too long, if its length is strictly more than <em>10</em> characters. All too long words should be replaced with a special abbreviation.</p><p>This abbreviation is made like this: we write down the first and the last letter of a word and between them we write the number of letters between the first and the last letters. That number is in decimal system and doesn't contain any leading zeroes.</p><p>Thus, "localization" will be spelt as "l10n", and "internationalization» will be spelt as "i18n".</p><p>You are suggested to automatize the process of changing the words with abbreviations. At that all too long words should be replaced by the abbreviation and the words that are not too long should not undergo any changes.</p></dd>
+<dt>Input</dt><dd><p>The first line contains an integer <em>n</em> (<em>1≤n≤100</em>). Each of the following <em>n</em> lines contains one word. All the words consist of lowercase Latin letters and possess the lengths of from <em>1</em> to <em>100</em> characters.</p></dd>
+<dt>Output</dt><dd><p>Print <em>n</em> lines. The <em>i</em> -th line should contain the result of replacing of the <em>i</em> -th word from the input data.</p></dd>
+<dt>样例输入</dt><dd><pre>4
+word
+localization
+internationalization
+pneumonoultramicroscopicsilicovolcanoconiosis</pre></dd>
+<dt>样例输出</dt><dd><pre>word
+l10n
+i18n
+p43s</pre></dd>
+</dl>
 </body></html>

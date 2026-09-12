@@ -1,10 +1,19 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2218D: The 67th OEIS Problem</title></head>
-<body><div id="pageTitle"><h2>2218D: The 67th OEIS Problem</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2218/D" rel="noopener">Codeforces 2218D</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>思路：注意到 $\gcd(2n+1, 2n + 5) = \gcd(4, 2n+1) = 1$，因此考察数列 $a_i = (2i+1)\cdot (2i-1)$，有 $\gcd(a_i, a_{i+1}) = 2i+1$，对于任意的 $i\ge 1$ 不可能存在相等的最小公因数，因此直接过关。
-
-代码：</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2218/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2218D: D. The 67th OEIS Problem</title></head>
+<body><div id="pageTitle"><h2>D. The 67th OEIS Problem</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2218/D" rel="noopener">Codeforces 2218D</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Macaque, being a terrible problemsetter, decided to search for funny sequences on the OEIS <em><sup>∗</sup></em>  one day, so he could gain inspiration for his doomed problemsetting job for the Pan-Mammalian Olympiad in Informatics (PMOI). To his delight, he found one, and thought it would be funny to make you, his loyal tester, solve it:</p><p>Construct a sequence  <em>a</em>  containing  <em>n</em>  integers such that  <em>gcd(a<sub>i</sub>, a<sub>i+1</sub>)</em>   <em><sup>†</sup></em>  is distinct over all  <em>1 ≤ i ≤ n - 1</em>. It is guaranteed that at least one sequence  <em>a</em>  exists.</p><p><em><sup>∗</sup></em> Online Encyclopedia of Integer Sequences, the favourite website of math nerds, overly astute testers, and insufficiently rigorous coordinators.</p><p><em><sup>†</sup></em>  <em>gcd(x,y)</em>  refers to the <a href="https://en.wikipedia.org/wiki/Greatest_common_divisor" rel="noopener">greatest common divisor</a> of integers  <em>x</em>  and  <em>y</em>.</p></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains the number of test cases  <em>t</em>  (<em>1 ≤ t ≤ 100</em>). The description of the test cases follows.</p><p>The following  <em>t</em>  lines contain one integer  <em>n</em>  (<em>2 ≤ n ≤ 10<sup>4</sup></em>) — the desired length of the sequence.</p><p>It is guaranteed the sum of  <em>n</em>  over all test cases does not exceed  <em>10<sup>4</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each query, output your answer — a sequence  <em>a</em>  of  <em>n</em>  space-separated integers (<em>1 ≤ a<sub>i</sub> ≤ 10<sup>18</sup></em>).</p></dd>
+<dt>样例输入</dt><dd><pre>2
+3
+5</pre></dd>
+<dt>样例输出</dt><dd><pre>1 6 2
+134 67 69 207 414</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, the sequence  <em>[1, 6, 2]</em>  is a possible answer. This is because  <em>gcd(1, 6)</em>  is not equal to  <em>gcd(6, 2)</em>.</p><p>In the second test case, the sequence  <em>[134, 67, 69, 207, 414]</em>  is a possible answer. This is because the values of  <em>gcd(a<sub>i</sub>, a<sub>i+1</sub>)</em>  for all  <em>i</em>  between  <em>1</em>  and  <em>n-1</em>  are distinct. For reference, they are  <em>67</em>,  <em>1</em>,  <em>69</em>  and  <em>207</em>.</p></dd>
+</dl>
 </body></html>

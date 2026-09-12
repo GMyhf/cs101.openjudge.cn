@@ -1,0 +1,29 @@
+{
+  "id": "2195H",
+  "name": "Codeforces Heuristic Contest 001",
+  "source_url": "https://codeforces.com/problemset/problem/2195/H",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2195H",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 4000,
+  "memory_limit_kb": 1024000,
+  "statement": {
+    "description": "There is a grid of  $ 3n \\times 3n $  points, consisting of all integer points  $ (x,y) $  such that  $ 1 \\le x,y \\le 3n $ .\n\nFind a largest set of triangles satisfying the following conditions:\n\n- Each triangle has its vertices on exactly three points on the grid.\n- Each triangle has an area of exactly  $ \\frac{1}{2} $ . Note that they do not have to be right triangles.\n- No two triangles share a common intersection point, including their vertices.\n\nIf there exist multiple largest such sets of triangles, you may output any of them.",
+    "formatI": "Each test contains multiple test cases. The first line contains the number of test cases  $ t $  ( $ 1 \\le t \\le 30 $ ). The description of the test cases follows.\n\nThe only line of each test case contains a single integer  $ n $  ( $ 1 \\le n \\le 166 $ ).\n\nIt is guaranteed that the sum of  $ n^2 $  over all test cases does not exceed  $ 166^2 $ .",
+    "formatO": "Output the maximum size  $ m $  of the set of triangles on one line ( $ 0 \\le m \\le 3n^2 $ ).\n\nThen, output  $ m $  lines in the following format:\n\n- $ x_{i,1}\\;y_{i,1}\\;x_{i,2}\\;y_{i,2}\\;x_{i,3}\\;y_{i,3} $ : The vertices of the  $ i $ -th triangle are  $ (x_{i,1},y_{i,1}) $ ,  $ (x_{i,2},y_{i,2}) $ ,  $ (x_{i,3},y_{i,3}) $ .\n\nYou may output the vertices of one triangle in any order (clockwise or counterclockwise).\n\nYour output will be accepted if it satisfies all conditions and the maximum size given is correct.",
+    "hint": "In the first test case, the example output has  $ 2 $  triangles as shown in the following image:\n\n ![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF2195H/c057be17528d33d4a7a59438642fc44d1fc91068ec6feb7c6bd66fa85b0fc00f.png)In the second test case, the example output has  $ 12 $  triangles as shown in the image on the left:\n\n ![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF2195H/0e82b5ed1e62fedbe970de8541d1e2820d6137d34e3775a4522287cb96c2e325.png)![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF2195H/94c24a3a5d47da4337dd6a445b552083b4602ff11161bbcfc7a875960a9fc865.png)As the triangles are not required to be right triangles, the set of triangles shown in the image on the right will also be considered valid.",
+    "background": null
+  },
+  "translation": {
+    "description": "给定一个 $3n \\times 3n$ 的点阵，包含所有整数点 $(x, y)$，满足 $1 \\le x, y \\le 3n$。\n\n请找出一个最大集合的三角形，需满足以下条件：\n\n- 每个三角形的三个顶点都在格点上，且恰好有三个不同的顶点。\n- 每个三角形的面积恰好为 $\\frac{1}{2}$。注意三角形不一定要求为直角三角形。\n- 任意两个三角形都没有公共的交点，包括顶点。\n\n如果存在多个规模最大的三角形集合，你可以输出其中任意一个。",
+    "formatI": "每组测试数据包含多组测试用例。第一行包含一个整数 $t$（$1 \\le t \\le 30$），表示测试用例的组数。\n\n接下来每组测试用例占一行，包含一个整数 $n$（$1 \\le n \\le 166$）。\n\n保证所有测试用例中 $\\sum n^2 \\le 166^2$。",
+    "formatO": "对于每组测试用例，首先输出一行，包含一个整数 $m$，表示三角形集合的最大数量（$0 \\le m \\le 3n^2$）。\n\n接下来输出 $m$ 行，每行 $6$ 个整数 $x_{i,1}\\;y_{i,1}\\;x_{i,2}\\;y_{i,2}\\;x_{i,3}\\;y_{i,3}$，代表第 $i$ 个三角形的三个顶点分别为 $(x_{i,1},y_{i,1})$、$(x_{i,2},y_{i,2})$、$(x_{i,3},y_{i,3})$。\n\n每个三角形顶点输出顺序可以随意（顺时针或逆时针均可）。\n\n只要输出满足所有条件且最大规模正确即可通过。",
+    "hint": "在第一个测试用例中，示例输出展示了 $2$ 个三角形，如下图所示：\n\n![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF2195H/c057be17528d33d4a7a59438642fc44d1fc91068ec6feb7c6bd66fa85b0fc00f.png)\n\n在第二个测试用例中，示例输出展示了 $12$ 个三角形，见下左图：\n\n![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF2195H/0e82b5ed1e62fedbe970de8541d1e2820d6137d34e3775a4522287cb96c2e325.png)\n\n由于三角形不要求为直角三角形，右图中的三角形集合同样是合法的。\n\n![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF2195H/94c24a3a5d47da4337dd6a445b552083b4602ff11161bbcfc7a875960a9fc865.png)\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "2\n1\n2",
+      "output": "2\n1 1 1 2 2 1\n2 3 3 2 3 3\n12\n1 1 1 2 2 1\n2 2 3 2 3 1\n1 3 1 4 2 3\n2 4 3 4 3 3\n1 5 1 6 2 5\n2 6 3 6 3 5\n4 1 4 2 5 1\n5 2 6 2 6 1\n4 3 4 4 5 3\n5 4 6 4 6 3\n4 5 4 6 5 5\n5 6 6 6 6 5"
+    }
+  ]
+}

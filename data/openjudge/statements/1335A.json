@@ -1,0 +1,29 @@
+{
+  "id": "1335A",
+  "name": "Candies and Two Sisters",
+  "source_url": "https://codeforces.com/problemset/problem/1335/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF1335A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "There are two sisters Alice and Betty. You have $ n $ candies. You want to distribute these $ n $ candies between two sisters in such a way that:\n\n- Alice will get $ a $ ( $ a > 0 $ ) candies;\n- Betty will get $ b $ ( $ b > 0 $ ) candies;\n- each sister will get some integer number of candies;\n- Alice will get a greater amount of candies than Betty (i.e. $ a > b $ );\n- all the candies will be given to one of two sisters (i.e. $ a+b=n $ ).\n\nYour task is to calculate the number of ways to distribute exactly $ n $ candies between sisters in a way described above. Candies are indistinguishable.\n\nFormally, find the number of ways to represent $ n $ as the sum of $ n=a+b $ , where $ a $ and $ b $ are positive integers and $ a>b $ .\n\nYou have to answer $ t $ independent test cases.",
+    "formatI": "The first line of the input contains one integer $ t $ ( $ 1 \\le t \\le 10^4 $ ) — the number of test cases. Then $ t $ test cases follow.\n\nThe only line of a test case contains one integer $ n $ ( $ 1 \\le n \\le 2 \\cdot 10^9 $ ) — the number of candies you have.",
+    "formatO": "For each test case, print the answer — the number of ways to distribute exactly $ n $ candies between two sisters in a way described in the problem statement. If there is no way to satisfy all the conditions, print $ 0 $ .",
+    "hint": "For the test case of the example, the $ 3 $ possible ways to distribute candies are:\n\n- $ a=6 $ , $ b=1 $ ;\n- $ a=5 $ , $ b=2 $ ;\n- $ a=4 $ , $ b=3 $ .",
+    "background": ""
+  },
+  "translation": {
+    "description": "### 题面翻译\n\n给你 $n$ 个糖果，你需要分给 Alice 和 Betty,求有多少种分法。\n\n设 Alice 分到 $a$ 个，Betty 分到 $b$ 个，则分糖果的规则为：\n1. Alice 和 Betty 的糖果都必须大于 $0$ $(a>0,b>0)$\n2. Alice 和 Betty 的糖果数均为整数\n3. Alice 得到的糖果要比 Betty 多 $(a>b)$\n4. 所有的糖果都要分完 $(a+b=n)$",
+    "formatI": "#### 本题有多组测试数据\n\n第一行为一个整数 $t$，代表测试组数。\n\n接下来 $t$ 行，对于每组测试数据，一行一个整数 $n$ 表示糖果的数目。",
+    "formatO": "对于每组测试数据，一行一个整数表示有几种分法。",
+    "hint": "$7$ 个糖果的分糖果方法为：\n- $a = 6, b = 1$\n- $a = 5, b = 2$\n- $a = 4, b = 3$\n\n共有 $3$ 种方法。",
+    "background": ""
+  },
+  "samples": [
+    {
+      "input": "6\n7\n1\n2\n3\n2000000000\n763243547",
+      "output": "3\n0\n0\n1\n999999999\n381621773"
+    }
+  ]
+}

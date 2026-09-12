@@ -1,32 +1,34 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>1850H: The Third Letter</title></head>
-<body><div id="pageTitle"><h2>1850H: The Third Letter</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1850/H" rel="noopener">Codeforces 1850H</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>In order to win his toughest battle, Mircea came up with a great strategy for his army. He has 𝑛 soldiers and decided to arrange them in a certain way in camps. Each soldier has to belong to exactly one camp, and there is one camp at each integer point on the 𝑥-axis (at points ⋯,−2,−1,0,1,2,⋯).
-
-The strategy consists of 𝑚 conditions. Condition 𝑖 tells that soldier 𝑎𝑖 should belong to a camp that is situated 𝑑𝑖 meters in front of the camp that person 𝑏𝑖 belongs to. (If 𝑑𝑖&lt;0, then 𝑎𝑖&#x27;s camp should be −𝑑𝑖 meters behind 𝑏𝑖&#x27;s camp.)
-
-Now, Mircea wonders if there exists a partition of soldiers that respects the condition and he asks for your help! Answer &quot;YES&quot; if there is a partition of the 𝑛 soldiers that satisfies **all** of the 𝑚 conditions and &quot;NO&quot; otherwise.
-
-Note that two different soldiers **may** be placed in the same camp.
-
-**Input**
-
-The first line contains a single integer 𝑡 (1≤𝑡≤100) — the number of test cases.
-
-The first line of each test case contains two positive integers 𝑛 and 𝑚 (2≤𝑛≤2⋅10^5; 1≤𝑚≤𝑛) — the number of soldiers, and the number of conditions respectively.
-
-Then 𝑚 lines follow, each of them containing 3 integers: 𝑎𝑖, 𝑏𝑖, 𝑑𝑖 (𝑎𝑖≠𝑏𝑖; 1≤𝑎𝑖,𝑏𝑖≤𝑛; −10^9 ≤ 𝑑𝑖 ≤ 10^9) — denoting the conditions explained in the statement. Note that if 𝑑𝑖 is positive, 𝑎𝑖 should be 𝑑𝑖 meters in front of 𝑏𝑖 and if it is negative, 𝑎𝑖 should be −𝑑𝑖 meters behind 𝑏𝑖.
-
-Note that the sum of 𝑛 over all test cases doesn&#x27;t exceed 2⋅105.
-
-**Output**
-
-For each test case, output &quot;YES&quot; if there is an arrangement of the 𝑛 soldiers that satisfies **all** of the 𝑚 conditions and &quot;NO&quot; otherwise.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1850/H" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 1850H: H. The Third Letter</title></head>
+<body><div id="pageTitle"><h2>H. The Third Letter</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/1850/H" rel="noopener">Codeforces 1850H</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>In order to win his toughest battle, Mircea came up with a great strategy for his army. He has <em>n</em> soldiers and decided to arrange them in a certain way in camps. Each soldier has to belong to exactly one camp, and there is one camp at each integer point on the <em>x</em> -axis (at points <em>…, -2, -1, 0, 1, 2, …</em>).</p><p>The strategy consists of <em>m</em> conditions. Condition <em>i</em> tells that soldier <em>a<sub>i</sub></em> should belong to a camp that is situated <em>d<sub>i</sub></em> meters in front of the camp that person <em>b<sub>i</sub></em> belongs to. (If <em>d<sub>i</sub> &lt; 0</em>, then <em>a<sub>i</sub></em> 's camp should be <em>-d<sub>i</sub></em> meters behind <em>b<sub>i</sub></em> 's camp.)</p><p>Now, Mircea wonders if there exists a partition of soldiers that respects the condition and he asks for your help! Answer "YES" if there is a partition of the <em>n</em> soldiers that satisfies all of the <em>m</em> conditions and "NO" otherwise.</p><p>Note that two different soldiers may be placed in the same camp.</p></dd>
+<dt>Input</dt><dd><p>The first line contains a single integer <em>t</em> (<em>1 ≤ t ≤ 100</em>) — the number of test cases.</p><p>The first line of each test case contains two positive integers <em>n</em> and <em>m</em> (<em>2 ≤ n ≤ 2 · 10<sup>5</sup></em>; <em>1 ≤ m ≤ n</em>) — the number of soldiers, and the number of conditions respectively.</p><p>Then <em>m</em> lines follow, each of them containing <em>3</em> integers: <em>a<sub>i</sub></em>, <em>b<sub>i</sub></em>, <em>d<sub>i</sub></em> (<em>a<sub>i</sub> ≠ b<sub>i</sub></em>; <em>1 ≤ a<sub>i</sub>, b<sub>i</sub> ≤ n</em>; <em>-10<sup>9</sup> ≤ d<sub>i</sub> ≤ 10<sup>9</sup></em>) — denoting the conditions explained in the statement. Note that if <em>d<sub>i</sub></em> is positive, <em>a<sub>i</sub></em> should be <em>d<sub>i</sub></em> meters in front of <em>b<sub>i</sub></em> and if it is negative, <em>a<sub>i</sub></em> should be <em>-d<sub>i</sub></em> meters behind <em>b<sub>i</sub></em>.</p><p>Note that the sum of <em>n</em> over all test cases doesn't exceed <em>2 · 10<sup>5</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output "YES" if there is an arrangement of the <em>n</em> soldiers that satisfies all of the <em>m</em> conditions and "NO" otherwise.</p></dd>
+<dt>样例输入</dt><dd><pre>4
+5 3
+1 2 2
+2 3 4
+4 2 -6
+6 5
+1 2 2
+2 3 4
+4 2 -6
+5 4 4
+3 5 100
+2 2
+1 2 5
+1 2 4
+4 1
+1 2 3</pre></dd>
+<dt>样例输出</dt><dd><pre>YES
+NO
+NO
+YES</pre></dd>
+<dt>Note</dt><dd><p>For the first test case, we can partition the soldiers into camps in the following way: soldier:</p><ul><li>Soldier <em>1</em> in the camp with the coordinate <em>x = 3</em>.</li><li>Soldier <em>2</em> in the camp with the coordinate <em>x = 5</em>.</li><li>Soldier <em>3</em> in the camp with the coordinate <em>x = 9</em>.</li><li>Soldier <em>4</em> in the camp with the coordinate <em>x = 11</em>.</li></ul><p>For the second test case, there is no partition that can satisfy all the constraints at the same time.</p><p>For the third test case, there is no partition that satisfies all the constraints since we get contradictory information about the same pair.</p><p>For the fourth test case, in order to satisfy the only condition, a possible partition is:</p><ul><li>Soldier <em>1</em> in the camp with the coordinate <em>x = 10</em>.</li><li>Soldier <em>2</em> in the camp with the coordinate <em>x = 13</em>.</li><li>Soldier <em>3</em> in the camp with the coordinate <em>x = -2023</em>.</li><li>Soldier <em>4</em> in the camp with the coordinate <em>x = -2023</em>.</li></ul></dd>
+</dl>
 </body></html>

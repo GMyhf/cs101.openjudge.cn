@@ -1,0 +1,37 @@
+{
+  "id": "118A",
+  "name": "String Task",
+  "source_url": "https://codeforces.com/problemset/problem/118/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF118A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Petya started to attend programming lessons. On the first lesson his task was to write a simple program. The program was supposed to do the following: in the given string, consisting if uppercase and lowercase Latin letters, it:\n\n- deletes all the vowels,\n- inserts a character \".\" before each consonant,\n- replaces all uppercase consonants with corresponding lowercase ones.\n\nVowels are letters \"A\", \"O\", \"Y\", \"E\", \"U\", \"I\", and the rest are consonants. The program's input is exactly one string, it should return the output as a single string, resulting after the program's processing the initial string.\n\nHelp Petya cope with this easy task.",
+    "formatI": "The first line represents input string of Petya's program. This string only consists of uppercase and lowercase Latin letters and its length is from $ 1 $ to $ 100 $ , inclusive.",
+    "formatO": "Print the resulting string. It is guaranteed that this string is not empty.",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "Petya 开始参加编程课程。在第一节课上，他的任务是编写一个简单的程序。该程序需要对给定的仅由大写和小写拉丁字母组成的字符串进行如下处理：\n\n- 删除所有元音字母；\n- 在每个辅音字母前插入一个字符“.”；\n- 将所有大写辅音字母转换为对应的小写字母。\n\n元音字母包括 “A”、“O”、“Y”、“E”、“U”、“I”，其余字母均为辅音。程序的输入为一个字符串，输出为经过上述处理后的字符串。\n\n请帮助 Petya 完成这个简单的任务。",
+    "formatI": "输入的第一行是 Petya 程序的字符串。该字符串仅由大写和小写拉丁字母组成，长度为 $1$ 到 $100$（包含 $1$ 和 $100$）。",
+    "formatO": "输出处理后的字符串。保证输出字符串非空。",
+    "hint": "\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "tour\n",
+      "output": ".t.r\n"
+    },
+    {
+      "input": "Codeforces\n",
+      "output": ".c.d.f.r.c.s\n"
+    },
+    {
+      "input": "aBAcAba\n",
+      "output": ".b.c.b\n"
+    }
+  ]
+}

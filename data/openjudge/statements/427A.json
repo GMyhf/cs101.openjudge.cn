@@ -1,0 +1,37 @@
+{
+  "id": "427A",
+  "name": "Police Recruits",
+  "source_url": "https://codeforces.com/problemset/problem/427/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF427A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "The police department of your city has just started its journey. Initially, they don’t have any manpower. So, they started hiring new recruits in groups.\n\nMeanwhile, crimes keeps occurring within the city. One member of the police force can investigate only one crime during his/her lifetime.\n\nIf there is no police officer free (isn't busy with crime) during the occurrence of a crime, it will go untreated.\n\nGiven the chronological order of crime occurrences and recruit hirings, find the number of crimes which will go untreated.",
+    "formatI": "The first line of input will contain an integer $ n (1<=n<=10^{5}) $ , the number of events. The next line will contain $ n $ space-separated integers.\n\nIf the integer is -1 then it means a crime has occurred. Otherwise, the integer will be positive, the number of officers recruited together at that time. No more than 10 officers will be recruited at a time.",
+    "formatO": "Print a single integer, the number of crimes which will go untreated.",
+    "hint": "Lets consider the second example:\n\n1. Firstly one person is hired.\n2. Then crime appears, the last hired person will investigate this crime.\n3. One more person is hired.\n4. One more crime appears, the last hired person will investigate this crime.\n5. Crime appears. There is no free policeman at the time, so this crime will go untreated.\n6. One more person is hired.\n7. One more person is hired.\n8. One more person is hired.\n\nThe answer is one, as one crime (on step 5) will go untreated.",
+    "background": ""
+  },
+  "translation": {
+    "description": "你所在城市的警察局刚刚成立。最初，他们没有任何警力。因此，他们会分批招募新警察。\n\n与此同时，城市中不断发生犯罪。一个警察在其职业生涯中只能侦查一起案件。\n\n如果在某次犯罪发生时，没有空闲（未忙于案件）的警察，那么该犯罪将无法被侦查。\n\n给定按时间顺序排列的犯罪事件发生和招募警力的过程，请你计算有多少起犯罪将得不到处理。",
+    "formatI": "输入的第一行包含一个整数 $n\\ (1 \\leq n \\leq 10^{5})$，表示事件的总数。下一行包括 $n$ 个以空格分隔的整数。\n\n如果某个整数为 $-1$，表示发生了一起犯罪。否则，该整数为正数，表示本次招募了相应数量的警察。每次最多招募 $10$ 名警察。",
+    "formatO": "输出一个整数，表示未得到处理的犯罪事件数。",
+    "hint": "以第二个样例为例：\n\n1. 首先招募了一名警察。\n2. 然后发生了一起犯罪，最后招募的警察将会侦查此案。\n3. 又招募了一名警察。\n4. 又发生了一起犯罪，最后招募的警察将会侦查此案。\n5. 又发生了一起犯罪。此时没有空闲警察，因此这起犯罪没有得到处理。\n6. 又招募了一名警察。\n7. 又招募了一名警察。\n8. 又招募了一名警察。\n\n答案为 $1$，即第 $5$ 步中有一起犯罪未得到处理。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "3\n-1 -1 1\n",
+      "output": "2\n"
+    },
+    {
+      "input": "8\n1 -1 1 -1 -1 1 1 1\n",
+      "output": "1\n"
+    },
+    {
+      "input": "11\n-1 -1 2 -1 -1 -1 -1 -1 -1 -1 -1\n",
+      "output": "8\n"
+    }
+  ]
+}

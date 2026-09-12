@@ -1,51 +1,26 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>37C: Old Berland Language</title></head>
-<body><div id="pageTitle"><h2>37C: Old Berland Language</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/37/C" rel="noopener">Codeforces 37C</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>data structures, greedy, trees, *1900
-
-https://www.luogu.com.cn/problem/CF37C
-
-
-$Berland$的科学家知道，古老的$Berland$语言中有$n$个单词。这些单词的长度为$l_1$,$l_2$,...,$l_n$。每个单词由$0$和$1$组成。
-
-尽管古代$Berland$人语速很快并且说话不停顿，但同时他们也能很好地理解对方。
-
-可能的原因是：没有一个单词是另一个单词的前缀。字符串的前缀被认为是子串的其中一个开端。
-
-请你帮助科学家确定，是否所有的古$Berland$语的单词都可以被重构。如果可以，输出单词本身。
-
-**输入**
-
-第一行：一个整数$n$，表示古$Berland$语言的单词个数，其中$1 \le n\le 10^3$。
-
-第二行，有$n$个由空格隔开的整数$len$，分别为这$n$个单词的长度。其中$len\le 10^3$。
-
-**输出**
-
-如果没有任何符合的单词，只输出$NO$；
-
-否则，在第一行输出$YES$，并在接下来的$n$行，按照输入顺序输出单词本身。
-
-如果答案不唯一，输出任意一种。
-
-
-
-Berland scientists know that the Old Berland language had exactly $ n $ words. Those words had lengths of $ l_{1},l_{2},...,l_{n} $ letters. Every word consisted of two letters, $ 0 $ and $ 1 $ . Ancient Berland people spoke quickly and didn’t make pauses between the words, but at the same time they could always understand each other perfectly. It was possible because no word was a prefix of another one. The prefix of a string is considered to be one of its substrings that starts from the initial symbol.
-
-Help the scientists determine whether all the words of the Old Berland language can be reconstructed and if they can, output the words themselves.
-
-**Input**
-
-The first line contains one integer $ N $ ( $ 1&lt;=N&lt;=1000 $ ) — the number of words in Old Berland language. The second line contains $ N $ space-separated integers — the lengths of these words. All the lengths are natural numbers not exceeding $ 1000 $ .
-
-**Output**
-
-If there’s no such set of words, in the single line output NO. Otherwise, in the first line output YES, and in the next $ N $ lines output the words themselves in the order their lengths were given in the input file. If the answer is not unique, output any.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/37/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 37C: C. Old Berland Language</title></head>
+<body><div id="pageTitle"><h2>C. Old Berland Language</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/37/C" rel="noopener">Codeforces 37C</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Berland scientists know that the Old Berland language had exactly <em>n</em> words. Those words had lengths of <em>l<sub>1</sub>,l<sub>2</sub>,...,l<sub>n</sub></em> letters. Every word consisted of two letters, <em>0</em> and <em>1</em>. Ancient Berland people spoke quickly and didn’t make pauses between the words, but at the same time they could always understand each other perfectly. It was possible because no word was a prefix of another one. The prefix of a string is considered to be one of its substrings that starts from the initial symbol.</p><p>Help the scientists determine whether all the words of the Old Berland language can be reconstructed and if they can, output the words themselves.</p></dd>
+<dt>Input</dt><dd><p>The first line contains one integer <em>N</em> (<em>1≤N≤1000</em>) — the number of words in Old Berland language. The second line contains <em>N</em> space-separated integers — the lengths of these words. All the lengths are natural numbers not exceeding <em>1000</em>.</p></dd>
+<dt>Output</dt><dd><p>If there’s no such set of words, in the single line output NO. Otherwise, in the first line output YES, and in the next <em>N</em> lines output the words themselves in the order their lengths were given in the input file. If the answer is not unique, output any.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+3
+1 2 3
+样例输出1
+YES
+0
+10
+110</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入2
+3
+1 1 1
+样例输出2
+NO</pre></dd>
+</dl>
 </body></html>

@@ -1,24 +1,28 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>615A: Bulbs</title></head>
-<body><div id="pageTitle"><h2>615A: Bulbs</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/615/A" rel="noopener">Codeforces 615A</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Vasya wants to turn on Christmas lights consisting of *m* bulbs. Initially, all bulbs are turned off. There are *n* buttons, each of them is connected to some set of bulbs. Vasya can press any of these buttons. When the button is pressed, it turns on all the bulbs it&#x27;s connected to. Can Vasya light up all the bulbs?
-
-If Vasya presses the button such that some bulbs connected to it are already turned on, they do not change their state, i.e. remain turned on.
-
-**Input**
-
-The first line of the input contains integers *n* and *m* (1 ≤ *n*, *m* ≤ 100) — the number of buttons and the number of bulbs respectively.
-
-Each of the next *n* lines contains *x~i~* (0 ≤ *x~i~*≤ *m*) — the number of bulbs that are turned on by the *i*-th button, and then *x~i~* numbers *y~ij~* (1 ≤ *y~ij~* ≤ *m*) — the numbers of these bulbs.
-
-**Output**
-
-If it&#x27;s possible to turn on all *m* bulbs print &quot;YES&quot;, otherwise print &quot;NO&quot;.
-
-Examples
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/615/A" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 615A: A. Bulbs</title></head>
+<body><div id="pageTitle"><h2>A. Bulbs</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/615/A" rel="noopener">Codeforces 615A</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Vasya wants to turn on Christmas lights consisting of <em>m</em> bulbs. Initially, all bulbs are turned off. There are <em>n</em> buttons, each of them is connected to some set of bulbs. Vasya can press any of these buttons. When the button is pressed, it turns on all the bulbs it's connected to. Can Vasya light up all the bulbs?</p><p>If Vasya presses the button such that some bulbs connected to it are already turned on, they do not change their state, i.e. remain turned on.</p></dd>
+<dt>Input</dt><dd><p>The first line of the input contains integers <em>n</em> and <em>m</em> (<em>1≤n,m≤100</em>) — the number of buttons and the number of bulbs respectively.</p><p>Each of the next <em>n</em> lines contains <em>x<sub>i</sub></em> (<em>0≤x<sub>i</sub>≤m</em>) — the number of bulbs that are turned on by the <em>i</em> -th button, and then <em>x<sub>i</sub></em> numbers <em>y<sub>ij</sub></em> (<em>1≤y<sub>ij</sub>≤m</em>) — the numbers of these bulbs.</p></dd>
+<dt>Output</dt><dd><p>If it's possible to turn on all <em>m</em> bulbs print "YES", otherwise print "NO".</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+3 4
+2 1 4
+3 1 3 1
+1 2
+样例输出1
+YES</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入2
+3 3
+1 1
+1 2
+1 1
+样例输出2
+NO</pre></dd>
+<dt>Note</dt><dd><p>In the first sample you can press each button once and turn on all the bulbs. In the 2 sample it is impossible to turn on the 3-rd lamp.</p></dd>
+</dl>
 </body></html>

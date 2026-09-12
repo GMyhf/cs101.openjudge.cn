@@ -1,0 +1,29 @@
+{
+  "id": "1729C",
+  "name": "Jumping on Tiles",
+  "source_url": "https://codeforces.com/problemset/problem/1729/C",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF1729C",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Polycarp was given a row of tiles. Each tile contains one lowercase letter of the Latin alphabet. The entire sequence of tiles forms the string $ s $ .\n\nIn other words, you are given a string $ s $ consisting of lowercase Latin letters.\n\nInitially, Polycarp is on the first tile of the row and wants to get to the last tile by jumping on the tiles. Jumping from $ i $ -th tile to $ j $ -th tile has a cost equal to $ |index(s_i) - index(s_j)| $ , where $ index(c) $ is the index of the letter $ c $ in the alphabet (for example, $ index( $ 'a' $ )=1 $ , $ index( $ 'b' $ )=2 $ , ..., $ index( $ 'z' $ )=26 $ ) .\n\nPolycarp wants to get to the $ n $ -th tile for the minimum total cost, but at the same time make maximum number of jumps.\n\nIn other words, among all possible ways to get to the last tile for the minimum total cost, he will choose the one with the maximum number of jumps.\n\nPolycarp can visit each tile at most once.\n\nPolycarp asks you to help — print the sequence of indices of string $ s $ on which he should jump.",
+    "formatI": "The first line of the input contains an integer $ t $ ( $ 1 \\le t \\le 10^4 $ ) — the number of test cases in the test.\n\nEach test case is given by the string $ s $ ( $ 2 \\le |s| \\le 2 \\cdot 10^5 $ ), where $ |s| $ — is the length of string $ s $ . The string $ s $ consists of lowercase Latin letters.\n\nIt is guaranteed that the sum of string lengths $ s $ over all test cases does not exceed $ 2 \\cdot 10^5 $ .",
+    "formatO": "The answer to each test case consists of two lines.\n\nIn the first line print two integers $ cost $ , $ m $ , where $ cost $ is the minimum total cost of the path, and $ m $ is the maximum number of visited tiles Polycarp can make to get to $ n $ -th tiles for the minimum total cost $ cost $ (i.e. the number of jumps is $ m-1 $ ).\n\nIn the next line print $ m $ different numbers $ j_1, j_2, \\dots, j_m $ ( $ 1 \\le j_i \\le |s| $ ) — the sequence of indices of the tiles Polycarp will jump on. The first number in the sequence must be $ 1 $ (that is, $ j_1=1 $ ) and the last number must be the value of $ |s| $ (that is, $ j_m=|s| $ ).\n\nIf there are multiple answers, print any of them.",
+    "hint": "In the first test case, the required path corresponds to the picture:\n\n ![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF1729C/49e2c8e284a7d3fb956b42ba8cd8d2662420f728.png)In this case, the minimum possible total cost of the path is achieved. Since $ index( $ 'l' $ )=12 $ , $ index( $ 'o' $ )=15 $ , $ index( $ 'g' $ )=7 $ , $ index( $ 'i' $ )=9 $ , $ index( $ 'c' $ )=3 $ , then the total cost of the path is $ |12-9|+|9-7|+|7-3|=3+2+4=9 $ .",
+    "background": ""
+  },
+  "translation": {
+    "description": "### 题目大意\n\n给定一个字符串 $s$，polycarp 欲从字符串首跳到字符串末 ($s_1$ → $s_n$，其中 $n$ 表示该字符串长度)。\n\n假设 polycarp 现从 $a_i$ 跳到了 $a_j$ 我们定义这一次跳跃的权值为 $|\\operatorname{index}(a_i) - \\operatorname{index}(a_j)|$，其中 $\\operatorname{index}$\n 表示该字符在字母表中的序号 ( 如 $\\operatorname{index}('a') = 1, \\; \\operatorname{index}('z') = 26$ )。\n \n 请构造出一种在保证**权值和最小**的情况下**经过的字符最多**的跳跃方案 ( 当然，同一个字符只能经过一次，其中同一个仅指在字符串中的位置相同 )。",
+    "formatI": "第一行包含一个整数 $t \\; (1 \\leqslant t \\leqslant 10^4)$ ，表示测试样例组数。\n \n 对于每组测试样例，包含一行一个字符串 $s \\; (2 \\leqslant |s| \\leqslant 2 \\cdot 10^5)$，意义见题面。",
+    "formatO": "对于每组测试样例，第一行包含两个用空格隔开的整数 $cost$ 和 $m$ 分别表示 最小权值和 和 最大经过的字符数。\n \n 第二行包含 $m$ 个整数，分别表示沿途经过的所有字符位置。( 例如输出 $1 \\; 4 \\; 3 \\; 5$ 表示跳跃路径为 $s_1$ → $s_4$ → $s_3$ → $s_5$ ) 数与数之间用空格隔开。\n \n $Translated \\; by \\; Zigh$",
+    "hint": "",
+    "background": ""
+  },
+  "samples": [
+    {
+      "input": "6\nlogic\ncodeforces\nbca\naaaaaaaaaaa\nadbaadabad\nto",
+      "output": "9 4\n1 4 3 5\n16 10\n1 8 3 4 9 5 2 6 7 10\n1 2\n1 3\n0 11\n1 8 10 4 3 5 7 2 9 6 11\n3 10\n1 9 5 4 7 3 8 6 2 10\n5 2\n1 2"
+    }
+  ]
+}

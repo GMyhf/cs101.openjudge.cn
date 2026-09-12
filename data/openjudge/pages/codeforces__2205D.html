@@ -1,46 +1,30 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2205D: Simons and Beating Peaks</title></head>
-<body><div id="pageTitle"><h2>2205D: Simons and Beating Peaks</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2205/D" rel="noopener">Codeforces 2205D</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>data structures, divide and conquer, dp, greedy, implementation, trees, 1700
-
-
-*My loveliest wishes dissolved into the air; At eighteen, I poured my dreams into the mic to share.*
-
-— SHUN, *[720](https://open.spotify.com/track/3bhQrFuaaPk8pMMb7TcU2d)*
-
-We call an array 𝑏 of length 𝑚 *cool* if and only if:
-
-- There exists **no** index 𝑖 (1&lt;𝑖&lt;𝑚) such that 𝑏𝑖=max({𝑏𝑖−1,𝑏𝑖,𝑏𝑖+1}).
-
-Simons has an array 𝑎 of size 𝑛. Initially, the array is a permutation∗.
-
-He must perform the following operation until the array is *cool*:
-
-- Choose an index 𝑖 (1&lt;𝑖&lt;𝑛) such that 𝑎𝑖=max({𝑎𝑖−1,𝑎𝑖,𝑎𝑖+1}).
-- Then, he can remove either 𝑎𝑖−1 **or** 𝑎𝑖+1 from the array. After removal, a gap appears in the array, and the left and right sides of the gap will be rejoined.
-
-Find the minimum number of operations for Simons to perform.
-
-∗A permutation of length 𝑛 is an array consisting of 𝑛 distinct integers from 1 to 𝑛 in arbitrary order. For example, [2,3,1,5,4] is a permutation, but [1,2,2] is not a permutation (2 appears twice in the array), and [1,3,4] is also not a permutation (𝑛=3 but there is 4 in the array).
-
-**Input**
-
-Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤5⋅104). The description of the test cases follows.
-
-The first line contains an integer 𝑛 (3≤𝑛≤5⋅105) — the size of 𝑎.
-
-The second line contains 𝑛 integers 𝑎1,𝑎2,…,𝑎𝑛 (1≤𝑎𝑖≤𝑛, all 𝑎𝑖-s are distinct) — the array Simons has initially.
-
-It is guaranteed that the sum of 𝑛 over all test cases does not exceed 5⋅105.
-
-**Output**
-
-For each test case, print a single integer — the minimum number of operations for Simons to perform.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2205/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2205D: D. Simons and Beating Peaks</title></head>
+<body><div id="pageTitle"><h2>D. Simons and Beating Peaks</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2205/D" rel="noopener">Codeforces 2205D</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>512 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>My loveliest wishes dissolved into the air; At eighteen, I poured my dreams into the mic to share.</p><p>— SHUN, <a href="https://open.spotify.com/track/3bhQrFuaaPk8pMMb7TcU2d" rel="noopener">720</a></p><p>We call an array  <em>b</em>  of length  <em>m</em>  cool if and only if:</p><ul><li>There exists no index  <em>i</em>  (<em>1 &lt; i &lt; m</em>) such that  <em>b<sub>i</sub>=max({b<sub>i-1</sub>, b<sub>i</sub>, b<sub>i+1</sub>})</em>.</li></ul><p>Simons has an array  <em>a</em>  of size  <em>n</em>. Initially, the array is a permutation <em><sup>∗</sup></em>.</p><p>He must perform the following operation until the array is cool:</p><ul><li>Choose an index  <em>i</em>  (<em>1 &lt; i &lt; n</em>) such that  <em>a<sub>i</sub>=max({a<sub>i-1</sub>, a<sub>i</sub>, a<sub>i+1</sub>})</em>.</li><li>Then, he can remove either  <em>a<sub>i-1</sub></em>  or  <em>a<sub>i+1</sub></em>  from the array. After removal, a gap appears in the array, and the left and right sides of the gap will be rejoined.</li></ul><p>Find the minimum number of operations for Simons to perform.</p><p><em><sup>∗</sup></em> A permutation of length  <em>n</em>  is an array consisting of  <em>n</em>  distinct integers from  <em>1</em>  to  <em>n</em>  in arbitrary order. For example,  <em>[2,3,1,5,4]</em>  is a permutation, but  <em>[1,2,2]</em>  is not a permutation (<em>2</em>  appears twice in the array), and  <em>[1,3,4]</em>  is also not a permutation (<em>n=3</em>  but there is  <em>4</em>  in the array).</p></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains the number of test cases  <em>t</em>  (<em>1 ≤ t ≤ 5· 10<sup>4</sup></em>). The description of the test cases follows.</p><p>The first line contains an integer  <em>n</em>  (<em>3≤ n≤ 5· 10<sup>5</sup></em>) — the size of  <em>a</em>.</p><p>The second line contains  <em>n</em>  integers  <em>a<sub>1</sub>,a<sub>2</sub>,…,a<sub>n</sub></em>  (<em>1≤ a<sub>i</sub>≤ n</em>, all  <em>a<sub>i</sub></em> -s are distinct) — the array Simons has initially.</p><p>It is guaranteed that the sum of  <em>n</em>  over all test cases does not exceed  <em>5· 10<sup>5</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, print a single integer — the minimum number of operations for Simons to perform.</p></dd>
+<dt>样例输入</dt><dd><pre>5
+3
+1 2 3
+5
+4 1 3 2 5
+6
+4 5 3 6 2 1
+7
+6 5 1 7 4 2 3
+15
+7 4 10 12 9 14 5 3 8 11 1 15 2 13 6</pre></dd>
+<dt>样例输出</dt><dd><pre>0
+1
+3
+3
+9</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, the array is cool initially, so Simons can't perform any operation. The answer is  <em>0</em>.</p><p>In the second test case, Simons can perform as follows:</p><ul><li>Choose index  <em>3</em>, because  <em>a<sub>3</sub>=max({a<sub>2</sub>,a<sub>3</sub>,a<sub>4</sub>})</em>. Then, he removes  <em>a<sub>2</sub></em>  from the array. The array becomes  <em>[4,3,2,5]</em>.</li></ul><p>We can see the array is cool now. Thus, the answer is  <em>1</em>.</p><p>In the third test case, Simons can perform as follows:</p><ul><li>Choose index  <em>2</em>. Then, he removes  <em>a<sub>1</sub></em>  from the array. The array becomes  <em>[5,3,6,2,1]</em>.</li><li>Choose index  <em>3</em>. Then, he removes  <em>a<sub>2</sub></em>  from the array. The array becomes  <em>[5,6,2,1]</em>.</li><li>Choose index  <em>2</em>. Then, he removes  <em>a<sub>1</sub></em>  from the array. The array becomes  <em>[6,2,1]</em>.</li></ul><p>Thus, Simons makes the array cool in  <em>3</em>  operations.</p></dd>
+</dl>
 </body></html>

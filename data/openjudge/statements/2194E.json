@@ -1,0 +1,29 @@
+{
+  "id": "2194E",
+  "name": "The Turtle Strikes Back",
+  "source_url": "https://codeforces.com/problemset/problem/2194/E",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2194E",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 512000,
+  "statement": {
+    "description": "After a heavy training session, Michelangelo and Raphael decided to order pizza. Today, on the occasion of the holiday, the pizzeria is preparing rectangular pizzas made of  $ n $  rows and  $ m $  columns of slices. Each slice has its own unique recipe and flavor.\n\nMichelangelo was the first to open the box and roughly estimated the pleasure of eating each slice: the pleasure from the slice located in the  $ i $ -th row and  $ j $ -th column is equal to  $ a_{i,j} $ . It is guaranteed that there is at least one slice that Michelangelo liked, meaning that among  $ a_{i, j} $  there is at least one non-negative number.\n\nThe turtles agreed that Michelangelo would eat first. According to an ancient tradition, he must choose a route from the top left corner  $ (1,1) $  to the bottom right corner  $ (n,m) $  and eat all the slices on that route. In one step, he can move either to the adjacent slice on the right or to the adjacent slice below.\n\nMichelangelo aims to maximize the total pleasure from the eaten slices.\n\nHowever, Raphael decided to use sauce. Before Michelangelo chooses a route, Raphael decided to choose exactly one slice of pizza and apply his signature sauce to it. But due to the specifics of this sauce, the pleasure from that slice changes to the opposite: if it was previously  $ a_{i,j} $ , after applying the sauce it becomes  $ -a_{i,j} $ .\n\nAfter that, knowing Raphael's choice, Michelangelo will choose the optimal route for himself and eat all the slices on it.\n\nRaphael became curious about what minimum pleasure Michelangelo could achieve. Help him calculate this number.",
+    "formatI": "Each test contains multiple test cases. The first line contains the number of test cases  $ t $  ( $ 1 \\le t \\le 10^4 $ ). The description of the test cases follows.\n\nIn the first line of each test case, two integers  $ n, m\\, (1 \\le n, m \\le 10^6, 1 \\leq n \\cdot m \\le 10^6) $  are given — the number of rows and columns in the table, respectively.\n\nIn each of the following  $ n $  lines of each test case,  $ m $  integers are provided, separated by spaces. The  $ j $ -th number in the  $ i $ -th of these lines corresponds to the value  $ a_{i, j} $  ( $ -10^9 \\leq a_{i, j} \\leq 10^9 $ ). It is guaranteed that there is at least one non-negative value among the  $ a_{i, j} $ .\n\nIt is guaranteed that the sum of  $ n \\cdot m $  across all test cases does not exceed  $ 10^6 $",
+    "formatO": "For each test case, output a single integer — the minimum pleasure Michelangelo can achieve, which Raphael can guarantee.",
+    "hint": "If Raphael did not use the sauce, Michelangelo would choose the path $$$\n (1,1) \\rightarrow (2,1) \\rightarrow(3,1) \\rightarrow (3,2) \\rightarrow (3,3) \n$$$ which gives a total pleasure of  $ 1 + 4 + 1 + 6 - 1 = 11 $ .\n\nHowever, if Raphael applies the sauce to the cell  $ (3,2) $ , the value  $ 6 $  will turn into  $ -6 $ . Then the optimal path for Michelangelo will be $$$\n (1,1) \\rightarrow (1,2) \\rightarrow (1,3) \\rightarrow (2,3) \\rightarrow (3,3) \n$$$ with a total pleasure of  $ 1 - 2 + 3 + 2 - 1 = 3 $ . Raphael cannot achieve a lower result in any cell",
+    "background": null
+  },
+  "translation": {
+    "description": "在一次艰苦的训练之后，Michelangelo 和 Raphael 决定点披萨庆祝。今天因为节日，披萨店准备了由 $n$ 行 $m$ 列切片组成的矩形披萨。每片披萨都有独特的配方和风味。\n\nMichelangelo 是第一个打开盒子的人，他粗略估算了每片披萨的享受值：位于第 $i$ 行第 $j$ 列的披萨片带来的享受值为 $a_{i,j}$。保证至少有一片披萨是 Michelangelo 喜欢的，即 $a_{i,j}$ 中至少有一个非负数。\n\n两只乌龟约定由 Michelangelo 先吃。按照古老的传统，他必须从左上角 $(1,1)$ 走到右下角 $(n,m)$，并吃掉这条路径上的所有披萨片。每一步，他只能向右或向下走到相邻的披萨片。\n\nMichelangelo 希望最大化他吃到的总享受值。\n\n然而 Raphael 决定使用特制酱汁。在 Michelangelo 选择路径之前，Raphael 决定选择恰好一片披萨，并在上面涂抹他独家秘制的酱汁。但是由于这种酱汁特殊，这片披萨的享受值会变为相反数：即原来是 $a_{i,j}$，使用酱汁后变为 $-a_{i,j}$。\n\n之后，Michelangelo 知道 Raphael 的选择后，将为自己选择最优路径，吃掉这条路径上的所有披萨片。\n\nRaphael 很好奇 Michelangelo 最少能够获得多少享受值。请帮助他计算这个最小值。",
+    "formatI": "每个测试点包含多个测试用例。第一行包含测试用例数 $t$（$1 \\le t \\le 10^4$）。随后是每个测试用例的描述。\n\n每个测试用例的第一行包含两个整数 $n, m$（$1 \\le n, m \\le 10^6, 1 \\leq n \\cdot m \\le 10^6$），表示表格的行数和列数。\n\n接下来的 $n$ 行，每行包含 $m$ 个用空格隔开的整数。第 $i$ 行第 $j$ 个数字表示 $a_{i,j}$（$-10^9 \\leq a_{i,j} \\leq 10^9$）。保证 $a_{i,j}$ 中至少有一个非负数。\n\n保证所有测试用例中 $n \\cdot m$ 的总和不超过 $10^6$。",
+    "formatO": "对于每个测试用例，输出一个整数，表示 Raphael 能保证的 Michelangelo 最少能获得的享受值。",
+    "hint": "如果 Raphael 不使用酱汁，Michelangelo 会选择如下路径：\n$$\n(1,1) \\rightarrow (2,1) \\rightarrow(3,1) \\rightarrow (3,2) \\rightarrow (3,3)\n$$\n获得的总享受值为 $1 + 4 + 1 + 6 - 1 = 11$。\n\n然而，如果 Raphael 将酱汁用在单元格 $(3,2)$ 上，值 $6$ 会变为 $-6$。此时 Michelangelo 的最优路径为：\n$$\n(1,1) \\rightarrow (1,2) \\rightarrow (1,3) \\rightarrow (2,3) \\rightarrow (3,3)\n$$\n获得的总享受值为 $1 - 2 + 3 + 2 - 1 = 3$。在其他任何单元格上使用酱汁，Raphael 都无法获得更低的结果。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "2\n3 3\n1 -2 3\n4 -5 2\n1 6 -1\n2 4\n-1 -1 -1 1\n-1 -1 -1 -1",
+      "output": "3\n-5"
+    }
+  ]
+}

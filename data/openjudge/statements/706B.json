@@ -1,0 +1,29 @@
+{
+  "id": "706B",
+  "name": "Interesting drink",
+  "source_url": "https://codeforces.com/problemset/problem/706/B",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF706B",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Vasiliy likes to rest after a hard work, so you may often meet him in some bar nearby. As all programmers do, he loves the famous drink \"Beecola\", which can be bought in $ n $ different shops in the city. It's known that the price of one bottle in the shop $ i $ is equal to $ x_{i} $ coins.\n\nVasiliy plans to buy his favorite drink for $ q $ consecutive days. He knows, that on the $ i $ -th day he will be able to spent $ m_{i} $ coins. Now, for each of the days he want to know in how many different shops he can buy a bottle of \"Beecola\".",
+    "formatI": "The first line of the input contains a single integer $ n $ ( $ 1<=n<=100000 $ ) — the number of shops in the city that sell Vasiliy's favourite drink.\n\nThe second line contains $ n $ integers $ x_{i} $ ( $ 1<=x_{i}<=100000 $ ) — prices of the bottles of the drink in the $ i $ -th shop.\n\nThe third line contains a single integer $ q $ ( $ 1<=q<=100000 $ ) — the number of days Vasiliy plans to buy the drink.\n\nThen follow $ q $ lines each containing one integer $ m_{i} $ ( $ 1<=m_{i}<=10^{9} $ ) — the number of coins Vasiliy can spent on the $ i $ -th day.",
+    "formatO": "Print $ q $ integers. The $ i $ -th of them should be equal to the number of shops where Vasiliy will be able to buy a bottle of the drink on the $ i $ -th day.",
+    "hint": "On the first day, Vasiliy won't be able to buy a drink in any of the shops.\n\nOn the second day, Vasiliy can buy a drink in the shops $ 1 $ , $ 2 $ , $ 3 $ and $ 4 $ .\n\nOn the third day, Vasiliy can buy a drink only in the shop number $ 1 $ .\n\nFinally, on the last day Vasiliy can buy a drink in any shop.",
+    "background": ""
+  },
+  "translation": {
+    "description": "Vasiliy 喜欢在辛苦工作后休息，因此你经常可以在附近的酒吧里见到他。像所有程序员一样，他喜欢著名饮料 “Beecola”，这款饮料在城市中的 $n$ 家不同的商店有售。已知第 $i$ 家商店中一瓶饮料的价格为 $x_i$ 枚硬币。\n\nVasiliy 计划连续 $q$ 天购买他最喜欢的饮料。他知道，第 $i$ 天他能花费 $m_i$ 枚硬币。现在，他想知道，在每一天里，他能在多少家不同的商店买到一瓶 “Beecola”。",
+    "formatI": "输入的第一行包含一个整数 $n$（$1 \\le n \\le 100000$），表示城市中售卖 Vasiliy 最爱饮料的商店数量。\n\n第二行包含 $n$ 个整数 $x_i$（$1 \\le x_i \\le 100000$），表示第 $i$ 家商店的饮料价格。\n\n第三行包含一个整数 $q$（$1 \\le q \\le 100000$），表示 Vasiliy 计划购买饮料的天数。\n\n接下来的 $q$ 行，每行一个整数 $m_i$（$1 \\le m_i \\le 10^{9}$），表示第 $i$ 天 Vasiliy 可用于购买饮料的硬币数量。",
+    "formatO": "输出 $q$ 个整数，第 $i$ 个整数表示 Vasiliy 在第 $i$ 天能买到饮料的商店数量。",
+    "hint": "第一天，Vasiliy 无法在任何一家商店买到饮料。\n\n第二天，Vasiliy 可以在商店 1、2、3 和 4 买到饮料。\n\n第三天，Vasiliy 只能在商店 1 买到饮料。\n\n最后一天，Vasiliy 可以在所有商店买到饮料。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "5\n3 10 8 6 11\n4\n1\n10\n3\n11\n",
+      "output": "0\n4\n1\n5\n"
+    }
+  ]
+}

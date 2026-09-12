@@ -1,0 +1,29 @@
+{
+  "id": "1764C",
+  "name": "Doremy's City Construction",
+  "source_url": "https://codeforces.com/problemset/problem/1764/C",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF1764C",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Doremy's new city is under construction! The city can be regarded as a simple undirected graph with $ n $ vertices. The $ i $ -th vertex has altitude $ a_i $ . Now Doremy is deciding which pairs of vertices should be connected with edges.\n\nDue to economic reasons, there should be no self-loops or multiple edges in the graph.\n\nDue to safety reasons, there should not be pairwise distinct vertices $ u $ , $ v $ , and $ w $ such that $ a_u \\leq a_v \\leq a_w $ and the edges $ (u,v) $ and $ (v,w) $ exist.\n\nUnder these constraints, Doremy would like to know the maximum possible number of edges in the graph. Can you help her?\n\nNote that the constructed graph is allowed to be disconnected.",
+    "formatI": "The input consists of multiple test cases. The first line contains a single integer $ t $ ( $ 1\\le t\\le 10^4 $ ) — the number of test cases. The description of the test cases follows.\n\nThe first line of each test case contains a single integer $ n $ ( $ 2 \\le n \\le 2\\cdot 10^5 $ ) — the number of vertices.\n\nThe second line of each test case contains $ n $ integers $ a_1, a_2, \\dots, a_n $ ( $ 1\\le a_i\\le 10^6 $ ) — the altitudes of each vertex.\n\nIt is guaranteed that the sum of $ n $ over all test cases does not exceed $ 2 \\cdot 10^5 $ .",
+    "formatO": "For each test case, output the maximum possible number of edges in the graph.",
+    "hint": "In the first test case, there can only be at most $ 3 $ edges in the graph. A possible construction is to connect $ (1,3) $ , $ (2,3) $ , $ (3,4) $ . In the picture below the red number above node $ i $ is $ a_i $ .\n\n![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF1764C/664da7a7b39c78efe9a85191f05318cb0a9df4d9.png)\n\nThe following list shows all such $ u $ , $ v $ , $ w $ that the edges $ (u,v) $ and $ (v,w) $ exist.\n\n- $ u=1 $ , $ v=3 $ , $ w=2 $ ;\n- $ u=1 $ , $ v=3 $ , $ w=4 $ ;\n- $ u=2 $ , $ v=3 $ , $ w=1 $ ;\n- $ u=2 $ , $ v=3 $ , $ w=4 $ ;\n- $ u=4 $ , $ v=3 $ , $ w=1 $ ;\n- $ u=4 $ , $ v=3 $ , $ w=2 $ .\n\nAnother possible construction is to connect $ (1,4) $ , $ (2,4) $ , $ (3,4) $ .\n\n![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF1764C/7d1fc03a74b1366633e41dc227acef23827c0f69.png)\n\nAn unacceptable construction is to connect $ (1,3) $ , $ (2,3) $ , $ (2,4) $ , $ (3,4) $ . Because when $ u=4 $ , $ v=2 $ , $ w=3 $ , $ a_u\\le a_v \\le a_w $ holds, and the respective edges exist.\n\n![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF1764C/02cccee9e8ea3921ef7338c4d1dd72e83e933cbc.png)",
+    "background": ""
+  },
+  "translation": {
+    "description": "哆蕾咪的新城市正在建设中！这座城市可以被看作一个简单无向图，有 $n$ 个顶点。第 $i$ 个顶点的海拔为 $a_i$。现在哆蕾咪正在决定哪些顶点对之间应该连边。\n\n出于经济原因，图中不允许有自环或重边。\n\n出于安全原因，不允许存在互不相同的顶点 $u$、$v$ 和 $w$，使得 $a_u \\leq a_v \\leq a_w$ 且边 $(u,v)$ 和 $(v,w)$ 都存在。\n\n在这些约束下，哆蕾咪想知道图中最多可以有多少条边。你能帮帮她吗？\n\n注意，所构造的图可以是不连通的。",
+    "formatI": "输入包含多组测试用例。第一行包含一个整数 $t$（$1 \\leq t \\leq 10^4$），表示测试用例的数量。接下来是每个测试用例的描述。\n\n每个测试用例的第一行包含一个整数 $n$（$2 \\leq n \\leq 2 \\cdot 10^5$），表示顶点数。\n\n第二行包含 $n$ 个整数 $a_1, a_2, \\dots, a_n$（$1 \\leq a_i \\leq 10^6$），表示每个顶点的海拔。\n\n保证所有测试用例中 $n$ 的总和不超过 $2 \\cdot 10^5$。",
+    "formatO": "对于每个测试用例，输出图中最多可以有多少条边。",
+    "hint": "在第一个测试用例中，图中最多只能有 $3$ 条边。一种可能的构造方式是连接 $(1,3)$、$(2,3)$、$(3,4)$。下图中，节点 $i$ 上方的红色数字为 $a_i$。\n\n![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF1764C/664da7a7b39c78efe9a85191f05318cb0a9df4d9.png)\n\n下列是所有满足条件的 $u$、$v$、$w$，使得边 $(u,v)$ 和 $(v,w)$ 都存在：\n\n- $u=1$，$v=3$，$w=2$；\n- $u=1$，$v=3$，$w=4$；\n- $u=2$，$v=3$，$w=1$；\n- $u=2$，$v=3$，$w=4$；\n- $u=4$，$v=3$，$w=1$；\n- $u=4$，$v=3$，$w=2$。\n\n另一种可能的构造方式是连接 $(1,4)$、$(2,4)$、$(3,4)$。\n\n![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF1764C/7d1fc03a74b1366633e41dc227acef23827c0f69.png)\n\n一种不合法的构造方式是连接 $(1,3)$、$(2,3)$、$(2,4)$、$(3,4)$。因为当 $u=4$，$v=2$，$w=3$ 时，$a_u \\leq a_v \\leq a_w$ 成立，且相应的边都存在。\n\n![](https://cdn.luogu.com.cn/upload/vjudge_pic/CF1764C/02cccee9e8ea3921ef7338c4d1dd72e83e933cbc.png)\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "4\n4\n2 2 3 1\n6\n5 2 3 1 5 2\n12\n7 2 4 9 1 4 6 3 7 4 2 3\n4\n1000000 1000000 1000000 1000000",
+      "output": "3\n9\n35\n2"
+    }
+  ]
+}

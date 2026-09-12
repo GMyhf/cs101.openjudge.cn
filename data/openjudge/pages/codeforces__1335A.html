@@ -1,34 +1,27 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>1335A: Candies and Two Sisters</title></head>
-<body><div id="pageTitle"><h2>1335A: Candies and Two Sisters</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1335/A" rel="noopener">Codeforces 1335A</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>There are two sisters Alice and Betty. You have 𝑛 candies. You want to distribute these 𝑛 candies between two sisters in such a way that:
-
-- Alice will get 𝑎 (𝑎&gt;0) candies;
-- Betty will get 𝑏 (𝑏&gt;0) candies;
-- each sister will get some **integer** number of candies;
-- Alice will get a greater amount of candies than Betty (i.e. 𝑎&gt;𝑏);
-- all the candies will be given to one of two sisters (i.e. 𝑎+𝑏=𝑛).
-
-Your task is to calculate the number of ways to distribute exactly 𝑛 candies between sisters in a way described above. Candies are indistinguishable.
-
-Formally, find the number of ways to represent 𝑛n as the sum of 𝑛=𝑎+𝑏, where 𝑎a and 𝑏b are positive integers and 𝑎&gt;𝑏.
-
-You have to answer 𝑡 independent test cases.
-
-**Input**
-
-The first line of the input contains one integer $𝑡 (1≤𝑡≤10^4)$ — the number of test cases. Then 𝑡t test cases follow.
-
-The only line of a test case contains one integer $𝑛 (1≤𝑛≤2⋅10^9)$ — the number of candies you have.
-
-**Output**
-
-For each test case, print the answer — the number of ways to distribute exactly 𝑛n candies between two sisters in a way described in the problem statement. If there is no way to satisfy all the conditions, print 00.
-
-Example
-
-Input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1335/A" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 1335A: A. Candies and Two Sisters</title></head>
+<body><div id="pageTitle"><h2>A. Candies and Two Sisters</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/1335/A" rel="noopener">Codeforces 1335A</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>There are two sisters Alice and Betty. You have <em>n</em> candies. You want to distribute these <em>n</em> candies between two sisters in such a way that:</p><ul><li>Alice will get <em>a</em> (<em>a &gt; 0</em>) candies;</li><li>Betty will get <em>b</em> (<em>b &gt; 0</em>) candies;</li><li>each sister will get some integer number of candies;</li><li>Alice will get a greater amount of candies than Betty (i.e. <em>a &gt; b</em>);</li><li>all the candies will be given to one of two sisters (i.e. <em>a+b=n</em>).</li></ul><p>Your task is to calculate the number of ways to distribute exactly <em>n</em> candies between sisters in a way described above. Candies are indistinguishable.</p><p>Formally, find the number of ways to represent <em>n</em> as the sum of <em>n=a+b</em>, where <em>a</em> and <em>b</em> are positive integers and <em>a&gt;b</em>.</p><p>You have to answer <em>t</em> independent test cases.</p></dd>
+<dt>Input</dt><dd><p>The first line of the input contains one integer <em>t</em> (<em>1 ≤ t ≤ 10<sup>4</sup></em>) — the number of test cases. Then <em>t</em> test cases follow.</p><p>The only line of a test case contains one integer <em>n</em> (<em>1 ≤ n ≤ 2 · 10<sup>9</sup></em>) — the number of candies you have.</p></dd>
+<dt>Output</dt><dd><p>For each test case, print the answer — the number of ways to distribute exactly <em>n</em> candies between two sisters in a way described in the problem statement. If there is no way to satisfy all the conditions, print <em>0</em>.</p></dd>
+<dt>样例输入</dt><dd><pre>6
+7
+1
+2
+3
+2000000000
+763243547</pre></dd>
+<dt>样例输出</dt><dd><pre>3
+0
+0
+1
+999999999
+381621773</pre></dd>
+<dt>Note</dt><dd><p>For the test case of the example, the <em>3</em> possible ways to distribute candies are:</p><ul><li><em>a=6</em>, <em>b=1</em>;</li><li><em>a=5</em>, <em>b=2</em>;</li><li><em>a=4</em>, <em>b=3</em>.</li></ul></dd>
+</dl>
 </body></html>

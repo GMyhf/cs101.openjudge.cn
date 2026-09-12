@@ -1,33 +1,24 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>2208C: Stamina and Tasks</title></head>
-<body><div id="pageTitle"><h2>2208C: Stamina and Tasks</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/2208/C" rel="noopener">Codeforces 2208C</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>There are 𝑛 tasks for you. Task 𝑖 has an integer value of 𝑐𝑖 and a difficulty of 𝑝𝑖. Also, you have an initial stamina of 1, which is denoted as 𝑆. You should process the tasks from task 1 to task 𝑛. For each task, you have two choices.
-
-- Give up the task. This way, nothing will happen.
-- Complete the task. This way, you will gain 𝑆⋅𝑐𝑖 points. However, 𝑆 will drop to 𝑆⋅(1−𝑝𝑖100) **after** the task is completed.
-
-You need to maximize your points after you finish the process.
-
-**Input**
-
-Each test contains multiple test cases. The first line contains the number of test cases 𝑡 (1≤𝑡≤10^3). The description of the test cases follows.
-
-The first line of each test cases contain an integer 𝑛 (1≤𝑛≤10^5) denoting the number of tasks.
-
-The following 𝑛 lines contain two integers each, denoting 𝑐𝑖 (1≤𝑐𝑖≤100) and 𝑝𝑖 (0≤𝑝𝑖≤100).
-
-It is guaranteed that the sum of 𝑛 over all test cases does not exceed 10^5.
-
-**Output**
-
-For each test case, output a single real number — the maximum possible points you can get. Your answer is considered correct if its absolute or relative error does not exceed 10^−6.
-
-Formally, let your answer be 𝑎, and the jury&#x27;s answer be 𝑏. Your answer is accepted if and only if |𝑎−𝑏|max(1,|𝑏|)≤10^−6.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/2208/C" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 2208C: C. Stamina and Tasks</title></head>
+<body><div id="pageTitle"><h2>C. Stamina and Tasks</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/2208/C" rel="noopener">Codeforces 2208C</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>There are  <em>n</em>  tasks for you. Task  <em>i</em>  has an integer value of  <em>c<sub>i</sub></em>  and a difficulty of  <em>p<sub>i</sub></em>. Also, you have an initial stamina of  <em>1</em>, which is denoted as  <em>S</em>. You should process the tasks from task  <em>1</em>  to task  <em>n</em>. For each task, you have two choices.</p><ul><li>Give up the task. This way, nothing will happen.</li><li>Complete the task. This way, you will gain  <em>S· c<sub>i</sub></em>  points. However,  <em>S</em>  will drop to  <em>S· (1-p<sub>i</sub>/100)</em>  after the task is completed.</li></ul><p>You need to maximize your points after you finish the process.</p></dd>
+<dt>Input</dt><dd><p>Each test contains multiple test cases. The first line contains the number of test cases  <em>t</em>  (<em>1 ≤ t ≤ 10<sup>3</sup></em>). The description of the test cases follows.</p><p>The first line of each test cases contain an integer  <em>n</em>  (<em>1≤ n≤10<sup>5</sup></em>) denoting the number of tasks.</p><p>The following  <em>n</em>  lines contain two integers each, denoting  <em>c<sub>i</sub></em>  (<em>1≤ c<sub>i</sub>≤ 100</em>) and  <em>p<sub>i</sub></em>  (<em>0≤ p<sub>i</sub>≤ 100</em>).</p><p>It is guaranteed that the sum of  <em>n</em>  over all test cases does not exceed  <em>10<sup>5</sup></em>.</p></dd>
+<dt>Output</dt><dd><p>For each test case, output a single real number — the maximum possible points you can get. Your answer is considered correct if its absolute or relative error does not exceed  <em>10<sup>-6</sup></em>.</p><p>Formally, let your answer be  <em>a</em>, and the jury's answer be  <em>b</em>. Your answer is accepted if and only if  <em>(|a−b|)/(max(1,|b|))≤ 10<sup>-6</sup></em>.</p></dd>
+<dt>样例输入</dt><dd><pre>2
+2
+10 0
+20 5
+3
+10 5
+10 80
+20 5</pre></dd>
+<dt>样例输出</dt><dd><pre>30.0000000000
+29.0000000000</pre></dd>
+<dt>Note</dt><dd><p>In the first test case, it's optimal to complete task  <em>1</em>  and  <em>2</em>  in order, gaining points of  <em>10+20=30</em>.</p><p>In the second test case, it's optimal to complete task  <em>1</em>, give up task  <em>2</em>, and complete task  <em>3</em>. Before completing task  <em>3</em>, your stamina has dropped to  <em>1-5/100=0.95</em>. So your gain is  <em>10+20· 0.95=29</em>  points in total.</p></dd>
+</dl>
 </body></html>

@@ -1,0 +1,29 @@
+{
+  "id": "1443C",
+  "name": "The Delivery Dilemma",
+  "source_url": "https://codeforces.com/problemset/problem/1443/C",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF1443C",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Petya is preparing for his birthday. He decided that there would be $ n $ different dishes on the dinner table, numbered from $ 1 $ to $ n $ . Since Petya doesn't like to cook, he wants to order these dishes in restaurants.\n\nUnfortunately, all dishes are prepared in different restaurants and therefore Petya needs to pick up his orders from $ n $ different places. To speed up this process, he wants to order courier delivery at some restaurants. Thus, for each dish, there are two options for Petya how he can get it:\n\n- the dish will be delivered by a courier from the restaurant $ i $ , in this case the courier will arrive in $ a_i $ minutes,\n- Petya goes to the restaurant $ i $ on his own and picks up the dish, he will spend $ b_i $ minutes on this.\n\nEach restaurant has its own couriers and they start delivering the order at the moment Petya leaves the house. In other words, all couriers work in parallel. Petya must visit all restaurants in which he has not chosen delivery, he does this consistently.\n\nFor example, if Petya wants to order $ n = 4 $ dishes and $ a = [3, 7, 4, 5] $ , and $ b = [2, 1, 2, 4] $ , then he can order delivery from the first and the fourth restaurant, and go to the second and third on your own. Then the courier of the first restaurant will bring the order in $ 3 $ minutes, the courier of the fourth restaurant will bring the order in $ 5 $ minutes, and Petya will pick up the remaining dishes in $ 1 + 2 = 3 $ minutes. Thus, in $ 5 $ minutes all the dishes will be at Petya's house.\n\nFind the minimum time after which all the dishes can be at Petya's home.",
+    "formatI": "The first line contains one positive integer $ t $ ( $ 1 \\le t \\le 2 \\cdot 10^5 $ ) — the number of test cases. Then $ t $ test cases follow.\n\nEach test case begins with a line containing one integer $ n $ ( $ 1 \\le n \\le 2 \\cdot 10^5 $ ) — the number of dishes that Petya wants to order.\n\nThe second line of each test case contains $ n $ integers $ a_1 \\ldots a_n $ ( $ 1 \\le a_i \\le 10^9 $ ) — the time of courier delivery of the dish with the number $ i $ .\n\nThe third line of each test case contains $ n $ integers $ b_1 \\ldots b_n $ ( $ 1 \\le b_i \\le 10^9 $ ) — the time during which Petya will pick up the dish with the number $ i $ .\n\nThe sum of $ n $ over all test cases does not exceed $ 2 \\cdot 10^5 $ .",
+    "formatO": "For each test case output one integer — the minimum time after which all dishes can be at Petya's home.",
+    "hint": "",
+    "background": ""
+  },
+  "translation": {
+    "description": "Petya 正在为他的生日做准备。他决定在餐桌上准备 $n$ 道不同的菜肴，这些菜肴编号从 $1$ 到 $n$。由于 Petya 不喜欢做饭，他打算在餐厅点这些菜。\n\n不幸的是，每道菜都在不同的餐厅制作，因此 Petya 需要从 $n$ 个不同的地方取餐。为了加快这个过程，他想在一些餐厅选择快递送餐。因此，对于每道菜，Petya 有两种获取方式：\n\n- 由第 $i$ 家餐厅的快递员送餐，这种情况下快递员将在 $a_i$ 分钟后送达；\n- Petya 自己前往第 $i$ 家餐厅取餐，他将花费 $b_i$ 分钟。\n\n每家餐厅都有自己的快递员，并且快递员会在 Petya 离开家时开始送餐。换句话说，所有快递员是同时工作的。Petya 必须依次前往所有他没有选择快递送餐的餐厅。\n\n例如，如果 Petya 想要点 $n=4$ 道菜，$a=[3,7,4,5]$，$b=[2,1,2,4]$，那么他可以选择让第一家和第四家餐厅送餐，自己去第二家和第三家餐厅取餐。这样，第一家餐厅的快递员将在 $3$ 分钟后送达，第四家餐厅的快递员将在 $5$ 分钟后送达，而 Petya 自己取餐将花费 $1+2=3$ 分钟。因此，$5$ 分钟后所有菜肴都能到达 Petya 家中。\n\n请你计算，使所有菜肴都能到达 Petya 家中的最短时间。",
+    "formatI": "第一行包含一个正整数 $t$（$1 \\le t \\le 2 \\cdot 10^5$）——测试用例的数量。接下来是 $t$ 个测试用例。\n\n每个测试用例的第一行包含一个整数 $n$（$1 \\le n \\le 2 \\cdot 10^5$）——Petya 想要点的菜肴数量。\n\n每个测试用例的第二行包含 $n$ 个整数 $a_1,\\ldots,a_n$（$1 \\le a_i \\le 10^9$）——第 $i$ 道菜由快递送达所需的时间。\n\n每个测试用例的第三行包含 $n$ 个整数 $b_1,\\ldots,b_n$（$1 \\le b_i \\le 10^9$）——Petya 自己去取第 $i$ 道菜所需的时间。\n\n所有测试用例中 $n$ 的总和不超过 $2 \\cdot 10^5$。",
+    "formatO": "对于每个测试用例，输出一个整数，表示所有菜肴都能到达 Petya 家中的最短时间。",
+    "hint": "\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "4\n4\n3 7 4 5\n2 1 2 4\n4\n1 2 3 4\n3 3 3 3\n2\n1 2\n10 10\n2\n10 10\n1 2",
+      "output": "5\n3\n2\n3"
+    }
+  ]
+}

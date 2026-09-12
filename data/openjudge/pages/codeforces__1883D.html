@@ -1,29 +1,39 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><title>1883D: In Love</title></head>
-<body><div id="pageTitle"><h2>1883D: In Love</h2></div>
-<dl class="problem-params"><dt>来源</dt><dd><a href="https://codeforces.com/problemset/problem/1883/D" rel="noopener">Codeforces 1883D</a></dd>
-<dt>本地状态</dt><dd>题解摘要已导入；判题数据请按题目另行补充。</dd></dl>
-<dl class="problem-content"><dt>题解摘要</dt><dd><pre>Initially, you have an empty multiset of segments. You need to process 𝑞 operations of two types:
-
-- \+ 𝑙 𝑟 — Add the segment (𝑙,𝑟) to the multiset,
-- − 𝑙 𝑟 — Remove **exactly** one segment (𝑙,𝑟) from the multiset. It is guaranteed that this segment exists in the multiset.
-
-After each operation, you need to determine if there exists a pair of segments in the multiset that do not intersect. A pair of segments (𝑙,𝑟) and (𝑎,𝑏) do not intersect if there does not exist a point 𝑥 such that 𝑙≤𝑥≤𝑟 and 𝑎≤𝑥≤𝑏.
-
-**Input**
-
-The first line of each test case contains an integer 𝑞 (1≤𝑞≤10^5^) — the number of operations.
-
-The next 𝑞 lines describe two types of operations. If it is an addition operation, it is given in the format \+ 𝑙 𝑟. If it is a deletion operation, it is given in the format − 𝑙 𝑟 (1≤𝑙≤𝑟≤10^9^).
-
-**Output**
-
-After each operation, print &quot;YES&quot; if there exists a pair of segments in the multiset that do not intersect, and &quot;NO&quot; otherwise.
-
-You can print the answer in any case (uppercase or lowercase). For example, the strings &quot;yEs&quot;, &quot;yes&quot;, &quot;Yes&quot;, and &quot;YES&quot; will be recognized as positive answers.
-
-Example
-
-input</pre></dd>
-<dt>原题</dt><dd><p>完整题面、限制与样例请查看 <a href="https://codeforces.com/problemset/problem/1883/D" rel="noopener">Codeforces 原题</a>。</p></dd></dl>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 1883D: D. In Love</title></head>
+<body><div id="pageTitle"><h2>D. In Love</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/1883/D" rel="noopener">Codeforces 1883D</a></dd>
+<dt>Time limit</dt><dd>2 seconds</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Initially, you have an empty multiset of segments. You need to process <em>q</em> operations of two types:</p><ul><li><em>+</em> <em>l</em> <em>r</em> — Add the segment <em>(l, r)</em> to the multiset,</li><li><em>-</em> <em>l</em> <em>r</em> — Remove exactly one segment <em>(l, r)</em> from the multiset. It is guaranteed that this segment exists in the multiset.</li></ul><p>After each operation, you need to determine if there exists a pair of segments in the multiset that do not intersect. A pair of segments <em>(l, r)</em> and <em>(a, b)</em> do not intersect if there does not exist a point <em>x</em> such that <em>l ≤ x ≤ r</em> and <em>a ≤ x ≤ b</em>.</p></dd>
+<dt>Input</dt><dd><p>The first line of each test case contains an integer <em>q</em> (<em>1 ≤ q ≤ 10<sup>5</sup></em>) — the number of operations.</p><p>The next <em>q</em> lines describe two types of operations. If it is an addition operation, it is given in the format <em>+</em> <em>l</em> <em>r</em>. If it is a deletion operation, it is given in the format <em>-</em> <em>l</em> <em>r</em> (<em>1 ≤ l ≤ r ≤ 10<sup>9</sup></em>).</p></dd>
+<dt>Output</dt><dd><p>After each operation, print "YES" if there exists a pair of segments in the multiset that do not intersect, and "NO" otherwise.</p><p>You can print the answer in any case (uppercase or lowercase). For example, the strings "yEs", "yes", "Yes", and "YES" will be recognized as positive answers.</p></dd>
+<dt>样例输入</dt><dd><pre>12
++ 1 2
++ 3 4
++ 2 3
++ 2 2
++ 3 4
+- 3 4
+- 3 4
+- 1 2
++ 3 4
+- 2 2
+- 2 3
+- 3 4</pre></dd>
+<dt>样例输出</dt><dd><pre>NO
+YES
+YES
+YES
+YES
+YES
+NO
+NO
+YES
+NO
+NO
+NO</pre></dd>
+<dt>Note</dt><dd><p>In the example, after the second, third, fourth, and fifth operations, there exists a pair of segments <em>(1, 2)</em> and <em>(3, 4)</em> that do not intersect.</p><p>Then we remove exactly one segment <em>(3, 4)</em>, and by that time we had two segments. Therefore, the answer after this operation also exists.</p></dd>
+</dl>
 </body></html>

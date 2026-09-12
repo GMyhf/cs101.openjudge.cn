@@ -1,0 +1,29 @@
+{
+  "id": "1883D",
+  "name": "In Love",
+  "source_url": "https://codeforces.com/problemset/problem/1883/D",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF1883D",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Initially, you have an empty multiset of segments. You need to process $ q $ operations of two types:\n\n- $ + $ $ l $ $ r $ — Add the segment $ (l, r) $ to the multiset,\n- $ - $ $ l $ $ r $ — Remove exactly one segment $ (l, r) $ from the multiset. It is guaranteed that this segment exists in the multiset.\n\nAfter each operation, you need to determine if there exists a pair of segments in the multiset that do not intersect. A pair of segments $ (l, r) $ and $ (a, b) $ do not intersect if there does not exist a point $ x $ such that $ l \\leq x \\leq r $ and $ a \\leq x \\leq b $ .",
+    "formatI": "The first line of each test case contains an integer $ q $ ( $ 1 \\leq q \\leq 10^5 $ ) — the number of operations.\n\nThe next $ q $ lines describe two types of operations. If it is an addition operation, it is given in the format $ + $ $ l $ $ r $ . If it is a deletion operation, it is given in the format $ - $ $ l $ $ r $ ( $ 1 \\leq l \\leq r \\leq 10^9 $ ).",
+    "formatO": "After each operation, print \"YES\" if there exists a pair of segments in the multiset that do not intersect, and \"NO\" otherwise.\n\nYou can print the answer in any case (uppercase or lowercase). For example, the strings \"yEs\", \"yes\", \"Yes\", and \"YES\" will be recognized as positive answers.",
+    "hint": "In the example, after the second, third, fourth, and fifth operations, there exists a pair of segments $ (1, 2) $ and $ (3, 4) $ that do not intersect.\n\nThen we remove exactly one segment $ (3, 4) $ , and by that time we had two segments. Therefore, the answer after this operation also exists.",
+    "background": ""
+  },
+  "translation": {
+    "description": "最初，你有一个空的线段多重集。你需要处理 $q$ 次两种类型的操作：\n\n- $+ \\ l \\ r$ —— 向多重集中添加线段 $(l, r)$；\n- $- \\ l \\ r$ —— 从多重集中恰好移除一个线段 $(l, r)$。保证该线段在多重集中存在。\n\n每次操作后，你需要判断多重集中是否存在一对不相交的线段。两条线段 $(l, r)$ 和 $(a, b)$ 不相交，当且仅当不存在一个点 $x$ 使得 $l \\leq x \\leq r$ 且 $a \\leq x \\leq b$。",
+    "formatI": "每个测试用例的第一行包含一个整数 $q$（$1 \\leq q \\leq 10^5$），表示操作次数。\n\n接下来的 $q$ 行描述两种操作。如果是添加操作，格式为 $+ \\ l \\ r$；如果是删除操作，格式为 $- \\ l \\ r$（$1 \\leq l \\leq r \\leq 10^9$）。",
+    "formatO": "每次操作后，输出一行。如果多重集中存在一对不相交的线段，输出 \"YES\"；否则输出 \"NO\"。\n\n输出可以为任意大小写。例如，\"yEs\"、\"yes\"、\"Yes\" 和 \"YES\" 都会被识别为肯定答案。",
+    "hint": "在样例中，在第二、第三、第四和第五次操作后，存在一对不相交的线段 $(1, 2)$ 和 $(3, 4)$。\n\n然后我们移除了恰好一个线段 $(3, 4)$，此时仍然有两条线段，因此该操作后的答案也存在。\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "12\n+ 1 2\n+ 3 4\n+ 2 3\n+ 2 2\n+ 3 4\n- 3 4\n- 3 4\n- 1 2\n+ 3 4\n- 2 2\n- 2 3\n- 3 4",
+      "output": "NO\nYES\nYES\nYES\nYES\nYES\nNO\nNO\nYES\nNO\nNO\nNO"
+    }
+  ]
+}

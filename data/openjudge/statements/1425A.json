@@ -1,0 +1,29 @@
+{
+  "id": "1425A",
+  "name": "Arena of Greed",
+  "source_url": "https://codeforces.com/problemset/problem/1425/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF1425A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Lately, Mr. Chanek frequently plays the game Arena of Greed. As the name implies, the game's goal is to find the greediest of them all, who will then be crowned king of Compfestnesia.\n\nThe game is played by two people taking turns, where Mr. Chanek takes the first turn. Initially, there is a treasure chest containing $ N $ gold coins. The game ends if there are no more gold coins in the chest. In each turn, the players can make one of the following moves:\n\n- Take one gold coin from the chest.\n- Take half of the gold coins on the chest. This move is only available if the number of coins in the chest is even.\n\nBoth players will try to maximize the number of coins they have. Mr. Chanek asks your help to find the maximum number of coins he can get at the end of the game if both he and the opponent plays optimally.",
+    "formatI": "The first line contains a single integer $ T $ $ (1 \\le T \\le 10^5) $ denotes the number of test cases.\n\nThe next $ T $ lines each contain a single integer $ N $ $ (1 \\le N \\le 10^{18}) $ .",
+    "formatO": "$ T $ lines, each line is the answer requested by Mr. Chanek.",
+    "hint": "For the first case, the game is as follows:\n\n1. Mr. Chanek takes one coin.\n2. The opponent takes two coins.\n3. Mr. Chanek takes one coin.\n4. The opponent takes one coin.\n\nFor the second case, the game is as follows:\n\n1. Mr. Chanek takes three coins.\n2. The opponent takes one coin.\n3. Mr. Chanek takes one coin.\n4. The opponent takes one coin.",
+    "background": ""
+  },
+  "translation": {
+    "description": "最近，Mr. Chanek 经常玩一款名为 Arena of Greed 的游戏。顾名思义，这款游戏的目标是找出最贪婪的人，他将被加冕为 Compfestnesia 的国王。\n\n这款游戏由两个人轮流进行，Mr. Chanek 先手。最初，宝箱中有 $N$ 枚金币。当宝箱中没有金币时，游戏结束。在每一回合，玩家可以进行以下两种操作之一：\n\n- 从宝箱中取出一枚金币。\n- 取出宝箱中一半的金币。只有当宝箱中的金币数量为偶数时，才能进行此操作。\n\n两位玩家都会尽力让自己获得的金币数量最大化。Mr. Chanek 想请你帮忙计算，如果双方都采取最优策略，他最终最多能获得多少金币。",
+    "formatI": "第一行包含一个整数 $T$ $(1 \\le T \\le 10^5)$，表示测试用例的数量。\n\n接下来的 $T$ 行，每行包含一个整数 $N$ $(1 \\le N \\le 10^{18})$。",
+    "formatO": "输出 $T$ 行，每行一个答案，表示 Mr. Chanek 能获得的最大金币数。",
+    "hint": "对于第一个样例，游戏过程如下：\n\n1. Mr. Chanek 取走一枚金币。\n2. 对手取走两枚金币。\n3. Mr. Chanek 取走一枚金币。\n4. 对手取走一枚金币。\n\n对于第二个样例，游戏过程如下：\n\n1. Mr. Chanek 取走三枚金币。\n2. 对手取走一枚金币。\n3. Mr. Chanek 取走一枚金币。\n4. 对手取走一枚金币。\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "2\n5\n6",
+      "output": "2\n4"
+    }
+  ]
+}

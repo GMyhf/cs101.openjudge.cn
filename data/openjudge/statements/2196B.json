@@ -1,0 +1,29 @@
+{
+  "id": "2196B",
+  "name": "Another Problem about Beautiful Pairs",
+  "source_url": "https://codeforces.com/problemset/problem/2196/B",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF2196B",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 2000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "In the array  $ a $ , we call a pair of indices  $ i $ ,  $ j $  beautiful if the following condition holds:\n\n- $ a_{i} \\cdot a_{j} = j - i $ .\n\nCount the number of beautiful pairs in the array  $ a $ .",
+    "formatI": "Each test contains multiple test cases. The first line contains the number of test cases  $ t $  ( $ 1 \\le t \\le 10^4 $ ). The description of the test cases follows.\n\nThe first line of each test case contains a single integer  $ n $  ( $ 2 \\le n \\le 2 \\cdot 10^{5} $ ).\n\nThe second line of each test case contains  $ n $  integers  $ a_{i} $  ( $ 1 \\le a_{i} \\le 10^{9} $ ).\n\nAdditional constraints on the input:\n\n- The sum of  $ n $  across all test cases does not exceed  $ 2 \\cdot 10^5 $ .",
+    "formatO": "For each test case, output a single integer — the answer to the problem.",
+    "hint": "In the first example, there are  $ 3 $  beautiful pairs: ( $ 1, 2 $ ), ( $ 1, 3 $ ), and ( $ 1, 5 $ ).\n\nIn the second example, there are  $ 7 $  beautiful pairs: ( $ 1, 3 $ ), ( $ 1, 5 $ ), ( $ 2, 4 $ ), ( $ 2, 6 $ ), ( $ 3, 4 $ ), ( $ 3, 5 $ ), and ( $ 4, 6 $ ).",
+    "background": null
+  },
+  "translation": {
+    "description": "在数组 $a$ 中，如果下标对 $i$，$j$ 满足以下条件：\n- $a_i \\cdot a_j = j - i$，\n则我们称 $(i, j)$ 为美丽对。\n\n请计算数组 $a$ 中美丽对的数量。",
+    "formatI": "每组测试数据包含多组测试用例。第一行为测试用例数 $t$（$1 \\le t \\le 10^4$）。\n\n每个测试用例的第一行为一个整数 $n$（$2 \\le n \\le 2 \\cdot 10^5$）。\n\n每个测试用例的第二行为 $n$ 个整数 $a_i$（$1 \\le a_i \\le 10^9$）。\n\n额外输入限制：\n\n- 所有测试用例中 $n$ 的和不超过 $2 \\times 10^5$。",
+    "formatO": "对于每个测试用例，输出一个整数，表示该测试用例中美丽对的数量。",
+    "hint": "在第一个样例中，有 $3$ 个美丽对：( $1, 2$ )、( $1, 3$ ) 和 ( $1, 5$ )。\n\n在第二个样例中，有 $7$ 个美丽对：( $1, 3$ )、( $1, 5$ )、( $2, 4$ )、( $2, 6$ )、( $3, 4$ )、( $3, 5$ ) 和 ( $4, 6$ )。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "4\n5\n1 1 2 100 4\n6\n2 2 1 1 2 2\n10\n1 1 2 3 4 1 1 7 3 9\n2\n1000000000 1000000000",
+      "output": "3\n7\n10\n0"
+    }
+  ]
+}
