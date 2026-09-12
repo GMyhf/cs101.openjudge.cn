@@ -709,7 +709,7 @@
           "tests/1000-1999/1610"
         ],
         "excluded": [],
-        "method": "exact output tokens against recorded title-matched historical archives"
+        "method": "exact output tokens against the archived real test data (mydata.in/out and test.in/out, N up to 512) — both the reference and an independently written oracle reproduce 0/114/258C0511 and 458C45/6C1441/60D415"
       },
       "generator": "generate",
       "generator_seed_smoke": {
@@ -718,8 +718,8 @@
         "failed_seeds": []
       },
       "test_cases": 21,
-      "max_input_bytes": 176,
-      "max_output_bytes": 102,
+      "max_input_bytes": 524294,
+      "max_output_bytes": 360,
       "constraints": [
         [
           "each quadtree case is a power-of-two square binary bitmap",
@@ -735,11 +735,11 @@
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 4,
+          "frequency": 2,
           "total": 20,
           "status": "rejected",
           "exemption": null,
-          "share": 0.2
+          "share": 0.1
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -778,7 +778,18 @@
         "book": "practice",
         "problem": "01610",
         "merged_cases": 21,
-        "total_ms": 315
+        "total_ms": 532
+      },
+      "data_rebuilt": {
+        "date": "2026-09-12",
+        "task": "T-040",
+        "reason": "round12 的中央生成器把矩阵写成无分隔的 `10010111`，题面要求「每两个 0 和 1 之间至少有一个空格」；参考实现按 `input().split()` 读，21 组 `.out` 全是乱码。数据已按题面重建（单题 producecase + valid() 输入契约），本条目里的自检数字是对**重建后**的 data/ 重新实测的值，不是 round12 当时的测量。",
+        "superseded": {
+          "max_input_bytes": 176,
+          "max_output_bytes": 102,
+          "constant_output_probe.frequency": 4,
+          "constant_output_probe.share": 0.2
+        }
       }
     },
     {

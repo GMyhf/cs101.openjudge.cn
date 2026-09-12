@@ -675,6 +675,47 @@ print("\\n".join(answers))
         self.assertGreaterEqual(impossible, 3)
         self.assertIn(28, sizes)
 
+    def test_practice_01610_data_obeys_the_stated_input_separator(self):
+        status, _, body = request(self.port, "GET", "/practice/01610/")
+        self.assertEqual(status, 200)
+        self.assertIn("01610:四分树", body.decode("utf-8", errors="replace"))
+        mirrored = (ROOT / "data/openjudge/pages/practice__01610.html").read_text(encoding="utf-8")
+        self.assertRegex(mirrored, r"全局题号\s*</dt>\s*<dd>\s*612")
+
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        disk = [item for item in catalog["problems"] if item.get("global_number") == 612]
+        self.assertEqual([(item["book"], item["id"], item["test_count"]) for item in disk],
+                         [("practice", "01610", 21)])
+
+        made = ROOT / "data/openjudge/tests/1000-1999/01610_made/data"
+        self.assertEqual((made / "0.out").read_text(encoding="utf-8"), "0\n114\n258C0511\n")
+
+        # **这条是这道题的要害。** 题面写的是「每两个 0 和 1 之间至少有一个空格」，而
+        # 2026-09-12 之前生成器把整行写成无分隔的 `10010111`，参考实现按 `input().split()`
+        # 读就把一行读成单个整数 10010111 —— 21 组 `.out` 全是乱码，任何按题面写的正解
+        # 反而全挂。数据自洽（重跑逐字节不变、参考解 21/21 AC），所以闸门一个都没红。
+        # 这里把「每行恰好 N 个空格分隔的 0/1」逐组钉死，顺带钉住题面两端 N=512 与 k=100。
+        sizes, counts = [], []
+        for path in sorted(made.glob("*.in")):
+            lines = path.read_text(encoding="utf-8").rstrip("\n").split("\n")
+            position = 0
+            pictures = int(lines[position]); position += 1
+            counts.append(pictures)
+            for _ in range(pictures):
+                size = int(lines[position]); position += 1
+                sizes.append(size)
+                self.assertEqual(size & (size - 1), 0, f"{path.name}: N={size} 不是 2 的幂")
+                for _row in range(size):
+                    cells = lines[position].split(" ")
+                    position += 1
+                    self.assertEqual(len(cells), size,
+                                     f"{path.name}: 矩阵行 {lines[position - 1]!r} 不是 {size} 个空格分隔的格子")
+                    self.assertTrue(set(cells) <= {"0", "1"}, path.name)
+            self.assertEqual(position, len(lines), f"{path.name}: 有没被契约消费掉的行")
+        self.assertIn(512, sizes)
+        self.assertIn(2, sizes)
+        self.assertIn(100, counts)
+
     def test_practice_31183_to_31185_are_mirrored_with_discriminating_data(self):
         expected = {
             "31183": ("一道题搞懂输入", set(range(1, 9))),
