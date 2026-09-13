@@ -1349,7 +1349,10 @@ class Handler(BaseHTTPRequestHandler):
         match = re.search(r'<dt>样例输入</dt>\s*<dd>(.*?)</dd>\s*<dt>样例输出</dt>\s*<dd>(.*?)</dd>',
                           text, re.S)
         if not match:
-            return {"input": "", "output": "", "cases": []}
+            content = re.search(r'<div\s+class="markdown-body"[^>]*>(.*?)</div>', text, re.I | re.S)
+            cases = parse_embedded_html_samples(content.group(0)) if content else []
+            return {"input": cases[0]["input"] if cases else "",
+                    "output": cases[0]["output"] if cases else "", "cases": cases}
         def plain(chunk):
             chunk = re.sub(r"</?pre[^>]*>", "", chunk.strip())
             return unescape(re.sub(r"<[^>]+>", "", chunk)).strip("\n")
