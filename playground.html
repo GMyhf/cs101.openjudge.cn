@@ -29,8 +29,9 @@ __THEME_HEAD__
  .side.output-collapsed{grid-template-rows:minmax(0,1fr) 10px auto!important}
  .side.stdin-collapsed.output-collapsed{grid-template-rows:auto 10px auto!important;align-content:start}
  .side.stdin-collapsed .pane-stdin>:not(.pane-tabs),.side.output-collapsed .pane-output>:not(.pane-tabs){display:none}
- .pane-tools button{padding:3px 9px;font-size:12px}
- .pane-tools .meta{font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+ .pane-tools{min-width:0}
+ .pane-tools button{padding:3px 9px;font-size:12px;white-space:nowrap;flex:0 0 auto}
+ .pane-tools .meta{font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;min-width:0;overflow:hidden;text-overflow:ellipsis}
  .lint-state{border:0;background:transparent;color:var(--warn)!important;cursor:pointer}
  .lint-state[hidden]{display:none}
 
@@ -137,6 +138,7 @@ __THEME_HEAD__
         <button id="lintState" class="meta lint-state" type="button" hidden></button>
         <span class="meta" id="cursor">行 1，列 1</span>
         <span class="meta" id="saveState"></span>
+        <button id="copyCode" class="ghost" type="button" title="复制全部代码">复制代码</button>
       </span>
     </div>
     <div class="editor-host" id="editor"></div>
@@ -259,7 +261,7 @@ function loadLanguage(language) {
   current = language;
   lang.value = language;
   editor.setLanguage(language);
-  const saved = store.get(draftKey(language));
+  const saved = user ? store.get(draftKey(language)) : null;
   editor.value = saved !== null ? saved : share && language === share.language ? share.source : TEMPLATES[language] || "";
 }
 lang.addEventListener("change", () => {
@@ -301,8 +303,19 @@ async function post(endpoint, payload) {
   catch (err) { return { status: "Error", message: "服务器返回了无法解析的响应（HTTP " + response.status + "）" }; }
 }
 
+// 未登录的人是从分享链接点进来的：能看、能改，但运行 / 检查 / 分享要占服务器资源，得先登录。
+function askLogin(action) {
+  showConsole(true);
+  collapse("output", false);
+  output.innerHTML = '<p class="placeholder">' + esc(action) + '需要先登录（运行代码要占用服务器的判题沙箱）。</p>'
+    + '<p style="margin-top:12px"><a class="primary" href="' + LOGIN_URL + '">登录后回到这条分享</a>'
+    + '　<a href="/register/">注册账号</a></p>'
+    + '<p class="placeholder" style="margin-top:12px">不登录也可以直接复制代码，粘到自己的编辑器里运行。</p>';
+}
+
 async function execute(kind) {
-  if (busy || !user) return;
+  if (!user) { askLogin(kind === "run" ? "运行" : "语法检查"); return; }
+  if (busy) return;
   if (!editor.value.trim()) { render(kind, { status: "Empty Source", message: "先写点代码再" + (kind === "run" ? "运行。" : "检查。") }); return; }
   setBusy(true, kind === "run" ? "运行中…" : "检查中…");
   showConsole(true);
@@ -363,18 +376,25 @@ async function copyText(text) {
   box.remove();
   return ok;
 }
+// 从微信群点开的人多半只想把代码拿走；手机上在 textarea 里全选很难操作，所以单给一个按钮。
+$("#copyCode").onclick = async () => {
+  const button = $("#copyCode");
+  button.textContent = (await copyText(editor.value)) ? "已复制" : "复制失败";
+  setTimeout(() => { button.textContent = "复制代码"; }, 1400);
+};
 $("#copyOut").onclick = async () => {
   $("#runState").textContent = (await copyText(lastOutput)) ? "输出已复制" : "复制失败";
 };
 
 const shareDialog = $("#shareDialog"), shareLink = $("#shareLink");
 shareBtn.onclick = async () => {
-  if (!user || !editor.value.trim()) { $("#runState").textContent = "代码为空，没什么可分享的"; return; }
+  if (!user) { askLogin("分享"); return; }
+  if (!editor.value.trim()) { $("#runState").textContent = "代码为空，没什么可分享的"; return; }
   shareBtn.disabled = true;
   try {
     const data = await post("/api/playground/share", { language: current, source: editor.value, stdin: stdin.value });
     if (!data.url) { $("#runState").textContent = data.message || "分享失败"; return; }
-    const link = location.origin + data.url;
+    const link = data.link || location.origin + data.url;
     shareLink.value = link;
     $("#shareOpen").href = data.url;
     $("#shareMsg").textContent = (await copyText(link)) ? "链接已复制到剪贴板。" : "请复制下面的链接。";
@@ -506,13 +526,14 @@ const hasLanguage = value => Array.from(lang.options).some(option => option.valu
   let me;
   try { me = await (await fetch("/api/me", { credentials: "same-origin" })).json(); }
   catch (err) { output.innerHTML = '<p class="placeholder">连不上服务器，请刷新重试。</p>'; return; }
-  if (!me.authenticated) { location.href = LOGIN_URL; return; }
-  user = me.user;
-  $("#auth").innerHTML = "已登录：<b>" + esc(me.user) + "</b>";
+  if (!me.authenticated && !SHARE_ID) { location.href = LOGIN_URL; return; }
+  user = me.authenticated ? me.user : "";
+  $("#auth").innerHTML = user ? "已登录：<b>" + esc(user) + "</b>" : '<a href="' + LOGIN_URL + '">登录</a>';
   let notice = "";
   if (SHARE_ID) {
     const response = await fetch("/api/playground/share/" + SHARE_ID + "/", { credentials: "same-origin" });
     if (response.ok) share = await response.json();
+    else if (!user) { output.innerHTML = '<p class="placeholder">这条分享链接不存在。</p>'; return; }
     else notice = "这条分享链接不存在，已打开你自己的 Playground。";
   }
   let language = share ? share.language : store.get("cs101-playground-" + user + "-language");
@@ -524,7 +545,7 @@ const hasLanguage = value => Array.from(lang.options).some(option => option.valu
     history.replaceState(null, "", location.pathname);
   }
   loadLanguage(hasLanguage(language) ? language : lang.value);
-  const savedStdin = store.get(stdinKey());
+  const savedStdin = user ? store.get(stdinKey()) : null;
   stdin.value = savedStdin !== null ? savedStdin : share ? share.stdin : STDIN_TEMPLATE;
   if (legacy && typeof legacy.source === "string") {
     editor.replaceAll(legacy.source);
@@ -532,8 +553,10 @@ const hasLanguage = value => Array.from(lang.options).some(option => option.valu
     notice = "已载入旧版分享链接里的代码（Ctrl+Z 可撤销）。";
   }
   if (share) renderShareNote();
+  if (!user) notice = "未登录 · 运行需登录";
   if (notice) $("#runState").textContent = notice;
   runBtn.disabled = checkBtn.disabled = shareBtn.disabled = false;
-  editor.focus();
+  // 手机上一打开就聚焦会立刻弹出键盘挡住代码；只在有鼠标的设备、且不是来看分享时聚焦
+  if (!share && matchMedia("(pointer: fine)").matches) editor.focus();
 })();
 </script></html>

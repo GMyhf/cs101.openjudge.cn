@@ -952,14 +952,13 @@ print("\\n".join(answers))
         status, headers, _ = request(self.port, "GET", "/playground/")
         self.assertEqual(status, 302)
         self.assertIn("/auth/login/?next=/playground/", headers.get("Location", ""))
-        # 分享链接也要登录；登录后要回到那条分享，而不是 Playground 首页
-        status, headers, _ = request(self.port, "GET", "/playground/AbCd2345/")
-        self.assertEqual(status, 302)
-        self.assertIn("/auth/login/?next=/playground/AbCd2345/", headers.get("Location", ""))
-        for method, path in (("POST", "/api/playground/run"), ("POST", "/api/playground/check"),
-                             ("POST", "/api/playground/share"), ("GET", "/api/playground/share/AbCd2345/")):
-            body = {"language": "python", "source": "print(1)"} if method == "POST" else None
-            self.assertEqual(request(self.port, method, path, body)[0], 401, path)
+        # 分享链接本身不要求登录（要能从课程微信群直接点开）；运行 / 检查 / 分享仍要登录
+        status, _, body = request(self.port, "GET", "/playground/AbCd2345/")
+        self.assertEqual(status, 200)
+        self.assertIn("CS101 Playground", body.decode("utf-8"))
+        self.assertEqual(request(self.port, "GET", "/api/playground/share/AbCd2345/")[0], 404)
+        for path in ("/api/playground/run", "/api/playground/check", "/api/playground/share"):
+            self.assertEqual(request(self.port, "POST", path, {"language": "python", "source": "print(1)"})[0], 401, path)
 
     def test_playground_run_uses_stdin_and_skips_submissions(self):
         cookie = self.register_and_login("pg_runner", "Playground-password")
@@ -1015,6 +1014,8 @@ print("\\n".join(answers))
         created = json.loads(raw)
         self.assertRegex(created["id"], r"^[A-Za-z0-9]{8}$")
         self.assertEqual(created["url"], f"/playground/{created['id']}/")
+        # 发到群里的完整链接用对外地址拼（套件里 CS101_PUBLIC_URL 指向这个地址），不是请求来的 Host
+        self.assertEqual(created["link"], f"http://10.129.81.235:8000/playground/{created['id']}/")
         # 同一份内容再分享一次：同一条链接，不重复入库
         _, _, raw = request(self.port, "POST", "/api/playground/share", snippet, cookie=cookie)
         self.assertEqual(json.loads(raw)["id"], created["id"])
@@ -1026,6 +1027,11 @@ print("\\n".join(answers))
         self.assertEqual({k: shared[k] for k in snippet}, snippet)
         self.assertEqual(shared["author"], "pg_sharer")
         self.assertEqual(request(self.port, "GET", created["url"], cookie=viewer)[0], 200)
+        # 没登录的人（微信群里点开）也能拿到同一份快照
+        status, _, raw = request(self.port, "GET", f"/api/playground/share/{created['id']}/")
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(raw)["source"], snippet["source"])
+        self.assertNotIn("user", json.loads(raw))
         self.assertEqual(request(self.port, "GET", "/api/playground/share/Zzzz9999/", cookie=viewer)[0], 404)
         status, _, _ = request(self.port, "POST", "/api/playground/share",
                                {"language": "python", "source": "   "}, cookie=cookie)

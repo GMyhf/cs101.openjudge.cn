@@ -1645,7 +1645,9 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                 self.send_html(page.read_text(encoding="utf-8")); return
         playground = re.fullmatch(r"/playground(?:/|/([A-Za-z0-9]{8})/)?", path)
         if playground:
-            if not self.authorized():
+            # 分享链接要能发到课程微信群里直接点开看，所以查看分享不要求登录；
+            # 运行 / 检查 / 分享仍然要登录（它们占沙箱或写库），页面会在点按钮时引导登录。
+            if not self.authorized() and not playground.group(1):
                 self.send_response(302)
                 self.send_header("Location", "/auth/login/?next=" + (path if path.endswith("/") else path + "/"))
                 self.end_headers(); return
@@ -1653,8 +1655,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                            .replace("__LANGUAGE_OPTIONS__", editor_language_options())); return
         shared_snippet = re.fullmatch(r"/api/playground/share/([A-Za-z0-9]{8})/", path)
         if shared_snippet:
-            if not self.authorized():
-                self.send_json({"error": "Unauthorized"}, 401); return
+            # 只读、ID 为 8 位随机串（约 10^14 种），不对外暴露登录名（只给昵称）。
             with connect_db() as db:
                 row = db.execute("select id, user, language, source, stdin, created from playground_shares where id = ?",
                                  (shared_snippet.group(1),)).fetchone()
@@ -2045,7 +2046,8 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                 row = db.execute("select id from playground_shares where lower(user) = lower(?) and language = ? "
                                  "and source = ? and stdin = ?", (user, language, source, stdin)).fetchone()
                 if row:
-                    self.send_json({"id": row[0], "url": f"/playground/{row[0]}/"}); return
+                    self.send_json({"id": row[0], "url": f"/playground/{row[0]}/",
+                                    "link": f"{public_base_url()}/playground/{row[0]}/"}); return
             retry_after = quota_retry_after("share", user)
             if retry_after:
                 self.send_json({"error": "Rate Limited", "retry_after": retry_after,
@@ -2062,7 +2064,10 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                         continue
                 else:
                     self.send_json({"error": "Share failed", "message": "生成链接失败，请重试。"}, 500); return
-            self.send_json({"id": share_id, "url": f"/playground/{share_id}/"}); return
+            # link 用对外地址（CS101_PUBLIC_URL）拼，而不是分享者浏览器里的地址：
+            # 老师在本机用 localhost 打开时，location.origin 发到群里谁也点不开。
+            self.send_json({"id": share_id, "url": f"/playground/{share_id}/",
+                            "link": f"{public_base_url()}/playground/{share_id}/"}); return
         if path in {"/api/submit", "/api/submit/"} and self.authorized():
             book, problem = data.get("book", ""), data.get("problem", "")
             language = data.get("language", "python")
