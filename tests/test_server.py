@@ -906,6 +906,11 @@ print("\\n".join(answers))
                          "David 288\nQ1 2 165.5\nQ2 1 180.0\nQ3 1 165.2\nQ4 1 178.4\n1\nAlice 90 85 95 270\n")
         headers = {tuple(path.read_text(encoding="utf-8").splitlines()[1].split()) for path in made.glob("*.in")}
         self.assertGreater(len(headers), 5)
+        import server
+        handler = server.Handler.__new__(server.Handler)
+        samples = handler.sample_io(ROOT / "data/openjudge/pages/practice__31180.html")["cases"]
+        self.assertEqual(samples[0]["input"].splitlines()[0], "5")
+        self.assertEqual(samples[0]["output"].splitlines()[0], "David 288")
 
     def test_catalog_summary_is_small_and_contains_judgeable_titles(self):
         status, headers, body = request(self.port, "GET", "/api/catalog?summary=1")

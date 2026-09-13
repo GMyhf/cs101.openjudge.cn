@@ -4,6 +4,7 @@ from http import cookies
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import contextlib
+import base64
 import gzip
 import socket
 import threading
@@ -143,6 +144,16 @@ def parse_embedded_html_samples(text):
         pre = re.search(r"<pre\b[^>]*>(.*?)</pre>", text[heading.end():end], re.I | re.S)
         if pre:
             blocks.append((kind, plain(pre.group(1))))
+    if not blocks:
+        # OJ Inject's Markdown renderer uses paragraphs with a strong label
+        # instead of heading tags for sample captions.
+        labels = list(re.finditer(r'<p>\s*<strong>\s*样例(输入|输出)(?:\d+)?\s*</strong>\s*</p>',
+                                  text, re.I | re.S))
+        for index, label in enumerate(labels):
+            end = labels[index + 1].start() if index + 1 < len(labels) else len(text)
+            pre = re.search(r'<pre\b[^>]*>(.*?)</pre>', text[label.end():end], re.I | re.S)
+            if pre:
+                blocks.append((label.group(1), plain(pre.group(1))))
 
     cases, pending_input = [], None
     for kind, body in blocks:
@@ -1267,6 +1278,20 @@ class Handler(BaseHTTPRequestHandler):
 
     def local_page(self, page):
         text = page.read_text(encoding="utf-8", errors="replace")
+        # Newer OpenJudge pages may keep the rendered statement (including
+        # samples) in gzip/base64 OJ Inject data nodes. Decode those nodes so
+        # server-side sample extraction sees the same content as the browser.
+        def decode_inject(match):
+            attrs, payload = match.group(1), match.group(2)
+            if 'data-version="2"' not in attrs or not payload.strip():
+                return match.group(0)
+            try:
+                decoded = gzip.decompress(base64.b64decode(payload.strip())).decode("utf-8")
+            except (ValueError, OSError, UnicodeDecodeError):
+                return match.group(0)
+            return decoded
+        text = re.sub(r'<script\b([^>]*application/x-oj-inject-data[^>]*)>(.*?)</script>',
+                      decode_inject, text, flags=re.I | re.S)
         text = text.replace("http://cs101.openjudge.cn/", "/")
         text = text.replace("https://cs101.openjudge.cn/", "/")
         text = text.replace("http://cs101.openjudge.cn", "/")
@@ -1321,6 +1346,10 @@ class Handler(BaseHTTPRequestHandler):
             return unescape(re.sub(r"<[^>]+>", "", chunk)).strip("\n")
         raw_input, raw_output = plain(match.group(1)), plain(match.group(2))
         cases = []
+        if not raw_input.strip() and not raw_output.strip():
+            content = re.search(r'<dl class="problem-content">(.*?)</dl>', text, re.S)
+            if content:
+                cases = parse_embedded_html_samples(content.group(1))
         if raw_input.strip() == "见描述" and raw_output.strip() == "见描述":
             content = re.search(r'<dl class="problem-content">(.*?)</dl>', text, re.S)
             if content:
