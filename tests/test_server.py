@@ -911,6 +911,7 @@ print("\\n".join(answers))
         rendered = handler.local_page(ROOT / "data/openjudge/pages/practice__31180.html")
         self.assertNotIn("题目描述加载中", rendered)
         self.assertIn("在班级数据管理", rendered)
+        self.assertEqual(rendered.count("在班级数据管理"), 1)
         samples = handler.sample_io(ROOT / "data/openjudge/pages/practice__31180.html")["cases"]
         self.assertEqual(samples[0]["input"].splitlines()[0], "5")
         self.assertEqual(samples[0]["output"].splitlines()[0], "David 288")

@@ -1294,6 +1294,13 @@ class Handler(BaseHTTPRequestHandler):
                       decode_inject, text, flags=re.I | re.S)
         text = re.sub(r'<p>题目描述加载中。如果持续看到此说明，请确认浏览器没有禁用 JavaScript，并查看是否有加载错误。</p>',
                       '', text)
+        rendered = re.search(r'<div\s+class="markdown-body"\b[^>]*>.*?</div>', text, re.I | re.S)
+        if rendered:
+            start = text.find('<dl class="problem-content">')
+            end = text.find('<div class="problem-statistics', start)
+            if start >= 0 and end >= 0:
+                replacement = '<dl class="problem-content"><dd>' + rendered.group(0) + '</dd></dl>\n'
+                text = text[:start] + replacement + text[end:]
         text = text.replace("http://cs101.openjudge.cn/", "/")
         text = text.replace("https://cs101.openjudge.cn/", "/")
         text = text.replace("http://cs101.openjudge.cn", "/")
