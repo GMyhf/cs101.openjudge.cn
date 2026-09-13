@@ -23,7 +23,8 @@ from email.message import EmailMessage
 from html import escape, unescape
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
-from judge import judge, language_version, problem_exists, run_sample
+from judge import (SANDBOX_PATH, check_syntax, judge, language_version, parse_diagnostics,
+                   problem_exists, run_sample)
 
 ROOT = Path(__file__).parent
 DB = Path(os.environ.get("CS101_DB", ROOT / "data" / "course.db"))
@@ -208,6 +209,8 @@ QUOTA_DEFAULTS = {
     # 按来源地址计数挡的是「手里有一份邮箱名单、从一个地方群发」。
     # 正常人一次重置只需要一两封，10 次/10 分钟对真实使用绰绰有余。
     "forgot": {"limit": 10, "window": 600},
+    # Playground 分享：每次分享写一行（整份源码）进库，挡的是脚本刷库，不是正常分享。
+    "share": {"limit": 30, "window": 600},
 }
 QUOTA_LIMIT_CAP = 100000
 QUOTA_WINDOW_RANGE = (10, 86400)
@@ -471,6 +474,29 @@ def submit_page_template():
     return _SUBMIT_PAGE_CACHE["text"]
 
 
+# 提交页与 Playground 共用一份语言清单。它同时是 Playground 接口的白名单：
+# prepare_program 对不认识的语言会落进 C++ 分支，所以不能把任意字符串透传进去。
+EDITOR_LANGUAGES = ("python", "pypy3", "cpp", "c", "csharp", "fsharp", "vbnet", "swift", "objc")
+
+
+def editor_language_options():
+    """语言下拉框。显示的是本机探测到的真实版本号。"""
+    return "".join(f'<option value="{key}">{escape(language_version(key))}</option>'
+                   for key in EDITOR_LANGUAGES)
+
+
+def playground_result(result, language):
+    """Playground 的运行 / 检查结果：去掉沙箱临时目录前缀，附上可点击跳转的行号诊断。"""
+    result = dict(result)
+    for key in ("message", "stderr"):
+        if isinstance(result.get(key), str):
+            result[key] = SANDBOX_PATH.sub("", result[key])
+    failed = result.get("status") not in {"OK", "Rate Limited", "Busy"}
+    result["diagnostics"] = parse_diagnostics(result.get("stderr") or result.get("message") or "") if failed else []
+    result["language_version"] = language_version(language)
+    return result
+
+
 # 默认 busy timeout 是 5 秒。一个班同时交时写会互相排队，超时抛的是
 # `database is locked` —— 学生看到的是「提交失败」，而那次判题其实已经跑完了。
 DB_BUSY_TIMEOUT_SECONDS = 15
@@ -509,6 +535,10 @@ def init_db():
         db.execute("create table if not exists submissions (id integer primary key, user text, problem text, result text, created text default current_timestamp)")
         db.execute("create table if not exists users (username text primary key, password_hash text not null, created text default current_timestamp)")
         db.execute("create table if not exists settings (key text primary key, value text not null)")
+        # Playground 分享链接 /playground/<id>/ 的快照：分享后不可改，改了再分享就是新链接。
+        db.execute("create table if not exists playground_shares (id text primary key, user text not null, "
+                   "language text not null, source text not null, stdin text not null default '', "
+                   "created text default current_timestamp)")
         # 历史库里没有这几列；用 ALTER 补，已存在则跳过（create table if not exists 加不了列）。
         existing = {row[1] for row in db.execute("pragma table_info(submissions)")}
         for column in ("book text", "language text", "detail text", "source text"):
@@ -1376,10 +1406,7 @@ class Handler(BaseHTTPRequestHandler):
 
     def submission_page(self, page, book, problem):
         title, params_html, content_html, _ = self.problem_parts(page, book, problem)
-        language_options = "".join(
-            f'<option value="{key}">{escape(language_version(key))}</option>'
-            for key in ("python", "pypy3", "cpp", "c", "csharp", "fsharp", "vbnet", "swift", "objc")
-        )
+        language_options = editor_language_options()
         return (submit_page_template().replace("__BOOK__", escape(book))
                 .replace("__BOOK_NAME__", escape(BOOK_META.get(book, {}).get("name", book)))
                 .replace("__PROBLEM__", escape(problem))
@@ -1616,14 +1643,26 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             page = ROOT / "history.html"
             if page.is_file():
                 self.send_html(page.read_text(encoding="utf-8")); return
-        if path in ("/playground", "/playground/"):
+        playground = re.fullmatch(r"/playground(?:/|/([A-Za-z0-9]{8})/)?", path)
+        if playground:
             if not self.authorized():
                 self.send_response(302)
-                self.send_header("Location", "/auth/login/?next=/playground/")
+                self.send_header("Location", "/auth/login/?next=" + (path if path.endswith("/") else path + "/"))
                 self.end_headers(); return
-            page = ROOT / "playground.html"
-            if page.is_file():
-                self.send_html(page.read_text(encoding="utf-8")); return
+            self.send_html(ROOT.joinpath("playground.html").read_text(encoding="utf-8")
+                           .replace("__LANGUAGE_OPTIONS__", editor_language_options())); return
+        shared_snippet = re.fullmatch(r"/api/playground/share/([A-Za-z0-9]{8})/", path)
+        if shared_snippet:
+            if not self.authorized():
+                self.send_json({"error": "Unauthorized"}, 401); return
+            with connect_db() as db:
+                row = db.execute("select id, user, language, source, stdin, created from playground_shares where id = ?",
+                                 (shared_snippet.group(1),)).fetchone()
+                nicknames = nickname_map(db) if row else {}
+            if not row:
+                self.send_json({"error": "Not found", "message": "分享链接不存在。"}, 404); return
+            self.send_json({"id": row[0], "author": nicknames.get(row[1].casefold(), row[1]),
+                            "language": row[2], "source": row[3], "stdin": row[4], "created": row[5]}); return
         if path in ("/problems", "/problems/"):
             page = ROOT / "problems.html"
             if page.is_file():
@@ -1974,6 +2013,56 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                 self.send_json(run_sample(book, problem, data.get("language", "python"),
                                           data.get("source", ""), data.get("stdin", "")))
             return
+        if path in {"/api/playground/run", "/api/playground/check"} and self.authorized():
+            # Playground 不挂题号：限时取默认 4s，沙箱与「运行样例」同一条路径，同一个配额桶。
+            language = str(data.get("language", "python")).lower()
+            if language not in EDITOR_LANGUAGES:
+                self.send_json({"status": "Language Unavailable", "message": "不支持这种语言。"}, 400); return
+            user = self.current_user() or ADMIN_USER
+            retry_after = quota_retry_after("run", user)
+            if retry_after:
+                self.send_json({"status": "Rate Limited", "retry_after": retry_after,
+                                "message": f"运行太频繁了，请 {retry_after} 秒后再试。"}, 429); return
+            with judging_slot(user) as got_slot:
+                if not got_slot:
+                    self.send_json({"status": "Busy",
+                                    "message": "判题队列忙，稍后再试（或你上一次运行还没结束）。"}, 429); return
+                if path.endswith("/check"):
+                    result = check_syntax(language, data.get("source", ""))
+                else:
+                    result = run_sample("", "", language, data.get("source", ""), data.get("stdin", ""))
+            self.send_json(playground_result(result, language)); return
+        if path == "/api/playground/share" and self.authorized():
+            language, source, stdin = str(data.get("language", "")).lower(), data.get("source"), data.get("stdin", "")
+            if language not in EDITOR_LANGUAGES or not isinstance(source, str) or not source.strip():
+                self.send_json({"error": "Invalid snippet", "message": "代码不能为空。"}, 400); return
+            stdin = stdin if isinstance(stdin, str) else ""
+            if len(source.encode()) > 512 * 1024 or len(stdin.encode()) > 64 * 1024:
+                self.send_json({"error": "Too large", "message": "代码不超过 512 KiB、输入不超过 64 KiB 才能分享。"}, 413); return
+            user = self.current_user() or ADMIN_USER
+            with connect_db() as db:
+                # 同一个人把同一份内容点两次「分享」，给回同一条链接，不重复入库、不扣额度。
+                row = db.execute("select id from playground_shares where lower(user) = lower(?) and language = ? "
+                                 "and source = ? and stdin = ?", (user, language, source, stdin)).fetchone()
+                if row:
+                    self.send_json({"id": row[0], "url": f"/playground/{row[0]}/"}); return
+            retry_after = quota_retry_after("share", user)
+            if retry_after:
+                self.send_json({"error": "Rate Limited", "retry_after": retry_after,
+                                "message": f"分享太频繁了，请 {retry_after} 秒后再试。"}, 429); return
+            alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789"
+            with connect_db() as db:
+                for _ in range(8):
+                    share_id = "".join(secrets.choice(alphabet) for _ in range(8))
+                    try:
+                        db.execute("insert into playground_shares(id, user, language, source, stdin) values (?, ?, ?, ?, ?)",
+                                   (share_id, user, language, source, stdin))
+                        break
+                    except sqlite3.IntegrityError:
+                        continue
+                else:
+                    self.send_json({"error": "Share failed", "message": "生成链接失败，请重试。"}, 500); return
+            self.send_json({"id": share_id, "url": f"/playground/{share_id}/"}); return
         if path in {"/api/submit", "/api/submit/"} and self.authorized():
             book, problem = data.get("book", ""), data.get("problem", "")
             language = data.get("language", "python")

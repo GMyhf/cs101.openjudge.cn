@@ -933,17 +933,162 @@ print("\\n".join(answers))
         self.assertLess(int(headers["Content-Length"]), 500_000)
 
     def test_playground_page_exposes_sandbox_workbench(self):
-        status, headers, body = request(self.port, "GET", "/playground/")
-        self.assertEqual(status, 302)
-        page = (ROOT / "playground.html").read_text(encoding="utf-8")
+        cookie = self.register_and_login("pg_page", "Playground-password")
+        status, _, body = request(self.port, "GET", "/playground/", cookie=cookie)
+        self.assertEqual(status, 200)
+        page = body.decode("utf-8")
         self.assertIn("CS101 Playground", page)
-        self.assertIn("/api/run", page)
-        self.assertIn('id="language"', page)
+        self.assertIn('"/api/playground/" + kind', page)
+        self.assertIn('/static/code-editor.js', page)
+        # 语言选项由服务端注入，与提交页同一份清单；主题引导也要换进来
+        self.assertIn('value="pypy3"', page)
+        self.assertNotIn("__LANGUAGE_OPTIONS__", page)
+        self.assertNotIn("__THEME_HEAD__", page)
+        status, headers, _ = request(self.port, "GET", "/static/code-editor.js")
+        self.assertEqual(status, 200)
+        self.assertIn("javascript", headers.get("Content-Type", ""))
 
     def test_playground_requires_login(self):
         status, headers, _ = request(self.port, "GET", "/playground/")
         self.assertEqual(status, 302)
         self.assertIn("/auth/login/?next=/playground/", headers.get("Location", ""))
+        # 分享链接也要登录；登录后要回到那条分享，而不是 Playground 首页
+        status, headers, _ = request(self.port, "GET", "/playground/AbCd2345/")
+        self.assertEqual(status, 302)
+        self.assertIn("/auth/login/?next=/playground/AbCd2345/", headers.get("Location", ""))
+        for method, path in (("POST", "/api/playground/run"), ("POST", "/api/playground/check"),
+                             ("POST", "/api/playground/share"), ("GET", "/api/playground/share/AbCd2345/")):
+            body = {"language": "python", "source": "print(1)"} if method == "POST" else None
+            self.assertEqual(request(self.port, method, path, body)[0], 401, path)
+
+    def test_playground_run_uses_stdin_and_skips_submissions(self):
+        cookie = self.register_and_login("pg_runner", "Playground-password")
+
+        def submission_count():
+            _, _, raw = request(self.port, "GET", "/api/submissions?mine=1", cookie=cookie)
+            return len(json.loads(raw)["submissions"])
+
+        before = submission_count()
+        status, _, raw = request(self.port, "POST", "/api/playground/run", {
+            "language": "python", "source": "print(int(input()) * 2)", "stdin": "21\n"}, cookie=cookie)
+        self.assertEqual(status, 200)
+        payload = json.loads(raw)
+        self.assertEqual((payload["status"], payload["stdout"]), ("OK", "42\n"))
+        self.assertEqual(payload["diagnostics"], [])
+        self.assertEqual(submission_count(), before)
+        # 运行期异常：诊断指向用户代码里出错的那一行，报错里不带沙箱临时目录
+        _, _, raw = request(self.port, "POST", "/api/playground/run", {
+            "language": "python", "source": "x = 1\nprint(x // 0)\n", "stdin": ""}, cookie=cookie)
+        payload = json.loads(raw)
+        self.assertEqual(payload["status"], "Runtime Error")
+        self.assertEqual(payload["diagnostics"][0]["line"], 2)
+        self.assertNotIn("cs101-run-", payload["stderr"])
+        # 白名单外的语言不能透传给 prepare_program（它会把未知语言当 C++ 编译）
+        status, _, _ = request(self.port, "POST", "/api/playground/run", {
+            "language": "rust", "source": "fn main(){}"}, cookie=cookie)
+        self.assertEqual(status, 400)
+
+    def test_playground_check_reports_compiler_line_numbers(self):
+        cookie = self.register_and_login("pg_checker", "Playground-password")
+        _, _, raw = request(self.port, "POST", "/api/playground/check", {
+            "language": "python", "source": "def f(:\n    pass\n"}, cookie=cookie)
+        payload = json.loads(raw)
+        self.assertEqual(payload["status"], "Compile Error")
+        self.assertEqual(payload["diagnostics"][0]["line"], 1)
+        _, _, raw = request(self.port, "POST", "/api/playground/check", {
+            "language": "python", "source": "while True:\n    pass\n"}, cookie=cookie)
+        # 只编译不执行：死循环也要秒回 OK
+        self.assertEqual(json.loads(raw)["status"], "OK")
+        if shutil.which("g++"):
+            _, _, raw = request(self.port, "POST", "/api/playground/check", {
+                "language": "cpp", "source": "#include <cstdio>\nint main() {\n  int a = 1\n  return a;\n}\n"}, cookie=cookie)
+            payload = json.loads(raw)
+            self.assertEqual(payload["status"], "Compile Error")
+            self.assertIn(payload["diagnostics"][0]["line"], {3, 4})
+            self.assertNotIn("/tmp/", payload["message"])
+
+    def test_playground_share_is_a_stable_short_link(self):
+        cookie = self.register_and_login("pg_sharer", "Playground-password")
+        snippet = {"language": "cpp", "source": "int main() { return 0; }\n", "stdin": "1 2\n"}
+        status, _, raw = request(self.port, "POST", "/api/playground/share", snippet, cookie=cookie)
+        self.assertEqual(status, 200)
+        created = json.loads(raw)
+        self.assertRegex(created["id"], r"^[A-Za-z0-9]{8}$")
+        self.assertEqual(created["url"], f"/playground/{created['id']}/")
+        # 同一份内容再分享一次：同一条链接，不重复入库
+        _, _, raw = request(self.port, "POST", "/api/playground/share", snippet, cookie=cookie)
+        self.assertEqual(json.loads(raw)["id"], created["id"])
+        # 别的登录用户打开：拿到完整快照，页面路由本身也能打开
+        viewer = self.register_and_login("pg_viewer", "Playground-password")
+        status, _, raw = request(self.port, "GET", f"/api/playground/share/{created['id']}/", cookie=viewer)
+        self.assertEqual(status, 200)
+        shared = json.loads(raw)
+        self.assertEqual({k: shared[k] for k in snippet}, snippet)
+        self.assertEqual(shared["author"], "pg_sharer")
+        self.assertEqual(request(self.port, "GET", created["url"], cookie=viewer)[0], 200)
+        self.assertEqual(request(self.port, "GET", "/api/playground/share/Zzzz9999/", cookie=viewer)[0], 404)
+        status, _, _ = request(self.port, "POST", "/api/playground/share",
+                               {"language": "python", "source": "   "}, cookie=cookie)
+        self.assertEqual(status, 400)
+
+    @unittest.skipUnless(shutil.which("node"), "需要 node 才能真跑编辑器代码")
+    def test_playground_editor_core_runs(self):
+        """在 node 里真跑 `static/code-editor.js` 的纯函数：按语言切 token、即时检查、编辑动作。"""
+        harness = r"""
+const E = require(process.argv[2]);
+const kinds = (code, lang) => E.scan(code, lang).map(t => t[0] + ":" + code.slice(t[1], t[2]));
+const has = (code, lang, ...want) => { const got = kinds(code, lang); return want.every(w => got.includes(w)) || (console.error(lang, got), false); };
+const checks = {
+  python: has('def f(x): # c\n  return f"a{x}" + str(1)', "python", "kw:def", "fn:f", "com:# c", 'str:f"a{x}"', "type:str", "num:1"),
+  boundary: !kinds("classic = 1", "python").some(k => k.startsWith("kw:")),
+  cpp: has('#include <vector>\nauto s = R"(a"b)";', "cpp", "pre:#include <vector>", "kw:auto", 'str:R"(a"b)"'),
+  csharp: has('var s = @"a""b";', "csharp", 'str:@"a""b"'),
+  fsharp: has('let x = (*) (* note *)', "fsharp", "com:(* note *)") && !kinds("let x = (*) 1 2", "fsharp").some(k => k.startsWith("com:")),
+  vbnet: has("DIM s As String ' note", "vbnet", "kw:DIM", "com:' note"),
+  swift: has('print("v \\(n)")', "swift", 'str:"v \\(n)"'),
+  objc: has('NSString *s = @"hi";', "objc", 'str:@"hi"', "type:NSString"),
+  escaped: !E.highlight("x = '<b>'", "python").includes("<b>"),
+  lintClean: E.lint("int main() { return (1); }", "cpp").length === 0,
+  lintBrackets: JSON.stringify(E.lint("print((1)\n", "python").map(d => [d.line, d.column])) === "[[1,6]]",
+  // 漏写的 ")" 要报在它自己那一行，而不是报在后面的 "}" 上
+  lintBlamesOpener: JSON.stringify(E.lint("int main() {\n  int a = (1\n  return 0;\n}", "cpp").map(d => [d.line, d.column])) === "[[2,11]]",
+  lintExtraCloser: E.lint("f())", "python")[0].message === "多余的 ')'",
+  lintString: E.lint('x = "abc\n', "python")[0].message === "字符串没有结束",
+  lintSkipsStrings: E.lint('s = "(" + f()', "python").length === 0,
+  pair: JSON.stringify(E.bracketMatch("a[b(c)]", 1, "python")) === "[1,6]",
+  comment: E.toggleComment("a\nb", 0, 3, "cpp").insert === "// a\n// b"
+        && E.toggleComment("# a\n# b", 0, 7, "python").insert === "a\nb",
+  shift: E.shiftLines("a\nb", 0, 3, false).insert === "    a\n    b" && E.shiftLines("    a", 0, 0, true).insert === "a",
+  indent: E.indentFor("    if x:", 9, "python") === "        " && E.indentFor("    return 1", 12, "python") === ""
+       && E.indentFor("If x Then", 9, "vbnet") === "    ",
+  enter: E.enterAction("f(){}", 4, 4, "cpp").insert === "\n    \n",
+  quoteClosesString: E.pairAction('x = "abc', 8, 8, '"', "python") === null,
+  fstringPrefix: E.pairAction("print(f", 7, 7, '"', "python").insert === '""',
+  apostrophe: E.pairAction("don", 3, 3, "'", "python") === null,
+};
+const failed = Object.keys(checks).filter(k => !checks[k]);
+if (failed.length) { console.error("failed:", failed.join(", ")); process.exit(1); }
+"""
+        with tempfile.NamedTemporaryFile("w", suffix=".js", encoding="utf-8", delete=False) as handle:
+            handle.write(harness)
+            path = handle.name
+        self.addCleanup(os.unlink, path)
+        result = subprocess.run(["node", path, str(ROOT / "static" / "code-editor.js")],
+                                capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, (result.stderr or result.stdout)[:800])
+
+    def test_parse_diagnostics_understands_each_toolchain(self):
+        from judge import parse_diagnostics
+        gcc = "/tmp/cs101-run-ab12/main.cpp: In function 'int main()':\n/tmp/cs101-run-ab12/main.cpp:3:2: error: expected ';'\n"
+        self.assertEqual(parse_diagnostics(gcc), [{"line": 3, "column": 2, "severity": "error", "message": "expected ';'"}])
+        dotnet = "/tmp/cs101-run-x/Program.cs(7,13): error CS1002: ; expected [/tmp/cs101-run-x/Judge.csproj]"
+        self.assertEqual(parse_diagnostics(dotnet)[0]["line"], 7)
+        self.assertEqual(parse_diagnostics("invalid syntax (main.py, line 4)")[0]["line"], 4)
+        traceback = ('Traceback (most recent call last):\n  File "/tmp/cs101-run-q/main.py", line 5, in <module>\n'
+                     '    f()\n  File "/tmp/cs101-run-q/main.py", line 2, in f\n    1/0\nZeroDivisionError: division by zero\n')
+        self.assertEqual(parse_diagnostics(traceback),
+                         [{"line": 2, "column": 0, "severity": "error", "message": "ZeroDivisionError: division by zero"}])
+        self.assertEqual(parse_diagnostics("/usr/include/stdio.h:10:1: error: boom"), [])
 
     def test_catalog_response_omits_internal_test_case_paths(self):
         """目录接口不再透出 `test_cases`。

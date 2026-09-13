@@ -322,6 +322,56 @@ def run_sample(book, problem_id, language, source, stdin):
         return {"status": "OK", **metrics, "stdout": stdout, "stderr": stderr}
 
 
+def check_syntax(language, source):
+    """Playground 的「语法检查」：只编译、不执行。
+
+    走同一个 prepare_program，所以语法判定与运行、判题完全一致 ——
+    Python 用宿主 compile()、PyPy3 用它自己、C/C++ 用 gcc/g++，不另起一套规则。
+    （.NET file-based 的编译本身就要跑一次程序，这一点与「运行」相同，没有额外放宽。）
+    """
+    if not isinstance(source, str) or not source.strip():
+        return {"status": "Empty Source", "message": "代码不能为空。"}
+    if len(source.encode()) > 512 * 1024:
+        return {"status": "Source Too Large", "message": "代码不能超过 512 KiB。"}
+    with tempfile.TemporaryDirectory(prefix="cs101-run-") as temp:
+        _, failure = prepare_program(Path(temp), str(language).lower(), source)
+    return failure or {"status": "OK", "message": "编译通过，没有发现语法错误。"}
+
+
+# 编译器 / 解释器报错里的「第几行第几列」。编辑器靠它在行号栏打标记、点一下跳过去。
+# 路径前缀一律只认沙箱里的源文件名：头文件里的报错（如 /usr/include/...）不指向用户代码。
+DIAGNOSTIC_PATTERNS = (
+    # gcc / g++ / clang / swiftc：main.cpp:3:5: error: expected ';'
+    re.compile(r"main\.(?:c|cpp|m|swift):(\d+):(\d+):\s*(?:fatal\s+)?(error|warning|note):\s*(.+)"),
+    # dotnet：Program.cs(3,5): error CS1002: ; expected [/tmp/.../Judge.csproj]
+    re.compile(r"Program\.(?:cs|fs|vb)\((\d+),(\d+)\):\s*(error|warning)\s+([^\[\n]+)"),
+)
+PY_LINE = re.compile(r'main\.py"?, line (\d+)')
+SANDBOX_PATH = re.compile(r"/tmp/cs101-run-[^/\s]+/")
+
+
+def parse_diagnostics(text):
+    """把报错文本切成 [{line, column, severity, message}]，最多 50 条。"""
+    text = SANDBOX_PATH.sub("", text or "")
+    found = []
+    for pattern in DIAGNOSTIC_PATTERNS:
+        for match in pattern.finditer(text):
+            line, column, severity, message = match.groups()
+            if severity == "note":
+                continue
+            found.append({"line": int(line), "column": int(column),
+                          "severity": severity, "message": message.strip()})
+    if not found:
+        # Python：SyntaxError 是「msg (main.py, line 3)」，运行期是 traceback，
+        # 取**最后一个**指向 main.py 的帧 —— 那才是出错的那一行。
+        lines = PY_LINE.findall(text)
+        if lines:
+            last = [row for row in text.strip().splitlines() if row.strip()][-1].strip()
+            message = re.sub(r"\s*\(main\.py, line \d+\)\s*$", "", last)
+            found.append({"line": int(lines[-1]), "column": 0, "severity": "error", "message": message})
+    return found[:50]
+
+
 def problem_exists(book, problem_id):
     """Return whether a requested run/submit target is in the local catalog.
 

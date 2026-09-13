@@ -2,6 +2,26 @@
 
 ## 2026-09-13
 
+### Playground 重做：真正的语言支持、服务端语法检查、短链接分享、可收起的控制台
+
+上一版的「高亮」是十几个关键字的正则（C#/Swift/F# 全按 C 处理），「语法检查」只数括号且不看字符串，
+「分享」把整份代码 base64 塞进 URL #hash，运行则借用 `practice/31183` 这道题的名义去调 `/api/run`。
+
+- **编辑器**：新增零依赖的 `static/code-editor.js`（红线 6，不引 CodeMirror/Monaco）。9 种语言各有 tokenizer
+  （关键字、内置类型、函数调用、f-string / C++ 原始字符串 / C# 逐字字符串 / Swift 插值 / F# `(* *)` 注释等），
+  括号匹配、自动补全、回车自动缩进、`Ctrl+/` 注释、`Tab`/`Shift+Tab` 整块缩进、当前行高亮；
+  编辑走 `execCommand("insertText")`，自动补的括号和缩进 `Ctrl+Z` 撤得回来。
+- **语法检查**：打字时本地即时检查（括号不配对、字符串/注释没结束、Python 缩进混用 Tab），行号栏标黄；
+  点「语法检查」由服务端真编译器只编译不运行（新接口 `/api/playground/check`，复用 `prepare_program`），
+  编译 / 运行报错解析成行列号（gcc/g++/clang/swiftc、dotnet、CPython 与 PyPy traceback），行号栏标红、点击跳转。
+  报错里的沙箱临时目录前缀一并去掉。
+- **分享**：`/api/playground/share` 存快照（代码 + 语言 + 标准输入）到 `playground_shares` 表，给出
+  `/playground/<8 位 ID>/` 短链接；同一人重复分享同一内容给回同一条链接。打开需登录，改动存在查看者自己的浏览器里，
+  不覆盖他自己的草稿；旧版 `#hash` 链接仍能打开。分享有独立配额桶 `share`（默认 30 次 / 10 分钟，管理页可调）。
+- **控制台**：右侧标准输入 / 运行结果可整体隐藏（`Ctrl+\``），两个面板各自可收起、分隔条可拖拽，状态记在本机。
+- **运行**：新接口 `/api/playground/run` 不再挂题号，语言走白名单（`prepare_program` 会把未知语言当 C++ 编译），
+  沙箱、配额桶（`run`）与「运行样例」相同，不写 submissions 表。
+
 ### Playground 登录与用户隔离
 
 - Playground 现在要求登录，账号菜单提供入口；代码草稿按用户名和语言分别保存。
