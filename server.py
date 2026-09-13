@@ -1292,6 +1292,8 @@ class Handler(BaseHTTPRequestHandler):
             return decoded
         text = re.sub(r'<script\b([^>]*application/x-oj-inject-data[^>]*)>(.*?)</script>',
                       decode_inject, text, flags=re.I | re.S)
+        text = re.sub(r'<p>题目描述加载中。如果持续看到此说明，请确认浏览器没有禁用 JavaScript，并查看是否有加载错误。</p>',
+                      '', text)
         text = text.replace("http://cs101.openjudge.cn/", "/")
         text = text.replace("https://cs101.openjudge.cn/", "/")
         text = text.replace("http://cs101.openjudge.cn", "/")
