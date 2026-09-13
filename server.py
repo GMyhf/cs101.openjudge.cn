@@ -1616,6 +1616,10 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             page = ROOT / "history.html"
             if page.is_file():
                 self.send_html(page.read_text(encoding="utf-8")); return
+        if path in ("/playground", "/playground/"):
+            page = ROOT / "playground.html"
+            if page.is_file():
+                self.send_html(page.read_text(encoding="utf-8")); return
         if path in ("/problems", "/problems/"):
             page = ROOT / "problems.html"
             if page.is_file():

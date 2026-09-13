@@ -932,6 +932,13 @@ print("\\n".join(answers))
         )
         self.assertLess(int(headers["Content-Length"]), 500_000)
 
+    def test_playground_page_exposes_sandbox_workbench(self):
+        status, headers, body = request(self.port, "GET", "/playground/")
+        self.assertEqual(status, 200)
+        self.assertIn("CS101 Playground", body.decode("utf-8"))
+        self.assertIn("/api/run", body.decode("utf-8"))
+        self.assertIn('id="language"', body.decode("utf-8"))
+
     def test_catalog_response_omits_internal_test_case_paths(self):
         """目录接口不再透出 `test_cases`。
 
