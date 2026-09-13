@@ -1617,6 +1617,10 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             if page.is_file():
                 self.send_html(page.read_text(encoding="utf-8")); return
         if path in ("/playground", "/playground/"):
+            if not self.authorized():
+                self.send_response(302)
+                self.send_header("Location", "/auth/login/?next=/playground/")
+                self.end_headers(); return
             page = ROOT / "playground.html"
             if page.is_file():
                 self.send_html(page.read_text(encoding="utf-8")); return

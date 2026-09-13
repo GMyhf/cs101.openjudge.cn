@@ -934,10 +934,16 @@ print("\\n".join(answers))
 
     def test_playground_page_exposes_sandbox_workbench(self):
         status, headers, body = request(self.port, "GET", "/playground/")
-        self.assertEqual(status, 200)
-        self.assertIn("CS101 Playground", body.decode("utf-8"))
-        self.assertIn("/api/run", body.decode("utf-8"))
-        self.assertIn('id="language"', body.decode("utf-8"))
+        self.assertEqual(status, 302)
+        page = (ROOT / "playground.html").read_text(encoding="utf-8")
+        self.assertIn("CS101 Playground", page)
+        self.assertIn("/api/run", page)
+        self.assertIn('id="language"', page)
+
+    def test_playground_requires_login(self):
+        status, headers, _ = request(self.port, "GET", "/playground/")
+        self.assertEqual(status, 302)
+        self.assertIn("/auth/login/?next=/playground/", headers.get("Location", ""))
 
     def test_catalog_response_omits_internal_test_case_paths(self):
         """目录接口不再透出 `test_cases`。
