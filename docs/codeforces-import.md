@@ -3,6 +3,9 @@
 - 导入源：`/home/rocky/git/2020fall-cs101/2020fall_Codeforces_problems.md`
 - 导入源 SHA-256：`940fb9d066ca956ef4ee3775eba8841c288a5787de56c0e9702863aea4625e4f`
 - 标准题：158 道；其中已有条目保留、缺失条目补入 Codeforces 题库。
+- 另补 6 道（2026-09-13，按「Codeforces 800 分经典入门题」清单）：116A、546A、617A、734A、791A、977A。
+  它们不在导入源里，走单题流水线（`tests/codeforces/<题号>_made/` 下 `samplecode.py` + `producecase.py`），
+  状态记为 `rebuilt_tests`。**重跑导入脚本前注意**：本文件由脚本整页生成，会把这 6 行冲掉，需手工补回。
 - 判题数据：至少 20 组互异、验证过的数据才可 token 精确判题；其余条目展示题解摘要和官方原题链接。
 
 ## 测试数据状态
@@ -17,7 +20,7 @@
 | interactive_requires_judge | 5 |
 | multiple_output_requires_special_judge | 7 |
 | no_extractable_sample | 9 |
-| rebuilt_tests | 15 |
+| rebuilt_tests | 21 |
 | withheld_pending_rework | 6 |
 
 ## 未接入精确判题数据
@@ -37,6 +40,7 @@
 | 71A | generated_tests | https://codeforces.com/problemset/problem/71/A |
 | 96A | generated_tests | https://codeforces.com/problemset/problem/96/A |
 | 112A | generated_tests | https://codeforces.com/problemset/problem/112/A |
+| 116A | rebuilt_tests | https://codeforces.com/problemset/problem/116/A |
 | 118A | generated_tests | https://codeforces.com/problemset/problem/118/A |
 | 122A | generated_tests | https://codeforces.com/problemset/problem/122/A |
 | 131A | generated_tests | https://codeforces.com/problemset/problem/131/A |
@@ -77,20 +81,25 @@
 | 508A | generated_tests | https://codeforces.com/problemset/problem/508/A |
 | 545C | generated_tests | https://codeforces.com/problemset/problem/545/C |
 | 545D | generated_tests | https://codeforces.com/problemset/problem/545/D |
+| 546A | rebuilt_tests | https://codeforces.com/problemset/problem/546/A |
 | 550C | generated_tests | https://codeforces.com/problemset/problem/550/C |
 | 579A | generated_tests | https://codeforces.com/problemset/problem/579/A |
 | 580A | generated_tests | https://codeforces.com/problemset/problem/580/A |
 | 580C | generated_tests | https://codeforces.com/problemset/problem/580/C |
 | 584A | generated_tests | https://codeforces.com/problemset/problem/584/A |
 | 615A | generated_tests | https://codeforces.com/problemset/problem/615/A |
+| 617A | rebuilt_tests | https://codeforces.com/problemset/problem/617/A |
 | 698A | rebuilt_tests | https://codeforces.com/problemset/problem/698/A |
 | 705A | generated_tests | https://codeforces.com/problemset/problem/705/A |
 | 706B | generated_tests | https://codeforces.com/problemset/problem/706/B |
 | 723A | generated_tests | https://codeforces.com/problemset/problem/723/A |
+| 734A | rebuilt_tests | https://codeforces.com/problemset/problem/734/A |
+| 791A | rebuilt_tests | https://codeforces.com/problemset/problem/791/A |
 | 803A | generated_tests | https://codeforces.com/problemset/problem/803/A |
 | 893C | generated_tests | https://codeforces.com/problemset/problem/893/C |
 | 894E | insufficient_sample_cases | https://codeforces.com/problemset/problem/894/E |
 | 903C | rebuilt_tests | https://codeforces.com/problemset/problem/903/C |
+| 977A | rebuilt_tests | https://codeforces.com/problemset/problem/977/A |
 | 986B | generated_tests | https://codeforces.com/problemset/problem/986/B |
 | 986D | withheld_pending_rework | https://codeforces.com/problemset/problem/986/D |
 | 996A | generated_tests | https://codeforces.com/problemset/problem/996/A |

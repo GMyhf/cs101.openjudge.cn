@@ -1,0 +1,33 @@
+{
+  "id": "977A",
+  "name": "Wrong Subtraction",
+  "source_url": "https://codeforces.com/problemset/problem/977/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF977A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Little girl Tanya is learning how to decrease a number by one, but she does it wrong with a number consisting of two or more digits. Tanya subtracts one from a number by the following algorithm:\n\n- if the last digit of the number is non-zero, she decreases the number by one;\n- if the last digit of the number is zero, she divides the number by 10 (i.e. removes the last digit).\n\nYou are given an integer number $ n $ . Tanya will subtract one from it $ k $ times. Your task is to print the result after all $ k $ subtractions.\n\nIt is guaranteed that the result will be positive integer number.",
+    "formatI": "The first line of the input contains two integer numbers $ n $ and $ k $ ( $ 2 \\le n \\le 10^9 $ , $ 1 \\le k \\le 50 $ ) — the number from which Tanya will subtract and the number of subtractions correspondingly.",
+    "formatO": "Print one integer number — the result of the decreasing $ n $ by one $ k $ times.\n\nIt is guaranteed that the result will be positive integer number.",
+    "hint": "The first example corresponds to the following sequence: $ 512 \\rightarrow 511 \\rightarrow 510 \\rightarrow 51 \\rightarrow 50 $ .",
+    "background": ""
+  },
+  "translation": {
+    "description": "小女孩 Tanya 正在学习如何将一个数减一，但当面对一个由两位或更多位数字组成的数时，她的方法是错误的。Tanya 按照如下算法对一个数减一：\n\n- 如果该数的最后一位数字不是零，她就将该数减一；\n- 如果该数的最后一位数字是零，她就将该数除以 $10$（即去掉最后一位数字）。\n\n给定一个整数 $n$，Tanya 会对它进行 $k$ 次减一操作。你的任务是输出经过 $k$ 次操作后的结果。\n\n保证最终结果为正整数。",
+    "formatI": "输入的第一行包含两个整数 $n$ 和 $k$（$2 \\leq n \\leq 10^9$，$1 \\leq k \\leq 50$），分别表示初始的数字和要进行的操作次数。",
+    "formatO": "输出一个整数，表示经过 $k$ 次减一操作后的结果。\n\n保证最终结果为正整数。",
+    "hint": "第一个样例对应的操作序列为：$512 \\rightarrow 511 \\rightarrow 510 \\rightarrow 51 \\rightarrow 50$。\n\n由 ChatGPT 4.1 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "512 4\n",
+      "output": "50\n"
+    },
+    {
+      "input": "1000000000 9\n",
+      "output": "1\n"
+    }
+  ]
+}

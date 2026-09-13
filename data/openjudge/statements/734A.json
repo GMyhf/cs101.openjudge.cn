@@ -1,0 +1,37 @@
+{
+  "id": "734A",
+  "name": "Anton and Danik",
+  "source_url": "https://codeforces.com/problemset/problem/734/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF734A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "Anton likes to play chess, and so does his friend Danik.\n\nOnce they have played $ n $ games in a row. For each game it's known who was the winner — Anton or Danik. None of the games ended with a tie.\n\nNow Anton wonders, who won more games, he or Danik? Help him determine this.",
+    "formatI": "The first line of the input contains a single integer $ n $ ( $ 1<=n<=100000 $ ) — the number of games played.\n\nThe second line contains a string $ s $ , consisting of $ n $ uppercase English letters 'A' and 'D' — the outcome of each of the games. The $ i $ -th character of the string is equal to 'A' if the Anton won the $ i $ -th game and 'D' if Danik won the $ i $ -th game.",
+    "formatO": "If Anton won more games than Danik, print \"Anton\" (without quotes) in the only line of the output.\n\nIf Danik won more games than Anton, print \"Danik\" (without quotes) in the only line of the output.\n\nIf Anton and Danik won the same number of games, print \"Friendship\" (without quotes).",
+    "hint": "In the first sample, Anton won $ 6 $ games, while Danik — only $ 1 $ . Hence, the answer is \"Anton\".\n\nIn the second sample, Anton won $ 3 $ games and Danik won $ 4 $ games, so the answer is \"Danik\".\n\nIn the third sample, both Anton and Danik won $ 3 $ games and the answer is \"Friendship\".",
+    "background": ""
+  },
+  "translation": {
+    "description": "Anton 喜欢下国际象棋，他的朋友 Danik 也同样如此。\n\n他们连续下了 $n$ 局棋。每局棋的胜者——Anton 或 Danik——都已知，没有哪一局是平局。\n\n现在 Anton 想知道，他赢的局数多，还是 Danik 赢的局数多？请帮助他判断。",
+    "formatI": "输入的第一行包含一个整数 $n$（$1 \\leq n \\leq 100000$），表示下了 $n$ 局棋。\n\n第二行包含一个长度为 $n$ 的字符串 $s$，每个字符均为大写英文字母 'A' 或 'D'，分别表示该局棋的胜者是 Anton 或 Danik。字符串第 $i$ 个字符为 'A'，表示 Anton 赢得第 $i$ 局棋；为 'D' 则表示 Danik 赢得第 $i$ 局棋。",
+    "formatO": "如果 Anton 赢得的局数多于 Danik，则输出 \"Anton\"（不含引号）。\n\n如果 Danik 赢得的局数多于 Anton，则输出 \"Danik\"（不含引号）。\n\n如果 Anton 和 Danik 赢得的局数相同，则输出 \"Friendship\"（不含引号）。",
+    "hint": "在第一个样例中，Anton 赢了 $6$ 局，而 Danik 只赢了 $1$ 局，因此答案为 \"Anton\"。\n\n在第二个样例中，Anton 赢了 $3$ 局，Danik 赢了 $4$ 局，所以答案为 \"Danik\"。\n\n在第三个样例中，Anton 和 Danik 都赢了 $3$ 局，所以答案为 \"Friendship\"。\n\n由 ChatGPT 5 翻译",
+    "background": null
+  },
+  "samples": [
+    {
+      "input": "6\nADAAAA\n",
+      "output": "Anton\n"
+    },
+    {
+      "input": "7\nDDDAADA\n",
+      "output": "Danik\n"
+    },
+    {
+      "input": "6\nDADADA\n",
+      "output": "Friendship\n"
+    }
+  ]
+}

@@ -11,7 +11,7 @@
 每条记录都同时保留 `source_url`（Codeforces 原题）和 `mirror_url`（抓取地址）。
 
 交叉验证：4A 的时限内存（1 秒 / 64 MB）与本站此前人工核对过的 4A 页面逐字相同；
-158 道题的样例全部能被 `server.py:sample_io()` 原样切回抓取到的官方样例。
+164 道题的样例全部能被 `server.py:sample_io()` 原样切回抓取到的官方样例。
 
 ## 重新抓取与重建
 
@@ -21,14 +21,14 @@ python3 scripts/build_codeforces_pages.py                 # 重建题面页并�
 python3 scripts/mirror_openjudge_images.py                # 新题面引入的插图要进本地镜像
 ```
 
-全部 158 道都由本脚本渲染。4A 曾是唯一人工写的那页（也正是它让人看出其余 157 页不对），
+全部 164 道都由本脚本渲染。4A 曾是唯一人工写的那页（也正是它让人看出当时其余 157 页不对），
 现在也换成了抓回来的原文：官方限制与那一版逐字相同，正文补回 Codeforces 的原始表述和 Note。
 
 ## 覆盖
 
-- 题目：158 道
-- 有 Note（官方样例解释）：109 道
-- 多组样例：60 道
+- 题目：164 道
+- 有 Note（官方样例解释）：114 道
+- 多组样例：64 道
 - 带插图：23 道
 
 | 题目 | 标题 | 时限 | 内存 | 样例 | 抓取日期 | 官方链接 |
@@ -47,6 +47,7 @@ python3 scripts/mirror_openjudge_images.py                # 新题面引入的�
 | 71A | Way Too Long Words | 1 s | 256 MB | 1 | 2026-09-12 | https://codeforces.com/problemset/problem/71/A |
 | 96A | Football | 2 s | 256 MB | 2 | 2026-09-12 | https://codeforces.com/problemset/problem/96/A |
 | 112A | Petya and Strings | 2 s | 256 MB | 3 | 2026-09-12 | https://codeforces.com/problemset/problem/112/A |
+| 116A | Tram | 2 s | 256 MB | 1 | 2026-09-12 | https://codeforces.com/problemset/problem/116/A |
 | 118A | String Task | 2 s | 256 MB | 3 | 2026-09-12 | https://codeforces.com/problemset/problem/118/A |
 | 122A | Lucky Division | 2 s | 256 MB | 3 | 2026-09-12 | https://codeforces.com/problemset/problem/122/A |
 | 131A | cAPS lOCK | 0.5 s | 256 MB | 2 | 2026-09-12 | https://codeforces.com/problemset/problem/131/A |
@@ -87,20 +88,25 @@ python3 scripts/mirror_openjudge_images.py                # 新题面引入的�
 | 508A | Pasha and Pixels | 2 s | 256 MB | 3 | 2026-09-12 | https://codeforces.com/problemset/problem/508/A |
 | 545C | Woodcutters | 1 s | 256 MB | 2 | 2026-09-12 | https://codeforces.com/problemset/problem/545/C |
 | 545D | Queue | 1 s | 256 MB | 1 | 2026-09-12 | https://codeforces.com/problemset/problem/545/D |
+| 546A | Soldier and Bananas | 1 s | 256 MB | 1 | 2026-09-12 | https://codeforces.com/problemset/problem/546/A |
 | 550C | Divisibility by Eight | 2 s | 256 MB | 3 | 2026-09-12 | https://codeforces.com/problemset/problem/550/C |
 | 579A | Raising Bacteria | 1 s | 256 MB | 2 | 2026-09-12 | https://codeforces.com/problemset/problem/579/A |
 | 580A | Kefa and First Steps | 2 s | 256 MB | 2 | 2026-09-12 | https://codeforces.com/problemset/problem/580/A |
 | 580C | Kefa and Park | 2 s | 256 MB | 2 | 2026-09-12 | https://codeforces.com/problemset/problem/580/C |
 | 584A | Olesya and Rodion | 1 s | 256 MB | 1 | 2026-09-12 | https://codeforces.com/problemset/problem/584/A |
 | 615A | Bulbs | 1 s | 256 MB | 2 | 2026-09-12 | https://codeforces.com/problemset/problem/615/A |
+| 617A | Elephant | 1 s | 256 MB | 2 | 2026-09-12 | https://codeforces.com/problemset/problem/617/A |
 | 698A | Vacations | 1 s | 256 MB | 3 | 2026-09-12 | https://codeforces.com/problemset/problem/698/A |
 | 705A | Hulk | 1 s | 256 MB | 3 | 2026-09-12 | https://codeforces.com/problemset/problem/705/A |
 | 706B | Interesting drink | 2 s | 256 MB | 1 | 2026-09-12 | https://codeforces.com/problemset/problem/706/B |
 | 723A | The New Year: Meeting Friends | 1 s | 256 MB | 2 | 2026-09-12 | https://codeforces.com/problemset/problem/723/A |
+| 734A | Anton and Danik | 1 s | 256 MB | 3 | 2026-09-12 | https://codeforces.com/problemset/problem/734/A |
+| 791A | Bear and Big Brother | 1 s | 256 MB | 3 | 2026-09-12 | https://codeforces.com/problemset/problem/791/A |
 | 803A | Maximal Binary Matrix | 1 s | 256 MB | 3 | 2026-09-12 | https://codeforces.com/problemset/problem/803/A |
 | 893C | Rumor | 2 s | 256 MB | 3 | 2026-09-12 | https://codeforces.com/problemset/problem/893/C |
 | 894E | Ralph and Mushrooms | 2.5 s | 512 MB | 2 | 2026-09-12 | https://codeforces.com/problemset/problem/894/E |
 | 903C | Boxes Packing | 1 s | 256 MB | 2 | 2026-09-12 | https://codeforces.com/problemset/problem/903/C |
+| 977A | Wrong Subtraction | 1 s | 256 MB | 2 | 2026-09-12 | https://codeforces.com/problemset/problem/977/A |
 | 986B | Petr and Permutations | 2 s | 256 MB | 1 | 2026-09-12 | https://codeforces.com/problemset/problem/986/B |
 | 986D | Perfect Encoding | 2 s | 256 MB | 3 | 2026-09-12 | https://codeforces.com/problemset/problem/986/D |
 | 996A | Hit the Lottery | 1 s | 256 MB | 3 | 2026-09-12 | https://codeforces.com/problemset/problem/996/A |

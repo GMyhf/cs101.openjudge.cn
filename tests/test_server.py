@@ -390,7 +390,7 @@ class ServerApiTests(unittest.TestCase):
         status, _, body = request(self.port, "GET", "/api/catalog")
         payload = json.loads(body)
         self.assertEqual(payload["book_meta"]["codeforces"],
-                         {"name": "Codeforces 题库", "count": 158})
+                         {"name": "Codeforces 题库", "count": 164})
         row = next(item for item in payload["problems"]
                    if (item["book"], item["id"]) == ("codeforces", "4A"))
         self.assertEqual((row["title"], row["test_count"]), ("A. Watermelon", 21))
@@ -410,7 +410,9 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
         entries = {item["id"]: item for item in catalog["problems"]
                    if item.get("source") == "codeforces"}
-        self.assertEqual(len(entries), 158)
+        # 158 道来自课程题解导入；另 6 道（116A 546A 617A 734A 791A 977A）是 2026-09-13
+        # 按「800 分经典入门题」清单补的，走单题流水线，不在导入源里
+        self.assertEqual(len(entries), 164)
         self.assertTrue({"1A", "2228D", "4A"}.issubset(entries))
         self.assertFalse({"2095A", "2214A"} & set(entries))
         self.assertEqual(entries["4A"]["test_count"], 21)
@@ -539,7 +541,8 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
                                  for case in item["test_cases"]}) == 21 for item in generated))
         rebuilt = [item for item in entries if item.get("data_status") == "rebuilt_tests"]
         self.assertEqual({item["id"] for item in rebuilt},
-                         {"270A", "456A", "698A", "903C", "1374B", "1374C", "1475A", "1742A", "1764C", "1829D", "1883D", "1970E1", "2140B", "2208C", "2227B"})
+                         {"270A", "456A", "698A", "903C", "1374B", "1374C", "1475A", "1742A", "1764C", "1829D", "1883D", "1970E1", "2140B", "2208C", "2227B",
+                          "116A", "546A", "617A", "734A", "791A", "977A"})
         self.assertTrue(all(item["test_count"] == 21 for item in rebuilt))
         self.assertEqual(sum(item["test_count"] for item in entries if item["id"] != "4A"),
                          sum(item["test_count"] for item in sampled)
@@ -608,6 +611,55 @@ print("\\n".join(answers))
         # 2140B now contains multi-test input. A solver that only produces a
         # witness for the first x must fail instead of silently passing t=1.
         self.assertEqual("Wrong Answer", judge("codeforces", "2140B", "python", "print(1)\n")["status"])
+
+    def test_codeforces_800_basics_are_mirrored_and_discriminate(self):
+        """按「800 分经典入门题」清单补的 6 道：题面在、数据是单题流水线造的、并且真判得动。
+
+        钉的不是「有 21 组」，而是每题最常见的错法会挂（见各题 producecase.py 的 SHAPES）。
+        数据由参考实现生成，所以另有一份算法不同的 oracle 在交接时逐组对过（T-043）。
+        """
+        basics = ("116A", "546A", "617A", "734A", "791A", "977A")
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        rows = {item["id"]: item for item in catalog["problems"] if item.get("book") == "codeforces"}
+        for problem_id in basics:
+            self.assertEqual((rows[problem_id]["data_status"], rows[problem_id]["test_count"]),
+                             ("rebuilt_tests", 21), problem_id)
+            statement = json.loads((ROOT / f"data/openjudge/statements/{problem_id}.json").read_text(encoding="utf-8"))
+            made = ROOT / f"data/openjudge/tests/codeforces/{problem_id}_made"
+            # 第 0 组就是官方第一个样例，逐字
+            self.assertEqual((made / "data/0.in").read_text(encoding="utf-8"), statement["samples"][0]["input"])
+            self.assertEqual((made / "data/0.out").read_text(encoding="utf-8").strip(),
+                             statement["samples"][0]["output"].strip())
+            reference = (made / "samplecode.py").read_text(encoding="utf-8")
+            verdict = judge("codeforces", problem_id, "python", reference)
+            self.assertEqual((verdict["status"], verdict["cases"]), ("Accepted", 21), (problem_id, verdict))
+        status, _, body = request(self.port, "GET", "/codeforces/116A/")
+        self.assertEqual(status, 200)
+        self.assertIn("Tram", body.decode("utf-8", errors="replace"))
+
+        wrong = {
+            # 先上后下：把容量算大
+            "116A": "import sys\nv=list(map(int,sys.stdin.read().split()))\nc=m=0\n"
+                    "for i in range(v[0]):\n    c+=v[2+2*i];m=max(m,c);c-=v[1+2*i]\nprint(m)\n",
+            "617A": "print(int(input())//5)\n",                                   # 向下取整
+            "791A": "a,b=map(int,input().split())\ny=0\nwhile a<b:\n    a*=3;b*=2;y+=1\nprint(y)\n",  # 非严格
+            "977A": "n,k=map(int,input().split())\nprint(n-k)\n",
+            "546A": "k,n,w=map(int,input().split())\nprint(k*w*(w+1)//2-n)\n",   # 忘了和 0 取 max
+            "734A": "input();s=input()\nprint('Anton' if s.count('A')>s.count('D') else 'Danik')\n",  # 没有平局
+        }
+        for problem_id, source in wrong.items():
+            self.assertEqual("Wrong Answer", judge("codeforces", problem_id, "python", source)["status"], problem_id)
+        # 另一侧的取整错法也要挂：x // 5 + 1 在 5 的倍数上多算一步
+        self.assertEqual("Wrong Answer",
+                         judge("codeforces", "617A", "python", "print(int(input())//5+1)\n")["status"])
+
+        # 数据形状：791A 的 4 个「某年恰好一样重」输入一个不漏；734A 三种结局各不少于 4 组
+        inputs = {path.read_text(encoding="utf-8")
+                  for path in (ROOT / "data/openjudge/tests/codeforces/791A_made/data").glob("*.in")}
+        self.assertTrue({"2 3\n", "4 6\n", "4 9\n", "6 9\n"} <= inputs)
+        answers = [path.read_text(encoding="utf-8").strip()
+                   for path in (ROOT / "data/openjudge/tests/codeforces/734A_made/data").glob("*.out")]
+        self.assertTrue(all(answers.count(name) >= 4 for name in ("Anton", "Danik", "Friendship")), answers)
 
     def test_codeforces_withheld_problems_stay_out_of_the_judge(self):
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))

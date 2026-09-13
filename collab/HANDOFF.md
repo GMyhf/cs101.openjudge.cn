@@ -1,5 +1,28 @@
 # HANDOFF · 交接日志
 
+### 2026-09-13 · Claude · 补齐「Codeforces 800 分经典入门题」清单（T-043）
+
+人给了一份 12 道题的入门清单，要求「缺的就加」。**6 道已在**（71A 282A 236A 281A 266A 339A），
+**6 道补上**：116A Tram、546A Soldier and Bananas、617A Elephant、734A Anton and Danik、
+791A Bear and Big Brother、977A Wrong Subtraction。Codeforces 题库 158 → 164。
+
+- **题面**：沿用 09-12 那套 —— `fetch_codeforces_statements.py <ids>` 从洛谷 CF 镜像抓（6/6 成功，
+  含全部官方样例和时限内存），`build_codeforces_pages.py` 全量重建；164 页里只多出这 6 页，
+  其余逐字节不变。报告里两处写死的「158」顺手改成按记录数生成。
+- **数据没进中央批量生成器**（`build_codeforces_basic_data.py` 的 `BUILDERS`）：那里答案和输入出自同一个函数，
+  正是 698A / 1374C 栽过的「自洽地全错」。每题走单题流水线：`samplecode.py` 管答案、`producecase.py`
+  管输入 + `valid()` + 构建，构建前断言参考实现对上**全部**官方样例，第 0 组即官方第一个样例。
+  状态记 `rebuilt_tests`（测试里 rebuilt 集合同步加了这 6 个）。
+- **仓外事实**：①官方样例（抓回来的 statements JSON）；②另写一份算法不同的 oracle 逐组比对
+  （前缀和 / 逐步贪心 / 闭式比较 / 字符串操作 / 逐根累加 / ±1 计分），6 × 21 组 0 差异。
+- **判别力**：参考 Python 与另写的 C++ 均 Accepted 21/21；13 份典型错解全部 Wrong Answer
+  （116A 先上后下、只取 max(b)；617A `x//5` 与 `x//5+1`；791A `<` 代替 `<=`；977A `n-k`、只判一次末位；
+  546A 不和 0 取 max、少算一根、按 k w n 读；734A 没有平局分支、`>=`）。
+  钉进 `test_codeforces_800_basics_are_mirrored_and_discriminate`。
+- **要留心的下游**：`docs/codeforces-import.md` 是导入脚本整页生成的，这 6 行是手工补的，
+  重跑导入会被冲掉（文件头已注明）。
+- **留给 Codex**：拿 6 份 `samplecode.py` 去 Codeforces 平台（或 cs101.openjudge.cn 对应题）真提交复验。
+
 ### 2026-09-12 · Claude · Codeforces 题面改成抓回来的原题（157 页）
 
 人报的是显示问题：`/codeforces/4A/` 是对的，50A、1A、231A 这些「题解摘要」不对，要求

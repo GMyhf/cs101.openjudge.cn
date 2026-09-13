@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Codeforces 791A: A. Bear and Big Brother</title></head>
+<body><div id="pageTitle"><h2>A. Bear and Big Brother</h2></div>
+<dl class="problem-params">
+<dt>Source</dt><dd><a href="https://codeforces.com/problemset/problem/791/A" rel="noopener">Codeforces 791A</a></dd>
+<dt>Time limit</dt><dd>1 second</dd><dt>Memory limit</dt><dd>256 megabytes</dd>
+</dl>
+<dl class="problem-content">
+<dt>Description</dt><dd><p>Bear Limak wants to become the largest of bears, or at least to become larger than his brother Bob.</p><p>Right now, Limak and Bob weigh <em>a</em> and <em>b</em> respectively. It's guaranteed that Limak's weight is smaller than or equal to his brother's weight.</p><p>Limak eats a lot and his weight is tripled after every year, while Bob's weight is doubled after every year.</p><p>After how many full years will Limak become strictly larger (strictly heavier) than Bob?</p></dd>
+<dt>Input</dt><dd><p>The only line of the input contains two integers <em>a</em> and <em>b</em> (<em>1≤a≤b≤10</em>) — the weight of Limak and the weight of Bob respectively.</p></dd>
+<dt>Output</dt><dd><p>Print one integer, denoting the integer number of years after which Limak will become strictly larger than Bob.</p></dd>
+<dt>样例输入</dt><dd><pre>样例输入1
+4 7
+样例输出1
+2
+
+样例输入2
+4 9
+样例输出2
+3</pre></dd>
+<dt>样例输出</dt><dd><pre>样例输入3
+1 1
+样例输出3
+1</pre></dd>
+<dt>Note</dt><dd><p>In the first sample, Limak weighs <em>4</em> and Bob weighs <em>7</em> initially. After one year their weights are <em>4·3=12</em> and <em>7·2=14</em> respectively (one weight is tripled while the other one is doubled). Limak isn't larger than Bob yet. After the second year weights are <em>36</em> and <em>28</em>, so the first weight is greater than the second one. Limak became larger than Bob after two years so you should print <em>2</em>.</p><p>In the second sample, Limak's and Bob's weights in next years are: <em>12</em> and <em>18</em>, then <em>36</em> and <em>36</em>, and finally <em>108</em> and <em>72</em> (after three years). The answer is <em>3</em>. Remember that Limak wants to be larger than Bob and he won't be satisfied with equal weights.</p><p>In the third sample, Limak becomes larger than Bob after the first year. Their weights will be <em>3</em> and <em>2</em> then.</p></dd>
+</dl>
+</body></html>

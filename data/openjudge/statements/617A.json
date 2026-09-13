@@ -1,0 +1,33 @@
+{
+  "id": "617A",
+  "name": "Elephant",
+  "source_url": "https://codeforces.com/problemset/problem/617/A",
+  "mirror_url": "https://www.luogu.com.cn/problem/CF617A",
+  "fetched": "2026-09-12",
+  "time_limit_ms": 1000,
+  "memory_limit_kb": 256000,
+  "statement": {
+    "description": "An elephant decided to visit his friend. It turned out that the elephant's house is located at point $ 0 $ and his friend's house is located at point $ x(x&gt;0) $ of the coordinate line. In one step the elephant can move $ 1 $ , $ 2 $ , $ 3 $ , $ 4 $ or $ 5 $ positions forward. Determine, what is the minimum number of steps he need to make in order to get to his friend's house.",
+    "formatI": "The first line of the input contains an integer $ x $ ( $ 1<=x<=1000000 $ ) — The coordinate of the friend's house.",
+    "formatO": "Print the minimum number of steps that elephant needs to make to get from point $ 0 $ to point $ x $ .",
+    "hint": "In the first sample the elephant needs to make one step of length $ 5 $ to reach the point $ x $ .\n\nIn the second sample the elephant can get to point $ x $ if he moves by $ 3 $ , $ 5 $ and $ 4 $ . There are other ways to get the optimal answer but the elephant cannot reach $ x $ in less than three moves.",
+    "background": ""
+  },
+  "translation": {
+    "description": "## 题意简述\n数轴起点坐标为0，终点坐标为x，可以向前移动1/2/3/4/5个单位长度，问最少几步可以从起点到终点。\n一只大象决定去拜访他的朋友。结果，大象的房子位于0点0，他的朋友的房子位于点X。每一步大象可以向前移动1、2、3、4或5个位置。问：他最少走多少步才能到达他的朋友的房子。",
+    "formatI": "输入共一行，只有一个整数x（$ 1<=x<=1000000 $）表示朋友家的坐标。",
+    "formatO": "输出共一行，只有一个整数，表示大象到达他的朋友的房子的最少步数。",
+    "hint": "在第一个样例中，大象需要走一步长度为5，以到达X点。  \n在第二个样例中，如果大象移动3，5和4步，可以到达X点。还有其他方法三步到达，但大象不能以少于三步的方法到达X点。\n\n感谢@仁和_童博扬 提供的翻译",
+    "background": ""
+  },
+  "samples": [
+    {
+      "input": "5\n",
+      "output": "1\n"
+    },
+    {
+      "input": "12\n",
+      "output": "3\n"
+    }
+  ]
+}

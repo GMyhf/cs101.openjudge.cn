@@ -2,6 +2,18 @@
 
 ## 2026-09-13
 
+### 补齐「Codeforces 800 分经典入门题」清单：新增 116A、546A、617A、734A、791A、977A
+
+清单 12 道里 71A、282A、236A、281A、266A、339A 本来就在；缺的 6 道补进 Codeforces 题库（158 → 164）。
+
+- **题面**：`fetch_codeforces_statements.py` 从洛谷 CF 镜像抓英文原题、全部官方样例与时限内存，`build_codeforces_pages.py` 渲染。
+- **数据**：每题走单题流水线（`tests/codeforces/<题号>_made/`），`samplecode.py` 与 `producecase.py` 分离；
+  `valid()` 按题面逐条抄契约（116A 的「下车人数不超过车上人数、末站清空」、977A 的「保证结果为正」都在里面），
+  构建时先拿参考实现对**全部官方样例**，第 0 组即官方样例。生成形状按错法设计：116A 先上后下、617A 两种取整、
+  791A 「某年恰好一样重」的 4 个输入全收、977A 末尾连续 0、546A 钱够时的负数、734A 平局。
+- **验证**：另写一份算法不同的 oracle 逐组比对 6 × 21 组 0 差异；Python 参考与另写的 C++ 均 Accepted 21/21；
+  13 份典型错解全部 Wrong Answer。新回归用例 `test_codeforces_800_basics_are_mirrored_and_discriminate`。
+
 ### Playground 分享链接免登录查看（发到课程微信群能直接点开）
 
 - `/playground/<ID>/` 与 `/api/playground/share/<ID>/` 不再要求登录：未登录者可查看、修改（仅在当前页面，不存草稿）、复制代码；
