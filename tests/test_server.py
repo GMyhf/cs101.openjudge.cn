@@ -469,14 +469,14 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
                              [{"input": sample["input"].strip("\n"), "output": sample["output"].strip("\n")}
                               for sample in statement["samples"]], path.stem)
 
-    def test_practice_27329_splits_delimited_samples(self):
+    def test_practice_31202_splits_delimited_samples(self):
         sys.path.insert(0, str(ROOT))
         try:
             import server
         finally:
             sys.path.pop(0)
         handler = server.Handler.__new__(server.Handler)
-        cases = handler.sample_io(ROOT / "data/openjudge/pages/practice__27329.html")["cases"]
+        cases = handler.sample_io(ROOT / "data/openjudge/pages/practice__31202.html")["cases"]
         self.assertEqual(cases, [
             {"input": "5\n4 8 2 6 2\n4 5 4 1 3", "output": "7"},
             {"input": "4\n1 3 2 4\n1 3 2 4", "output": "0"},
