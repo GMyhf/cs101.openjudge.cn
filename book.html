@@ -395,6 +395,7 @@ function renderSolution(data) {
     if (d.message) lines.push(`<pre class="src">${esc(d.message)}</pre>`);
     if (d.failing_input) lines.push(`<div><b>出错那组的输入：</b></div><pre class="src">${esc(d.failing_input.text || '')}</pre>`);
     if (d.expected_output) lines.push(`<div><b>期望输出：</b></div><pre class="src">${esc(d.expected_output.text || '')}</pre>`);
+    if (d.actual_output) lines.push(`<div><b>实际输出：</b></div><pre class="src">${esc(d.actual_output.text || '（没有输出）')}</pre>`);
     if (lines.length) blocks.push('<section class="block"><h2>判题详情</h2>' + lines.join('') + '</section>');
     const source = data.source || '（这次提交没有留下代码）';
     blocks.push('<section class="block code-block"><h2>代码</h2><div class="source-wrap"><button class="copy-code" type="button" aria-label="复制代码" onclick="copySource(this)"></button><span class="copy-tip" role="status">复制代码</span>'

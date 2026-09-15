@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## 2026-09-15
+
+### 修复 practice/31183「运行样例」必 RE、WA 不给实际输出
+
+- **样例**：31183 的题面整段 gzip 压在内联 `<script>` 常量里，`<dt>样例输入</dt>` 只剩零宽空格
+  `U+200B`；`str.strip()` 不去它，于是 `sample_io` 把 `"\u200b"` 当样例下发，任何 `int(input())`
+  都 RE。现在零宽空格视为空，并解开内联 gzip 题面取出 9 组样例。回归 `test_practice_31183_inline_gzip_samples_are_available`。
+- **WA 详情**：判题器只回 token 数，学生看不到自己的输出。WA 结果新增 `actual_output`（截断 4000 字符），
+  提交页、提交记录、题库详情页与期望输出并列展示。
+
 ## 2026-09-14
 
 ### 新增 practice/31201「水仙花数」

@@ -166,6 +166,22 @@ def parse_embedded_html_samples(text):
     return cases
 
 
+def inline_gzip_statement(text):
+    """OJ Inject 的另一种形状：`<script>…b='H4sI…'…DecompressionStream('gzip')…</script>`。
+
+    整段题面（含样例）压在脚本常量里，只在浏览器端解开；`<dt>样例输入</dt>` 里只剩
+    一个零宽空格。`local_page` 只认 `application/x-oj-inject-data` 节点，看不见这种。
+    解不出就返回空串。
+    """
+    match = re.search(r"\bb='(H4sI[A-Za-z0-9+/=]+)'", text)
+    if not match:
+        return ""
+    try:
+        return gzip.decompress(base64.b64decode(match.group(1))).decode("utf-8")
+    except (ValueError, OSError, UnicodeDecodeError):
+        return ""
+
+
 JUDGE_SLOTS = set()
 JUDGE_SLOTS_LOCK = threading.Lock()
 
@@ -1388,10 +1404,14 @@ class Handler(BaseHTTPRequestHandler):
             return unescape(re.sub(r"<[^>]+>", "", chunk)).strip("\n")
         raw_input, raw_output = plain(match.group(1)), plain(match.group(2))
         cases = []
-        if not raw_input.strip() and not raw_output.strip():
+        # 零宽空格不算内容：str.strip() 不去掉 U+200B，31183 的空样例就是它，
+        # 改动前被当成真样例下发，「运行样例」喂进去一个 "\u200b"，学生看到的是 RE。
+        if not raw_input.replace("\u200b", "").strip() and not raw_output.replace("\u200b", "").strip():
             content = re.search(r'<dl class="problem-content">(.*?)</dl>', text, re.S)
             if content:
                 cases = parse_embedded_html_samples(content.group(1))
+            if not cases:
+                cases = parse_embedded_html_samples(inline_gzip_statement(text))
         if raw_input.strip() == "见描述" and raw_output.strip() == "见描述":
             content = re.search(r'<dl class="problem-content">(.*?)</dl>', text, re.S)
             if content:

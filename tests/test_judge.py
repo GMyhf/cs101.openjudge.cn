@@ -100,6 +100,9 @@ class JudgeCoreTests(unittest.TestCase):
         result = judge(BOOK, PROBLEM, "python", source)
         self.assertEqual(result["status"], "Wrong Answer")
         self.assertEqual(result["case"], 2)
+        # 只给 token 数学生看不出错在哪；WA 必须带回出错那组的实际输出。
+        self.assertEqual(result["actual_output"],
+                         {"text": "0\n", "truncated": False, "total_lines": 1, "total_chars": 2})
 
     def test_compile_error_is_distinct_from_runtime_error(self):
         result = judge(BOOK, PROBLEM, "python", "def broken(:\n    pass\n")

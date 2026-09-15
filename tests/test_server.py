@@ -492,6 +492,20 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         cases = handler.sample_io(ROOT / "data/openjudge/pages/practice__31201.html")["cases"]
         self.assertEqual(cases, [{"input": "100 500", "output": "153 370 371 407"}])
 
+    def test_practice_31183_inline_gzip_samples_are_available(self):
+        """31183 的题面压在内联脚本里，<dd><pre> 只有零宽空格；不能把 "\\u200b" 当样例下发。"""
+        sys.path.insert(0, str(ROOT))
+        try:
+            import server
+        finally:
+            sys.path.pop(0)
+        handler = server.Handler.__new__(server.Handler)
+        sample = handler.sample_io(ROOT / "data/openjudge/pages/practice__31183.html")
+        self.assertEqual(len(sample["cases"]), 9)
+        self.assertEqual(sample["cases"][0], {"input": "1\nOpenJudge  is fun!", "output": "OpenJudge  is fun!"})
+        self.assertEqual(sample["cases"][-1], {"input": "6\n10\n-3\n8\nEND", "output": "15"})
+        self.assertEqual(sample["input"], sample["cases"][0]["input"])
+
     def test_codeforces_generated_data_has_twenty_one_distinct_cases(self):
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
         entries = [item for item in catalog["problems"] if item.get("source") == "codeforces"]

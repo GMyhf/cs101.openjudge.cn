@@ -761,7 +761,10 @@ def judge(book, problem_id, language, source, collect_case_times=False):
             if result.returncode != 0: return {"status": "Runtime Error", "case": index, **metrics, "message": result.stderr.decode(errors="replace")[-4000:]}
             checker = item.get("special_checker")
             matched = special_output_matches(checker, input_data, actual) if checker else outputs_match(actual, expected, item.get("comparison", "tokens"))
-            if not matched: return {"status": "Wrong Answer", "case": index, **metrics, "expected_tokens": len(expected.split()), "actual_tokens": len(actual.split())}
+            # 实际输出是学生自己程序打印的，不涉及泄题；只截断 UI 载荷（它会整份进 submissions.detail）。
+            if not matched: return {"status": "Wrong Answer", "case": index, **metrics, "expected_tokens": len(expected.split()), "actual_tokens": len(actual.split()),
+                                    "actual_output": {"text": actual[:4000], "truncated": len(actual) > 4000,
+                                                      "total_lines": len(actual.splitlines()), "total_chars": len(actual)}}
     accepted = {"status": "Accepted", "cases": len(cases), **last_metrics}
     if collect_case_times:
         max_case = max(case_timings, key=lambda row: row["ratio"])

@@ -642,6 +642,12 @@ function renderVerdict(data) {
     snippet += '<div class="snip"><div class="snip-h">第 ' + data.case + ' 组对应 .out 期望输出 ' + tail
             + '</div><pre class="msg source">' + esc(o.text) + "</pre></div>";
   }
+  if (data.actual_output) {
+    const a = data.actual_output;
+    const tail = a.truncated ? "（内容过长，已截断）" : "";
+    snippet += '<div class="snip"><div class="snip-h">第 ' + data.case + ' 组你的实际输出 ' + tail
+            + '</div><pre class="msg source">' + esc(a.text || "（没有输出）") + "</pre></div>";
+  }
   verdict.innerHTML = '<div class="verdict-head">' + badge(data.status)
     + '<span class="verdict-title">' + esc(data.status === "Accepted" ? "通过" : data.status) + '</span></div>'
     + (metrics.length ? '<div class="metrics">' + metrics.join("") + "</div>" : "")
@@ -754,6 +760,8 @@ function submissionDetail(row) {
   if (detail.cases !== undefined) metrics.push(chip("通过", detail.cases + " 组全过"));
   let diagnostic = detail.message ? '<pre class="msg">' + esc(detail.message) + '</pre>' : '';
   if (detail.expected_tokens !== undefined) diagnostic += '<p class="muted">输出规模：期望 ' + esc(detail.expected_tokens) + ' 个 token，实际 ' + esc(detail.actual_tokens) + ' 个。</p>';
+  if (detail.expected_output) diagnostic += '<div class="snip"><div class="snip-h">期望输出</div><pre class="msg source">' + esc(detail.expected_output.text || '') + '</pre></div>';
+  if (detail.actual_output) diagnostic += '<div class="snip"><div class="snip-h">实际输出</div><pre class="msg source">' + esc(detail.actual_output.text || '（没有输出）') + '</pre></div>';
   const code = row.source
     ? '<div class="submission-source-wrap"><button class="source-copy" type="button" aria-label="复制代码" onclick="copySelectedSubmission(this)"></button><span class="source-copy-tip" role="status">复制代码</span><pre class="submission-source"><code>' + highlight(row.source, row.language) + '</code></pre></div>'
     : '<p class="placeholder">这次提交的代码与判题详情仅对提交者和管理员可见。</p>';
