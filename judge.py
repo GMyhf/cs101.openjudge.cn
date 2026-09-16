@@ -15,8 +15,38 @@ from pathlib import Path
 ROOT = Path(__file__).parent
 MIRROR = ROOT / "data" / "openjudge"
 PROBLEM_KEYS_CACHE = None
-PROBLEM_KEYS_MTIME_NS = None
+PROBLEM_KEYS_VERSION = None
 PROBLEM_KEYS_LOCK = threading.Lock()
+
+# —— 按文件版本失效的缓存，键怎么取（2026-09-16）——
+#
+# 文件时间戳不是连续的：内核给 mtime 用的是粗粒度时钟。实测 2000 次连写，
+# **开发机 zfs 与线上 xfs 都是每 1ms 才跳一次**，连续两次写有 65%~94% 拿到
+# **同一个** `st_mtime_ns`。所以「只比 mtime」的缓存分不出「同一 tick 内的两次修改」。
+#
+# 这不只是理论上的洞，它一直在咬人：`test_template_is_reread_when_it_changes` 与
+# `test_problem_exists_caches_until_catalog_changes` 都是「写探针 → 读 → 写回原样 → 再读」，
+# 两次写落在同一 tick，缓存就继续吐探针那一版 —— 干净树上连跑 5 次红 4 次。
+# （手册 §7 另记着一条 `errors=1` 的假红，那条是抛异常、至今没定位，**不是这一条**。）
+#
+# 键里带上大小（和静态文件 ETag 的 `size-mtime` 一个做法），再加一条：文件**刚改过**
+# 的窗口内一律不信缓存 —— 窗口取 50ms，是实测 tick 的 50 倍，代价只是改动后的几十毫秒
+# 里多读几次，之后照常缓存。两条合起来，「同一 tick 内改两次」才真的挡得住。
+STAT_FRESH_WINDOW_NS = 50 * 1000 * 1000
+
+
+def file_version(path):
+    """缓存键：`(mtime_ns, size)`；文件刚改过就返回 `None`，意思是「这次别信缓存」。
+
+    用 `abs()` 是因为时间戳可能落在未来（时钟回拨、从别处拷进来的文件）：附近
+    ±50ms 一律当「刚改过」从严处理，而远在未来的时间戳按老样子缓存 —— 否则一份
+    时间戳错到明年的 `catalog.json` 会让 4MB 的目录每个请求都重读一遍。
+    """
+    stat = path.stat()
+    if abs(time.time_ns() - stat.st_mtime_ns) < STAT_FRESH_WINDOW_NS:
+        return None
+    return (stat.st_mtime_ns, stat.st_size)
+
 
 # CPython 与 PyPy3 都跑 .py 源码，但是两个独立解释器：本机 PyPy 是 Python 3.9，
 # 宿主 CPython 是 3.12，语法能力并不一致，所以 PyPy 的语法检查必须交给它自己做。
@@ -378,14 +408,14 @@ def problem_exists(book, problem_id):
     Cache only lookup keys and refresh them when catalog.json changes. This
     keeps the judge independent from server.py's catalog cache.
     """
-    global PROBLEM_KEYS_CACHE, PROBLEM_KEYS_MTIME_NS
+    global PROBLEM_KEYS_CACHE, PROBLEM_KEYS_VERSION
     catalog_path = MIRROR / "catalog.json"
     try:
-        mtime_ns = catalog_path.stat().st_mtime_ns
+        version = file_version(catalog_path)
     except OSError:
         return False
     with PROBLEM_KEYS_LOCK:
-        if PROBLEM_KEYS_CACHE is None or mtime_ns != PROBLEM_KEYS_MTIME_NS:
+        if PROBLEM_KEYS_CACHE is None or version is None or version != PROBLEM_KEYS_VERSION:
             try:
                 catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
             except (OSError, ValueError):
@@ -395,7 +425,7 @@ def problem_exists(book, problem_id):
                 for p in catalog.get("problems", [])
                 if isinstance(p, dict)
             )
-            PROBLEM_KEYS_MTIME_NS = mtime_ns
+            PROBLEM_KEYS_VERSION = version
         return (book, problem_id) in PROBLEM_KEYS_CACHE
 
 

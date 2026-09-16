@@ -23,8 +23,8 @@ from email.message import EmailMessage
 from html import escape, unescape
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urlparse
-from judge import (SANDBOX_PATH, check_syntax, judge, language_version, parse_diagnostics,
-                   problem_exists, run_sample)
+from judge import (SANDBOX_PATH, check_syntax, file_version, judge, language_version,
+                   parse_diagnostics, problem_exists, run_sample)
 
 ROOT = Path(__file__).parent
 DB = Path(os.environ.get("CS101_DB", ROOT / "data" / "course.db"))
@@ -450,7 +450,7 @@ SESSION_SEEN = {}
 ONLINE_WINDOW_SECONDS = 300
 CATALOG_TITLE_CACHE = {}
 CATALOG_RAW_CACHE = None
-CATALOG_RAW_MTIME = None
+CATALOG_RAW_VERSION = None
 CATALOG_FULL_CACHE = None
 CAPTCHA_CHALLENGES = {}
 
@@ -482,11 +482,11 @@ _SUBMIT_PAGE_CACHE = {}
 
 
 def submit_page_template():
-    """读一次缓存一次，文件变了自动重读。"""
-    mtime = SUBMIT_TEMPLATE.stat().st_mtime_ns
-    if _SUBMIT_PAGE_CACHE.get("mtime") != mtime:
+    """读一次缓存一次，文件变了自动重读。失效键见 `judge.file_version`。"""
+    version = file_version(SUBMIT_TEMPLATE)
+    if version is None or _SUBMIT_PAGE_CACHE.get("version") != version:
         _SUBMIT_PAGE_CACHE["text"] = SUBMIT_TEMPLATE.read_text(encoding="utf-8")
-        _SUBMIT_PAGE_CACHE["mtime"] = mtime
+        _SUBMIT_PAGE_CACHE["version"] = version
     return _SUBMIT_PAGE_CACHE["text"]
 
 
@@ -738,14 +738,14 @@ def catalog_title(item):
 
 def catalog_raw():
     """Read the catalog once per file version instead of once per request."""
-    global CATALOG_RAW_CACHE, CATALOG_RAW_MTIME, CATALOG_FULL_CACHE
+    global CATALOG_RAW_CACHE, CATALOG_RAW_VERSION, CATALOG_FULL_CACHE
     catalog_path = MIRROR / "catalog.json"
     if not catalog_path.is_file():
         return {"problems": []}
-    mtime = catalog_path.stat().st_mtime_ns
-    if CATALOG_RAW_CACHE is None or CATALOG_RAW_MTIME != mtime:
+    version = file_version(catalog_path)
+    if CATALOG_RAW_CACHE is None or version is None or CATALOG_RAW_VERSION != version:
         CATALOG_RAW_CACHE = json.loads(catalog_path.read_text(encoding="utf-8"))
-        CATALOG_RAW_MTIME = mtime
+        CATALOG_RAW_VERSION = version
         CATALOG_FULL_CACHE = None
     return CATALOG_RAW_CACHE
 

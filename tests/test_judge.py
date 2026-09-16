@@ -4,6 +4,7 @@
 （那批抓取数据按人拍板决策不入库），因此新克隆的仓库也能跑通交接闸门。
 """
 import json
+import os
 import re
 import resource
 import shutil
@@ -297,27 +298,65 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertTrue(judge_module.special_output_matches("subtree_parity_tree", b"1\n1 1\n", "YES\n1 2\n"))
         self.assertFalse(judge_module.special_output_matches("subtree_parity_tree", b"1\n1 1\n", "NO\n"))
 
+    def test_file_version_distinguishes_two_writes_in_one_timestamp_tick(self):
+        """缓存键的两半各自都要顶用：「刚改过」的窗口，和键里的大小。
+
+        文件时间戳来自内核的粗粒度时钟 —— 实测开发机 zfs 与线上 xfs 都是 **1ms 一跳**，
+        连续两次写有 65%~94% 拿到同一个 `st_mtime_ns`。只比 mtime 的缓存因此分不出
+        「同一 tick 内改了两次」，`submit.html` 模板与 `catalog.json` 键集两条失效用例
+        就是这么间歇性变红的（干净树上连跑 5 次红 4 次）。
+        """
+        with tempfile.TemporaryDirectory(prefix="cs101-version-") as temp:
+            path = Path(temp) / "f.json"
+            path.write_text("aaaa", encoding="utf-8")
+
+            # ① 刚改过：窗口内一律不信缓存。
+            self.assertIsNone(judge_module.file_version(path))
+
+            # ② 稳定下来之后才缓存，而且同一份文件的键必须稳定 —— 否则缓存等于没有。
+            time.sleep(judge_module.STAT_FRESH_WINDOW_NS / 1e9)
+            settled = judge_module.file_version(path)
+            self.assertIsNotNone(settled)
+            self.assertEqual(settled, judge_module.file_version(path))
+
+            # ③ 时间戳被工具原样保留（tar/rsync -t 拷回来的文件就是这样），只有内容变了：
+            #    窗口已经过去，这时候只剩「大小」这一道。
+            stat = path.stat()
+            path.write_text("aaaaaa", encoding="utf-8")
+            os.utime(path, ns=(stat.st_atime_ns, stat.st_mtime_ns))
+            self.assertEqual(path.stat().st_mtime_ns, stat.st_mtime_ns)
+            self.assertNotEqual(judge_module.file_version(path), settled)
+
     def test_problem_exists_caches_until_catalog_changes(self):
         with tempfile.TemporaryDirectory(prefix="cs101-catalog-") as temp:
             mirror = Path(temp)
             catalog = mirror / "catalog.json"
             catalog.write_text(json.dumps({"problems": [{"book": "b", "id": "1"}]}), encoding="utf-8")
+            # 等过「刚改过」的窗口再断言缓存：文件时间戳每 1ms 才跳一次，`file_version`
+            # 在窗口内一律不信缓存（否则同一 tick 内的第二次修改根本看不出来）。
+            # 「稳定下来的文件只读一次」与「刚改过的文件每次重读」是同一份契约的两半，
+            # 这里两半都要测到，所以先让第一份 catalog 稳定下来。
+            time.sleep(judge_module.STAT_FRESH_WINDOW_NS / 1e9)
             old_cache = judge_module.PROBLEM_KEYS_CACHE
-            old_mtime = judge_module.PROBLEM_KEYS_MTIME_NS
+            old_version = judge_module.PROBLEM_KEYS_VERSION
             try:
                 judge_module.PROBLEM_KEYS_CACHE = None
-                judge_module.PROBLEM_KEYS_MTIME_NS = None
+                judge_module.PROBLEM_KEYS_VERSION = None
                 with mock.patch.object(judge_module, "MIRROR", mirror), \
                      mock.patch.object(judge_module.json, "loads", wraps=json.loads) as loads:
                     self.assertTrue(judge_module.problem_exists("b", "1"))
                     self.assertFalse(judge_module.problem_exists("b", "2"))
                     self.assertEqual(loads.call_count, 1)
+                    # 改完立刻问：两份 catalog **字节数一样**，而两次写极可能落在同一个
+                    # 时间戳 tick 里 —— 只比 `st_mtime_ns`（甚至 mtime+大小）的缓存在这里
+                    # 分不出新旧，会继续吐旧键集。这正是这条用例此前间歇性变红的原因。
                     catalog.write_text(json.dumps({"problems": [{"book": "b", "id": "2"}]}), encoding="utf-8")
                     self.assertTrue(judge_module.problem_exists("b", "2"))
-                    self.assertEqual(loads.call_count, 2)
+                    self.assertFalse(judge_module.problem_exists("b", "1"))
+                    self.assertGreaterEqual(loads.call_count, 2)
             finally:
                 judge_module.PROBLEM_KEYS_CACHE = old_cache
-                judge_module.PROBLEM_KEYS_MTIME_NS = old_mtime
+                judge_module.PROBLEM_KEYS_VERSION = old_version
 
 
 if __name__ == "__main__":

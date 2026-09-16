@@ -10,6 +10,38 @@
 
 ## 2026-09-16
 
+### 修复按 mtime 失效的缓存分不出「同一毫秒内的两次修改」
+
+- **现象**：`test_template_is_reread_when_it_changes` 与
+  `test_problem_exists_caches_until_catalog_changes` 时红时绿 —— 干净树上连跑 5 次红 4 次，
+  `tools/handoff.py --verify` 因此拿不到退出码 0。
+- **根因（实测，不是推测）**：文件时间戳来自内核的粗粒度时钟。2000 次连写实测，
+  **开发机 zfs 与线上 xfs 都是 1ms 才跳一次**，连续两次写有 65%~94% 拿到**同一个**
+  `st_mtime_ns`。两条用例都是「写探针 → 读 → 写回原样 → 再读」，两次写落在同一 tick，
+  只比 mtime 的缓存于是继续吐探针那一版。判题器那条更硬：两份 `catalog.json`
+  **字节数还一样**，连 mtime+大小都分不出来。
+- **这不只是用例的事**。`submit.html` 与 `catalog.json` 在线上都是热加载的
+  （改完不用重启），同一毫秒内的第二次修改**会被吃掉**，直到下一次写。
+- **修法**：三处缓存键统一走新的 `judge.file_version()` —— 键是 `(mtime_ns, size)`，
+  大小那半和静态文件 ETag 的 `size-mtime` 是同一个做法（挡 tar/rsync -t 那种把时间戳
+  原样拷回来的情况）；外加一条「文件**刚改过**（50ms 窗口，实测 tick 的 50 倍）一律不信缓存」，
+  这才是真正挡住「同一 tick 改两次」的那一半。代价是文件改动后的几十毫秒里多读几次。
+  三处：`server.submit_page_template()`、`server.catalog_raw()`、`judge.problem_exists()`
+  （`judge` 的键集缓存仍与 `server` 的目录缓存各管各的，只是共用这一个取键函数 ——
+  两份迟早只改一份）。
+- **两半各自有机械判据**：新增 `test_file_version_distinguishes_two_writes_in_one_timestamp_tick`
+  分别钉住「刚改过返回 None」「稳定文件的键不变」「时间戳被原样保留、只有大小变也要认出来」。
+  变异自检 3/3 且**次次红**（退回只比 `mtime_ns`：两条用例全红；只去掉窗口：判题器那条红；
+  只去掉大小：`file_version` 那条红），改回来连跑 3 次全绿。
+  `test_problem_exists_caches_until_catalog_changes` 里那句「只读一次」改成先等过窗口再断言 ——
+  「稳定的文件只读一次」和「刚改过的文件每次重读」是同一份契约的两半，两半都要测到。
+- 闸门从「三次全红」变成**三次全绿**（`tools/handoff.py --verify` 退出码 0）。
+- **知道但没动**：`server.py` 静态文件的 ETag（`size-mtime`）有同一个洞。它走的是
+  `no-cache`、每次都回源校验，且 `static/` 只在发版时变，风险低；改它等于动 HTTP 缓存语义，
+  不搭在这次里。
+- 手册 §7「闸门偶发假红」记上这条，并写明它与原来那条 `errors=1`**不是一回事**
+  （一个是断言不成立，一个是抛异常）—— 后者仍未定位，别把两者混为一谈。
+
 ### 修复 pctbook/M01922（practice/01922）判题数据：21 组里有 20 组只有一组测试
 
 - **现象**：题面第一句是「There are several test cases」，N=0 才结束输入，而每份 `.in`
