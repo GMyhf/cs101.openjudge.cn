@@ -1,4 +1,4 @@
-import random,subprocess,sys,tempfile
+import random,re,subprocess,sys,tempfile
 from pathlib import Path
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
@@ -57,7 +57,29 @@ def generate(number, seed):
     if number==1905:
         rows=[f"{r.randint(1,10000)} {r.random()*20:.3f} {r.random()/10000:.7f}" for _ in range(r.randint(1,6))];return "\n".join(rows)+"\n-1 -1 -1\n"
     if number==1922:
-        n=r.randint(1,15);rows=[(r.randint(1,40),r.randint(-200,500)) for _ in range(n)];rows[0]=(rows[0][0],r.randint(0,500));return f"{n}\n"+"\n".join(f"{a} {b}" for a,b in rows)+"\n0\n"
+        # 题面：「There are several test cases」，每组 N 行、N=0 结束；行内是 `Vi [TAB] Ti`；
+        # 「In any case it is assured that there always exists a nonnegative Ti」。
+        # 形状按「这题会怎么错」设计，不是撒随机：
+        #   多组     —— 只读一组就 break 的解法会少输出几行（旧数据每份只有一组，抓不住）；
+        #   trap     —— 在 Charley 到门口之前就走了的最快骑手，把他算进去必得一个偏小的答案；
+        #   fraction —— 16200 = 2^3·3^4·5^2，这些 Vi 除不尽，floor/round 与题面要的 ceil 分得开；
+        #   exact    —— 除得尽的那一半，ceil 不起作用；
+        #   边界     —— Vi 取 1 与 40、N 取 1 与题面上界 10000。
+        def dataset(kind,n):
+            rows=[]
+            if kind=="trap":rows.append((40,-r.randint(1,3000)))
+            if kind=="fraction":rows.append((r.choice([7,11,13,17,19,23,29,31,37]),r.randint(0,400)))
+            elif kind=="exact":rows.append((r.choice([8,20,24,25,27,30,36,40]),r.randint(0,400)))
+            else:rows.append((r.choice([1,40]) if kind=="edge" else r.randint(1,40),r.randint(0,500)))
+            while len(rows)<n:rows.append((r.randint(1,40),r.randint(-3000,3000)))
+            r.shuffle(rows)
+            return f"{len(rows)}\n"+"\n".join(f"{v}\t{t}" for v,t in rows)+"\n"
+        kinds=["trap","fraction","exact","edge","plain"]
+        if seed==1:groups=[("edge",1)]                                            # 合法输入的下界：一组、一个人
+        elif seed==2:groups=[(kinds[i%len(kinds)],r.randint(1,4)) for i in range(12)]   # 组数多
+        elif seed==3:groups=[("plain",10000),("trap",3)]                          # N 取到题面上界
+        else:groups=[(r.choice(kinds),r.randint(1,15)) for _ in range(r.randint(2,6))]
+        return "".join(dataset(k,n) for k,n in groups)+"0\n"
     if number==1936:return "\n".join(f"{word()} {word(5,18)}" for _ in range(r.randint(1,8)))+"\n"
     if number==2538:
         chars="1234567890-=WERTYUIOP[]\\SDFGHJKL;'XCVBNM,./ ";return "\n".join("".join(r.choice(chars) for _ in range(r.randint(1,60))) for _ in range(r.randint(1,6)))+"\n"
@@ -152,6 +174,29 @@ REFERENCE="# External reference: http://cs101.openjudge.cn/practice/01922/statis
 LANGUAGE='Python3'
 NUMBER=1922
 SAMPLE='4\n20\t0\n25\t-155\n27\t190\n30\t240\n2\n21\t0\n22\t34\n0\n'
+SAMPLE_OUT='780\n771\n'
+def valid(number,text):
+ """把题面的输入格式逐条抄下来：生成器违反它的唯一机械闸门。
+
+ N 行首、1<=N<=10000、N=0 结束输入；每行 `Vi [TAB] Ti`，Vi 是 1..40 的正整数、
+ Ti 是可为负的整数；「In any case it is assured that there always exists a
+ nonnegative Ti」是**每组**的保证 —— 全负的一组会让参考实现对着空集取 min。
+ """
+ if number!=NUMBER:return True
+ if not text.endswith('\n'):return False
+ lines=text.split('\n')[:-1];i=0;groups=0
+ while True:
+  if i>=len(lines) or not re.fullmatch(r'\d+',lines[i]):return False
+  n=int(lines[i]);i+=1
+  if n==0:break
+  if n>10000 or i+n>len(lines):return False
+  block=lines[i:i+n]
+  for row in block:
+   m=re.fullmatch(r'(\d+)\t(-?\d+)',row)
+   if not m or not 1<=int(m.group(1))<=40:return False
+  if all(int(row.split('\t')[1])<0 for row in block):return False
+  i+=n;groups+=1
+ return groups>=1 and i==len(lines)
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -160,6 +205,10 @@ def main():
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
   cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1,21)])
+  if len(set(cases))!=len(cases):raise SystemExit('两组输入撞了，数据必须互异')
   for i,x in enumerate(cases):
-   q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
+   if not valid(NUMBER,x):raise SystemExit(f'第 {i} 组违反题面输入契约：{x!r}')
+   q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True)
+   if i==0 and SAMPLE_OUT and q.stdout!=SAMPLE_OUT:raise SystemExit(f'第 0 组与题面样例输出不符：{q.stdout!r} != {SAMPLE_OUT!r}')
+   (out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

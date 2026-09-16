@@ -849,6 +849,61 @@ print("\\n".join(answers))
         self.assertIn(2, sizes)
         self.assertIn(100, counts)
 
+    def test_practice_01922_data_has_the_several_test_cases_the_statement_promises(self):
+        status, _, body = request(self.port, "GET", "/practice/01922/")
+        self.assertEqual(status, 200)
+        self.assertIn("01922:Ride to School", body.decode("utf-8", errors="replace"))
+        mirrored = (ROOT / "data/openjudge/pages/practice__01922.html").read_text(encoding="utf-8")
+        self.assertRegex(mirrored, r"全局题号\s*</dt>\s*<dd>\s*924")
+
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        disk = [item for item in catalog["problems"] if item.get("global_number") == 924]
+        self.assertEqual(sorted((item["book"], item["id"], item["test_count"]) for item in disk),
+                         [("pctbook", "M01922", 21), ("practice", "01922", 21)])
+
+        made = ROOT / "data/openjudge/tests/1000-1999/01922_made/data"
+        self.assertEqual((made / "0.out").read_text(encoding="utf-8"), "780\n771\n")
+
+        # **这条是这道题的要害。** 题面第一句就是「There are several test cases」，N=0 才结束输入，
+        # 而 2026-09-16 之前每份 `.in` 里只有**一组**数据（题面样例那份除外）—— 21 组里有 20 组
+        # 对「要读到 0 为止」零判别力，一个读完一组就 break 的程序能拿 20/21。
+        # 归档真数据 `tests/1000-1999/1922/ride.in` 一份里就有 10 组，形状照它重建。
+        # 这里把「多组」「`Vi [TAB] Ti` 是制表符」「每组至少一个非负 Ti」逐组钉死，
+        # 顺带钉住题面两端 N=1 与 N=10000。
+        sizes, per_file = [], []
+        for path in sorted(made.glob("*.in")):
+            lines = path.read_text(encoding="utf-8").rstrip("\n").split("\n")
+            position, groups = 0, 0
+            while True:
+                riders = int(lines[position])
+                position += 1
+                if riders == 0:
+                    break
+                self.assertLessEqual(riders, 10000, f"{path.name}: N={riders} 超过题面上界")
+                sizes.append(riders)
+                starts = []
+                for _rider in range(riders):
+                    row = lines[position]
+                    position += 1
+                    self.assertRegex(row, r"^\d+\t-?\d+$",
+                                     f"{path.name}: {row!r} 不是 `Vi [TAB] Ti`")
+                    speed, start = (int(x) for x in row.split("\t"))
+                    self.assertTrue(1 <= speed <= 40, f"{path.name}: Vi={speed} 越出题面的 1..40")
+                    starts.append(start)
+                self.assertTrue(any(start >= 0 for start in starts),
+                                f"{path.name}: 有一组全是负的 Ti，题面保证每组至少一个非负")
+                groups += 1
+            self.assertEqual(position, len(lines), f"{path.name}: 有没被契约消费掉的行")
+            answers = path.with_suffix(".out").read_text(encoding="utf-8").split()
+            self.assertEqual(len(answers), groups,
+                             f"{path.name}: {groups} 组输入却有 {len(answers)} 行答案")
+            per_file.append(groups)
+        self.assertGreaterEqual(sum(1 for groups in per_file if groups > 1), 15,
+                                f"多组的文件太少，抓不住「只读一组」的写法：{per_file}")
+        self.assertGreaterEqual(sum(per_file), 70)
+        self.assertIn(1, sizes)
+        self.assertIn(10000, sizes)
+
     def test_practice_04093_data_obeys_the_guarantees_the_statement_makes(self):
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
         rows = [item for item in catalog["problems"] if item["id"] == "04093"]

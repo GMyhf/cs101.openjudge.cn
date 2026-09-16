@@ -1576,8 +1576,8 @@
         "failed_seeds": []
       },
       "test_cases": 21,
-      "max_input_bytes": 106,
-      "max_output_bytes": 8,
+      "max_input_bytes": 79054,
+      "max_output_bytes": 57,
       "constraints": [
         [
           "rider cases include a nonnegative start and end with zero",
@@ -1637,6 +1637,16 @@
         "problem": "01922",
         "merged_cases": 21,
         "total_ms": 327
+      },
+      "data_rebuilt": {
+        "date": "2026-09-16",
+        "reason": "题面写着「There are several test cases」，N=0 结束输入；round8 的中央生成器每份 .in 只放**一组**数据（第 0 组题面样例除外），于是 21 组里有 20 组对「多组」这件事零判别力 —— 只读一组就 break 的解法照样能过 20/21。数据已按题面重建（多组、`Vi [TAB] Ti` 制表符分隔、N 取到题面上界 10000），并补上 valid() 输入契约与第 0 组样例断言。本条目里的实测数字是对**重建后**的 data/ 重新量的，不是 round8 当时的测量。",
+        "superseded": {
+          "max_input_bytes": 106,
+          "max_output_bytes": 8
+        },
+        "external_evidence": "tests/1000-1999/1922/ride.in 是这题的 2008 归档真数据：一份输入里 10 组、制表符分隔、N 取到 10000。参考实现在它上面逐字复现 ride.out 的十行（780/1110/660/740/675/771/772/…）。重建后的形状是照着这份仓外事实来的，不是照着生成器自己的口味。",
+        "unchanged": "self_audit 的数字重新实测后与 round8 一致（distinct 20/20、constant_output_probe.frequency 1、share 0.05），merged_judge 仍是 Accepted 21 组、327ms —— 所以 full_sweep 第 11 条当时不会红：这处缺陷没有任何既有机械判据能发现，是人看题面看出来的。"
       }
     },
     {
