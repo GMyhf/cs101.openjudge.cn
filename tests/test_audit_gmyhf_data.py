@@ -53,7 +53,13 @@ class GMyhfDataArtifactTests(unittest.TestCase):
             number = int(item["global_number"])
             paths = [case["input"] for case in item.get("test_cases", [])]
             if number in materialized:
-                self.assertTrue(paths and all("_GMyhf/" in path for path in paths), number)
+                # 原数据在前；不足 20 组时后面接同题 `_made`（index_tests.merge_short_gmyhf）
+                original = [path for path in paths if "_GMyhf/" in path]
+                self.assertTrue(original and paths[:len(original)] == original, number)
+                if len(original) >= 20:
+                    self.assertEqual(paths, original, number)
+                else:
+                    self.assertTrue(all("_made/" in path for path in paths[len(original):]), number)
             elif number in problems:
                 self.assertTrue(paths and all("_made/" in path for path in paths), number)
 

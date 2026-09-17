@@ -2,6 +2,27 @@
 
 ## 2026-09-17
 
+### 少于 20 组测试数据的题补到 20 组以上（第一步：OpenJudge）
+
+- **平台原数据不足 20 组时不再整份顶替 `_made`**：T-030 起 `_GMyhf` 优先级最高且整份
+  替换，于是 53 道题（catalog 111 条）从 `_made` 的 21 组掉到平台原数据的 1–19 组
+  （如 12555 只剩 3 组、29917 只剩 1 组）。`scripts/index_tests.py` 新增
+  `merge_short_gmyhf`：原数据不足 `MIN_CASES = 20` 组时，原数据在前、同题 `_made` 接在后面，
+  与原数据输入逐字节相同的 `_made` 组跳过。合并后 53 道题为 22–40 组。
+- **外部依据**：这批 `_made` 的参考实现当初就是在平台原数据上本站判题 Accepted 的
+  （`collab/gmyhf-localjudge.json`）。合并后逐题用同一份参考实现走真实 `judge()`：
+  **53/53 Accepted**，逐组计时余量全部通过（最慢组占单组限额 19.79%，30283）。
+  `_made` 生成器本身这一轮没有逐题重审。
+- **18250 冰阔落 I 重建为 21 组**：旧生成器用无种子 `random`、只有 10 组、第 0 组不是题面样例。
+  新 `producecase.py` 有 `valid()` 输入契约、第 0 组断言题面样例，按错法设计形状（合并方向写反、
+  x==y 自倒、全部倒进一杯、没碰过的杯子、n=1、4 份数据读到 EOF、n=m=50000 上界），
+  答案由 `samplecode.py` 产出并逐组与另写的模拟 oracle 比对。重跑逐字节不变；
+  Python 参考解与另写的 C++ 正解均 Accepted，合并方向写反 / 只读一份 / 不排序三种错解
+  分别挂 19 / 17 / 16 组。
+- 回归：新增 `test_short_gmyhf_data_is_topped_up_from_made_not_replaced`；
+  `test_generated_data_replaces_legacy_data_for_the_same_global_problem`、
+  `test_audit_decisions_match_active_catalog` 与 29917 的组数断言按新规则更新。
+
 ### 补齐 pctbook/M01002（practice/01002）判题数据里的「No duplicates.」用例
 
 - **现象**：题面规定没有重复号码时输出一行「No duplicates.」，而 21 组期望输出里一次都没出现 ——

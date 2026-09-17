@@ -1090,7 +1090,7 @@ print("\\n".join(answers))
             {(item["book"], item["id"], item["test_count"])
              for item in payload["problems"]
              if item["id"] in {"M29917", "29917"}},
-            {("pctbook", "M29917", 1), ("practice", "29917", 1)},
+            {("pctbook", "M29917", 22), ("practice", "29917", 22)},
         )
         self.assertLess(int(headers["Content-Length"]), 500_000)
 

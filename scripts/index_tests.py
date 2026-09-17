@@ -42,6 +42,29 @@ def exclude_special_judge_cases(by_global_number):
             if number not in SPECIAL_JUDGE_GLOBAL_NUMBERS}
 
 
+# 每题至少要这么多组；不足的平台数据要拿同题 `_made` 补齐（见 merge_short_gmyhf）。
+MIN_CASES = 20
+
+
+def merge_short_gmyhf(gmyhf, made):
+    """平台原数据不足 MIN_CASES 组时，把同题 `_made` 接在后面，而不是整份顶替。
+
+    2026-09-17 之前 `_GMyhf` 一律整份顶替 `_made`，于是 12555 这类题从 21 组掉到 3 组。
+    `_made` 的参考实现已在这份原数据上本站判题 Accepted（collab/gmyhf-localjudge.json），
+    原数据仍排在前面；与原数据输入逐字节相同的 `_made` 组跳过，不重复计数。
+    """
+    merged = {}
+    for number, cases in gmyhf.items():
+        extra = made.get(number, [])
+        if len(cases) >= MIN_CASES or not extra:
+            merged[number] = cases
+            continue
+        seen = {(MIRROR / case["input"]).read_bytes() for case in cases}
+        merged[number] = cases + [case for case in extra
+                                  if (MIRROR / case["input"]).read_bytes() not in seen]
+    return merged
+
+
 def numeric(value):
     match = re.search(r"(\d+)$", value)
     return int(match.group(1)) if match else None
@@ -223,7 +246,7 @@ def main():
     # `_GMyhf` directory is created and `_made` remains active.
     by_global_number = dict(legacy_by_global_number)
     by_global_number.update(made_by_global_number)
-    by_global_number.update(gmyhf_by_global_number)
+    by_global_number.update(merge_short_gmyhf(gmyhf_by_global_number, made_by_global_number))
     by_global_number = exclude_special_judge_cases(by_global_number)
 
     stats = book_stats()

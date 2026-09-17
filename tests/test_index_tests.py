@@ -75,11 +75,29 @@ class ArchiveExclusionTests(unittest.TestCase):
         for global_number, cases in by_global.items():
             has_made = any(case["input"].split("/")[2].endswith("_made") for case in cases)
             if has_made:
+                # `_GMyhf` 不足 20 组时会与 `_made` 合并（merge_short_gmyhf），那不算旧数据
                 legacy = [case["input"] for case in cases
-                          if not case["input"].split("/")[2].endswith("_made")]
+                          if not case["input"].split("/")[2].endswith(("_made", "_GMyhf"))]
                 offenders.extend((global_number, path) for path in legacy)
         self.assertEqual([], offenders[:5],
                          f"已有自产数据的全局题仍混入 {len(offenders)} 条旧数据")
+
+    def test_short_gmyhf_data_is_topped_up_from_made_not_replaced(self):
+        """2026-09-17：`_GMyhf` 原来整份顶替 `_made`，12555 这类题从 21 组掉到 3 组。"""
+        by_global = {}
+        for problem in self.catalog["problems"]:
+            if problem.get("source", "openjudge") == "openjudge":
+                by_global.setdefault(problem["global_number"], problem.get("test_cases", []))
+        cases = [case["input"] for case in by_global[12555]]
+        self.assertEqual(cases[:3], [f"tests/10000-19963/12555_GMyhf/data/{i}.in" for i in range(3)])
+        self.assertGreaterEqual(len(cases), index_tests.MIN_CASES)
+        self.assertTrue(all("12555_made/" in path for path in cases[3:]))
+        inputs = [(ROOT / "data/openjudge" / path).read_bytes() for path in cases]
+        self.assertEqual(len(inputs), len(set(inputs)), "与原数据逐字节相同的 _made 组应跳过")
+        short = [number for number, rows in by_global.items()
+                 if rows and any("_GMyhf/" in row["input"] for row in rows)
+                 and len(rows) < index_tests.MIN_CASES]
+        self.assertEqual(short, [])
 
     def test_problem_pages_supply_global_identity(self):
         self.assertEqual(self.per_entry[("pctbook", "E02676")], 1678)
