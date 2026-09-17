@@ -1,5 +1,22 @@
 # CHANGELOG
 
+## 2026-09-17
+
+### 补齐 pctbook/M01002（practice/01002）判题数据里的「No duplicates.」用例
+
+- **现象**：题面规定没有重复号码时输出一行「No duplicates.」，而 21 组期望输出里一次都没出现 ——
+  round6 生成器只从 4 个固定号码里抽 2..30 行，几乎必有重复。漏写这个分支的解法能拿 21/21。
+- **改法**：`producecase.py` 里 seed 为 5 的倍数的 4 组（第 5/10/15/20 组）改为无重复用例：
+  第 5 组 n=1；第 10、15 组是随机的互不相同号码，数字随机换成对应字母、随机插 `-`；
+  第 20 组让 `S/V/Y` 与数字 `7/8/9` 分别在两行里落在同一位，没跳过 Q 的 `(ord-65)//3+2`
+  映射会算出假重复。其余 17 组逐字节不变。
+- **外部依据**：归档真数据 `tests/1000-1999/1002/data15` 就是一组 No duplicates.；归档 8 份
+  输入里没有小写字母，新用例也只用大写（避免误杀在原 OJ 上能过、只认大写的解法，如归档的 `e1.py`）。
+  归档的 `e1.py`、`E-c.cpp`、`E-h.cpp` 在新 21 组上逐组复现 `.out`，本地 judge 两个题号均 Accepted。
+- `collab/t028-round6-report.json` 的 1002 条目按新数据重测（`max_input_bytes` 279 → 272、
+  `constant_output_probe.frequency` 1 → 4），加 `data_rebuilt` 说明；新增回归
+  `test_practice_01002_data_exercises_no_duplicates`（把旧 `10.out` 放回去即变红）。
+
 ## 2026-09-15
 
 ### 对外地址改为标准 443 端口

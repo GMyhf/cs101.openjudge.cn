@@ -849,6 +849,24 @@ print("\\n".join(answers))
         self.assertIn(2, sizes)
         self.assertIn(100, counts)
 
+    def test_practice_01002_data_exercises_no_duplicates(self):
+        # 题面：没有重复号码时输出一行「No duplicates.」。2026-09-17 之前 21 组期望输出里
+        # 一次都没出现这一行，漏写这个分支的解法照样 21/21。
+        made = ROOT / "data/openjudge/tests/1000-1999/01002_made/data"
+        outputs = {int(p.stem): p.read_text(encoding="utf-8") for p in made.glob("*.out")}
+        self.assertEqual(len(outputs), 21)
+        none = sorted(i for i, text in outputs.items() if text == "No duplicates.\n")
+        self.assertEqual(none, [5, 10, 15, 20])
+        self.assertEqual((made / "5.in").read_text(encoding="utf-8").split("\n")[0], "1")
+
+        # 第 20 组：没跳过 Q 的 (ord-65)//3+2 映射把 S/V/Y 算成 8/9/10，会凭空造出重复。
+        keypad = {c: str(2 + i // 3) for i, c in enumerate("ABCDEFGHIJKLMNOPRSTUVWXY")}
+        for mapping, expect_duplicates in ((keypad, False),
+                                           ({c: str((ord(c) - 65) // 3 + 2) for c in keypad}, True)):
+            lines = (made / "20.in").read_text(encoding="utf-8").split()[1:]
+            numbers = ["".join(mapping.get(c, c) for c in line if c != "-") for line in lines]
+            self.assertEqual(len(set(numbers)) < len(numbers), expect_duplicates)
+
     def test_practice_01922_data_has_the_several_test_cases_the_statement_promises(self):
         status, _, body = request(self.port, "GET", "/practice/01922/")
         self.assertEqual(status, 200)

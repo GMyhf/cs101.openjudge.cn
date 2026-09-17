@@ -6,6 +6,28 @@ def generate(number, seed):
     word = lambda a=1, b=10: "".join(r.choice(letters) for _ in range(r.randint(a, b)))
     if number == 3247: return f"{seed % 9 + 1}\n"
     if number == 1002:
+        if seed % 5 == 0:
+            # "No duplicates." cases: distinct standard numbers written with
+            # letters and stray dashes (uppercase only, like the archived data). Seed 20 pairs S/V/Y with the
+            # digit a naive (ord-65)//3+2 mapping would give them, so skipping Q
+            # wrongly produces false duplicates.
+            keys = {"2": "ABC", "3": "DEF", "4": "GHI", "5": "JKL", "6": "MNO", "7": "PRS", "8": "TUV", "9": "WXY"}
+            if seed == 5: nums = [f"{r.randrange(10**7):07d}"]
+            elif seed == 20: nums = ["7770000", "8880000", "8881111", "9991111", "9992222", "1002222", "7078090", "8089000"]
+            else:
+                nums = set()
+                while len(nums) < r.randint(2, 60): nums.add(f"{r.randrange(10**7):07d}")
+                nums = sorted(nums)
+            def write(num):
+                if seed == 20 and num in ("7770000", "8881111", "9992222", "7078090"):
+                    chars = [{"7": "S", "8": "V", "9": "Y"}.get(c, c) for c in num]
+                else:
+                    chars = [r.choice(keys[c]) if c in keys and r.random() < 0.6 else c for c in num]
+                out = ""
+                for c in chars: out += "-" * (r.random() < 0.3) * r.randint(1, 3) + c
+                return out + "-" * (r.random() < 0.2)
+            rows = [write(x) for x in nums]; r.shuffle(rows)
+            return f"{len(rows)}\n" + "\n".join(rows) + "\n"
         base = ["4873279", "ITS-EASY", "888-4567", "3-10-10-10"]
         rows = [r.choice(base) for _ in range(r.randint(2, 30))]
         return f"{len(rows)}\n" + "\n".join(rows) + "\n"

@@ -130,7 +130,7 @@
         "failed_seeds": []
       },
       "test_cases": 21,
-      "max_input_bytes": 279,
+      "max_input_bytes": 272,
       "max_output_bytes": 35,
       "constraints": [
         [
@@ -147,11 +147,11 @@
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 1,
+          "frequency": 4,
           "total": 20,
           "status": "rejected",
           "exemption": null,
-          "share": 0.05
+          "share": 0.2
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -191,6 +191,16 @@
         "problem": "01002",
         "merged_cases": 21,
         "total_ms": 327
+      },
+      "data_rebuilt": {
+        "date": "2026-09-17",
+        "reason": "题面规定没有重复号码时输出「No duplicates.」，而原先 21 组的期望输出里一次都没有出现过这一行 —— round6 生成器只从 4 个固定号码里抽行，行数又 ≥2，几乎必然有重复；漏写这个分支的解法照样 21/21。已把第 5/10/15/20 组改为无重复用例（第 5 组 n=1；第 20 组让 S/V/Y 与数字 7/8/9 各在一行里对应同一位，(ord-65)//3+2 这种没跳过 Q 的映射会算出假重复），其余 17 组逐字节不变。本条目里的实测数字是对**改动后**的 data/ 重新量的。",
+        "superseded": {
+          "max_input_bytes": 279,
+          "constant_output_probe.frequency": 1,
+          "constant_output_probe.share": 0.05
+        },
+        "external_evidence": "tests/1000-1999/1002/ 下的归档真数据 data15.in/out 就是一组 No duplicates. 用例；归档真数据全部 8 份里没有小写字母，所以新用例也只用大写。归档的 e1.py、E-c.cpp、E-h.cpp 三份解法在改动后的 21 组上逐组复现 .out。"
       }
     },
     {
