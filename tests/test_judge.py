@@ -702,3 +702,122 @@ class PyPy3Tests(unittest.TestCase):
                 judge(BOOK, PROBLEM, language, source)
         self.assertEqual(seen.get("python3"), "cpython")
         self.assertEqual(seen.get("pypy3"), "pypy")
+
+
+class SpecialJudgeTests(unittest.TestCase):
+    """答案不唯一（逐题 checker.py）、交互题（逐题 interactor.py）、预设代码（preset_code.py）。
+
+    2026-09-17 加。三条新路径都必须：①学生程序仍走 _limits 与 {PATH, HOME} 环境；
+    ②判题器自身出错给 Judge Error，不冤枉学生；③「运行样例」给出同一个判定。
+    """
+
+    GUESS = """n = int(input())
+lo, hi = 0, n
+while True:
+    mid = (lo + hi) // 2
+    print("?", mid, flush=True)
+    reply = int(input())
+    if reply == 0:
+        print("!", mid, flush=True)
+        break
+    if reply > 0:
+        hi = mid - 1
+    else:
+        lo = mid + 1
+"""
+
+    @classmethod
+    def setUpClass(cls):
+        patcher = mock.patch.object(judge_module, "MIRROR", FIXTURE_MIRROR)
+        patcher.start()
+        cls.addClassCleanup(patcher.stop)
+
+    def test_checker_accepts_any_correct_answer_and_explains_a_wrong_one(self):
+        # 参考答案是 "5 5" / "3 4"，换一种同样正确的拆法必须 Accepted —— 这正是精确比对做不到的
+        self.assertEqual(judge(BOOK, "SPLIT", "python", "n = int(input())\nprint(1, n - 1)\n")["status"],
+                         "Accepted")
+        wrong = judge(BOOK, "SPLIT", "python", "print(1, 1)\n")
+        self.assertEqual((wrong["status"], wrong["case"]), ("Wrong Answer", 1))
+        self.assertEqual(wrong["message"], "两数之和不等于 n")
+        self.assertEqual(judge(BOOK, "SPLIT", "python", "print('x')\n")["status"], "Wrong Answer")
+
+    def test_broken_checker_is_a_judge_error_not_a_wrong_answer(self):
+        result = judge(BOOK, "BADCHECK", "python", "print(5, 5)\n")
+        self.assertEqual(result["status"], "Judge Error")
+        self.assertIn("不是你的问题", result["message"])
+
+    def test_interactive_verdicts(self):
+        self.assertEqual(judge(BOOK, "GUESS", "python", self.GUESS)["status"], "Accepted")
+        cpp = ('#include <iostream>\nint main(){int n;std::cin>>n;int lo=0,hi=n;while(1){int m=(lo+hi)/2;'
+               'std::cout<<"? "<<m<<std::endl;int r;std::cin>>r;if(!r){std::cout<<"! "<<m<<std::endl;return 0;}'
+               'if(r>0)hi=m-1;else lo=m+1;}}\n')
+        self.assertEqual(judge(BOOK, "GUESS", "cpp", cpp)["status"], "Accepted")
+        linear = "n = int(input())\nfor i in range(n + 1):\n    print('?', i, flush=True)\n    if input() == '0':\n        print('!', i, flush=True)\n        break\n"
+        wrong = judge(BOOK, "GUESS", "python", linear)
+        self.assertEqual((wrong["status"], wrong["case"], wrong["message"]),
+                         ("Wrong Answer", 1, "询问超过 15 次"))
+        crash = judge(BOOK, "GUESS", "python", "n = int(input())\nraise SystemExit(3)\n")
+        self.assertEqual(crash["status"], "Runtime Error")
+        spin = judge(BOOK, "GUESS", "python", "n = int(input())\nwhile True:\n    pass\n")
+        self.assertEqual(spin["status"], "Time Limit Exceeded")
+        # 等输入却没先 flush：双方都在等，只能靠墙钟收场
+        with mock.patch.object(judge_module, "case_seconds", return_value=1):
+            stuck = judge(BOOK, "GUESS", "python", "import sys\nn = sys.stdin.readline()\nsys.stdout.write('? 1\\n')\nsys.stdin.readline()\n")
+        self.assertEqual(stuck["status"], "Time Limit Exceeded")
+        self.assertIn("flush", stuck["message"])
+
+    def test_interactive_student_process_keeps_the_sandbox_contract(self):
+        seen = []
+        real_popen = judge_module.subprocess.Popen
+
+        def spy(command, **kwargs):
+            seen.append((command, kwargs.get("env"), kwargs.get("preexec_fn")))
+            return real_popen(command, **kwargs)
+
+        with mock.patch.object(judge_module.subprocess, "Popen", spy):
+            self.assertEqual(judge(BOOK, "GUESS", "python", self.GUESS)["status"], "Accepted")
+        self.assertTrue(seen)
+        for command, env, preexec in seen:
+            self.assertEqual(sorted(env), ["HOME", "PATH"])
+            self.assertEqual(env["PATH"], "/usr/local/bin:/usr/bin:/bin")
+            self.assertIn("-I", command)
+            limits = {}
+            with mock.patch.object(resource, "setrlimit", lambda k, v: limits.__setitem__(k, v)):
+                preexec()
+            self.assertEqual(limits[resource.RLIMIT_FSIZE], (2 * 1024 * 1024, 2 * 1024 * 1024))
+            self.assertEqual(limits[resource.RLIMIT_AS], (768 * 1024 * 1024, 768 * 1024 * 1024))
+            self.assertLessEqual(limits[resource.RLIMIT_CPU][0], judge_module.CASE_CAP_S)
+
+    def test_checker_process_keeps_the_sandbox_contract(self):
+        seen = []
+        real_run = judge_module.subprocess.run
+
+        def spy(command, **kwargs):
+            seen.append((command, kwargs.get("env"), kwargs.get("preexec_fn")))
+            return real_run(command, **kwargs)
+
+        with mock.patch.object(judge_module.subprocess, "run", spy):
+            judge(BOOK, "SPLIT", "python", "n = int(input())\nprint(1, n - 1)\n")
+        checker_calls = [row for row in seen if any(str(part).endswith("checker.py") for part in row[0])]
+        self.assertTrue(checker_calls)
+        for _command, env, preexec in checker_calls:
+            self.assertEqual(sorted(env), ["HOME", "PATH"])
+            self.assertIsNotNone(preexec)
+
+    def test_run_sample_reports_the_checker_and_interactor_verdicts(self):
+        ok = judge_module.run_sample(BOOK, "SPLIT", "python", "n = int(input())\nprint(2, n - 2)\n", "10\n")
+        self.assertEqual((ok["status"], ok["checker"]["ok"]), ("OK", True))
+        custom = judge_module.run_sample(BOOK, "SPLIT", "python", "n = int(input())\nprint(2, n - 2)\n", "99\n")
+        self.assertIsNone(custom["checker"]["ok"])                 # 没有参考答案的输入不判
+        guess = judge_module.run_sample(BOOK, "GUESS", "python", self.GUESS, "1000 377\n")
+        self.assertEqual(guess["interactive"]["verdict"], "Accepted")
+        self.assertIn("< 1000", guess["stdout"])
+        self.assertIn("> ! 377", guess["stdout"])
+        broken = judge_module.run_sample(BOOK, "GUESS", "python", self.GUESS, "not numbers\n")
+        self.assertEqual(broken["interactive"]["verdict"], "Judge Error")
+
+    def test_preset_code_is_prepended_and_python_only(self):
+        self.assertEqual(judge(BOOK, "PRESET", "python", "print(secret)\n")["status"], "Accepted")
+        self.assertEqual(judge_module.run_sample(BOOK, "PRESET", "python", "print(secret)\n", "\n")["stdout"], "42\n")
+        refused = judge(BOOK, "PRESET", "cpp", "int main(){}\n")
+        self.assertEqual(refused["status"], "Language Unavailable")

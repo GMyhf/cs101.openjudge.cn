@@ -5,8 +5,14 @@
       "id": "SUM2",
       "title": "两数之和（T-001 判题器自带夹具）",
       "test_cases": [
-        {"input": "tests/sum2/1.in", "output": "tests/sum2/1.out"},
-        {"input": "tests/sum2/2.in", "output": "tests/sum2/2.out"}
+        {
+          "input": "tests/sum2/1.in",
+          "output": "tests/sum2/1.out"
+        },
+        {
+          "input": "tests/sum2/2.in",
+          "output": "tests/sum2/2.out"
+        }
       ]
     },
     {
@@ -14,6 +20,62 @@
       "id": "NODATA",
       "title": "无测试数据（T-001 判题器自带夹具）",
       "test_cases": []
+    },
+    {
+      "book": "t001",
+      "id": "GUESS",
+      "title": "交互题（判题器自带夹具）",
+      "test_cases": [
+        {
+          "input": "tests/guess/0.in",
+          "output": "tests/guess/0.out"
+        },
+        {
+          "input": "tests/guess/1.in",
+          "output": "tests/guess/1.out"
+        }
+      ],
+      "interactor": "tests/guess/interactor.py"
+    },
+    {
+      "book": "t001",
+      "id": "SPLIT",
+      "title": "答案不唯一（判题器自带夹具）",
+      "test_cases": [
+        {
+          "input": "tests/split/0.in",
+          "output": "tests/split/0.out"
+        },
+        {
+          "input": "tests/split/1.in",
+          "output": "tests/split/1.out"
+        }
+      ],
+      "checker": "tests/split/checker.py"
+    },
+    {
+      "book": "t001",
+      "id": "BADCHECK",
+      "title": "checker 自身出错（判题器自带夹具）",
+      "test_cases": [
+        {
+          "input": "tests/split/0.in",
+          "output": "tests/split/0.out"
+        }
+      ],
+      "checker": "tests/badcheck/checker.py"
+    },
+    {
+      "book": "t001",
+      "id": "PRESET",
+      "title": "预设代码（判题器自带夹具）",
+      "test_cases": [
+        {
+          "input": "tests/preset/0.in",
+          "output": "tests/preset/0.out"
+        }
+      ],
+      "code_prefix": "tests/preset/preset_code.py"
     }
   ]
 }

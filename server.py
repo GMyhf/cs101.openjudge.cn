@@ -755,7 +755,8 @@ def catalog_raw():
 # `problems.html` 与 `admin.html` 只读 book/id/path/title/test_count/pass_rate/
 # accepted_count/attempt_count。判题取数据走 `catalog_raw()`，不经这个响应。
 # 顺带也不再把 `_made/` 与归档目录的内部布局透给任何访客。
-CATALOG_INTERNAL_FIELDS = ("test_cases",)
+# checker / interactor / code_prefix 同理是数据目录里的文件路径，只给判题器用。
+CATALOG_INTERNAL_FIELDS = ("test_cases", "checker", "interactor", "code_prefix")
 
 
 def catalog_full_payload():
@@ -1424,6 +1425,28 @@ class Handler(BaseHTTPRequestHandler):
             cases = [{"input": raw_input, "output": raw_output}]
         return {"input": cases[0]["input"], "output": cases[0]["output"], "cases": cases}
 
+    def sample_payload(self, page, book, problem):
+        """「运行样例」的数据，外加本题的判题方式（前端据此决定怎么显示对错）。
+
+        交互题的输入框放的是**交互器读的隐藏数据**（第 0 组，即官方样例对应的那份），
+        题面上的「样例输入」其实是评测方的回应，喂给程序没有意义。
+        """
+        item = next((p for p in catalog_raw().get("problems", [])
+                     if p.get("book") == book and p.get("id") == problem), None) or {}
+        payload = self.sample_io(page)
+        if item.get("interactor") and item.get("test_cases"):
+            hidden = (MIRROR / item["test_cases"][0]["input"]).read_text(encoding="utf-8", errors="replace")
+            payload = {"input": hidden, "output": "", "cases": [{"input": hidden, "output": ""}]}
+            payload["judge_mode"] = "interactive"
+        elif item.get("checker"):
+            payload["judge_mode"] = "checker"
+        elif item.get("code_prefix") and item.get("test_cases"):
+            case = item["test_cases"][0]
+            text = lambda key: (MIRROR / case[key]).read_text(encoding="utf-8", errors="replace")
+            payload = {"input": text("input"), "output": text("output"),
+                       "cases": [{"input": text("input"), "output": text("output")}], "judge_mode": "preset_code"}
+        return payload
+
     def submission_page(self, page, book, problem):
         title, params_html, content_html, _ = self.problem_parts(page, book, problem)
         language_options = editor_language_options()
@@ -1433,7 +1456,7 @@ class Handler(BaseHTTPRequestHandler):
                 .replace("__LANGUAGE_OPTIONS__", language_options)
                 .replace("__STATEMENT_TITLE__", escape(title))
                 .replace("__STATEMENT_PARAMS__", params_html)
-                .replace("__SAMPLE_JSON__", json.dumps(self.sample_io(page), ensure_ascii=False)
+                .replace("__SAMPLE_JSON__", json.dumps(self.sample_payload(page, book, problem), ensure_ascii=False)
                          .replace("</", "<\\/"))
                 .replace("__STATEMENT_CONTENT__", content_html))
 

@@ -263,6 +263,8 @@ def check_multi_answer_problems():
         match = re.search(r"__(\d+)\.html$", page.name)
         if not match or int(match.group(1)) not in made:
             continue
+        if (made_paths[int(match.group(1))] / "checker.py").is_file():
+            continue                       # 有逐题 checker，正是这条判据要的 special judge
         text = re.sub(r"<[^>]+>", " ", page.read_text(encoding="utf-8", errors="replace"))
         text = re.sub(r"\s+", " ", text)
         start = text.find("输出")

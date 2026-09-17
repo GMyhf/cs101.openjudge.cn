@@ -44,6 +44,13 @@ def main():
         cases = cases_for(problem_id)
         row.update({"tests": True, "test_count": len(cases), "test_cases": cases,
                     "data_status": "rebuilt_tests"})
+        root = MIRROR / "tests" / "codeforces" / f"{problem_id}_made"
+        # 与 scripts/index_tests.py 的 JUDGE_HOOK_FILES 同一口径
+        for field, name in (("checker", "checker.py"), ("interactor", "interactor.py")):
+            if (root / name).is_file():
+                row[field] = str((root / name).relative_to(MIRROR))
+            else:
+                row.pop(field, None)
         if problem_id in FLOAT_REBUILDS:
             row["comparison"] = "float_tokens"
     # Match index_tests.py: its canonical JSON product has no terminal newline.

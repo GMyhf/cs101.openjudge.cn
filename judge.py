@@ -307,6 +307,11 @@ def prepare_program(work, language, source, warmup_input=b""):
 
 
 def run_sample(book, problem_id, language, source, stdin):
+    item = catalog_item(book, problem_id) if book else None
+    return unshift_prefix_lines(item, _run_sample(item, book, problem_id, language, source, stdin))
+
+
+def _run_sample(item, book, problem_id, language, source, stdin):
     """跑一次用户给的输入，只回显输出，不比对、不入库。
 
     沙箱一条没放宽：命令来自同一个 prepare_program，执行走同一个 _run，
@@ -325,6 +330,11 @@ def run_sample(book, problem_id, language, source, stdin):
     number = int(digits.group(1)) if digits else None
     cpu_seconds = case_seconds(number, language, 1)
     payload = stdin.encode()
+    source, failure = apply_code_prefix(item, language, source)
+    if failure is not None:
+        return failure
+    if item and item.get("interactor"):
+        return _run_interactive_sample(item, language, source, payload, cpu_seconds)
     with tempfile.TemporaryDirectory(prefix="cs101-run-") as temp:
         work = Path(temp)
         command, failure = prepare_program(work, language, source, warmup_input=payload)
@@ -349,7 +359,53 @@ def run_sample(book, problem_id, language, source, stdin):
         if result.returncode != 0:
             return {"status": "Runtime Error", **metrics, "stdout": stdout,
                     "stderr": stderr, "message": stderr}
-        return {"status": "OK", **metrics, "stdout": stdout, "stderr": stderr}
+        row = {"status": "OK", **metrics, "stdout": stdout, "stderr": stderr}
+        if item and item.get("checker"):
+            # 答案不唯一：拿不到参考答案就不判；输入恰好是某组测试数据（样例就是第 0 组）才判
+            case = _matching_case(item, payload)
+            if case is None:
+                row["checker"] = {"ok": None, "message": "本题答案不唯一，自定义输入无法判定对错。"}
+            else:
+                ok, message = run_checker(item["checker"], payload, result.stdout,
+                                          (MIRROR / case["output"]).read_bytes())
+                row["checker"] = {"ok": ok, "message": message if ok is not None else "判题器出错，请联系管理员。"}
+        return row
+
+
+def _matching_case(item, payload):
+    wanted = payload.split()
+    for case in item.get("test_cases", []):
+        path = MIRROR / case["input"]
+        try:
+            if path.stat().st_size <= 4 * len(payload) + 64 and path.read_bytes().split() == wanted:
+                return case
+        except OSError:
+            continue
+    return None
+
+
+def _run_interactive_sample(item, language, source, payload, cpu_seconds):
+    """交互题的「运行样例」：输入框里是交互器读的隐藏数据（样例即第 0 组），回显交互过程。"""
+    if not payload.strip():
+        payload = (MIRROR / item["test_cases"][0]["input"]).read_bytes()
+    case = _matching_case(item, payload)
+    answer = (MIRROR / case["output"]).read_bytes() if case else b""
+    with tempfile.TemporaryDirectory(prefix="cs101-run-") as temp:
+        work = Path(temp)
+        command, failure = prepare_program(work, language, source)
+        if failure is not None:
+            return failure
+        run_address_space = DOTNET_ADDRESS_SPACE if language in DOTNET_LANGUAGES else 768 * 1024 * 1024
+        run_file_size = DOTNET_FILE_SIZE if language in DOTNET_LANGUAGES else 2 * 1024 * 1024
+        outcome = run_interactive(command, item["interactor"], payload, answer, work, cpu_seconds,
+                                  run_address_space, run_file_size, keep_transcript=True)
+    verdict = INTERACTIVE_VERDICTS[outcome["outcome"]]
+    message = outcome["message"]
+    if verdict == "Judge Error":
+        message = "交互器读不懂这份输入（格式要和第 0 组一致），或交互器出错。"
+    return {"status": "OK", "time_ms": outcome["time_ms"], "memory_kb": outcome["memory_kb"],
+            "stdout": outcome.get("transcript", ""), "stderr": outcome["stderr"],
+            "interactive": {"verdict": verdict, "message": message}}
 
 
 def check_syntax(language, source):
@@ -727,16 +783,270 @@ def special_output_matches(kind, input_data, actual):
             worker.join()
 
 
+# ---- 特判与交互 ---------------------------------------------------------------
+# 「答案不唯一」的题用逐题 checker.py，交互题用逐题 interactor.py，二者都放在该题
+# 数据目录的根上，由索引器写进 catalog 的 `checker` / `interactor`（相对 MIRROR 的路径）。
+# 它们是仓库里受信任的代码，但读的是学生程序的输出，所以照样走 _run 的限制与 env 白名单；
+# 学生程序本身的执行路径一条没变。
+#
+# checker 约定：python3 -I checker.py <输入> <学生输出> <参考答案>
+#   退出码 0 = 通过、42 = 答案错误；stdout 第一行是给学生看的一句话（不泄露数据）。
+#   （不用 1：Python 未捕获的异常也退 1，会把判题器自己的 bug 变成冤判的 WA。）
+#   其他退出码或超时 = 判题器自身出错，给 "Judge Error"，绝不算到学生头上。
+# interactor 约定：python3 -I interactor.py <输入> <参考答案>
+#   stdin 读学生程序的输出，stdout 写给学生程序；退出码 0 = 通过、42 = 答案错误，
+#   stderr 最后一行是给学生看的一句话；其他退出码 = 判题器出错。
+WRONG_ANSWER_EXIT = 42
+CHECKER_CPU_S = 10
+INTERACTOR_CPU_S = 20
+INTERACTION_OUTPUT_LIMIT = 16 * 1024 * 1024
+INTERACTION_STDERR_KEEP = 64 * 1024
+CODE_PREFIX_LANGUAGES = {"python", "py", "python3"}
+
+
+INTERACTIVE_VERDICTS = {"accepted": "Accepted", "wrong": "Wrong Answer", "tle": "Time Limit Exceeded",
+                        "re": "Runtime Error", "ole": "Output Limit Exceeded", "judge_error": "Judge Error"}
+
+
+def catalog_item(book, problem_id):
+    try:
+        catalog = json.loads((MIRROR / "catalog.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    return next((p for p in catalog.get("problems", [])
+                 if p.get("book") == book and p.get("id") == problem_id), None)
+
+
+def apply_code_prefix(item, language, source):
+    """「预设代码」题（如 29986）：平台把交互库拼在学生代码前面。返回 (source, failure)。"""
+    prefix = (item or {}).get("code_prefix")
+    if not prefix:
+        return source, None
+    if language not in CODE_PREFIX_LANGUAGES:
+        return None, {"status": "Language Unavailable",
+                      "message": "这道题的预设代码是 Python，只能用 Python 3 提交。"}
+    text = (MIRROR / prefix).read_text(encoding="utf-8")
+    return text.rstrip("\n") + "\n" + source, None
+
+
+def unshift_prefix_lines(item, result):
+    """报错里的行号减去预设代码的行数，指回学生自己写的那一行（编辑器靠它打标记）。"""
+    prefix = (item or {}).get("code_prefix")
+    if not prefix or not isinstance(result, dict) or not isinstance(result.get("message"), str):
+        return result
+    offset = len((MIRROR / prefix).read_text(encoding="utf-8").rstrip("\n").split("\n"))
+    def shift(match):
+        line = int(match.group(2)) - offset
+        return f"{match.group(1)}{line}" if line > 0 else f"{match.group(1)}{match.group(2)}（预设代码）"
+    result["message"] = re.sub(r'(main\.py"?, line )(\d+)', shift, result["message"])
+    if isinstance(result.get("stderr"), str):
+        result["stderr"] = re.sub(r'(main\.py"?, line )(\d+)', shift, result["stderr"])
+    return result
+
+
+def _trusted_python():
+    return shutil.which("python3") or "/usr/bin/python3"
+
+
+def run_checker(checker, input_data, output_data, answer_data):
+    """跑逐题 checker。返回 (True/False/None, 一句话)；None 表示判题器自身出错。"""
+    with tempfile.TemporaryDirectory(prefix="cs101-check-") as temp:
+        work = Path(temp)
+        files = []
+        for name, data in (("input.txt", input_data), ("output.txt", output_data), ("answer.txt", answer_data)):
+            (work / name).write_bytes(data if isinstance(data, bytes) else data.encode())
+            files.append(str(work / name))
+        try:
+            result = _run([_trusted_python(), "-I", str(MIRROR / checker), *files], cwd=work,
+                          timeout=CHECKER_CPU_S + 2, cpu_seconds=CHECKER_CPU_S)
+        except subprocess.TimeoutExpired:
+            return None, "checker 超时"
+    message = result.stdout.decode(errors="replace").strip().splitlines()
+    message = message[0][:300] if message else ""
+    if result.returncode == 0:
+        return True, message
+    if result.returncode == WRONG_ANSWER_EXIT:
+        return False, message
+    return None, (result.stderr.decode(errors="replace")[-2000:] or f"checker 退出码 {result.returncode}")
+
+
+def _pump(source_fd, sink_fd, state, key, transcript, tag):
+    """把一端的输出原样搬到另一端。sink 断开后继续读干净，免得上游写满管道卡住。"""
+    sink_open = sink_fd is not None
+    while True:
+        try:
+            chunk = os.read(source_fd, 65536)
+        except OSError:
+            chunk = b""
+        if not chunk:
+            break
+        state[key] += len(chunk)
+        if transcript is not None and state["transcript_bytes"] < SAMPLE_OUTPUT_LIMIT:
+            transcript.append((tag, chunk))
+            state["transcript_bytes"] += len(chunk)
+        if key == "student_bytes" and state[key] > INTERACTION_OUTPUT_LIMIT:
+            state["output_exceeded"] = True
+        if sink_open:
+            view = memoryview(chunk)
+            try:
+                while view:
+                    view = view[os.write(sink_fd, view):]
+            except OSError:
+                sink_open = False
+    if sink_fd is not None:
+        try:
+            os.close(sink_fd)
+        except OSError:
+            pass
+
+
+def _drain(source_fd, keep):
+    while True:
+        try:
+            chunk = os.read(source_fd, 65536)
+        except OSError:
+            break
+        if not chunk:
+            break
+        keep.append(chunk)
+        while sum(map(len, keep)) > INTERACTION_STDERR_KEEP and len(keep) > 1:
+            keep.pop(0)
+
+
+def run_interactive(command, interactor, input_data, answer_data, cwd, cpu_seconds,
+                    address_space_bytes, file_size_bytes, keep_transcript=False):
+    """学生程序与 interactor 对跑一组，判题器居中转发（好限制输出量、留交互记录）。
+
+    返回 dict：outcome ∈ {accepted, wrong, tle, re, ole, judge_error}，另带 message、
+    student_returncode、time_ms、memory_kb、stderr、transcript。
+    """
+    wall_seconds = 2 * cpu_seconds + 2          # 交互题等对方回应不耗 CPU，墙钟给到两倍
+    with tempfile.TemporaryDirectory(prefix="cs101-interact-") as temp:
+        jury = Path(temp)
+        (jury / "input.txt").write_bytes(input_data)
+        (jury / "answer.txt").write_bytes(answer_data)
+        student = subprocess.Popen(
+            command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd,
+            preexec_fn=lambda: _limits(cpu_seconds, address_space_bytes, file_size_bytes),
+            env={"PATH": CHILD_PATH, "HOME": str(cwd)})
+        judge_proc = subprocess.Popen(
+            [_trusted_python(), "-I", str(MIRROR / interactor), str(jury / "input.txt"), str(jury / "answer.txt")],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=jury,
+            preexec_fn=lambda: _limits(INTERACTOR_CPU_S),
+            env={"PATH": CHILD_PATH, "HOME": str(jury)})
+        state = {"student_bytes": 0, "jury_bytes": 0, "transcript_bytes": 0, "output_exceeded": False}
+        transcript = [] if keep_transcript else None
+        student_err, jury_err = [], []
+        # 线程直接读写 fd：先 dup 出来，再关掉 Popen 上的文件对象，免得两边各关一次
+        s_in, s_out, s_err = (os.dup(stream.fileno()) for stream in (student.stdin, student.stdout, student.stderr))
+        j_in, j_out, j_err = (os.dup(stream.fileno()) for stream in (judge_proc.stdin, judge_proc.stdout, judge_proc.stderr))
+        for stream in (student.stdin, student.stdout, student.stderr,
+                       judge_proc.stdin, judge_proc.stdout, judge_proc.stderr):
+            stream.close()
+        threads = [
+            threading.Thread(target=_pump, args=(s_out, j_in, state, "student_bytes", transcript, ">"), daemon=True),
+            threading.Thread(target=_pump, args=(j_out, s_in, state, "jury_bytes", transcript, "<"), daemon=True),
+            threading.Thread(target=_drain, args=(s_err, student_err), daemon=True),
+            threading.Thread(target=_drain, args=(j_err, jury_err), daemon=True),
+        ]
+        for thread in threads:
+            thread.start()
+        started = time.perf_counter()
+        deadline = started + wall_seconds
+        student_usage = None
+        killed_student = timed_out = False
+        grace_until = None
+        student_first = None                    # 谁先退出决定 RE 与 WA 谁优先
+        while True:
+            if student.returncode is None:
+                pid, status, usage = os.wait4(student.pid, os.WNOHANG)
+                if pid:
+                    student.returncode = os.waitstatus_to_exitcode(status)
+                    student_usage = usage
+                    if student_first is None:
+                        student_first = judge_proc.poll() is None
+            if judge_proc.poll() is not None and student_first is None:
+                student_first = False
+            now = time.perf_counter()
+            if student.returncode is not None and judge_proc.returncode is not None:
+                break
+            if state["output_exceeded"] and student.returncode is None:
+                student.kill(); killed_student = True
+            if now > deadline:
+                timed_out = True
+                break
+            if judge_proc.returncode is not None and student.returncode is None:
+                # interactor 已给出结论：给学生程序一小段时间自己退出
+                grace_until = grace_until or now + 1.0
+                if now > grace_until:
+                    student.kill(); killed_student = True
+            if student.returncode is not None and judge_proc.returncode is None:
+                grace_until = grace_until or now + 5.0
+                if now > grace_until:
+                    judge_proc.kill()
+            time.sleep(0.002)
+        for proc in (student, judge_proc):
+            if proc.returncode is None or timed_out:
+                try:
+                    proc.kill()
+                except OSError:
+                    pass
+        if student.returncode is None:
+            _, status, student_usage = os.wait4(student.pid, 0)
+            student.returncode = os.waitstatus_to_exitcode(status)
+        judge_proc.wait()
+        for thread in threads:
+            thread.join(timeout=2)
+    elapsed_ms = round((time.perf_counter() - started) * 1000)
+    memory_kb = int(student_usage.ru_maxrss) if student_usage else 0
+    student_rc, jury_rc = student.returncode, judge_proc.returncode
+    jury_message = b"".join(jury_err).decode(errors="replace").strip().splitlines()
+    jury_message = jury_message[-1][:300] if jury_message else ""
+    row = {"student_returncode": student_rc, "time_ms": elapsed_ms, "memory_kb": memory_kb,
+           "stderr": b"".join(student_err).decode(errors="replace")[-4000:], "message": jury_message}
+    if transcript is not None:
+        lines = []
+        for tag, chunk in transcript:
+            lines.extend(f"{tag} {line}" for line in chunk.decode(errors="replace").splitlines())
+        row["transcript"] = "\n".join(lines)[:SAMPLE_OUTPUT_LIMIT]
+    if timed_out:
+        return {**row, "outcome": "tle", "message": f"单组交互超过 {wall_seconds} 秒墙钟（程序可能在等输入却没先 flush 输出）。"}
+    if student_rc == -signal.SIGXCPU or (student_rc == -signal.SIGKILL and not killed_student):
+        return {**row, "outcome": "tle", "message": "单组测试超过 CPU 限制。"}
+    if state["output_exceeded"]:
+        return {**row, "outcome": "ole", "message": "交互中输出超过 16 MiB。"}
+    if student_first and student_rc != 0 and student_rc != -signal.SIGPIPE:
+        # 程序先自己崩了，interactor 只看到「提前 EOF」；报 RE 比报 WA 有用。
+        # 反过来 interactor 先判了 WA、程序随后读到 EOF 才崩的，仍是 WA。
+        return {**row, "outcome": "re", "message": row["stderr"] or f"退出码 {student_rc}"}
+    if jury_rc == WRONG_ANSWER_EXIT:
+        return {**row, "outcome": "wrong"}
+    if jury_rc == 0:
+        if killed_student:
+            return {**row, "outcome": "tle", "message": "交互已结束，但程序没有退出。"}
+        if student_rc != 0:
+            return {**row, "outcome": "re", "message": row["stderr"] or f"退出码 {student_rc}"}
+        return {**row, "outcome": "accepted"}
+    # interactor 既没判通过也没判错：它自己崩了（学生先崩的情况上面已经按 RE 返回）
+    return {**row, "outcome": "judge_error",
+            "message": b"".join(jury_err).decode(errors="replace")[-2000:] or f"interactor 退出码 {jury_rc}"}
+
+
 def judge(book, problem_id, language, source, collect_case_times=False):
-    catalog_path = MIRROR / "catalog.json"
-    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
-    item = next((p for p in catalog["problems"] if p["book"] == book and p["id"] == problem_id), None)
+    item = catalog_item(book, problem_id)
+    return unshift_prefix_lines(item, _judge(item, book, problem_id, language, source, collect_case_times))
+
+
+def _judge(item, book, problem_id, language, source, collect_case_times):
     if item is None: return {"status": "Problem Not Found", "message": "本地题库中没有这道题。"}
     cases = item.get("test_cases", [])
     if not cases: return {"status": "No Test Data", "message": "这道题暂时没有测试数据，等待补充。"}
     if not isinstance(source, str) or not source.strip(): return {"status": "Empty Source", "message": "提交代码不能为空。"}
     if len(source.encode()) > 512 * 1024: return {"status": "Source Too Large", "message": "代码不能超过 512 KiB。"}
     language = language.lower()
+    source, failure = apply_code_prefix(item, language, source)
+    if failure is not None:
+        return failure
     with tempfile.TemporaryDirectory(prefix="cs101-judge-") as temp:
         work = Path(temp)
         command, failure = prepare_program(
@@ -765,6 +1075,26 @@ def judge(book, problem_id, language, source, collect_case_times=False):
             expected = (MIRROR / case["output"]).read_text(encoding="utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
             run_address_space = DOTNET_ADDRESS_SPACE if language in DOTNET_LANGUAGES else 768 * 1024 * 1024
             run_file_size = DOTNET_FILE_SIZE if language in DOTNET_LANGUAGES else 2 * 1024 * 1024
+            if item.get("interactor"):
+                outcome = run_interactive(command, item["interactor"], input_data,
+                                          (MIRROR / case["output"]).read_bytes(), work, cpu_seconds,
+                                          run_address_space, run_file_size)
+                if collect_case_times:
+                    case_timings.append({"case": index, "time_ms": outcome["time_ms"],
+                                         "case_limit_ms": cpu_seconds * 1000,
+                                         "ratio": round(outcome["time_ms"] / (cpu_seconds * 1000), 4)})
+                peak_memory = max(peak_memory, outcome["memory_kb"])
+                last_metrics = {"time_ms": round((time.perf_counter() - overall_started) * 1000), "memory_kb": peak_memory}
+                verdict = INTERACTIVE_VERDICTS[outcome["outcome"]]
+                if verdict != "Accepted":
+                    row = {"status": verdict, "case": index, **last_metrics}
+                    if verdict == "Judge Error":
+                        print(f"judge error: {book}/{problem_id} case {index}: {outcome['message']}", flush=True)
+                        row["message"] = f"第 {index} 组的交互器出错，这不是你的问题，请联系管理员。"
+                    elif outcome["message"]:
+                        row["message"] = outcome["message"]
+                    return row
+                continue
             case_started = time.perf_counter()
             try: result = _run(command, stdin=input_data, cwd=work, timeout=cpu_seconds + 1,
                                cpu_seconds=cpu_seconds, address_space_bytes=run_address_space,
@@ -790,9 +1120,21 @@ def judge(book, problem_id, language, source, collect_case_times=False):
             if result.returncode in {-signal.SIGXCPU, -signal.SIGKILL}: return {"status": "Time Limit Exceeded", "case": index, **metrics, "message": "单组测试超过 CPU 限制。"}
             if result.returncode != 0: return {"status": "Runtime Error", "case": index, **metrics, "message": result.stderr.decode(errors="replace")[-4000:]}
             checker = item.get("special_checker")
-            matched = special_output_matches(checker, input_data, actual) if checker else outputs_match(actual, expected, item.get("comparison", "tokens"))
+            checker_message = ""
+            if item.get("checker"):
+                matched, checker_message = run_checker(item["checker"], input_data, result.stdout,
+                                                       (MIRROR / case["output"]).read_bytes())
+                if matched is None:
+                    print(f"judge error: {book}/{problem_id} case {index}: {checker_message}", flush=True)
+                    return {"status": "Judge Error", "case": index, **metrics,
+                            "message": f"第 {index} 组的判题器出错，这不是你的问题，请联系管理员。"}
+            elif checker:
+                matched = special_output_matches(checker, input_data, actual)
+            else:
+                matched = outputs_match(actual, expected, item.get("comparison", "tokens"))
             # 实际输出是学生自己程序打印的，不涉及泄题；只截断 UI 载荷（它会整份进 submissions.detail）。
             if not matched: return {"status": "Wrong Answer", "case": index, **metrics, "expected_tokens": len(expected.split()), "actual_tokens": len(actual.split()),
+                                    **({"message": checker_message} if checker_message else {}),
                                     "actual_output": {"text": actual[:4000], "truncated": len(actual) > 4000,
                                                       "total_lines": len(actual.splitlines()), "total_chars": len(actual)}}
     accepted = {"status": "Accepted", "cases": len(cases), **last_metrics}

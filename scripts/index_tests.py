@@ -38,8 +38,32 @@ def is_archive(bucket, directory_name):
 
 
 def exclude_special_judge_cases(by_global_number):
+    """多解题在没有 checker 之前一律不判；数据目录里放了 checker.py 就放行（2026-09-17）。"""
     return {number: cases for number, cases in by_global_number.items()
-            if number not in SPECIAL_JUDGE_GLOBAL_NUMBERS}
+            if number not in SPECIAL_JUDGE_GLOBAL_NUMBERS or judge_hooks(cases).get("checker")}
+
+
+# 逐题判题钩子：放在数据目录根上的文件名 → catalog 字段（路径相对 MIRROR）。
+# checker.py = 答案不唯一时的特判；interactor.py = 交互题；preset_code.py = 平台拼在学生代码前的预设代码。
+JUDGE_HOOK_FILES = {"checker": "checker.py", "interactor": "interactor.py", "code_prefix": "preset_code.py"}
+
+
+def judge_hooks(cases):
+    directories = []
+    for case in cases:
+        directory = (MIRROR / case["input"]).parent
+        if directory.name == "data":
+            directory = directory.parent
+        if directory not in directories:
+            directories.append(directory)
+    hooks = {}
+    for field, name in JUDGE_HOOK_FILES.items():
+        found = [directory / name for directory in directories if (directory / name).is_file()]
+        if len(found) > 1:
+            raise ValueError(f"{field}: 同一题的多个数据目录都有 {name}：{found}")
+        if found:
+            hooks[field] = str(found[0].relative_to(MIRROR))
+    return hooks
 
 
 # 每题至少要这么多组；不足的平台数据要拿同题 `_made` 补齐（见 merge_short_gmyhf）。
@@ -264,6 +288,12 @@ def main():
         item["tests"] = bool(cases)
         item["test_count"] = len(cases)
         item["test_cases"] = cases
+        hooks = judge_hooks(cases)
+        for field in JUDGE_HOOK_FILES:
+            if field in hooks:
+                item[field] = hooks[field]
+            else:
+                item.pop(field, None)
         item.update({key: value for key, value in stats.get((item["book"], item["id"]), {}).items()
                      if key != "id"})
         if cases: matched += 1

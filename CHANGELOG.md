@@ -2,6 +2,31 @@
 
 ## 2026-09-17
 
+### 判题器支持「答案不唯一」「交互题」「预设代码题」
+
+- **三种新判法，按数据目录里的文件自动启用**：`checker.py`（特判）、`interactor.py`（交互）、
+  `preset_code.py`（平台把交互库拼在学生代码前）。`scripts/index_tests.py` 与
+  `tools/activate_codeforces_rebuilds.py` 把路径写进 catalog 的 `checker` / `interactor` /
+  `code_prefix`；`/api/catalog` 不下发这三个字段。约定写在管理员手册 §5「答案不唯一的题、交互题、预设代码题」。
+- **checker**：`python3 -I checker.py 输入 学生输出 参考答案`，退出码 0 通过、42 答案错误，
+  其他退出码或超时（CPU 10 秒）给新状态 **Judge Error**（「判题器出错，不是你的问题」，详情进服务日志）。
+  不用 1 表示 WA：Python 未捕获异常也退 1，会把判题器 bug 变成冤判。checker 的一句话随 WA 下发。
+- **interactor**：学生程序与 interactor 对跑，判题器居中转发（好限制输出量、留交互记录）。
+  单组墙钟 2×CPU 限时+2 秒、交互输出上限 16 MiB；学生先崩报 RE、interactor 先判错报 WA、
+  判完后学生 1 秒不退出报 TLE、双方互等（没 flush）按墙钟报 TLE。内存按 `wait4` 单取学生进程。
+- **预设代码**：只收 Python 3；报错行号减去预设代码行数，编辑器标记仍指向学生自己的行。
+- **沙箱没有放宽**：学生程序那一侧仍是同一套 `_limits` 与 `{PATH, HOME}`；checker / interactor
+  虽是受信任代码，也走 `_limits` 与同一份环境白名单。新增 `SpecialJudgeTests` 7 条（含
+  Popen 路径的沙箱契约、checker 崩溃 → Judge Error、互等 → TLE、运行样例的判定），夹具在
+  `tests/fixtures/mirror/tests/{guess,split,badcheck,preset}`。
+- **「运行样例」**：特判题在输入恰好是某组测试数据时由 checker 判（否则显示「未判定」）；
+  交互题的输入框换成交互器读的隐藏数据（第 0 组），输出区显示交互记录（`>` 程序、`<` 交互器）与判定。
+- **`29986` 猜数接入**（预设代码题）：`preset_code.py` 从镜像题面逐字取出；21 组数据
+  （io1/io2 < 1024，输出恒为 15 行 io1 + io2）。二分参考解与另一种 ≤15 次的策略 Accepted，
+  线性扫描 RE（交互库 assert），多打印 WA，C++/PyPy3 提交给 Language Unavailable。
+  已从 `collab/tests-below-20.json` 删去。
+- `full_sweep` 多解判据对有 `checker.py` 的题放行；`index_tests` 的多解屏蔽名单同样在有 checker 时放行。
+
 ### 少于 20 组测试数据的题补到 20 组以上（第二步：Codeforces 17 道 + 登记做不到的 28 道）
 
 - **Codeforces 17 道从 0 组补到 21 组**：`insufficient_sample_cases` 的 894E、1000E；

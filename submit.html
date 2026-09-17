@@ -666,7 +666,11 @@ let sampleIdx = 0;
 function selectSample(i) {
   sampleIdx = i;
   sampleIn.value = SAMPLE_CASES[i].input;
-  sampleExp.textContent = SAMPLE_CASES[i].output;
+  sampleExp.textContent = SAMPLES.judge_mode === "interactive"
+    ? "交互题：上面的输入是交互器读的隐藏数据（格式同第 0 组测试），\n运行后这里右侧显示交互过程：> 是你的输出，< 是交互器的回应。"
+    : SAMPLES.judge_mode === "checker"
+      ? SAMPLE_CASES[i].output + "\n\n（本题答案不唯一，这只是其中一个正确答案；运行样例时由判题器判定。）"
+      : SAMPLE_CASES[i].output;
   sampleGot.textContent = "点「运行样例」后显示。";
   sampleGot.classList.add("muted");
   sampleVerdict.innerHTML = "";
@@ -709,11 +713,24 @@ run.addEventListener('click', async () => {
       sampleGot.classList.remove("muted");
       sampleGot.textContent = data.stdout || (data.stderr ? "" : "（没有输出）");
       if (data.stderr) sampleGot.textContent += "\n--- stderr ---\n" + data.stderr;
-      // 与判题器同一条比对规则：按 token 比，不计空白差异
-      const want = SAMPLE_CASES[sampleIdx].output || "";
-      const same = data.stdout.trim().split(/\s+/).join(" ") === want.trim().split(/\s+/).join(" ");
-      sampleVerdict.innerHTML = '<span class="badge ' + (same ? "b-ac" : "b-wa") + '">'
-        + (same ? "与样例一致" : "与样例不一致") + "</span>";
+      if (data.interactive) {
+        // 交互题：stdout 是交互记录（> 你的程序输出，< 交互器回应），对错由交互器给出
+        const v = data.interactive;
+        if (v.message) sampleGot.textContent += "\n--- 交互器 ---\n" + v.message;
+        sampleVerdict.innerHTML = badge(v.verdict);
+      } else if (data.checker) {
+        // 答案不唯一：由逐题 checker 判；自定义输入没有参考答案时不判
+        const c = data.checker;
+        if (c.message) sampleGot.textContent += "\n--- 判题器 ---\n" + c.message;
+        sampleVerdict.innerHTML = c.ok === null ? '<span class="badge b-other">未判定</span>'
+          : '<span class="badge ' + (c.ok ? "b-ac" : "b-wa") + '">' + (c.ok ? "判题器：通过" : "判题器：不通过") + "</span>";
+      } else {
+        // 与判题器同一条比对规则：按 token 比，不计空白差异
+        const want = SAMPLE_CASES[sampleIdx].output || "";
+        const same = data.stdout.trim().split(/\s+/).join(" ") === want.trim().split(/\s+/).join(" ");
+        sampleVerdict.innerHTML = '<span class="badge ' + (same ? "b-ac" : "b-wa") + '">'
+          + (same ? "与样例一致" : "与样例不一致") + "</span>";
+      }
     }
   } catch (err) {
     sampleGot.classList.remove("muted");
