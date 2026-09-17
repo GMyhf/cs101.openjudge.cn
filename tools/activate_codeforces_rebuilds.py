@@ -20,13 +20,16 @@ def cases_for(problem_id: str):
         raise ValueError(f"{problem_id}: missing single-problem source")
     data = root / "data"
     cases = []
-    for index in range(21):
+    # 默认 21 组；输入域本身更小的题（如 2201G 题面只允许 n∈{5,1001}）按实有组数收，
+    # 少于 20 组的要登记进 collab/tests-below-20.json（full_sweep 第 12 条盯着）
+    count = len(list(data.glob("*.in")))
+    for index in range(count):
         input_path, output_path = data / f"{index}.in", data / f"{index}.out"
         if not input_path.is_file() or not output_path.is_file():
             raise ValueError(f"{problem_id}: missing paired case {index}")
         cases.append({"input": str(input_path.relative_to(MIRROR)),
                       "output": str(output_path.relative_to(MIRROR))})
-    if len({(MIRROR / case["input"]).read_bytes() for case in cases}) != 21:
+    if not cases or len({(MIRROR / case["input"]).read_bytes() for case in cases}) != count:
         raise ValueError(f"{problem_id}: inputs are not all distinct")
     return cases
 

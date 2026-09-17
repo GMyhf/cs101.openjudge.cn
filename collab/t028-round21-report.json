@@ -137,16 +137,15 @@
         "failed_seeds": []
       },
       "test_cases": 21,
-      "max_input_bytes": 57,
-      "max_output_bytes": 3,
+      "max_input_bytes": 719,
+      "max_output_bytes": 420,
       "constraint": "a 1..10 by 1..10 grid has valid distinct locks including time 1 and disjoint blocked cells",
       "constraint_counterexample": "11 1 1 0\n1 1 1",
-      "requires_special_judge": "the statement accepts any feasible path; no-solution-only exact data has no discriminating power and remains offline",
       "input_domain": {
         "statement_quote": "HAL 是一个 N × M 的神经元矩阵（最多10x10）。",
         "generated_extremes": {
-          "max_int": 10,
-          "min_int": 1
+          "max_int": 99,
+          "min_int": 0
         }
       },
       "self_audit": {
@@ -157,11 +156,11 @@
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 20,
+          "frequency": 7,
           "total": 20,
-          "status": "exempted",
-          "exemption": "only disconnected no-solution instances are generated because feasible paths have multiple accepted outputs",
-          "share": 1.0
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.35
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -201,6 +200,28 @@
         "problem": "30193",
         "merged_cases": 21,
         "total_ms": 394
+      },
+      "special_judge": "tests/30000-/30193_made/checker.py",
+      "data_rebuilt": {
+        "date": "2026-09-17",
+        "reason": "旧数据 21 组全是无解实例（print(-1) 全过），因多解无法精确比对而离线。2026-09-17 判题器支持逐题 checker，数据按题面重建：13 组有解（多数有多条合法路径）、8 组无解（含 2 组过得了颜色/奇偶/曼哈顿/连通全部简单剪枝的无解），由 checker.py 判任一合法路径。",
+        "superseded": {
+          "max_input_bytes": 57,
+          "max_output_bytes": 3,
+          "requires_special_judge": "the statement accepts any feasible path; no-solution-only exact data has no discriminating power and remains offline",
+          "constant_output_probe": {
+            "frequency": 20,
+            "total": 20,
+            "status": "exempted",
+            "exemption": "only disconnected no-solution instances are generated because feasible paths have multiple accepted outputs",
+            "share": 1.0
+          },
+          "generated_extremes": {
+            "max_int": 10,
+            "min_int": 1
+          }
+        },
+        "note": "本条目里的数字是对重建后的 data/ 重新实测的；参考实现与生成器已换成仓库交接件（旧 samplecode 见 git 历史）。"
       }
     },
     {

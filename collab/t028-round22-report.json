@@ -723,21 +723,15 @@
         "failed_seeds": []
       },
       "test_cases": 21,
-      "max_input_bytes": 23,
-      "max_output_bytes": 3,
+      "max_input_bytes": 2000001,
+      "max_output_bytes": 8,
       "constraint": "the 1..2000000-digit nonnegative integer has no leading zero",
       "constraint_counterexample": "0123",
-      "multi_answer_exemption": {
-        "reason": "every generated digit string has no divisible-by-eight subsequence",
-        "unique_output_tokens": [
-          "NO"
-        ]
-      },
       "input_domain": {
         "statement_quote": "一个不超过200万位的非负整数，且没有前导零。",
         "generated_extremes": {
-          "max_int": 111111111111111111,
-          "min_int": 111
+          "max_int": 111111,
+          "min_int": 0
         }
       },
       "self_audit": {
@@ -748,11 +742,11 @@
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 20,
+          "frequency": 6,
           "total": 20,
-          "status": "exempted",
-          "exemption": "only the unique NO branch is generated because successful divisible subsequences are non-unique",
-          "share": 1.0
+          "status": "rejected",
+          "exemption": null,
+          "share": 0.3
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -792,6 +786,33 @@
         "problem": "27150",
         "merged_cases": 21,
         "total_ms": 309
+      },
+      "special_judge": "tests/20000-29982/27150_made/checker.py",
+      "data_rebuilt": {
+        "date": "2026-09-17",
+        "reason": "旧数据 21 组全是 NO（YES 分支答案不唯一，无法精确比对），判别力为零而离线。2026-09-17 判题器支持逐题 checker，数据按题面重建：15 组 YES（含答案数字相隔 200 万位、只剩 3 位答案、前导零陷阱）、6 组 NO，输入到 200 万位，由 checker.py 判任一合法子序列。",
+        "superseded": {
+          "max_input_bytes": 23,
+          "max_output_bytes": 3,
+          "multi_answer_exemption": {
+            "reason": "every generated digit string has no divisible-by-eight subsequence",
+            "unique_output_tokens": [
+              "NO"
+            ]
+          },
+          "constant_output_probe": {
+            "frequency": 20,
+            "total": 20,
+            "status": "exempted",
+            "exemption": "only the unique NO branch is generated because successful divisible subsequences are non-unique",
+            "share": 1.0
+          },
+          "generated_extremes": {
+            "max_int": 111111111111111111,
+            "min_int": 111
+          }
+        },
+        "note": "本条目里的数字是对重建后的 data/ 重新实测的；参考实现与生成器已换成仓库交接件（旧 samplecode 见 git 历史）。"
       }
     },
     {

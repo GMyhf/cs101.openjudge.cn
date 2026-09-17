@@ -46,24 +46,26 @@ class ArchiveExclusionTests(unittest.TestCase):
                     offenders.append(case["input"])
         self.assertEqual(offenders[:5], [], f"catalog 里还引着 {len(offenders)} 条存档数据")
 
-    def test_special_judge_problem_stays_unindexed_even_when_data_exists(self):
-        selected = index_tests.exclude_special_judge_cases({
-            27150: [{"input": "unsafe.in", "output": "unsafe.out"}],
-            30193: [{"input": "also-unsafe.in", "output": "also-unsafe.out"}],
+    def test_multi_answer_problem_is_indexed_only_with_its_checker(self):
+        """多解题没有 checker 时一律不判（精确比对会冤判）；数据目录里有 checker.py 才放行。
+
+        2026-09-17 之前 27150、30193 因此零数据；判题器支持逐题 checker 之后两题重建接回。
+        """
+        without_checker = index_tests.exclude_special_judge_cases({
+            27150: [{"input": "tests/nowhere/data/0.in", "output": "tests/nowhere/data/0.out"}],
             1678: [{"input": "safe.in", "output": "safe.out"}],
         })
-        self.assertTrue({27150, 30193}.isdisjoint(selected))
-        self.assertIn(1678, selected)
-        for number in (27150, 30193):
+        self.assertNotIn(27150, without_checker)
+        self.assertIn(1678, without_checker)
+        for number, directory in ((27150, "tests/20000-29982/27150_made"), (30193, "tests/30000-/30193_made")):
             entries = [row for row in self.catalog["problems"]
                        if row.get("source", "openjudge") == "openjudge"
                        and int(row["global_number"]) == number]
             self.assertTrue(entries)
-            self.assertTrue(all(not row.get("test_cases") for row in entries))
-        self.assertTrue((ROOT / "data/openjudge/tests/20000-29982/27150_made").is_dir(),
-                        "离线参考数据应保留，但不能进入 catalog")
-        self.assertTrue((ROOT / "data/openjudge/tests/30000-/30193_made").is_dir(),
-                        "30193 离线参考数据应保留，但不能进入 catalog")
+            for row in entries:
+                self.assertEqual(row["checker"], f"{directory}/checker.py")
+                self.assertTrue(all(case["input"].startswith(directory + "/") for case in row["test_cases"]))
+                self.assertGreaterEqual(len(row["test_cases"]), 20)
 
     def test_generated_data_replaces_legacy_data_for_the_same_global_problem(self):
         offenders = []

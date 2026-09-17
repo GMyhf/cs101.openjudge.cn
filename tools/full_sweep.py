@@ -614,6 +614,18 @@ def check_sample_anchor():
         anchored += 1
         if sample_out and sample_out[-1].endswith("以下省略"):
             sample_out = sample_out[:-1]   # 原站自己截断的样例输出，只比对它给出的那截
+        if problem.get("interactor"):
+            anchored -= 1                  # 交互题的「样例输出」是交互记录，不是 .out
+            continue
+        if problem.get("checker"):
+            # 答案不唯一：题面给的是其中一个正确答案，交给该题 checker 判，而不是逐字比
+            sys.path.insert(0, str(ROOT))
+            import judge
+            verdict, message = judge.run_checker(problem["checker"], first_in.read_bytes(),
+                                                 plain(match.group(2)).encode(), first_out.read_bytes())
+            if verdict is not True:
+                bad.append(f"{problem.get('book')}__{problem['id']}: checker 不接受题面样例输出（{message}）")
+            continue
         expected = first_out.read_text(encoding="utf-8", errors="replace").split()
         shared = min(len(expected), len(sample_out))
         if expected[:shared] != sample_out[:shared]:

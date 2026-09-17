@@ -1,31 +1,22 @@
-# External reference: http://cs101.openjudge.cn/routine/27150/statistics/
-# Accepted submission: 43089968
-# Source: http://cs101.openjudge.cn/routine/solution/43089968/
-# License: not declared on the submission page; no license is inferred.
+# 27150 Divisibility by Eight 加强版 —— 参考实现。
+# 为本仓库编写的交接件（2026-09-17，特判数据重建），不取自平台提交，不套用外部许可。
+#
+# 任何一个合法结果的末三位去掉前导零后仍是合法结果（1000 是 8 的倍数），所以只要
+# 按不带前导零的写法枚举 0..992 里 8 的倍数，逐个查是不是输入的子序列即可。
+import sys
 
-j=k=l=m=0
-def p(i):print('YES\n'+i);exit()
-for i in input():
-    if i in'08':p(i)
-    elif i in'26':
-        j=i
-        if'2'==i:
-            if k:
-                if k in'37':p(k+i)
-                elif l:
-                    if l in'37':p(l+i)
-                    else:p(k+l+i)
-        else:
-            if k:
-                if k in'159':p(k+i)
-                elif l:
-                    if l in'159':p(l+i)
-                    else:p(k+l+i)
-    elif'4'==i:
-        if j:p(j+i)
-        if m:p(k+m+i)
-        if k:m=i
+digits = sys.stdin.readline().strip()
+for value in range(0, 1000, 8):
+    text = str(value)
+    position = 0
+    for ch in text:
+        position = digits.find(ch, position)
+        if position < 0:
+            break
+        position += 1
     else:
-        if not k:k=i
-        elif not l:l=i
-print('NO')
+        print("YES")
+        print(text)
+        break
+else:
+    print("NO")

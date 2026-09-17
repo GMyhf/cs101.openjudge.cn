@@ -1,245 +1,251 @@
 #!/usr/bin/env python3
-"""Problem-specific generators and input contracts for T-028 phase-2 round 22."""
+"""27150 Divisibility by Eight 加强版 —— 生成器、输入契约与数据构建（配 checker.py 特判）。
+
+2026-09-17 重写。旧数据 21 组全是 NO，因为「有解时答案不唯一」而只敢出无解的情况，
+判不出任何「把有解判成 NO」的错法。现在题目有了 checker.py，任何合法删法都接受，
+于是有解/无解都出。
+
+题面：一个不超过 200 万位、没有前导零的非负整数。删掉若干位（可以不删），剩下至少一位、
+没有前导零（单独的 `0` 合法）、能被 8 整除；有则输出 YES 与结果，否则 NO。
+
+判别力按「这题会怎么错」排（seed → 形状）：
+  1-2   题面另外两个样例（`10` → 0、`111111` → NO）；第 0 组是 `3454`
+  3-4   一位数输入：`0`（YES 0，忘了 0 本身是 8 的倍数的挂）、`4`（NO）
+  5     9…92：唯一解族是三位 992（只查一二位的挂）
+  6     2626…：偶数很多却无解（「有偶数就能凑」的挂）
+  7     200 万位随机奇数：无解
+  8     1…14514：解是 144/544，不是连续子串（只查连续窗口的挂）
+  9-10  2 1…1 4 / 7 6…6 2：唯一解 24 / 72 的两位相隔 200 万位
+  11    随机「刚好无解」前缀 + 一位，使解只能是三位子序列
+  12    随机奇数中间夹一个 0：解要用到那个 0
+  13    3…3 里撒三个 0 与一个 8：补前导零枚举（`000`、`008`）的挂
+  14    随机数字且整个数被 8 整除：允许输出很长的结果（考 checker 的子序列检查）
+  15-17 平台原数据形状 1222222222 循环（112）、5…56（56）、3…36（336）
+  18    随机「刚好无解」（含偶数）200 万位
+  19    4…42：无解
+  20    3…38：唯一一位解在最末
+参考解 samplecode.py 用「枚举 8 的倍数查子序列」；构建时用完全不同的线性状态机
+（记录已出现的一位、两位子序列模 8 的余数）独立复核有无解，再逐组调用 checker：
+参考解必须通过，另外构造两份不同的合法结果必须通过，几份错误输出必须被拒。
+"""
 from __future__ import annotations
-import random,re
+import random
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
 
-NUMBERS={30339,30163,30868,30178,29335,19959,20101,27150,27947,28193,
-28276,28912,29256,29886,29950,29952,29954,30172,30442,27093}
-EXEMPTIONS={27150:"only the unique NO branch is generated because successful divisible subsequences are non-unique"}
-MULTI_ANSWER_EXEMPTIONS={27150:{"reason":"every generated digit string has no divisible-by-eight subsequence","unique_output_tokens":["NO"]}}
-FILTER_INVALID_ARCHIVE_INPUTS={30172}
-INPUT_DOMAINS={
-30339:"第一行两个整数 N,M（1≤N,M≤50）。",
-30163:"M (0 < M <= 30)、N (0 < N <= 30)。",
-30868:"对于全部数据， 0 ≤ hi ≤ n, 0 ≤ q ≤ 10^5, 1 ≤ n ≤ 10^{18}, 0 ≤ a,b,c ≤ 10^6 。",
-30178:"第 1 行：一个整数 n ，(2 <= n <= 1000)",
-29335:"1 <= len(path) <= 3000 path 由英文字母，数字， '.' ， '/' 或 '_' 组成。",
-19959:"第一行为一个正整数n，n<=10^12",
-20101:"输入的多项式次数不超过9次，各系数绝对值不超过9。",
-27150:"一个不超过200万位的非负整数，且没有前导零。",
-27947:"1<=M<=99999 且所有 M 相加之和不超过500000。",
-28193:"第一行包含两个整数n和m（1 ≤ n ≤ 10**5， 0 ≤ m ≤ 10**5）",
-28276:"第一行：正整数 n<50, 代表输入的字符串数量。",
-28912:"第1行，2个正整数 n,M。1 ≤ n ≤ 3000；1 ≤ M ≤ 10^9；",
-29256:"第一行为两个整数 n ​和 m ​，分别表示有 n​ 位选手和 m 个组（1 < n < 50000，1 <= m <= n)",
-29886:"1 <= power.length <= 19 1 <= power[i] <= 10^9",
-29950:"一行，一个仅包含小写英文字母的字符串 s (1 <= 字符串长度 <= 50000)。",
-29952:"一行，一个只包含 ( 和 ) 的字符串，长度不超过 30000。",
-29954:"第一行包含三个整数 R, C, K (1 <= R, C <= 100, 0 <= K <= 10)。",
-30172:"第一行是数字n (n <= 1000)，表示节点的总数（包括起始节点和终止节点）",
-30442:"保证所有测试用例中 n 的总和不超过 2*10^5。",
-27093:"第一行包含两个正整数 N, D (1<=N<=10^5, 1<=D<=10^9)。",
-}
-SAMPLE_INPUTS={30868:"7 3 5\n4\n4\n10\n13\n41\n",29335:"/home/\n",19959:"9\n",20101:"-1\nx^2+2x+1\n",27150:"111111\n",
-29886:"3 1 4\n",
-28193:"5 2\n2 5 3 4 8\n1 4\n4 5\n",28276:"2\na==b b!=a\n",
-28912:"3 5\n1 3 1\n1 -4 -4\n-2 5 1\n",29256:"5 2\n100 80 90 75 95\n"}
-SAMPLE_OUTPUTS={30868:"No\nYes\nYes\nYes\n",29335:"/home\n",19959:"130\n",20101:"(x+1)^2\n",27150:"NO\n",
-30163:"11\n",29886:"4\n",28193:"10\n",28276:"False\n",28912:"10 -8\n",
-29256:"260\n",30442:"11\n2\n12\n"}
-LABELS={
-30339:"a 1..50 rectangular dot-X grid contains exactly three four-connected islands",
-30163:"1 or more groups contain 1..30 rectangular height grids in -65..319 and an in-bounds water source",
-30868:"three step sizes in 0..10^6 precede 1..100000 query heights in 0..10^18",
-30178:"a 2..1000 square board is a permutation of 0..n^2-1",
-29335:"the single 1..3000-character valid absolute Unix path uses only the stated character alphabet",
-19959:"the input is one positive integer at most 10^12",
-20101:"a nonzero shift and a nonzero descending polynomial of degree at most 9 have coefficients in -9..9",
-27150:"the 1..2000000-digit nonnegative integer has no leading zero",
-27947:"1..100 datasets have 1..99999 integers each and at most 500000 integers in total",
-28193:"a graph of 1..100000 vertices has at most 100000 unique non-loop edges and bounded nonnegative costs",
-28276:"1..49 four-character lowercase equality or inequality relations follow the declared count",
-28912:"1..3000 absolute-value terms obey all coefficient bounds and 1<=M<=10^9",
-29256:"2..49999 positive scores in 2..999 are partitioned into 1..n nonempty consecutive groups",
-29886:"the single row contains 1..19 boss powers in 1..10^9",
-29950:"the single string has 1..50000 lowercase letters",
-29952:"the single nonempty string has at most 30000 parentheses",
-29954:"a 1..100 rectangular grid over dot-hash-S-E has exactly one start and one exit with 0<=K<=10",
-30172:"2..1000 named nodes define every nonterminal row with at most 10 weighted outgoing edges",
-30442:"1..10000 arrays have lengths 3..200000, values 1..100 and total length at most 200000",
-27093:"1..100000 positive heights at most 10^9 follow a distance in 1..10^9",
-}
-INVALID={30339:"2 2\nXX\nXX\n",30163:"1\n31 1\n0\n1 1\n",30868:"1 2 3\n1\n-1\n",
-30178:"2\n0 1\n1 3\n",29335:"relative/path\n",19959:"0\n",20101:"0\nx+1\n",27150:"0123\n",
-27947:"1\n\n",28193:"2 1\n1 2\n1 1\n",28276:"1\na=b\n",28912:"1 0\n1 2 3\n",
-29256:"2 3\n4 5\n",29886:"0 1\n",29950:"abcD\n",29952:"()a\n",29954:"2 2 0\nS.\n..\n",
-30172:"1\na a\n",30442:"1\n2\n1 2\n",27093:"2 0\n1 2\n"}
-
-def _poly(r):
- d=r.randint(1,9);terms=[]
- for power in range(d,-1,-1):
-  c=r.randint(-9,9)
-  if power==d and c==0:c=1
-  if c==0:continue
-  sign='-' if c<0 else ('+' if terms else '')
-  a=abs(c)
-  if power==0:body=str(a)
-  else:body=('' if a==1 else str(a))+'x'+('' if power==1 else '^'+str(power))
-  terms.append(sign+body)
- return ''.join(terms)
-
-def generate(number,seed):
- r=random.Random(number*1_000_003+seed)
- if number==30339:
-  n,m=r.randint(3,50),r.randint(3,50);g=[['.']*m for _ in range(n)]
-  points=r.sample([(i,j) for i in range(n) for j in range(m)],3)
-  while min(abs(a-c)+abs(b-d) for i,(a,b) in enumerate(points) for c,d in points[i+1:])<2:points=r.sample([(i,j) for i in range(n) for j in range(m)],3)
-  for i,j in points:g[i][j]='X'
-  return f"{n} {m}\n"+'\n'.join(''.join(x) for x in g)+'\n'
- if number==30163:
-  blocks=[]
-  for _ in range(r.randint(1,5)):
-   m,n=r.randint(1,8),r.randint(1,8);rows=[[r.randint(-65,319) for _ in range(n)] for _ in range(m)]
-   blocks.append(f"{m} {n}\n"+'\n'.join(' '.join(map(str,x)) for x in rows)+f"\n{r.randint(1,m)} {r.randint(1,n)}")
-  return f"{len(blocks)}\n"+'\n'.join(blocks)+'\n'
- if number==30868:
-  steps=[r.randint(0,10**6) for _ in range(3)];q=r.randint(1,200);h=[r.randint(0,10**18) for _ in range(q)]
-  return ' '.join(map(str,steps))+f"\n{q}\n"+'\n'.join(map(str,h))+'\n'
- if number==30178:
-  n=30 if seed==20 else r.randint(2,12);a=list(range(n*n));r.shuffle(a)
-  return f"{n}\n"+'\n'.join(' '.join(map(str,a[i*n:(i+1)*n])) for i in range(n))+'\n'
- if number==29335:
-  parts=[]
-  for _ in range(r.randint(1,100)):
-   parts.append(r.choice(('.', '..', '...', ''.join(r.choice('abcXYZ012_') for _ in range(r.randint(1,12))))))
-  return '/'+'/'.join(parts)+('/'*r.randint(0,4))+'\n'
- if number==19959:return f"{10**12 if seed==20 else r.randint(1,10**12)}\n"
- if number==20101:return f"{r.choice([x for x in range(-20,21) if x])}\n{_poly(r)}\n"
- if number==27150:return '1'*(seed%1999+2)+'\n'
- if number==27947:
-  rows=[];total=0
-  for _ in range(r.randint(1,10)):
-   n=r.randint(1,min(2000,500000-total));total+=n;rows.append(' '.join(str(r.randint(-10**9,10**9)) for _ in range(n)))
-  return f"{len(rows)}\n"+'\n'.join(rows)+'\n'
- if number==28193:
-  n=r.randint(1,500);maxe=min(1000,n*(n-1)//2);m=r.randint(0,maxe);edges=set()
-  while len(edges)<m:
-   a,b=r.sample(range(1,n+1),2);edges.add(tuple(sorted((a,b))))
-  return f"{n} {m}\n"+' '.join(str(r.randint(0,10**9)) for _ in range(n))+'\n'+'\n'.join(f'{a} {b}' for a,b in sorted(edges))+('\n' if edges else '')
- if number==28276:
-  rows=[]
-  for _ in range(r.randint(1,49)):
-   rows.append(r.choice('abcdefghijklmnopqrstuvwxyz')+r.choice(('==','!='))+r.choice('abcdefghijklmnopqrstuvwxyz'))
-  return f"{len(rows)}\n"+' '.join(rows)+'\n'
- if number==28912:
-  n=r.randint(1,300);M=r.randint(1,10**9);rows=[f"{r.randint(-1000,1000)} {r.randint(-10**9,10**9)} {r.randint(-1000,1000)}" for _ in range(n)]
-  return f"{n} {M}\n"+'\n'.join(rows)+'\n'
- if number==29256:
-  n=49999 if seed==20 else r.randint(2,1000);return f"{n} {r.randint(1,n)}\n"+' '.join(str(r.randint(2,999)) for _ in range(n))+'\n'
- if number==29886:
-  n=16 if seed==20 else r.randint(1,12);return ' '.join(str(r.randint(1,10**9)) for _ in range(n))+'\n'
- if number==29950:
-  n=50000 if seed==20 else r.randint(1,3000);return ''.join(r.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(n))+'\n'
- if number==29952:
-  n=30000 if seed==20 else r.randint(1,3000);return ''.join(r.choice('()') for _ in range(n))+'\n'
- if number==29954:
-  R,C=r.randint(1,20),r.randint(2,20);K=r.randint(0,10);g=[[r.choice('.#') for _ in range(C)] for _ in range(R)];g[0][0]='S';g[-1][-1]='E'
-  return f"{R} {C} {K}\n"+'\n'.join(''.join(x) for x in g)+'\n'
- if number==30172:
-  n=r.randint(2,30);names=['node'+chr(97+i//26)+chr(97+i%26) for i in range(n)];end=names[-1];rows=[]
-  if seed%5==0 and n>=4:
-   edges={i:[] for i in range(n-1)};edges[0]=[(1,1)];edges[1]=[(2,1)];edges[2]=[(1,1)]
-  else:
-   edges={i:[] for i in range(n-1)}
-   for i in range(n-1):
-    choices=list(range(i+1,min(n,i+11)));pick=r.sample(choices,r.randint(1,min(len(choices),3)))
-    edges[i]=[(j,r.randint(-1000,1000)) for j in pick]
-  for i in range(n-1):rows.append(names[i]+' '+str(len(edges[i]))+''.join(f' {names[j]} {w}' for j,w in edges[i]))
-  return f"{n}\n{names[0]} {end}\n"+'\n'.join(rows)+'\n'
- if number==30442:
-  blocks=[];total=0
-  for _ in range(r.randint(1,10)):
-   n=r.randint(3,min(2000,200000-total));total+=n;blocks.append(f"{n}\n"+' '.join(str(r.randint(1,100)) for _ in range(n)))
-  return f"{len(blocks)}\n"+'\n'.join(blocks)+'\n'
- if number==27093:
-  n=100000 if seed==20 else r.randint(1,2000);return f"{n} {r.randint(1,10**9)}\n"+' '.join(str(r.randint(1,10**9)) for _ in range(n))+'\n'
- raise KeyError(number)
-
-def valid(number,text):
- try:
-  lines=text.rstrip('\n').splitlines();tokens=text.split()
-  if number==30339:
-   n,m=map(int,lines[0].split());g=lines[1:];seen=set();count=0
-   for i in range(n):
-    for j in range(m):
-     if g[i][j]=='X' and (i,j) not in seen:
-      count+=1;stack=[(i,j)];seen.add((i,j))
-      while stack:
-       x,y=stack.pop()
-       for dx,dy in ((1,0),(-1,0),(0,1),(0,-1)):
-        p=(x+dx,y+dy)
-        if 0<=p[0]<n and 0<=p[1]<m and g[p[0]][p[1]]=='X' and p not in seen:seen.add(p);stack.append(p)
-   return 1<=n<=50 and 1<=m<=50 and len(g)==n and all(len(x)==m and set(x)<={'.','X'} for x in g) and count==3
-  if number==30163:
-   k=int(lines[0]);pos=1
-   if k<1:return False
-   for _ in range(k):
-    m,n=map(int,lines[pos].split());pos+=1;rows=[list(map(int,x.split())) for x in lines[pos:pos+m]];pos+=m;x,y=map(int,lines[pos].split());pos+=1
-    if not 1<=m<=30 or not 1<=n<=30 or len(rows)!=m or any(len(a)!=n or any(not -65<=v<=319 for v in a) for a in rows) or not(1<=x<=m and 1<=y<=n):return False
-   return pos==len(lines)
-  if number==30868:
-   a,b,c=map(int,lines[0].split());q=int(lines[1]);h=list(map(int,lines[2:]));return all(0<=x<=10**6 for x in(a,b,c)) and 1<=q<=10**5 and len(h)==q and all(0<=x<=10**18 for x in h)
-  if number==30178:
-   n=int(lines[0]);rows=[list(map(int,x.split())) for x in lines[1:]];return 2<=n<=1000 and len(rows)==n and all(len(x)==n for x in rows) and {v for x in rows for v in x}==set(range(n*n))
-  if number==29335:return len(lines)==1 and 1<=len(lines[0])<=3000 and lines[0].startswith('/') and bool(re.fullmatch(r'[A-Za-z0-9._/]+',lines[0]))
-  if number==19959:return len(tokens)==1 and 1<=int(tokens[0])<=10**12
-  if number==20101:return len(lines)==2 and int(lines[0])!=0 and lines[1]!='0' and bool(re.fullmatch(r'[+-]?(?:(?:[1-9]?x(?:\^[1-9])?)|[1-9])(?:[+-](?:(?:[1-9]?x(?:\^[1-9])?)|[1-9]))*',lines[1]))
-  if number==27150:return len(lines)==1 and bool(re.fullmatch(r'(?:0|[1-9]\d{0,1999999})',lines[0]))
-  if number==27947:
-   t=int(lines[0]);rows=[list(map(int,x.split())) for x in lines[1:]];return 1<=t<=100 and len(rows)==t and all(1<=len(x)<=99999 for x in rows) and sum(map(len,rows))<=500000
-  if number==28193:
-   n,m=map(int,lines[0].split());cost=list(map(int,lines[1].split()));edges=[tuple(map(int,x.split())) for x in lines[2:]];return 1<=n<=10**5 and 0<=m<=10**5 and len(cost)==n and all(0<=x<=10**9 for x in cost) and len(edges)==len(set(tuple(sorted(x)) for x in edges))==m and all(len(x)==2 and 1<=x[0]<=n and 1<=x[1]<=n and x[0]!=x[1] for x in edges)
-  if number==28276:return 1<=int(tokens[0])<50 and len(tokens)==int(tokens[0])+1 and all(re.fullmatch(r'[a-z](?:==|!=)[a-z]',x) for x in tokens[1:])
-  if number==28912:
-   n,M=map(int,lines[0].split());rows=[list(map(int,x.split())) for x in lines[1:]];return 1<=n<=3000 and 1<=M<=10**9 and len(rows)==n and all(len(x)==3 and -1000<=x[0]<=1000 and -10**9<=x[1]<=10**9 and -1000<=x[2]<=1000 for x in rows)
-  if number==29256:
-   n,m=map(int,lines[0].split());a=list(map(int,lines[1].split()));return len(lines)==2 and 1<n<50000 and 1<=m<=n and len(a)==n and all(1<x<1000 for x in a)
-  if number==29886:return len(lines)==1 and 1<=len(tokens)<=19 and all(1<=int(x)<=10**9 for x in tokens)
-  if number==29950:return bool(re.fullmatch(r'[a-z]{1,50000}\n?',text))
-  if number==29952:return bool(re.fullmatch(r'[()]{1,30000}\n?',text))
-  if number==29954:
-   R,C,K=map(int,lines[0].split());g=lines[1:];s=''.join(g);return 1<=R<=100 and 1<=C<=100 and 0<=K<=10 and len(g)==R and all(len(x)==C and set(x)<={'.','#','S','E'} for x in g) and s.count('S')==s.count('E')==1
-  if number==30172:
-   n=int(lines[0]);start,end=lines[1].split();rows=lines[2:];names=set((start,end))
-   if not 2<=n<=1000 or len(rows)!=n-1 or not all(re.fullmatch(r'[a-z_]+',x) for x in(start,end)):return False
-   for row in rows:
-    p=row.split();m=int(p[1])
-    if not 0<=m<=10 or len(p)!=2+2*m or not re.fullmatch(r'[a-z_]+',p[0]):return False
-    names.add(p[0])
-    for i in range(m):
-     if not re.fullmatch(r'[a-z_]+',p[2+2*i]):return False
-     int(p[3+2*i]);names.add(p[2+2*i])
-   return len(names)==n and start not in {p[2+2*i] for row in rows for p in [row.split()] for i in range(int(p[1]))} and end not in {row.split()[0] for row in rows}
-  if number==30442:
-   t=int(lines[0]);pos=1;total=0
-   if not 1<=t<=10**4:return False
-   for _ in range(t):
-    n=int(lines[pos]);pos+=1;a=list(map(int,lines[pos].split()));pos+=1;total+=n
-    if not 3<=n<=2*10**5 or len(a)!=n or any(not 1<=x<=100 for x in a):return False
-   return pos==len(lines) and total<=2*10**5
-  if number==27093:
-   n,D=map(int,lines[0].split());a=list(map(int,lines[1].split()));return len(lines)==2 and 1<=n<=10**5 and 1<=D<=10**9 and len(a)==n and all(1<=x<=10**9 for x in a)
- except (ValueError,IndexError,TypeError):return False
- return False
+NUMBER = 27150
+HERE = Path(__file__).resolve().parent
+REFERENCE = HERE / "samplecode.py"
+CHECKER = HERE / "checker.py"
+INPUT_DOMAIN = "一个不超过200万位的非负整数，且没有前导零。"
+MAX_DIGITS = 2_000_000
+SAMPLE = "3454\n"
+SAMPLE_OUT = "YES\n344\n"          # 题面样例 1 的输出（任何合法结果都行，checker 必须接受它）
+OTHER_SAMPLES = (("10\n", "YES\n0\n"), ("111111\n", "NO\n"))
 
 
-import subprocess as _subprocess, sys as _sys, tempfile as _tempfile
-from pathlib import Path as _Path
-REFERENCE="# External reference: http://cs101.openjudge.cn/routine/27150/statistics/\n# Accepted submission: 43089968\n# Source: http://cs101.openjudge.cn/routine/solution/43089968/\n# License: not declared on the submission page; no license is inferred.\n\nj=k=l=m=0\ndef p(i):print('YES\\n'+i);exit()\nfor i in input():\n    if i in'08':p(i)\n    elif i in'26':\n        j=i\n        if'2'==i:\n            if k:\n                if k in'37':p(k+i)\n                elif l:\n                    if l in'37':p(l+i)\n                    else:p(k+l+i)\n        else:\n            if k:\n                if k in'159':p(k+i)\n                elif l:\n                    if l in'159':p(l+i)\n                    else:p(k+l+i)\n    elif'4'==i:\n        if j:p(j+i)\n        if m:p(k+m+i)\n        if k:m=i\n    else:\n        if not k:k=i\n        elif not l:l=i\nprint('NO')\n"
-LANGUAGE='Python3'
-NUMBER=27150
-SAMPLE='111111\n'
+# ---------- 独立 oracle：线性状态机 ----------
+def _step(state, digit):
+    """state = (一位子序列集合, 两位子序列模 8 集合)；返回 (是否出现解, 新 state)。"""
+    ones, twos = state
+    if digit % 8 == 0:
+        return True, state
+    if any((10 * a + digit) % 8 == 0 for a in ones) or any((10 * v + digit) % 8 == 0 for v in twos):
+        return True, state
+    return False, (ones | {digit}, twos | frozenset((10 * a + digit) % 8 for a in ones))
+
+
+def oracle_solvable(text):
+    state, cache = (frozenset(), frozenset()), {}
+    for ch in text.strip():
+        key = (state, ch)
+        if key not in cache:
+            cache[key] = _step(state, int(ch))
+        hit, state = cache[key]
+        if hit:
+            return True
+    return False
+
+
+def _no_answer_digits(r, length, weights):
+    """逐位随机，只挑不会产生解的数字；首位非零。返回 (字符串, 末状态)。"""
+    state, out, cache = (frozenset(), frozenset()), [], {}
+    for _ in range(length):
+        if state not in cache:
+            allowed = [d for d in range(1, 10) if not _step(state, d)[0]]
+            cache[state] = allowed
+        allowed = cache[state]
+        d = r.choices(allowed, [weights[x] for x in allowed])[0]
+        out.append(d)
+        state = _step(state, d)[1]
+    return "".join(map(str, out)), state
+
+
+def generate(number, seed):
+    assert number == NUMBER
+    r = random.Random(number * 1_000_003 + seed)
+    big = MAX_DIGITS
+    if seed <= 2:
+        return OTHER_SAMPLES[seed - 1][0]
+    if seed == 3:
+        return "0\n"
+    if seed == 4:
+        return "4\n"
+    if seed == 5:
+        return "9" * (big - 1) + "2\n"
+    if seed == 6:
+        return "26" * (big // 2) + "\n"
+    if seed == 7:
+        return "".join(r.choice("13579") for _ in range(big)) + "\n"
+    if seed == 8:
+        return "1" * (big - 4) + "4514\n"
+    if seed == 9:
+        return "2" + "1" * (big - 2) + "4\n"
+    if seed == 10:
+        return "7" + "6" * (big - 2) + "2\n"
+    if seed == 11:
+        # 偶数权重压低，避免状态太快饱和；末位挑一个只能组成三位解的数字
+        body, (ones, twos) = _no_answer_digits(r, 1_000_000, {1: 5, 2: 1, 3: 5, 4: 1, 5: 5, 6: 1, 7: 5, 9: 5})
+        tails = [d for d in range(1, 10) if d % 8
+                 and not any((10 * a + d) % 8 == 0 for a in ones)
+                 and any((10 * v + d) % 8 == 0 for v in twos)]
+        assert tails, "seed 11 的无解前缀找不到只能凑三位解的末位"
+        return body + str(r.choice(tails)) + "\n"
+    if seed == 12:
+        half = big // 2
+        return ("".join(r.choice("13579") for _ in range(half - 1)) + "0"
+                + "".join(r.choice("13579") for _ in range(half)) + "\n")
+    if seed == 13:
+        chars = ["3"] * big
+        for p in sorted(r.sample(range(1, big - 1), 3)):
+            chars[p] = "0"
+        chars[r.randrange(big // 2, big - 1)] = "8"
+        return "".join(chars) + "\n"
+    if seed == 14:
+        length = 1_000_000
+        head = str(r.randint(1, 9)) + "".join(r.choice("0123456789") for _ in range(length - 4))
+        tail = r.choice([t for t in range(0, 1000, 8)])
+        return head + f"{tail:03d}\n"
+    if seed == 15:
+        return "1222222222" * (big // 10) + "\n"
+    if seed == 16:
+        return "5" * (big - 1) + "6\n"
+    if seed == 17:
+        return "3" * (big - 1) + "6\n"
+    if seed == 18:
+        body, _ = _no_answer_digits(r, big, {d: 1 for d in range(1, 10)})
+        return body + "\n"
+    if seed == 19:
+        return "4" * (big - 1) + "2\n"
+    return "3" * (big - 1) + "8\n"
+
+
+def valid(number, text):
+    """题面：一行一个不超过 200 万位的非负整数，没有前导零。"""
+    if number != NUMBER or not text.endswith("\n") or text.count("\n") != 1:
+        return False
+    digits = text[:-1]
+    return (1 <= len(digits) <= MAX_DIGITS and digits.isascii() and digits.isdigit()
+            and (digits == "0" or digits[0] != "0"))
+
+
+# ---------- 构造别的合法结果 / 错误结果，喂 checker ----------
+def _alternatives(digits, reference):
+    """两份与参考答案不同写法的合法结果（可能与参考相同，调用方只要求合法）。"""
+    words = reference.split()
+    if words[0] == "NO":
+        return []
+    found = []
+    # 1) 取最后出现的合法三位/两位/一位子序列（从右往左贪心）
+    for value in range(992, -1, -8):
+        text = str(value); position = len(digits)
+        for ch in reversed(text):
+            position = digits.rfind(ch, 0, position)
+            if position < 0:
+                break
+        else:
+            found.append(text); break
+    # 2) 找到一个三位解 (i,j,k) 后，把 i 之前的整段前缀接在前面（前缀首位非零），得到很长的结果
+    for value in range(104, 1000, 8):
+        text = str(value); position, spots = 0, []
+        for ch in text:
+            position = digits.find(ch, position)
+            if position < 0:
+                break
+            spots.append(position); position += 1
+        else:
+            prefix = digits[:spots[0]]
+            found.append(prefix + text); break
+    return found
+
+
+def _wrongs(digits, reference):
+    words = reference.split()
+    bad = ["", "yes\n", "YES\n", "NO NO\n", "\x00\xff garbage\n", "YES\n" + "9" * 5000 + "\n"]
+    if words[0] == "NO":
+        bad += ["YES\n0\n", "YES\n8\n", "YES\n" + digits[:3] + "\n"]
+    else:
+        ans = words[1]
+        bad += ["NO\n", f"YES\n{ans}\n{ans}\n", f"YES\n0{ans}\n", "YES\n" + "8" * (len(digits) + 1) + "\n",
+                f"YES\n{ans}1\n" if ans != "0" else "YES\n1\n"]
+    return bad
+
+
+def _check(case, output, answer):
+    with tempfile.TemporaryDirectory() as temp:
+        paths = []
+        for name, data in (("in", case), ("out", output), ("ans", answer)):
+            path = Path(temp) / name
+            path.write_bytes(data.encode("latin-1") if name == "out" else data.encode())
+            paths.append(str(path))
+        code = subprocess.run([sys.executable, "-I", str(CHECKER), *paths], capture_output=True).returncode
+    if code not in (0, 42):
+        raise SystemExit(f"checker 自身出错（退出码 {code}）")
+    return code == 0
+
+
 def _build():
- with _tempfile.TemporaryDirectory() as folder:
-  folder=_Path(folder);src=folder/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE)
-  cmd=[_sys.executable,'-I',str(src)]
-  if LANGUAGE!='Python3':
-   exe=folder/'s';_subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
-  out=_Path('data');out.mkdir(exist_ok=True)
-  for path in out.glob('*'):path.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,seed) for seed in range(1,21)]
-  for index,case in enumerate(cases):
-   result=_subprocess.run(cmd,input=case,text=True,capture_output=True,timeout=120,check=True)
-   answer='\n'.join(line.rstrip() for line in result.stdout.rstrip().splitlines())+'\n'
-   (out/f'{index}.in').write_text(case);(out/f'{index}.out').write_text(answer)
-if __name__=='__main__':_build()
+    out = HERE / "data"
+    out.mkdir(exist_ok=True)
+    for path in out.glob("*"):
+        path.unlink()
+    cases = [SAMPLE] + [generate(NUMBER, seed) for seed in range(1, 21)]
+    if len(set(cases)) != len(cases):
+        raise SystemExit("两组输入撞了，数据必须互异")
+    kinds = {True: 0, False: 0}
+    for index, case in enumerate(cases):
+        if not valid(NUMBER, case):
+            raise SystemExit(f"case {index} violates the input contract")
+        result = subprocess.run([sys.executable, str(REFERENCE)], input=case, text=True,
+                                capture_output=True, timeout=120, check=True)
+        answer = result.stdout
+        digits = case.strip()
+        solvable = oracle_solvable(case)
+        kinds[solvable] += 1
+        if (answer.split()[0] == "YES") != solvable:
+            raise SystemExit(f"case {index}: 参考解与状态机 oracle 的有无解不一致")
+        if not _check(case, answer, answer):
+            raise SystemExit(f"case {index}: checker 不接受参考解")
+        if index == 0 and not _check(case, SAMPLE_OUT, answer):
+            raise SystemExit("checker 不接受题面样例输出")
+        for sample_in, sample_out in OTHER_SAMPLES:
+            if case == sample_in and not _check(case, sample_out, answer):
+                raise SystemExit(f"case {index}: checker 不接受题面样例输出")
+        for alt in _alternatives(digits, answer):
+            if not _check(case, f"YES\n{alt}\n", answer):
+                raise SystemExit(f"case {index}: checker 拒绝了另一种合法结果")
+        for bad in _wrongs(digits, answer):
+            if _check(case, bad, answer):
+                raise SystemExit(f"case {index}: checker 接受了错误输出 {bad[:40]!r}")
+        if len(case.encode()) > 3 * 1024 * 1024 or len(answer.encode()) > 1_500_000:
+            raise SystemExit(f"case {index} 超出体积上限")
+        (out / f"{index}.in").write_text(case, encoding="utf-8")
+        (out / f"{index}.out").write_text(answer, encoding="utf-8")
+    if not (kinds[True] >= 8 and kinds[False] >= 5):
+        raise SystemExit(f"有解/无解分布不对：{kinds}")
+
+
+if __name__ == "__main__":
+    _build()

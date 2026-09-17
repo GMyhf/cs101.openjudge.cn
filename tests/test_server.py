@@ -65,6 +65,12 @@ REBUILT_2026_09_17_CODEFORCES = (
     "894E", "1000E", "986D", "1970E2", "1970E3", "2167F", "2171G", "2192D", "2194E",
     "2195E", "2205D", "2218G", "2227D", "2227E", "2227F", "2227H", "2228D",
 )
+# 同日判题器支持特判与交互后接回的 12 道：7 道答案不唯一（checker.py）、5 道交互（interactor.py）。
+# 2201G 题面只允许 n∈{5,1001}，整个输入域只有 2 组。
+SPECIAL_JUDGE_CODEFORCES = {"37C": "checker", "1793C": "checker", "2146D1": "checker", "2171F": "checker",
+                            "2195H": "checker", "2201G": "checker", "2208D1": "checker",
+                            "2109C1": "interactor", "2109C2": "interactor", "2109C3": "interactor",
+                            "2173E": "interactor", "2209C": "interactor"}
 
 
 class ServerApiTests(unittest.TestCase):
@@ -518,8 +524,10 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertTrue(all((ROOT / "data/openjudge" / case["input"]).is_file()
                             and (ROOT / "data/openjudge" / case["output"]).is_file()
                             for item in sampled for case in item["test_cases"]))
+        # 2026-09-17 判题器支持交互题后，原先 interactive_requires_judge 的 5 道已接回（interactor.py）
         self.assertEqual({item["id"] for item in entries
-                         if item.get("data_status") == "interactive_requires_judge"},
+                         if item.get("data_status") == "interactive_requires_judge"}, set())
+        self.assertEqual({item["id"] for item in entries if item.get("interactor")},
                          {"2109C1", "2109C2", "2109C3", "2173E", "2209C"})
 
         generated = [item for item in entries if item.get("data_status") == "generated_tests"]
@@ -584,8 +592,11 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertEqual({item["id"] for item in rebuilt},
                          {"270A", "456A", "698A", "903C", "1374B", "1374C", "1475A", "1742A", "1764C", "1829D", "1883D", "1970E1", "2140B", "2208C", "2227B",
                           "116A", "546A", "617A", "734A", "791A", "977A",
-                          *REBUILT_2026_09_17_CODEFORCES})
-        self.assertTrue(all(item["test_count"] == 21 for item in rebuilt))
+                          *REBUILT_2026_09_17_CODEFORCES, *SPECIAL_JUDGE_CODEFORCES})
+        self.assertTrue(all(item["test_count"] == (2 if item["id"] == "2201G" else 21) for item in rebuilt))
+        for problem_id, field in SPECIAL_JUDGE_CODEFORCES.items():
+            item = next(row for row in rebuilt if row["id"] == problem_id)
+            self.assertEqual(item[field], f"tests/codeforces/{problem_id}_made/{field}.py")
         self.assertEqual(sum(item["test_count"] for item in entries if item["id"] != "4A"),
                          sum(item["test_count"] for item in sampled)
                          + sum(item["test_count"] for item in generated)
@@ -2521,6 +2532,61 @@ process.exit(richExpected.every(value => richOut.includes(value))
         self.assertIn("output", payload)
         self.assertTrue(payload["output"].strip(), "样例输出不该是空的")
         self.assertNotIn("<pre>", payload["input"])     # 标签要剥干净
+
+    def test_special_judge_and_interactive_problems_are_judged_on_the_real_catalog(self):
+        """2026-09-17：答案不唯一的题走 checker、交互题走 interactor、29986 走预设代码。"""
+        def samples(path):
+            status, _, body = request(self.port, "GET", path)
+            self.assertEqual(status, 200)
+            return json.loads(re.search(r"const SAMPLES = (\{.*?\});", body.decode("utf-8")).group(1))
+
+        # 交互题：输入框里是交互器读的隐藏数据（第 0 组），不是题面上评测方的回应
+        interactive = samples("/codeforces/2209C/submit/")
+        self.assertEqual(interactive["judge_mode"], "interactive")
+        hidden = (ROOT / "data/openjudge/tests/codeforces/2209C_made/data/0.in").read_text(encoding="utf-8")
+        self.assertEqual(interactive["input"], hidden)
+        self.assertEqual(samples("/practice/03151/submit/")["judge_mode"], "checker")
+
+        # 判题器内部路径不下发
+        status, _, body = request(self.port, "GET", "/api/catalog")
+        rows = {(row["book"], row["id"]): row for row in json.loads(body)["problems"]}
+        for key in (("practice", "03151"), ("codeforces", "2209C"), ("practice", "29986")):
+            self.assertTrue({"checker", "interactor", "code_prefix", "test_cases"}.isdisjoint(rows[key]), key)
+
+        # 另一条同样最短、但与参考答案不同的倒水序列必须 Accepted —— 精确比对做不到这一点
+        pots = """from collections import deque
+A, B, C = map(int, input().split())
+prev = {(0, 0): None}; queue = deque([(0, 0)]); goal = None
+while queue:
+    a, b = queue.popleft()
+    if C in (a, b):
+        goal = (a, b); break
+    for name, state in (("POUR(2,1)", (min(A, a + b), b - (min(A, a + b) - a))),
+                        ("POUR(1,2)", (a - (min(B, a + b) - b), min(B, a + b))),
+                        ("DROP(2)", (a, 0)), ("DROP(1)", (0, b)), ("FILL(2)", (a, B)), ("FILL(1)", (A, b))):
+        if state not in prev:
+            prev[state] = ((a, b), name); queue.append(state)
+if goal is None:
+    print("impossible")
+else:
+    ops = []
+    while prev[goal]:
+        goal, name = prev[goal]; ops.append(name)
+    print(len(ops)); print("\\n".join(reversed(ops)))
+"""
+        self.assertEqual(judge("practice", "03151", "python", pots)["status"], "Accepted")
+        wrong = judge("practice", "03151", "python", "print('impossible')\n")
+        self.assertEqual(wrong["status"], "Wrong Answer")
+        self.assertTrue(wrong["message"])                         # checker 的一句话随 WA 下发
+
+        reference = (ROOT / "data/openjudge/tests/codeforces/2209C_made/samplecode.py").read_text(encoding="utf-8")
+        self.assertEqual(judge("codeforces", "2209C", "python", reference)["status"], "Accepted")
+        guess = "t = int(input())\nfor _ in range(t):\n    n = int(input())\n    print('!', 2 * n, flush=True)\n"
+        self.assertEqual(judge("codeforces", "2209C", "python", guess)["status"], "Wrong Answer")
+
+        preset = (ROOT / "data/openjudge/tests/20000-29982/29986_made/samplecode.py").read_text(encoding="utf-8")
+        self.assertEqual(judge("practice", "29986", "python", preset)["status"], "Accepted")
+        self.assertEqual(judge("practice", "29986", "cpp", "int main(){}")["status"], "Language Unavailable")
 
     def test_submit_page_splits_annotated_multi_samples(self):
         """T27237 这类题面：样例 1 的输入和输出一起塞在「样例输入」里，样例 2 整组在「样例输出」里。"""
