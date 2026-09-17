@@ -6,6 +6,8 @@
 - 另补 6 道（2026-09-13，按「Codeforces 800 分经典入门题」清单）：116A、546A、617A、734A、791A、977A。
   它们不在导入源里，走单题流水线（`tests/codeforces/<题号>_made/` 下 `samplecode.py` + `producecase.py`），
   状态记为 `rebuilt_tests`。**重跑导入脚本前注意**：本文件由脚本整页生成，会把这 6 行冲掉，需手工补回。
+- 2026-09-17：原先 0 组的 17 道（`insufficient_sample_cases` 2、`no_extractable_sample` 9、`withheld_pending_rework` 6）
+  按同一单题流水线补到 21 组、改记 `rebuilt_tests`。剩下 12 道（交互 5、多解 7）登记在 `collab/tests-below-20.json`。
 - 判题数据：至少 20 组互异、验证过的数据才可 token 精确判题；其余条目展示题解摘要和官方原题链接。
 
 ## 测试数据状态
@@ -16,12 +18,9 @@
 | 状态 | 数量 |
 | --- | ---: |
 | generated_tests | 113 |
-| insufficient_sample_cases | 2 |
 | interactive_requires_judge | 5 |
 | multiple_output_requires_special_judge | 7 |
-| no_extractable_sample | 9 |
-| rebuilt_tests | 21 |
-| withheld_pending_rework | 6 |
+| rebuilt_tests | 38 |
 
 ## 未接入精确判题数据
 
@@ -97,14 +96,14 @@
 | 791A | rebuilt_tests | https://codeforces.com/problemset/problem/791/A |
 | 803A | generated_tests | https://codeforces.com/problemset/problem/803/A |
 | 893C | generated_tests | https://codeforces.com/problemset/problem/893/C |
-| 894E | insufficient_sample_cases | https://codeforces.com/problemset/problem/894/E |
+| 894E | rebuilt_tests | https://codeforces.com/problemset/problem/894/E |
 | 903C | rebuilt_tests | https://codeforces.com/problemset/problem/903/C |
 | 977A | rebuilt_tests | https://codeforces.com/problemset/problem/977/A |
 | 986B | generated_tests | https://codeforces.com/problemset/problem/986/B |
-| 986D | withheld_pending_rework | https://codeforces.com/problemset/problem/986/D |
+| 986D | rebuilt_tests | https://codeforces.com/problemset/problem/986/D |
 | 996A | generated_tests | https://codeforces.com/problemset/problem/996/A |
 | 1000B | generated_tests | https://codeforces.com/problemset/problem/1000/B |
-| 1000E | insufficient_sample_cases | https://codeforces.com/problemset/problem/1000/E |
+| 1000E | rebuilt_tests | https://codeforces.com/problemset/problem/1000/E |
 | 1154A | generated_tests | https://codeforces.com/problemset/problem/1154/A |
 | 1163B2 | generated_tests | https://codeforces.com/problemset/problem/1163/B2 |
 | 1195C | generated_tests | https://codeforces.com/problemset/problem/1195/C |
@@ -141,8 +140,8 @@
 | 1881C | generated_tests | https://codeforces.com/problemset/problem/1881/C |
 | 1883D | rebuilt_tests | https://codeforces.com/problemset/problem/1883/D |
 | 1970E1 | rebuilt_tests | https://codeforces.com/problemset/problem/1970/E1 |
-| 1970E2 | no_extractable_sample | https://codeforces.com/problemset/problem/1970/E2 |
-| 1970E3 | no_extractable_sample | https://codeforces.com/problemset/problem/1970/E3 |
+| 1970E2 | rebuilt_tests | https://codeforces.com/problemset/problem/1970/E2 |
+| 1970E3 | rebuilt_tests | https://codeforces.com/problemset/problem/1970/E3 |
 | 1985H1 | generated_tests | https://codeforces.com/problemset/problem/1985/H1 |
 | 2033D | generated_tests | https://codeforces.com/problemset/problem/2033/D |
 | 2075C | generated_tests | https://codeforces.com/problemset/problem/2075/C |
@@ -153,24 +152,24 @@
 | 2132B | generated_tests | https://codeforces.com/problemset/problem/2132/B |
 | 2140B | rebuilt_tests | https://codeforces.com/problemset/problem/2140/B |
 | 2146D1 | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2146/D1 |
-| 2167F | no_extractable_sample | https://codeforces.com/problemset/problem/2167/F |
+| 2167F | rebuilt_tests | https://codeforces.com/problemset/problem/2167/F |
 | 2171D | generated_tests | https://codeforces.com/problemset/problem/2171/D |
 | 2171E | generated_tests | https://codeforces.com/problemset/problem/2171/E |
 | 2171F | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2171/F |
-| 2171G | withheld_pending_rework | https://codeforces.com/problemset/problem/2171/G |
+| 2171G | rebuilt_tests | https://codeforces.com/problemset/problem/2171/G |
 | 2173E | interactive_requires_judge | https://codeforces.com/problemset/problem/2173/E |
 | 2184F | generated_tests | https://codeforces.com/problemset/problem/2184/F |
-| 2192D | withheld_pending_rework | https://codeforces.com/problemset/problem/2192/D |
+| 2192D | rebuilt_tests | https://codeforces.com/problemset/problem/2192/D |
 | 2193D | generated_tests | https://codeforces.com/problemset/problem/2193/D |
 | 2193E | generated_tests | https://codeforces.com/problemset/problem/2193/E |
-| 2194E | no_extractable_sample | https://codeforces.com/problemset/problem/2194/E |
-| 2195E | withheld_pending_rework | https://codeforces.com/problemset/problem/2195/E |
+| 2194E | rebuilt_tests | https://codeforces.com/problemset/problem/2194/E |
+| 2195E | rebuilt_tests | https://codeforces.com/problemset/problem/2195/E |
 | 2195H | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2195/H |
 | 2196A | generated_tests | https://codeforces.com/problemset/problem/2196/A |
 | 2196B | generated_tests | https://codeforces.com/problemset/problem/2196/B |
 | 2200G | generated_tests | https://codeforces.com/problemset/problem/2200/G |
 | 2201G | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2201/G |
-| 2205D | withheld_pending_rework | https://codeforces.com/problemset/problem/2205/D |
+| 2205D | rebuilt_tests | https://codeforces.com/problemset/problem/2205/D |
 | 2208C | rebuilt_tests | https://codeforces.com/problemset/problem/2208/C |
 | 2208D1 | multiple_output_requires_special_judge | https://codeforces.com/problemset/problem/2208/D1 |
 | 2209C | interactive_requires_judge | https://codeforces.com/problemset/problem/2209/C |
@@ -181,15 +180,15 @@
 | 2218D | generated_tests | https://codeforces.com/problemset/problem/2218/D |
 | 2218E | generated_tests | https://codeforces.com/problemset/problem/2218/E |
 | 2218F | generated_tests | https://codeforces.com/problemset/problem/2218/F |
-| 2218G | no_extractable_sample | https://codeforces.com/problemset/problem/2218/G |
+| 2218G | rebuilt_tests | https://codeforces.com/problemset/problem/2218/G |
 | 2227A | generated_tests | https://codeforces.com/problemset/problem/2227/A |
 | 2227B | rebuilt_tests | https://codeforces.com/problemset/problem/2227/B |
 | 2227C | generated_tests | https://codeforces.com/problemset/problem/2227/C |
-| 2227D | no_extractable_sample | https://codeforces.com/problemset/problem/2227/D |
-| 2227E | no_extractable_sample | https://codeforces.com/problemset/problem/2227/E |
-| 2227F | no_extractable_sample | https://codeforces.com/problemset/problem/2227/F |
-| 2227H | no_extractable_sample | https://codeforces.com/problemset/problem/2227/H |
-| 2228D | withheld_pending_rework | https://codeforces.com/problemset/problem/2228/D |
+| 2227D | rebuilt_tests | https://codeforces.com/problemset/problem/2227/D |
+| 2227E | rebuilt_tests | https://codeforces.com/problemset/problem/2227/E |
+| 2227F | rebuilt_tests | https://codeforces.com/problemset/problem/2227/F |
+| 2227H | rebuilt_tests | https://codeforces.com/problemset/problem/2227/H |
+| 2228D | rebuilt_tests | https://codeforces.com/problemset/problem/2228/D |
 
 ## 未导入题目
 

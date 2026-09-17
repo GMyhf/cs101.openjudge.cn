@@ -2,6 +2,32 @@
 
 ## 2026-09-17
 
+### 少于 20 组测试数据的题补到 20 组以上（第二步：Codeforces 17 道 + 登记做不到的 28 道）
+
+- **Codeforces 17 道从 0 组补到 21 组**：`insufficient_sample_cases` 的 894E、1000E；
+  `no_extractable_sample` 的 1970E2、1970E3、2167F、2194E、2218G、2227D、2227E、2227F、2227H
+  （页面其实有样例，状态是旧的）；`withheld_pending_rework` 的 986D、2171G、2192D、2195E、2205D、2228D。
+  每题一个 `tests/codeforces/<题号>_made/`：`samplecode.py`（2171G、2194E 为 `.cpp`）+ `producecase.py`
+  （`valid()` 输入契约、第 0 组断言官方样例 1、其余官方样例也在数据里、按错法设计形状、
+  构建时逐组跑独立暴力 oracle：每题 8–21 组被 oracle 完整覆盖，含成千上万个小测试的多测文件）。
+  catalog 改记 `rebuilt_tests`。
+- **证据**：17/17 参考解走真实 `judge()` 21/21 Accepted，最慢组占限额 26.6%（1000E）；
+  常量程序 `print(0)` 17/17 挂；独立于构建脚本，从镜像页解析的全部 21 组官方样例逐字出现在数据里；
+  17 份构建重跑数据逐字节不变。每题 3–6 种典型错解（32 位溢出、少取模、贪心、边界 off-by-one、
+  只读一组等）各挂 1–21 组，逐题记录在构建者的报告里。
+- **986D 顺带修掉一份错的参考解**：`986D_made/samplecode.py`（eae056e4 入库，当时没有数据）
+  对官方样例 `36` 输出 6，正确是 10；`n=1` 输出 0，正确是 1。已替换。
+- **规模上的让步（如实记下）**：为把单份输入控制在约 3MB，894E 的 m、1000E 的 n/m、2205D 的单组 n、
+  2228D 的 n、2195E 的总 n 没取到题面上界（分别约 1.15e5 / 2.2e5 / 4.4e5 / 2e5 / 9e4），
+  对最坏复杂度的施压弱于官方数据。大规模组只靠参考解，oracle 覆盖的是同一公式的小规模组。
+- **做不到的登记在 `collab/tests-below-20.json`**（28 道题 / 44 条 catalog 记录，逐条写原因并引题面原文）：
+  无输入或唯一输入 4、输入域小于 20 且已穷举 4、交互 6、多解需 special judge 14。
+  `tools/full_sweep.py` 新增第 12 条 `check_short_data_is_recorded`：少于 20 组又没登记的报，
+  登记了但已补够或组数对不上的也报；配 `ShortDataRegistryTests`。
+- 回归：新增 `test_codeforces_short_problems_rebuilt_to_21_cases_anchor_every_official_sample`；
+  `WITHHELD_CODEFORCES` 清空。`docs/codeforces-import.md`、管理员手册 §5 的数据统计同步更新。
+- **平台侧**：Codeforces 参考解没有在 codeforces.com 提交过，这一步留给 Codex。
+
 ### 少于 20 组测试数据的题补到 20 组以上（第一步：OpenJudge）
 
 - **平台原数据不足 20 组时不再整份顶替 `_made`**：T-030 起 `_GMyhf` 优先级最高且整份

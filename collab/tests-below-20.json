@@ -1,0 +1,275 @@
+{
+  "min_cases": 20,
+  "description": "每题至少 20 组测试数据。这里登记的是做不到的题及原因；tools/full_sweep.py 第 12 条（check_short_data_is_recorded）会拦下没登记的短数据和已经补够却没删的条目。OpenJudge 按全局题号登记，外部题库按「来源:题号」。",
+  "updated": "2026-09-17",
+  "entries": [
+    {
+      "key": "openjudge:12065",
+      "problems": [
+        "2025sp_routine/04140",
+        "practice/04140",
+        "routine/04140"
+      ],
+      "test_count": 1,
+      "category": "no_input",
+      "reason": "无输入、答案唯一（题面「输入 -」，输出方程的根精确到 9 位小数）：合法输入只有一个，1 组即穷举。constant_output_probe 早已按 exemption 记录。"
+    },
+    {
+      "key": "openjudge:2226",
+      "problems": [
+        "pctbook/E03225",
+        "practice/03225"
+      ],
+      "test_count": 1,
+      "category": "no_input",
+      "reason": "题面「输入 无」：按格式输出全部满足条件的整数组，合法输入只有一个，1 组即穷举。"
+    },
+    {
+      "key": "openjudge:1700",
+      "problems": [
+        "practice/02698"
+      ],
+      "test_count": 1,
+      "category": "no_input",
+      "reason": "题面「无输入」：输出全部八皇后解，合法输入只有一个，1 组即穷举。"
+    },
+    {
+      "key": "openjudge:1681",
+      "problems": [
+        "practice/02679"
+      ],
+      "test_count": 8,
+      "category": "small_input_domain",
+      "reason": "题面 1 < k < 10，合法输入只有 k=2..9 八个，8 组已穷举整个输入域（见 02679_made/producecase.py 顶部说明）。"
+    },
+    {
+      "key": "openjudge:3190",
+      "problems": [
+        "2024sp_routine/04077",
+        "practice/04077"
+      ],
+      "test_count": 15,
+      "category": "small_input_domain",
+      "reason": "题面 1≤n≤15，合法输入只有 15 个，15 组已穷举整个输入域（见 04077_made/producecase.py 顶部说明）。"
+    },
+    {
+      "key": "openjudge:22642",
+      "problems": [
+        "2024sp_routine/22642",
+        "practice/22642"
+      ],
+      "test_count": 10,
+      "category": "small_input_domain",
+      "reason": "题面 1 ≤ N ≤ 10，合法输入只有 10 个，10 组已穷举整个输入域。"
+    },
+    {
+      "key": "openjudge:26573",
+      "problems": [
+        "2024sp_routine/26573",
+        "dsapre/26573",
+        "practice/26573"
+      ],
+      "test_count": 9,
+      "category": "small_input_domain",
+      "reason": "输入只有一个 n，题面没给范围；输出长 3^n，n≥14 时超过本站 2MB 输出上限，可判的输入至多 n=0..13 共 14 个，凑不到 20。现有 n=0..8 共 9 组；n=9..13 题面无依据，未外推。"
+    },
+    {
+      "key": "openjudge:31033",
+      "problems": [
+        "practice/00000"
+      ],
+      "test_count": 0,
+      "category": "output_exceeds_judge_limit",
+      "reason": "输入固定为 3000000 行，正确输出约 20MB，超过判题器 RLIMIT_FSIZE=2MB；且合法输入只有一个。"
+    },
+    {
+      "key": "openjudge:29986",
+      "problems": [
+        "practice/29986"
+      ],
+      "test_count": 0,
+      "category": "interactive",
+      "reason": "交互题：依赖平台预设的 query() 交互库，本站 stdin/stdout 判题做不了。"
+    },
+    {
+      "key": "openjudge:428",
+      "problems": [
+        "2024sp_routine/01426",
+        "2025sp_routine/01426",
+        "dsapre/01426",
+        "practice/01426"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "题面「If there are multiple solutions for a given value of n, any one of them is acceptable.」本站 token 精确比对，需要 special judge。"
+    },
+    {
+      "key": "openjudge:731",
+      "problems": [
+        "practice/01729",
+        "routine/01729"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "题面「If several pairs of routes are possible, any one will do.」本站 token 精确比对，需要 special judge。"
+    },
+    {
+      "key": "openjudge:1795",
+      "problems": [
+        "practice/02793"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "题面「如果有多组答案，输出任意一组即可」，需要 special judge。"
+    },
+    {
+      "key": "openjudge:1983",
+      "problems": [
+        "practice/02982",
+        "routine/02982"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "Sudoku 题面允许输出任一合法填法，本站 token 精确比对，需要 special judge。"
+    },
+    {
+      "key": "openjudge:2152",
+      "problems": [
+        "2024sp_routine/03151",
+        "2025sp_routine/03151",
+        "25dsapre/03151",
+        "practice/03151"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "题面「If there are several sequences of minimal length, output any one of them.」本站 token 精确比对，需要 special judge。"
+    },
+    {
+      "key": "openjudge:27150",
+      "problems": [
+        "routine/27150",
+        "practice/27150"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "题面：可以时输出「移除某些数字的结果」，任一可被 8 整除的结果都对；T-030 复核证明原数据会把正确解判 WA。已在 index_tests.SPECIAL_JUDGE_GLOBAL_NUMBERS 屏蔽，需要 special judge。"
+    },
+    {
+      "key": "openjudge:30193",
+      "problems": [
+        "practice/30193"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "题面要求输出一条完整激活路径，可行路径不唯一；已在 index_tests.SPECIAL_JUDGE_GLOBAL_NUMBERS 屏蔽，需要 special judge。"
+    },
+    {
+      "key": "codeforces:37C",
+      "problems": [
+        "codeforces/37C"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "题面「If the answer is not unique, output any.」本站 token 精确比对会误判正确答案，需要 special judge。catalog data_status 为 multiple_output_requires_special_judge。"
+    },
+    {
+      "key": "codeforces:1793C",
+      "problems": [
+        "codeforces/1793C"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "题面「If there are several solutions, then output any of them.」本站 token 精确比对会误判正确答案，需要 special judge。catalog data_status 为 multiple_output_requires_special_judge。"
+    },
+    {
+      "key": "codeforces:2146D1",
+      "problems": [
+        "codeforces/2146D1"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "题面「If there are multiple answers, you may print any of them.」本站 token 精确比对会误判正确答案，需要 special judge。catalog data_status 为 multiple_output_requires_special_judge。"
+    },
+    {
+      "key": "codeforces:2171F",
+      "problems": [
+        "codeforces/2171F"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "题面「Additionally, if there exists such a tree, output any of them.」本站 token 精确比对会误判正确答案，需要 special judge。catalog data_status 为 multiple_output_requires_special_judge。"
+    },
+    {
+      "key": "codeforces:2195H",
+      "problems": [
+        "codeforces/2195H"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "题面「If there exist multiple largest such sets of triangles, you may output any of them.」本站 token 精确比对会误判正确答案，需要 special judge。catalog data_status 为 multiple_output_requires_special_judge。"
+    },
+    {
+      "key": "codeforces:2201G",
+      "problems": [
+        "codeforces/2201G"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "题面「If there are multiple solutions, print any of them.」本站 token 精确比对会误判正确答案，需要 special judge。catalog data_status 为 multiple_output_requires_special_judge。"
+    },
+    {
+      "key": "codeforces:2208D1",
+      "problems": [
+        "codeforces/2208D1"
+      ],
+      "test_count": 0,
+      "category": "multiple_answers",
+      "reason": "题面「If there are multiple solutions, print any of them.」本站 token 精确比对会误判正确答案，需要 special judge。catalog data_status 为 multiple_output_requires_special_judge。"
+    },
+    {
+      "key": "codeforces:2109C1",
+      "problems": [
+        "codeforces/2109C1"
+      ],
+      "test_count": 0,
+      "category": "interactive",
+      "reason": "题面「This is an interactive problem.」本站 stdin/stdout 判题没有交互器。catalog data_status 为 interactive_requires_judge。"
+    },
+    {
+      "key": "codeforces:2109C2",
+      "problems": [
+        "codeforces/2109C2"
+      ],
+      "test_count": 0,
+      "category": "interactive",
+      "reason": "题面「This is an interactive problem.」本站 stdin/stdout 判题没有交互器。catalog data_status 为 interactive_requires_judge。"
+    },
+    {
+      "key": "codeforces:2109C3",
+      "problems": [
+        "codeforces/2109C3"
+      ],
+      "test_count": 0,
+      "category": "interactive",
+      "reason": "题面「This is an interactive problem.」本站 stdin/stdout 判题没有交互器。catalog data_status 为 interactive_requires_judge。"
+    },
+    {
+      "key": "codeforces:2173E",
+      "problems": [
+        "codeforces/2173E"
+      ],
+      "test_count": 0,
+      "category": "interactive",
+      "reason": "题面「This is an interactive problem.」本站 stdin/stdout 判题没有交互器。catalog data_status 为 interactive_requires_judge。"
+    },
+    {
+      "key": "codeforces:2209C",
+      "problems": [
+        "codeforces/2209C"
+      ],
+      "test_count": 0,
+      "category": "interactive",
+      "reason": "题面「This is an interactive problem.」本站 stdin/stdout 判题没有交互器。catalog data_status 为 interactive_requires_judge。"
+    }
+  ]
+}

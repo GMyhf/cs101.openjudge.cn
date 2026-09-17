@@ -14,8 +14,9 @@ FLOAT_REBUILDS = {"2208C"}
 
 def cases_for(problem_id: str):
     root = MIRROR / "tests" / "codeforces" / f"{problem_id}_made"
-    required = (root / "samplecode.py", root / "producecase.py")
-    if not all(path.is_file() for path in required):
+    # 参考解可以是 Python 或 C++（2171G、2194E 的 Python 跑不进时限）
+    if not (root / "producecase.py").is_file() or not any(
+            (root / name).is_file() for name in ("samplecode.py", "samplecode.cpp")):
         raise ValueError(f"{problem_id}: missing single-problem source")
     data = root / "data"
     cases = []

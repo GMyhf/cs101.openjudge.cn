@@ -454,3 +454,43 @@ class SampleAnchorTests(unittest.TestCase):
                                     stored_in="9\n9 9 9\n")
         self.assertIn("已锚定 0 题", label)
         self.assertEqual(bad, [])
+
+
+class ShortDataRegistryTests(unittest.TestCase):
+    """少于 20 组的题必须登记原因；补够了的登记要删掉（2026-09-17）。"""
+
+    def run_check(self, problems, entries):
+        import tempfile, pathlib
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            (root / "collab").mkdir()
+            (root / "data/openjudge").mkdir(parents=True)
+            (root / "collab/tests-below-20.json").write_text(
+                json.dumps({"min_cases": 20, "entries": entries}), encoding="utf-8")
+            (root / "data/openjudge/catalog.json").write_text(
+                json.dumps({"problems": problems}), encoding="utf-8")
+            with mock.patch.object(full_sweep, "ROOT", root):
+                return full_sweep.check_short_data_is_recorded()[1]
+
+    def test_flags_unrecorded_short_data_and_stale_entries(self):
+        problems = [
+            {"book": "practice", "id": "00001", "global_number": 1, "test_count": 3},
+            {"book": "pctbook", "id": "M00001", "global_number": 1, "test_count": 3},
+            {"book": "practice", "id": "00002", "global_number": 2, "test_count": 21},
+            {"book": "codeforces", "id": "1A", "source": "codeforces", "test_count": 0},
+        ]
+        bad = self.run_check(problems, [])
+        self.assertEqual(len(bad), 2, bad)                      # 别名只算一次
+        self.assertTrue(any("openjudge:1" in line for line in bad))
+        self.assertTrue(any("codeforces:1A" in line for line in bad))
+
+        entries = [{"key": "openjudge:1", "test_count": 3, "reason": "域只有 3 个"},
+                   {"key": "codeforces:1A", "test_count": 0, "reason": "交互题"}]
+        self.assertEqual(self.run_check(problems, entries), [])
+
+        entries.append({"key": "openjudge:2", "test_count": 21, "reason": "过期"})
+        entries[0]["test_count"] = 2
+        bad = self.run_check(problems, entries)
+        self.assertEqual(len(bad), 2, bad)
+        self.assertTrue(any("该删了" in line for line in bad))
+        self.assertTrue(any("登记 2 组，实际 3 组" in line for line in bad))

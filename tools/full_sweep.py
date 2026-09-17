@@ -620,12 +620,53 @@ def check_sample_anchor():
     return f"第 0 组与题面样例输出的锚定（已锚定 {anchored} 题）", bad
 
 
+def check_short_data_is_recorded():
+    """12. 每题至少 20 组；做不到的必须记进 `collab/tests-below-20.json` 并写明原因。
+
+    2026-09-17 人要求「少于 20 组测试用例的题目增加到至少 20 组，实在没法增加的标记下来」。
+    当时 176 条 catalog 记录不足 20 组，其中 53 道是 `_GMyhf` 整份顶替 `_made` 顶掉的，
+    **没有任何闸门在看组数**。判据两头都查：没登记的短数据要报，登记了但已补够
+    （或组数与登记不符）的也要报 —— 否则登记表会悄悄变成过期的豁免清单。
+    OpenJudge 按全局题号登记（覆盖全部题库别名），外部题库按 `来源:题号`。
+    """
+    label = "少于 20 组测试数据却没有登记原因"
+    registry_path = ROOT / "collab" / "tests-below-20.json"
+    catalog_path = ROOT / "data" / "openjudge" / "catalog.json"
+    try:
+        registry = json.loads(registry_path.read_text(encoding="utf-8"))
+        catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        return label, [f"读不到登记表或 catalog：{error}"]
+    minimum = registry.get("min_cases", 20)
+    recorded = {row["key"]: row for row in registry.get("entries", [])}
+    actual = {}
+    for item in catalog.get("problems", []):
+        source = item.get("source", "openjudge")
+        key = (f"openjudge:{item['global_number']}" if source == "openjudge"
+               else f"{source}:{item['id']}")
+        actual.setdefault(key, (item.get("test_count", 0), f"{item['book']}/{item['id']}"))
+    bad = []
+    for key, (count, example) in sorted(actual.items()):
+        row = recorded.get(key)
+        if count < minimum and row is None:
+            bad.append(f"{key}（{example}）只有 {count} 组，没登记原因")
+        elif row is not None and count >= minimum:
+            bad.append(f"{key}（{example}）已有 {count} 组，登记表里的条目该删了")
+        elif row is not None and row.get("test_count") != count:
+            bad.append(f"{key}（{example}）登记 {row.get('test_count')} 组，实际 {count} 组")
+        if row is not None and not str(row.get("reason", "")).strip():
+            bad.append(f"{key}：登记了但没写原因")
+    bad += [f"{key}：登记表里有，catalog 里没有" for key in sorted(recorded.keys() - actual.keys())]
+    return label, bad
+
+
 CHECKS = (check_reported_failures, check_degenerate_constraints,
           check_output_size, check_repeating_decimals, check_annotated_sample_outputs,
           check_sample_anchor,
           check_merged_judge, check_multi_answer_problems,
           check_archive_oracle_is_auditable, check_priority_gaps_are_recorded,
-          check_self_audit_numbers_are_measured, check_input_domain_is_anchored)
+          check_self_audit_numbers_are_measured, check_input_domain_is_anchored,
+          check_short_data_is_recorded)
 
 
 def main():

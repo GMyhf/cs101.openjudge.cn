@@ -58,9 +58,13 @@ def request(port, method, path, body=None, cookie=None, extra_headers=None):
 # 复核撤下、等返工的 Codeforces 题：903C/2140B 是数据或 checker 造错（2026-09-10 Codex 止血），
 # 其余 17 道是判别力为零 —— 21 组期望输出完全相同，或整题只有 1 组样例数据，
 # 一个不读输入、只 print 常量的程序就能拿 Accepted。集合本身也是判据：谁加谁减都要动这里。
-WITHHELD_CODEFORCES = {
-    "986D", "2171G", "2192D", "2195E", "2205D", "2228D",
-}
+# 2026-09-17 最后六道也按单题流水线重建接回，撤下集合清空；以后再撤题要同步写进这里。
+WITHHELD_CODEFORCES = set()
+# 同日按单题流水线（samplecode + producecase + valid + 暴力 oracle）补到 21 组的 17 道。
+REBUILT_2026_09_17_CODEFORCES = (
+    "894E", "1000E", "986D", "1970E2", "1970E3", "2167F", "2171G", "2192D", "2194E",
+    "2195E", "2205D", "2218G", "2227D", "2227E", "2227F", "2227H", "2228D",
+)
 
 
 class ServerApiTests(unittest.TestCase):
@@ -579,7 +583,8 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         rebuilt = [item for item in entries if item.get("data_status") == "rebuilt_tests"]
         self.assertEqual({item["id"] for item in rebuilt},
                          {"270A", "456A", "698A", "903C", "1374B", "1374C", "1475A", "1742A", "1764C", "1829D", "1883D", "1970E1", "2140B", "2208C", "2227B",
-                          "116A", "546A", "617A", "734A", "791A", "977A"})
+                          "116A", "546A", "617A", "734A", "791A", "977A",
+                          *REBUILT_2026_09_17_CODEFORCES})
         self.assertTrue(all(item["test_count"] == 21 for item in rebuilt))
         self.assertEqual(sum(item["test_count"] for item in entries if item["id"] != "4A"),
                          sum(item["test_count"] for item in sampled)
@@ -594,6 +599,31 @@ print((n + a - 1) // a * ((m + a - 1) // a))
 print(n // a * (m // a))
 """)
         self.assertEqual(mutant["status"], "Wrong Answer", mutant)
+
+    def test_codeforces_short_problems_rebuilt_to_21_cases_anchor_every_official_sample(self):
+        """原先 0 组（样例不足 20 组 / 缺样例 / 撤下待返工）的 17 道，补到 21 组。
+
+        钉住：catalog 引用 21 组 `_made` 数据；页面上**每一组**官方样例都原样出现在数据里、
+        第 0 组就是样例 1；常量程序挂。986D 另钉旧参考解的错：样例 `36` 旧解输出 6，正确是 10。
+        """
+        import server
+        handler = server.Handler.__new__(server.Handler)
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        entries = {item["id"]: item for item in catalog["problems"] if item.get("source") == "codeforces"}
+        for problem_id in REBUILT_2026_09_17_CODEFORCES:
+            item = entries[problem_id]
+            self.assertEqual((item["data_status"], item["test_count"]), ("rebuilt_tests", 21), problem_id)
+            data = ROOT / f"data/openjudge/tests/codeforces/{problem_id}_made/data"
+            pairs = [((data / f"{i}.in").read_text(encoding="utf-8").split(),
+                      (data / f"{i}.out").read_text(encoding="utf-8").split()) for i in range(21)]
+            samples = handler.sample_io(ROOT / f"data/openjudge/pages/codeforces__{problem_id}.html")["cases"]
+            self.assertTrue(samples, problem_id)
+            self.assertEqual(pairs[0], (samples[0]["input"].split(), samples[0]["output"].split()), problem_id)
+            for sample in samples:
+                self.assertIn((sample["input"].split(), sample["output"].split()), pairs, problem_id)
+            self.assertEqual("Wrong Answer", judge("codeforces", problem_id, "python", "print(0)\n")["status"])
+        self.assertEqual((data.parent.parent / "986D_made/data/0.in").read_text(encoding="utf-8").split(), ["36"])
+        self.assertEqual((data.parent.parent / "986D_made/data/0.out").read_text(encoding="utf-8").split(), ["10"])
 
     def test_codeforces_rebuilt_problems_discriminate(self):
         """698A / 1374C 走单题流水线重建后必须真判得动。
