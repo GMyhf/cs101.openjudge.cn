@@ -8,6 +8,10 @@
 - 修复 `scripts/audit_gmyhf_data.py` 遇到没有全局题号的 Codeforces 条目就崩溃的问题；重新生成 `collab/gmyhf-data-audit.json` 与 `collab/gmyhf-localjudge.json`，30193 改记为特判题。
 - 27150 已有 checker 接回判题，复核确认它接受所有合法答案、拒绝非法答案；T-030 状态改为 Done。
 
+### 收口 T-038 Codeforces 数据返工
+
+- 根据现有提交与专项回归，将 `collab/PLAN.md` 中 T-038 从 `In progress` 更正为 `Done`：17 道短题已按单题流水线补齐，特判/交互题已接回，`withheld_pending_rework` 为空；结构性少于 20 组的题目均登记了题面约束豁免。
+
 ### 收口 T-028 状态
 
 - 根据 phase 2 的 208/208 全量复核记录，将 `collab/PLAN.md` 中 T-028 从 `In progress` 更正为 `Done`；发布闸门和 special judge 仍按独立事项记录。
