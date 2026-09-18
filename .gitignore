@@ -5,7 +5,8 @@ data/*.db
 data/*.db-wal
 data/*.db-shm
 data/.admin_password
-data/.smtp.env
+# 连带 .smtp.env.bak-YYYYMMDD 这类手工备份：里面同样是 SMTP 口令，不能等着被 `git add -A` 收走。
+data/.smtp.env*
 # 抓取的第三方测试数据不入库；自产 *_made 与 GMyhf 自有 *_GMyhf 数据必须入库
 data/openjudge/tests/**
 !data/openjudge/tests/*/
