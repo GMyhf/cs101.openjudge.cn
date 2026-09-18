@@ -191,7 +191,9 @@ def audit(materialize=False, replace_materialized=False):
     ownership = json.loads(OWNERSHIP.read_text(encoding="utf-8"))
     editable = {int(row["global_number"]): row for row in ownership["entries"]}
     catalog = json.loads((OPENJUDGE / "catalog.json").read_text(encoding="utf-8"))
-    catalog_numbers = {int(row["global_number"]) for row in catalog["problems"]}
+    # Codeforces 导入题没有全局题号，也不可能是 GMyhf 的题，跳过。
+    catalog_numbers = {int(row["global_number"]) for row in catalog["problems"]
+                       if "global_number" in row}
     made = made_directories()
     evidence = validation_evidence()
     rows = []
@@ -221,7 +223,7 @@ def audit(materialize=False, replace_materialized=False):
                 "title": editable[number]["title"],
                 "status": status,
                 "made_dir": str(made_dir.relative_to(ROOT)),
-                "reason": "multiple valid outputs require a special judge; exact token data disabled",
+                "reason": "multiple valid outputs; original data not materialized, judged via _made + checker.py",
             })
             continue
         proof = evidence.get(number)
@@ -375,7 +377,8 @@ def verify_active():
     for index, row in enumerate((entry for entry in audit_payload["entries"]
                                  if entry.get("materialized_dir")), 1):
         number = int(row["global_number"])
-        aliases = [entry for entry in catalog if int(entry["global_number"]) == number]
+        aliases = [entry for entry in catalog
+                   if "global_number" in entry and int(entry["global_number"]) == number]
         problem = next((entry for entry in aliases if entry["book"] == "practice"), aliases[0])
         made_dir = ROOT / row["made_dir"]
         sources = (("python3", made_dir / "samplecode.py"),

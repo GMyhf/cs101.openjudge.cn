@@ -2,6 +2,12 @@
 
 ## 2026-09-18
 
+### T-030 销账复核：GMyhf 自有数据回收关闭
+
+- 按当前仓库重核 158 个 `_GMyhf` 目录 / 3290 组：校验和、原文件逐字节一致、catalog 引用、重建索引不变、全库横扫均通过；用当前判题器重判 158/158 Accepted，逐组最慢 35% 时限。
+- 修复 `scripts/audit_gmyhf_data.py` 遇到没有全局题号的 Codeforces 条目就崩溃的问题；重新生成 `collab/gmyhf-data-audit.json` 与 `collab/gmyhf-localjudge.json`，30193 改记为特判题。
+- 27150 已有 checker 接回判题，复核确认它接受所有合法答案、拒绝非法答案；T-030 状态改为 Done。
+
 ### 收口 T-028 状态
 
 - 根据 phase 2 的 208/208 全量复核记录，将 `collab/PLAN.md` 中 T-028 从 `In progress` 更正为 `Done`；发布闸门和 special judge 仍按独立事项记录。

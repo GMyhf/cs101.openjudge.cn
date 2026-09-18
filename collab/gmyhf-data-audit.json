@@ -1,13 +1,13 @@
 {
   "policy": "editable admin problem; copy only archive_cross_check-covered pairs; require local output/runtime margin and exact-judge-safe outputs",
   "ownership_source": "collab/gmyhf-editable-problems.json",
-  "audited_at": "2026-07-30T12:32:55.276249+00:00",
+  "audited_at": "2026-09-18T07:47:11.963663+00:00",
   "totals": {
     "eligible": 156,
     "partial_eligible": 2,
-    "requires_special_judge": 1,
+    "requires_special_judge": 2,
     "original_problem": 13,
-    "unverified": 139,
+    "unverified": 138,
     "without_made": 1,
     "materialized": 158,
     "cases": 3290,
@@ -1623,7 +1623,7 @@
       "title": "Divisibility by Eight 加强版",
       "status": "requires_special_judge",
       "made_dir": "data/openjudge/tests/20000-29982/27150_made",
-      "reason": "multiple valid outputs require a special judge; exact token data disabled"
+      "reason": "multiple valid outputs; original data not materialized, judged via _made + checker.py"
     },
     {
       "global_number": 27205,
@@ -3203,8 +3203,9 @@
     {
       "global_number": 30193,
       "title": "哈密顿激活层",
-      "status": "unverified",
-      "made_dir": "data/openjudge/tests/30000-/30193_made"
+      "status": "requires_special_judge",
+      "made_dir": "data/openjudge/tests/30000-/30193_made",
+      "reason": "multiple valid outputs; original data not materialized, judged via _made + checker.py"
     },
     {
       "global_number": 30201,
