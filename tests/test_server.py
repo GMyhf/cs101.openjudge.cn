@@ -636,6 +636,25 @@ print(n // a * (m // a))
         self.assertEqual((data.parent.parent / "986D_made/data/0.in").read_text(encoding="utf-8").split(), ["36"])
         self.assertEqual((data.parent.parent / "986D_made/data/0.out").read_text(encoding="utf-8").split(), ["10"])
 
+    def test_codeforces_427a_generated_outputs_match_police_simulation(self):
+        """427A 的每组答案必须与逐事件模拟一致，防止答案文件单独漂移。"""
+        data = ROOT / "data/openjudge/tests/codeforces/427A_made/data"
+        for index in range(21):
+            values = list(map(int, (data / f"{index}.in").read_text(encoding="utf-8").split()))
+            count, events = values[0], values[1:]
+            self.assertEqual(len(events), count, index)
+            officers = missing = 0
+            for event in events:
+                if event < 0:
+                    if officers:
+                        officers -= 1
+                    else:
+                        missing += 1
+                else:
+                    officers += event
+            expected = (data / f"{index}.out").read_text(encoding="utf-8").split()
+            self.assertEqual(expected, [str(missing)], index)
+
     def test_codeforces_rebuilt_problems_discriminate(self):
         """698A / 1374C 走单题流水线重建后必须真判得动。
 
