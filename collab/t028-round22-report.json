@@ -1046,11 +1046,12 @@
       "constraint": "1..49 four-character lowercase equality or inequality relations follow the declared count",
       "constraint_counterexample": "1\na=b",
       "input_domain": {
-        "statement_quote": "第一行：正整数 n<50, 代表输入的字符串数量。",
+        "statement_quote": "第一行：正整数 n <= 500, 代表输入的字符串数量。",
         "generated_extremes": {
           "max_int": 47,
           "min_int": 2
-        }
+        },
+        "statement_quote_updated_2026_09_20": "原站把题面从「正整数 n<50」改成「正整数 n <= 500」，镜像页已按 `crawl_openjudge.py --problem practice/28276` 重抓；引文跟着改，生成极值（max_int 47）未变 —— 这道题当前在判的是 `_GMyhf` 平台原数据（n 取到 402..495），旧题面下越界、新题面下合规。"
       },
       "self_audit": {
         "distinct_cases": {

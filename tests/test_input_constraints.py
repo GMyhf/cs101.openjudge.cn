@@ -465,6 +465,25 @@ def check_30192(text):
     return None
 
 
+def check_28276(text):
+    """题面 2026-09-20 由原站改为「正整数 n <= 500」（此前写的是 n<50）。
+
+    这题用的是平台原数据（`_GMyhf`），n 取到 402..495 —— 旧题面下越界，新题面下合规。
+    留这条用例是为了把「数据合规」钉在题面上，而不是钉在「它是平台数据所以不管」。
+    """
+    values = text.split()
+    n = int(values[0])
+    if not 1 <= n <= 500:
+        return f"n={n} 越出题面 n <= 500"
+    rows = values[1:]
+    if len(rows) != n:
+        return f"{len(rows)} 个字符串，n={n}"
+    bad = [row for row in rows if not re.fullmatch(r"[a-z](==|!=)[a-z]", row)]
+    if bad:
+        return f"{bad[0]!r} 不是题面说的 xi==yi / xi!=yi（长度 4、小写字母）"
+    return None
+
+
 def check_04101(text):
     lines = [line for line in text.splitlines() if line != ""]
     k = int(lines[0])
@@ -528,6 +547,7 @@ VALIDATORS = {
     ("practice", "30085"): check_30085,
     ("practice", "30192"): check_30192,
     ("pctbook", "M05585"): check_04101,
+    ("practice", "28276"): check_28276,
 }
 
 

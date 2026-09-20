@@ -767,9 +767,24 @@ def case_313b(r):
     return text+"\n"+str(len(queries))+"\n"+"".join(f"{a} {b}\n" for a,b in queries),"\n".join(answer)+"\n"
 
 def case_1749c(r):
-    size=r.randint(1,100); values=[r.randint(1,size) for _ in range(size)]; answer=0   # 题面：1<=a_i<=n
-    for value in sorted(values):
-        if value>answer:answer+=1
+    # 题面：Alice 选 k，第 i 阶段必须删掉一个 <= k-i+1 的数，之后 Bob 把 k-i+1 加到任意
+    # 一个数上；求 Alice 能赢的最大 k。最优对抗下 Alice 删「<= 当前上限里最大的那个」，
+    # Bob 把增量加到最小的那个（把它顶出可用范围）。
+    # 2026-09-20 之前这里写的是一个不相干的贪心（排序后 value>answer 就加一），
+    # 21 组里 20 组的期望输出是错的 —— 官方样例 `4 4 4 4` 应为 0，旧写法给 4。
+    import bisect
+    size=r.randint(1,100); values=[r.randint(1,size) for _ in range(size)]   # 题面：1<=a_i<=n
+    def wins(k):
+        current=sorted(values)
+        for limit in range(k,0,-1):
+            index=bisect.bisect_right(current,limit)-1
+            if index<0:return False
+            current.pop(index)
+            if current:
+                current[0]+=limit
+                current.sort()
+        return True
+    answer=next((k for k in range(len(values),-1,-1) if wins(k)),0)
     return f"1\n{len(values)}\n{' '.join(map(str,values))}\n",f"{answer}\n"
 
 def case_2184f(r):
@@ -777,12 +792,15 @@ def case_2184f(r):
     for node in range(1,nodes):edges.append((r.randrange(node),node))
     children=[[] for _ in range(nodes)]
     for a,b in edges:children[a].append(b)
-    subtree=[]
+    # `subtree` 必须按**结点号**索引。2026-09-20 之前这里是 `subtree.append(...)`，
+    # 装的是后序完成顺序，再用 `subtree[node]` 去取 —— 200 个种子里 163 个对不上号。
+    # 当前 21 组的答案经独立 oracle 复核恰好没被这个 bug 改写，但重跑一次就不保证了。
+    subtree=[None]*nodes
     def visit(node):
         found=[]
         if not children[node]:found=[node]
         for child in children[node]:found+=visit(child)
-        subtree.append(set(found)); return found
+        subtree[node]=set(found); return found
     leaf_set=set(visit(0))
     answer=False
     for mask in range(1<<nodes):
