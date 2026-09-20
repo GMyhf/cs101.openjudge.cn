@@ -9,6 +9,14 @@
 页面却没有 `contestId` 提交表单。因此本轮没有伪造 Accepted，详细路由证据见
 `collab/1374C-2227B-2140B-platform.json`，待部署后重试。
 
+— **Claude 复核（同日）**：平台侧结论采信（登录提交这层由 Codex 负责），另外把「404 到底是
+路由不存在还是没发版」定死了：`server.py:1565` 的 submit 路由本来就收 `codeforces`，
+它 200 的前提是 `data/openjudge/pages/codeforces__<id>.html` 存在，而 1374C/2227B/2140B
+三份页面自 `b3cce8d8`（2026-09-12）起就在仓里。**所以线上 404 = 线上代码/数据停在 9-12 之前，
+不是路由或题号写错**，与本轮改动无关，`tools/release.sh` 跑完即可重试。本机复跑回归：
+`tests/test_judging_contracts.py` 5 项、`tests/test_expected_outputs.py` 4 项全绿
+（报告里的「6 项」对不上任一模块的实际条数，按模块名记数更好追）。
+
 ## 2026-09-20
 
 ### 2218F 平台侧复验待部署
