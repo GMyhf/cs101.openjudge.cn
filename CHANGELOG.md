@@ -2,6 +2,13 @@
 
 ## 2026-09-20
 
+### 2218F 平台侧复验待部署
+
+2218F 的新数据用独立参考程序经 `verify_2218f` **21/21 组通过**。尝试登录平台提交时，
+线上 `/codeforces/2218F/submit/` 返回 404；备用 `/practice/2218F/submit/` 虽返回页面，
+但缺少本地提交表单的 `contestId`。这表明当前线上服务尚未部署该 Codeforces 题，
+因此没有伪造平台 Accepted；详细路由证据记录在 `collab/2218F-platform.json`，部署后应重试。
+
 ### 给 113 道 Codeforces 题补独立 oracle，抓出 12 道数据是错的
 
 `data_status = generated_tests` 的题由 `scripts/build_codeforces_basic_data.py` 里同一段代码
