@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## 2026-09-21
+
+### 1374C / 2227B / 2140B 平台复验待部署
+
+按要求使用各题 `samplecode.py` 尝试真实平台复验。登录成功，但三题的
+`/codeforces/<id>/submit/` 均返回 404；备用 `/practice/<id>/submit/` 虽返回 200，
+页面却没有 `contestId` 提交表单。因此本轮没有伪造 Accepted，详细路由证据见
+`collab/1374C-2227B-2140B-platform.json`，待部署后重试。
+
 ## 2026-09-20
 
 ### 2218F 平台侧复验待部署
