@@ -6,15 +6,31 @@
   "local_verification": {
     "cases": 21,
     "verdict": "Accepted",
-    "checker": "tests/cf_oracles.py:verify_2218f"
+    "checker": "tests/cf_oracles.py:verify_2218f",
+    "reference": "tests/test_judging_contracts.py:TWIST_2218F",
+    "note": "参考程序原先只存在 /tmp/2218f_ref.py，记录无法复现；已把同一份程序落进仓库的回归用例里。"
   },
   "platform": {
     "status": "blocked_not_deployed",
     "base_url": "http://cs101.openjudge.cn",
     "attempted_routes": [
-      {"path": "/codeforces/2218F/submit/", "http_status": 404},
-      {"path": "/practice/2218F/submit/", "http_status": 200, "contest_id": "missing"}
+      {
+        "path": "/codeforces/2218F/submit/",
+        "http_status": 404
+      },
+      {
+        "path": "/practice/2218F/submit/",
+        "http_status": 200,
+        "contest_id": "missing"
+      }
     ],
     "note": "The live service does not expose the locally mirrored Codeforces problem yet; no platform solution ID or verdict was produced. Retry after deployment."
+  },
+  "claude_recheck_2026_09_20": {
+    "judge": "Accepted（真实 judge()，codeforces/2218F，21 组）",
+    "discrimination": "去掉题面那条「t==2 时 x 加一」的同一份程序：Wrong Answer（第 2 组） —— 说明数据真的在判这条规则，不是碰巧都过",
+    "casing": "把 YES/NO 改成官方样例的 Yes/No：Accepted（case_insensitive_tokens 生效）",
+    "pinned_by": "tests/test_judging_contracts.py",
+    "platform_next_step": "平台侧路由 404 与本轮改动无关：新数据还没发版。按惯例要有人/Codex 在 rocky 上跑 tools/release.sh，之后再重试提交。"
   }
 }

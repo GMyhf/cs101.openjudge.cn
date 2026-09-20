@@ -9,6 +9,18 @@
 但缺少本地提交表单的 `contestId`。这表明当前线上服务尚未部署该 Codeforces 题，
 因此没有伪造平台 Accepted；详细路由证据记录在 `collab/2218F-platform.json`，部署后应重试。
 
+— **Claude 复核（同日）**：本地结论采信并补齐两件事。①真实 `judge()` 复跑：照题面（含
+「t==2 时 x 加一」）的程序 Accepted，**去掉那条规则的同一份程序 Wrong Answer 挂第 2 组** ——
+数据确实在判这条规则；把 YES/NO 换成官方样例的 `Yes/No` 同样 Accepted。②参考程序原先只在
+`/tmp/2218f_ref.py`，记录不可复现，已连同 1154A「任意顺序」、2171D「任意大小写」一起落成
+回归用例 `tests/test_judging_contracts.py`（每条都配一份**会挂**的对照程序，口径放宽之后
+判据仍要挡得住错答案）。③平台 404 与本轮改动无关：新数据还没发版，要先在 rocky 跑
+`tools/release.sh`。④「全量测试被 t001/BADCHECK 的 checker 环境错误中止」这条**没能复现**：
+那行 `judge error: t001/BADCHECK case 1: checker 退出码 3` 是
+`test_broken_checker_is_a_judge_error_not_a_wrong_answer` 这个**通过的用例**故意打的日志
+（它装了一个坏 checker，断言判题器报 Judge Error）；本机 `python3 -m unittest discover -s tests`
+跑完 340 项全绿。
+
 ### 给 113 道 Codeforces 题补独立 oracle，抓出 12 道数据是错的
 
 `data_status = generated_tests` 的题由 `scripts/build_codeforces_basic_data.py` 里同一段代码
