@@ -319,6 +319,31 @@ def verify_1352a(text, answer):
 
 VERIFIERS = {"550C": verify_550c, "1352A": verify_1352a}
 
+# 2026-09-20 起，逐题补的 oracle 放在 `tests/cf_oracles.py`（这个文件会长到上百道题，
+# 判据本身留在这里，题解搬过去）。两边的注册表在这里合并，检查方式完全一样。
+try:
+    from cf_oracles import ORACLES as _MORE_ORACLES, VERIFIERS as _MORE_VERIFIERS
+except ImportError:                                            # 直接 `python3 tests/...`
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    from cf_oracles import ORACLES as _MORE_ORACLES, VERIFIERS as _MORE_VERIFIERS
+ORACLES.update(_MORE_ORACLES)
+VERIFIERS.update(_MORE_VERIFIERS)
+
+
+def case_insensitive_problems():
+    """catalog 里标了 `case_insensitive_tokens` 的题：判题就是大小写不敏感的，
+    这里的比对要用同一口径，否则 `Yes`/`YES` 会被当成不一致。"""
+    catalog = json.loads((MIRROR / "catalog.json").read_text(encoding="utf-8"))
+    return {item["id"] for item in catalog["problems"]
+            if item.get("book") == "codeforces"
+            and item.get("comparison") == "case_insensitive_tokens"}
+
+
+def normalize(text, problem_id, loose):
+    tokens = text.split()
+    return [token.lower() for token in tokens] if problem_id in loose else tokens
+
 
 def samples(problem_id):
     data = json.loads((STATEMENTS / f"{problem_id}.json").read_text(encoding="utf-8"))
@@ -335,12 +360,14 @@ def data_cases(problem_id):
 class OracleTests(unittest.TestCase):
     def test_oracles_reproduce_the_official_samples(self):
         """先证明 oracle 自己是对的 —— 官方样例是这里唯一的仓外事实。"""
+        loose = case_insensitive_problems()
         for problem_id, oracle in ORACLES.items():
             rows = samples(problem_id)
             self.assertTrue(rows, f"{problem_id} 镜像题面里没有官方样例")
             for index, row in enumerate(rows):
                 got = oracle(row["input"])
-                self.assertEqual(got.split(), row["output"].split(),
+                self.assertEqual(normalize(got, problem_id, loose),
+                                 normalize(row["output"], problem_id, loose),
                                  f"{problem_id} 官方样例 {index} 对不上")
 
     def test_verifiers_accept_the_official_samples(self):
@@ -351,11 +378,39 @@ class OracleTests(unittest.TestCase):
                 self.assertIsNone(verify(row["input"], row["output"]),
                                   f"{problem_id} 官方样例 {index} 被判据拒了")
 
+    def test_every_generated_problem_has_an_oracle_or_a_written_reason(self):
+        """覆盖率本身是判据：`generated_tests` 的题答案只有生成器一家之言。
+
+        2026-09-20 给这 113 道题逐题补了独立 oracle，当场抓到 11 道答案或输入是错的。
+        新加的题如果走中央生成器，就必须在 `tests/cf_oracles.py` 里配一份 oracle，
+        或者把「为什么不用核」写进 `UNCOVERED` —— 一个缺陷被接受和被忽略，
+        从代码上看一模一样，区别只在有没有写下来。
+        """
+        from cf_oracles import UNCOVERED
+        covered = set(ORACLES) | set(VERIFIERS)
+        missing = []
+        for item in self.rows_by_book("codeforces"):
+            if item.get("data_status") != "generated_tests":
+                continue
+            problem_id = item["id"]
+            if problem_id in covered or problem_id in UNCOVERED:
+                continue
+            missing.append(problem_id)
+        self.assertEqual(missing, [], f"这些题没有独立 oracle，也没写明理由：{missing}")
+        for problem_id, reason in UNCOVERED.items():
+            self.assertTrue(reason.strip(), f"{problem_id} 的豁免理由不能是空的")
+
+    def rows_by_book(self, book):
+        catalog = json.loads((MIRROR / "catalog.json").read_text(encoding="utf-8"))
+        return [item for item in catalog["problems"] if item.get("book") == book]
+
     def test_expected_outputs_match_an_independent_oracle(self):
         failures = []
+        loose = case_insensitive_problems()
         for problem_id, oracle in ORACLES.items():
             for name, text, expected in data_cases(problem_id):
-                if oracle(text).split() != expected.split():
+                if (normalize(oracle(text), problem_id, loose)
+                        != normalize(expected, problem_id, loose)):
                     failures.append(f"{problem_id}/{name}: oracle 与 .out 不一致")
         for problem_id, verify in VERIFIERS.items():
             for name, text, expected in data_cases(problem_id):

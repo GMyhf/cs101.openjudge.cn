@@ -249,12 +249,14 @@ def case_545d(r):
     return str(len(times)) + "\n" + " ".join(map(str, times)) + "\n", f"{count}\n"
 
 def case_1154a(r):
-    values = [r.randint(1, 100) for _ in range(3)]
-    values.append(sum(values))
-    r.shuffle(values)
-    maximum = max(values)
-    answer = sorted(maximum - value for value in values if value != maximum)
-    return " ".join(map(str, values)) + "\n", " ".join(map(str, answer)) + "\n"
+    # 题面：黑板上是 a+b、a+c、b+c 与 a+b+c 四个数。2026-09-20 之前这里写的是
+    # 「三个随机数 + 它们的和」——那不是两两之和，21 组输入全都不满足题面的
+    # 「保证答案存在」，期望输出也跟着错（实测 `69 12 99 180` 根本解不出来）。
+    # 答案顺序任意，所以这题配 `pairwise_sum_triple` 特判，不做 token 精确比对。
+    a, b, c = (r.randint(1, 10 ** 8) for _ in range(3))
+    board = [a + b, a + c, b + c, a + b + c]
+    r.shuffle(board)
+    return " ".join(map(str, board)) + "\n", f"{a} {b} {c}\n"
 
 def case_1221a(r):
     values = [2 ** r.randint(0, 12) for _ in range(r.randint(1, 30))]
@@ -310,7 +312,13 @@ def case_158b(r):
     return str(len(groups)) + "\n" + " ".join(map(str, groups)) + "\n", f"{taxis}\n"
 
 def case_189a(r):
-    n, a, b, c = r.randint(1, 4000), r.randint(1, 100), r.randint(1, 100), r.randint(1, 100)
+    # 题面保证「至少存在一种合法切法」。2026-09-20 之前 n 是纯随机的，21 组里有 6 组无解，
+    # 期望输出直接写成了 dp 的哨兵值 -999999996 —— 那既违反题面保证，答案也不是数。
+    # 现在 n 由若干段拼出来，合法切法必然存在。
+    a, b, c = r.randint(1, 100), r.randint(1, 100), r.randint(1, 100)
+    n = 0
+    while n == 0 or n > 4000:
+        n = sum(r.choice((a, b, c)) for _ in range(r.randint(1, 60)))
     dp = [-10**9] * (n + 1); dp[0] = 0
     for length in range(1, n + 1):
         dp[length] = max((dp[length - cut] + 1 for cut in (a, b, c) if length >= cut), default=-10**9)
@@ -324,7 +332,11 @@ def case_368b(r):
             + "\n".join(map(str, queries)) + "\n"), "\n".join(answer) + "\n"
 
 def case_431c(r):
-    n, k, d = r.randint(1, 100), r.randint(1, 100), r.randint(1, 100)
+    # 题面：1<=n,k<=100，**1<=d<=k**。2026-09-20 之前 d 是独立随机的，21 组里 10 组 d>k；
+    # 那些组的期望输出也跟着错（生成器把 small 的步长截到 min(k,d-1)，而按题面 d<=k 时
+    # 这个 min 不该出现），独立 oracle 在其中 7 组上对不上。
+    n, k = r.randint(1, 100), r.randint(1, 100)
+    d = r.randint(1, k)
     mod = 1_000_000_007
     small = [0] * (n + 1); total = [0] * (n + 1); small[0] = total[0] = 1
     for value in range(1, n + 1):
@@ -468,8 +480,24 @@ def case_1881c(r):
     return f"1\n{n}\n" + "".join("".join(row) + "\n" for row in grid), f"{answer}\n"
 
 def case_1425a(r):
-    n, m = r.randint(1, 10**6), r.randint(1, 10**6)
-    return f"1\n{n} {m}\n", f"{(n - 1) * (m - 1)}\n"
+    # 2026-09-20 之前这里生成的**根本不是这道题**：每组写两个数、答案是 (n-1)*(m-1)，
+    # 而 1425A 的输入是 T 行、每行一个 N，答案是先手在最优对抗下拿到的金币数。
+    # 最优策略（与 n<=2*10^5 的精确 DP 逐个核过）：n 为偶数且（n/2 为奇数，或 n 是 2、4）
+    # 时取一半，否则取一枚。
+    count = r.randint(1, 5)
+    numbers = [r.randint(1, 10 ** 18) for _ in range(count)]
+    answers = []
+    for coins in numbers:
+        mine, turn = 0, 0
+        while coins:
+            take = coins // 2 if (coins % 2 == 0 and ((coins // 2) % 2 == 1 or coins in (2, 4))) else 1
+            if turn == 0:
+                mine += take
+            coins -= take
+            turn ^= 1
+        answers.append(mine)
+    return (f"{count}\n" + "".join(f"{value}\n" for value in numbers),
+            "".join(f"{value}\n" for value in answers))
 
 def case_1526c1(r):
     import heapq
@@ -483,7 +511,11 @@ def case_1526c1(r):
 def case_1879b(r):
     first = [r.randint(1, 1000) for _ in range(r.randint(1, 100))]
     second = [r.randint(1, 1000) for _ in first]
-    answer = len(first) * (min(first) + min(second))
+    # 题面：覆盖整块棋盘要么占满一行、要么占满一列 —— 代价是
+    # min(min(a)*n + sum(b), min(b)*n + sum(a))。2026-09-20 之前写的是
+    # n*(min(a)+min(b))，官方样例第一组（答案 10）就给成了 9。
+    answer = min(min(first) * len(first) + sum(second),
+                 min(second) * len(second) + sum(first))
     return f"1\n{len(first)}\n{' '.join(map(str, first))}\n{' '.join(map(str, second))}\n", f"{answer}\n"
 
 def case_1b(r):
@@ -558,17 +590,23 @@ def case_1443c(r):
 
 def case_2033d(r):
     values = [r.randint(-20, 20) for _ in range(r.randint(1, 200))]
+    # 切掉一段之后要**从零重新累计**。2026-09-20 之前这里写的是 `running = value`，
+    # 等于把刚闭合那一段的最后一个元素又算进下一段，21 组里 9 组答案偏大
+    # （0.in 精确 DP 是 13，旧写法给 14）。
     prefixes, running, answer = {0}, 0, 0
     for value in values:
         running += value
         if running in prefixes:
-            answer += 1; prefixes = {0}; running = value
-        prefixes.add(running)
+            answer += 1; prefixes = {0}; running = 0
+        else:
+            prefixes.add(running)
     return f"1\n{len(values)}\n{' '.join(map(str,values))}\n", f"{answer}\n"
 
 def case_508a(r):
     rows, cols, moves = r.randint(1, 20), r.randint(1, 20), r.randint(1, 100)
-    plan = [(r.randint(0, rows - 1), r.randint(0, cols - 1)) for _ in range(moves)]; black=set(); answer=-1
+    # 题面：没形成 2x2 全黑就输出 **0**。2026-09-20 之前这里写的是 -1，
+    # 21 组里 9 组（正好是「没输」的那些）期望输出是错的。
+    plan = [(r.randint(0, rows - 1), r.randint(0, cols - 1)) for _ in range(moves)]; black=set(); answer=0
     for index,(x,y) in enumerate(plan,1):
         black.add((x,y))
         if any({(a,b),(a+1,b),(a,b+1),(a+1,b+1)} <= black for a in (x-1,x) for b in (y-1,y)): answer=index; break
@@ -588,15 +626,28 @@ def case_1163b2(r):
     return str(len(values))+"\n"+" ".join(map(str,values))+"\n",f"{answer}\n"
 
 def case_1427b(r):
-    n,k=r.randint(1,100),r.randint(0,100); text="".join(r.choice("LW") for _ in range(n)); k=min(k,n); original_k=k
-    wins=[i for i,ch in enumerate(text) if ch=='W']
-    if not wins: answer=0 if not k else 2*min(n,k)-1
+    # 2026-09-20 修：旧写法漏了「k 足够把所有 L 翻成 W 时答案封顶 2n-1」，补空隙之后
+    # 剩余的 k 也算错了 —— 拿暴力枚举在 400 个 n<=12 的随机用例上对照，旧写法错 253 个。
+    import re as _re
+    n, k = r.randint(1, 100), r.randint(0, 100)
+    text = "".join(r.choice("LW") for _ in range(n))
+    k = min(k, n)
+    wins = text.count("W")
+    if wins == 0:
+        answer = 0 if not k else 2 * k - 1
+    elif wins + k >= n:
+        answer = 2 * n - 1
     else:
-        score=len(wins)+sum(text[i]==text[i-1]=='W' for i in range(1,n)); gaps=sorted(wins[i]-wins[i-1]-1 for i in range(1,len(wins)))
-        for gap in gaps:
-            if k>=gap: k-=gap; score+=2*gap+1
-        score+=2*min(k, text.count('L')); answer=score
-    return f"1\n{n} {original_k}\n{text}\n",f"{answer}\n"
+        remaining = k
+        score = 2 * wins - len([block for block in text.split("L") if block])
+        for gap in sorted(len(piece) for piece in _re.findall(r"(?<=W)L+(?=W)", text)):
+            if remaining >= gap:
+                remaining -= gap
+                score += 2 * gap + 1
+            else:
+                break
+        answer = score + 2 * remaining
+    return f"1\n{n} {k}\n{text}\n", f"{answer}\n"
 
 def case_2075c(r):
     n,m=r.randint(2,30),r.randint(2,20); capacity=[r.randint(1,n) for _ in range(m)]; answer=0
@@ -636,12 +687,19 @@ def case_2196b(r):
 def case_1875d(r):
     from functools import lru_cache
     values=tuple(r.randint(0,8) for _ in range(r.randint(1,9)))
+    # 题面：**先删一个数，再把删完之后的 MEX 加进 m**。2026-09-20 之前这里加的是
+    # 删除**前**的 MEX，21 组里 3 组答案偏大（4.in 的 [7,0,8] 正解是 0，旧写法给 1）。
     @lru_cache(None)
     def solve(state):
         if not state:return 0
-        available=set(state); mex=0
-        while mex in available:mex+=1
-        return mex+min(solve(state[:i]+state[i+1:]) for i in range(len(state)))
+        best=None
+        for i in range(len(state)):
+            rest=state[:i]+state[i+1:]
+            available=set(rest); mex=0
+            while mex in available:mex+=1
+            value=mex+solve(rest)
+            best=value if best is None else min(best,value)
+        return best
     return f"1\n{len(values)}\n{' '.join(map(str,values))}\n",f"{solve(values)}\n"
 
 def case_1985h1(r):
@@ -721,10 +779,16 @@ def case_2131c(r):
     return f"1\n{n} {k}\n{' '.join(map(str,first))}\n{' '.join(map(str,second))}\n",("YES" if answer else "NO")+"\n"
 
 def case_2193e(r):
+    # 题面：**至少选一个**元素，乘积等于 i。数组里直接有 i 时答案就是 1 ——
+    # 2026-09-20 之前这里只允许「更小的乘积再乘一个数」，于是 a 里直接有的 2 被算成 2 次，
+    # 21 组里 20 组答案偏大（官方样例第一组的 i=2 应为 1）。
     n=r.randint(1,30); values=[r.randint(1,n) for _ in range(n)]; inf=10**9; dp=[inf]*(n+1)
-    if 1 in values:dp[1]=1
+    for value in set(values):
+        if value<=n: dp[value]=1
     for target in range(2,n+1):
-        dp[target]=min((dp[target//value]+1 for value in values if value>1 and target%value==0),default=inf)
+        for value in set(values):
+            if value>1 and target%value==0 and dp[target//value]<inf:
+                dp[target]=min(dp[target], dp[target//value]+1)
     answer=[str(value if value<inf else -1) for value in dp[1:]]
     return f"1\n{n}\n{' '.join(map(str,values))}\n", " ".join(answer)+"\n"
 
@@ -757,7 +821,10 @@ def case_2200g(r):
         total+=value
     average=total/Fraction(len(list(permutations(operations))))
     mod=1_000_000_007; answer=(average.numerator%mod)*pow(average.denominator%mod,mod-2,mod)%mod
-    return f"1\n{len(operations)} {initial}\n"+"\n".join(op+str(arg) for op,arg in operations)+"\n",f"{answer}\n"
+    # 题面：第二行是 **n 个字符串**（同一行、空格分隔）。2026-09-20 之前这里一行一个算子，
+    # 照题面用 `input().split()` 读的正确程序只会读到第一个算子。
+    return (f"1\n{len(operations)} {initial}\n"
+            + " ".join(op + str(arg) for op, arg in operations) + "\n", f"{answer}\n")
 
 def case_313b(r):
     text="".join(r.choice(".#") for _ in range(r.randint(2,200))); queries=[]
@@ -843,11 +910,15 @@ def case_112a(r):
 
 
 def case_151a(r):
-    n, k, liters, limes, slices, salt, need = (r.randint(1, 20), r.randint(1, 20),
-                                                r.randint(1, 20), r.randint(1, 30),
-                                                r.randint(1, 10), r.randint(1, 200), r.randint(1, 10))
-    value = min(k * liters // need, limes * slices, salt // need) // n
-    return f"{n} {k} {liters} {limes} {slices} {salt} {need}\n", f"{value}\n"
+    # 题面第一行是**八**个数：n k l c d p nl np —— 一杯要 nl 毫升饮料、np 克盐，两者分开给。
+    # 2026-09-20 之前这里把 nl 和 np 合成一个 need，只写了 7 个数：照题面读 8 个数的
+    # 正确程序在每一组上都会读到文件末尾（Runtime Error）。
+    n, k, liters, limes, slices, salt = (r.randint(1, 20), r.randint(1, 20), r.randint(1, 20),
+                                         r.randint(1, 30), r.randint(1, 10), r.randint(1, 200))
+    per_drink, per_salt = r.randint(1, 10), r.randint(1, 10)
+    value = min(k * liters // per_drink, limes * slices, salt // per_salt) // n
+    return (f"{n} {k} {liters} {limes} {slices} {salt} {per_drink} {per_salt}\n",
+            f"{value}\n")
 
 
 def case_231a(r):
@@ -1084,6 +1155,7 @@ def case_2218f(r):
     cases = [(x, y) if x+y else (0, 1) for x, y in cases]
     output = []
     for x, y in cases:
+        if len(cases) == 2: x += 1        # 题面：t == 2 时把 x 加一
         n=x+y
         if x > n//2 or (n%2==0 and x==0): output.append("NO"); continue
         output.append("YES"); nxt=2; pairs=x if n%2 else x-1
@@ -1178,6 +1250,21 @@ BUILDERS = {
 }
 
 
+def statement_allows_any_case(problem):
+    """题面是否明写「答案大小写随意」。按镜像下来的结构化题面判，不靠手工清单。"""
+    path = MIRROR / "statements" / f"{problem}.json"
+    if not path.is_file():
+        return False
+    try:
+        statement = json.loads(path.read_text(encoding="utf-8"))["statement"]
+    except (OSError, json.JSONDecodeError, KeyError):
+        return False
+    text = " ".join(((statement.get("formatO") or "")
+                     + " " + (statement.get("description") or "")).split())
+    import re as _re
+    return bool(_re.search(r"in any case|any case \(upper|upper or lower", text, _re.I))
+
+
 def main():
     catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
     rows = {(item["book"], item["id"]): item for item in catalog["problems"]}
@@ -1212,10 +1299,15 @@ def main():
                     "data_status": "generated_tests", "sample_count": row.get("sample_count", 0)})
         if problem in {"20B", "200B", "492B"}:
             row["comparison"] = "float_tokens"
+        elif statement_allows_any_case(problem):
+            # 题面明写「大小写随意」的题，不能拿 token 精确比对判（见 judge.outputs_match）。
+            row["comparison"] = "case_insensitive_tokens"
         if problem == "2140B":
             row["special_checker"] = "concat_divisible"
         if problem == "550C":
             row["special_checker"] = "divisible_by_8_subsequence"
+        if problem == "1154A":
+            row["special_checker"] = "pairwise_sum_triple"
         if problem == "584A":
             row["special_checker"] = "n_digit_divisible"
         if problem == "1352A":

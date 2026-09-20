@@ -486,8 +486,18 @@ def problem_exists(book, problem_id):
 
 
 def outputs_match(actual, expected, comparison="tokens"):
-    """Compare output using a catalog-selected contract."""
+    """Compare output using a catalog-selected contract.
+
+    `case_insensitive_tokens` 是 2026-09-20 加的：Codeforces 有一批题的题面明写
+    「YES/NO 大小写随意」（"You can output the answer in any case"），而我们只做 token
+    精确比对 —— 数据里的期望输出是 `YES`，照官方样例写 `Yes` 的正确程序会被判 Wrong Answer。
+    口径挂在 catalog 的 `comparison` 字段上，逐题按题面开，不改全局默认
+    （像 1B 那种输出列名的题，大小写是有意义的）。
+    """
     actual_tokens, expected_tokens = actual.split(), expected.split()
+    if comparison == "case_insensitive_tokens":
+        return ([token.lower() for token in actual_tokens]
+                == [token.lower() for token in expected_tokens])
     if comparison != "float_tokens":
         return actual_tokens == expected_tokens
     if len(actual_tokens) != len(expected_tokens):
@@ -503,6 +513,9 @@ def _special_output_matches_core(kind, input_data, actual):
     if kind == "subtree_parity_tree":
         try:
             values = list(map(int, input_data.decode().split())); queries = list(zip(values[1::2], values[2::2]))
+            # 题面里那条彩蛋规则：t == 2 时每组的 x 要加一。2026-09-20 之前特判和数据
+            # 都没实现它，而 21 组数据的 t 全是 2 —— 照题面写的程序会被判错。
+            if values[0] == 2: queries = [(x + 1, y) for x, y in queries]
             tokens = actual.split(); cursor = 0
             for even_count, odd_count in queries:
                 n = even_count + odd_count; possible = even_count <= n // 2 and not (n % 2 == 0 and even_count == 0)
@@ -710,6 +723,17 @@ def _special_output_matches_core(kind, input_data, actual):
                     and len(tokens[0]) == n and int(tokens[0]) % divisor == 0)
         except (UnicodeDecodeError, ValueError):
             return False
+    if kind == "pairwise_sum_triple":
+        # 1154A：黑板上是 a+b、a+c、b+c、a+b+c 四个数，**输出顺序任意**。
+        try:
+            board = sorted(map(int, input_data.decode().split()))
+            values = list(map(int, actual.split()))
+        except (UnicodeDecodeError, ValueError):
+            return False
+        if len(board) != 4 or len(values) != 3 or any(value <= 0 for value in values):
+            return False
+        a, b, c = values
+        return sorted([a + b, a + c, b + c, a + b + c]) == board
     if kind == "divisible_by_8_subsequence":
         try:
             from itertools import combinations

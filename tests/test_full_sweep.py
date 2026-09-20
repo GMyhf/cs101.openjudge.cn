@@ -494,3 +494,129 @@ class ShortDataRegistryTests(unittest.TestCase):
         self.assertEqual(len(bad), 2, bad)
         self.assertTrue(any("该删了" in line for line in bad))
         self.assertTrue(any("登记 2 组，实际 3 组" in line for line in bad))
+
+
+class InputContractTests(unittest.TestCase):
+    """第 13、14 条：`valid()` 必须真的跑，契约覆盖率只能涨。
+
+    2026-09-20 之前 `valid()` 是一份**没人跑**的文档 —— 117 个活目录写了它，
+    闸门一次都没调用过。手改数据（`7f6a07bd` 把 1850H 的输入写成 `1 NaN`）、
+    生成器改坏、契约自己写错，这三种都不会红。
+    """
+
+    GOOD = ("NUMBER = 1\n"
+            "def valid(number, text):\n"
+            "    return text.strip().isdigit()\n")
+    BAD = ("NUMBER = 1\n"
+           "def valid(number, text):\n"
+           "    return text.strip() == 'nope'\n")
+    RAISES = ("NUMBER = 1\n"
+              "def valid(number, text):\n"
+              "    raise ValueError('boom')\n")
+
+    def build(self, folder, source, contents="7\n"):
+        root = Path(folder)
+        made = root / "data/openjudge/tests/bucket/00001_made"
+        (made / "data").mkdir(parents=True)
+        (made / "data" / "0.in").write_text(contents, encoding="utf-8")
+        (made / "producecase.py").write_text(source, encoding="utf-8")
+        (root / "collab").mkdir(exist_ok=True)
+        return root, made
+
+    def run_contracts(self, source):
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            root, made = self.build(folder, source)
+            with mock.patch.object(full_sweep, "ROOT", root), \
+                 mock.patch.object(full_sweep, "active_dirs",
+                                   side_effect=lambda: iter([(1, made)])):
+                return full_sweep.check_input_contracts_hold()[1]
+
+    def test_a_contract_that_holds_is_green(self):
+        self.assertEqual([], self.run_contracts(self.GOOD))
+
+    def test_a_contract_that_rejects_its_own_data_is_red(self):
+        bad = self.run_contracts(self.BAD)
+        self.assertEqual(1, len(bad), bad)
+        self.assertIn("valid() -> False", bad[0])
+
+    def test_a_contract_that_raises_is_red(self):
+        bad = self.run_contracts(self.RAISES)
+        self.assertEqual(1, len(bad), bad)
+        self.assertIn("raised", bad[0])
+
+    def run_ratchet(self, source, ledger):
+        import json
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            root, made = self.build(folder, source)
+            (root / "collab" / "valid-contracts.json").write_text(
+                json.dumps(ledger), encoding="utf-8")
+            with mock.patch.object(full_sweep, "ROOT", root), \
+                 mock.patch.object(full_sweep, "active_dirs",
+                                   side_effect=lambda: iter([(1, made)])):
+                return full_sweep.check_contract_coverage_ratchet()[1]
+
+    def test_ratchet_catches_a_removed_contract(self):
+        ledger = {"without_contract": 0, "dirs": ["tests/bucket/00001_made"]}
+        self.assertEqual([], self.run_ratchet(self.GOOD, ledger))
+        bad = self.run_ratchet("NUMBER = 1\n", ledger)
+        self.assertTrue(any("现在没了" in line for line in bad), bad)
+
+    def test_ratchet_catches_new_data_without_a_contract(self):
+        ledger = {"without_contract": 0, "dirs": []}
+        bad = self.run_ratchet("NUMBER = 1\n", ledger)
+        self.assertTrue(any("必须带输入契约" in line for line in bad), bad)
+
+    def test_ratchet_asks_to_tighten_when_coverage_improves(self):
+        ledger = {"without_contract": 3, "dirs": ["tests/bucket/00001_made"]}
+        bad = self.run_ratchet(self.GOOD, ledger)
+        self.assertTrue(any("棘轮才收紧" in line for line in bad), bad)
+
+
+class InputDomainLedgerTests(unittest.TestCase):
+    """第 15 条：全库「题面原话 + 实测极值 + 数据指纹」记账。"""
+
+    STATEMENT = "描述 x 输入 第一行一个正整数 N，N &lt;= 100 输出 y"
+
+    def run_check(self, quote=None, digest=None, entries=None, contents="7\n"):
+        import json
+        import tempfile
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            made = root / "data/openjudge/tests/bucket/00001_made"
+            (made / "data").mkdir(parents=True)
+            (made / "data" / "0.in").write_text(contents, encoding="utf-8")
+            (root / "data/openjudge/pages").mkdir(parents=True)
+            (root / "data/openjudge/pages/practice__00001.html").write_text(
+                self.STATEMENT, encoding="utf-8")
+            (root / "collab").mkdir()
+            with mock.patch.object(full_sweep, "ROOT", root):
+                count, real_digest = full_sweep.data_digest(made)
+            row = {"book": "practice", "id": "00001", "source": "mirror_page",
+                   "statement_quote": quote if quote is not None else "第一行一个正整数 N，N <= 100",
+                   "generated_extremes": {"max_int": 7, "min_int": 7},
+                   "case_count": count, "data_digest": digest or real_digest}
+            ledger = {"entries": entries if entries is not None
+                      else {"tests/bucket/00001_made": row}}
+            (root / "collab" / "input-domains.json").write_text(
+                json.dumps(ledger, ensure_ascii=False), encoding="utf-8")
+            with mock.patch.object(full_sweep, "ROOT", root), \
+                 mock.patch.object(full_sweep, "active_dirs",
+                                   side_effect=lambda: iter([(1, made)])):
+                return full_sweep.check_input_domains_are_ledgered()[1]
+
+    def test_a_verbatim_quote_and_a_matching_digest_are_green(self):
+        self.assertEqual([], self.run_check())
+
+    def test_a_paraphrased_quote_is_red(self):
+        bad = self.run_check(quote="第一行一个正整数 N，最大 100")
+        self.assertTrue(any("找不到原话" in line for line in bad), bad)
+
+    def test_changed_data_is_red_until_the_ledger_is_rebuilt(self):
+        bad = self.run_check(digest="0" * 64)
+        self.assertTrue(any("数据变了" in line for line in bad), bad)
+
+    def test_data_missing_from_the_ledger_is_red(self):
+        bad = self.run_check(entries={})
+        self.assertTrue(any("账本里没有这份在判数据" in line for line in bad), bad)

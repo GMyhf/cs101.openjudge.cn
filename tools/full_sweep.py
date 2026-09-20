@@ -25,11 +25,15 @@ round9 的 15291 —— 它们的 `self_audit.failed` 一直非空，只是当�
     python3 tools/full_sweep.py --list    # 连干净的项目也列出来
 """
 import argparse
+import concurrent.futures
 import glob
+import hashlib
 import html
 import json
 import re
+import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -301,6 +305,9 @@ def check_archive_oracle_is_auditable():
     return "T-028 报告未记录 oracle 用了哪些存档目录（round8 起）", bad
 
 
+_STATEMENT_CACHE = {}
+
+
 def statement_text(book, problem_id):
     """镜像题面的纯文本，用于「原话必须逐字出现」的核对。
 
@@ -308,14 +315,21 @@ def statement_text(book, problem_id):
     就是裸的 `<`，按标签剥会把整段范围声明连同后文一起吃掉 —— 而范围声明**正是**
     这条检查要读的东西。2026-07-30 复核 18106 时就是先被这一口吃掉、差点判成「题面没写上界」。
     """
+    # 缓存键带上 ROOT：用例会把 ROOT 指到临时目录，只按题号缓存会串味
+    # （2026-09-20 加缓存时 `test_a_quote_with_a_bound_passes` 当场变红）。
+    key = (str(ROOT), book, problem_id)
+    if key in _STATEMENT_CACHE:
+        return _STATEMENT_CACHE[key]
     page = ROOT / "data" / "openjudge" / "pages" / f"{book}__{problem_id}.html"
     if not page.is_file():
+        _STATEMENT_CACHE[key] = ""
         return ""
     raw = page.read_text(encoding="utf-8", errors="replace")
     raw = re.sub(r"<script.*?</script>", " ", raw, flags=re.S)
     raw = re.sub(r"<(?![/a-zA-Z!])", "&lt;", raw)
-    text = html.unescape(re.sub(r"<[^>]+>", " ", raw))
-    return " ".join(text.split())
+    text = " ".join(html.unescape(re.sub(r"<[^>]+>", " ", raw)).split())
+    _STATEMENT_CACHE[key] = text
+    return text
 
 
 def generated_extremes(made_dir):
@@ -674,13 +688,222 @@ def check_short_data_is_recorded():
     return label, bad
 
 
+
+# ---------------------------------------------------------------- 输入契约
+
+VALID_DRIVER = r"""
+import importlib.util, inspect, json, sys
+from pathlib import Path
+module_path, data_dir, identifier = sys.argv[1], sys.argv[2], sys.argv[3]
+spec = importlib.util.spec_from_file_location("producecase_under_test", module_path)
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+valid = module.valid
+parameters = list(inspect.signature(valid).parameters)
+key = None
+for attribute in ("NUMBER", "PROBLEM", "PROBLEM_ID", "ID"):
+    if hasattr(module, attribute):
+        key = getattr(module, attribute)
+        break
+if key is None:
+    key = int(identifier) if identifier.isdigit() else identifier
+bad = []
+for path in sorted(Path(data_dir).glob("*.in"), key=lambda item: int(item.stem)):
+    text = path.read_text(encoding="utf-8", errors="replace")
+    try:
+        verdict = valid(text) if len(parameters) == 1 else valid(key, text)
+    except Exception as error:
+        verdict = "raised %r" % (error,)
+    if verdict is not True:
+        bad.append("%s: valid() -> %r" % (path.name, verdict))
+print(json.dumps(bad))
+"""
+
+
+def contract_dirs():
+    """活目录里带 `valid()` 的那些，连同目录名里的题号。"""
+    for number, directory in active_dirs():
+        module = directory / "producecase.py"
+        if not module.is_file():
+            continue
+        try:
+            source = module.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        if re.search(r"^def valid\(", source, re.M):
+            match = re.search(r"/0*(\d+[A-Za-z]?\d*)_made$", str(directory))
+            yield (match.group(1) if match else str(number)), directory
+
+
+def _run_contract(item):
+    identifier, directory = item
+    module = directory / "producecase.py"
+    with tempfile.TemporaryDirectory(prefix="valid-contract-") as work:
+        # 临时 CWD：个别生成器把 `Path("data")` 当相对路径用，跑契约时不能让它写到仓库里。
+        result = subprocess.run([sys.executable, "-c", VALID_DRIVER, str(module),
+                                 str(directory / "data"), identifier],
+                                capture_output=True, text=True, cwd=work, timeout=600)
+    rel = directory.relative_to(ROOT / "data" / "openjudge")
+    if result.returncode:
+        tail = (result.stderr.strip().splitlines() or ["(无输出)"])[-1]
+        return f"{rel}: valid() 跑不起来 —— {tail[:140]}"
+    bad = json.loads(result.stdout)
+    if bad:
+        return f"{rel}: {len(bad)} 组不满足自己的 valid() —— {bad[0]}"
+    return None
+
+
+def check_input_contracts_hold():
+    """13. 生成器写了 `valid()`，就必须对**自己产出的每一组输入**成立。
+
+    2026-09-20 加的。在此之前 `valid()` 是一份没人跑的文档：117 个活目录里写了它，
+    而闸门一次都没调用过 —— 生成器改了、数据被手改了、契约自己写错了，都不会红。
+    （同一天修的 `7f6a07bd` 正是「手改 `.in/.out`、生成器没动」，1850H 的输入被写成
+    `1 NaN`；那种数据在这条判据下当场就是红的。）
+
+    **它证明不了什么**：契约是照着生成器写的，两边一起错仍然自洽（见
+    `data-self-consistency`）。要拿题面说话的是 `tests/test_input_constraints.py`
+    里逐题手写的那份契约。这条只保证「生成器和它自己的契约没有漂移」，很便宜，所以常跑。
+    """
+    items = sorted(set(contract_dirs()), key=lambda item: str(item[1]))
+    bad = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+        for message in pool.map(_run_contract, items):
+            if message:
+                bad.append(message)
+    return f"生成器的 valid() 在自己的数据上不成立（{len(items)} 个目录）", bad
+
+
+def check_contract_coverage_ratchet():
+    """14. 输入契约的覆盖率只能涨，不能跌。
+
+    2026-09-20 立的规矩（人拍板）：**新增或重建数据的题必须带 `valid()`**，
+    见 `docs/管理员手册.md` 的「新增一道题」。规矩要有闸门盯着才算数，
+    所以这里记一个基线：`collab/valid-contracts.json` 写着当时带契约的目录清单
+    和「有 `producecase.py` 却没有 `valid()`」的数量。
+
+    判据只看两件事：清单里的目录不许把 `valid()` 删掉；没契约的目录数不许比基线多。
+    数字降了就更新基线（脚本会提示），这样棘轮只往一个方向走。
+    """
+    ledger_path = ROOT / "collab" / "valid-contracts.json"
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return "输入契约覆盖率棘轮", [f"读不到 {ledger_path.relative_to(ROOT)}"]
+    have = {str(directory.relative_to(ROOT / "data" / "openjudge"))
+            for _identifier, directory in contract_dirs()}
+    missing = []
+    for entry in ledger.get("dirs", []):
+        if entry not in have:
+            missing.append(f"{entry}: 基线里有 `valid()`，现在没了")
+    without = 0
+    for _number, directory in active_dirs():
+        module = directory / "producecase.py"
+        if module.is_file() and not re.search(
+                r"^def valid\(", module.read_text(encoding="utf-8", errors="replace"), re.M):
+            without += 1
+    baseline = ledger.get("without_contract")
+    if isinstance(baseline, int) and without > baseline:
+        missing.append(f"没有 `valid()` 的活目录 {without} 个，基线是 {baseline} —— "
+                       f"新增/重建的数据必须带输入契约")
+    if isinstance(baseline, int) and without < baseline:
+        missing.append(f"没有 `valid()` 的活目录降到 {without} 个（基线 {baseline}）—— "
+                       f"把 collab/valid-contracts.json 的 without_contract 改成 {without}，棘轮才收紧")
+    return "输入契约覆盖率棘轮（collab/valid-contracts.json）", missing
+
+
+
+def data_digest(directory):
+    """与 `scripts/build_input_domains.py` 同一口径的数据指纹。
+
+    第 15 条核指纹而不是重算极值：重算要把全库 260MB 输入逐 token 解析一遍，
+    实测让 `full_sweep` 从 20 秒涨到 2 分钟。指纹对上就说明账本里的极值
+    是从**这些字节**量出来的，数据一变指纹就变，账本必须跟着重建。
+    """
+    digest = hashlib.sha256()
+    cases = sorted((directory / "data").glob("*.in"),
+                   key=lambda item: (len(item.stem), item.stem))
+    for path in cases:
+        digest.update(path.name.encode())
+        digest.update(b"\0")
+        digest.update(path.read_bytes())
+    return len(cases), digest.hexdigest()
+
+
+def codeforces_statement_input(problem_id):
+    """Codeforces 题面的输入格式段。镜像页只有样例，约束在结构化题面里。"""
+    path = ROOT / "data" / "openjudge" / "statements" / f"{problem_id}.json"
+    if not path.is_file():
+        return ""
+    try:
+        statement = json.loads(path.read_text(encoding="utf-8"))["statement"]
+    except (OSError, json.JSONDecodeError, KeyError):
+        return ""
+    return " ".join(statement.get("formatI", "").split())
+
+
+def check_input_domains_are_ledgered():
+    """15. **全库**每份在判数据都要有「题面原话 + 实测极值」的记账。
+
+    第 10 条只覆盖 T-028 各轮报告里的题；这一条把同样的两半推广到 catalog 引用的
+    每一个目录，账本是 `collab/input-domains.json`（由 `scripts/build_input_domains.py`
+    生成）。判据仍然只判两件可验的事：引文在题面里**逐字**出现、极值能从 `data/` 重算。
+
+    **它不判「极值是否合法」** —— 那需要把约束绑到输入里的位置，能绑的已经写成
+    `tests/test_input_constraints.py` 的逐题契约；绑不了的（题面没写上界、约束在提示段）
+    机械判只会制造噪音。这条判据保证的是：这两个数字**摆在一起、各自为真**，
+    而且数据一重建，极值的变化会连同题面原话一起出现在 diff 里。
+    """
+    ledger_path = ROOT / "collab" / "input-domains.json"
+    try:
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return "全库输入范围记账（collab/input-domains.json）", [
+            f"读不到 {ledger_path.relative_to(ROOT)}，跑 scripts/build_input_domains.py"]
+    entries = ledger.get("entries", {})
+    bad = []
+    seen = set()
+    for _number, directory in active_dirs():
+        rel = str(directory.relative_to(ROOT / "data" / "openjudge"))
+        if rel in seen:
+            continue
+        seen.add(rel)
+        row = entries.get(rel)
+        if row is None:
+            bad.append(f"{rel}: 账本里没有这份在判数据")
+            continue
+        quote = " ".join(str(row.get("statement_quote") or "").split())
+        if not quote:
+            bad.append(f"{rel}: statement_quote 为空")
+        else:
+            text = (codeforces_statement_input(row.get("id", ""))
+                    if row.get("source") == "codeforces_statement"
+                    else statement_text(row.get("book", ""), row.get("id", "")))
+            if not text:
+                bad.append(f"{rel}: 找不到题面，无法核对引文")
+            elif quote not in text:
+                bad.append(f"{rel}: statement_quote 在题面里找不到原话")
+        count, digest = data_digest(directory)
+        if row.get("data_digest") != digest:
+            bad.append(f"{rel}: 数据变了（{count} 组，指纹 {digest[:12]}…），"
+                       f"账本记的是 {str(row.get('data_digest'))[:12]}… —— "
+                       f"重跑 scripts/build_input_domains.py 把极值重新量一遍")
+    stale = sorted(set(entries) - seen)
+    for rel in stale[:5]:
+        bad.append(f"{rel}: 账本里有，但已经不在判了 —— 重跑 scripts/build_input_domains.py")
+    return (f"全库输入范围记账（{len(seen)} 份在判数据，"
+            f"引文无数值范围 {ledger.get('without_bound')} 条）"), bad
+
+
 CHECKS = (check_reported_failures, check_degenerate_constraints,
           check_output_size, check_repeating_decimals, check_annotated_sample_outputs,
           check_sample_anchor,
           check_merged_judge, check_multi_answer_problems,
           check_archive_oracle_is_auditable, check_priority_gaps_are_recorded,
           check_self_audit_numbers_are_measured, check_input_domain_is_anchored,
-          check_short_data_is_recorded)
+          check_short_data_is_recorded,
+          check_input_contracts_hold, check_contract_coverage_ratchet,
+          check_input_domains_are_ledgered)
 
 
 def main():
