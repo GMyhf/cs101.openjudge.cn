@@ -386,19 +386,28 @@ class OracleTests(unittest.TestCase):
         或者把「为什么不用核」写进 `UNCOVERED` —— 一个缺陷被接受和被忽略，
         从代码上看一模一样，区别只在有没有写下来。
         """
-        from cf_oracles import UNCOVERED
+        from cf_oracles import PIPELINE_ONLY, UNCOVERED
         covered = set(ORACLES) | set(VERIFIERS)
         missing = []
         for item in self.rows_by_book("codeforces"):
-            if item.get("data_status") != "generated_tests":
+            status = item.get("data_status")
+            if status not in ("generated_tests", "rebuilt_tests"):
                 continue
             problem_id = item["id"]
             if problem_id in covered or problem_id in UNCOVERED:
                 continue
+            # 单题流水线的题可以只靠它自带的暴力 oracle，但必须写下来是哪一份。
+            if status == "rebuilt_tests" and problem_id in PIPELINE_ONLY:
+                continue
             missing.append(problem_id)
-        self.assertEqual(missing, [], f"这些题没有独立 oracle，也没写明理由：{missing}")
-        for problem_id, reason in UNCOVERED.items():
-            self.assertTrue(reason.strip(), f"{problem_id} 的豁免理由不能是空的")
+        self.assertEqual(sorted(missing), [], f"这些题没有独立 oracle，也没写明理由：{missing}")
+        for table in (UNCOVERED, PIPELINE_ONLY):
+            for problem_id, reason in table.items():
+                self.assertTrue(reason.strip(), f"{problem_id} 的理由不能是空的")
+        for problem_id in PIPELINE_ONLY:
+            directory = MIRROR / "tests" / "codeforces" / f"{problem_id}_made"
+            self.assertTrue((directory / "producecase.py").is_file(),
+                            f"{problem_id} 没有单题流水线，PIPELINE_ONLY 的理由不成立")
 
     def rows_by_book(self, book):
         catalog = json.loads((MIRROR / "catalog.json").read_text(encoding="utf-8"))

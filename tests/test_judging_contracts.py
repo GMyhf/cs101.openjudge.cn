@@ -74,6 +74,16 @@ print("\\n".join(out))
 '''
 
 
+ODD_DIVISOR_1475A = '''import sys
+data = sys.stdin.read().split()
+out = []
+for token in data[1:1 + int(data[0])]:
+    value = int(token)
+    out.append("No" if value & (value - 1) == 0 else "Yes")
+print("\\n".join(out))
+'''
+
+
 class JudgingContractTests(unittest.TestCase):
     def verdict(self, problem_id, source):
         return judge("codeforces", problem_id, "Python3", source)["status"]
@@ -100,6 +110,13 @@ class JudgingContractTests(unittest.TestCase):
         self.assertEqual(self.verdict("2171D", uppercase), "Accepted")
         self.assertEqual(self.verdict("2171D", ALWAYS_YES_2171D), "Wrong Answer",
                          "大小写放宽之后，常量程序仍然必须挂")
+
+    def test_rebuilt_problems_also_honour_the_casing_contract(self):
+        """`rebuilt_tests` 走的是另一条激活链路（tools/activate_codeforces_rebuilds.py），
+        大小写口径也要按题面自动开 —— 2026-09-20 之前那 7 道全是精确比对。"""
+        self.assertEqual(self.verdict("1475A", ODD_DIVISOR_1475A), "Accepted")
+        constant = 'import sys\nn=int(sys.stdin.readline())\nprint("\\n".join("YES" for _ in range(n)))\n'
+        self.assertEqual(self.verdict("1475A", constant), "Wrong Answer")
 
 
 if __name__ == "__main__":

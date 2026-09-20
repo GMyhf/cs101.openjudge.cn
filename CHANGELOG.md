@@ -66,6 +66,32 @@ oracle/验证器，2 道（20C、1833B）写明豁免理由（期望输出是空
 - 顺带：`full_sweep` 的题面文本改成带缓存（键里带 `ROOT`，否则用例把 ROOT 指到临时目录时会串味），
   第 15 条核指纹而不是重算极值 —— 重算要把 260MB 输入逐 token 解析，实测让全库横扫从 20 秒涨到 2 分钟。
 
+### rebuilt_tests 的 50 道也纳入同一份 oracle 库
+
+人拍板「把 rebuilt_tests 那 30 多道也纳入」——实际是 50 道。做法分三层：
+
+- **官方样例锚点（新闸门 `tests/test_rebuilt_anchors.py`）**：单题流水线的外部锚点只有题面样例，
+  所以第 0 组必须**逐字**是官方样例（有 checker/interactor 的题只钉输入，5 道交互题登记豁免）。
+  这条一加就红了三道：
+  - `1374C` 第 0 组把样例里的 `())()()(` 抄成 `())()(()`（答案碰巧一样，锚点却没了）；
+  - `2227B` 第 0 组放的是**另一道题**（1374C）的样例；
+  - `2140B` 第 0 组是自造的 `1\n6` —— 顺带暴露出它的**参考实现在题面范围内根本不成立**：
+    只在 `y < 10^5` 里线性扫，而 x 可达 10^8（官方样例的 x=9876543 直接抛异常）。
+    参考实现改成有证明的构造 `y = 2x`（`concat(x,2x) = x(10^L+2)`，`x+y = 3x`，`3 | 10^L+2` 恒成立），
+    `valid()` 放宽到题面的 `x <= 10^8`，生成器随之取到上界，`oracle` 改成**验证关系**而不是比对某一个见证。
+- **独立 oracle**：31 道按题面另写了一份实现放进 `tests/cf_oracles.py`（含 894E 的 SCC 缩点最长路、
+  1000E 的桥树直径、986D 的 `decimal` 百万位比较、1970E1/E2/E3 用秩 2 压缩后的 2×2 矩阵快速幂等）。
+  写 37C 的判据时踩到一次浮点坑：Kraft 和用 `float` 算会把 6.in 的和四舍五入成正好 1.0，
+  于是把正确的 `NO` 判成错 —— 改成整数比较。
+- **其余 13 道登记 `PIPELINE_ONLY`**：它们是 Div1 量级的构造/计数题，各自的 `producecase.py` 里
+  本来就有一份算法不同的暴力（`brute` / `oracle_exhaustive` / `bfs_oracle` …）在小规模上逐组比过，
+  这里把「用的是哪一份」写下来，而不是留一个空白。覆盖率用例现在同时盯着 `generated_tests` 与
+  `rebuilt_tests`：要么有 oracle，要么在 `PIPELINE_ONLY`/`UNCOVERED` 里有理由。
+- **大小写口径补到另一条链路**：`tools/activate_codeforces_rebuilds.py` 也按题面自动开
+  `case_insensitive_tokens`（新增共享判断 `scripts/cf_statement_flags.py`），7 道 rebuilt 题
+  此前是精确比对 —— 照官方样例写 `Yes` 的正确程序会被判 Wrong Answer。回归用例见
+  `tests/test_judging_contracts.py`。
+
 ### 期望输出接上外部锚点：独立 oracle 闸门，修正 1749C 的错误答案
 
 - **28276 题面已由原站改为 `n <= 500`**（此前是 `n<50`）。按 `crawl_openjudge.py --problem practice/28276`

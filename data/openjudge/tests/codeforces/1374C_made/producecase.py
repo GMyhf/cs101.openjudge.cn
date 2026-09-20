@@ -28,7 +28,10 @@ PROBLEM = "1374C"
 INPUT_DOMAIN = "1 ≤ t ≤ 2000；2 ≤ n ≤ 50，n 为偶数；串由 n/2 个 '(' 与 n/2 个 ')' 组成"
 LABEL = "first line t (1..2000), then per test a line n (even, 2..50) and a line s"
 INVALID = "1\n3\n(()\n"                # n 是奇数，且左右括号不等
-SAMPLE = "4\n2\n)(\n4\n()()\n8\n())()(()\n10\n)))((((())\n"   # 题面样例：1 0 1 3
+# 题面样例逐字（`data/openjudge/statements/1374C.json`）。2026-09-20 发现第 0 组把
+# 第三个串抄成了 `())()(()`（官方是 `())()()(`）—— 答案碰巧一样，但样例锚点就此失效。
+SAMPLE = '4\n2\n)(\n4\n()()\n8\n())()()(\n10\n)))((((())\n'
+SAMPLE_OUT = '1\n0\n1\n3\n'
 SHAPES = ("worst", "one_swap", "regular", "shortest", "longest", "many_tests", "plain")
 
 
@@ -129,6 +132,8 @@ def _build():
             raise SystemExit(f"case {index} violates the input contract: {case!r}")
         result = _subprocess.run([_sys.executable, str(REFERENCE)], input=case, text=True,
                                  capture_output=True, timeout=120, check=True)
+        if index == 0 and result.stdout.split() != SAMPLE_OUT.split():
+            raise SystemExit(f"第 0 组与题面样例输出不符：{result.stdout!r} != {SAMPLE_OUT!r}")
         (out / f"{index}.in").write_text(case, encoding="utf-8")
         (out / f"{index}.out").write_text(result.stdout.rstrip("\n") + "\n", encoding="utf-8")
 

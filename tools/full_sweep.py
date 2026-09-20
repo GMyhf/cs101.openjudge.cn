@@ -640,6 +640,18 @@ def check_sample_anchor():
             if verdict is not True:
                 bad.append(f"{problem.get('book')}__{problem['id']}: checker 不接受题面样例输出（{message}）")
             continue
+        if problem.get("special_checker"):
+            # 同上，只是特判写在 judge.py 里（`concat_divisible` 这类命名口径）。
+            # 2026-09-20 加：此前这条分支不存在，2140B 把第 0 组换成官方样例之后，
+            # 判据拿「另一个同样合法的答案」去逐字比，红得毫无道理。
+            # 反过来这也给特判器本身加了一条锚：它必须接受题面给的那个答案。
+            sys.path.insert(0, str(ROOT))
+            import judge
+            if not judge.special_output_matches(problem["special_checker"],
+                                                first_in.read_bytes(), plain(match.group(2))):
+                bad.append(f"{problem.get('book')}__{problem['id']}: "
+                           f"特判 {problem['special_checker']} 不接受题面样例输出")
+            continue
         expected = first_out.read_text(encoding="utf-8", errors="replace").split()
         shared = min(len(expected), len(sample_out))
         if expected[:shared] != sample_out[:shared]:

@@ -737,8 +737,34 @@ def oracle_1327a(text):
     return "".join(out)
 
 
+# 只靠单题流水线自带的暴力 oracle（加上本仓新加的官方样例锚点 `tests/test_rebuilt_anchors.py`）
+# 的题。这里不重写一份高效解：这些都是 Div1 量级的构造/计数题，重写的出错概率高于收益，
+# 而它们各自的 `producecase.py` 里本来就有一份**算法不同的暴力**在小规模上逐组比过。
+# 写下来是为了让「没重写」是一个**记录**，不是一个空白。
+PIPELINE_ONLY = {
+    "2146D1": "producecase.py 的 `oracle` 用匈牙利算法验证 r*(r+1) 这个上界可达；构造本身走 checker.py。",
+    "2167F": "producecase.py 有两份实现：`oracle_exhaustive`（枚举所有 k 元子集求 LCA）与 "
+             "`oracle_quadratic`，小规模逐组互核。",
+    "2171G": "producecase.py 有 `bfs_oracle` / `k0_oracle` / `dp_x_oracle` 三份，小规模互核。",
+    "2192D": "producecase.py 的 `brute` 是 O(n^4) 的字面模拟（枚举 r、u、v 重建父数组），n<=12 的组逐组比。",
+    "2194E": "producecase.py 的 `brute` 枚举全部路径与拦截点。",
+    "2195E": "producecase.py 的 `simulate` 逐步模拟 Idiot First Search，小树逐组比。",
+    "2195H": "producecase.py 的 `brute_valid` 逐三角形验面积与不相交，并跑自带 checker。",
+    "2205D": "producecase.py 的 `brute` 枚举删除顺序求最少操作数。",
+    "2208D1": "producecase.py 的 `all_tree_matrices` 枚举小树的全部定向，`check_output` 验构造。",
+    "2218G": "producecase.py 的 `tally` 按题面定义直接数方案数。",
+    "2227F": "producecase.py 的 `oracle_one`/`metric` 按题面重新模拟重力并累加移动距离。",
+    "2227H": "producecase.py 的 `brute_one` 枚举小树上的全部情形。",
+    "2228D": "producecase.py 的 `brute_one` 枚举所有 (k1,k2) 与染色。",
+}
+
 # 没有 oracle 的题，必须在这里写明理由（`tests/test_expected_outputs.py` 的覆盖率用例盯着）。
 UNCOVERED = {
+    "2109C1": "交互题：判题走 interactor.py，`.out` 不参与比对。",
+    "2109C2": "交互题：同上。",
+    "2109C3": "交互题：同上。",
+    "2173E": "交互题：判题走 interactor.py（自适应对手），`.out` 不参与比对。",
+    "2209C": "交互题：判题走 interactor.py，`.out` 不参与比对。",
     "1833B": "题面「若有多解，输出任意一组」，数据里的 .out 是空的 —— 判题走 "
              "`weather_permutation` 特判，只看提交的排列本身。",
     "20C": "题面「若有多解，输出任意一条」，数据里的 .out 是空的 —— 判题走 "
@@ -1645,3 +1671,739 @@ def verify_2171e(text, answer):
         if bad > 6:
             return f"n={n}: 有 {bad} 个 bad 下标，题面要求至多 6 个"
     return None
+
+
+# ------------------------------------------- 批次 14（rebuilt_tests：单题流水线的题）
+
+@oracle("270A")
+def oracle_270a(text):
+    values = ints(text)
+    out = []
+    for angle in values[1:1 + values[0]]:
+        # 正 n 边形内角 = 180*(n-2)/n，即 360 % (180 - a) == 0
+        out.append(("YES" if 360 % (180 - angle) == 0 else "NO") + "\n")
+    return "".join(out)
+
+
+@oracle("456A")
+def oracle_456a(text):
+    values = ints(text)
+    n = values[0]
+    rows = sorted((values[1 + 2 * i], values[2 + 2 * i]) for i in range(n))
+    happy = any(rows[i][1] > rows[i + 1][1] for i in range(n - 1))
+    return ("Happy Alex" if happy else "Poor Alex") + "\n"
+
+
+@oracle("546A")
+def oracle_546a(text):
+    k, n, w = ints(text)
+    return f"{max(0, k * w * (w + 1) // 2 - n)}\n"
+
+
+@oracle("617A")
+def oracle_617a(text):
+    return f"{-(-int(text) // 5)}\n"
+
+
+@oracle("698A")
+def oracle_698a(text):
+    # 状态：0 休息、1 比赛、2 运动。dp 求最少休息天数。
+    days = ints(text.splitlines()[1])
+    best = [0, float("inf"), float("inf")]
+    for day in days:
+        rest = min(best) + 1
+        contest = min(best[0], best[2]) if day in (1, 3) else float("inf")
+        sport = min(best[0], best[1]) if day in (2, 3) else float("inf")
+        best = [rest, contest, sport]
+    return f"{min(best)}\n"
+
+
+@oracle("734A")
+def oracle_734a(text):
+    row = text.splitlines()[1].strip()
+    anton, danik = row.count("A"), row.count("D")
+    return ("Anton" if anton > danik else "Danik" if danik > anton else "Friendship") + "\n"
+
+
+@oracle("791A")
+def oracle_791a(text):
+    a, b = ints(text)
+    years = 0
+    while a <= b:
+        a, b, years = a * 3, b * 2, years + 1
+    return f"{years}\n"
+
+
+@oracle("977A")
+def oracle_977a(text):
+    n, k = ints(text)
+    for _ in range(k):
+        n = n // 10 if n % 10 == 0 else n - 1
+    return f"{n}\n"
+
+
+# --------------------------------------------------------------------- 批次 15
+
+@oracle("894E")
+def oracle_894e(text):
+    values = ints(text)
+    n, m = values[0], values[1]
+    edges = [(values[2 + 3 * i], values[3 + 3 * i], values[4 + 3 * i]) for i in range(m)]
+    start = values[2 + 3 * m]
+
+    def full_collect(weight):
+        """一条边在强连通分量里可以反复走：第 i 次收 w - (i-1)i/2，直到非正。
+
+        w 最大 10^8、边最多 10^6，逐次累加会跑到 10^10 量级，所以用闭式：
+        走 t 次时总收成 = t*w - Σ_{i=1..t} (i-1)i/2。
+        """
+        if weight <= 0:
+            return 0
+        steps = int((1 + math.isqrt(1 + 8 * weight)) // 2)
+        while (steps - 1) * steps // 2 >= weight:
+            steps -= 1
+        while steps * (steps + 1) // 2 < weight:
+            steps += 1
+        return steps * weight - (steps * (steps + 1) * (2 * steps + 1) // 6
+                                 - steps * (steps + 1) // 2) // 2
+
+    graph = [[] for _ in range(n + 1)]
+    reverse = [[] for _ in range(n + 1)]
+    for x, y, _w in edges:
+        graph[x].append(y)
+        reverse[y].append(x)
+    order, seen = [], [False] * (n + 1)
+    for node in range(1, n + 1):                 # 迭代式 Kosaraju
+        if seen[node]:
+            continue
+        stack = [(node, iter(graph[node]))]
+        seen[node] = True
+        while stack:
+            current, children = stack[-1]
+            for nxt in children:
+                if not seen[nxt]:
+                    seen[nxt] = True
+                    stack.append((nxt, iter(graph[nxt])))
+                    break
+            else:
+                order.append(current)
+                stack.pop()
+    component = [0] * (n + 1)
+    label = 0
+    seen = [False] * (n + 1)
+    for node in reversed(order):
+        if seen[node]:
+            continue
+        label += 1
+        stack = [node]
+        seen[node] = True
+        while stack:
+            current = stack.pop()
+            component[current] = label
+            for nxt in reverse[current]:
+                if not seen[nxt]:
+                    seen[nxt] = True
+                    stack.append(nxt)
+    inside = [0] * (label + 1)
+    condensed = [[] for _ in range(label + 1)]
+    for x, y, weight in edges:
+        if component[x] == component[y]:
+            inside[component[x]] += full_collect(weight)
+        else:
+            condensed[component[x]].append((component[y], weight))
+    # 缩点后的 DAG 上求最长路。用 Kahn 拓扑排序而不是递归 —— 链长可以到 10^5，
+    # 递归版在 15.in 上直接 RecursionError。
+    indegree = [0] * (label + 1)
+    for node in range(1, label + 1):
+        for nxt, _weight in condensed[node]:
+            indegree[nxt] += 1
+    queue = collections.deque(node for node in range(1, label + 1) if indegree[node] == 0)
+    order = []
+    while queue:
+        node = queue.popleft()
+        order.append(node)
+        for nxt, _weight in condensed[node]:
+            indegree[nxt] -= 1
+            if indegree[nxt] == 0:
+                queue.append(nxt)
+    best = [0] * (label + 1)
+    for node in reversed(order):
+        best[node] = inside[node] + max((weight + best[nxt]
+                                         for nxt, weight in condensed[node]), default=0)
+    return f"{best[component[start]]}\n"
+
+
+@oracle("903C")
+def oracle_903c(text):
+    counts = collections.Counter(ints(text.splitlines()[1]))
+    return f"{max(counts.values())}\n"
+
+
+@oracle("986D")
+def oracle_986d(text):
+    """最小的代价 S，使得「和为 S 的正整数乘积的最大值」不小于 n。
+
+    和固定为 S 时乘积最大的拆法只用 3，余 1 换成一个 4、余 2 留一个 2。
+    n 有上百万位，所以先用 log10 把 S 夹到 ±3 的窗口里，只在窗口内做精确比较；
+    精确比较走 `decimal`（libmpdec 的 NTT 乘法），不把整数从十进制字符串转成 int。
+    """
+    import decimal
+    digits = text.strip()
+    if digits == "1":
+        return "1\n"
+    log3, log2, log4 = math.log10(3), math.log10(2), math.log10(4)
+    head = digits[:18]
+    log_n = math.log10(int(head)) + (len(digits) - len(head))
+
+    def log_best(total):
+        if total % 3 == 0:
+            return total // 3 * log3
+        if total % 3 == 1:
+            return log4 + (total - 4) // 3 * log3 if total >= 4 else 0.0
+        return log2 + (total - 2) // 3 * log3
+
+    estimate = max(1, int(3 * log_n / log3) - 3)
+    while log_best(estimate) > log_n + 1e-9 and estimate > 1:
+        estimate -= 1
+    context = decimal.Context(prec=len(digits) + 30, Emax=decimal.MAX_EMAX,
+                              Emin=decimal.MIN_EMIN)
+    with decimal.localcontext(context):
+        n = decimal.Decimal(digits)
+        three, two, four = decimal.Decimal(3), decimal.Decimal(2), decimal.Decimal(4)
+
+        def best_product(total):
+            if total % 3 == 0:
+                return three ** (total // 3)
+            if total % 3 == 1:
+                return four * three ** ((total - 4) // 3) if total >= 4 else decimal.Decimal(1)
+            return two * three ** ((total - 2) // 3)
+
+        total = estimate
+        while best_product(total) < n:
+            total += 1
+    return f"{total}\n"
+
+
+@oracle("1000E")
+def oracle_1000e(text):
+    values = ints(text)
+    n, m = values[0], values[1]
+    graph = [[] for _ in range(n + 1)]
+    for index in range(m):
+        x, y = values[2 + 2 * index], values[3 + 2 * index]
+        graph[x].append((y, index))
+        graph[y].append((x, index))
+    # 先找桥（迭代式 Tarjan），再把 2-边连通分量缩点，答案是桥树的直径。
+    discovery = [0] * (n + 1)
+    low = [0] * (n + 1)
+    timer = 1
+    bridges = set()
+    stack = [(1, -1, iter(graph[1]))]
+    discovery[1] = low[1] = timer
+    timer += 1
+    while stack:
+        node, parent_edge, children = stack[-1]
+        for nxt, edge_id in children:
+            if edge_id == parent_edge:
+                continue
+            if discovery[nxt]:
+                low[node] = min(low[node], discovery[nxt])
+            else:
+                discovery[nxt] = low[nxt] = timer
+                timer += 1
+                stack.append((nxt, edge_id, iter(graph[nxt])))
+                break
+        else:
+            stack.pop()
+            if stack:
+                up = stack[-1][0]
+                low[up] = min(low[up], low[node])
+                if low[node] > discovery[up]:
+                    bridges.add(parent_edge)
+    component = [0] * (n + 1)
+    label = 0
+    for start in range(1, n + 1):
+        if component[start]:
+            continue
+        label += 1
+        queue = [start]
+        component[start] = label
+        while queue:
+            node = queue.pop()
+            for nxt, edge_id in graph[node]:
+                if edge_id in bridges or component[nxt]:
+                    continue
+                component[nxt] = label
+                queue.append(nxt)
+    tree = [[] for _ in range(label + 1)]
+    for index in range(m):
+        x, y = values[2 + 2 * index], values[3 + 2 * index]
+        if index in bridges:
+            tree[component[x]].append(component[y])
+            tree[component[y]].append(component[x])
+
+    def farthest(source):
+        distance = {source: 0}
+        queue = collections.deque([source])
+        far = source
+        while queue:
+            node = queue.popleft()
+            if distance[node] > distance[far]:
+                far = node
+            for nxt in tree[node]:
+                if nxt not in distance:
+                    distance[nxt] = distance[node] + 1
+                    queue.append(nxt)
+        return far, distance[far]
+
+    first, _ = farthest(1)
+    _, diameter = farthest(first)
+    return f"{diameter}\n"
+
+
+@oracle("116A")
+def oracle_116a(text):
+    values = ints(text)
+    inside, best = 0, 0
+    for index in range(values[0]):
+        inside += values[2 + 2 * index] - values[1 + 2 * index]
+        best = max(best, inside)
+    return f"{best}\n"
+
+
+@oracle("1374B")
+def oracle_1374b(text):
+    values = ints(text)
+    out = []
+    for n in values[1:1 + values[0]]:
+        twos = threes = 0
+        while n % 2 == 0:
+            n //= 2
+            twos += 1
+        while n % 3 == 0:
+            n //= 3
+            threes += 1
+        out.append(f"{2 * threes - twos if n == 1 and twos <= threes else -1}\n")
+    return "".join(out)
+
+
+@oracle("1374C")
+def oracle_1374c(text):
+    rows = lines(text)
+    index, out = 1, []
+    for _ in range(int(rows[0])):
+        sequence = rows[index + 1].strip()
+        index += 2
+        balance, moves = 0, 0
+        for char in sequence:
+            balance += 1 if char == "(" else -1
+            if balance < 0:
+                moves += 1
+                balance = 0
+        out.append(f"{moves}\n")
+    return "".join(out)
+
+
+@oracle("1475A")
+def oracle_1475a(text):
+    values = ints(text)
+    out = []
+    for n in values[1:1 + values[0]]:
+        out.append(("NO" if n & (n - 1) == 0 else "YES") + "\n")
+    return "".join(out)
+
+
+# --------------------------------------------------------------------- 批次 16
+
+@oracle("1764C")
+def oracle_1764c(text):
+    values = ints(text)
+    position, out = 1, []
+    for _ in range(values[0]):
+        n = values[position]
+        row = sorted(values[position + 1:position + 1 + n])
+        position += 1 + n
+        if row[0] == row[-1]:
+            out.append(f"{n // 2}\n")          # 全相等时只能两两配对
+            continue
+        best = 0
+        for index in range(1, n):
+            if row[index] != row[index - 1]:
+                best = max(best, index * (n - index))
+        out.append(f"{best}\n")
+    return "".join(out)
+
+
+@verifier("1793C")
+def verify_1793c(text, answer):
+    """输出任意一段两端既不是最小也不是最大的子段，或 -1。"""
+    values = ints(text)
+    tokens = answer.split()
+    position, cursor = 1, 0
+    for _ in range(values[0]):
+        n = values[position]
+        row = values[position + 1:position + 1 + n]
+        position += 1 + n
+        # 双指针判存在性：两端只要是当前区间的最小或最大就缩掉。
+        left, right, low, high = 0, n - 1, 1, n
+        while left <= right:
+            if row[left] == low:
+                left += 1
+                low += 1
+            elif row[left] == high:
+                left += 1
+                high -= 1
+            elif row[right] == low:
+                right -= 1
+                low += 1
+            elif row[right] == high:
+                right -= 1
+                high -= 1
+            else:
+                break
+        exists = left <= right
+        if tokens[cursor] == "-1":
+            cursor += 1
+            if exists:
+                return f"n={n}: 存在合法子段（{left + 1},{right + 1}），不该输出 -1"
+            continue
+        l, r = int(tokens[cursor]), int(tokens[cursor + 1])
+        cursor += 2
+        if not exists:
+            return f"n={n}: 不存在合法子段，却输出了 {l} {r}"
+        if not 1 <= l <= r <= n:
+            return f"n={n}: 下标 {l} {r} 越界"
+        segment = row[l - 1:r]
+        if (segment[0] in (min(segment), max(segment))
+                or segment[-1] in (min(segment), max(segment))):
+            return f"n={n}: 子段 [{l},{r}] 的端点是最小或最大值"
+    return None
+
+
+@oracle("1829D")
+def oracle_1829d(text):
+    values = ints(text)
+    out = []
+    for index in range(values[0]):
+        n, m = values[1 + 2 * index], values[2 + 2 * index]
+
+        def reachable(pile):
+            while True:
+                if pile == m:
+                    return True
+                if pile < m or pile % 3:
+                    return False
+                if reachable(pile // 3):
+                    return True
+                pile = pile // 3 * 2
+
+        out.append(("YES" if reachable(n) else "NO") + "\n")
+    return "".join(out)
+
+
+@oracle("1883D")
+def oracle_1883d(text):
+    rows = lines(text)
+    count = int(rows[0])
+    lefts, rights = collections.Counter(), collections.Counter()
+    left_heap, right_heap = [], []
+    out = []
+    for row in rows[1:1 + count]:
+        sign, left, right = row.split()
+        left, right = int(left), int(right)
+        if sign == "+":
+            lefts[left] += 1
+            rights[right] += 1
+            heapq.heappush(left_heap, -left)
+            heapq.heappush(right_heap, right)
+        else:
+            lefts[left] -= 1
+            rights[right] -= 1
+        while left_heap and lefts[-left_heap[0]] <= 0:
+            heapq.heappop(left_heap)
+        while right_heap and rights[right_heap[0]] <= 0:
+            heapq.heappop(right_heap)
+        # 不相交 <=> 最小的右端点 < 最大的左端点
+        ok = left_heap and right_heap and right_heap[0] < -left_heap[0]
+        out.append(("YES" if ok else "NO") + "\n")
+    return "".join(out)
+
+
+def _trails(text):
+    """1970E1/E2/E3 是同一道题的三档规模（n 最大 10^9，m 最大 10^5）。
+
+    一天的走法数 T[i][j] = s_i*s_j + s_i*l_j + l_i*s_j（至少一条短路）。
+    关键：这个 m×m 的转移只有秩 2 —— 把状态压成 (S, L) = (Σ cur_i*s_i, Σ cur_i*l_i)，
+    一天就是一个 2×2 矩阵，于是 n 再大也只要快速幂。
+    """
+    rows = lines(text)
+    m, n = ints(rows[0])
+    short, long_ = ints(rows[1]), ints(rows[2])
+    mod = 10 ** 9 + 7
+    a = sum(short[j] * (short[j] + long_[j]) for j in range(m)) % mod
+    b = sum(short[j] * short[j] for j in range(m)) % mod
+    c = sum(long_[j] * (short[j] + long_[j]) for j in range(m)) % mod
+    d = sum(short[j] * long_[j] for j in range(m)) % mod
+
+    def multiply(x, y):
+        return [(x[0] * y[0] + x[1] * y[2]) % mod, (x[0] * y[1] + x[1] * y[3]) % mod,
+                (x[2] * y[0] + x[3] * y[2]) % mod, (x[2] * y[1] + x[3] * y[3]) % mod]
+
+    power, base, steps = [1, 0, 0, 1], [a, b, c, d], n - 1
+    while steps:
+        if steps & 1:
+            power = multiply(power, base)
+        base = multiply(base, base)
+        steps >>= 1
+    state = [(power[0] * short[0] + power[1] * long_[0]) % mod,
+             (power[2] * short[0] + power[3] * long_[0]) % mod]
+    total = (state[0] * sum(short[j] + long_[j] for j in range(m))
+             + state[1] * sum(short)) % mod
+    return f"{total}\n"
+
+
+ORACLES["1970E1"] = _trails
+ORACLES["1970E2"] = _trails
+ORACLES["1970E3"] = _trails
+
+
+@oracle("2227B")
+def oracle_2227b(text):
+    """可以整段删掉再逐个任意插回 —— 删掉整串就能随意重排，所以只看左右括号数是否相等。"""
+    rows = lines(text)
+    index, out = 1, []
+    for _ in range(int(rows[0])):
+        sequence = rows[index + 1].strip()
+        index += 2
+        out.append(("YES" if sequence.count("(") == sequence.count(")") else "NO") + "\n")
+    return "".join(out)
+
+
+# --------------------------------------------------------------------- 批次 17
+
+@oracle("1742A")
+def oracle_1742a(text):
+    values = ints(text)
+    out = []
+    for index in range(values[0]):
+        row = values[1 + 3 * index:4 + 3 * index]
+        out.append(("YES" if max(row) == sum(row) - max(row) else "NO") + "\n")
+    return "".join(out)
+
+
+@verifier("2140B")
+def verify_2140b(text, answer):
+    """任何满足 (x+y) | concat(x,y) 且 1<=y<=10^9 的 y 都算对。"""
+    values = ints(text)
+    ys = ints(answer)
+    xs = values[1:1 + values[0]]
+    if len(ys) != len(xs):
+        return f"应输出 {len(xs)} 个 y，实际 {len(ys)} 个"
+    for x, y in zip(xs, ys):
+        if not 1 <= y <= 10 ** 9:
+            return f"y={y} 越出题面 1<=y<=10^9"
+        if int(f"{x}{y}") % (x + y):
+            return f"x={x}, y={y}: concat 不能被 x+y 整除"
+    return None
+
+
+@oracle("2227E")
+def oracle_2227e(text):
+    """重力向右后会移动的方块数，允许把某一列减 1（或不减）。
+
+    某列 i 高度 h 的方块**不动** <=> 它右边每一列都至少有 h 个方块，
+    所以第 i 列不动的方块数 = min(a_i, 右侧后缀最小值)。把某列减 1 只会影响
+    它自己那一项，以及左边那些「后缀最小值恰好等于 a_k」的列，逐项算差即可。
+    """
+    values = ints(text)
+    position, out = 1, []
+    for _ in range(values[0]):
+        n = values[position]
+        row = values[position + 1:position + 1 + n]
+        position += 1 + n
+        infinity = float("inf")
+        suffix = [infinity] * (n + 1)
+        for index in range(n - 1, -1, -1):
+            suffix[index] = min(suffix[index + 1], row[index])
+        stay = [min(row[index], suffix[index + 1]) for index in range(n)]
+        total, kept = sum(row), sum(stay)
+        best = total - kept
+        # 按后缀最小值分组，便于数「左边有多少列的 m_i 恰好等于 a_k 且 a_i >= a_k」
+        groups = collections.defaultdict(list)
+        for index in range(n):
+            groups[suffix[index + 1]].append(index)
+        prefix = {}
+        for value, indices in groups.items():
+            running, table = 0, []
+            for index in indices:
+                running += 1 if row[index] >= value else 0
+                table.append(running)
+            prefix[value] = (indices, table)
+        for k in range(n):
+            if row[k] < 1:
+                continue
+            same = 0
+            if row[k] in prefix:
+                indices, table = prefix[row[k]]
+                cut = bisect.bisect_left(indices, k)
+                same = table[cut - 1] if cut else 0
+            own = min(row[k], suffix[k + 1]) - min(row[k] - 1, suffix[k + 1])
+            best = max(best, (total - 1) - (kept - same - own))
+        out.append(f"{best}\n")
+    return "".join(out)
+
+
+@verifier("2171F")
+def verify_2171f(text, answer):
+    """存在性判据与 2171D 相同；YES 时还要给出一棵满足「小号在前」的树。"""
+    values = ints(text)
+    tokens = answer.split()
+    position, cursor = 1, 0
+    for _ in range(values[0]):
+        n = values[position]
+        permutation = values[position + 1:position + 1 + n]
+        position += 1 + n
+        smallest, split = n + 1, False
+        for length in range(1, n):
+            smallest = min(smallest, permutation[length - 1])
+            if smallest == n - length + 1:
+                split = True
+                break
+        decision = tokens[cursor].lower()
+        cursor += 1
+        if decision == "no":
+            if not split:
+                return f"n={n}: 存在合法的树，不该输出 No"
+            continue
+        if decision != "yes":
+            return f"n={n}: 答案既不是 Yes 也不是 No：{decision!r}"
+        if split:
+            return f"n={n}: 不存在合法的树，却输出了 Yes"
+        edges = []
+        for _ in range(n - 1):
+            u, v = int(tokens[cursor]), int(tokens[cursor + 1])
+            cursor += 2
+            edges.append((u, v))
+        if not is_tree(n, edges):
+            return f"n={n}: 给出的边不是一棵树"
+        place = {value: index for index, value in enumerate(permutation)}
+        for u, v in edges:
+            small, large = min(u, v), max(u, v)
+            if place[small] > place[large]:
+                return f"n={n}: 边 ({u},{v}) 里小的一端没有排在前面"
+    return None
+
+
+@verifier("37C")
+def verify_37c(text, answer):
+    """给定长度的前缀码：每个词长度对得上、两两不互为前缀；构造不唯一。"""
+    values = ints(text)
+    lengths = values[1:1 + values[0]]
+    tokens = answer.split()
+    if tokens[0].upper() == "NO":
+        # Kraft 不等式：Σ 2^-l > 1 时无解。**必须用整数算** —— 长度到 1000、词有 1000 个时
+        # 浮点版会把 6.in 的和四舍五入成正好 1.0，于是把正确的 NO 判成错（2026-09-20 实测）。
+        top = max(lengths)
+        if sum(2 ** (top - length) for length in lengths) > 2 ** top:
+            return None
+        return "存在合法的前缀码，不该输出 NO"
+    words = tokens[1:]
+    if len(words) != len(lengths):
+        return f"应输出 {len(lengths)} 个词，实际 {len(words)} 个"
+    for word, length in zip(words, lengths):
+        if len(word) != length or set(word) - {"0", "1"}:
+            return f"{word!r} 不是长度 {length} 的 01 串"
+    for i, first in enumerate(words):
+        for second in words[i + 1:]:
+            if first.startswith(second) or second.startswith(first):
+                return f"{first!r} 与 {second!r} 互为前缀"
+    return None
+
+
+@verifier("2201G")
+def verify_2201g(text, answer):
+    """S 诱导出的子图必须同构于一个长度至少 ⌊n²/e⌋ 的环。"""
+    n = int(text.split()[0])
+    rows = [row for row in answer.split() if row]
+    if len(rows) != n or any(len(row) != n or set(row) - {"0", "1"} for row in rows):
+        return f"应输出 {n} 行、每行 {n} 个 0/1"
+    chosen = [(r, c) for r in range(n) for c in range(n) if rows[r][c] == "1"]
+    need = int(n * n / math.e)
+    if len(chosen) < need:
+        return f"只选了 {len(chosen)} 个点，题面要求至少 {need} 个"
+    index = {point: number for number, point in enumerate(chosen)}
+    degree = [0] * len(chosen)
+    edges = []
+    for (r, c) in chosen:
+        for dr, dc in ((2, 3), (3, 2), (2, -3), (3, -2)):
+            other = (r + dr, c + dc)
+            if other in index:
+                degree[index[(r, c)]] += 1
+                degree[index[other]] += 1
+                edges.append((index[(r, c)], index[other]))
+    if any(value != 2 for value in degree):
+        return "诱导子图里有点的度不是 2，不可能是一个环"
+    if not edges or len(edges) != len(chosen):
+        return f"环应当有 {len(chosen)} 条边，实际 {len(edges)} 条"
+    seen, current, previous = {0}, 0, None
+    neighbours = collections.defaultdict(list)
+    for a, b in edges:
+        neighbours[a].append(b)
+        neighbours[b].append(a)
+    while True:
+        nxt = next((node for node in neighbours[current] if node != previous), None)
+        if nxt is None or nxt == 0:
+            break
+        if nxt in seen:
+            return "诱导子图不是单个环"
+        seen.add(nxt)
+        previous, current = current, nxt
+    if len(seen) != len(chosen):
+        return f"环只穿过 {len(seen)} 个点，选了 {len(chosen)} 个"
+    return None
+
+
+# --------------------------------------------------------------------- 批次 18
+
+def _stamina_2208c(text):
+    """得分随 S 线性伸缩，所以从后往前一遍 DP：f(i) = max(f(i+1), c_i + (1-p_i/100)·f(i+1))。"""
+    values = ints(text)
+    position, out = 1, []
+    for _ in range(values[0]):
+        n = values[position]
+        tasks = [(values[position + 1 + 2 * i], values[position + 2 + 2 * i]) for i in range(n)]
+        position += 1 + 2 * n
+        best = 0.0
+        for value, difficulty in reversed(tasks):
+            best = max(best, value + (1 - difficulty / 100) * best)
+        out.append(best)
+    return out
+
+
+float_verifier("2208C", _stamina_2208c, tolerance=1e-6)
+
+
+@oracle("2227D")
+def oracle_2227d(text):
+    """回文子数组的最大 mex。每个值恰好出现两次，所以从每个中心往外扩的总步数是线性的。"""
+    values = ints(text)
+    position, out = 1, []
+    for _ in range(values[0]):
+        n = values[position]
+        row = values[position + 1:position + 1 + 2 * n]
+        position += 1 + 2 * n
+        size = len(row)
+        best = 0
+        for centre in range(2 * size - 1):
+            left, right = centre // 2, (centre + 1) // 2
+            seen, mex = set(), 0
+            while left >= 0 and right < size and row[left] == row[right]:
+                seen.add(row[left])
+                seen.add(row[right])
+                while mex in seen:
+                    mex += 1
+                best = max(best, mex)
+                left -= 1
+                right += 1
+        out.append(f"{best}\n")
+    return "".join(out)

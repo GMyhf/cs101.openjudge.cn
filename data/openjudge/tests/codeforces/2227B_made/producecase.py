@@ -6,7 +6,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-SAMPLE = "4\n2\n)(\n4\n()()\n4\n))((\n5\n()(()\n"
+# 题面样例逐字。2026-09-20 发现第 0 组放的是 1374C 的样例，不是这道题的。
+SAMPLE = '6\n2\n()\n2\n)(\n3\n(((\n6\n())(()\n4\n(()(\n5\n)()()\n'
+SAMPLE_OUT = 'YES\nYES\nNO\nYES\nNO\nNO\n'
 REFERENCE = Path(__file__).with_name("samplecode.py")
 
 
@@ -39,6 +41,8 @@ def build():
         if not valid(case): raise SystemExit(f"invalid {index}")
         answer = subprocess.run([sys.executable, str(REFERENCE)], input=case, text=True, capture_output=True, check=True).stdout
         if answer != oracle(case): raise SystemExit(f"oracle disagreement {index}")
+        if index == 0 and answer.split() != SAMPLE_OUT.split():
+            raise SystemExit(f"第 0 组与题面样例输出不符：{answer!r} != {SAMPLE_OUT!r}")
         (out / f"{index}.in").write_text(case, encoding="utf-8"); (out / f"{index}.out").write_text(answer, encoding="utf-8")
 
 

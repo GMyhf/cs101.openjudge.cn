@@ -3,6 +3,11 @@
 import json
 from pathlib import Path
 import random
+import sys
+
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from cf_statement_flags import allows_any_case as statement_allows_any_case  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 # 复核撤下的题：这个脚本不许把它们重新接进判题队列。
@@ -1248,21 +1253,6 @@ BUILDERS = {
     "2227A": case_2227a,
     "2227C": case_2227c,
 }
-
-
-def statement_allows_any_case(problem):
-    """题面是否明写「答案大小写随意」。按镜像下来的结构化题面判，不靠手工清单。"""
-    path = MIRROR / "statements" / f"{problem}.json"
-    if not path.is_file():
-        return False
-    try:
-        statement = json.loads(path.read_text(encoding="utf-8"))["statement"]
-    except (OSError, json.JSONDecodeError, KeyError):
-        return False
-    text = " ".join(((statement.get("formatO") or "")
-                     + " " + (statement.get("description") or "")).split())
-    import re as _re
-    return bool(_re.search(r"in any case|any case \(upper|upper or lower", text, _re.I))
 
 
 def main():

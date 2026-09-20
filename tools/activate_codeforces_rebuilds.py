@@ -11,6 +11,12 @@ MIRROR = ROOT / "data" / "openjudge"
 CATALOG = MIRROR / "catalog.json"
 FLOAT_REBUILDS = {"2208C"}
 
+import sys  # noqa: E402
+
+if str(ROOT / "scripts") not in sys.path:
+    sys.path.insert(0, str(ROOT / "scripts"))
+from cf_statement_flags import allows_any_case  # noqa: E402
+
 
 def cases_for(problem_id: str):
     root = MIRROR / "tests" / "codeforces" / f"{problem_id}_made"
@@ -56,6 +62,11 @@ def main():
                 row.pop(field, None)
         if problem_id in FLOAT_REBUILDS:
             row["comparison"] = "float_tokens"
+        elif allows_any_case(problem_id):
+            # 题面明写「答案大小写随意」的题不能拿 token 精确比对判（见 judge.outputs_match）。
+            row["comparison"] = "case_insensitive_tokens"
+        else:
+            row.pop("comparison", None)
     # Match index_tests.py: its canonical JSON product has no terminal newline.
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"activated {len(options.problem)} Codeforces rebuilds")

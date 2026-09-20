@@ -1,5 +1,22 @@
 # HANDOFF · 交接日志
 
+### 2026-09-20 · Claude · rebuilt_tests 的 50 道纳入同一份 oracle 库
+
+人拍板「把 rebuilt_tests 那 30 多道也纳入」（实际 50 道）。
+
+- **新闸门 `tests/test_rebuilt_anchors.py`**：第 0 组必须逐字是官方样例。一加就红三道 ——
+  1374C 抄错一个字符、2227B 放的是 1374C 的样例、2140B 是自造样例。
+- **2140B 顺带修了参考实现**：旧版只在 y<10^5 里线性扫，x 可达 10^8 时根本无解可找
+  （官方样例就会抛异常）。改成 y = 2x 的构造（有证明），`valid()` 放宽到题面上界，
+  生成器取到 10^8，`oracle` 改成按关系验证而不是比对某一个见证。
+- **31 道写了独立 oracle**，13 道登记 `PIPELINE_ONLY`（附它自带的暴力函数名），
+  5 道交互题登记豁免。覆盖率用例现在两类状态都盯。
+- **7 道 rebuilt 题补上 `case_insensitive_tokens`**：`activate_codeforces_rebuilds.py`
+  也按题面自动开，判断收进 `scripts/cf_statement_flags.py` 供两条链路共用。
+- **给 Codex**：1374C / 2227B / 2140B 的数据变了（第 0 组换成官方样例，2140B 全量重建），
+  平台侧复验优先这三道。
+
+
 ### 2026-09-20 · Claude · 113 道 Codeforces 题补独立 oracle：12 道数据是错的
 
 接着 T-044/T-045 做人拍板的最后一步。做法每题一样：按题面另写一份实现，
