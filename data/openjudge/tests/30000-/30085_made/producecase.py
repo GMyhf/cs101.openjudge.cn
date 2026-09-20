@@ -3,7 +3,8 @@ REFERENCE="# External reference: /practice/30085/statistics/\n# Accepted submiss
 SAMPLE='100 \n9 \n90 \n20 \n20 \n30 \n50 \n60 \n70 \n80 \n90\n'
 GENERATOR_NAME='g30085'
 def g30085(r):
-    n = r.randint(1, 200); w = r.randint(1, 2000); prices = [r.randint(1, w) for _ in range(n)]
+    # 题面：80 <= w <= 200，1 <= n <= 3*10^4，5 <= Pi <= w。
+    n = r.randint(1, 200); w = r.randint(80, 200); prices = [r.randint(5, w) for _ in range(n)]
     return f"{w}\n{n}\n" + "\n".join(map(str, prices)) + "\n"
 
 from pathlib import Path

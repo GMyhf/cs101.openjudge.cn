@@ -5,7 +5,8 @@ LANGUAGE='Python3'
 SAMPLE='4\n6 2 9 1\n'
 GENERATOR_NAME='g19962'
 def g19962(r):
-    n=r.randint(2,30); return f"{n}\n"+" ".join(str(r.randint(-100,100)) for _ in range(n))+"\n"
+    # 题面数据范围：1 <= N <= 100000，1 <= Ai <= 100000（坐标不为负）。
+    n=r.randint(2,30); return f"{n}\n"+" ".join(str(r.randint(1,100000)) for _ in range(n))+"\n"
 
 def run(text):
     with tempfile.TemporaryDirectory(prefix="producecase-") as d:

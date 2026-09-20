@@ -881,7 +881,8 @@
         "byte_reproduction": {
           "status": "passed"
         },
-        "failed": []
+        "failed": [],
+        "rebuilt_2026_09_20": "旧数据难度为负，题面写的是 1 <= Ai,Bi <= 10^3。2026-09-20 按题面重建数据（见 tests/test_input_constraints.py）：本轮的 constraint_checklist 没有照题面核对取值范围，数据越出题面；这里的自检数字已按重建后的 data/ 重新量过。"
       },
       "sample_reproduced": true,
       "producecase_reproduced": true
@@ -1566,11 +1567,11 @@
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 2,
+          "frequency": 3,
           "total": 20,
           "status": "rejected",
           "exemption": null,
-          "share": 0.1
+          "share": 0.15
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -1601,7 +1602,8 @@
         "byte_reproduction": {
           "status": "passed"
         },
-        "failed": []
+        "failed": [],
+        "rebuilt_2026_09_20": "旧数据 w 取到 1..2000、价格从 1 起，题面写的是 80 <= w <= 200、5 <= Pi <= w。2026-09-20 按题面重建数据（见 tests/test_input_constraints.py）：本轮的 constraint_checklist 没有照题面核对取值范围，数据越出题面；这里的自检数字已按重建后的 data/ 重新量过。"
       },
       "sample_reproduced": true,
       "producecase_reproduced": true

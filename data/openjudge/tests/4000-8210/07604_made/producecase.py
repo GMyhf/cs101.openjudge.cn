@@ -4,7 +4,8 @@ REFERENCE='n = int(input())\nstring = input()\ndict_ = {} # 注意用dict()或�
 SAMPLE='3\nabcdefabcd\n'
 GENERATOR_NAME='g7604'
 def g7604(r):
-    n=r.randint(1,8); s="".join(r.choice("abcde") for _ in range(r.randint(n,40)))
+    n=r.randint(2,4)                 # 题面：1 < n < 5
+    s="".join(r.choice("abcde") for _ in range(r.randint(n,40)))
     return f"{n}\n{s}\n"
 
 def run(text):

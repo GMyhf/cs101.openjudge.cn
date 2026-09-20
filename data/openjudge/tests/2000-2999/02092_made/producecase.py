@@ -121,7 +121,18 @@ def generate(number, seed):
     if number == 2092:
         cases=[]
         for _ in range(r.randint(1,4)):
-            n,m=r.randint(2,20),r.randint(1,20);cases.append(f"{n} {m}\n"+"\n".join(" ".join(str(r.randint(1,60)) for _ in range(m)) for _ in range(n)))
+            while True:
+                n,m=r.randint(2,20),r.randint(2,20)            # 题面：2<=N,M<=500
+                rows=[r.sample(range(1,61),m) for _ in range(n)]   # 每张榜内编号互不相同
+                counts={}
+                for row in rows:
+                    for player in row: counts[player]=counts.get(player,0)+1
+                best=max(counts.values())
+                # 题面保证：恰好一个最佳选手，且至少有一个次佳选手
+                if sum(value==best for value in counts.values())!=1: continue
+                if all(value==best for value in counts.values()): continue
+                break
+            cases.append(f"{n} {m}\n"+"\n".join(" ".join(map(str,row)) for row in rows))
         return "\n".join(cases)+"\n0 0\n"
     if number == 2253:
         cases=[]

@@ -3,7 +3,8 @@ REFERENCE='# External reference: /practice/29853/statistics/\n# Accepted submiss
 SAMPLE='2\n1 10\n2 20\n'
 GENERATOR_NAME='g29853'
 def g29853(r):
-    n = r.randint(1, 100); a = [r.randint(-1000, 1000) for _ in range(n)]; b = [r.randint(-1000, 1000) for _ in range(n)]
+    # 题面：1<=N<=1000，1<=Ai<=10^3，1<=Bi<=10^3。
+    n = r.randint(1, 100); a = [r.randint(1, 1000) for _ in range(n)]; b = [r.randint(1, 1000) for _ in range(n)]
     return f"{n}\n{' '.join(map(str, a))}\n{' '.join(map(str, b))}\n"
 
 from pathlib import Path

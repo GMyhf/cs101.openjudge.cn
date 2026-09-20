@@ -33,7 +33,7 @@ LABELS={
 18182:"1..100 cases contain the stated 1..1000 skills with positive bounded time, damage, capacity and health",
 12556:"the input is one 1..1000-character alphabetic string",
 12560:"the n-by-m board has exact dimensions and contains only zero and one",
-4101:"the case count matches square 3..30 grids over r, b and non-mineral cells",
+4101:"the case count matches square 3..30 grids over the statement's three cell types r, b and #",
 28050:"3<=n<=19 and the knight start coordinates lie inside the n-by-n board",
 4030:"the first line is one alphabetic word and the second contains only letters and spaces",
 16528:"0<=n<10000 activities each satisfy 0<=start<=end<=60",
@@ -89,7 +89,9 @@ def generate(number,seed):
  if number==4101:
   k=r.randint(1,6);chunks=[]
   for _ in range(k):
-   n=30 if seed==20 else r.randint(3,15);chunks.append(str(n)+'\n'+'\n'.join(''.join(r.choice('rb#.') for _ in range(n)) for _ in range(n)))
+   # 题面只定义了三种地点：'#' 非晶矿、'r' 红晶矿、'b' 黑晶矿。旧生成器还撒了 '.'，
+   # 于是「非 '#' 即晶矿」这种照题面写同样成立的实现会被判错。
+   n=30 if seed==20 else r.randint(3,15);chunks.append(str(n)+'\n'+'\n'.join(''.join(r.choice('rb#') for _ in range(n)) for _ in range(n)))
   return f"{k}\n"+'\n'.join(chunks)+'\n'
  if number==28050:
   n=3+(seed-1)%17;return f"{n}\n{r.randrange(n)} {r.randrange(n)}\n"
@@ -152,7 +154,7 @@ def valid(number,text):
    k=int(lines[0]);i=1
    for _ in range(k):
     n=int(lines[i]);i+=1
-    if not 3<=n<=30 or i+n>len(lines) or any(len(row)!=n or set(row)-set('rb#.') for row in lines[i:i+n]):return False
+    if not 3<=n<=30 or i+n>len(lines) or any(len(row)!=n or set(row)-set('rb#') for row in lines[i:i+n]):return False
     i+=n
    return k>=1 and i==len(lines)
   if number==28050:

@@ -4,7 +4,10 @@ SAMPLE='100 3\n24 60\n10 40\n18 50\n'
 GENERATOR_NAME='g30192'
 CPP=False
 def g30192(r):
-    n = r.randint(1, 7); return f"{r.randint(20, 200)} {n}\n" + "\n".join(f"{r.randint(1,50)} {r.randint(1,30)}" for _ in range(n)) + "\n"
+    # 题面：100 <= W <= 400，1 <= n <= 16，1 <= t <= 50，10 <= w <= 100。
+    # n 只取到 7：参考解法枚举子集的子集（3^n），贴着题面上界 16 会跑成分钟级。
+    n = r.randint(1, 7)
+    return f"{r.randint(100, 400)} {n}\n" + "\n".join(f"{r.randint(1,50)} {r.randint(10,100)}" for _ in range(n)) + "\n"
 
 from pathlib import Path
 import subprocess, sys, tempfile

@@ -6,7 +6,13 @@ import random
 
 ROOT = Path(__file__).resolve().parents[1]
 # 复核撤下的题：这个脚本不许把它们重新接进判题队列。
-WITHHELD_STATUSES = {"withheld_pending_rework"}
+# 复核撤下的题：这个脚本不许把它们重新接进判题队列。
+# `rebuilt_tests` 同理 —— 那些题已经按单题流水线（各自的 `producecase.py` +
+# `samplecode.py` + `valid()`）重建过，数据不再由这里的 `BUILDERS` 负责。
+# 2026-09-20 实测：不挡的话跑一次这个脚本就会把 9 道重建题的数据盖回中央生成器的
+# 版本，并把 catalog 里的 `data_status` 从 `rebuilt_tests` 改回 `generated_tests`，
+# 单题流水线连同它的 `valid()` 契约一起失效，而闸门全绿。
+WITHHELD_STATUSES = {"withheld_pending_rework", "rebuilt_tests"}
 MIRROR = ROOT / "data" / "openjudge"
 CATALOG = MIRROR / "catalog.json"
 
@@ -19,8 +25,10 @@ def case_1a(r):
 def case_25a(r):
     n = r.randrange(3, 52, 2)
     parity = r.randrange(2)
-    values = [2 * r.randint(1, 100) + parity for _ in range(n - 1)]
-    outlier = 2 * r.randint(1, 100) + (1 - parity)
+    # 题面：n 个**不超过 100** 的自然数。同奇偶的取 [1,100] 内同奇偶的值。
+    pick = lambda bit: r.randrange(2 - bit, 101 - bit, 2)
+    values = [pick(parity) for _ in range(n - 1)]
+    outlier = pick(1 - parity)
     index = r.randrange(n)
     values.insert(index, outlier)
     return f"{n}\n{' '.join(map(str, values))}\n", f"{index + 1}\n"
@@ -108,8 +116,9 @@ def case_230a(r):
 
 
 def case_34b(r):
-    n, m = r.randint(1, 50), r.randint(1, 50)
-    prices = [r.randint(-100, 100) for _ in range(n)]
+    n = r.randint(1, 100)
+    m = r.randint(1, n)                      # 题面：1<=m<=n<=100
+    prices = [r.randint(-1000, 1000) for _ in range(n)]
     gain = -sum(value for value in sorted(prices)[:m] if value < 0)
     return f"{n} {m}\n{' '.join(map(str, prices))}\n", f"{gain}\n"
 
@@ -125,7 +134,7 @@ def case_339b(r):
 
 
 def case_427a(r):
-    events = [r.randint(-5, 5) for _ in range(r.randint(1, 100))]
+    events = [r.choice([-1] + list(range(1, 11))) for _ in range(r.randint(1, 100))]
     officers = missing = 0
     for event in events:
         if event > 0: officers += event
@@ -188,7 +197,7 @@ def case_615a(r):
         chosen = sorted(r.sample(range(1, bulbs + 1), r.randint(0, bulbs)))
         groups.append(chosen)
     lit = set().union(*map(set, groups)) if groups else set()
-    text = f"{bulbs} {buttons}\n" + "".join(str(len(group)) + (" " + " ".join(map(str, group)) if group else "") + "\n" for group in groups)
+    text = f"{buttons} {bulbs}\n" + "".join(str(len(group)) + (" " + " ".join(map(str, group)) if group else "") + "\n" for group in groups)
     return text, ("YES" if len(lit) == bulbs else "NO") + "\n"
 
 
@@ -311,7 +320,8 @@ def case_368b(r):
     values = [r.randint(1, 50) for _ in range(r.randint(1, 200))]
     queries = [r.randint(1, len(values)) for _ in range(r.randint(1, 100))]
     answer = [str(len(set(values[index - 1:]))) for index in queries]
-    return str(len(values)) + "\n" + " ".join(map(str, values)) + "\n" + str(len(queries)) + "\n" + "\n".join(map(str, queries)) + "\n", "\n".join(answer) + "\n"
+    return (f"{len(values)} {len(queries)}\n" + " ".join(map(str, values)) + "\n"
+            + "\n".join(map(str, queries)) + "\n"), "\n".join(answer) + "\n"
 
 def case_431c(r):
     n, k, d = r.randint(1, 100), r.randint(1, 100), r.randint(1, 100)
@@ -390,7 +400,8 @@ def case_1398c(r):
     return f"1\n{len(text)}\n{text}\n", f"{answer}\n"
 
 def case_1520d(r):
-    values = [r.randint(1, 1000) for _ in range(r.randint(1, 200))]; counts = {}; answer = 0
+    size = r.randint(1, 200)
+    values = [r.randint(1, size) for _ in range(size)]; counts = {}; answer = 0   # 题面：1<=a_i<=n
     for index, value in enumerate(values):
         key = value - index; answer += counts.get(key, 0); counts[key] = counts.get(key, 0) + 1
     return f"1\n{len(values)}\n{' '.join(map(str,values))}\n", f"{answer}\n"
@@ -427,7 +438,7 @@ def case_1829e(r):
     return f"1\n{rows} {cols}\n" + "".join(" ".join(map(str,row)) + "\n" for row in grid), f"{best}\n"
 
 def case_1850h(r):
-    nodes, edges = r.randint(2, 30), r.randint(1, 60)
+    nodes = r.randint(2, 30); edges = r.randint(1, nodes)    # 题面：2<=n，1<=m<=n
     graph = [[] for _ in range(nodes)]; rows = []
     for _ in range(edges):
         a, b, weight = r.randrange(nodes), r.randrange(nodes), r.randint(-20, 20)
@@ -504,7 +515,8 @@ def case_545c(r):
     return str(count) + "\n" + "".join(f"{p} {h}\n" for p,h in zip(positions,heights)), f"{answer}\n"
 
 def case_580c(r):
-    nodes, limit = r.randint(1, 100), r.randint(0, 10); cats = [r.randint(0, 1) for _ in range(nodes)]
+    nodes = r.randint(2, 100); limit = r.randint(1, nodes)   # 题面：2<=n，1<=m<=n
+    cats = [r.randint(0, 1) for _ in range(nodes)]
     edges = []
     for node in range(1, nodes): edges.append((r.randrange(node), node))
     graph = [[] for _ in range(nodes)]
@@ -604,7 +616,7 @@ def case_2132b(r):
     return f"1\n{value}\n",str(len(answers))+("\n"+" ".join(map(str,answers)) if answers else "")+"\n"
 
 def case_986b(r):
-    n=r.randint(3,100); perm=list(range(1,n+1)); r.shuffle(perm)
+    n=r.randint(1000,1200); perm=list(range(1,n+1)); r.shuffle(perm)   # 题面：10^3<=n<=10^6
     inversions=sum(perm[i]>perm[j] for i in range(n) for j in range(i+1,n))%2
     return f"{n}\n{' '.join(map(str,perm))}\n",("Petr" if inversions==n%2 else "Um_nik")+"\n"
 
@@ -755,13 +767,13 @@ def case_313b(r):
     return text+"\n"+str(len(queries))+"\n"+"".join(f"{a} {b}\n" for a,b in queries),"\n".join(answer)+"\n"
 
 def case_1749c(r):
-    values=[r.randint(1,100) for _ in range(r.randint(1,100))]; answer=0
+    size=r.randint(1,100); values=[r.randint(1,size) for _ in range(size)]; answer=0   # 题面：1<=a_i<=n
     for value in sorted(values):
         if value>answer:answer+=1
     return f"1\n{len(values)}\n{' '.join(map(str,values))}\n",f"{answer}\n"
 
 def case_2184f(r):
-    nodes=r.randint(1,10); edges=[]
+    nodes=r.randint(2,10); edges=[]                  # 题面：2<=n
     for node in range(1,nodes):edges.append((r.randrange(node),node))
     children=[[] for _ in range(nodes)]
     for a,b in edges:children[a].append(b)
@@ -886,14 +898,15 @@ def case_2140b(r):
 
 
 def case_363b(r):
-    values = [r.randint(1, 1000) for _ in range(r.randint(1, 200))]
+    values = [r.randint(1, 100) for _ in range(r.randint(1, 200))]   # 题面：1<=h_i<=100
     width = r.randint(1, len(values))
     sums = [sum(values[index:index + width]) for index in range(len(values) - width + 1)]
     return f"{len(values)} {width}\n{' '.join(map(str, values))}\n", f"{sums.index(min(sums)) + 1}\n"
 
 
 def case_550c(r):
-    text = "".join(str(r.randint(0, 9)) for _ in range(r.randint(1, 12)))
+    # 题面：n 的十进制表示**不含前导零**。首位单独取 1..9。
+    text = str(r.randint(1, 9)) + "".join(str(r.randint(0, 9)) for _ in range(r.randint(0, 11)))
     witness = next(("".join(text[index] for index in range(len(text)) if mask >> index & 1)
                     for mask in range(1, 1 << len(text))
                     if int("".join(text[index] for index in range(len(text)) if mask >> index & 1)) % 8 == 0), None)
@@ -908,7 +921,7 @@ def case_584a(r):
 
 
 def case_1352a(r):
-    value = r.randint(1, 10**9)
+    value = r.randint(1, 10**4)                      # 题面：1<=n<=10^4
     parts = [int(char) * 10**index for index, char in enumerate(reversed(str(value))) if char != "0"]
     return f"1\n{value}\n", str(len(parts)) + "\n" + " ".join(map(str, parts)) + "\n"
 

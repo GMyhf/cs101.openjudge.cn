@@ -15,7 +15,8 @@ SAMPLE_OUT = '17\n'
 REFERENCE_SOURCE = 'import heapq\n\ndef min_weighted_path_length(n, weights):\n    heapq.heapify(weights)\n    total = 0\n    while len(weights) > 1:\n        a = heapq.heappop(weights)\n        b = heapq.heappop(weights)\n        combined = a + b\n        total += combined\n        heapq.heappush(weights, combined)\n    return total\n\n# 读取输入\nn = int(input())\nweights = list(map(int, input().split()))\nprint(min_weighted_path_length(n, weights))\n'
 
 def g4080(r):
-    n = r.randint(1, 30); return f"{n}\n" + " ".join(str(r.randint(1, 1000)) for _ in range(n)) + "\n"
+    n = r.randint(2, 100)          # 题面：2<=N<=100
+    return f"{n}\n" + " ".join(str(r.randint(1, 1000)) for _ in range(n)) + "\n"
 
 def build_cases():
     return [SAMPLE_IN] + [g4080(random.Random(NUMBER + i)) for i in range(1, 20)]

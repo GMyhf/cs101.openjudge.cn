@@ -12,8 +12,10 @@ def solve_text(text):
 
 
 def generate_case(rng):
-    cases = [("9128456", 2), ("1444", 3), ("987654321", 4), ("100000001", 2)]
-    for _ in range(12):
+    # 题面：第一行 t（t <= 10）；每组的 n 满足 0 < n < 10^9 且**每个数位都不为 0**。
+    # 2026-09-20 之前这里固定 16 组（越过 t<=10），并且带了一个含 0 的 100000001。
+    cases = [("9128456", 2), ("1444", 3), ("987654321", 4)]
+    for _ in range(7):
         size = rng.randint(2, 9)
         cases.append((str(rng.randint(1, 9)) + "".join(str(rng.randint(1, 9)) for _ in range(size - 1)), rng.randint(1, size - 1)))
     return str(len(cases)) + "\n" + "\n".join(f"{n} {k}" for n, k in cases) + "\n"

@@ -10,11 +10,19 @@ SAMPLE = "2\n1 2\n2 1\n"
 REFERENCE = Path(__file__).with_name("samplecode.py")
 
 
+# 题面：1<=a_i,b_i<=n，且 a_i 两两不同、b_i 两两不同 —— 于是价格与质量各是 1..n 的排列。
+# 2026-09-20 之前这里从 1..100000 里取样，n=2 的组里也会出现 a_i=57238，越出题面；
+# 规模列表同时避免 n=1 出现两次（n=1 只有唯一一种合法输入，会撞成重复组）。
+SIZES = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 30, 50, 80, 120, 200, 500, 1000)
+
+
 def generate(seed, attempt=0):
     r = random.Random(456_000_003 + seed * 9176 + attempt)
-    n = (1, 2, 3, 1000)[(seed - 1) % 4]
-    prices = r.sample(range(1, 100_001), n)
-    qualities = r.sample(range(1, 100_001), n)
+    n = SIZES[(seed - 1 + attempt) % len(SIZES)]
+    prices = list(range(1, n + 1))
+    qualities = list(range(1, n + 1))
+    r.shuffle(prices)
+    r.shuffle(qualities)
     rows = list(zip(prices, qualities))
     if seed % 3 == 0:
         rows = list(zip(sorted(prices), sorted(qualities)))
@@ -26,7 +34,8 @@ def generate(seed, attempt=0):
 
 def valid(text):
     v = list(map(int, text.split())); n = v[0]
-    return 1 <= n <= 100_000 and len(v) == 1 + 2*n and len(set(v[1::2])) == n and len(set(v[2::2])) == n and all(1 <= x <= 100_000 for x in v[1:])
+    return (1 <= n <= 100_000 and len(v) == 1 + 2*n and len(set(v[1::2])) == n
+            and len(set(v[2::2])) == n and all(1 <= x <= n for x in v[1:]))
 
 
 def oracle(text):
