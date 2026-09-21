@@ -6,8 +6,11 @@ def g4105(r):
  R,C,K=r.randint(5,8),r.randint(6,9),r.randint(1,3);g=[list("."*C) for _ in range(R)];g[0][0]="S";g[-1][-1]="E"
  for k in range(K):g[r.randint(1,R-2)][r.randint(1,C-2)]=str(k)
  return f"1\n{R} {C} {K}\n"+"\n".join("".join(x) for x in g)+"\n"
+B=["1\n5 6 1\nS.....\n......\n......\n......\n.....E\n",
+   "1\n5 6 2\nS0....\n......\n......\n....1.\n.....E\n",
+   "1\n8 9 3\nS0.......\n.........\n..1......\n.........\n....2....\n.........\n.........\n........E\n"]
 
 with tempfile.NamedTemporaryFile("w") as f:
  f.write(S);f.flush();d=Path(__file__).parent/"data"
  for i in range(21):
-  c=I if i==0 else g4105(random.Random(4105+i));p=subprocess.run(["python3",f.name],input=c,text=True,capture_output=True,check=True);(d/f"{i}.in").write_text(c);(d/f"{i}.out").write_text(p.stdout)
+  c=I if i==0 else B[i-1] if i <= 3 else g4105(random.Random(4105+i));p=subprocess.run(["python3",f.name],input=c,text=True,capture_output=True,check=True);(d/f"{i}.in").write_text(c);(d/f"{i}.out").write_text(p.stdout)

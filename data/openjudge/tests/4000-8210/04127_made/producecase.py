@@ -13,8 +13,9 @@ def g4127(r):
  grid=[list("11111") for _ in range(5)]
  for r0,c0 in path:grid[r0][c0]="0"
  return "\n".join(" ".join(row) for row in grid)+"\n"
+B=["\n".join(["0 0 0 0 0"]*5)+"\n", "0 0 1 1 1\n1 0 0 0 1\n1 1 1 0 1\n1 1 1 0 1\n1 1 1 0 0\n", "0 1 1 1 1\n0 0 0 0 1\n1 1 1 0 1\n1 1 1 0 1\n1 1 1 0 0\n"]
 
 with tempfile.NamedTemporaryFile("w") as f:
  f.write(S);f.flush();d=Path(__file__).parent/"data"
  for i in range(21):
-  c=I if i==0 else g4127(random.Random(4127+i));p=subprocess.run(["python3",f.name],input=c,text=True,capture_output=True,check=True);(d/f"{i}.in").write_text(c);(d/f"{i}.out").write_text(p.stdout)
+  c=I if i==0 else B[i-1] if i <= 3 else g4127(random.Random(4127+i));p=subprocess.run(["python3",f.name],input=c,text=True,capture_output=True,check=True);(d/f"{i}.in").write_text(c);(d/f"{i}.out").write_text(p.stdout)

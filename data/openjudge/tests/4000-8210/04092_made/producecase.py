@@ -7,7 +7,12 @@ def g4092(r):
  for _ in range(z):o+=["3"]+["".join(r.choice("ATGC") for _ in range(60)) for __ in range(3)]
  return "\n".join(o)+"\n"
 
+def b4092():
+ def one(a,b): return "2\n2\n"+a+"\n"+b+"\n2\n"+a+"\n"+b+"\n"
+ return [one("A"*60,"C"*60), one("A"*60,"A"*59+"C"),
+         one("A"*3+"C"*57,"A"*3+"G"*57)]
+
 with tempfile.NamedTemporaryFile("w") as f:
  f.write(S);f.flush();d=Path(__file__).parent/"data"
  for i in range(21):
-  c=I if i==0 else g4092(random.Random(4092+i));p=subprocess.run(["python3",f.name],input=c,text=True,capture_output=True,check=True);(d/f"{i}.in").write_text(c);(d/f"{i}.out").write_text(p.stdout)
+  c=I if i==0 else b4092()[i-1] if i <= 3 else g4092(random.Random(4092+i));p=subprocess.run(["python3",f.name],input=c,text=True,capture_output=True,check=True);(d/f"{i}.in").write_text(c);(d/f"{i}.out").write_text(p.stdout)
