@@ -631,10 +631,17 @@ def _special_output_matches_core(kind, input_data, actual):
     if kind == "weather_permutation":
         try:
             values = list(map(int, input_data.decode().split()))
-            n, k = values[1], values[2]
-            forecast = values[3:3+n]; actual_values = values[3+n:3+2*n]
             output = list(map(int, actual.split()))
-            return len(output) == n and sorted(output) == sorted(actual_values) and all(abs(a-b) <= k for a,b in zip(forecast,output))
+            t = values[0]; cursor = 1; out_cursor = 0
+            for _ in range(t):
+                n, k = values[cursor:cursor + 2]; cursor += 2
+                forecast = values[cursor:cursor+n]; cursor += n
+                actual_values = values[cursor:cursor+n]; cursor += n
+                part = output[out_cursor:out_cursor+n]; out_cursor += n
+                if (len(part) != n or sorted(part) != sorted(actual_values)
+                        or any(abs(a-b) > k for a, b in zip(forecast, part))):
+                    return False
+            return out_cursor == len(output)
         except (UnicodeDecodeError, ValueError, IndexError):
             return False
     if kind == "tile_jump_path":
@@ -705,12 +712,19 @@ def _special_output_matches_core(kind, input_data, actual):
             return False
     if kind == "round_number_decomposition":
         try:
-            value = int(input_data.decode().split()[1])
+            values = list(map(int, input_data.decode().split()))
             tokens = list(map(int, actual.split()))
-            if not tokens or tokens[0] != len(tokens) - 1:
-                return False
-            parts = tokens[1:]
-            return sum(parts) == value and all(part > 0 and str(part).rstrip("0").isdigit() and len(str(part).rstrip("0")) == 1 for part in parts)
+            t = values[0]; in_cursor = 1; out_cursor = 0
+            for _ in range(t):
+                value = values[in_cursor]; in_cursor += 1
+                if out_cursor >= len(tokens): return False
+                count = tokens[out_cursor]; out_cursor += 1
+                parts = tokens[out_cursor:out_cursor+count]; out_cursor += count
+                if (count != len(parts) or sum(parts) != value
+                        or not all(part > 0 and str(part).rstrip("0").isdigit()
+                                   and len(str(part).rstrip("0")) == 1 for part in parts)):
+                    return False
+            return out_cursor == len(tokens)
         except (UnicodeDecodeError, ValueError, IndexError):
             return False
     if kind == "n_digit_divisible":

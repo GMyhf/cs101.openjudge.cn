@@ -43,24 +43,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 987042,
       "max_output_bytes": 14,
       "constraint": "1<=N<=100000 followed by exactly N positive decimal stock prices",
       "constraint_counterexample": "2\n1 0",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 1,
-          "total": 20,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.05
+          "share": 0.025
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -69,7 +69,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -98,14 +98,14 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "16529",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 381
       },
       "input_domain": {
         "statement_quote": "第一行为天数N(1 <= N <= 100000) 接下来一行有N个数Pi，为每天的股票价格，0 < Pi",
         "generated_extremes": {
           "max_int": 100000,
-          "min_int": 5
+          "min_int": 4
         }
       }
     },
@@ -139,24 +139,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 9,
       "max_output_bytes": 3,
       "constraint": "the input is one integer n with 0<n<50000000",
       "constraint_counterexample": "50000000",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 16,
+          "total": 40,
+          "distinct": 35,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 4,
-          "total": 20,
+          "frequency": 11,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.2
+          "share": 0.275
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -165,7 +165,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -194,7 +194,7 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "27626",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 313
       },
       "input_domain": {
@@ -235,24 +235,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
-      "max_input_bytes": 703,
+      "test_cases": 40,
+      "max_input_bytes": 755,
       "max_output_bytes": 9,
       "constraint": "1<=N<=100, 1<=M<=10000 and N ore rows have value and weight in 1..1000",
       "constraint_counterexample": "1 0\n1 1",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 1,
-          "total": 20,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.05
+          "share": 0.025
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -261,7 +261,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -290,7 +290,7 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "29949",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 335
       },
       "input_domain": {
@@ -331,24 +331,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 200303,
       "max_output_bytes": 400,
       "constraint": "1<=n<=100000, 1<=q<=100, n counts in 0..10^9 and q targets in 1..10^9",
       "constraint_counterexample": "1 1\n-1\n2",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 2,
-          "total": 20,
+          "frequency": 3,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.1
+          "share": 0.075
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -357,7 +357,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -386,13 +386,13 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "30947",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 418
       },
       "input_domain": {
         "statement_quote": "第一行，两个整数 n, q（1 <= n <= 10^5, 1 <= q <= 100）。 第二行，n 个整数 c[1], ..., c[n]（0 <= c[i] <= 10^9）。 接下来 q 行，每行一个整数 x（1 <= x <= 10^9），表示一次询问。",
         "generated_extremes": {
-          "max_int": 976876,
+          "max_int": 997594,
           "min_int": 0
         }
       }
@@ -427,21 +427,21 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 3240,
       "max_output_bytes": 5,
       "constraint": "even 2<=n<=1000 followed by n uppercase names shorter than 30 characters",
       "constraint_counterexample": "3\nA\nB\nC",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 2,
-          "total": 20,
+          "frequency": 4,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
           "share": 0.1
@@ -453,7 +453,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -482,7 +482,7 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "16530",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 314
       },
       "input_domain": {
@@ -523,7 +523,7 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 989112,
       "max_output_bytes": 10,
       "constraint": "2<=m<=n<=100000 and n distinct basket positions are integers in 1..10^9",
@@ -537,17 +537,17 @@
       },
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 1,
-          "total": 20,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.05
+          "share": 0.025
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -556,7 +556,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -585,7 +585,7 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "27122",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 704
       }
     },
@@ -619,24 +619,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
-      "max_input_bytes": 7293,
-      "max_output_bytes": 1289,
+      "test_cases": 40,
+      "max_input_bytes": 7598,
+      "max_output_bytes": 1323,
       "constraint": "1<=t<100 nonempty disjoint member rows precede at most 50000 valid queue commands ending STOP",
       "constraint_counterexample": "1\n\nSTOP",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 1,
-          "total": 20,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.05
+          "share": 0.025
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -645,7 +645,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -674,14 +674,14 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "27925",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 358
       },
       "input_domain": {
         "statement_quote": "第一行：小组数量 t (t<100)。 接下来 t 行，每行输入一个小组描述，表示这个小组的人的编号。 编号是 0 到 999999 范围内的整数，一个小组最多可包含 1000 个人。 最后，命令列表如下。 有三种不同的命令： 1、ENQUEUE x - 将编号是 x 的人插入队列； 2、DEQUEUE - 让整个队列的第一个人出队； 3、STOP - 测试用例结束 每个命令占一行，不超过50000行。",
         "generated_extremes": {
-          "max_int": 994103,
-          "min_int": 2
+          "max_int": 999033,
+          "min_int": 1
         }
       }
     },
@@ -715,24 +715,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 11028,
       "max_output_bytes": 195,
       "constraint": "1<=m<=200, 1<=n<=1000 and n positive integers each use at most 20 digits",
       "constraint_counterexample": "0\n1\n5",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 1,
-          "total": 20,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.05
+          "share": 0.025
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -741,7 +741,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -770,13 +770,13 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "27373",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 798
       },
       "input_domain": {
         "statement_quote": "第一行m表示新数的最大位数，m<=200。第二行n表示整数的数量，n <= 1000。接下来一行有n个整数，每个整数的位数不超过20。",
         "generated_extremes": {
-          "max_int": 997820680866836194,
+          "max_int": 998423454642540590,
           "min_int": 1
         }
       }
@@ -811,24 +811,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 288894,
       "max_output_bytes": 3,
       "constraint": "1<=n<50000 followed by n colors in 0..n",
       "constraint_counterexample": "2\n0 3",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 7,
-          "total": 20,
+          "frequency": 13,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.35
+          "share": 0.325
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -837,7 +837,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -866,7 +866,7 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "27363",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 366
       },
       "input_domain": {
@@ -907,24 +907,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
-      "max_input_bytes": 47,
+      "test_cases": 40,
+      "max_input_bytes": 50,
       "max_output_bytes": 4,
       "constraint": "the target is an integer and the second line has 1..16 positive integers",
       "constraint_counterexample": "1",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 10,
-          "total": 20,
+          "frequency": 21,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.5
+          "share": 0.525
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -933,7 +933,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -962,13 +962,13 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "18155",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 526
       },
       "input_domain": {
         "statement_quote": "输入为两行。 第一行为目标数T。 第二行为S中的N个元素，以空格隔开。 其中 N <= 16。",
         "generated_extremes": {
-          "max_int": 7720504,
+          "max_int": 9969820,
           "min_int": 1
         }
       }
@@ -1003,24 +1003,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 14,
-      "max_output_bytes": 11,
+      "max_output_bytes": 12,
       "constraint": "the input is either an integer in 1..3999 or its canonical uppercase Roman representation",
       "constraint_counterexample": "IIII",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 1,
-          "total": 20,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.05
+          "share": 0.025
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -1029,7 +1029,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -1058,13 +1058,13 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "28700",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 302
       },
       "input_domain": {
         "statement_quote": "一行字符（可能是罗马数字，也可能是正整数）",
         "generated_extremes": {
-          "max_int": 2948,
+          "max_int": 3630,
           "min_int": 92
         }
       }
@@ -1099,24 +1099,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 160353,
-      "max_output_bytes": 99,
+      "max_output_bytes": 103,
       "constraint": "one or more 1..15000-sized integer datasets are encoded one value per line and terminated by zero",
       "constraint_counterexample": "2\n1\n0",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 1,
-          "total": 20,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.05
+          "share": 0.025
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -1125,7 +1125,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -1154,7 +1154,7 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "04013",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 319
       },
       "input_domain": {
@@ -1195,24 +1195,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 1393,
       "max_output_bytes": 383,
       "constraint": "each EOF-driven row contains an uppercase word, integer shift and a permutation of all positions",
       "constraint_counterexample": "ABC 2 1 1 3",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 1,
-          "total": 20,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.05
+          "share": 0.025
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -1221,7 +1221,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -1250,7 +1250,7 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "04014",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 313
       },
       "input_domain": {
@@ -1291,24 +1291,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
-      "max_input_bytes": 5677,
-      "max_output_bytes": 4377,
+      "test_cases": 40,
+      "max_input_bytes": 5975,
+      "max_output_bytes": 4617,
       "constraint": "1<=N<=500 followed by unique numeric IDs shorter than 10 digits and grades in 1..100",
       "constraint_counterexample": "2\n1 50\n1 60",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 1,
-          "total": 20,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.05
+          "share": 0.025
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -1317,7 +1317,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -1346,13 +1346,13 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "04016",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 319
       },
       "input_domain": {
         "statement_quote": "第一行为N,表示输入N位学生的信息，接着的N行输入学生信息，1<=N<=500 学生信息的格式为：学号 平均成绩 学号的长度小于10，平均成绩在1-100之间.",
         "generated_extremes": {
-          "max_int": 999866490,
+          "max_int": 999867042,
           "min_int": 1
         }
       }
@@ -1387,24 +1387,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
-      "max_input_bytes": 79,
-      "max_output_bytes": 135,
+      "test_cases": 40,
+      "max_input_bytes": 80,
+      "max_output_bytes": 139,
       "constraint": "each nonempty EOF-driven line is an integer N in 1..30",
       "constraint_counterexample": "31",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 19,
+          "total": 40,
+          "distinct": 38,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 2,
-          "total": 20,
+          "frequency": 3,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.1
+          "share": 0.075
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -1413,7 +1413,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -1442,7 +1442,7 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "04017",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 313
       },
       "input_domain": {
@@ -1483,24 +1483,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 60,
       "max_output_bytes": 118,
       "constraint": "each nonempty EOF-driven line is a weekday integer in 1..7",
       "constraint_counterexample": "0",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 1,
-          "total": 20,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.05
+          "share": 0.025
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -1509,7 +1509,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -1538,7 +1538,7 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "04019",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 306
       },
       "input_domain": {
@@ -1579,24 +1579,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 12996,
       "max_output_bytes": 237,
       "constraint": "1<=N<=100 and every case contains exactly 53 distinct cards from the 54-card deck",
       "constraint_counterexample": "1\nJoker",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 1,
-          "total": 20,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.05
+          "share": 0.025
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -1605,7 +1605,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -1634,7 +1634,7 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "04020",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 314
       },
       "input_domain": {
@@ -1675,24 +1675,24 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 3084,
       "max_output_bytes": 150,
       "constraint": "1<=N<=100 and every row has lowercase S, 1<=m<len(S), and integer q",
       "constraint_counterexample": "1\nabc 3 2",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 2,
-          "total": 20,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.1
+          "share": 0.05
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -1701,7 +1701,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -1730,7 +1730,7 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "04042",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 330
       },
       "input_domain": {
@@ -1771,7 +1771,7 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 1633,
       "max_output_bytes": 640,
       "constraint": "1<N<100 followed by distinct positive weights and nonempty colors of at most 10 characters",
@@ -1785,17 +1785,17 @@
       },
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 1,
-          "total": 20,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
-          "share": 0.05
+          "share": 0.025
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -1804,7 +1804,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -1833,7 +1833,7 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "04044",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 297
       }
     },
@@ -1867,21 +1867,21 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 21,
+      "test_cases": 40,
       "max_input_bytes": 27477,
       "max_output_bytes": 581,
       "constraint": "1<=N<=100 followed by N nonempty integer arrays, one per line",
       "constraint_counterexample": "2\n1 2",
       "self_audit": {
         "distinct_cases": {
-          "total": 20,
-          "distinct": 20,
+          "total": 40,
+          "distinct": 40,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 1,
-          "total": 20,
+          "frequency": 2,
+          "total": 40,
           "status": "rejected",
           "exemption": null,
           "share": 0.05
@@ -1893,7 +1893,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 21,
+          "cases": 40,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -1922,7 +1922,7 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "04068",
-        "merged_cases": 21,
+        "merged_cases": 40,
         "total_ms": 306
       },
       "input_domain": {
