@@ -23,6 +23,6 @@ def main():
     if GENERATOR_NAME == 'g30216':
         cases=[SAMPLE]+[f'{n}\n' for n in range(1,11)]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,11)]
     else:
-        cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,21)]
+        cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
     for i,c in enumerate(cases): (data/f'{i}.in').write_text(c); (data/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

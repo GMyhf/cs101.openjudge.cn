@@ -237,7 +237,7 @@ LANGUAGE = "Python"
 def _build():
     out = _Path(__file__).with_name("data")
     out.mkdir(exist_ok=True)
-    cases = [SAMPLE] + [generate(NUMBER, seed) for seed in range(1, 21)]
+    cases = [SAMPLE] + [generate(NUMBER, seed) for seed in range(1, 40)]
     if len(set(cases)) != len(cases):
         raise SystemExit("两组输入撞了，数据必须互异")
     for index, case in enumerate(cases):

@@ -17,7 +17,7 @@ def generate(i):
     rank = 1 + (i * 3) % (sum(len(r.split()) for r in rows) + 2)
     return f'{query}\n{n}\n{rank}\n' + '\n'.join(rows) + '\n'
 
-for i in range(21):
+for i in range(40):
     case = generate(i)
     out = subprocess.run(['python3', str(ROOT / 'samplecode.py')], input=case, text=True, capture_output=True, check=True).stdout
     (ROOT / 'data' / f'{i}.in').write_text(case)

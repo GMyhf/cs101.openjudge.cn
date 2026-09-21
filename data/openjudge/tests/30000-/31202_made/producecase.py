@@ -33,7 +33,7 @@ def generate(i):
     return render(a, b)
 
 
-for i in range(21):
+for i in range(40):
     case = generate(i)
     result = subprocess.run(
         ["python3", str(ROOT / "samplecode.py")],

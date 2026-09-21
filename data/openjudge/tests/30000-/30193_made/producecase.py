@@ -464,7 +464,7 @@ def check(case, output, answer):
 def _build():
     out = HERE / "data"
     out.mkdir(exist_ok=True)
-    cases = [SAMPLE] + [generate(NUMBER, seed) for seed in range(1, 21)]
+    cases = [SAMPLE] + [generate(NUMBER, seed) for seed in range(1, 40)]
     if len(set(cases)) != len(cases):
         raise SystemExit("两组输入撞了，数据必须互异")
     outputs = []

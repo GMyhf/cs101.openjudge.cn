@@ -205,7 +205,7 @@ def build():
         f.unlink()
     tmp = Path(tempfile.mkdtemp()); exe = tmp / "ref"
     subprocess.run(["g++", "-O2", "-o", str(exe), str(SOURCE)], check=True)
-    cases = [SAMPLE] + [generate(s) for s in range(1, 21)]
+    cases = [SAMPLE] + [generate(s) for s in range(1, 40)]
     if len(set(cases)) != len(cases):
         raise SystemExit("duplicate inputs")
     checked_cases = 0

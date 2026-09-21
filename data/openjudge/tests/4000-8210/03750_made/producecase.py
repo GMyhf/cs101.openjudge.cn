@@ -10,7 +10,7 @@ def g3750(r):
 
 with tempfile.NamedTemporaryFile("w", suffix=".py") as h:
  h.write(REFERENCE_SOURCE); h.flush(); root=Path(__file__).parent/"data"
- for i in range(21):
+ for i in range(40):
   c=SAMPLE_IN if i == 0 else g3750(random.Random(3750+i))
   p=subprocess.run(["python3", h.name], input=c, text=True, capture_output=True, check=True)
   (root/f"{i}.in").write_text(c); (root/f"{i}.out").write_text(p.stdout)

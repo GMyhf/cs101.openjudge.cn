@@ -12,6 +12,8 @@ If there are exactly n-1 covers, they form a tree, and the tree's reachability
 import sys
 
 
+def _bc(x): return bin(x).count("1")
+
 def solve(n, rows):
     R = [int(s[::-1], 2) for s in rows]          # bit j of R[i]: i reaches j
     C = [0] * n                                    # bit i of C[j]: i reaches j
@@ -31,7 +33,7 @@ def solve(n, rows):
             low = rest & -rest
             v = low.bit_length() - 1
             rest ^= low
-            if (ru & C[v]).bit_count() == 2:
+            if _bc(ru & C[v]) == 2:
                 edges.append((u, v))
                 if len(edges) > n - 1:
                     return None

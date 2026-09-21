@@ -83,7 +83,7 @@ def _build():
     for path in out.glob("*"):
         path.unlink()
     cases = [SAMPLES[0][0]]
-    for seed in range(1, 21):
+    for seed in range(1, 40):
         attempt = 0
         case = generate(PROBLEM, seed)
         while case in cases:

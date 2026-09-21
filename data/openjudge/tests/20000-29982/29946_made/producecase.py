@@ -16,7 +16,7 @@ def solve(text):
         return result.stdout
 def main():
     data=Path('data'); data.mkdir(exist_ok=True)
-    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(seed)) for seed in range(1,21)]
+    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(seed)) for seed in range(1, 40)]
     for i, case in enumerate(cases):
         (data/f'{i}.in').write_text(case); (data/f'{i}.out').write_text(solve(case))
 if __name__=='__main__': main()

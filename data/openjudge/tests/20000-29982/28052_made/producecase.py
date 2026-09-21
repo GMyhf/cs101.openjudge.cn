@@ -294,7 +294,7 @@ def _build():
    exe=folder/'s';_subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=_Path('data');out.mkdir(exist_ok=True)
   for path in out.glob('*'):path.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,seed) for seed in range(1,21)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,seed) for seed in range(1, 40)]
   for index,case in enumerate(cases):
    result=_subprocess.run(cmd,input=case,text=True,capture_output=True,timeout=120,check=True)
    answer='\n'.join(line.rstrip() for line in result.stdout.rstrip().splitlines())+'\n'

@@ -292,7 +292,7 @@ def build():
     out = HERE / "data"; out.mkdir(exist_ok=True)
     for f in out.glob("*"):
         f.unlink()
-    cases = [SAMPLE] + [generate(s) for s in range(1, 21)]
+    cases = [SAMPLE] + [generate(s) for s in range(1, 40)]
     if len(set(cases)) != len(cases):
         raise SystemExit("duplicate inputs")
     checked_cases = 0

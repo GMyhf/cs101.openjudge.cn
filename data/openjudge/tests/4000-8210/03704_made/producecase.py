@@ -12,7 +12,7 @@ def g3704(r):
 with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as handle:
  handle.write(REFERENCE_SOURCE);handle.flush()
  root=Path(__file__).parent/"data";seen=[SAMPLE_IN]
- for index in range(21):
+ for index in range(40):
   if index==0: content=SAMPLE_IN
   else:
    for attempt_no in range(100):

@@ -527,7 +527,7 @@ def build():
     out = HERE / "data"; out.mkdir(exist_ok=True)
     table = all_tree_matrices(ORACLE_N)
     cases = [SAMPLE]; expects = [[None] * 11]
-    for seed in range(1, 21):
+    for seed in range(1, 40):
         EXPECT.clear()
         cases.append(generate(seed)); expects.append(LAST_EXPECT)
     assert len(set(cases)) == len(cases)

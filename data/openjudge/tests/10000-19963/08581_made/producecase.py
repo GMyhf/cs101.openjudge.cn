@@ -66,7 +66,7 @@ def make(rng, depth):
 def build_cases():
     cases = [SAMPLE_IN, ".\n", "A..\n"]
     for index in range(1, 60):
-        if len(cases) >= 21:
+        if len(cases) >= 40:
             break
         depth = 2 + index % 6
         for attempt in range(200):

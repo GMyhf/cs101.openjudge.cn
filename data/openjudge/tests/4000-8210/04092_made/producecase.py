@@ -14,5 +14,5 @@ def b4092():
 
 with tempfile.NamedTemporaryFile("w") as f:
  f.write(S);f.flush();d=Path(__file__).parent/"data"
- for i in range(21):
+ for i in range(40):
   c=I if i==0 else b4092()[i-1] if i <= 3 else g4092(random.Random(4092+i));p=subprocess.run(["python3",f.name],input=c,text=True,capture_output=True,check=True);(d/f"{i}.in").write_text(c);(d/f"{i}.out").write_text(p.stdout)

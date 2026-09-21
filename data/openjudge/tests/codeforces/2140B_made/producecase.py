@@ -50,7 +50,7 @@ def oracle(text: str, answer: str) -> bool:
 def build():
     out = Path(__file__).with_name("data"); out.mkdir(exist_ok=True)
     cases = [SAMPLE]
-    for seed in range(1, 21):
+    for seed in range(1, 40):
         attempt = 0; case = generate(seed)
         while case in cases:
             attempt += 1; case = generate(seed, attempt)

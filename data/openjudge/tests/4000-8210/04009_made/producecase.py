@@ -6,7 +6,7 @@ def g4009(r): return "\n".join(map(str,[r.randint(1,8) for _ in range(r.randint(
 
 with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as h:
  h.write(REFERENCE_SOURCE);h.flush();root=Path(__file__).parent/"data";seen=[SAMPLE_IN]
- for i in range(21):
+ for i in range(40):
   if i==0:c=SAMPLE_IN
   else:
    for j in range(100):

@@ -9,7 +9,7 @@ from pathlib import Path
 
 SAMPLE_IN = '3\n'
 SAMPLE_OUT = '5\n'
-PICKS = [0, 1, 2, 3, 4, 5, 6, 7, 9, 11, 14, 18, 23, 30, 38, 47, 58, 70, 83, 95, 100]
+PICKS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 21, 23, 25, 28, 31, 34, 38, 42, 46, 50, 55, 60, 65, 70, 75, 80, 85, 90, 93, 95, 98, 100]
 
 
 def solve_text(text):
@@ -29,7 +29,7 @@ def main():
     assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
     assert all(0 <= int(c) <= 100 for c in cases), "题面 0<=n<=100"
     assert "0\n" in cases and "100\n" in cases, "上下界都要有数据"
-    assert len(set(cases)) >= 15, "去重后至少 15 组"
+    assert len(set(cases)) >= 35, "去重后至少 35 组"
     root = Path(__file__).parent / "data"
     root.mkdir(exist_ok=True)
     for old in list(root.glob("*.in")) + list(root.glob("*.out")):

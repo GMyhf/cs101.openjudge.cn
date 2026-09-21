@@ -104,8 +104,22 @@ def generate(seed):
         rs = [140000, BIG - 140002]
     elif seed == 19:       # random large mixture
         rs = fill(r, [], 0, BIG, BIG + 1)
-    else:                  # seed 20: t = 1e4, r = 19 each (sum n exactly 2e5)
+    elif seed == 20:       # t = 1e4, r = 19 each (sum n exactly 2e5)
         rs = [19] * MAXT
+    else:                  # seeds 21+: random mixtures
+        mode = (seed - 21) % 5
+        if mode == 0:
+            rs = [r.randint(0, BIG) for _ in range(min(MAXT, 500))]
+        elif mode == 1:
+            rs = [r.randint(0, 38) for _ in range(MAXT)]
+        elif mode == 2:
+            rs = [(1 << r.randint(1, 17)) - r.randint(0, 2) for _ in range(300)]
+        elif mode == 3:
+            rs = [r.randint(100, KUHN_MAX) for _ in range(400)]
+        else:
+            rs = fill(r, [], 0, BIG, BIG + 1)
+        while sum(x + 1 for x in rs) > MAXSUM:
+            rs.pop()
     assert sum(x + 1 for x in rs) <= MAXSUM and len(rs) <= MAXT
     return fmt(rs)
 
@@ -208,7 +222,7 @@ def run_checker(inp, out):
 def build():
     out = HERE / "data"; out.mkdir(exist_ok=True)
     cases = [SAMPLE]
-    for seed in range(1, 21):
+    for seed in range(1, 40):
         case = generate(seed)
         assert case not in cases, seed
         cases.append(case)

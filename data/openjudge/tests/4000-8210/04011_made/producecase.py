@@ -12,7 +12,7 @@ root=Path(__file__).parent
 with tempfile.TemporaryDirectory() as folder:
  binary=Path(folder)/"reference"
  subprocess.run(["g++", "-std=c++17", "-O2", str(root/"samplecode_ac.cpp"), "-o", str(binary)], check=True)
- for i in range(21):
+ for i in range(40):
   c=SAMPLE_IN if i == 0 else g4011(random.Random(4011+i))
   p=subprocess.run([str(binary)], input=c, text=True, capture_output=True, check=True)
   (root/"data"/f"{i}.in").write_text(c); (root/"data"/f"{i}.out").write_text(p.stdout)

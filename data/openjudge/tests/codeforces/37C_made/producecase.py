@@ -195,7 +195,7 @@ def build():
     out.mkdir(exist_ok=True)
     for path in out.glob("*"):
         path.unlink()
-    cases = [SAMPLES[0][0]] + [generate(seed) for seed in range(1, 21)]
+    cases = [SAMPLES[0][0]] + [generate(seed) for seed in range(1, 40)]
     if len(set(cases)) != len(cases):
         raise SystemExit("两组输入撞了，数据必须互异")
     kinds = {True: 0, False: 0}

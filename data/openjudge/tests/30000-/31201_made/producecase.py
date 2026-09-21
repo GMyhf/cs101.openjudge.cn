@@ -20,7 +20,7 @@ def generate(i):
     return f"{a} {b}\n"
 
 
-for i in range(21):
+for i in range(40):
     case = generate(i)
     result = subprocess.run(
         ["python3", str(ROOT / "samplecode.py")],

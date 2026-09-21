@@ -174,7 +174,14 @@ def generate(seed):
     if seed == 20:
         return tests_file([render(r, shape_tree(r, 45001, "left"), "shuffle"),
                            render(r, shape_tree(r, 44999, "random"), "dfs")])
-    raise ValueError(seed)
+    # Extended range: random combinations for seeds 21+
+    shape_modes = ["random", "left", "right", "zigzag", "complete", "deep", "broom"]
+    label_modes = ["shuffle", "identity", "dfs"]
+    tests = []
+    for _ in range(r.randint(20, 80)):
+        n = odd(r, 1, 2001)
+        tests.append(render(r, shape_tree(r, n, r.choice(shape_modes)), r.choice(label_modes), swap=r.random() < 0.3))
+    return tests_file(tests)
 
 
 def parse(text):
@@ -267,7 +274,7 @@ def oracle_lines(text):
 def build():
     out = Path(__file__).with_name("data"); out.mkdir(exist_ok=True)
     for f in out.glob("*"): f.unlink()
-    cases = [SAMPLE] + [generate(seed) for seed in range(1, 21)]
+    cases = [SAMPLE] + [generate(seed) for seed in range(1, 40)]
     if len(set(cases)) != len(cases):
         raise SystemExit("duplicate inputs")
     full = 0

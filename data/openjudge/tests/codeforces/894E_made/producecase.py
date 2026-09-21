@@ -285,7 +285,7 @@ def build():
     out.mkdir(exist_ok=True)
     for path in out.glob("*"):
         path.unlink()
-    cases = [SAMPLE] + [generate(seed) for seed in range(1, 21)]
+    cases = [SAMPLE] + [generate(seed) for seed in range(1, 40)]
     if len(set(cases)) != len(cases):
         raise SystemExit("duplicate inputs")
     checked = {"state": 0, "matrix": 0, "any": 0}

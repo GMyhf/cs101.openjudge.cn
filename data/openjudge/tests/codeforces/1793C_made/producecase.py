@@ -252,7 +252,7 @@ def build():
     for path in out.glob("*"):
         path.unlink()
     sample_tests = [(a, None) for a in _parse(SAMPLE)]
-    groups = [sample_tests] + [generate(seed) for seed in range(1, 21)]
+    groups = [sample_tests] + [generate(seed) for seed in range(1, 40)]
     cases = [_render(tests) for tests in groups]
     if cases[0] != SAMPLE or len(set(cases)) != len(cases):
         raise SystemExit("第 0 组不是样例，或两组输入撞了")

@@ -7,5 +7,5 @@ B=["3\n0x0 0x0\n0x1 0x0\n0xffff 0xffff\n", "2\n0x8000 0x7fff\n0xaaaa 0x5555\n", 
 
 with tempfile.NamedTemporaryFile("w") as f:
  f.write(S);f.flush();d=Path(__file__).parent/"data"
- for i in range(21):
+ for i in range(40):
   c=I if i==0 else B[i-1] if i <= 3 else g4111(random.Random(4111+i));p=subprocess.run(["python3",f.name],input=c,text=True,capture_output=True,check=True);(d/f"{i}.in").write_text(c);(d/f"{i}.out").write_text(p.stdout)

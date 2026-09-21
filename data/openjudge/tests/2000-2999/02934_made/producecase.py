@@ -103,7 +103,7 @@ def _build():
         out.mkdir(exist_ok=True)
         for path in out.glob("*"):
             path.unlink()
-        cases = [SAMPLE] + [generate(NUMBER, seed) for seed in range(1, 21)]
+        cases = [SAMPLE] + [generate(NUMBER, seed) for seed in range(1, 40)]
         for index, case in enumerate(cases):
             if not valid(NUMBER, case):
                 raise SystemExit(f"case {index} violates the input contract: {case!r}")

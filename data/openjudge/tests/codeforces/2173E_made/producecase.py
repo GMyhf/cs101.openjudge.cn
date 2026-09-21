@@ -237,7 +237,7 @@ def run_reference(case):
 def build():
     out = HERE / "data"
     out.mkdir(exist_ok=True)
-    cases = [render(SAMPLE_TESTS, *SAMPLE_COINS)] + [generate(seed) for seed in range(1, 21)]
+    cases = [render(SAMPLE_TESTS, *SAMPLE_COINS)] + [generate(seed) for seed in range(1, 40)]
     if len(set(cases)) != len(cases):
         raise SystemExit("duplicate cases")
     for index, case in enumerate(cases):

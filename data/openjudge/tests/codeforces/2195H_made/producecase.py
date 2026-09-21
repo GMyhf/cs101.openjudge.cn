@@ -116,8 +116,28 @@ def generate(seed):
             if sq + n * n > 14000:
                 break
             ns.append(n); sq += n * n
-    else:
+    elif seed == 20:
         ns = [111]
+    else:
+        mode = (seed - 21) % 5
+        if mode == 0:
+            ns = [r.randint(1, 30) for _ in range(r.randint(5, 25))]
+        elif mode == 1:
+            ns = [r.randint(1, 50) for _ in range(r.randint(3, 15))]
+        elif mode == 2:
+            ns = []
+            sq = 0
+            while len(ns) < r.randint(10, 28):
+                n = r.randint(1, 50)
+                if sq + n * n > MAXSQ:
+                    break
+                ns.append(n); sq += n * n
+        elif mode == 3:
+            ns = [r.randint(20, 60) for _ in range(r.randint(3, 8))]
+        else:
+            ns = [r.randint(1, 20) for _ in range(r.randint(15, 30))]
+        while sum(n * n for n in ns) > MAXSQ:
+            ns.pop()
     assert 1 <= len(ns) <= MAXT and sum(n * n for n in ns) <= MAXSQ
     return fmt(ns)
 
@@ -327,7 +347,7 @@ def build():
     out = HERE / "data"; out.mkdir(exist_ok=True)
     oracle_n1()
     cases = [SAMPLE]
-    for seed in range(1, 21):
+    for seed in range(1, 40):
         case = generate(seed)
         assert case not in cases, seed
         cases.append(case)

@@ -13,6 +13,6 @@ def case(i):
     if i%3==2: expr.append('2147483647+1')
     if i>12: expr.append('+'.join(str(rng.randrange(1,100000)) for _ in range(8)))
     return str(len(expr))+'\n'+'\n'.join(expr)+'\n'
-for i in range(21):
+for i in range(40):
     inp=case(i); out=subprocess.run(['python3',str(ROOT/'samplecode.py')],input=inp,text=True,capture_output=True,check=True).stdout
     (ROOT/'data'/f'{i}.in').write_text(inp); (ROOT/'data'/f'{i}.out').write_text(out)

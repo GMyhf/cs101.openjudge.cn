@@ -65,7 +65,7 @@ def one_graph(r, want_cycle):
 
 def build_cases():
     cases = [SAMPLE_IN]
-    for index in range(1, 21):
+    for index in range(1, 40):
         r = random.Random(9202 + index * 1013)
         groups = r.randint(1, 3)             # 每份文件多组数据，压到 T 的循环
         blocks, want = [], []

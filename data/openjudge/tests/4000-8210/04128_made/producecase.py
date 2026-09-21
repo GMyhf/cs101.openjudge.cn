@@ -6,5 +6,5 @@ def g4128(r):return "hit cog\n"+" ".join(r.sample(["hot","dot","dog","lot","log"
 
 with tempfile.NamedTemporaryFile("w") as f:
  f.write(S);f.flush();d=Path(__file__).parent/"data"
- for i in range(21):
+ for i in range(40):
   c=I if i==0 else g4128(random.Random(4128+i));p=subprocess.run(["python3",f.name],input=c,text=True,capture_output=True,check=True);(d/f"{i}.in").write_text(c);(d/f"{i}.out").write_text(p.stdout)

@@ -139,7 +139,12 @@ def generate(seed):
         return fmt(res)
     if seed == 20:
         return fmt([rnd(10) for _ in range(50000)])
-    raise ValueError(seed)
+    # Extended range: random combinations
+    tests = []
+    for _ in range(r.randint(100, 500)):
+        n = r.randint(3, r.choice([12, 60, 100]))
+        tests.append(tree_perm(r, n, skew=r.random()))
+    return fmt(tests)
 
 
 def valid(text):
@@ -199,7 +204,7 @@ def oracle_lines(text):
 def build():
     out = Path(__file__).with_name("data"); out.mkdir(exist_ok=True)
     for f in out.glob("*"): f.unlink()
-    cases = [SAMPLE] + [generate(seed) for seed in range(1, 21)]
+    cases = [SAMPLE] + [generate(seed) for seed in range(1, 40)]
     if len(set(cases)) != len(cases):
         raise SystemExit("duplicate inputs")
     full = 0

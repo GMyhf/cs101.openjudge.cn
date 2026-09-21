@@ -185,7 +185,25 @@ def generate(seed, attempt=0):
                 x = r.choice([uniform(r), log_uniform(r)])
             pairs.append((n, x))
         return fmt(pairs)
-    raise ValueError(seed)
+    # Extended range: mixed strategies for seeds 21+
+    pairs = []
+    for _ in range(r.randint(500, 2500)):
+        kind = r.randrange(6)
+        n = r.choice([uniform(r), log_uniform(r), r.choice(SPECIAL_N)])
+        if kind == 0:
+            x = with_digit_sum(r, r.randint(1, 81))
+        elif kind == 1:
+            x = edgy_x(r)
+        elif kind == 2:
+            x = n
+        elif kind == 3:
+            x = r.randint(1, MAX_V)
+        elif kind == 4:
+            x = log_uniform(r)
+        else:
+            x = uniform(r)
+        pairs.append((n, x))
+    return fmt(pairs)
 
 
 # ---------------------------------------------------------------- naive strategies (simulated)
@@ -241,7 +259,7 @@ def build():
     out = HERE / "data"
     out.mkdir(exist_ok=True)
     cases = [SAMPLE]
-    for seed in range(1, 21):
+    for seed in range(1, 40):
         attempt = 0
         case = generate(seed)
         while case in cases:

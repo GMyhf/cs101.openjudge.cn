@@ -9,6 +9,6 @@ def case(i):
         p=tuple(rng.randrange(101) for _ in range(3))
         if p not in used: used.add(p); pts.append(p)
     return str(n) + '\n' + ' '.join(map(str, sum((list(p) for p in pts), []))) + '\n'
-for i in range(21):
+for i in range(40):
     inp=case(i); out=subprocess.run(['python3',str(ROOT/'samplecode.py')],input=inp,text=True,capture_output=True,check=True).stdout
     (ROOT/'data'/f'{i}.in').write_text(inp); (ROOT/'data'/f'{i}.out').write_text(out)

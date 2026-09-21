@@ -335,7 +335,7 @@ def decisions(ans):
 def build():
     out = HERE / "data"; out.mkdir(exist_ok=True)
     cases = [SAMPLE]
-    for seed in range(1, 21):
+    for seed in range(1, 40):
         case = generate(seed)
         assert case not in cases, seed
         cases.append(case)

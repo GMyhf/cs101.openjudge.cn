@@ -44,7 +44,7 @@ def valid(text):
 def build():
     out = HERE / "data"
     out.mkdir(exist_ok=True)
-    cases = [generate(seed) for seed in range(21)]
+    cases = [generate(seed) for seed in range(40)]
     assert len(set(cases)) == 21
     program = PRESET.read_text(encoding="utf-8").rstrip("\n") + "\n" + REFERENCE.read_text(encoding="utf-8")
     with tempfile.TemporaryDirectory() as temp:

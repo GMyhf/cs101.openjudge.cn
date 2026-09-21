@@ -14,6 +14,6 @@ def case(i):
     else:
         seq=list(range(1,n+1)); seq[n//2]=seq[max(0,n//2-1)]
     return str(n)+'\n'+' '.join(map(str,seq))+'\n'
-for i in range(21):
+for i in range(40):
     inp=case(i); out=subprocess.run(['python3',str(ROOT/'samplecode.py')],input=inp,text=True,capture_output=True,check=True).stdout
     (ROOT/'data'/f'{i}.in').write_text(inp); (ROOT/'data'/f'{i}.out').write_text(out)

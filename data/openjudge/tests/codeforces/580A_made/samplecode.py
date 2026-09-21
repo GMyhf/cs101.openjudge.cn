@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+import sys
+
+def solve():
+    data = sys.stdin.buffer.read().split()
+    n = int(data[0])
+    a = [int(data[i + 1]) for i in range(n)]
+
+    if n == 0:
+        print(0)
+        return
+
+    max_len = 1
+    cur_len = 1
+    for i in range(1, n):
+        if a[i] >= a[i - 1]:
+            cur_len += 1
+        else:
+            cur_len = 1
+        if cur_len > max_len:
+            max_len = cur_len
+    print(max_len)
+
+solve()

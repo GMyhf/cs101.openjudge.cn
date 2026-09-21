@@ -63,7 +63,7 @@ def solve(text):
 def main():
     data = ROOT / "data"
     data.mkdir(exist_ok=True)
-    for number in range(21):
+    for number in range(40):
         case = generate(number)
         assert valid(case)
         output = solve(case)
