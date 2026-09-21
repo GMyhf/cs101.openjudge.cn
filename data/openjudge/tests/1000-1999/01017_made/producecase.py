@@ -147,7 +147,30 @@ def generate(n, seed):
     if n==1003:return '\n'.join(f'{r.uniform(.01,5.20):.2f}' for _ in range(r.randint(1,6)))+'\n0.00\n'
     if n==1011:
         a=[r.randint(1,30) for _ in range(r.randint(3,20))];return f'{len(a)}\n'+' '.join(map(str,a))+'\n0\n'
-    if n==1017:return ' '.join(str(r.randint(0,20)) for _ in range(6))+'\n0 0 0 0 0 0\n'
+    if n==1017:
+        # The original random-only batch missed the packing boundaries.  Keep
+        # these deterministic cases first so regressions around each residual
+        # capacity are always present, then continue with seeded random cases.
+        corner_cases = [
+            '1 9 0 0 0 0',       # reported failure: nine 2x2 do not fit in one box
+            '9 1 0 0 0 0',
+            '0 0 1 0 0 0', '0 0 4 0 0 0', '0 0 5 0 0 0',
+            '0 0 0 1 0 0', '0 0 0 0 1 0', '0 0 0 0 0 1',
+            '0 9 0 0 0 0', '0 10 0 0 0 0',
+            '0 5 0 1 0 0', '0 6 0 1 0 0',
+            '0 5 1 0 0 0', '0 6 1 0 0 0',
+            '1 0 0 1 0 0', '37 0 0 1 0 0',
+            '0 0 0 0 0 2', '0 0 0 0 2 0',
+            '20 20 20 20 20 20', '0 0 3 1 0 0',
+            '0 0 4 1 0 0', '0 0 7 1 0 0',
+            '0 0 8 1 0 0', '1 5 0 0 0 1',
+            '1 6 0 0 0 1', '35 0 0 0 0 1',
+            '36 0 0 0 0 1', '37 0 0 0 0 1',
+            '0 0 0 5 0 0', '0 0 0 0 5 0',
+        ]
+        if 1 <= seed <= len(corner_cases):
+            return corner_cases[seed - 1] + '\n0 0 0 0 0 0\n'
+        return ' '.join(str(r.randint(0,20)) for _ in range(6))+'\n0 0 0 0 0 0\n'
     if n==1065:
         out=[str(r.randint(1,3))]
         for _ in range(int(out[0])):
@@ -168,6 +191,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1,21)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1,51)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()
