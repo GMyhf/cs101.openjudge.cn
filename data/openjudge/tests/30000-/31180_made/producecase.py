@@ -19,6 +19,21 @@ NAMES = ["Alice", "Bob", "Cathy", "David", "Eva", "Grace", "Helen", "Ivy", "Jack
 HEADERS = ["Name", "Gender", "Chinese", "Math", "English", "Birth", "Height"]
 
 
+def hundredths_digit(tenths):
+    """平均身高（以 0.1 cm 为单位的整数列表）的百分位数字，精确整数运算。"""
+    return (10 * sum(tenths) // len(tenths)) % 10
+
+
+def fix_quarter_averages(rows):
+    """题面保证各季度平均身高的第二位小数不为 4 或 5：逐次把该季度最后一人加高 0.1 cm 直到满足。"""
+    quarters = {}
+    for row in rows:
+        quarters.setdefault((int(row[5][5:7]) - 1) // 3, []).append(row)
+    for members in quarters.values():
+        while hundredths_digit([round(r[6] * 10) for r in members]) in (4, 5):
+            members[-1][6] = round(members[-1][6] + 0.1, 1)
+
+
 def generate(number):
     if number == 0:
         return SAMPLE_INPUT
@@ -38,6 +53,7 @@ def generate(number):
             scores = tuple(rng.randint(0, 100) for _ in range(3))
         height = 145.0 + rng.randint(0, 450) / 10
         rows.append([name, gender, scores[0], scores[1], scores[2], f"2005-{month:02d}-{day:02d}", height])
+    fix_quarter_averages(rows)
     headers = HEADERS[:]
     rng.shuffle(headers)
     lines = [str(n), " ".join(headers)]
@@ -55,6 +71,15 @@ def valid(text):
     return 1 <= n <= 1000 and sorted(headers) == sorted(HEADERS) and len(lines) == n + 2
 
 
+def averages_ok(text):
+    lines = text.splitlines(); headers = lines[1].split()
+    quarters = {}
+    for line in lines[2:]:
+        row = dict(zip(headers, line.split()))
+        quarters.setdefault((int(row["Birth"][5:7]) - 1) // 3, []).append(int(row["Height"].replace(".", "")))
+    return all(hundredths_digit(t) not in (4, 5) for t in quarters.values())
+
+
 def solve(text):
     result = subprocess.run([sys.executable, str(ROOT / "samplecode.py")], input=text, text=True, capture_output=True, check=True)
     return result.stdout
@@ -65,7 +90,7 @@ def main():
     data.mkdir(exist_ok=True)
     for number in range(40):
         case = generate(number)
-        assert valid(case)
+        assert valid(case) and averages_ok(case), number
         output = solve(case)
         if number == 0:
             assert output == """David 288
