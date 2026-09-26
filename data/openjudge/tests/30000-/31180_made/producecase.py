@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Generate deterministic tests for practice/31180."""
 import random
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -39,7 +40,7 @@ def generate(number):
         return SAMPLE_INPUT
     rng = random.Random(3118000 + number)
     n = 1 if number == 1 else (2 if number == 2 else (100 if number == 20 else 3 + (number * 7) % 18))
-    names = [f"Student{chr(65 + (i // 26) % 26)}{chr(65 + i % 26)}" for i in range(n)] if n > len(NAMES) else NAMES[:n]
+    names = [f"Student{chr(97 + (i // 26) % 26)}{chr(97 + i % 26)}" for i in range(n)] if n > len(NAMES) else NAMES[:n]
     rows = []
     for i, name in enumerate(names):
         month = ((i + number * 2) % 12) + 1
@@ -68,7 +69,11 @@ def valid(text):
     if len(lines) < 2:
         return False
     n = int(lines[0]); headers = lines[1].split()
-    return 1 <= n <= 1000 and sorted(headers) == sorted(HEADERS) and len(lines) == n + 2
+    if not (1 <= n <= 1000 and sorted(headers) == sorted(HEADERS) and len(lines) == n + 2):
+        return False
+    name_at = headers.index("Name")
+    # 题面：姓名仅由英文字母组成，仅第一个字符为大写
+    return all(re.fullmatch(r"[A-Z][a-z]*", line.split()[name_at]) for line in lines[2:])
 
 
 def averages_ok(text):
