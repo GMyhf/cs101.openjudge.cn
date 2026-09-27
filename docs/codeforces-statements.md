@@ -11,7 +11,7 @@
 每条记录都同时保留 `source_url`（Codeforces 原题）和 `mirror_url`（抓取地址）。
 
 交叉验证：4A 的时限内存（1 秒 / 64 MB）与本站此前人工核对过的 4A 页面逐字相同；
-164 道题的样例全部能被 `server.py:sample_io()` 原样切回抓取到的官方样例。
+165 道题的样例全部能被 `server.py:sample_io()` 原样切回抓取到的官方样例。
 
 ## 重新抓取与重建
 
@@ -21,13 +21,13 @@ python3 scripts/build_codeforces_pages.py                 # 重建题面页并�
 python3 scripts/mirror_openjudge_images.py                # 新题面引入的插图要进本地镜像
 ```
 
-全部 164 道都由本脚本渲染。4A 曾是唯一人工写的那页（也正是它让人看出当时其余 157 页不对），
+全部 165 道都由本脚本渲染。4A 曾是唯一人工写的那页（也正是它让人看出当时其余 157 页不对），
 现在也换成了抓回来的原文：官方限制与那一版逐字相同，正文补回 Codeforces 的原始表述和 Note。
 
 ## 覆盖
 
-- 题目：164 道
-- 有 Note（官方样例解释）：114 道
+- 题目：165 道
+- 有 Note（官方样例解释）：115 道
 - 多组样例：64 道
 - 带插图：23 道
 
@@ -197,3 +197,4 @@ python3 scripts/mirror_openjudge_images.py                # 新题面引入的�
 | 2227F | It Just Keeps Going Sideways | 2 s | 256 MB | 1 | 2026-09-12 | https://codeforces.com/problemset/problem/2227/F |
 | 2227H | Fallen Leaves | 2 s | 256 MB | 1 | 2026-09-12 | https://codeforces.com/problemset/problem/2227/H |
 | 2228D | Sanae, Cross and Color | 2 s | 256 MB | 1 | 2026-09-12 | https://codeforces.com/problemset/problem/2228/D |
+| 2254F | Whiplash | 2 s | 256 MB | 1 | 2026-09-27 | https://codeforces.com/problemset/problem/2254/F |
