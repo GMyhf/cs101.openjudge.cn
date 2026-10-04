@@ -207,7 +207,12 @@ def generate(number, seed):
         R,C=3+(seed-1)%7,3+(seed-1)//7;grid=[["."]*C for _ in range(R)];grid[0][0]="S";grid[-1][-1]="E";return f"1 {R} {C}\n"+"\n".join("".join(x) for x in grid)+"\n0 0 0\n"
     if number==2663:return "\n".join(str(r.randint(0,30)) for _ in range(r.randint(1,10)))+"\n-1\n"
     if number==2745:return "\n".join(f"{r.randint(1,10)} {r.randint(0,99999999)}" for _ in range(r.randint(1,5)))+"\n0 0\n"
-    if number==2977:return " ".join(str(r.randint(0,365)) for _ in range(4))+"\n"
+    if number==2977:
+        # 约三分之一的组让最小非负解 t<=d（含 t==d，答案 21252），卡掉「只在 [0,21252) 找解再减 d」的写法
+        if seed==1:return "0 0 0 0\n"
+        if seed==2:return "365 365 365 365\n"
+        if seed%3:return " ".join(str(r.randint(0,365)) for _ in range(4))+"\n"
+        d=r.randint(0,365);t=d if seed%2 else r.randint(0,d);return " ".join(str(t%m+m*r.randint(0,(365-t%m)//m)) for m in (23,28,33))+f" {d}\n"
     if number==2352:
         pts=sorted({(r.randint(0,100),r.randint(0,100)) for _ in range(30)},key=lambda p:(p[1],p[0]));return f"{len(pts)}\n"+"\n".join(f"{x} {y}" for x,y in pts)+"\n"
     if number==2599:
