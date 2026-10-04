@@ -3110,6 +3110,13 @@ else:
         # XFF 是空串 → 退回对端，不要返回空字符串当 key
         self.assertEqual(FakeHandler("127.0.0.1", {"X-Forwarded-For": "  "}).client_ip(), "127.0.0.1")
 
+    def test_extra_trusted_proxies_come_from_env(self):
+        """异机反代（成都中转经 tailnet 连进来）要能用 CS101_TRUSTED_PROXIES 加进受信名单。"""
+        import server
+        self.assertEqual(server.parse_trusted_proxies(""), {"127.0.0.1", "::1"})
+        self.assertEqual(server.parse_trusted_proxies(" 100.123.133.112 , ,"),
+                         {"127.0.0.1", "::1", "100.123.133.112"})
+
     def test_session_cookie_is_secure_only_over_https(self):
         """公网走 HTTPS 时 cookie 要带 Secure；tailnet 内的 HTTP 访问不能因此登不上。"""
         import server

@@ -429,7 +429,8 @@ BOOK_META = {
     "2024sp_routine": {"name": "数算 2024Spring每日选作", "count": 154},
 }
 SMTP_ENV_FILE = ROOT / "data" / ".smtp.env"
-DEFAULT_PUBLIC_URL = "http://10.129.81.235:8000"
+# 校外学生收邮件用，回退值也必须是公网能开的地址，不能是校内 IP
+DEFAULT_PUBLIC_URL = "https://jensen.zhengmao.ltd"
 
 if SMTP_ENV_FILE.is_file() and os.environ.get("CS101_LOAD_DOTENV", "1") != "0":
     for line in SMTP_ENV_FILE.read_text(encoding="utf-8").splitlines():
@@ -1182,7 +1183,7 @@ def send_account_email(recipient, subject, body):
 
 
 def public_base_url():
-    """Return the address users on the LAN can open from emailed links."""
+    """Return the public address used to build emailed and shared links."""
     return os.environ.get("CS101_PUBLIC_URL", DEFAULT_PUBLIC_URL).rstrip("/")
 
 
@@ -1208,7 +1209,13 @@ def safe_return_path(value):
 # 反向代理（Tailscale Funnel / Cloudflare / nginx）会把请求转成本机连接，
 # 只有来自这里的连接才允许用 X-Forwarded-For 覆盖来源地址 —— 否则任何人
 # 直接连上来加一个头就能伪造自己的 IP，限频形同虚设。
-TRUSTED_PROXIES = {"127.0.0.1", "::1"}
+# 别的机器上的反代（如成都中转 cd-relay 经 tailnet 连过来）用
+# CS101_TRUSTED_PROXIES 追加，逗号分隔；只能填确实会重写 XFF 的代理。
+def parse_trusted_proxies(extra):
+    return {"127.0.0.1", "::1"} | {address.strip() for address in extra.split(",") if address.strip()}
+
+
+TRUSTED_PROXIES = parse_trusted_proxies(os.environ.get("CS101_TRUSTED_PROXIES", ""))
 
 
 class Handler(BaseHTTPRequestHandler):

@@ -1,5 +1,17 @@
 # CHANGELOG
 
+## 2026-10-04
+
+### 新增成都中转入口 jensen.zhengmao.ltd
+
+Funnel 入口在境外，国内访问慢；新增经腾讯云成都 `cd-relay` 反代的 `https://jensen.zhengmao.ltd/`，
+北大网络实测首页从约 0.93s 降到 0.28s。`CS101_PUBLIC_URL` 改为新地址，激活、找回密码与分享链接
+随之改用它；代码里的默认值也从校内 IP `http://10.129.81.235:8000` 改成新地址，避免漏配时
+邮件带出校外打不开的链接。Funnel 地址保留作备用。
+
+新增 `CS101_TRUSTED_PROXIES`（逗号分隔）追加可信反代地址：cd-relay 经 tailnet 连入，不在原先
+仅含本机的 `TRUSTED_PROXIES` 里，不加的话所有经中转的用户会共用一个限频额度。
+
 ## 2026-09-23
 
 ### 暂存 2026fallcs101testing/E31292「放气球」40 组测试数据
