@@ -2,6 +2,15 @@
 
 ## 2026-10-04
 
+### 压缩 5 张超大题面图片（7.1MB → 1.0MB）
+
+成都中转 cd-relay 出口带宽只有约 2.5 Mbps，所有学生共用；2MB 的题图单张就要 8 秒。把镜像里
+超过 500KB 的 5 张 PNG（30913、30919、30921、30930 的 AI 插画和 09202 的地图，都是无透明的
+照片类图片）转成 JPEG：插画 q85，地图带字母标注用 q88 + 4:4:4 色度采样保持字边清晰。
+按镜像约定内容变了就换文件名（新内容哈希），manifest 同步更新 path/bytes/sha256，
+`source_content_type` 记原始 PNG；旧文件删除，已缓存旧 URL 的浏览器不受影响。
+`mirror_openjudge_images.py --check` 通过；镜像目录 16MB → 8.7MB。
+
 ### 新增成都中转入口 jensen.zhengmao.ltd
 
 Funnel 入口在境外，国内访问慢；新增经腾讯云成都 `cd-relay` 反代的 `https://jensen.zhengmao.ltd/`，
