@@ -6,8 +6,6 @@ __THEME_HEAD__
  /* 全屏工作台，与提交页同一套外壳：页面本身不滚动，滚动只发生在各面板里。 */
  html,body{height:100%}
  body.app{display:flex;flex-direction:column;height:100dvh;overflow:hidden}
- .auth-chip{font-size:13px;white-space:nowrap}
- .theme-toggle{padding:5px 10px;font-size:13px}
  kbd{font:11px/1.4 var(--font-mono);padding:0 5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;background:var(--soft);color:var(--muted)}
  .placeholder{color:var(--muted);font-size:13.5px;margin:0}
 
@@ -115,7 +113,7 @@ __THEME_HEAD__
     <a class="nav-link" href="/history/">提交记录</a>
     <a class="nav-link" href="/help/">说明</a>
     <button id="theme" type="button" class="ghost theme-toggle">深色</button>
-    <span id="auth" class="auth-chip muted">正在检查登录状态…</span>
+    __ACCOUNT_MENU__
   </nav>
 </header>
 <div class="toolbar">
@@ -511,14 +509,7 @@ $("#fontUp").onclick = () => applySize(codeSize() + 1);
 $("#fontDown").onclick = () => applySize(codeSize() - 1);
 if (Number(store.get(SIZE_KEY))) applySize(Number(store.get(SIZE_KEY)));
 
-const theme = $("#theme");
-function applyTheme(name) {
-  document.documentElement.dataset.theme = name;
-  theme.textContent = name === "dark" ? "浅色" : "深色";
-  store.set("cs101-theme", name);
-}
-theme.onclick = () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
-applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+// 主题按钮的切换与记忆在 /static/shell.js（全站一份）。
 
 // ---- 启动 --------------------------------------------------------------------
 const hasLanguage = value => Array.from(lang.options).some(option => option.value === value);
@@ -528,7 +519,6 @@ const hasLanguage = value => Array.from(lang.options).some(option => option.valu
   catch (err) { output.innerHTML = '<p class="placeholder">连不上服务器，请刷新重试。</p>'; return; }
   if (!me.authenticated && !SHARE_ID) { location.href = LOGIN_URL; return; }
   user = me.authenticated ? me.user : "";
-  $("#auth").innerHTML = user ? "已登录：<b>" + esc(user) + "</b>" : '<a href="' + LOGIN_URL + '">登录</a>';
   let notice = "";
   if (SHARE_ID) {
     const response = await fetch("/api/playground/share/" + SHARE_ID + "/", { credentials: "same-origin" });

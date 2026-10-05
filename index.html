@@ -7,56 +7,159 @@ __THEME_HEAD__
   <title>CS101 题库 · 本机判题</title>
   <style>
     /* 顶栏（.brand/.mark/.topnav/.account-*）与 body 基础样式都在 theme.css 里，
-       这里只留首页自己的差异：更高的顶栏、更大的标记块、更宽的导航间距。
-       改动前这一段是 theme.css 那份的逐字复制，`.mark` 还漂成了两个尺寸。 */
-    .shell{max-width:1180px;margin:auto;padding:0 24px}
-    .top{height:72px;display:flex;align-items:center;justify-content:space-between}
-    .top .mark{width:34px;height:34px;font-size:16px}
-    .top .topnav{gap:20px}
-    .content{padding:30px 0 70px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:12px}.section-head h1{font-size:22px;margin:0}.section-head h1 a{color:inherit;text-decoration:none}.section-head h1 a:hover{color:var(--green)}.section-head p{color:var(--muted);margin:0;font-size:13px}.solution-link{color:var(--green);font-size:14px;font-weight:650;text-decoration:none;white-space:nowrap}.solution-link:hover{text-decoration:underline}.toolbar{display:flex;gap:10px;margin-bottom:16px}.toolbar input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:7px;background:var(--paper);font:inherit;outline:none}.toolbar input:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}.catalog-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.book-block{min-width:0}.book-title{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 8px;padding-bottom:7px;border-bottom:2px solid var(--line);font-size:16px}.book-title a{color:inherit;text-decoration:none}.book-title a:hover{color:var(--green)}.book-block.featured .book-title{border-color:var(--accent)}.book-block.featured .book-title a{color:var(--accent)}.book-block.featured .book-title span{color:var(--accent)}.book-title span{font-size:12px;color:var(--muted);font-weight:400}.list{display:grid;gap:8px}.problem{display:flex;align-items:center;gap:16px;background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:12px 14px;text-decoration:none;transition:transform .16s,border-color .16s,box-shadow .16s}.problem:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:var(--shadow)}.pid{font:700 13px ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--green);min-width:62px}.problem-main{min-width:0;flex:1}.problem-title{font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.problem-meta{display:block;color:var(--muted);font-size:12px;margin-top:2px}.arrow{color:var(--muted);font-size:18px}.empty{padding:32px;text-align:center;color:var(--muted);background:var(--paper);border:1px dashed var(--line);border-radius:9px}.footer{color:var(--muted);font-size:13px;border-top:1px solid var(--line);padding:22px 0 34px}
-    @media(max-width:760px){.shell{padding:0 16px}.top{height:62px}.top .topnav{gap:12px}.catalog-grid{grid-template-columns:1fr}.section-head{align-items:start;flex-direction:column;gap:3px}}
+       这里只留首页自己的差异：更高的顶栏、更大的标记块、更宽的导航间距。 */
+    .shell { max-width: 1180px; margin: auto; padding: 0 24px }
+    .top { height: 72px; display: flex; align-items: center; justify-content: space-between }
+    .top .mark { width: 34px; height: 34px; font-size: 16px }
+    .top .topnav { gap: 20px }
+
+    .content { padding: 30px 0 70px }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 12px }
+    .section-head h1 { font-size: 22px; margin: 0 }
+    .section-head h1 span { font-size: 14px; font-weight: 400; color: var(--muted) }
+    .section-head h1 b { color: var(--ink); font-variant-numeric: tabular-nums }
+    .section-head p { color: var(--muted); margin: 0; font-size: 13px }
+    .solution-link { color: var(--green); font-size: 14px; font-weight: 650; text-decoration: none; white-space: nowrap }
+    .solution-link:hover { text-decoration: underline }
+
+    .toolbar { display: flex; gap: 10px; margin-bottom: 16px }
+    .toolbar input { width: 100%; padding: 12px 14px; border: 1px solid var(--line); border-radius: 7px; background: var(--paper); color: var(--ink); font: inherit; outline: none }
+    .toolbar input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft) }
+    .search-note { margin: -6px 0 14px; color: var(--muted); font-size: 13px }
+
+    .catalog-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px }
+    .book-block { min-width: 0 }
+    .book-title { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 8px; padding-bottom: 7px; border-bottom: 2px solid var(--line); font-size: 16px }
+    .book-title a { color: inherit; text-decoration: none }
+    .book-title a:hover { color: var(--green) }
+    .book-title span { font-size: 12px; color: var(--muted); font-weight: 400 }
+    .book-block.featured .book-title { border-color: var(--accent) }
+    .book-block.featured .book-title a,
+    .book-block.featured .book-title span { color: var(--accent) }
+
+    .list { display: grid; gap: 8px }
+    .problem { display: flex; align-items: center; gap: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: 9px; padding: 12px 14px; text-decoration: none; transition: transform .16s, border-color .16s, box-shadow .16s }
+    .problem:hover { transform: translateY(-2px); border-color: var(--accent); box-shadow: var(--shadow) }
+    .pid { font: 700 13px var(--font-mono); color: var(--green); min-width: 62px }
+    .problem-main { min-width: 0; flex: 1 }
+    .problem-title { display: block; font-weight: 650; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+    .problem-meta { display: block; color: var(--muted); font-size: 12px; margin-top: 2px }
+    .arrow { color: var(--muted); font-size: 18px }
+    .more { display: block; padding: 6px 2px; color: var(--muted); font-size: 13px; text-decoration: none }
+    .more:hover { color: var(--accent) }
+
+    .empty { padding: 32px; text-align: center; color: var(--muted); background: var(--paper); border: 1px dashed var(--line); border-radius: 9px }
+    .footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding: 22px 0 34px; overflow-wrap: anywhere }
+
+    @media (max-width: 1000px) {
+      .catalog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+    }
+    @media (max-width: 760px) {
+      .shell { padding: 0 16px }
+      .top { height: 62px }
+      .content { padding-top: 18px }
+      .catalog-grid { grid-template-columns: 1fr }
+      .section-head { align-items: start; flex-direction: column; gap: 3px }
+      .problem { gap: 12px; padding: 11px 12px }
+    }
   </style>
 </head>
 <body>
-  <header class="top shell"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><nav class="topnav"><span class="online" id="online" hidden></span><a href="/help/">说明</a><button id="theme" type="button" class="ghost" style="padding:5px 10px;font-size:13px">深色</button><a href="/admin/" id="admin-link" hidden>判题设置</a><a href="/auth/login/" id="account">登录</a><span class="account-control" id="account-control" hidden><button class="account-trigger" type="button" aria-expanded="false" aria-haspopup="true">账号</button><span class="account-menu"><span class="account-menu-inner"><a href="/playground/">Playground</a><a href="/settings/">个人信息</a><a href="/account/">账户设置</a><button id="logout" type="button">退出登录</button></span></span></span></nav></header>
-  <main class="content shell"><div class="section-head"><div><h1>全部题库 <span>（<b id="total-count">—</b> 收录题目，<b id="tested-count">—</b> 有测试数据）</span></h1><p>题库标题可打开该题库的题目、排名与状态；这里展示每个题库 5 道可直接判题的题目</p></div><a class="solution-link" href="https://fuynaloft.github.io/sol101/" target="_blank" rel="noopener" onclick="window.open(this.href,'sol101-explanations','noopener,width=1280,height=900');return false;">题解 ↗</a></div><div class="toolbar"><input id="search" type="search" placeholder="搜索题号或标题" autocomplete="off"></div><div id="list" class="catalog-grid"></div><div id="empty" class="empty" hidden>没有找到匹配题目。</div></main>
+  <header class="top shell">
+    <a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a>
+    <nav class="topnav">
+      <span class="online" id="online" hidden></span>
+      <a href="/problems/">题库目录</a>
+      <a href="/history/">提交记录</a>
+      <a href="/help/">说明</a>
+      <button id="theme" type="button" class="ghost theme-toggle">深色</button>
+      __ACCOUNT_MENU__
+    </nav>
+  </header>
+  <main class="content shell">
+    <div class="section-head">
+      <div>
+        <h1>全部题库 <span>（<b id="total-count">—</b> 收录题目，<b id="tested-count">—</b> 有测试数据）</span></h1>
+        <p>题库标题可打开该题库的题目、排名与状态；这里展示每个题库 5 道可直接判题的题目</p>
+      </div>
+      <a class="solution-link" href="https://fuynaloft.github.io/sol101/" target="_blank" rel="noopener" onclick="window.open(this.href,'sol101-explanations','noopener,width=1280,height=900');return false;">题解 ↗</a>
+    </div>
+    <div class="toolbar"><input id="search" type="search" placeholder="搜索题号或标题" autocomplete="off" aria-label="搜索题号或标题"></div>
+    <p class="search-note" id="search-note" hidden></p>
+    <div id="list" class="catalog-grid"></div>
+    <div id="empty" class="empty" hidden>没有找到匹配题目。</div>
+  </main>
   <footer class="footer"><div class="shell">仓库地址：<a href="https://github.com/GMyhf/cs101.openjudge.cn" target="_blank" rel="noopener">https://github.com/GMyhf/cs101.openjudge.cn</a></div></footer>
   <script>
-    const list=document.querySelector('#list'), empty=document.querySelector('#empty'), search=document.querySelector('#search'); let problems=[],bookMeta={};
-    const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    fetch('/api/catalog?summary=1').then(r=>r.json()).then(data=>{const all=data.problems||[];document.querySelector('#tested-count').textContent=(data.tested_count||0).toLocaleString('en-US');document.querySelector('#total-count').textContent=(data.total||0).toLocaleString('en-US');problems=all;bookMeta=data.book_meta||{};shuffle(problems);render();}).catch(()=>{empty.hidden=false;empty.textContent='题库暂时不可用';});
-    fetch('/api/me').then(r=>r.json()).then(data=>{const account=document.querySelector('#account'),control=document.querySelector('#account-control');if(data.authenticated){account.textContent=data.user;account.href='/history/?mine=1';control.hidden=false;}}).catch(()=>{});
-    fetch('/api/settings').then(r=>r.json()).then(data=>{if(data.is_admin)document.querySelector('#admin-link').hidden=false;}).catch(()=>{});
-    const themeBtn=document.querySelector('#theme');
-    function applyTheme(n){document.documentElement.dataset.theme=n;themeBtn.textContent=n==='dark'?'浅色':'深色';try{localStorage.setItem('cs101-theme',n);}catch(e){}}
-    applyTheme(document.documentElement.dataset.theme==='dark'?'dark':'light');
-    themeBtn.addEventListener('click',()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
-    document.querySelector('#logout').addEventListener('click',async()=>{await fetch('/api/logout',{method:'POST',credentials:'same-origin'});location.reload();});
-    // 账号菜单：桌面靠 hover / 焦点，触屏靠这一下点击。**手机上原来点不开** ——
-    // 没有 hover，而 iOS Safari 点按钮也不一定让它拿到焦点，:focus-within 就不成立。
-    const accountControl=document.querySelector('#account-control'),
-          accountTrigger=accountControl.querySelector('.account-trigger');
-    function setAccountMenu(open){accountControl.classList.toggle('open',open);accountTrigger.setAttribute('aria-expanded',String(open));}
-    accountTrigger.addEventListener('click',e=>{e.stopPropagation();setAccountMenu(!accountControl.classList.contains('open'));});
-    document.addEventListener('click',e=>{if(!accountControl.contains(e.target))setAccountMenu(false);});
-    document.addEventListener('keydown',e=>{if(e.key==='Escape')setAccountMenu(false);});
-    function shuffle(items){for(let i=items.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[items[i],items[j]]=[items[j],items[i]];}}
-    function titleOf(p){return (p.title||'').replace(new RegExp('^'+p.id+'\\s*[:：]\\s*','i'),'')||p.id;}
-    const featuredBooks=['pctbook','practice','dsapre'];
-    function render(){const q=search.value.trim().toLowerCase();const groups=new Map();for(const p of problems){if(q&&!p.id.toLowerCase().includes(q)&&!(p.title||'').toLowerCase().includes(q))continue;if(!groups.has(p.book))groups.set(p.book,[]);if(groups.get(p.book).length<5)groups.get(p.book).push(p);}const ordered=[...groups].sort(([a],[b])=>(featuredBooks.indexOf(a)<0?99:featuredBooks.indexOf(a))-(featuredBooks.indexOf(b)<0?99:featuredBooks.indexOf(b)));list.innerHTML=ordered.map(([book,items])=>{const meta=bookMeta[book]||{};const featured=featuredBooks.includes(book)?' featured':'';return `<section class="book-block${featured}"><h3 class="book-title"><a href="/book/${encodeURIComponent(book)}/">${esc(meta.name||book)}</a><span>${meta.count||0} 题</span></h3><div class="list">${items.map(p=>`<a class="problem" href="${esc(p.path)}"><span class="pid">${esc(p.id)}</span><span class="problem-main"><span class="problem-title">${esc(titleOf(p))}</span><span class="problem-meta">${p.test_count} 组测试数据</span></span><span class="arrow">›</span></a>`).join('')}</div></section>`;}).join('');empty.hidden=groups.size>0;}
+    // 顶栏的主题按钮、账号菜单在 /static/shell.js，这里只管首页自己的目录与在线人数。
+    const list = document.querySelector('#list'), empty = document.querySelector('#empty'),
+          search = document.querySelector('#search'), searchNote = document.querySelector('#search-note');
+    let problems = [], bookMeta = {};
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+    fetch('/api/catalog?summary=1').then(r => r.json()).then(data => {
+      document.querySelector('#tested-count').textContent = (data.tested_count || 0).toLocaleString('en-US');
+      document.querySelector('#total-count').textContent = (data.total || 0).toLocaleString('en-US');
+      problems = data.problems || [];
+      bookMeta = data.book_meta || {};
+      shuffle(problems);
+      render();
+    }).catch(() => { empty.hidden = false; empty.textContent = '题库暂时不可用'; });
+
+    function shuffle(items) {
+      for (let i = items.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [items[i], items[j]] = [items[j], items[i]];
+      }
+    }
+    function titleOf(p) { return (p.title || '').replace(new RegExp('^' + p.id + '\\s*[:：]\\s*', 'i'), '') || p.id; }
+
+    const featuredBooks = ['pctbook', 'practice', 'dsapre'];
+    const rank = book => featuredBooks.indexOf(book) < 0 ? 99 : featuredBooks.indexOf(book);
+    // 平时每个题库随机挑 5 道；搜索时放宽到 20 道 —— 原来搜索也只给 5 道，
+    // 第 6 道起的匹配结果根本看不到，也没有任何提示。
+    const PER_BOOK = 5, PER_BOOK_SEARCHING = 20;
+
+    function render() {
+      const q = search.value.trim().toLowerCase();
+      const limit = q ? PER_BOOK_SEARCHING : PER_BOOK;
+      const groups = new Map();
+      let matched = 0;
+      for (const p of problems) {
+        if (q && !p.id.toLowerCase().includes(q) && !(p.title || '').toLowerCase().includes(q)) continue;
+        matched++;
+        if (!groups.has(p.book)) groups.set(p.book, { items: [], total: 0 });
+        const g = groups.get(p.book);
+        g.total++;
+        if (g.items.length < limit) g.items.push(p);
+      }
+      const ordered = [...groups].sort(([a], [b]) => rank(a) - rank(b));
+      list.innerHTML = ordered.map(([book, g]) => {
+        const meta = bookMeta[book] || {};
+        const featured = featuredBooks.includes(book) ? ' featured' : '';
+        const href = `/book/${encodeURIComponent(book)}/`;
+        const rows = g.items.map(p => `<a class="problem" href="${esc(p.path)}"><span class="pid">${esc(p.id)}</span><span class="problem-main"><span class="problem-title">${esc(titleOf(p))}</span><span class="problem-meta">${p.test_count} 组测试数据</span></span><span class="arrow" aria-hidden="true">›</span></a>`).join('');
+        const more = q && g.total > g.items.length ? `<a class="more" href="${href}">还有 ${g.total - g.items.length} 道匹配，去题库里看 ›</a>` : '';
+        return `<section class="book-block${featured}"><h3 class="book-title"><a href="${href}">${esc(meta.name || book)}</a><span>${meta.count || 0} 题</span></h3><div class="list">${rows}${more}</div></section>`;
+      }).join('');
+      empty.hidden = groups.size > 0;
+      searchNote.hidden = !q || !matched;
+      searchNote.textContent = `共 ${matched} 道匹配，分布在 ${groups.size} 个题库`;
+    }
+    search.addEventListener('input', render);
+
     // 在线人数。每一个数都来自 /api/stats，页面上不写死任何统计数字 ——
     // 这里原来的「1,863 收录题目」就是写死的，catalog 早已变成 1849，差了 14。
-    const onlineEl=document.querySelector('#online');
-    function refreshOnline(){
-      fetch('/api/stats',{credentials:'same-origin'}).then(r=>r.json()).then(s=>{
-        const n=s.online||0;
-        onlineEl.textContent='在线 '+n;
-        onlineEl.title=Math.round((s.online_window_seconds||300)/60)+' 分钟内有活动的登录用户';
-        onlineEl.hidden=false;
-      }).catch(()=>{onlineEl.textContent='在线 —';onlineEl.hidden=false;});
+    const onlineEl = document.querySelector('#online');
+    function refreshOnline() {
+      fetch('/api/stats', { credentials: 'same-origin' }).then(r => r.json()).then(s => {
+        onlineEl.textContent = '在线 ' + (s.online || 0);
+        onlineEl.title = Math.round((s.online_window_seconds || 300) / 60) + ' 分钟内有活动的登录用户';
+        onlineEl.hidden = false;
+      }).catch(() => { onlineEl.textContent = '在线 —'; onlineEl.hidden = false; });
     }
-    refreshOnline(); setInterval(refreshOnline,60000);
-    search.addEventListener('input',render);
+    refreshOnline();
+    setInterval(() => { if (!document.hidden) refreshOnline(); }, 60000);
   </script>
 </body>
 </html>

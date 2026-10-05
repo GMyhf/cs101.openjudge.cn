@@ -189,7 +189,10 @@ a { color: inherit }
 .account-control:focus-within .account-menu,
 .account-control.open .account-menu { display: block }
 
+/* 外层是 <span>（要能放进 <nav> 的行内流），必须显式成块 —— 否则背景和描边
+   只画在行内片段上，菜单项散落在面板外，压在正文上面。 */
 .account-menu-inner {
+  display: block;
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
@@ -215,6 +218,46 @@ a { color: inherit }
 .account-menu-inner button:hover {
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+.account-menu-inner [aria-current="page"] { color: var(--accent); font-weight: 650 }
+
+/* `.account-menu-inner a` 的 display:block 会压过 [hidden] 的浏览器默认样式。 */
+.account-menu-inner [hidden] { display: none }
+
+/* 登录后菜单按钮显示用户名；名字过长时截断，别把顶栏挤变形。 */
+.account-trigger {
+  max-width: 11em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-trigger::after { content: " ▾"; font-size: 11px }
+
+/* 宽屏：导航在顶栏上，菜单里的导航项不重复出现；未登录时只有「登录」链接。 */
+.account-menu-inner .menu-nav,
+.account-control.guest { display: none }
+
+.account-control.guest .menu-user { display: none }
+
+.theme-toggle { padding: 5px 10px; font-size: 13px }
+
+/* 窄屏：顶栏上的文字导航收进菜单。改动前这里没有任何规则，
+   题库/提交记录等页面在 390px 宽的手机上顶栏约 440px，整页被撑出横向滚动。 */
+@media (max-width: 640px) {
+  .topbar, .top { gap: 10px }
+  .topnav { gap: 10px }
+  .topnav > a:not(.account-login),
+  .topnav > .online { display: none }
+  .account-control.guest { display: inline-block }
+  .account-menu-inner .menu-nav { display: block }
+  .account-control:not(.guest) .menu-nav + .menu-user {
+    margin-top: 4px;
+    border-top: 1px solid var(--line);
+    border-radius: 0 0 4px 4px;
+  }
+  .account-trigger { max-width: 7em }
 }
 
 /* ---- 面板：力扣式圆角卡片 ---------------------------------------------- */

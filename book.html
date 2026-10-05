@@ -85,7 +85,7 @@ __THEME_HEAD__
 </style>
 </head>
 <body>
-<header class="topbar"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><nav class="topnav"><a href="/problems/">题库目录</a><a href="/history/">提交记录</a><a href="/help/">说明</a><button id="theme" type="button" class="ghost">深色</button><a id="account" href="/auth/login/">登录</a></nav></header>
+<header class="topbar"><a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a><nav class="topnav"><a href="/problems/">题库目录</a><a href="/history/">提交记录</a><a href="/help/">说明</a><button id="theme" type="button" class="ghost theme-toggle">深色</button>__ACCOUNT_MENU__</nav></header>
 
 <div class="wrap">
   <div class="head">
@@ -404,6 +404,5 @@ function renderSolution(data) {
   view.innerHTML = blocks.join('');
 }
 </script>
-<script>const themeBtn=document.querySelector('#theme');function applyTheme(n){document.documentElement.dataset.theme=n;themeBtn.textContent=n==='dark'?'浅色':'深色';try{localStorage.setItem('cs101-theme',n)}catch(e){}}applyTheme(document.documentElement.dataset.theme==='dark'?'dark':'light');themeBtn.onclick=()=>applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');fetch('/api/me',{credentials:'same-origin'}).then(r=>r.json()).then(d=>{if(d.authenticated){account.textContent=d.user;account.href='/history/?mine=1'}}).catch(()=>{});</script>
 </body>
 </html>

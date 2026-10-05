@@ -195,6 +195,32 @@ class ThemeConsistencyTests(unittest.TestCase):
         self.assertIn('href="/static/theme.css"', server.THEME_HEAD)
 
 
+    def test_topbar_behaviour_lives_in_shell_js(self):
+        """顶栏的主题切换与账号菜单只有 `static/shell.js` + `ACCOUNT_MENU` 一份。
+
+        改动前这段脚本在 7 个页面里各复制一份，而且只有首页那份带账号菜单 ——
+        其余页面登录后只剩一个用户名链接，**退不了登录、也找不到 Playground**。
+        """
+        import server
+        shell = (ROOT / "static" / "shell.js").read_text(encoding="utf-8")
+        self.assertIn("/static/shell.js", server.THEME_HEAD)
+        self.assertIn("/api/logout", shell)
+        for marker in ('id="account"', 'id="account-control"', 'id="logout"', 'href="/playground/"'):
+            self.assertIn(marker, server.ACCOUNT_MENU)
+        for name in PAGES + ("playground.html",):
+            text = (ROOT / name).read_text(encoding="utf-8")
+            with self.subTest(page=name):
+                self.assertNotIn("function applyTheme", text, f"{name} 又长回了一份主题切换脚本")
+                self.assertEqual(1, text.count(server.ACCOUNT_MENU_SLOT), f"{name} 顶栏应只放一个账号菜单占位符")
+                self.assertNotIn('id="logout"', text, f"{name} 应改用 __ACCOUNT_MENU__ 占位符")
+
+    def test_narrow_screens_fold_topbar_links_into_menu(self):
+        """窄屏上顶栏文字导航要收进菜单，否则 390px 宽的手机上整页被撑出横向滚动。"""
+        theme = THEME_CSS.read_text(encoding="utf-8")
+        narrow = theme[theme.index("@media (max-width: 640px)"):]
+        self.assertIn(".topnav > a:not(.account-login)", narrow)
+        self.assertIn(".account-menu-inner .menu-nav { display: block }", narrow)
+
 class SubmitTemplateTests(unittest.TestCase):
     """提交页是独立文件，不是 `server.py` 里的字符串。
 
@@ -237,7 +263,7 @@ class SubmitTemplateTests(unittest.TestCase):
         rendered = rendered[:rendered.index("\n    def ", 1)]
         for slot in _re.findall(r"__[A-Z_]+__", template):
             with self.subTest(slot=slot):
-                filled = slot in rendered or slot == server.THEME_HEAD_SLOT
+                filled = slot in rendered or slot in (server.THEME_HEAD_SLOT, server.ACCOUNT_MENU_SLOT)
                 self.assertTrue(filled, f"{slot} 在模板里出现，却没人替换它")
         for slot in self.PLACEHOLDERS:
             self.assertIn(slot, template, f"{slot} 的占位符从模板里消失了")

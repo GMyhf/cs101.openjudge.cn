@@ -325,8 +325,33 @@ THEME_HEAD = (
     "if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)')"
     ".matches?'dark':'light';document.documentElement.dataset.theme=t;}"
     "catch(e){document.documentElement.dataset.theme='light';}})();</script>"
+    # 顶栏行为（主题按钮、账号菜单、窄屏菜单）只有 shell.js 一份；defer 不挡首屏。
+    '<script src="/static/shell.js" defer></script>'
 )
 THEME_HEAD_SLOT = "__THEME_HEAD__"
+
+# 顶栏右侧的账号区。改动前只有首页有账号菜单：别的页面登录后只剩一个用户名链接，
+# **退不了登录、也找不到 Playground**。markup 只留这一份，行为在 static/shell.js。
+# 未登录时 `#account` 是「登录」链接，菜单按钮只在窄屏出现（收纳导航）；
+# 登录后 `#account` 隐藏，菜单按钮显示用户名。`data-guest` 的项未登录也显示。
+ACCOUNT_MENU = (
+    '<a href="/auth/login/" id="account" class="account-login">登录</a>'
+    '<span class="account-control guest" id="account-control">'
+    '<button class="account-trigger" type="button" aria-expanded="false" aria-haspopup="true">菜单</button>'
+    '<span class="account-menu"><span class="account-menu-inner">'
+    '<a class="menu-nav" href="/">首页</a>'
+    '<a class="menu-nav" href="/problems/">题库目录</a>'
+    '<a class="menu-nav" href="/history/">提交记录</a>'
+    '<a class="menu-nav" href="/help/">说明</a>'
+    '<a class="menu-user" href="/history/?mine=1">我的提交</a>'
+    '<a class="menu-user" href="/playground/">Playground</a>'
+    '<a class="menu-user" href="/settings/">个人信息</a>'
+    '<a class="menu-user" href="/account/">账户设置</a>'
+    '<a class="menu-admin" href="/admin/" id="admin-link" hidden>判题设置</a>'
+    '<button class="menu-user" id="logout" type="button">退出登录</button>'
+    '</span></span></span>'
+)
+ACCOUNT_MENU_SLOT = "__ACCOUNT_MENU__"
 
 STATIC_DIR = (ROOT / "static").resolve()
 STATIC_TYPES = {".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8",
@@ -1308,6 +1333,7 @@ class Handler(BaseHTTPRequestHandler):
         # 所有页面都从这里出去（含读盘的 `.html` 与镜像题面），
         # 所以主题引导只需在这一处注入。
         body = body.replace(THEME_HEAD_SLOT.encode(), THEME_HEAD.encode())
+        body = body.replace(ACCOUNT_MENU_SLOT.encode(), ACCOUNT_MENU.encode())
         self.send_body(body, "text/html; charset=utf-8")
 
     def send_static(self, file, content_type):

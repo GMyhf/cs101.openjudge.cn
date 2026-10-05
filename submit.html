@@ -10,8 +10,6 @@ __THEME_HEAD__
  .crumb{display:flex;align-items:baseline;gap:8px;min-width:0;color:var(--muted);font-size:13px}
  .crumb-id{font:700 13px var(--font-mono);color:var(--accent)}
  .crumb-title{color:var(--ink);font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
- .auth-chip{font-size:13px;white-space:nowrap}
- .theme-toggle{padding:5px 10px;font-size:13px}
 
  .workspace-layout{flex:1;min-height:0;display:grid;
    grid-template-columns:minmax(320px,1fr) 10px minmax(420px,1.1fr);padding:var(--pane-gap)}
@@ -123,6 +121,10 @@ __THEME_HEAD__
    .pane-body{max-height:72vh}
    .crumb{display:none}
    .sample-grid{grid-template-columns:1fr}
+   /* 语言下拉的 186px 下限在手机上会把「清空」挤成竖排两个字 */
+   .pane-editor .pane-tools{min-width:0;flex:1}
+   .pane-editor select{min-width:0;flex:1 1 auto}
+   .pane-editor .pane-tools button{white-space:nowrap}
  }
 </style>
 <body class="app">
@@ -134,7 +136,7 @@ __THEME_HEAD__
     <a href="/history/">提交记录</a>
     <a href="/help/">说明</a>
     <button id="theme" type="button" class="ghost theme-toggle">深色</button>
-    <span id="auth" class="auth-chip muted">正在检查登录状态…</span>
+    __ACCOUNT_MENU__
   </nav>
 </header>
 <main class="workspace-layout" id="workspace">
@@ -384,9 +386,9 @@ copyStatement.addEventListener('click', async () => {
 });
 
 fetch("/api/me", { credentials: "same-origin" }).then(r => r.json()).then(me => {
-  auth.innerHTML = me.authenticated
-    ? '已登录：<b>' + esc(me.user) + '</b>'
-    : '<a href="' + LOGIN_URL + '">请先登录后提交</a>';
+  // 顶栏账号区由 /static/shell.js 负责；未登录时把那个「登录」链接说得更明白些。
+  const account = document.getElementById("account");
+  if (!me.authenticated && account) account.textContent = "登录后提交";
   loadHistory();
 });
 // ---- 语法高亮 / 括号匹配 / 自动缩进 -------------------------------------
@@ -595,16 +597,7 @@ fontDown.onclick = () => applySize(parseFloat(getComputedStyle(document.document
 resetCode.onclick = () => { src.value = ""; clearDraft(); paintEditor(); src.focus(); };
 try { const saved = Number(localStorage.getItem(SIZE_KEY)); if (saved) applySize(saved); } catch (err) {}
 
-// ---- 主题 --------------------------------------------------------------
-// 首屏那段引导脚本已经写好 data-theme，这里只负责切换和记住。
-const THEME_KEY = "cs101-theme";
-function applyTheme(name) {
-  document.documentElement.dataset.theme = name;
-  theme.textContent = name === "dark" ? "浅色" : "深色";
-  try { localStorage.setItem(THEME_KEY, name); } catch (err) { /* 隐私模式下忽略 */ }
-}
-theme.onclick = () => applyTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
-applyTheme(document.documentElement.dataset.theme === "dark" ? "dark" : "light");
+// 主题按钮的切换与记忆在 /static/shell.js（全站一份）。
 
 restoreDraft();
 paintEditor();
