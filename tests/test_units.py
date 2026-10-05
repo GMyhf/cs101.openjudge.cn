@@ -221,6 +221,20 @@ class ThemeConsistencyTests(unittest.TestCase):
         self.assertIn(".topnav > a:not(.account-login)", narrow)
         self.assertIn(".account-menu-inner .menu-nav { display: block }", narrow)
 
+    def test_submit_page_collapses_to_one_column_on_phones(self):
+        """手机上提交页必须是单栏，且题面在最前。
+
+        分隔条脚本会把保存的分栏比例写成**内联** grid 样式，内联样式压过媒体查询 ——
+        窄屏规则不带 !important 就等于没写：手机上题面被挤成右侧一条细缝，学生看不到题目。
+        """
+        text = (ROOT / "submit.html").read_text(encoding="utf-8")
+        self.assertIn("workspace.style.gridTemplateColumns", text)  # 前提还在，这条约束才有意义
+        narrow = text[text.index("@media(max-width:900px)"):]
+        narrow = narrow[:narrow.index("</style>")]
+        self.assertIn("grid-template-columns:1fr!important", narrow)
+        self.assertIn("grid-template-rows:none!important", narrow)
+        self.assertIn(".pane-left{order:1}", narrow)
+
 class SubmitTemplateTests(unittest.TestCase):
     """提交页是独立文件，不是 `server.py` 里的字符串。
 

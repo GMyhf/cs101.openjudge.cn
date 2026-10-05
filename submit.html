@@ -113,10 +113,14 @@ __THEME_HEAD__
 
  @media(max-width:900px){
    body.app{height:auto;overflow:auto}
-   .workspace-layout{grid-template-columns:1fr;gap:var(--pane-gap)}
+   /* !important 是必须的：分隔条脚本会把保存的分栏比例写成内联 grid 样式，
+      内联样式压过这里的单栏规则 —— 手机上题面被挤成右侧一条细缝，看不到题目。 */
+   .workspace-layout{grid-template-columns:1fr!important;gap:var(--pane-gap)}
    .splitter{display:none}
-   .pane-col{grid-template-rows:none;gap:var(--pane-gap);order:1}
-   .pane-left{order:2}
+   .pane-col{grid-template-rows:none!important;gap:var(--pane-gap);order:2}
+   /* 先读题再写代码：题面放最前，原来排在编辑器和判题结果之后要滑很远才看到 */
+   .pane-left{order:1}
+   .pane-left .pane-body{max-height:none}
    .editor{flex:none;height:56vh}
    .pane-body{max-height:72vh}
    .crumb{display:none}
