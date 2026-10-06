@@ -413,6 +413,28 @@ def case_230b(r):
     answer = ["YES" if (root := math.isqrt(value)) ** 2 == value and prime(root) else "NO" for value in values]
     return str(len(values)) + "\n" + " ".join(map(str, values)) + "\n", "\n".join(answer) + "\n"
 
+def case_230b_max(r):
+    # 满规模：n = 1e5，卡掉对每个数暴力试除到 sqrt 的 O(n·sqrt(x)) 写法（要先筛 1e6 以内的质数）。
+    # 大质数的平方占一半，暴力判质要试除到 ~1e6，正好最慢。
+    case_230b(r)  # 借它把筛子建好
+    primes, sieve = _PRIMES_230B, _SIEVE_230B
+    values = []
+    for _ in range(10**5):
+        kind = r.random()
+        if kind < 0.5: values.append(r.choice(primes[-20000:]) ** 2)
+        elif kind < 0.6: values.append(r.choice(primes) ** 2)
+        elif kind < 0.75:
+            c = r.randint(4, 10**6)
+            while sieve[c]: c += 1
+            values.append(c * c)
+        elif kind < 0.85: values.append(max(1, r.choice(primes) ** 2 + r.choice((-1, 1))))
+        else: values.append(r.randint(1, 10**12))
+    values[:6] = [1, 4, 10**12, 999983 ** 2, 81, 3]
+    r.shuffle(values)
+    import math
+    answer = ["YES" if (root := math.isqrt(v)) ** 2 == v and sieve[root] else "NO" for v in values]
+    return f"{len(values)}\n" + " ".join(map(str, values)) + "\n", "\n".join(answer) + "\n"
+
 def case_474d(r):
     k = r.randint(1, 30); queries = []
     for _ in range(r.randint(1, 50)):
@@ -1286,6 +1308,9 @@ BUILDERS = {
     "2227C": case_2227c,
 }
 
+# 21 组随机数据之外再追加的满规模数据（编号接在后面），只给真需要卡复杂度的题用。
+MAX_CASES = {"230B": case_230b_max}
+
 
 def main():
     catalog = json.loads(CATALOG.read_text(encoding="utf-8"))
@@ -1312,6 +1337,13 @@ def main():
             seed = len(cases)
             directory = MIRROR / "tests" / "codeforces" / f"{problem}_made" / "data"
             directory.mkdir(parents=True, exist_ok=True)
+            (directory / f"{seed}.in").write_text(payload, encoding="utf-8")
+            (directory / f"{seed}.out").write_text(output, encoding="utf-8")
+            cases.append({"input": str((directory / f"{seed}.in").relative_to(MIRROR)),
+                          "output": str((directory / f"{seed}.out").relative_to(MIRROR))})
+        if problem in MAX_CASES:
+            payload, output = MAX_CASES[problem](random.Random(sum(map(ord, problem))))
+            seed = len(cases)
             (directory / f"{seed}.in").write_text(payload, encoding="utf-8")
             (directory / f"{seed}.out").write_text(output, encoding="utf-8")
             cases.append({"input": str((directory / f"{seed}.in").relative_to(MIRROR)),
@@ -1360,7 +1392,7 @@ def main():
     # 结尾**不要**补换行：`scripts/index_tests.py` 写出的规范产物最后一个字节就是 `}`，
     # 多一个 "\n" 会让下一次重跑索引冒出一个无关 diff（2026-09-10 复核抓到过一次）。
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"generated {built} problems x 21 cases; skipped {skipped} withheld")
+    print(f"generated {built} problems x 21 cases (+{len(MAX_CASES)} max cases); skipped {skipped} withheld")
 
 
 if __name__ == "__main__":

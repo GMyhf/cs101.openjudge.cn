@@ -2,6 +2,14 @@
 
 ## 2026-10-06
 
+### 230B 追加一组 n = 10^5 的满规模数据
+
+原数据 n 最多 80，测不到复杂度。`build_codeforces_basic_data.py` 新增 `MAX_CASES`：在 21 组随机
+数据之后追加编号 21 的满规模组（目前只有 230B），一半是 7.5e5~1e6 间大质数的平方。实测：筛法正解
+Python 0.04s；isqrt 后试除平方根（O(n·x^¼)，CF 上同样能过）Python 2.5s，在 Python 20s 时限内；
+对 x 数约数、试除到 √x 的写法 C++ 超过 6s（时限 2s）。同步 catalog / test_index / input-domains
+（顺带补上 02977 加强数据后漏更新的摘要）。
+
 ### 加强 codeforces/230B（T-primes）测试数据
 
 用户反馈：「随便编了一个代码 AC 了」。原生成器只在 [1, 10^12] 里均匀随机取数，几乎抽不到质数的
