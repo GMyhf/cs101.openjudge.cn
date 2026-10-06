@@ -370,9 +370,41 @@ def case_466c(r):
             if prefix == target: first += 1
     return str(len(values)) + "\n" + " ".join(map(str, values)) + "\n", f"{answer}\n"
 
+_PRIMES_230B, _SIEVE_230B = [], bytearray()
+
 def case_230b(r):
+    # 旧版只在 [1, 1e12] 里均匀取数，几乎抽不到质数的平方，21 组答案全是 NO，
+    # 「一律输出 NO」都能 AC。现在每组都混进 YES（质数平方）和最容易判错的 NO：
+    # 1、质数本身、合数的平方（81 = 9^2）、p^3、p^4、两质数之积、p^2±1。
     import math
-    values = [r.randint(1, 10**12) for _ in range(r.randint(1, 80))]
+    if not _PRIMES_230B:
+        sieve = bytearray([1]) * (10**6 + 1); sieve[0] = sieve[1] = 0
+        for i in range(2, 1001):
+            if sieve[i]: sieve[i * i::i] = bytearray(len(range(i * i, 10**6 + 1, i)))
+        _PRIMES_230B.extend(i for i in range(10**6 + 1) if sieve[i]); _SIEVE_230B.extend(sieve)
+    primes = _PRIMES_230B
+    def pick_prime():
+        return r.choice(primes[:25]) if r.random() < 0.4 else r.choice(primes)
+    def composite():
+        while True:
+            c = r.randint(4, 10**6) if r.random() < 0.5 else r.randint(4, 100)
+            if not _SIEVE_230B[c]: return c
+    edges = [1, 2, 3, 4, 8, 9, 16, 25, 49, 81, 121, 10**12, 999983 ** 2, 999983 ** 2 - 1, 999983 ** 2 + 1, 999983, 997 ** 2 * 1009]
+    kinds = [
+        lambda: pick_prime() ** 2,                       # YES
+        lambda: pick_prime() ** 2,                       # YES
+        lambda: composite() ** 2,                        # 完全平方但根不是质数
+        lambda: pick_prime(),                            # 质数本身只有 2 个约数
+        lambda: (lambda p: p ** 3)(r.choice(primes[:168])),
+        lambda: (lambda p: p ** 4)(r.choice(primes[:168])),
+        lambda: (lambda p, q: p * q if p != q else p * p)(pick_prime(), pick_prime()),
+        lambda: (lambda p: max(1, p * p + r.choice((-1, 1))))(pick_prime()),
+        lambda: r.randint(1, 10**12),
+    ]
+    values = r.sample(edges, r.randint(1, 4))
+    values += [r.choice(kinds)() for _ in range(r.randint(5, 80))]
+    values = [v for v in values if 1 <= v <= 10**12]
+    r.shuffle(values)
     def prime(value):
         if value < 2: return False
         for divisor in range(2, int(math.isqrt(value)) + 1):
