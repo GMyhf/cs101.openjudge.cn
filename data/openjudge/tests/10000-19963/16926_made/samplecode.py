@@ -1,4 +1,7 @@
 # Source: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md
+# 2026-10-08 本地修正：上面引用的原始代码在题面范围内有缺陷，已按题面改过，与原提交不再逐字一致（见 CHANGELOG）。
+# 原写法判“战斗不再变化”时把武器下标也算进状态，双方只剩伤害为 0 的 sword 且件数不同时下标一直在转，永远判不出平局而死循环超时；
+# 现改为：双方都只剩伤害为 0 的 sword（或没有武器）即判平局，每场战斗步数有界（每步要么扣血要么消耗武器），整体 O(T/60 * N * 战斗步数)。
 import sys
 
 # Warcraft III simulation.
@@ -39,6 +42,10 @@ class Warrior:
     def sort_for_battle(self):
         # Battle sorting: ID ascending, Arrow usage ascending (used arrow 1 comes before new 2).
         self.weapons.sort(key=lambda x: (x.type, x.usage))
+
+    def is_stuck(self):
+        # 手里只剩 sword 且 sword 伤害为 0（或根本没有武器），出手不会改变任何状态
+        return all(w.type == 0 for w in self.weapons) and (not self.weapons or self.atk * 2 // 10 == 0)
 
     def get_dmg(self, weapon):
         # Calculate weapon damage (floor values).
@@ -121,8 +128,8 @@ def conduct_battle(red, blue, time_p, pos):
 
     while True:
         if red.hp <= 0 or blue.hp <= 0: break
-        state_pre = (red.hp, blue.hp, tuple((w.type, w.usage) for w in red.weapons),
-                     tuple((w.type, w.usage) for w in blue.weapons), red.weapon_idx, blue.weapon_idx)
+        # 双方都只剩伤害为 0 的 sword（或没有武器）：生命值和武器都不会再变，平局
+        if red.is_stuck() and blue.is_stuck(): break
 
         # Attacker strikes
         if p1.weapons:
@@ -143,11 +150,6 @@ def conduct_battle(red, blue, time_p, pos):
             else:
                 p2.weapon_idx = 0
         if red.hp <= 0 or blue.hp <= 0: break
-
-        # Detect if combat is making progress
-        state_post = (red.hp, blue.hp, tuple((w.type, w.usage) for w in red.weapons),
-                      tuple((w.type, w.usage) for w in blue.weapons), red.weapon_idx, blue.weapon_idx)
-        if state_pre == state_post: break
 
     # Process battle results
     if red.hp <= 0 and blue.hp <= 0:
