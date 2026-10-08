@@ -2,6 +2,8 @@
 # Accepted submission: 52997591
 # Source: http://cs101.openjudge.cn/practice/solution/52997591/
 # License: not declared on the submission page; no license is inferred.
+# 2026-10-08 本地修正：上面引用的原始代码在题面范围内有缺陷，已按题面改过，与原提交不再逐字一致（见 CHANGELOG）。
+# 原代码用 int() 读得分，题面写明「得分可能带有小数」，改为 float()。
 
 N, M = map(int,input().split())
 result = []
@@ -10,8 +12,8 @@ for _ in range(N):
     sum1 = 0
     sum2 = 0
     for i in range(1,len(line)-1,2):
-        if int(line[i])>=60:
-            gpa = 4-(3*((100-int(line[i]))**2)/1600)
+        if float(line[i])>=60:
+            gpa = 4-(3*((100-float(line[i]))**2)/1600)
         else:
             gpa = 0
         sum1 += gpa * int(line[i+1])
