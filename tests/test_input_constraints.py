@@ -519,6 +519,101 @@ def check_01958(text):
     return None
 
 
+# ---------------------------------------------------- 2026-10-08 新增 31293–31298
+# 题面都压在 OJ Inject 的 gzip 节点里（镜像页的纯文本只剩「输入」两字），下面的数值
+# 照解码后的 Markdown 原文逐条抄。
+
+def _n_then_row(text, low, high, row_check, what):
+    lines = text.splitlines()
+    if len(lines) != 2:
+        return f"应为 2 行，实际 {len(lines)} 行"
+    head = numbers(lines[0])
+    if len(head) != 1 or not low <= head[0] <= high:
+        return f"第一行 {lines[0]!r} 越出题面 {low} <= n <= {high}"
+    row = numbers(lines[1])
+    if len(row) != head[0]:
+        return f"第二行 {len(row)} 个数，n={head[0]}"
+    bad = [value for value in row if not row_check(value)]
+    if bad:
+        return f"{what}：{bad[0]}"
+    return None
+
+
+def check_31293(text):
+    # 「1 <= n <= 10^5」「1 <= p_i <= 10^9」
+    return _n_then_row(text, 1, 10 ** 5, lambda p: 1 <= p <= 10 ** 9, "价格越出 1 <= p_i <= 10^9")
+
+
+def check_31294(text):
+    # 「1 <= n <= 10^5」「a_i ∈ {5,10,20}」
+    return _n_then_row(text, 1, 10 ** 5, lambda a: a in (5, 10, 20), "面额不在 {5,10,20} 里")
+
+
+def check_31295(text):
+    # 「1 <= n <= 10^5」，接下来 n 行「-10^9 <= l_i <= r_i <= 10^9」
+    lines = text.splitlines()
+    n = int(lines[0])
+    if not 1 <= n <= 10 ** 5:
+        return f"n={n} 越出题面 1 <= n <= 10^5"
+    if len(lines) != n + 1:
+        return f"应有 {n} 行区间，实际 {len(lines) - 1} 行"
+    for line in lines[1:]:
+        pair = numbers(line)
+        if len(pair) != 2 or not -10 ** 9 <= pair[0] <= pair[1] <= 10 ** 9:
+            return f"区间 {line!r} 不满足 -10^9 <= l_i <= r_i <= 10^9"
+    return None
+
+
+def check_31296(text):
+    # 「1 <= n <= 10^5，1 <= C <= 10^9」「1 <= w_i <= C」（「数据保证体重均不超过载重上限」）
+    lines = text.splitlines()
+    if len(lines) != 2:
+        return f"应为 2 行，实际 {len(lines)} 行"
+    head = numbers(lines[0])
+    if len(head) != 2:
+        return "第一行应为 n C"
+    n, cap = head
+    if not 1 <= n <= 10 ** 5 or not 1 <= cap <= 10 ** 9:
+        return f"n={n} C={cap} 越出题面"
+    weights = numbers(lines[1])
+    if len(weights) != n:
+        return f"第二行 {len(weights)} 个数，n={n}"
+    if any(not 1 <= w <= cap for w in weights):
+        return "体重越出 1 <= w_i <= C"
+    return None
+
+
+def check_31297(text):
+    # 「1 <= T <= 10^4」，接下来 T 行「偶数 N（4 <= N <= 10^6）」
+    lines = text.splitlines()
+    t = int(lines[0])
+    if not 1 <= t <= 10 ** 4:
+        return f"T={t} 越出题面 1 <= T <= 10^4"
+    if len(lines) != t + 1:
+        return f"应有 {t} 行，实际 {len(lines) - 1} 行"
+    for line in lines[1:]:
+        value = numbers(line)
+        if len(value) != 1 or value[0] % 2 or not 4 <= value[0] <= 10 ** 6:
+            return f"N={line!r} 不是 4..10^6 的偶数"
+    return None
+
+
+def check_31298(text):
+    # 「1 <= n, k <= 10^5」；a_i = -1 是犯罪，a_i = x（1 <= x <= 10）是招募
+    lines = text.splitlines()
+    if len(lines) != 2:
+        return f"应为 2 行，实际 {len(lines)} 行"
+    head = numbers(lines[0])
+    if len(head) != 2 or not all(1 <= value <= 10 ** 5 for value in head):
+        return f"第一行 {lines[0]!r} 越出题面 1 <= n, k <= 10^5"
+    events = numbers(lines[1])
+    if len(events) != head[0]:
+        return f"第二行 {len(events)} 个数，n={head[0]}"
+    if any(a != -1 and not 1 <= a <= 10 for a in events):
+        return "事件既不是 -1 也不在 1..10"
+    return None
+
+
 VALIDATORS = {
     ("practice", "01958"): check_01958,
     ("codeforces", "25A"): check_25a,
@@ -548,6 +643,12 @@ VALIDATORS = {
     ("practice", "30192"): check_30192,
     ("pctbook", "M05585"): check_04101,
     ("practice", "28276"): check_28276,
+    ("practice", "31293"): check_31293,
+    ("practice", "31294"): check_31294,
+    ("practice", "31295"): check_31295,
+    ("practice", "31296"): check_31296,
+    ("practice", "31297"): check_31297,
+    ("practice", "31298"): check_31298,
 }
 
 

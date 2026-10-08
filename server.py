@@ -182,6 +182,24 @@ def inline_gzip_statement(text):
         return ""
 
 
+def markdown_body(text):
+    """OJ Inject 解码后的 `<div class="markdown-body">…</div>`，按 div 层数配平取整块。
+
+    不能用非贪婪的 `.*?</div>`：31293–31298 的题面里 markdown-body 内还套着 `<div>`，
+    非贪婪匹配停在第一个 `</div>`，整段题面（连同样例）被截成空 —— 页面上看不到题面，
+    「运行样例」也拿不到样例。取不到就返回 None。
+    """
+    start = re.search(r'<div\s+class="markdown-body"[^>]*>', text, re.I)
+    if not start:
+        return None
+    depth = 1
+    for tag in re.finditer(r'<(/?)div\b[^>]*>', text[start.end():], re.I):
+        depth += -1 if tag.group(1) else 1
+        if depth == 0:
+            return text[start.start():start.end() + tag.end()]
+    return text[start.start():]
+
+
 JUDGE_SLOTS = set()
 JUDGE_SLOTS_LOCK = threading.Lock()
 
@@ -444,7 +462,7 @@ MIRRORED_IMAGE_PATTERN = (
 )
 BOOK_META = {
     "codeforces": {"name": "Codeforces 题库", "count": 164},
-    "practice": {"name": "题库（包括计概、数算题目）", "count": 990},
+    "practice": {"name": "题库（包括计概、数算题目）", "count": 996},
     "pctbook": {"name": "计算思维算法实践", "count": 215},
     "routine": {"name": "数算 2025Spring每日选作", "count": 203},
     "2025sp_routine": {"name": "数算 2025Spring每日选作", "count": 73},
@@ -1374,12 +1392,12 @@ class Handler(BaseHTTPRequestHandler):
                       decode_inject, text, flags=re.I | re.S)
         text = re.sub(r'<p>题目描述加载中。如果持续看到此说明，请确认浏览器没有禁用 JavaScript，并查看是否有加载错误。</p>',
                       '', text)
-        rendered = re.search(r'<div\s+class="markdown-body"[^>]*>.*?</div>', text, re.I | re.S)
+        rendered = markdown_body(text)
         if rendered:
             start = text.find('<dl class="problem-content">')
             end = text.find('<div class="problem-statistics', start)
             if start >= 0 and end >= 0:
-                replacement = '<dl class="problem-content"><dd>' + rendered.group(0) + '</dd></dl>\n'
+                replacement = '<dl class="problem-content"><dd>' + rendered + '</dd></dl>\n'
                 text = text[:start] + replacement + text[end:]
         text = text.replace("http://cs101.openjudge.cn/", "/")
         text = text.replace("https://cs101.openjudge.cn/", "/")
@@ -1429,8 +1447,8 @@ class Handler(BaseHTTPRequestHandler):
         match = re.search(r'<dt>样例输入</dt>\s*<dd>(.*?)</dd>\s*<dt>样例输出</dt>\s*<dd>(.*?)</dd>',
                           text, re.S)
         if not match:
-            content = re.search(r'<div\s+class="markdown-body"[^>]*>(.*?)</div>', text, re.I | re.S)
-            cases = parse_embedded_html_samples(content.group(0)) if content else []
+            content = markdown_body(text)
+            cases = parse_embedded_html_samples(content) if content else []
             return {"input": cases[0]["input"] if cases else "",
                     "output": cases[0]["output"] if cases else "", "cases": cases}
         def plain(chunk):

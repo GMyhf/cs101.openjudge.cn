@@ -387,7 +387,7 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(status, 200)
         meta = json.loads(body)["book_meta"]
         self.assertEqual(meta["practice"]["name"], "题库（包括计概、数算题目）")
-        self.assertEqual(meta["practice"]["count"], 990)
+        self.assertEqual(meta["practice"]["count"], 996)
         self.assertEqual(meta["pctbook"]["name"], "计算思维算法实践")
 
     def test_codeforces_4a_is_a_local_judgeable_problem(self):
@@ -1112,6 +1112,116 @@ print("\\n".join(answers))
         self.assertEqual({int(header.split()[1]) for header in headers}, {1, 2})
         self.assertTrue(any("2 3\n1 4\n" in path.read_text(encoding="utf-8")
                             for path in sort_cases.glob("*.in")))
+
+    def test_practice_31293_to_31298_are_mirrored_with_discriminating_data(self):
+        """2026-10-08 新增的 6 道 OJ Inject 题：题面要看得见、样例要取得到、数据要判得动。"""
+        sys.path.insert(0, str(ROOT))
+        try:
+            import server
+        finally:
+            sys.path.pop(0)
+        handler = server.Handler.__new__(server.Handler)
+        expected = {
+            "31293": ("双十一凑单大作战", [("4\n3 2 1 10", "14"), ("7\n6 5 5 5 2 1 1", "19")]),
+            "31294": ("大肥鱼卖白饭", [("5\n5 5 10 5 20", "YES"), ("4\n5 10 20 5", "NO")]),
+            "31295": ("宿舍的空调", [("3\n18 25\n20 30\n16 22", "20"), ("2\n-5 0\n1 6", "-1")]),
+            "31296": ("“淹园”救援", [("4 5\n3 2 2 1", "2"), ("5 3\n3 2 2 1 1", "3")]),
+            "31297": ("恒星共振裂变", [("3\n4\n10\n16", "2 2\n5 5\n5 11")]),
+            "31298": ("警察招募又来了", [("6 2\n1 1 -1 -1 -1 1", "2"), ("5 1\n5 -1 3 -1 -1", "3")]),
+        }
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        rows = {item["id"]: item for item in catalog["problems"]
+                if item["book"] == "practice" and item["id"] in expected}
+        self.assertEqual(set(rows), set(expected))
+        cases = {}
+        for problem_id, (title, samples) in expected.items():
+            status, _, body = request(self.port, "GET", f"/practice/{problem_id}/")
+            self.assertEqual(status, 200)
+            text = body.decode("utf-8", errors="replace")
+            self.assertIn(f"{problem_id}:{title}", text)
+            # 题面压在 OJ Inject 的 gzip 节点里，解出来的 markdown-body 内还套着 <div>；
+            # 非贪婪截取会停在第一个 </div>，页面上只剩一个空壳（2026-10-08 修的就是这个）。
+            self.assertIn("输入格式", text)
+            page = ROOT / f"data/openjudge/pages/practice__{problem_id}.html"
+            self.assertEqual([(case["input"], case["output"]) for case in handler.sample_io(page)["cases"]],
+                             samples)
+            self.assertEqual(rows[problem_id]["test_count"], 40)
+            data = ROOT / f"data/openjudge/tests/30000-/{problem_id}_made/data"
+            cases[problem_id] = [((data / f"{i}.in").read_text(encoding="utf-8"),
+                                  (data / f"{i}.out").read_text(encoding="utf-8").split())
+                                 for i in range(40)]
+
+        def ints(text):
+            return list(map(int, text.split()))
+
+        # 31293：凑不满一组的 n<3，以及超出 32 位的答案（题面原话「答案可能超过 32 位」）。
+        self.assertTrue(any(ints(i)[0] < 3 for i, _ in cases["31293"]))
+        self.assertTrue(any(int(o[0]) > 2 ** 31 - 1 for _, o in cases["31293"]))
+
+        # 31294：收 20 元先付 5+5+5 的写法会把 5 元花光，正确答案是 YES 的组上判成 NO。
+        def change_five_first(bills):
+            five = ten = 0
+            for bill in bills:
+                if bill == 5:
+                    five += 1
+                elif bill == 10:
+                    if not five:
+                        return "NO"
+                    five, ten = five - 1, ten + 1
+                elif five >= 3:
+                    five -= 3
+                elif five and ten:
+                    five, ten = five - 1, ten - 1
+                else:
+                    return "NO"
+            return "YES"
+        self.assertTrue(any(o == ["YES"] and change_five_first(ints(i)[1:]) == "NO"
+                            for i, o in cases["31294"]))
+
+        # 31295：-1 既可能是「无解」，也可能是真的最低温度 —— 两种都要有。
+        def intersection(text):
+            values = ints(text)[1:]
+            return max(values[0::2]), min(values[1::2])
+        bounds = [(intersection(i), o) for i, o in cases["31295"]]
+        self.assertTrue(any(o == ["-1"] and low == -1 <= high for (low, high), o in bounds))
+        self.assertTrue(any(o == ["-1"] and low > high for (low, high), o in bounds))
+
+        # 31296：体重和恰好等于 C 的配对；把 `<= C` 写成 `< C` 会多用船。
+        def boats_strict(text):
+            values = ints(text)
+            cap, weights = values[1], sorted(values[2:])
+            i, j, boats = 0, len(weights) - 1, 0
+            while i <= j:
+                if i < j and weights[i] + weights[j] < cap:
+                    i += 1
+                j, boats = j - 1, boats + 1
+            return str(boats)
+        self.assertTrue(any(boats_strict(i) != o[0] for i, o in cases["31296"]))
+
+        # 31297：N=4（答案 2 2）、N/2 本身是质数、以及贴着上界 10^6 的 N。
+        queries = [n for i, _ in cases["31297"] for n in ints(i)[1:]]
+        answers = [tuple(map(int, pair)) for _, o in cases["31297"] for pair in zip(o[0::2], o[1::2])]
+        self.assertIn(4, queries)
+        self.assertTrue(any(p == q and n >= 1000 for n, (p, q) in zip(queries, answers)))
+        self.assertTrue(any(n >= 999_000 for n in queries))
+
+        # 31298：服役区间 [t, t+k-1]；写成 [t, t+k] 的差一错要在数据里挂。
+        def missed_off_by_one(text):
+            values = ints(text)
+            k, queue, missed = values[1], [], 0
+            head = 0
+            for t, a in enumerate(values[2:], 1):
+                if a > 0:
+                    queue.append([t, a])
+                    continue
+                while head < len(queue) and (queue[head][0] + k < t or queue[head][1] == 0):
+                    head += 1
+                if head == len(queue):
+                    missed += 1
+                else:
+                    queue[head][1] -= 1
+            return str(missed)
+        self.assertTrue(any(missed_off_by_one(i) != o[0] for i, o in cases["31298"]))
 
     def test_practice_31180_is_mirrored_with_statistics_data(self):
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))

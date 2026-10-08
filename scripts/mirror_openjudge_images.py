@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import argparse
+import base64
+import gzip
 import hashlib
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from html.parser import HTMLParser
 import json
 import mimetypes
 from pathlib import Path
+import re
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlparse
 from urllib.request import Request, urlopen
@@ -63,11 +66,31 @@ def html_files():
     return [path for folder in HTML_DIRS for path in sorted(folder.glob("*.html"))]
 
 
+def page_text(path):
+    """镜像页的 HTML，外加 OJ Inject 节点解码后的题面。
+
+    OJ Inject 题（如 31294）把整段题面 gzip+base64 压在 `x-oj-inject-data` 节点里，
+    插图的 `<img>` 只在解码后才出现；`server.local_page` 会解码它们来渲染，所以图片也得从
+    解码后的内容里收集，否则页面上会留下外站地址。解码口径与 `local_page` 一致（逐节点解）。
+    """
+    text = path.read_text(encoding="utf-8", errors="replace")
+    decoded = []
+    for attrs, payload in re.findall(r'<script\b([^>]*application/x-oj-inject-data[^>]*)>(.*?)</script>',
+                                     text, re.I | re.S):
+        if 'data-version="2"' not in attrs or not payload.strip():
+            continue
+        try:
+            decoded.append(gzip.decompress(base64.b64decode(payload.strip())).decode("utf-8"))
+        except (ValueError, OSError, UnicodeDecodeError):
+            continue
+    return "\n".join([text] + decoded)
+
+
 def collect_remote_images(paths=None):
     references: dict[str, set[str]] = {}
     for path in paths or html_files():
         parser = ImageSources()
-        parser.feed(path.read_text(encoding="utf-8", errors="replace"))
+        parser.feed(page_text(path))
         for source in parser.sources:
             if urlparse(source).scheme.lower() not in {"http", "https"}:
                 continue
@@ -79,7 +102,7 @@ def collect_wikimedia_formulas(paths=None):
     formulas = {}
     for path in paths or html_files():
         parser = ImageSources()
-        parser.feed(path.read_text(encoding="utf-8", errors="replace"))
+        parser.feed(page_text(path))
         formulas.update(parser.formulas)
     return formulas
 
