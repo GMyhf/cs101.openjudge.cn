@@ -148,6 +148,16 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
+def valid(text):
+    """题面：若干行，每行一个 n（3 乘 n 棋盘的列数，n 最大不超过 30），以单独一行 -1 结束。"""
+    import re
+    if not text.endswith("\n"):return False
+    lines=text[:-1].split("\n")
+    if lines[-1]!="-1":return False
+    for ln in lines[:-1]:
+        if not re.fullmatch(r"0|[1-9]\d*",ln) or int(ln)>30:return False
+    return True
+
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02663/statistics/\n# Accepted submission: 50532219\n# Source: http://cs101.openjudge.cn/practice/solution/50532219/\n# License: not declared on the submission page; no license is inferred.\n\ndp = [0]*31\ndp[0] = 1\ndp[2] = 3\nfor i in range(4, 31, 2):\n    dp[i] = 4*dp[i-2] - dp[i-4]\nwhile True:\n    n = int(input())\n    if n == -1:\n        break\n    print(dp[n])\n'
 LANGUAGE='Python3'
 NUMBER=2663

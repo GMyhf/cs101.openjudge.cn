@@ -417,7 +417,152 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
-REFERENCE="# External reference: http://cs101.openjudge.cn/practice/01114/statistics/\n# Accepted submission: 52288305\n# Source: http://cs101.openjudge.cn/practice/solution/52288305/\n# License: not declared on the submission page; no license is inferred.\n\nfrom collections import defaultdict\ndef f(thing):\n    multiply = 1\n    i = 0\n    while thing[i].isdigit():\n        i += 1\n    if i:\n        multiply = int(thing[:i])\n        thing = thing[i:]\n    d = defaultdict(int)\n    stack = []\n    n = len(thing)\n    idx = 0\n    while idx < n:\n        char = thing[idx]\n        if char.isupper():\n            if idx+1 < n and thing[idx+1].islower():\n                stack.append(thing[idx:idx+2])\n                idx += 2\n                continue\n            else:\n                stack.append(char)\n        elif char.isdigit():\n            ori = idx\n            while idx < n and thing[idx].isdigit():\n                idx += 1\n            num = int(thing[ori: idx])\n            if stack and stack[-1] != ')':\n                stack += [stack[-1]]*(num-1)\n            else:\n                stack.pop()\n                temp = []\n                while stack[-1] != '(':\n                    temp.append(stack.pop())\n                stack.pop()\n                stack += temp*num\n            continue\n        else:\n            stack.append(char)\n        idx += 1\n    for ele in stack:\n        if ele not in '()':\n            d[ele] += multiply\n    return d\ndef fun(expr):\n    d = defaultdict(int)\n    l = expr.split('+')\n    for x in l:\n        dx = f(x)\n        for k, v in dx.items():\n            d[k] += v\n    return d\nmaterials = input()\nd_m = fun(materials)\nt = int(input())\nfor _ in range(t):\n    produce = input()\n    d_p = fun(produce)\n    if d_m == d_p:\n        print(f'{materials}=={produce}')\n    else:\n        print(f'{materials}!={produce}')\n"
+def _parse_formula(s):
+    """按题面 BNF 解析，返回 {元素: 总数}；不合法返回 None。"""
+    pos=0;n=len(s)
+    def count():
+        nonlocal pos
+        if pos<n and s[pos] in '123456789':
+            st=pos
+            while pos<n and s[pos].isdigit() and s[pos].isascii():pos+=1
+            v=int(s[st:pos])
+            if v<2:raise ValueError
+            return v
+        return 1
+    def sequence():
+        nonlocal pos
+        d={};k=0
+        while pos<n and (('A'<=s[pos]<='Z') or s[pos]=='('):
+            if s[pos]=='(':
+                pos+=1;sub=sequence()
+                if pos>=n or s[pos]!=')':raise ValueError
+                pos+=1
+            else:
+                e=s[pos];pos+=1
+                if pos<n and 'a'<=s[pos]<='z':e+=s[pos];pos+=1
+                sub={e:1}
+            c=count()
+            for kk,v in sub.items():d[kk]=d.get(kk,0)+v*c
+            k+=1
+        if k==0:raise ValueError
+        return d
+    try:
+        tot={}
+        while True:
+            c=count();d=sequence()
+            for kk,v in d.items():tot[kk]=tot.get(kk,0)+v*c
+            if pos==n:break
+            if s[pos]!='+':raise ValueError
+            pos+=1
+        return tot
+    except (ValueError,IndexError,RecursionError):
+        return None
+
+def valid(text):
+    """题面契约：首行左式；第二行 N（1<=N<=10）；随后 N 行右式。每个式子无空格、
+    符合题面 BNF、长度不超过 100、显式倍数至少为 2、每种元素总数不超过 10000。"""
+    import re
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if len(lines)<3 or not re.fullmatch(r'[1-9]\d*',lines[1]):return False
+    N=int(lines[1])
+    if not 1<=N<=10 or len(lines)!=N+2:return False
+    for f in [lines[0]]+lines[2:]:
+        if not 1<=len(f)<=100:return False
+        d=_parse_formula(f)
+        if d is None or any(v>10000 for v in d.values()):return False
+    return True
+
+_ATOMS=['C','H','O','N','Na','Cl','Si','Co','S','He','Ge','U']
+def _rand_seq(r,depth,atoms):
+    parts=[]
+    for _ in range(r.randint(1,4)):
+        if depth>0 and r.random()<.3:
+            p='('+_rand_seq(r,depth-1,atoms)+')'
+        else:p=r.choice(atoms)
+        if r.random()<.5:p+=str(r.choice([2,3,4,9,r.randint(2,12),r.randint(10,99)]))
+        parts.append(p)
+    return ''.join(parts)
+def _rand_formula(r,atoms,depth):
+    while True:
+        seqs=[]
+        for _ in range(r.randint(1,5)):
+            m=str(r.choice([2,3,r.randint(2,20),r.randint(10,200)])) if r.random()<.4 else ''
+            seqs.append(m+_rand_seq(r,depth,atoms))
+        f='+'.join(seqs)
+        d=_parse_formula(f)
+        if d and len(f)<=100 and max(d.values())<=10000:return f
+def _emit(r,d,style):
+    items=list(d.items());r.shuffle(items)
+    if style==0:   # 2C+6H+13O
+        return '+'.join((str(v) if v>1 else '')+e for e,v in items)
+    if style==1:   # C2H6O13
+        return ''.join(e+(str(v) if v>1 else '') for e,v in items)
+    if style==2:   # 公因子提出 g(...)
+        import math
+        g=0
+        for _,v in items:g=math.gcd(g,v)
+        inner=''.join(e+(str(v//g) if v//g>1 else '') for e,v in items)
+        if g>1:return str(g)+'('+inner+')' if r.random()<.5 else '('+inner+')'+str(g)
+        return '('+inner+')'
+    # 随机拆成多段
+    out=[]
+    for e,v in items:
+        while v>0:
+            t=r.randint(1,v) if r.random()<.5 else v
+            out.append(e+(str(t) if t>1 else ''));v-=t
+    r.shuffle(out)
+    segs=[];i=0
+    while i<len(out):
+        k=r.randint(1,3);segs.append(''.join(out[i:i+k]));i+=k
+    return '+'.join(segs)
+def _perturb(r,d):
+    d=dict(d);ks=list(d);op=r.randrange(5)
+    if op==0:
+        k=r.choice(ks);d[k]+=r.choice([1,-1]) if d[k]>1 else 1
+    elif op==1:
+        others=[a for a in _ATOMS if a not in d]
+        d[r.choice(others)]=r.randint(1,3)
+    elif op==2 and len(ks)>1:
+        del d[r.choice(ks)]
+    elif op==3:   # 换成形近元素（C/Co/Cl，S/Si，H/He）
+        sim={'C':'Co','Co':'C','Cl':'C','S':'Si','Si':'S','H':'He','He':'H','N':'Na','Na':'N','O':'Co','U':'H','Ge':'He'}
+        k=r.choice(ks);t=sim[k]
+        v=d.pop(k);d[t]=d.get(t,0)+v
+    else:
+        if len(ks)>1:
+            a,b=r.sample(ks,2)
+            if d[a]!=d[b]:d[a],d[b]=d[b],d[a]
+            else:d[a]+=1
+        else:d[ks[0]]+=1
+    return d
+
+def gen1114(seed):
+    r=random.Random(1114*1000+seed)
+    while True:
+        atoms=r.sample(_ATOMS,r.randint(1,6)) if seed%5 else ['C','Co','O','Cl']
+        depth=0 if seed<=4 else r.randint(1,4)
+        if seed==1:left='H';rights=['H','2H','H+H','(H)','H2','He','(H)2']
+        elif seed==2:
+            left='('*6+'H'+'4)'*6;rights=['H4096','4096H','2(H2048)','((H)64)64','H4095','H4097+H','4(H)1024']
+        elif seed==3:   # 长式与大总数
+            left='+'.join(['10000U'][:1]);rights=['U10000','100(U100)','10000U','U9999+U','100U100','9999U','U']
+        else:
+            left=_rand_formula(r,atoms,depth)
+            d=_parse_formula(left)
+            N=10 if seed>=20 else r.randint(1,10)
+            rights=[]
+            for _ in range(N):
+                tgt=d if r.random()<.5 else _perturb(r,d)
+                if max(tgt.values())>10000 or min(tgt.values())<1:continue
+                if r.random()<.15:f=left
+                else:f=_emit(r,tgt,r.randrange(4))
+                if 1<=len(f)<=100:rights.append(f)
+            if not rights:continue
+        x=left+f'\n{len(rights)}\n'+'\n'.join(rights)+'\n'
+        if valid(x):return x
+
+REFERENCE="# External reference: http://cs101.openjudge.cn/practice/01114/statistics/\n# Accepted submission: 52288305\n# Source: http://cs101.openjudge.cn/practice/solution/52288305/\n# License: not declared on the submission page; no license is inferred.\n\nfrom collections import defaultdict\ndef f(thing):\n    multiply = 1\n    i = 0\n    while thing[i].isdigit():\n        i += 1\n    if i:\n        multiply = int(thing[:i])\n        thing = thing[i:]\n    d = defaultdict(int)\n    stack = []\n    n = len(thing)\n    idx = 0\n    while idx < n:\n        char = thing[idx]\n        if char.isupper():\n            if idx+1 < n and thing[idx+1].islower():\n                stack.append(thing[idx:idx+2])\n                idx += 2\n                continue\n            else:\n                stack.append(char)\n        elif char.isdigit():\n            ori = idx\n            while idx < n and thing[idx].isdigit():\n                idx += 1\n            num = int(thing[ori: idx])\n            if stack and stack[-1] != ')':\n                stack += [stack[-1]]*(num-1)\n            else:\n                stack.pop()\n                temp = []\n                while stack[-1] != '(':\n                    temp.append(stack.pop())\n                stack.pop()\n                stack += temp*num\n            continue\n        else:\n            # 修正：无倍数的括号组要就地消去这一对括号，否则外层倍数会误停在内层 '('\n            if char == ')' and not (idx+1 < n and thing[idx+1].isdigit()):\n                temp = []\n                while stack[-1] != '(':\n                    temp.append(stack.pop())\n                stack.pop()\n                stack += temp[::-1]\n            else:\n                stack.append(char)\n        idx += 1\n    for ele in stack:\n        if ele not in '()':\n            d[ele] += multiply\n    return d\ndef fun(expr):\n    d = defaultdict(int)\n    l = expr.split('+')\n    for x in l:\n        dx = f(x)\n        for k, v in dx.items():\n            d[k] += v\n    return d\nmaterials = input()\nd_m = fun(materials)\nt = int(input())\nfor _ in range(t):\n    produce = input()\n    d_p = fun(produce)\n    if d_m == d_p:\n        print(f'{materials}=={produce}')\n    else:\n        print(f'{materials}!={produce}')\n"
 LANGUAGE='Python3'
 NUMBER=1114
 SAMPLE='C2H5OH+3O2+3(SiO2)\n7\n2CO2+3H2O+3SiO2\n2C+6H+13O+3Si\n99C2H5OH+3SiO2\n3SiO4+C2H5OH\nC2H5OH+3O2+3(SiO2)+Ge\n3(Si(O)2)+2CO+3H2O+O2\n2CO+3H2O+3O2+3Si\n'
@@ -428,7 +573,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[gen1114(s) for s in range(1, 40)]
   for i,x in enumerate(cases):
+   assert valid(x),i
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

@@ -151,6 +151,50 @@ def generate(number, seed):
 
 REFERENCE="# External reference: statistics page /practice/02791/\n# Accepted submission: 49065965\n# Source: http://cs101.openjudge.cn/practice/solution/49065965/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\n\ndef main():\n    while True:\n        n = int(sys.stdin.readline())\n        if n == 0:\n            break\n        points = []\n        for _ in range(n):\n            x, y = map(int, sys.stdin.readline().split())\n            points.append((x, y))\n\n        candidates = []\n        visited = set()\n\n        # 枚举所有子集，大小至少为2\n        for mask in range(1, 1 << n):\n            bit_count = bin(mask).count('1')\n            if bit_count < 2:\n                continue\n\n            tx = []\n            ty = []\n            for i in range(n):\n                if mask & (1 << i):\n                    tx.append(points[i][0])\n                    ty.append(points[i][1])\n\n            min_x, max_x = min(tx), max(tx)\n            if max_x == min_x:\n                left, right = min_x, min_x + 1\n            else:\n                left, right = min_x, max_x\n\n            min_y, max_y = min(ty), max(ty)\n            if max_y == min_y:\n                bottom, top = min_y, min_y + 1\n            else:\n                bottom, top = min_y, max_y\n\n            cover_mask = 0\n            for i in range(n):\n                x, y = points[i]\n                if left <= x <= right and bottom <= y <= top:\n                    cover_mask |= (1 << i)\n\n            key = (left, right, bottom, top)\n            if key not in visited:\n                visited.add(key)\n                area = (right - left) * (top - bottom)\n                candidates.append((cover_mask, area))\n\n        INF = float('inf')\n        dp = [INF] * (1 << n)\n        dp[0] = 0\n\n        for mask in range(1 << n):\n            if dp[mask] == INF:\n                continue\n            for cover_mask, area in candidates:\n                new_mask = mask | cover_mask\n                if dp[new_mask] > dp[mask] + area:\n                    dp[new_mask] = dp[mask] + area\n\n        print(dp[(1 << n) - 1])\n\nif __name__ == '__main__':\n    main()\n"
 NUMBER=2791
+def valid(text):
+    """题面：多组数据；每组首行 n (2<=n<=15)，后 n 行 x y (-1000<=x,y<=1000)，点互不相同；最后一组 n=0 结束。"""
+    if not text.endswith("\n"): return False
+    lines = text[:-1].split("\n"); pos = 0
+    def num(x):
+        y = x[1:] if x.startswith("-") else x
+        return y.isdigit() and (y == "0" or y[0] != "0") and x != "-0"
+    while True:
+        if pos >= len(lines) or not num(lines[pos]): return False
+        n = int(lines[pos]); pos += 1
+        if n == 0: return pos == len(lines)
+        if not 2 <= n <= 15 or pos + n > len(lines): return False
+        pts = set()
+        for line in lines[pos:pos + n]:
+            t = line.split(" ")
+            if len(t) != 2 or not all(num(v) and -1000 <= int(v) <= 1000 for v in t): return False
+            pts.add(tuple(t))
+        if len(pts) != n: return False
+        pos += n
+def extra_cases():
+    """补充：n 到 15、坐标到 ±1000、共线/退化（宽或高为 1）、单文件多组数据。"""
+    r = random.Random(2791)
+    def block(pts):
+        return f"{len(pts)}\n" + "\n".join(f"{x} {y}" for x, y in pts) + "\n"
+    def rnd(n, lo, hi):
+        pts = set()
+        while len(pts) < n: pts.add((r.randint(lo, hi), r.randint(lo, hi)))
+        pts = list(pts); r.shuffle(pts); return pts
+    cases = []
+    cases.append(block([(-1000, -1000), (1000, 1000)]) + block([(0, -1000), (0, 1000)]) + block([(1000, 5), (-1000, 5)]) + block([(3, 4), (3, 5)]) + "0\n")
+    cases.append(block(rnd(15, -1000, 1000)) + "0\n")
+    cases.append(block(rnd(15, -3, 3)) + "0\n")
+    cases.append(block([(0, y) for y in r.sample(range(-1000, 1001), 15)]) + block([(x, 7) for x in r.sample(range(-20, 21), 15)]) + "0\n")
+    cases.append(block([(x, y) for x in range(3) for y in range(5)]) + block(rnd(15, -1000, 1000)) + "0\n")
+    cases.append(block([(x, y) for x in (-1000, 1000) for y in (-1000, 1000)] + [(0, 0), (1, 1), (999, -999), (-999, 999)]) + "0\n")
+    multi = ""
+    for _ in range(30):
+        n = r.randint(2, 10); span = r.choice([2, 5, 20, 1000])
+        if r.random() < .2: multi += block([(r.randint(-1000, 1000), y) for y in r.sample(range(-span, span + 1), min(n, 2 * span + 1))])
+        else: multi += block(rnd(n, -span, span))
+    cases.append(multi + "0\n")
+    four = "".join(block(rnd(15, -s_, s_)) for s_ in (1000, 10, 4, 100))
+    cases.append(four + "0\n")
+    return cases
 SAMPLE='2\n0 1\n1 0\n0\n'
 def run(x):
  with tempfile.TemporaryDirectory() as d:
@@ -160,6 +204,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

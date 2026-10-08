@@ -148,6 +148,18 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
+ALLOWED2538 = set("0123456789 WERTYUIOPSDFGHJKLXCVBNM-=[]\\;',./")
+
+def valid(text):
+    """题面：若干行文本，每行只含数字、空格、大写字母（不含 Q、A、Z）以及键盘图上的标点（不含反引号 `）。
+    题面未给行数/行长上限，这里只核字符集与按行组织（至少一行，以换行结尾）。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not lines or lines == [""]:
+        return False
+    return all(ch in ALLOWED2538 for ln in lines for ch in ln)
+
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02538/statistics/\n# Accepted submission: 51766151\n# Source: http://cs101.openjudge.cn/practice/solution/51766151/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\ndef main():\n    mapping = {\n        \'1\': \'`\', \'2\': \'1\', \'3\': \'2\', \'4\': \'3\', \'5\': \'4\',\n        \'6\': \'5\', \'7\': \'6\', \'8\': \'7\', \'9\': \'8\', \'0\': \'9\',\n        \'-\': \'0\', \'=\': \'-\',\n        \'W\': \'Q\', \'E\': \'W\', \'R\': \'E\', \'T\': \'R\', \'Y\': \'T\',\n        \'U\': \'Y\', \'I\': \'U\', \'O\': \'I\', \'P\': \'O\',\n        \'[\': \'P\', \']\': \'[\', \'\\\\\': \']\',\n        \'S\': \'A\', \'D\': \'S\', \'F\': \'D\', \'G\': \'F\', \'H\': \'G\',\n        \'J\': \'H\', \'K\': \'J\', \'L\': \'K\',\n        \';\': \'L\', "\'": \';\',\n        \'X\': \'Z\', \'C\': \'X\', \'V\': \'C\', \'B\': \'V\', \'N\': \'B\',\n        \'M\': \'N\', \',\': \'M\', \'.\': \',\', \'/\': \'.\'\n    }\n    for line in sys.stdin:\n        if not line.strip():\n            print()\n            continue\n        result = []\n        for ch in line.rstrip(\'\\n\'):\n            if ch == \' \':\n                result.append(\' \')\n            elif ch in mapping:\n                result.append(mapping[ch])\n            else:\n                result.append(ch)\n        print(\'\'.join(result))\nif __name__ == "__main__":\n    main()\n'
 LANGUAGE='Python3'
 NUMBER=2538

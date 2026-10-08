@@ -1,16 +1,235 @@
-import random,subprocess,tempfile
-from pathlib import Path
-S='\nimport sys,math,re\nfrom collections import deque\nP=4105\ndef r4087(a):\n n,k=a[:2];print(sorted(a[2:2+n])[k-1])\ndef r4088(a):\n n=a[0];A=set(a[1:n+1]);m=a[n+1];B=set(a[n+2:n+2+m]);print(*sorted(A^B))\ndef r4090(t):\n a=t.split();i=0;n=int(a[i]);i+=1;v=list(map(int,a[i:i+n]));i+=n;q=int(a[i]);i+=1;o=[]\n for _ in range(q):\n  z=a[i];i+=1\n  if z=="ADD":x,y,d=map(int,a[i:i+3]);i+=3;v[x-1:y]=[q+d for q in v[x-1:y]]\n  elif z=="REVERSE":x,y=map(int,a[i:i+2]);i+=2;v[x-1:y]=v[x-1:y][::-1]\n  elif z=="REVOLVE":x,y,k=map(int,a[i:i+3]);i+=3;w=v[x-1:y];k%=len(w);v[x-1:y]=w[-k:]+w[:-k] if k else w\n  elif z=="INSERT":x,d=map(int,a[i:i+2]);i+=2;v.insert(x,d)\n  elif z=="DELETE":x=int(a[i]);i+=1;v.pop(x-1)\n  else:x,y=map(int,a[i:i+2]);i+=2;o.append(str(min(v[x-1:y])))\n print("\\n".join(o))\ndef r4091(a):\n i=0;o=[]\n while i<len(a):\n  n,k=a[i:i+2];i+=2;p=[tuple(a[i+j*k:i+(j+1)*k]) for j in range(n)];i+=n*k;q=a[i];i+=1\n  for _ in range(q):\n   x=tuple(a[i:i+k]);i+=k;m=a[i];i+=1;p2=sorted(p,key=lambda z:sum((z[j]-x[j])**2 for j in range(k)))[:m];o+=["the closest %d points are:"%m]+[" ".join(map(str,z)) for z in p2]\n print("\\n".join(o))\ndef r4092(a):\n i=1;o=[]\n for _ in range(int(a[0])):\n  m=int(a[i]);i+=1;s=a[i:i+m];i+=m;best=""\n  for L in range(60,2,-1):\n   q=sorted({s[0][j:j+L] for j in range(61-L)})\n   q=[x for x in q if all(x in z for z in s[1:])]\n   if q:best=q[0];break\n  o.append(best if len(best)>=3 else"no significant commonalities")\n print("\\n".join(o))\ndef r4104(t):\n print(re.sub(r"\\S+",lambda m:m.group()[::-1],t.splitlines()[0] if t.splitlines() else""))\ndef r4105(a):\n i=1;o=[]\n for _ in range(int(a[0])):\n  R,C,K=map(int,a[i:i+3]);i+=3;g=a[i:i+R];i+=R;S=E=None;ps=[];full=0\n  for r in range(R):\n   for c,ch in enumerate(g[r]):\n    if ch=="S":S=(r,c)\n    if ch=="E":E=(r,c)\n    if ch=="$":ps.append((r,c))\n    if ch.isdigit() and int(ch)<K:full|=1<<int(ch)\n  q=deque([(S[0],S[1],0,0)]);seen={(S[0],S[1],0)};ans=None\n  while q:\n   r,c,m,d=q.popleft()\n   if (r,c)==E and m==full:ans=d;break\n   ns=([(x,y) for x,y in ps if (x,y)!=(r,c)] if g[r][c]=="$" else [])\n   ns += [(r+dr,c+dc) for dr,dc in((1,0),(-1,0),(0,1),(0,-1))]\n   for x,y in ns:\n    if not(0<=x<R and 0<=y<C) or g[x][y]=="#":continue\n    mm=m|(1<<int(g[x][y])) if g[x][y].isdigit() and int(g[x][y])<K else m\n    st=(x,y,mm)\n    if st not in seen:seen.add(st);q.append((x,y,mm,d+(0 if g[r][c]=="$" and (x,y) in ps else 1)))\n  o.append(str(ans) if ans is not None else"oop!")\n print("\\n".join(o))\ndef r4106(a):\n print("\\n".join(next(c for c in s if s.count(c)==2) for s in a[1:1+int(a[0])]))\ndef r4108(a):\n ns=a[1:1+a[0]];f=[1,1,1]\n for n in range(3,max(ns,default=2)+1):f.append(f[-1]+f[n-3])\n print("\\n".join(map(str,(f[n] for n in ns))))\ndef r4110(a):\n n=int(a[0]);cap=a[1];x=[(a[i+2]/a[i+3],a[i+2],a[i+3]) for i in range(0,2*n,2)];o=0\n for z,v,w in sorted(x,reverse=True):q=min(cap,w);o+=q*z;cap-=q\n print("%.1f"%o)\ndef r4111(a):\n def f(x):b=bin(int(x,16))[2:];return sum(c=="1" and (i==0 or b[i-1]=="0") for i,c in enumerate(b))\n print("\\n".join("Alice" if f(x)>f(y) else"Bob" if f(x)<f(y) else"Tie" for x,y in zip(a[1::2],a[2::2])))\ndef r4112(t):\n o=[]\n for line in t.splitlines():\n  num=[0]\n  def f(m):\n   num[0]+=1;k=num[0];return"".join(chr((ord(c)-(65 if c.isupper() else 97)-k)%26+(65 if c.isupper() else 97)) for c in m.group()[::-1])\n  o.append(re.sub("[A-Za-z]+",f,line))\n print("\\n".join(o))\ndef r4114(a):\n i=1;o=[]\n for _ in range(int(a[0])):\n  n=int(a[i]);i+=1;s=[a[i+j*4:i+j*4+4] for j in range(n)];i+=4*n;ok=False\n  for q in range(7200):\n   t=math.pi*q/7200;u,v=math.cos(t),math.sin(t);lo=-1e99;hi=1e99\n   for x,y,X,Y in s:lo=max(lo,min(x*u+y*v,X*u+Y*v));hi=min(hi,max(x*u+y*v,X*u+Y*v))\n   if lo<=hi+1e-8:ok=True;break\n  o.append("Yes!" if ok else"No!")\n print("\\n".join(o))\ndef r4120(a):\n n,x=a[:2];c=a[2:2+n];must=[]\n for k in range(n):\n  d={0}\n  for j,z in enumerate(c):\n   if j!=k:d|={q+z for q in tuple(d) if q+z<=x}\n  if x not in d:must.append(c[k])\n print(len(must));print(*must)\ndef r4122(a):\n o=[]\n for s in a[1:1+a[0]]:\n  n=len(s);d=[n+1]*(n+1);d[0]=-1\n  for j in range(n):\n   for i in range(j+1):\n    if s[i:j+1]==s[i:j+1][::-1]:d[j+1]=min(d[j+1],d[i]+1)\n  o.append(str(d[n]))\n print("\\n".join(o))\ndef r4125(a):\n i=0;o=[]\n while i<len(a):\n  n=int(a[i]);i+=1;p=[(a[i+2*j],a[i+2*j+1]) for j in range(n)];i+=2*n\n  d=lambda x,y:math.hypot(p[x][0]-p[y][0],p[x][1]-p[y][1]);dp=[[1e99]*n for _ in range(n)];dp[0][1]=d(0,1)\n  for j in range(2,n):\n   for k in range(j-1):dp[k][j]=dp[k][j-1]+d(j-1,j)\n   dp[j-1][j]=min(dp[k][j-1]+d(k,j) for k in range(j-1))\n  o.append("%.2f"%(dp[n-2][n-1]+d(n-2,n-1)))\n print("\\n".join(o))\ndef r4126(a):\n i=1;o=[]\n for _ in range(a[0]):\n  n=int(a[i]);i+=1;s=a[i:i+n];i+=n;s=[x for j,x in enumerate(s) if not any(j!=k and x in s[k] for k in range(n))];n=len(s);ov=[[0]*n for _ in range(n)]\n  for x in range(n):\n   for y in range(n):\n    for k in range(min(len(s[x]),len(s[y])),-1,-1):\n     if s[y].endswith(s[x][:k]):ov[x][y]=k;break\n  d={(1<<j,j):len(s[j]) for j in range(n)}\n  for m in range(1,1<<n):\n   for j in range(n):\n    if(m,j)not in d:continue\n    for k in range(n):\n     if not m>>k&1:d[m|1<<k,k]=min(d.get((m|1<<k,k),9999),d[m,j]+len(s[k])-ov[j][k])\n  o.append(str(min(d[(1<<n)-1,j] for j in range(n))))\n print("\\n".join(o))\ndef r4127(a):\n g=[a[i*5:i*5+5] for i in range(5)];q=deque([(0,0)]);p={(0,0):None}\n while q:\n  u=q.popleft()\n  for x,y in((u[0]+1,u[1]),(u[0]-1,u[1]),(u[0],u[1]+1),(u[0],u[1]-1)):\n   if 0<=x<5 and 0<=y<5 and g[x][y]==0 and(x,y)not in p:p[x,y]=u;q.append((x,y))\n u=(4,4);o=[]\n while u is not None:o.append("(%d, %d)"%u);u=p[u]\n print("\\n".join(o[::-1]))\ndef r4128(a):\n s,e=a[0].split();w=a[1].split() if len(a)>1 else[];q=deque([(s,1)]);v={s};ans=0\n while q:\n  x,d=q.popleft()\n  if x==e:ans=d;break\n  for y in w+[e]:\n   if y not in v and len(x)==len(y) and sum(i!=j for i,j in zip(x,y))==1:v.add(y);q.append((y,d+1))\n print(ans)\ndef r4131(a):\n n,m=a[:2];d=[0]*(m+1);i=2\n for _ in range(n):\n  w,v=a[i:i+2];i+=2\n  for j in range(m,w-1,-1):d[j]=max(d[j],d[j-w]+v)\n print(d[m])\nF={4087:r4087,4088:r4088,4090:r4090,4091:r4091,4092:r4092,4104:r4104,4105:r4105,4106:r4106,4108:r4108,4110:r4110,4111:r4111,4112:r4112,4114:r4114,4120:r4120,4122:r4122,4125:r4125,4126:r4126,4127:r4127,4128:r4128,4131:r4131}\na=sys.stdin.read();F[P](a if P in(4090,4104,4112) else list(map(float,a.split())) if P in(4110,4114,4125) else a.splitlines() if P==4128 else [int(a.split()[0])]+a.split()[1:] if P in(4122,4126) else a.split() if P in(4092,4105,4106,4111) else list(map(int,a.split())))\n'
-I='1\n7 8 2\n........\n..S..#0.\n.##..1..\n.0#.....\n...1#...\n...##E..\n...1....\n'
-def g4105(r):
- R,C,K=r.randint(5,8),r.randint(6,9),r.randint(1,3);g=[list("."*C) for _ in range(R)];g[0][0]="S";g[-1][-1]="E"
- for k in range(K):g[r.randint(1,R-2)][r.randint(1,C-2)]=str(k)
- return f"1\n{R} {C} {K}\n"+"\n".join("".join(x) for x in g)+"\n"
-B=["1\n5 6 1\nS.....\n......\n......\n......\n.....E\n",
-   "1\n5 6 2\nS0....\n......\n......\n....1.\n.....E\n",
-   "1\n8 9 3\nS0.......\n.........\n..1......\n.........\n....2....\n.........\n.........\n........E\n"]
+"""4105 拯救公主 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 40 组数据。
 
-with tempfile.NamedTemporaryFile("w") as f:
- f.write(S);f.flush();d=Path(__file__).parent/"data"
- for i in range(40):
-  c=I if i==0 else B[i-1] if i <= 3 else g4105(random.Random(4105+i));p=subprocess.run(["python3",f.name],input=c,text=True,capture_output=True,check=True);(d/f"{i}.in").write_text(c);(d/f"{i}.out").write_text(p.stdout)
+2026-10 审计：
+- 原数据全是无墙、无传送门的小空地图（R≤8、C≤9、K≤3、T=1），从未出现 oop!；
+- 原内嵌参考解用普通 BFS 处理 0 代价的传送，队列失序，答案可能偏大
+  （反例：1 / 6 5 2 / E1.#. / 01##0 / ..$01 / 00..# / 0$.S. / $1#.# 应为 6，原解给 7）；
+  另外它把「集齐 K 种」理解成「集齐图上出现过的、编号 <K 的那几种」，
+  K=1 而图上没有宝石 0 时也能救出公主（原第 1、20 组即如此，答案 9、10）。
+现参考解改为分层 BFS（同层内做传送门 0 代价闭包），状态为（格子, 已得宝石集合），
+目标为宝石集合 = (1<<K)-1；与堆优化 Dijkstra 对拍。生成的地图只放编号 <K 的宝石，
+避免「K 种」是指 0..K-1 还是任意 K 种的歧义。
+复核补充：题面「公主所在的地方被设下了结界」也可理解为宝石不齐时不能踏入 E。
+原生成的随机图里有 13 组答案依赖「E 可中途经过」这一理解，现每张图生成后都用两种理解各解一次，
+答案不同就重抽，使数据与这一歧义无关（main() 写盘前逐张再 assert 一遍）。
+"""
+import random
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+SAMPLE_IN = '1\n7 8 2\n........\n..S..#0.\n.##..1..\n.0#.....\n...1#...\n...##E..\n...1....\n'
+SAMPLE_OUT = '11\n'
+REFERENCE = 'import sys\n\n\ndef solve(R, C, K, g):\n    cells = "".join(g)\n    n = R * C\n    full = (1 << K) - 1\n    gem = [0] * n\n    for i, ch in enumerate(cells):\n        if "0" <= ch <= "4" and int(ch) < K:\n            gem[i] = 1 << int(ch)\n    portals = [i for i, ch in enumerate(cells) if ch == "$"]\n    isp = [ch == "$" for ch in cells]\n    nb = []\n    for i in range(n):\n        r, c = divmod(i, C)\n        lst = []\n        if cells[i] != "#":\n            if r > 0 and cells[i - C] != "#": lst.append(i - C)\n            if r < R - 1 and cells[i + C] != "#": lst.append(i + C)\n            if c > 0 and cells[i - 1] != "#": lst.append(i - 1)\n            if c < C - 1 and cells[i + 1] != "#": lst.append(i + 1)\n        nb.append(lst)\n    s = cells.index("S"); e = cells.index("E")\n    target = (e << 5) | full\n    seen = bytearray(n << 5)\n    start = s << 5\n    seen[start] = 1\n    frontier = [start]\n    d = 0\n    while frontier:\n        k = 0\n        while k < len(frontier):  # 同层内传送门 0 代价闭包\n            st = frontier[k]; k += 1\n            if st == target:\n                return str(d)\n            cell = st >> 5\n            if isp[cell]:\n                m = st & 31\n                for p in portals:\n                    t = (p << 5) | m\n                    if not seen[t]:\n                        seen[t] = 1; frontier.append(t)\n        nxt = []\n        for st in frontier:\n            m = st & 31\n            for j in nb[st >> 5]:\n                t = (j << 5) | (m | gem[j])\n                if not seen[t]:\n                    seen[t] = 1; nxt.append(t)\n        frontier = nxt\n        d += 1\n    return "oop!"\n\n\ndef main():\n    a = sys.stdin.read().split()\n    t = int(a[0]); i = 1; out = []\n    for _ in range(t):\n        R, C, K = int(a[i]), int(a[i + 1]), int(a[i + 2]); i += 3\n        g = a[i:i + R]; i += R\n        out.append(solve(R, C, K, g))\n    print("\\n".join(out))\n\n\nmain()\n'
+
+
+def valid(text):
+    """题面契约：T（1..10）组；每组 R C K（2≤R,C≤200，K 为正整数且不超过 5 种），R 行各 C 个字符，
+    字符取自 S E # $ . 0-4；S、E 恰各一个；$ 不超过 10 个。"""
+    lines = text.split("\n")
+    if lines and lines[-1] == "":
+        lines.pop()
+    if not lines or not lines[0].isdigit() or not 1 <= int(lines[0]) <= 10:
+        return False
+    pos = 1
+    for _ in range(int(lines[0])):
+        if pos >= len(lines):
+            return False
+        head = lines[pos].split(" "); pos += 1
+        if len(head) != 3 or not all(x.isdigit() for x in head):
+            return False
+        R, C, K = map(int, head)
+        if not (2 <= R <= 200 and 2 <= C <= 200 and 1 <= K <= 5) or pos + R > len(lines):
+            return False
+        rows = lines[pos:pos + R]; pos += R
+        if any(len(x) != C or any(ch not in "SE#$.01234" for ch in x) for x in rows):
+            return False
+        allc = "".join(rows)
+        if allc.count("S") != 1 or allc.count("E") != 1 or allc.count("$") > 10:
+            return False
+    return pos == len(lines)
+
+
+def make_map(r, R, C, K, wall=0.25, portals=None, gems=None, maze=False):
+    """随机地图：只放编号 <K 的宝石（每种至少一个）；maze=True 时先挖迷宫式长走廊，再按 wall 概率打通墙。"""
+    if maze:
+        cells = ["#"] * (R * C)
+        stack = [(0, 0)]
+        cells[0] = "."
+        while stack:
+            y, x = stack[-1]
+            nbrs = [(y + dy, x + dx, y + dy // 2, x + dx // 2) for dy, dx in ((2, 0), (-2, 0), (0, 2), (0, -2))
+                    if 0 <= y + dy < R and 0 <= x + dx < C and cells[(y + dy) * C + x + dx] == "#"]
+            if not nbrs:
+                stack.pop()
+                continue
+            ny, nx, my, mx = r.choice(nbrs)
+            cells[my * C + mx] = "."
+            cells[ny * C + nx] = "."
+            stack.append((ny, nx))
+        for i in range(R * C):
+            if cells[i] == "#" and r.random() < wall * 0.3:
+                cells[i] = "."
+    else:
+        cells = ["#" if r.random() < wall else "." for _ in range(R * C)]
+    if portals is None:
+        portals = r.randint(0, 10)
+    if gems is None:
+        gems = r.randint(K, max(K, min(3 * K, R * C // 4)))
+    pick = r.sample(range(R * C), 2 + portals + gems)
+    cells[pick[0]] = "S"
+    cells[pick[1]] = "E"
+    for p in pick[2:2 + portals]:
+        cells[p] = "$"
+    for j, p in enumerate(pick[2 + portals:]):
+        cells[p] = str(j if j < K else r.randrange(K))
+    return ["".join(cells[i * C:(i + 1) * C]) for i in range(R)]
+
+
+_NS = {}
+exec(REFERENCE.replace("\n\nmain()\n", "\n"), _NS)
+
+
+def solve_e_blocked(R, C, K, g):
+    """另一种理解：宝石不齐时不能踏入 E。分层 BFS，同层做传送门 0 代价闭包。"""
+    cells = "".join(g)
+    full = (1 << K) - 1
+    s, e = cells.index("S"), cells.index("E")
+    portals = [i for i, ch in enumerate(cells) if ch == "$"]
+    start = (s, 0)
+    seen = {start}
+    frontier = [start]
+    d = 0
+    while frontier:
+        k = 0
+        while k < len(frontier):
+            cell, m = frontier[k]; k += 1
+            if cell == e:
+                return str(d)
+            if cells[cell] == "$":
+                for p in portals:
+                    if (p, m) not in seen:
+                        seen.add((p, m)); frontier.append((p, m))
+        nxt = []
+        for cell, m in frontier:
+            r, c = divmod(cell, C)
+            for nr, nc in ((r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)):
+                if not (0 <= nr < R and 0 <= nc < C):
+                    continue
+                j = nr * C + nc
+                ch = cells[j]
+                if ch == "#":
+                    continue
+                mm = m | (1 << int(ch)) if ch.isdigit() and int(ch) < K else m
+                if j == e and mm != full:
+                    continue
+                if (j, mm) not in seen:
+                    seen.add((j, mm)); nxt.append((j, mm))
+        frontier = nxt
+        d += 1
+    return "oop!"
+
+
+def unambiguous(K, g):
+    return _NS["solve"](len(g), len(g[0]), K, g) == solve_e_blocked(len(g), len(g[0]), K, g)
+
+
+def make_map_safe(r, R, C, K, **kw):
+    """make_map 的包装：答案与「E 能否中途经过」无关才收下。"""
+    while True:
+        g = make_map(r, R, C, K, **kw)
+        if unambiguous(K, g):
+            return g
+
+
+def maps_of(content):
+    a = content.split()
+    i = 1
+    for _ in range(int(a[0])):
+        R, C, K = int(a[i]), int(a[i + 1]), int(a[i + 2]); i += 3
+        yield K, a[i:i + R]
+        i += R
+
+
+def render(sets):
+    out = [str(len(sets))]
+    for K, g in sets:
+        out.append(f"{len(g)} {len(g[0])} {K}")
+        out += g
+    return "\n".join(out) + "\n"
+
+
+def handmade():
+    cases = []
+    # 1 最小地图与 oop!：2x2、被墙隔开、宝石被围住、K 种不全（K=1 却没有宝石 0）
+    cases.append(render([(1, ["S0", ".E"]), (1, ["S#", "#E"]), (1, ["S.", "0E"]),
+                         (2, ["S..#0", "...##", "1...E"]), (1, ["S...", "....", "...E"])]))
+    # 2 传送门：原参考解给错答案的反例；隔墙两侧的传送门；只有 1 个传送门（不能传送）
+    cases.append(render([(2, ["E1.#.", "01##0", "..$01", "00..#", "0$.S.", "$1#.#"]),
+                         (1, ["S$#....", "..#....", "..#....", "..#..0$", "..#...E"]),
+                         (1, ["S$#...", "..#.0E", "..####", "......"]),
+                         (3, ["S.$#$.2", "...#...", "0..#..1", "...#..E"])]))
+    # 3 宝石在 E 的另一侧、需绕开 E 去拿（E 能否中途经过两种理解答案一致）；传送门落点旁就是宝石
+    cases.append(render([(1, ["S...0", ".###.", "..E.."]), (2, ["S.$....", "#######", "1..E..$", "0......"])]))
+    return cases
+
+
+def build_cases():
+    r = random.Random(4105)
+    cases = [SAMPLE_IN] + handmade()
+    # 4-15 小地图，T=10，混合墙密度 / 传送门 / 宝石种类
+    for i in range(4, 16):
+        sets = []
+        for _ in range(10):
+            R, C, K = r.randint(2, 10), r.randint(2, 10), r.randint(1, 5)
+            K = min(K, max(1, (R * C - 2) // 3))
+            sets.append((K, make_map_safe(r, R, C, K, wall=r.choice([0.0, 0.2, 0.35, 0.5]),
+                                     portals=r.randint(0, min(10, (R * C - 2 - K) // 3)),
+                                     gems=r.randint(K, max(K, (R * C - 2) // 3)))))
+        cases.append(render(sets))
+    # 16-27 中等地图（20~80），T=3..10
+    for i in range(16, 28):
+        sets = []
+        for _ in range(r.randint(3, 10)):
+            R, C, K = r.randint(20, 80), r.randint(20, 80), r.randint(1, 5)
+            sets.append((K, make_map_safe(r, R, C, K, wall=r.choice([0.1, 0.3, 0.45]), maze=r.random() < 0.4)))
+        cases.append(render(sets))
+    # 28-39 满尺寸 200x200：K=5 时状态 128 万个，Python 参考解每张约 0.7s，
+    # 一组只放 2 张；K 小时多放几张（T 不超过 10）。
+    for i in range(28, 40):
+        K = [5, 5, 4, 3, 2, 1][(i - 28) % 6]
+        T = {5: 2, 4: 3, 3: 5, 2: 8, 1: 10}[K]
+        sets = []
+        for j in range(T):
+            R = 200 if j == 0 else r.randint(150, 200)
+            C = 200 if j == 0 else r.randint(150, 200)
+            sets.append((K, make_map_safe(r, R, C, K, wall=r.choice([0.2, 0.3, 0.4]), maze=(i + j) % 3 == 0,
+                                     portals=r.choice([0, 2, 10]), gems=r.choice([K, 3 * K, 20]))))
+        cases.append(render(sets))
+    return cases
+
+
+def solve_reference(content):
+    with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as fh:
+        fh.write(REFERENCE)
+        fh.flush()
+        return subprocess.run([sys.executable, fh.name], input=content, text=True,
+                              capture_output=True, timeout=120, check=True).stdout
+
+
+def main():
+    cases = build_cases()
+    assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert solve_reference(SAMPLE_IN) == SAMPLE_OUT, "参考解跑不出样例输出"
+    d = Path(__file__).parent / "data"
+    d.mkdir(exist_ok=True)
+    for i, c in enumerate(cases):
+        assert valid(c), f"第 {i} 组不满足题面约束"
+        assert all(unambiguous(K, g) for K, g in maps_of(c)), f"第 {i} 组答案依赖「E 能否中途经过」"
+        (d / f"{i}.in").write_text(c)
+        (d / f"{i}.out").write_text(solve_reference(c))
+
+
+if __name__ == "__main__":
+    main()

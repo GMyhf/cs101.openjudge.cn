@@ -148,10 +148,64 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
-REFERENCE='// External reference: http://cs101.openjudge.cn/practice/01836/statistics/\n// Accepted submission: 52502642\n// Source: http://cs101.openjudge.cn/practice/solution/52502642/\n// License: not declared on the submission page; no license is inferred.\n\n#include <algorithm>\n#include <bitset>\n#include <iostream>\n#include <stack>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <vector>\n#include <functional>\n#include <numeric>\n#include <queue>\n#include <set>\n#include <array>\n#include <bit>\n#include <map>\n#include <cmath>\n#include <iomanip>\n#include <cstring>\n\nusing namespace std;\ntypedef long long ll;\ntypedef unsigned long long ull;\n\nint n;\ndouble a[1001];\nchar maxIncreasing[1001], maxDecreasing[1001];\n\nint main()\n{\n\tcin >> n;\n\tfor (int i = 0; i < n; i++)cin >> a[i];\n\tmaxIncreasing[0] = maxDecreasing[n - 1] = 1;\n\tmemset(maxDecreasing, 1, 1001);\n\tmemset(maxIncreasing, 1, 1001);\n\tfor (int i = 0; i < n; i++)\n\t\tfor (int j = 0; j < i; j++)if (a[j] < a[i])\n\t\t\tmaxIncreasing[i] = max(maxIncreasing[i], (char)(maxIncreasing[j] + 1));\n\tfor (int i = n - 1; i >= 0; i--)\n\t\tfor (int j = n - 1; j > i; j--)if (a[j] < a[i])\n\t\t\tmaxDecreasing[i] = max(maxDecreasing[i], (char)(maxDecreasing[j] + 1));\n\tint ans = 0;\n\tfor (int i = 0; i < n; i++)\n\t\tfor (int j = i; j < n; j++)\n\t\t\tans = max(ans, maxIncreasing[i] + maxDecreasing[j] + (j == i ? -1 : 0));\n\tcout << n - ans << endl;\n\treturn 0;\n}\n'
+REFERENCE='// External reference: http://cs101.openjudge.cn/practice/01836/statistics/\n// Accepted submission: 52502642\n// Source: http://cs101.openjudge.cn/practice/solution/52502642/\n// License: not declared on the submission page; no license is inferred.\n\n#include <algorithm>\n#include <bitset>\n#include <iostream>\n#include <stack>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <vector>\n#include <functional>\n#include <numeric>\n#include <queue>\n#include <set>\n#include <array>\n#include <bit>\n#include <map>\n#include <cmath>\n#include <iomanip>\n#include <cstring>\n\nusing namespace std;\ntypedef long long ll;\ntypedef unsigned long long ull;\n\nint n;\ndouble a[1001];\n// 修正：原提交用 char 存子序列长度，长度超过 127 时溢出（如 n=1000 严格递增会答错），改为 int。\nint maxIncreasing[1001], maxDecreasing[1001];\n\nint main()\n{\n\tcin >> n;\n\tfor (int i = 0; i < n; i++)cin >> a[i];\n\tfor (int i = 0; i < 1001; i++) maxIncreasing[i] = maxDecreasing[i] = 1;\n\tfor (int i = 0; i < n; i++)\n\t\tfor (int j = 0; j < i; j++)if (a[j] < a[i])\n\t\t\tmaxIncreasing[i] = max(maxIncreasing[i], (int)(maxIncreasing[j] + 1));\n\tfor (int i = n - 1; i >= 0; i--)\n\t\tfor (int j = n - 1; j > i; j--)if (a[j] < a[i])\n\t\t\tmaxDecreasing[i] = max(maxDecreasing[i], (int)(maxDecreasing[j] + 1));\n\tint ans = 0;\n\tfor (int i = 0; i < n; i++)\n\t\tfor (int j = i; j < n; j++)\n\t\t\tans = max(ans, maxIncreasing[i] + maxDecreasing[j] + (j == i ? -1 : 0));\n\tcout << n - ans << endl;\n\treturn 0;\n}\n'
 LANGUAGE='G++'
 NUMBER=1836
 SAMPLE='8\n1.86 1.86 1.30621 2 1.4 1 1.97 2.2\n'
+import re as _re
+_NUM = _re.compile(r'\d+(\.\d{1,5})?')
+
+def valid(text):
+    """题面：首行 n(2<=n<=1000)；第二行 n 个浮点数（最多 5 位小数），单空格分隔，取值在 [0.5, 2.5]。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if len(lines) != 2 or not lines[0].isdigit() or lines[0] != str(int(lines[0])):
+        return False
+    n = int(lines[0])
+    if not 2 <= n <= 1000:
+        return False
+    a = lines[1].split(' ')
+    if len(a) != n:
+        return False
+    from decimal import Decimal
+    return all(_NUM.fullmatch(t) and Decimal('0.5') <= Decimal(t) <= Decimal('2.5') for t in a)
+
+def gen_case(seed):
+    r = random.Random(1836 * 1000 + seed)
+    def fmt(vals):
+        # vals 为 1e-5 为单位的整数；随机选用不同写法（如 2 / 2.0 / 2.00000），数值相同
+        out = []
+        for v in vals:
+            s = f"{v // 100000}.{v % 100000:05d}".rstrip("0")
+            s = s[:-1] if s.endswith(".") else s
+            if r.random() < 0.15 and "." in s:
+                s = s + "0" * r.randint(0, 5 - len(s.split(".")[1]))
+            elif r.random() < 0.1 and "." not in s:
+                s = s + "." + "0" * r.randint(1, 5)
+            out.append(s)
+        return f"{len(vals)}\n" + " ".join(out) + "\n"
+    LO, HI = 50000, 250000
+    if seed == 1: return fmt([150000, 150000])                     # 两人等高：都能看到一端，答 0
+    if seed == 2: return fmt([150000] * 3)                         # 答 1
+    if seed == 3: return fmt([200000] * 1000)                      # 答 998
+    if seed == 4: return fmt(list(range(LO, LO + 1000)))           # 严格递增，答 0
+    if seed == 5: return fmt(list(range(HI, HI - 1000, -1)))       # 严格递减，答 0
+    if seed == 6: return fmt([LO, HI])
+    if seed == 7: return fmt([HI, LO, HI])                         # 中间被挡住，答 1
+    if seed == 8:                                                  # 先增后减的山峰 + 平台
+        k = 500; up = sorted(r.sample(range(LO, HI), k)); dn = sorted(r.sample(range(LO, HI), 499), reverse=True)
+        return fmt(up + [up[-1]] + dn)
+    n = 1000 if seed >= 20 else r.randint(2, 999)
+    v = seed % 5
+    if v == 0: vals = [r.randint(LO, HI) for _ in range(n)]                       # 任意 5 位小数
+    elif v == 1: vals = [r.randrange(LO, HI + 1, 10000) for _ in range(n)]        # 0.1 步长，大量相等
+    elif v == 2: vals = [r.choice([LO, 100000, 150000, 200000, HI]) for _ in range(n)]
+    elif v == 3:                                                                 # 近似山峰形加扰动
+        vals = [min(HI, max(LO, int(HI - abs(i - n / 2) * (HI - LO) / n * 2) + r.randint(-5000, 5000))) for i in range(n)]
+    else: vals = [r.randrange(LO, HI + 1, 1000) for _ in range(n)]
+    return fmt(vals)
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -159,7 +213,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [gen_case(s) for s in range(1, 40)])
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

@@ -1,5 +1,10 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def valid(text):
+    """题面：一行，一个正整数 a（a < 32768）。"""
+    import re
+    return bool(re.fullmatch(r'[1-9]\d*\n', text)) and 1 <= int(text) < 32768
+
 def generate(n, seed):
     r=random.Random(seed)
     if n==2694:
@@ -135,7 +140,11 @@ def generate(n, seed):
     if n==2287:
         N=r.randint(1,30);return f'{N}\n'+' '.join(str(r.randint(1,100)) for _ in range(N))+'\n'+' '.join(str(r.randint(1,100)) for _ in range(N))+'\n0\n'
     if n==2981:return str(r.randrange(10**50))+'\n'+str(r.randrange(10**50))+'\n'
-    if n==2750:return f'{r.randint(1,32767)}\n'
+    if n==2750:
+        # 边界：最小值、奇数无解、a%4==2 与 a%4==0 两个分支、上界 32767
+        fixed={1:1,2:2,3:3,4:4,5:6,6:8,7:32767,8:32766,9:32764,10:10}
+        if seed in fixed:return f'{fixed[seed]}\n'
+        return f'{r.randint(1,32767)}\n'
     if n==2788:
         rows=[]
         for _ in range(r.randint(1,6)):

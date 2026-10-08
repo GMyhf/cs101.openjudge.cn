@@ -148,10 +148,105 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
-REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1062: 昂贵的聘礼\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01062/\n# License: not declared; no license is inferred.\n# 2300015881 赵凌哲 光华管理学院\ndef dfs(num, max_level, min_level):\n    if item_list[num][3]:\n        return -1\n    if item_list[num][1] < max_level - m or item_list[num][1] > min_level + m:\n        return -1\n    item_list[num][3] = True\n    max_level_updated = max(max_level, item_list[num][1])\n    min_level_updated = min(min_level, item_list[num][1])\n    price = item_list[num][0]\n    for replace_item in item_list[num][2]:\n        pr = dfs(replace_item[0], max_level_updated, min_level_updated)\n        if pr == -1:\n            continue\n        else:\n            price = min(price, replace_item[1] + pr)\n    item_list[num][3] = False\n    return price\n\n\nm, n = map(int, input().split())\nitem_list = []\nfor i in range(n):\n    p, l, x = map(int, input().split())\n    replace_options = []\n    for j in range(x):\n        t, v = map(int, input().split())\n        replace_options.append([t - 1, v])\n    item_list.append([p, l, replace_options, False])\nprint(dfs(0, item_list[0][1], item_list[0][1]))\n'
+REFERENCE='# 参考解：原先引用的 2020fall 代码是沿路径的指数级 DFS，N=100 的稠密数据会超时；旧生成器每件物品都没有替代品（X=0），\n# 答案恒为 P1，等于没测。这里改成：枚举包含酋长等级的等级窗口 [lo, lo+M]（lo 取现有等级），窗口内 Dijkstra。\nimport sys, heapq\nd = list(map(int, sys.stdin.read().split()))\nM, N = d[0], d[1]\np = 2\nP = []; Lv = []; adj = [[] for _ in range(N)]\nfor i in range(N):\n    pi, li, x = d[p], d[p + 1], d[p + 2]; p += 3\n    P.append(pi); Lv.append(li)\n    for _ in range(x):\n        t, v = d[p], d[p + 1]; p += 2\n        adj[t - 1].append((i, v))      # 拿到 t 之后，再付 v 换到 i\nINF = float("inf")\nbest = INF\nfor lo in sorted(set(Lv)):\n    if not (Lv[0] - M <= lo <= Lv[0]):\n        continue\n    hi = lo + M\n    ok = [lo <= l <= hi for l in Lv]\n    dist = [P[i] if ok[i] else INF for i in range(N)]\n    pq = [(dist[i], i) for i in range(N) if ok[i]]\n    heapq.heapify(pq)\n    while pq:\n        du, u = heapq.heappop(pq)\n        if du > dist[u]:\n            continue\n        for w, v in adj[u]:\n            if ok[w] and du + v < dist[w]:\n                dist[w] = du + v\n                heapq.heappush(pq, (dist[w], w))\n    best = min(best, dist[0])\nprint(best)\n'
 LANGUAGE='Python3'
 NUMBER=1062
 SAMPLE='1 4\n10000 3 2\n2 8000\n3 5000\n1000 2 1\n4 200\n3000 2 1\n4 200\n50 2 0\n'
+def valid(text):
+    """题面：首行 M N（1<=N<=100）；随后按编号给 N 个物品：一行非负整数 P L X（X<N），再 X 行 T V（T 是物品编号 1..N）。"""
+    lines = text.split("\n")
+    if lines and lines[-1] == "":
+        lines.pop()
+    def ints(s, k):
+        t = s.split()
+        if len(t) != k:
+            return None
+        try:
+            v = [int(z) for z in t]
+        except ValueError:
+            return None
+        if any(str(a) != b for a, b in zip(v, t)):
+            return None
+        return v
+    if not lines:
+        return False
+    h = ints(lines[0], 2)
+    if h is None:
+        return False
+    M, N = h
+    if not (1 <= N <= 100):
+        return False
+    i = 1
+    for _ in range(N):
+        if i >= len(lines):
+            return False
+        row = ints(lines[i], 3); i += 1
+        if row is None or min(row) < 0 or row[2] >= N:
+            return False
+        for _ in range(row[2]):
+            if i >= len(lines):
+                return False
+            tv = ints(lines[i], 2); i += 1
+            if tv is None or not (1 <= tv[0] <= N):
+                return False
+    return i == len(lines)
+
+def gen1062(seed):
+    """另行约定：M>=0，0<=V，P<=10000（题面没给上界，按原题量级）。"""
+    r = random.Random(1062_000 + seed)
+    def build(M, items):
+        out = [f"{M} {len(items)}"]
+        for P, L, subs in items:
+            out.append(f"{P} {L} {len(subs)}")
+            out += [f"{t} {v}" for t, v in subs]
+        return "\n".join(out) + "\n"
+    def rand_items(n, lvl_span, density, pmax=10000):
+        items = []
+        for i in range(1, n + 1):
+            P = r.randint(0 if r.random() < 0.03 else 1, pmax)
+            L = r.randint(1, lvl_span)
+            k = min(n - 1, int(round(density * (n - 1) * r.random() * 2)))
+            k = max(0, min(n - 1, k))
+            others = [j for j in range(1, n + 1) if j != i]
+            subs = [(t, r.randint(0, P)) for t in r.sample(others, k)]
+            items.append((P, L, subs))
+        return items
+    if seed == 1:
+        return build(0, [(r.randint(0, 10000), 1, [])])
+    if seed == 2:
+        return build(5, [(9999, 3, [])])
+    if seed == 3:
+        return build(1, [(10000, 3, [(2, 100)]), (50, 3, [])])            # 150
+    if seed == 4:
+        return build(1, [(10000, 3, [(2, 100)]), (50, 5, [])])            # 等级差 2 > M：只能 10000
+    if seed == 5:
+        return build(0, [(10000, 2, [(2, 5000), (3, 3000)]), (100, 2, [(3, 50)]), (10, 2, [])])
+    if seed == 6:
+        # 链 1<-2<-3：相邻两两差 ≤ M，但 1 与 3 差 2 > M=1，只按边检查等级会算出 30
+        return build(1, [(10000, 5, [(2, 10)]), (5000, 6, [(3, 10)]), (10, 7, [])])
+    if seed == 7:
+        # 酋长等级 5、M=2：等级 3 与 7 的两家不能同时用；窗口必须包含酋长等级
+        return build(2, [(10000, 5, [(2, 100), (3, 100)]), (8000, 3, [(3, 10)]), (8000, 7, [(2, 10)]), (1, 9, [])])
+    if seed == 8:
+        return build(3, [(0, 4, [(2, 0)]), (0, 4, [])])
+    if seed == 9:
+        # 自身是替代品、重复替代品
+        return build(2, [(500, 2, [(1, 1), (2, 7), (2, 3)]), (100, 3, [(1, 0)]), (9000, 2, []), (1, 9, [])])
+    if seed <= 20:
+        n = r.randint(3, 9)
+        return build(r.randint(0, 4), rand_items(n, r.randint(1, 8), r.uniform(0.2, 0.6)))
+    if seed <= 28:
+        n = r.randint(30, 100)
+        return build(r.randint(0, 10), rand_items(n, r.randint(5, 30), r.uniform(0.05, 0.3)))
+    if seed == 29:
+        return build(10 ** 6, rand_items(100, 100, 0.5))                 # M 很大，等级不起作用
+    if seed == 30:
+        # 长链：最优解要走 99 步替代
+        items = [(10000, 1, [(2, 1)])] + [(10000, 1, [(i + 1, 1)]) for i in range(2, 100)] + [(1, 1, [])]
+        return build(0, items)
+    n = 100
+    return build(r.randint(1, 15), rand_items(n, r.randint(10, 40), r.uniform(0.3, 0.5)))
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -159,7 +254,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [gen1062(s) for s in range(1, 40)])
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

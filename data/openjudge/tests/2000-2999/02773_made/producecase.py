@@ -153,6 +153,39 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
+def valid(text):
+    """题面契约：第一行 T (1..1000) M (1..100)；接下来 M 行，每行两个 1..100 的整数（时间、价值）。"""
+    import re
+    if not text.endswith('\n'): return False
+    lines = text[:-1].split('\n')
+    INT = re.compile(r'[1-9][0-9]*')
+    def two(s):
+        p = s.split(' ')
+        return (int(p[0]), int(p[1])) if len(p) == 2 and all(INT.fullmatch(x) for x in p) else None
+    h = two(lines[0])
+    if h is None: return False
+    T, M = h
+    if not (1 <= T <= 1000 and 1 <= M <= 100) or len(lines) != M + 1: return False
+    for s in lines[1:]:
+        q = two(s)
+        if q is None or not all(1 <= x <= 100 for x in q): return False
+    return True
+
+def extra_cases():
+    """补充覆盖：T=1/M=1 最小规模、全部采不了（答案 0）、T=1000/M=100 满规模、全能采、按性价比贪心会错的构造。"""
+    r = random.Random(277300)
+    def fmt(T, items): return f'{T} {len(items)}\n' + '\n'.join(f'{a} {b}' for a, b in items) + '\n'
+    cases = [fmt(1, [(1, 100)]), fmt(1, [(2, 100)]), fmt(5, [(r.randint(6, 100), r.randint(1, 100)) for _ in range(100)])]
+    for _ in range(3):
+        cases.append(fmt(1000, [(r.randint(1, 100), r.randint(1, 100)) for _ in range(100)]))
+    cases.append(fmt(1000, [(r.randint(1, 10), r.randint(1, 100)) for _ in range(100)]))
+    cases.append(fmt(1000, [(100, r.randint(1, 100)) for _ in range(100)]))
+    cases.append(fmt(1000, [(r.randint(90, 100), r.randint(95, 100)) for _ in range(100)]))
+    cases.append(fmt(10, [(6, 7), (5, 5), (5, 5)]))
+    cases.append(fmt(1000, [(r.randint(40, 100), r.randint(1, 100)) for _ in range(100)]))
+    cases.append(fmt(r.randint(900, 1000), [(1, 1)] * 100))
+    return cases
+
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2773: 采药\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024sp_routine/02773/\n# License: not declared in source collection; no license is inferred.\nimport sys\nT, M = map(int, input().split())\ndp = [ [0] + [0]*T for _ in range(M+1)]\n\nt = [0]\nv = [0]\nfor i in range(M):\n        ti, vi = map(int, input().split())\n        t.append(ti)\n        v.append(vi)\n\nfor i in range(1, M+1):\t\t\t# 外层循环（行）草药 M\n        for j in range(0, T+1):\t# 内层循环（列）时间 T\n                if j >= t[i]:\n                        dp[i][j] = max(dp[i-1][j], dp[i-1][j-t[i]] + v[i])\n                else:\n                        dp[i][j] = dp[i-1][j]\n\nprint(dp[M][T])\n'
 NUMBER=2773
 SAMPLE='70 3\n71 100\n69 1\n1 2\n'
@@ -164,6 +197,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

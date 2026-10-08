@@ -1,5 +1,21 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def valid(text):
+    """题面：第 1 行组数 n，后跟 n 行，每行一个正整数 b（1 <= b <= 92）。"""
+    import re
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if not re.fullmatch(r'[1-9]\d*', lines[0]):
+        return False
+    n = int(lines[0])
+    if len(lines) != n + 1:
+        return False
+    for line in lines[1:]:
+        if not re.fullmatch(r'[1-9]\d*', line) or not (1 <= int(line) <= 92):
+            return False
+    return True
+
 def generate(n, seed):
     r=random.Random(seed)
     if n==2694:

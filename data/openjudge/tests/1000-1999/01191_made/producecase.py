@@ -157,8 +157,27 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
-REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1191: 棋盘分割\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024sp_routine/01191/\n# License: not declared in source collection; no license is inferred.\nimport sys\n# https://blog.csdn.net/Dante__Alighieri/article/details/38823005\n# https://blog.csdn.net/qq_40774175/article/details/82704582\n# 时间: 93ms\nfrom collections import defaultdict\n\ndef f(n, x1, y1, x2, y2):\n    if dp[(n, x1, y1, x2, y2)] > 0:\n        return dp[(n, x1, y1, x2, y2)]\n    if n == 1:\n        su = 0\n        for i in range(x1, x2+1):\n            for j in range(y1, y2+1):\n                su += l[i][j]\n        dp[(n, x1, y1, x2, y2)] = su*su\n        return su*su\n    #mi = 10000000\n    mi = float(\'inf\')\n    for i in range(x1, x2):\n        mi = min(mi, f(n-1, x1, y1, i, y2)+f(1, i+1, y1, x2, y2))\n        mi = min(mi, f(1, x1, y1, i, y2)+f(n-1, i+1, y1, x2, y2))\n    for i in range(y1, y2):\n        mi = min(mi, f(n-1, x1, y1, x2, i)+f(1, x1, i+1, x2, y2))\n        mi = min(mi, f(1, x1, y1, x2, i)+f(n-1, x1, i+1, x2, y2))\n    dp[(n, x1, y1, x2, y2)] = mi\n    return mi\n\n\nn = int(input())\nl = []\nfor i in range(8):\n    l.append([int(x) for x in input().split()])\ns = 0\nfor i in l:\n    for j in i:\n        s += j\ndp = defaultdict(int)\n\nprint("%.3f"%(f(n, 0,0,7,7)/n-s*s/n/n)**0.5)\n'
+REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1191: 棋盘分割\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024sp_routine/01191/\n# License: not declared in source collection; no license is inferred.\nimport sys\n# https://blog.csdn.net/Dante__Alighieri/article/details/38823005\n# https://blog.csdn.net/qq_40774175/article/details/82704582\n# 时间: 93ms\nfrom collections import defaultdict\n\ndef f(n, x1, y1, x2, y2):\n    if (n, x1, y1, x2, y2) in dp:  # 原写法 dp[...] > 0 在分值全为 0 的区域上记忆化失效，会指数级超时\n        return dp[(n, x1, y1, x2, y2)]\n    if n == 1:\n        su = 0\n        for i in range(x1, x2+1):\n            for j in range(y1, y2+1):\n                su += l[i][j]\n        dp[(n, x1, y1, x2, y2)] = su*su\n        return su*su\n    #mi = 10000000\n    mi = float(\'inf\')\n    for i in range(x1, x2):\n        mi = min(mi, f(n-1, x1, y1, i, y2)+f(1, i+1, y1, x2, y2))\n        mi = min(mi, f(1, x1, y1, i, y2)+f(n-1, i+1, y1, x2, y2))\n    for i in range(y1, y2):\n        mi = min(mi, f(n-1, x1, y1, x2, i)+f(1, x1, i+1, x2, y2))\n        mi = min(mi, f(1, x1, y1, x2, i)+f(n-1, x1, i+1, x2, y2))\n    dp[(n, x1, y1, x2, y2)] = mi\n    return mi\n\n\nn = int(input())\nl = []\nfor i in range(8):\n    l.append([int(x) for x in input().split()])\ns = 0\nfor i in l:\n    for j in i:\n        s += j\ndp = defaultdict(int)\n\nprint("%.3f"%(f(n, 0,0,7,7)/n-s*s/n/n)**0.5)\n'
 NUMBER=1191
+def valid(text):
+    # 题面：第 1 行整数 n（1<n<15）；第 2~9 行每行 8 个小于 100 的非负整数，单空格分隔
+    if not text.endswith('\n'): return False
+    lines=text[:-1].split('\n')
+    if len(lines)!=9 or not lines[0].isdigit() or not 1<int(lines[0])<15: return False
+    for l in lines[1:]:
+        t=l.split(' ')
+        if len(t)!=8 or not all(x.isdigit() and int(x)<100 and (x=='0' or x[0]!='0') for x in t): return False
+    return True
+def extra_1191():
+    # 补充：n 取到上限 14 及 11~13、最小 n=2，全 0 / 全 99 / 大量 0 的稀疏棋盘
+    r=random.Random(1191_2024)
+    board=lambda f:'\n'.join(' '.join(str(f()) for _ in range(8)) for _ in range(8))+'\n'
+    out=[f'14\n'+board(lambda:r.randint(0,99)) for _ in range(4)]
+    out+=[f'{k}\n'+board(lambda:r.randint(0,99)) for k in (11,12,13)]
+    out+=['14\n'+board(lambda:0),'14\n'+board(lambda:99),'2\n'+board(lambda:0),'2\n'+board(lambda:99),
+          '14\n'+board(lambda:r.choice([0]*9+[r.randint(1,99)])),'13\n'+board(lambda:r.choice([0,0,0,99])),
+          '2\n'+board(lambda:r.randint(0,99)),'14\n'+board(lambda:r.randint(90,99))]
+    return out
 SAMPLE='3\n1 1 1 1 1 1 1 3\n1 1 1 1 1 1 1 1\n1 1 1 1 1 1 1 1\n1 1 1 1 1 1 1 1\n1 1 1 1 1 1 1 1\n1 1 1 1 1 1 1 1\n1 1 1 1 1 1 1 0\n1 1 1 1 1 1 0 3\n'
 def run(x):
  with tempfile.TemporaryDirectory() as d:
@@ -168,6 +187,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_1191()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

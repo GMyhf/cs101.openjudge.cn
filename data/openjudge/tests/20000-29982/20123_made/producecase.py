@@ -1,8 +1,8 @@
-"""20123 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+"""20123 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的全部数据。
 
 出处：build_001d
 生成器与循环取自 scripts/build_001d.py（批次 001d），保持同一形状；
-不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
+前 20 组之后追加 extra_cases()；不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
 """
 import random
 import subprocess
@@ -37,6 +37,26 @@ def g20123(r):
     n=r.randint(7,60) if kind<0.88 else r.randint(99000,100000)                                 # 后者贴题面 10^5 位上界
     return str(r.randint(1,9))+"".join(str(r.randint(0,9)) for _ in range(n-1))+"\n"
 
+def valid(text):
+    """题面：一个正整数 N，首位不为 0，位数 <= 10^5；单行。"""
+    if not text.endswith("\n"):
+        return False
+    s = text[:-1]
+    return 1 <= len(s) <= 10 ** 5 and s.isascii() and s.isdigit() and s[0] != "0"
+
+
+# 追加组（2026-10 审计）：6 位 NO（卡「>=6 位就 YES」）、只能取不连续子序列才成立的 YES（卡「只看连续子串」）、
+# 只有整串才是 7 的倍数的 999999、题面样例 2、恰好 10^5 位。
+EXTRA_SHORT = ["31116", "381166", "111885", "318818", "99999", "999999", "586262", "25451", "9486", "961", "7", "10"]
+
+
+def extra_cases():
+    r = random.Random(NUMBER * 7)
+    big = str(r.randint(1, 9)) + "".join(str(r.randint(0, 9)) for _ in range(10 ** 5 - 1))
+    big_no7 = "".join(r.choice("1234568") for _ in range(10 ** 5))     # 无 0/7 的满长度
+    return [s + "\n" for s in EXTRA_SHORT] + [big + "\n", big_no7 + "\n", "1" * 10 ** 5 + "\n"]
+
+
 def build_cases():
     cases = [SAMPLE_IN]
     for i in range(1, 20):
@@ -47,6 +67,10 @@ def build_cases():
                 break
         else:
             raise AssertionError("生成器多样性不足")
+    for value in extra_cases():
+        assert value not in cases
+        cases.append(value)
+    assert all(valid(c) for c in cases)
     return cases
 
 def solve_reference(content):

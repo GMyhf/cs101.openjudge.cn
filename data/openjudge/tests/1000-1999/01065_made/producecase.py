@@ -157,7 +157,7 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
-REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1065: Wooden Sticks\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/01065/\n# License: not declared in source collection; no license is inferred.\nimport sys\ndef min_setup_time(sticks):\n    n = len(sticks)\n    check = [0]*n\n    setup_time = 0\n    while (0 in check):\n        #print(check)\n        #print(sticks)\n        i = 0\n        for j in range(n):\n            if check[j] == 0:\n                i = j\n                break\n        current = sticks[i]\n        check[i] = 1\n        setup_time += 1\n        i += 1\n        while  i < n:\n            if  check[i]==0 and current[0]<=sticks[i][0] and  current[1]<= sticks[i][1]:\n                check[i] = 1\n                current = sticks[i]\n\n            i +=1\n\n    return setup_time\n\n\nT = int(input())\nfor _ in range(T):\n    n = int(input())\n    data = list(map(int, input().split()))\n    sticks = [(data[i], data[i + 1]) for i in range(0, 2 * n, 2)]\n    sticks.sort()\n    print(min_setup_time(sticks))\n'
+REFERENCE='# 参考解：原先的 2020fall 贪心（排序后反复扫链）是对的，但最坏 O(n^2)；数据放大到 n=5000 后换成\n# Dilworth：按 (l, w) 升序排好后，所需准备次数 = w 序列的最长严格下降子序列长度，O(n log n)。\nimport sys\nfrom bisect import bisect_left\ntok = sys.stdin.read().split()\nT = int(tok[0]); p = 1; out = []\nfor _ in range(T):\n    n = int(tok[p]); p += 1\n    a = sorted((int(tok[p + 2 * i]), int(tok[p + 2 * i + 1])) for i in range(n)); p += 2 * n\n    tails = []                       # 对 -w 求最长严格上升子序列\n    for _, w in a:\n        x = -w\n        k = bisect_left(tails, x)\n        if k == len(tails):\n            tails.append(x)\n        else:\n            tails[k] = x\n    out.append(str(len(tails)))\nprint("\\n".join(out))\n'
 NUMBER=1065
 SAMPLE='3\n5\n4 9 5 2 2 1 3 5 1 4\n3\n2 2 1 1 2 2\n3\n1 3 2 2 3 1\n'
 def run(x):
@@ -165,9 +165,76 @@ def run(x):
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout
+def valid(text):
+    """题面：首行 T；每组两行：n（1<=n<=5000），以及 2n 个不超过 10000 的正整数（以一个或多个空格分隔）。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    def posint(s):
+        return s.isdigit() and s[0] != "0"
+    if not lines or not posint(lines[0]):
+        return False
+    T = int(lines[0])
+    if len(lines) != 2 * T + 1:
+        return False
+    for i in range(T):
+        ns = lines[1 + 2 * i]
+        if not posint(ns) or not (1 <= int(ns) <= 5000):
+            return False
+        row = lines[2 + 2 * i]
+        if row != row.strip(" ") or "\t" in row:
+            return False
+        toks = row.split(" ")
+        toks = [t for t in toks if t != ""]
+        if len(toks) != 2 * int(ns) or not all(posint(t) and int(t) <= 10000 for t in toks):
+            return False
+    return True
+
+def gen1065(seed):
+    r = random.Random(1065_000 + seed)
+    def case(st):
+        r.shuffle(st)
+        sep = "  " if r.random() < 0.15 else " "
+        return f"{len(st)}\n" + sep.join(f"{l}{sep}{w}" for l, w in st)
+    def rand_st(n, V):
+        return [(r.randint(1, V), r.randint(1, V)) for _ in range(n)]
+    def chains(n, k, V=10000):
+        # k 条两两不可比的链：链 j 的 l 在第 j 段、w 在倒数第 j 段，答案恰为 k（每段需容纳一条链）
+        st = []
+        seg = V // k
+        for j in range(k):
+            m = n // k + (1 if j < n % k else 0)
+            ls = sorted(r.randint(j * seg + 1, (j + 1) * seg) for _ in range(m))
+            ws = sorted(r.randint((k - 1 - j) * seg + 1, (k - j) * seg) for _ in range(m))
+            st += list(zip(ls, ws))
+        return st
+    if seed == 1:
+        cases = [[(r.randint(1, 10000), r.randint(1, 10000))]]
+    elif seed == 2:
+        cases = [[(7, 7)] * 10, [(10000, 10000)] * 5000]
+    elif seed == 3:
+        cases = [[(i, 5001 - i) for i in range(1, 5001)]]          # 反链，答案 5000
+    elif seed == 4:
+        cases = [[(i, i) for i in range(1, 5001)]]                 # 全链，答案 1
+    elif seed == 5:
+        # l 相同 w 不同、w 相同 l 不同；只按 l 排序或用严格不等式会出错
+        cases = [[(1, 5), (1, 3), (2, 4)], [(3, 1), (1, 1), (2, 1)], [(2, 2), (2, 2), (1, 3), (3, 1)],
+                 [(1, 1), (1, 2), (2, 1), (2, 2)], [(5, 1), (5, 2), (5, 3), (4, 4)]]
+    elif seed <= 15:
+        cases = [rand_st(r.randint(1, 10), r.randint(1, 10)) for _ in range(r.randint(20, 60))]
+    elif seed <= 25:
+        cases = [rand_st(r.randint(100, 1000), r.choice([50, 1000, 10000])) for _ in range(r.randint(1, 5))]
+    elif seed <= 30:
+        cases = [chains(5000, r.choice([2, 7, 50, 300, 1000, 2500]))]
+    elif seed <= 35:
+        cases = [rand_st(5000, r.choice([100, 10000])) for _ in range(r.randint(1, 4))]
+    else:
+        cases = [chains(5000, r.randint(1, 5000)), rand_st(5000, 10000), chains(5000, r.randint(1, 100))]
+    return f"{len(cases)}\n" + "\n".join(case(list(c)) for c in cases) + "\n"
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[gen1065(s) for s in range(1, 40)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

@@ -152,6 +152,75 @@ REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.op
 LANGUAGE='Python3'
 NUMBER=2159
 SAMPLE='JWPUDJSTVP\nVICTORIOUS\n'
+def valid(text):
+    """题面契约：恰两行，只含大写英文字母，两行等长且长度不超过 100（至少 1）。"""
+    if not text.endswith('\n') or '\r' in text:
+        return False
+    lines = text[:-1].split('\n')
+    if len(lines) != 2:
+        return False
+    a, b = lines
+    if not (1 <= len(a) <= 100) or len(a) != len(b):
+        return False
+    return all('A' <= c <= 'Z' for c in a + b)
+
+
+_UP2159 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def _yes2159(r, b):
+    """把原文 b 先做随机代换（双射）再做随机置换，得到一定为 YES 的密文。"""
+    perm = list(_UP2159); r.shuffle(perm); sub = dict(zip(_UP2159, perm))
+    a = [sub[c] for c in b]; r.shuffle(a)
+    return "".join(a)
+
+
+def _counts2159(s):
+    return sorted(s.count(c) for c in set(s))
+
+
+def gen2159(seed):
+    r = random.Random(2159_000 + seed)
+    rand = lambda n, k=26: "".join(r.choice(_UP2159[:k]) for _ in range(n))
+    if seed == 1:  return "A\nZ\n"                         # 最短，YES
+    if seed == 2:  return "AB\nCC\n"                       # 最短的 NO
+    if seed == 3:  b = "Z" * 100; return _yes2159(r, b) + "\n" + b + "\n"   # 满长单字母
+    if seed == 4:  return "A" * 99 + "B\n" + "A" * 100 + "\n"               # 满长只差一个
+    if seed == 5:  b = (_UP2159 * 4)[:100]; return _yes2159(r, b) + "\n" + b + "\n"
+    n = 100 if seed % 3 == 0 else r.randint(1, 100)
+    k = r.choice([1, 2, 3, 5, 10, 26, 26])
+    b = rand(n, k)
+    if seed % 2 == 0:                                    # YES：真正的代换 + 置换
+        a = _yes2159(r, b)
+        if seed % 4 == 0 and a == b:
+            a = _yes2159(r, b)
+        return a + "\n" + b + "\n"
+    # NO：做成「看起来很像」的反例
+    kind = (seed // 2) % 4
+    for _ in range(1000):
+        if kind == 0:      # 字母种类数相同、频次多重集不同
+            a = list(_yes2159(r, b))
+            i, j = r.sample(range(n), 2) if n >= 2 else (0, 0)
+            a[i] = a[j]
+            a = "".join(a)
+        elif kind == 1:    # 只做置换不做代换，但改一个字符（仅判断是否为同字母重排的写法会对，判凯撒移位的写法会错）
+            s = r.randrange(1, 26)
+            a = list("".join(_UP2159[(_UP2159.index(c) + s) % 26] for c in b)); r.shuffle(a)
+            a[r.randrange(n)] = r.choice(_UP2159); a = "".join(a)
+        elif kind == 2:    # 完全随机
+            a = rand(n, r.choice([k, 26]))
+        else:              # 频次多重集差一：一个字母多一次、另一个少一次
+            a = list(_yes2159(r, b)); c = a[r.randrange(n)]
+            others = [x for x in a if x != c]
+            if others:
+                a[a.index(others[r.randrange(len(others))])] = c
+            a = "".join(a)
+        if len(a) == n and _counts2159(a) != _counts2159(b):
+            return a + "\n" + b + "\n"
+    b = "A" * (n - 1) + "B" if n >= 2 else "A"
+    a = "C" * n if n >= 2 else "B"
+    return a + "\n" + b + "\n"
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -159,7 +228,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [gen2159(s) for s in range(1, 40)])
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

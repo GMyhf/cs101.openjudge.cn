@@ -1,31 +1,97 @@
-import random, subprocess, sys, tempfile
+# 26273 字符串的周期：输出所有周期长度（升序）。
+# 输入仅一行，小写字母 a-z，1<=n<=10^6。
+import random
+import subprocess
+import sys
 from pathlib import Path
-REFERENCE='def main():\n    import sys\n    s = sys.stdin.readline().strip()\n    n = len(s)\n    if n == 0:\n        print()\n        return\n\n    # 计算前缀函数（next数组）\n    pi = [0] * n\n    for i in range(1, n):\n        j = pi[i-1]\n        while j > 0 and s[i] != s[j]:\n            j = pi[j-1]\n        if s[i] == s[j]:\n            j += 1\n        pi[i] = j\n\n    res = []\n    cur = pi[-1]\n    while cur > 0:\n        res.append(n - cur)\n        cur = pi[cur - 1]\n    res.append(n)  # 自身一定是周期\n\n    res.sort()\n    print(\' \'.join(map(str, res)))\n\nif __name__ == "__main__":\n    main()'
-SAMPLE='abcabca\n'
-GENERATOR_NAME='g26273'
-def g26273(r):
-    n = r.randint(1, 10000)
-    unit = "".join(r.choice("abc") for _ in range(r.randint(2, 30)))
-    return (unit * ((n + len(unit) - 1) // len(unit)))[:n] + "\n"
 
-def run(text):
-    with tempfile.TemporaryDirectory(prefix='producecase-') as d:
-        p=Path(d)/'main.py'; p.write_text(REFERENCE)
-        x=subprocess.run([sys.executable,str(p)],input=text,text=True,capture_output=True,timeout=60)
-        if x.returncode: raise SystemExit(x.stderr)
-        return x.stdout
-def scale_case():
-    if GENERATOR_NAME == 'g26267': return 'A'*1000000+'\n'+'A'*1000+'\n'
-    if GENERATOR_NAME == 'g26273': return ('abcdefghij'*10000)+'\n'
-    if GENERATOR_NAME == 'g26835':
-        e=[(i-1,i,float(i)) for i in range(1,99)]
-        for i in range(99):
-            for j in range(i+2,min(99,i+12)): e.append((i,j,float(10000+i*99+j)))
-        return '99 %d\n'%len(e)+'\n'.join(f'{a} {b} {w:.3f}' for a,b,w in e)+'\n'
-    if GENERATOR_NAME == 'g27311': return '100000\n'+' '.join(str(i%10001) for i in range(100000))+'\n'+' '.join(str((i*7)%10001) for i in range(100000))+'\n'
-    return None
+HERE = Path(__file__).resolve().parent
+MAXN = 1000000
+SAMPLE = 'abcabca\n'
+LOWER = 'abcdefghijklmnopqrstuvwxyz'
+
+
+def valid(text):
+    if not text.endswith('\n'):
+        return False
+    body = text[:-1]
+    if '\n' in body:
+        return False
+    if not (1 <= len(body) <= MAXN):
+        return False
+    return all('a' <= c <= 'z' for c in body)
+
+
+def rs(r, n, alpha):
+    return ''.join(r.choice(alpha) for _ in range(n))
+
+
+def periodic(unit, n):
+    return (unit * (n // len(unit) + 1))[:n]
+
+
+def fib_word(n):
+    a, b = 'a', 'ab'
+    while len(b) < n:
+        a, b = b, b + a
+    return b[:n]
+
+
+def build_cases():
+    r = random.Random(26273)
+    cases = [SAMPLE]
+    # 满规模 / 卡复杂度（输出控制在 2MB 内）
+    cases.append('a' * (MAXN - 1) + 'b' + '\n')           # 只有周期 n，朴素逐个 p 比较为 O(n^2)
+    cases.append(periodic('abcdefg', MAXN) + '\n')         # 约 14 万个周期
+    cases.append('a' * 200000 + '\n')                       # 每个 p 都是周期
+    cases.append(fib_word(MAXN) + '\n')                     # 斐波那契串，周期为斐波那契数
+    # 边界
+    for s in ['a', 'z', 'ab', 'aa', 'aba', 'abab', 'aab', 'abcab', 'zzzzzy', 'abacaba', 'aabaabaa']:
+        cases.append(s + '\n')
+    cases.append(rs(r, 20, LOWER) + '\n')
+    cases.append(periodic('ab', 9999) + '\n')
+    cases.append(fib_word(5000) + '\n')
+    # 随机：周期串 / 周期串中改一个字符 / 嵌套周期 / 纯随机
+    for i in range(24):
+        n = r.randint(1, [60, 3000, 50000][i % 3])
+        alpha = ['ab', 'abc', LOWER][(i // 3) % 3]
+        kind = i // 6                     # 0 周期 / 1 扰动 / 2 嵌套 / 3 纯随机，各 6 组
+        if kind == 0:
+            s = periodic(rs(r, r.randint(1, 30), alpha), n)
+        elif kind == 1:
+            s = list(periodic(rs(r, r.randint(1, 30), alpha), n))
+            p = r.randrange(n)
+            s[p] = r.choice(LOWER)
+            s = ''.join(s)
+        elif kind == 2:
+            u = rs(r, r.randint(1, 4), alpha)
+            u = periodic(u, r.randint(len(u), 3 * len(u) + 2))
+            u = periodic(u, r.randint(len(u), 4 * len(u) + 3))
+            s = periodic(u, n)
+        else:
+            s = rs(r, n, alpha)
+        cases.append(s + '\n')
+    return cases
+
+
+def run_ref(text):
+    x = subprocess.run([sys.executable, str(HERE / 'samplecode.py')], input=text,
+                       text=True, capture_output=True, timeout=120)
+    if x.returncode:
+        raise SystemExit(x.stderr)
+    return x.stdout
+
+
 def main():
-    d=Path('data'); d.mkdir(exist_ok=True)
-    extra=scale_case(); cases=[SAMPLE]+([extra] if extra else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
-    for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
-if __name__=='__main__': main()
+    cases = build_cases()
+    assert len(set(cases)) == len(cases), '存在重复组'
+    d = HERE / 'data'
+    d.mkdir(exist_ok=True)
+    for i, c in enumerate(cases):
+        assert valid(c), f'第 {i} 组不合法'
+        (d / f'{i}.in').write_text(c)
+        (d / f'{i}.out').write_text(run_ref(c))
+
+
+if __name__ == '__main__':
+    main()

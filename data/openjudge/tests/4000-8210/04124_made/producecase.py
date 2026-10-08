@@ -14,6 +14,31 @@ SAMPLE_IN = '4\n0 10 20 999\n5 0 90 30\n99 50 0 10\n999 1 2 0\n'
 SAMPLE_OUT = '100\n'
 REFERENCE_SOURCE = 'import sys\n\ndef solve():\n    data = sys.stdin.read().strip().split()\n    if not data:\n        return\n    it = iter(data)\n    N = int(next(it))\n    cost = [[int(next(it)) for _ in range(N)] for _ in range(N)]\n\n    INF = 10**12\n    # dp[mask][i]: 已访问mask，最后在i的最小花费\n    dp = [[INF] * N for _ in range(1 << N)]\n    dp[1][0] = 0  # 起点(编号0)\n\n    for mask in range(1 << N):\n        for i in range(N):\n            if dp[mask][i] == INF:\n                continue\n            for j in range(N):\n                if mask >> j & 1:  # j 已经访问过\n                    continue\n                new_mask = mask | (1 << j)\n                dp[new_mask][j] = min(dp[new_mask][j],\n                                      dp[mask][i] + cost[i][j])\n\n    print(dp[(1 << N) - 1][N - 1])\n\nif __name__ == "__main__":\n    solve()\n'
 
+# 题面约束：2 < N <= 16；随后 N 行每行 N 个整数，第 i 行第 i 个为 0，其余 0 < t < 10000。
+def valid(text):
+    lines = text.split("\n")
+    if lines and lines[-1] == "":
+        lines.pop()
+    try:
+        rows = [[int(v) for v in line.split()] for line in lines]
+    except ValueError:
+        return False
+    if not rows or any(" ".join(map(str, r)) != line.strip() for r, line in zip(rows, lines)):
+        return False
+    if len(rows[0]) != 1:
+        return False
+    n = rows[0][0]
+    if not 2 < n <= 16 or len(rows) != n + 1:
+        return False
+    for i, row in enumerate(rows[1:]):
+        if len(row) != n:
+            return False
+        for j, t in enumerate(row):
+            if (i == j and t != 0) or (i != j and not 0 < t < 10000):
+                return False
+    return True
+
+
 def g4124(r):
     n = 16 if r.random() < .12 else r.randint(3, 12)
     matrix = []

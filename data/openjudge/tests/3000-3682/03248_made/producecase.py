@@ -97,7 +97,24 @@ def generate(n, seed):
             s=''.join(r.sample('ABCDEFGHIJKLMNOPQRSTUVWXYZ',r.randint(1,12)));rows.append(' '.join(traversals(s)))
         return '\n'.join(rows)+'\n'
     if n==2811:return '\n'.join(' '.join(str(r.randint(0,1)) for _ in range(6)) for _ in range(5))+'\n'
-    if n==3248:return '\n'.join(f'{r.randint(1,2**31-1)} {r.randint(1,2**31-1)}' for _ in range(r.randint(1,8)))+'\n'
+    if n==3248:
+        # 边界：1、相等、整除、INT_MAX、相邻斐波那契（辗转相减/逐个试除会超时）、大公因子；另有多行组
+        M=2**31-1
+        special={1:[(1,1)],2:[(M,M)],3:[(1,M),(M,1)],4:[(1836311903,1134903170),(1134903170,1836311903)],
+                 5:[(2147483646,1073741823),(1073741823,2147483646)],6:[(2**30,2**29*3),(1,2),(7,7)],
+                 7:[(M,2147483646),(2147483646,M-2)]}
+        if seed in special:return '\n'.join(f'{a} {b}' for a,b in special[seed])+'\n'
+        def pair():
+            k=r.random()
+            if k<.3:return r.randint(1,M),r.randint(1,M)
+            if k<.6:
+                g=r.randint(2,10**6);return g*r.randint(1,M//g),g*r.randint(1,M//g)
+            if k<.8:
+                a=r.randint(1,10**5);return a,a*r.randint(1,M//a)
+            return r.randint(1,100),r.randint(1,100)
+        cnt=r.randint(1000,3000) if seed in (8,9) else r.randint(1,12)
+        rows=[pair() for _ in range(cnt)]
+        return '\n'.join(f'{a} {b}' if r.random()<.5 else f'{b} {a}' for a,b in rows)+'\n'
     if n==2692:
         coins=list('ABCDEFGHIJKL');coin=r.choice(coins);heavy=r.choice([True,False]);normal=[x for x in coins if x!=coin];r.shuffle(normal);x=normal[0]
         state='down' if heavy else 'up'
@@ -154,6 +171,16 @@ def generate(n, seed):
     raise KeyError(n)
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 3248: 最大公约数\n# Fenced code block index: 4\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/03248/\n# License: not declared in source collection; no license is inferred.\nimport sys\nfrom math import gcd\n\nwhile True:\n    try:\n        a, b = input().split()\n        print(gcd(int(a), int(b)))\n    except EOFError:\n        break\n'
+def valid(text):
+    """题面：多组数据，每行两个正整数，且不超过 int 可以表示的范围（<=2147483647）。"""
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if not lines:return False
+    for l in lines:
+        a=l.split(' ')
+        if len(a)!=2:return False
+        if not all(s.isdigit() and s[0]!='0' and 1<=int(s)<=2**31-1 for s in a):return False
+    return True
 NUMBER=3248
 SAMPLE='4 8\n8 6\n200 300\n'
 def run(x):

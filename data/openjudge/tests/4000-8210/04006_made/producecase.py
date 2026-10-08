@@ -6,14 +6,74 @@ def g4006(r):
     n=r.randint(1,30);q=r.randint(1,6)
     return f"{q} {n}\n"+"\n".join(f"{r.randint(1,n)} {r.randint(1,n)}" for _ in range(q))+"\n"
 
-with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as h:
- h.write(REFERENCE_SOURCE);h.flush();root=Path(__file__).parent/"data";seen=[SAMPLE_IN]
- for i in range(40):
-  if i==0:c=SAMPLE_IN
-  else:
-   for j in range(100):
-    c=g4006(random.Random(4006+i+j*1000))
-    if c not in seen:break
-   else:raise AssertionError("diversity")
-  seen.append(c);p=subprocess.run(["python3",h.name],input=c,text=True,capture_output=True,check=True)
-  (root/f"{i}.in").write_text(c,encoding="utf-8");(root/f"{i}.out").write_text(p.stdout,encoding="utf-8")
+
+def valid(text):
+    """题面契约：首行 K N（1<=K<=25，1<=N<=10000），其后恰 K 行，每行 i j（1<=i,j<=N）。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    def ints(line, cnt):
+        toks = line.split(" ")
+        if len(toks) != cnt or not all(t.isdigit() and t[0] != "0" for t in toks):
+            return None
+        return list(map(int, toks))
+    first = ints(lines[0], 2)
+    if not first:
+        return False
+    k, n = first
+    if not (1 <= k <= 25 and 1 <= n <= 10000) or len(lines) != k + 1:
+        return False
+    for line in lines[1:]:
+        q = ints(line, 2)
+        if not q or not all(1 <= v <= n for v in q):
+            return False
+    return True
+
+
+def fmt(n, qs):
+    return f"{len(qs)} {n}\n" + "\n".join(f"{i} {j}" for i, j in qs) + "\n"
+
+
+def extra_cases():
+    """补强：N 取满 10000（逐格模拟 1e8 格会超时）、K=25、四角/中心/各边、奇偶 N、N=1、N=2。"""
+    r = random.Random(40060)
+    out = []
+    for n in (10000, 9999):
+        c = (n + 1) // 2
+        qs = [(1, 1), (1, n), (n, n), (n, 1), (2, 1), (2, 2), (c, c), (c, c + 1 if c < n else c),
+              (c + 1 if c < n else c, c), (1, n - 1), (n - 1, n), (n, 2), (3, 2)]
+        qs += [(r.randint(1, n), r.randint(1, n)) for _ in range(25 - len(qs))]
+        out.append(fmt(n, qs))
+    out.append(fmt(10000, [(r.randint(4000, 6000), r.randint(4000, 6000)) for _ in range(25)]))
+    out.append(fmt(1, [(1, 1)] * 25))
+    out.append(fmt(2, [(1, 1), (1, 2), (2, 2), (2, 1)]))
+    out.append(fmt(3, [(i, j) for i in range(1, 4) for j in range(1, 4)]))
+    out.append(fmt(5, [(i, j) for i in range(1, 6) for j in range(1, 6)]))
+    for n in (8765, 4096, 7):
+        out.append(fmt(n, [(r.randint(1, n), r.randint(1, n)) for _ in range(25)]))
+    return out
+
+
+def main():
+ with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as h:
+  h.write(REFERENCE_SOURCE);h.flush();root=Path(__file__).parent/"data";seen=[SAMPLE_IN]
+  cases=[]
+  for i in range(40):
+   if i==0:c=SAMPLE_IN
+   else:
+    for j in range(100):
+     c=g4006(random.Random(4006+i+j*1000))
+     if c not in seen:break
+    else:raise AssertionError("diversity")
+   seen.append(c);cases.append(c)
+  for c in extra_cases():
+   assert c not in cases
+   cases.append(c)
+  for i,c in enumerate(cases):
+   assert valid(c), i
+   p=subprocess.run(["python3",h.name],input=c,text=True,capture_output=True,check=True)
+   (root/f"{i}.in").write_text(c,encoding="utf-8");(root/f"{i}.out").write_text(p.stdout,encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

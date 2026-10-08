@@ -121,7 +121,7 @@ def r4125(a):
 def r4126(a):
  i=1;o=[]
  for _ in range(a[0]):
-  n=int(a[i]);i+=1;s=a[i:i+n];i+=n;s=[x for j,x in enumerate(s) if not any(j!=k and x in s[k] for k in range(n))];n=len(s);ov=[[0]*n for _ in range(n)]
+  n=int(a[i]);i+=1;s=list(dict.fromkeys(a[i:i+n]));i+=n;n=len(s);s=[x for j,x in enumerate(s) if not any(j!=k and x in s[k] for k in range(n))];n=len(s);ov=[[0]*n for _ in range(n)]
   for x in range(n):
    for y in range(n):
     for k in range(min(len(s[x]),len(s[y])),-1,-1):

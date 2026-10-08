@@ -149,6 +149,9 @@ def generate(number, seed):
 
 NO_INPUT={3225, 2698}
 REFERENCE="# External reference: http://cs101.openjudge.cn/practice/03225/statistics/\n# Accepted submission: 50843945\n# Source: http://cs101.openjudge.cn/practice/solution/50843945/\n# License: not declared on the submission page; no license is inferred.\n\nfor i in range(2,101):\n    for j in range(i + 1,101):\n        for k in range(j + 1,101):\n            if i**2 + j**2 == k**2:\n                print(str(i)+'*'+str(i)+' + '+str(j)+'*'+str(j)+' = '+str(k)+'*'+str(k))\n"
+def valid(text):
+    """题面：输入 无。唯一合法的输入是空文本。"""
+    return text == ""
 LANGUAGE='Python3'
 NUMBER=3225
 SAMPLE=''

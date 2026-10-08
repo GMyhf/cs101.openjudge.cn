@@ -421,6 +421,128 @@ REFERENCE='// External reference: http://cs101.openjudge.cn/practice/02040/stati
 LANGUAGE='G++'
 NUMBER=2040
 SAMPLE='4\narlo zym\nflub pleve\npleve dourm\npleve zym\nbus seat\nbus stop\nhot seat\nschool bus\n2\niv otas\notas re\nec t\neg ec\n0\n'
+def valid(text):
+    # 题面：多组；每组首行正整数 n<=250，随后 2n 行各一个两词短语（只含大小写字母），前 n 行、后 n 行分别按字母序排列；
+    # 每种语言不超过 25 个不同单词；任一单词作为首词、作为尾词各不超过 10 次；以单独一行 0 结束；
+    # 保证存在唯一正确翻译（此处用回溯计数同构个数核验）
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n');i=0;sets=0
+    while True:
+        if i>=len(lines):return False
+        a=lines[i];i+=1
+        if not a.isdigit() or a!=str(int(a)):return False
+        n=int(a)
+        if n==0:break
+        if n>250 or i+2*n>len(lines):return False
+        langs=[]
+        for part in (lines[i:i+n],lines[i+n:i+2*n]):
+            if part!=sorted(part) and part!=sorted(part,key=str.lower):return False
+            if len(set(part))!=n:return False
+            es=[]
+            for t in part:
+                w=t.split(' ')
+                if len(w)!=2 or not all(x and x.isascii() and x.isalpha() for x in w):return False
+                es.append((w[0],w[1]))
+            words={x for e in es for x in e}
+            if len(words)>25:return False
+            from collections import Counter
+            if max(Counter(e[0] for e in es).values())>10 or max(Counter(e[1] for e in es).values())>10:return False
+            langs.append(es)
+        if count_iso(langs[0],langs[1],2)!=1:return False
+        i+=2*n;sets+=1
+    return i==len(lines) and sets>=1
+def count_iso(e1,e2,limit):
+    # 回溯统计 e1 到 e2 的同构（保持有向边、按词对应）个数，至多数到 limit
+    w1=sorted({x for e in e1 for x in e});w2=sorted({x for e in e2 for x in e})
+    if len(w1)!=len(w2):return 0
+    s1=set(e1);s2=set(e2)
+    def sig(ws,es):
+        o={w:0 for w in ws};d={w:0 for w in ws}
+        for a,b in es:o[a]+=1;d[b]+=1
+        return {w:(o[w],d[w],(w,w) in set(es)) for w in ws}
+    g1=sig(w1,e1);g2=sig(w2,e2)
+    from collections import Counter
+    if Counter(g1.values())!=Counter(g2.values()):return 0
+    nb={w:set() for w in w1}
+    for a,b in e1:nb[a].add(b);nb[b].add(a)
+    order=[];seen=set()
+    for st in sorted(w1,key=lambda w:-sum(g1[w][:2])):
+        if st in seen:continue
+        q=[st];seen.add(st)
+        while q:
+            u=q.pop(0);order.append(u)
+            for v in sorted(nb[u],key=lambda w:-sum(g1[w][:2])):
+                if v not in seen:seen.add(v);q.append(v)
+    m={};used=set();cnt=[0]
+    def rec(k):
+        if cnt[0]>=limit:return
+        if k==len(order):cnt[0]+=1;return
+        u=order[k]
+        for c in w2:
+            if c in used or g2[c]!=g1[u]:continue
+            ok=True
+            for p,q in m.items():
+                if ((u,p) in s1)!=((c,q) in s2) or ((p,u) in s1)!=((q,c) in s2):ok=False;break
+            if ok:
+                m[u]=c;used.add(c);rec(k+1);used.discard(c);del m[u]
+                if cnt[0]>=limit:return
+    rec(0)
+    return cnt[0]
+def rand_graph(r,k,n,maxd=10):
+    # k 个点、n 条有向边（可含自环），出入度均 <=maxd，且每个点至少出现一次
+    while True:
+        out=[0]*k;inn=[0]*k;E=set()
+        if n==k*maxd:
+            E={(u,(u+j)%k) for u in range(k) for j in range(maxd)}
+            E=list(E)
+            for _ in range(20*n):
+                x,y=r.sample(range(len(E)),2);(a,b),(c,d)=E[x],E[y]
+                if (a,d) not in E and (c,b) not in E:E[x]=(a,d);E[y]=(c,b)
+            E=set(E)
+        else:
+            tries=0
+            while len(E)<n and tries<100000:
+                tries+=1;u=r.randrange(k);v=r.randrange(k)
+                if (u,v) in E or out[u]>=maxd or inn[v]>=maxd:continue
+                if u==v and r.random()<.7:continue
+                E.add((u,v));out[u]+=1;inn[v]+=1
+            if len(E)<n:continue
+        if len({x for e in E for x in e})==k:return sorted(E)
+def rand_words(r,k,case):
+    ws=set()
+    while len(ws)<k:
+        w=''.join(r.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(r.randint(1,8)))
+        w={'lower':w,'upper':w.upper(),'cap':w.capitalize()}[case];ws.add(w)
+    return sorted(ws)
+def make_set(r,k,n,maxd=10):
+    for _ in range(200):
+        E=rand_graph(r,k,n,maxd)
+        ca,cb=r.choice(('lower','lower','upper','cap')),r.choice(('lower','lower','upper','cap'))
+        A=rand_words(r,k,ca);B=rand_words(r,k,cb);r.shuffle(B)
+        e1=[(A[u],A[v]) for u,v in E];e2=[(B[u],B[v]) for u,v in E]
+        if count_iso(e1,e2,2)==1:
+            return '\n'.join([str(n)]+sorted(f'{a} {b}' for a,b in e1)+sorted(f'{a} {b}' for a,b in e2))
+    return None
+def extra_cases():
+    r=random.Random(20402040)
+    cs=[]
+    cs.append('1\nab ab\nxy xy\n1\na b\nC D\n0\n')        # n=1、自环、大写
+    for _ in range(8):  # 多组小规模
+        sets=[]
+        for _ in range(r.randint(3,8)):
+            t=None
+            while t is None:
+                k=r.randint(2,7);n=r.randint(k-1,min(k*k,3*k));t=make_set(r,k,n,maxd=min(10,k))
+            sets.append(t)
+        cs.append('\n'.join(sets)+'\n0\n')
+    for _ in range(4):
+        sets=[make_set(r,k,r.randint(k,min(250,k*10))) for k in (r.randint(10,25) for _ in range(5))]
+        cs.append('\n'.join(sets)+'\n0\n')
+    for _ in range(4):                                          # 满规模：25 词、250 短语、出入度全为 10（度数无区分）
+        cs.append(make_set(r,25,250)+'\n0\n')
+    cs.append('\n'.join(make_set(r,25,250) for _ in range(6))+'\n0\n')
+    cs.append('\n'.join(make_set(r,25,r.randint(24,60)) for _ in range(6))+'\n0\n')  # 稀疏、多数单词度数相同
+    return cs
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -428,7 +550,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()
   for i,x in enumerate(cases):
+   assert valid(x),i
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

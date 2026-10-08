@@ -156,6 +156,38 @@ def generate(n, seed):
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2806: 公共子序列\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/02806/\n# License: not declared in source collection; no license is inferred.\nimport sys\nwhile True:\n    try:\n        a, b = input().split()\n    except EOFError:\n        break\n\n    alen = len(a)\n    blen = len(b)\n\n    dp = [[0]*(blen+1) for i in range(alen+1)]\n\n    for i in range(1, alen+1):\n        for j in range(1, blen+1):\n            if a[i-1]==b[j-1]:\n                dp[i][j] = dp[i-1][j-1] + 1\n            else:\n                dp[i][j] = max(dp[i-1][j], dp[i][j-1])\n\n\n    print(dp[alen][blen])\n'
 NUMBER=2806
 SAMPLE='abcfbc         abfcab\nprogramming    contest\nabcd           mnp\n'
+import re as _re
+def valid(text):
+    """题面：多组数据，每组一行，两个长度不超过 200 的字符串，之间由若干个空格隔开。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if not lines:
+        return False
+    return all(_re.fullmatch(r'[!-~]{1,200} +[!-~]{1,200}', s) for s in lines)
+
+
+def extra_cases():
+    """补充：长度 200 的满规模串、若干个空格分隔、大小写/数字/符号字符、
+    LCS=200（相同串）与 LCS=0（无公共字符）、长度 1 的边界、多组数据。"""
+    r = random.Random(2806_2026)
+    P = [chr(c) for c in range(33, 127)]
+    rs = lambda k, al: ''.join(r.choice(al) for _ in range(k))
+    sep = lambda: ' ' * r.choice([1, 1, 2, 5, 13])
+    out = []
+    out.append('\n'.join(rs(200, 'abcd') + sep() + rs(200, 'abcd') for _ in range(40)) + '\n')
+    out.append('\n'.join(rs(200, P) + sep() + rs(200, P) for _ in range(30)) + '\n')
+    x = rs(200, 'ab')
+    s = rs(200, 'xyz')
+    lines = [x + ' ' + x, rs(200, 'abc') + '   ' + rs(200, 'XYZ'), 'a a', 'a b', 'A a',
+             s + ' ' + s[3], s[7] + ' ' + s, s + ' ' + s[::-1], rs(199, 'ab') + ' ' + rs(200, 'ab')]
+    out.append('\n'.join(lines) + '\n')
+    out.append('\n'.join(rs(r.randint(1, 200), 'abcdefghijklmnopqrstuvwxyz0123456789') + sep() +
+                         rs(r.randint(1, 200), 'abcdefghijklmnopqrstuvwxyz0123456789') for _ in range(60)) + '\n')
+    out.append('\n'.join(rs(r.randint(1, 8), 'ab') + sep() + rs(r.randint(1, 8), 'ab') for _ in range(300)) + '\n')
+    return out
+
+
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
@@ -164,6 +196,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

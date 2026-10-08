@@ -127,9 +127,74 @@ def run(x):
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout.rstrip()+'\n'
+import re as _re
+def valid(text):
+    """题面：首行 N K（1<=N,K<=10000，单个空格分隔），随后 N 行各一个长度（米），1m..100km，保留两位小数。"""
+    lines = text.split("\n")
+    if lines and lines[-1] == "":
+        lines.pop()
+    if not lines or not _re.fullmatch(r"[1-9]\d* [1-9]\d*", lines[0]):
+        return False
+    n, k = map(int, lines[0].split())
+    if not (1 <= n <= 10000 and 1 <= k <= 10000) or len(lines) != n + 1:
+        return False
+    for s in lines[1:]:
+        if not _re.fullmatch(r"(0|[1-9]\d*)\.\d\d", s):
+            return False
+        cm = int(s.replace(".", ""))
+        if not (100 <= cm <= 10_000_000):
+            return False
+    return True
+
+def gen1064(seed):
+    r = random.Random(1064_000 + seed)
+    def fmt(k, cms):
+        return f"{len(cms)} {k}\n" + "\n".join(f"{x // 100}.{x % 100:02d}" for x in cms) + "\n"
+    fixed = {
+        1: (1, [r.randint(100, 10_000_000)]),
+        2: (10000, [100]),                                  # 0.00
+        3: (10000, [100] * 10000),                          # 1.00
+        4: (10000, [10_000_000]),                           # 10.00
+        5: (10000, [r.randint(100, 199) for _ in range(50)]),  # 总长不足 100m：0.00
+        6: (10000, [200] * 50),                             # 总长恰 10000cm：0.01
+        7: (2, [399]),                                      # 1.99（浮点二分再四舍五入会得 2.00）
+        8: (3, [100, 100, 100]),                            # 1.00
+        9: (7, [701, 699]),                                 # 1.75
+        10: (10000, [10_000_000] * 10000),                  # 100000.00
+        11: (1, [100, 10_000_000]),                         # 100000.00
+        12: (5, [101, 102, 103, 104, 109]),                 # 1.01
+    }
+    if seed in fixed:
+        k, cms = fixed[seed]
+        return fmt(k, cms)
+    if seed <= 18:
+        # 答案容易落在「x.x9 / x.x5」的长度：cm 精确值附近浮点误差
+        n = r.randint(1, 20); k = r.randint(1, 60)
+        cms = [r.randint(1, 3000) * 100 + r.choice([1, 5, 9, 29, 57, 99]) for _ in range(n)]
+        cms = [min(max(c, 100), 10_000_000) for c in cms]
+        return fmt(k, cms)
+    if seed <= 24:
+        n = r.randint(50, 500); k = r.randint(1, 10000)
+        return fmt(k, [r.randint(100, 10_000_000) for _ in range(n)])
+    if seed <= 28:
+        # 答案为 0.00 或很小
+        n = r.randint(1, 60); cms = [r.randint(100, 150) for _ in range(n)]
+        k = min(10000, sum(cms) + [1, 0, -1, 500][seed % 4])
+        k = max(1, k)
+        return fmt(k, cms)
+    n = 10000
+    k = r.choice([10000, r.randint(1, 10000), r.randint(9000, 10000), 1])
+    if seed % 3 == 0:
+        cms = [r.randint(100, 10_000_000) for _ in range(n)]
+    elif seed % 3 == 1:
+        cms = [r.randint(100, 2000) for _ in range(n)]
+    else:
+        cms = [r.randint(9_000_000, 10_000_000) for _ in range(n)]
+    return fmt(k, cms)
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[gen1064(s) for s in range(1, 40)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

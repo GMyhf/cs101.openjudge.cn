@@ -153,6 +153,106 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
+
+_DIRS1376 = ("north", "west", "south", "east")
+
+
+def _ok1376(g, i, j):
+    """交点 (i,j)（方格 (i,j) 的西北角）可站：不在外墙上，周围四个方格都无障碍。"""
+    M, N = len(g), len(g[0])
+    return (1 <= i <= M - 1 and 1 <= j <= N - 1 and not g[i - 1][j - 1] and not g[i - 1][j]
+            and not g[i][j - 1] and not g[i][j])
+
+
+def valid(text):
+    """题面契约：多块，每块 M N（M,N<=50；起终点要是方格的西北角且为正整数，故 M,N>=2），
+    M 行各 N 个 0/1，然后 B1 B2 E1 E2 与朝向（north/west/south/east），四个坐标为正整数且是存在的方格；
+    以 0 0 结束。另按物理意义要求起点交点机器人放得下（四周无障碍）。"""
+    t = text.split()
+    i, blocks = 0, 0
+    try:
+        while True:
+            if i + 2 > len(t):
+                return False
+            M, N = int(t[i]), int(t[i + 1]); i += 2
+            if M == 0 and N == 0:
+                return i == len(t) and blocks >= 1
+            if not (2 <= M <= 50 and 2 <= N <= 50) or i + M * N + 5 > len(t):
+                return False
+            cells = t[i:i + M * N]; i += M * N
+            if any(c not in ("0", "1") for c in cells):
+                return False
+            g = [[int(c) for c in cells[k * N:(k + 1) * N]] for k in range(M)]
+            b1, b2, e1, e2 = map(int, t[i:i + 4]); d = t[i + 4]; i += 5
+            if d not in _DIRS1376:
+                return False
+            if not (1 <= b1 <= M - 1 and 1 <= e1 <= M - 1 and 1 <= b2 <= N - 1 and 1 <= e2 <= N - 1):
+                return False
+            if not _ok1376(g, b1, b2):
+                return False
+            blocks += 1
+    except ValueError:
+        return False
+
+
+def _blk1376(g, s, e, d):
+    return (f"{len(g)} {len(g[0])}\n" + "".join(" ".join(map(str, row)) + "\n" for row in g) +
+            f"{s[0]} {s[1]} {e[0]} {e[1]} {d}\n")
+
+
+def _rand1376(r, M, N, dens, need_valid_end=True):
+    for _ in range(1000):
+        g = [[1 if r.random() < dens else 0 for _ in range(N)] for _ in range(M)]
+        pts = [(i, j) for i in range(1, M) for j in range(1, N) if _ok1376(g, i, j)]
+        if len(pts) < 1:
+            continue
+        s = r.choice(pts)
+        e = r.choice(pts) if need_valid_end or r.random() < .5 else (r.randint(1, M - 1), r.randint(1, N - 1))
+        return _blk1376(g, s, e, r.choice(_DIRS1376))
+    g = [[0] * N for _ in range(M)]
+    return _blk1376(g, (1, 1), (M - 1, N - 1), r.choice(_DIRS1376))
+
+
+def g1376_v2(seed):
+    r = random.Random(1376 * 1_000_003 + seed)
+    bl = []
+    if seed == 1:     # 边界：最小 2x2（唯一交点，起点即终点 0）；掉头需两次转向；GO 3 一步到位；被墙隔开 -1
+        bl.append(_blk1376([[0, 0], [0, 0]], (1, 1), (1, 1), "north"))
+        z = [[0] * 5 for _ in range(2)]
+        bl.append(_blk1376(z, (1, 4), (1, 1), "east"))       # 掉头 2 + GO 3 = 3
+        bl.append(_blk1376(z, (1, 1), (1, 4), "east"))       # 1
+        bl.append(_blk1376([[0] * 6 for _ in range(2)], (1, 1), (1, 5), "north"))   # 转 1 + GO3 + GO1 = 3
+        w = [[0] * 7 for _ in range(7)]
+        for i in range(7): w[i][3] = 1                         # 竖墙把左右隔开
+        bl.append(_blk1376(w, (2, 1), (2, 6), "east"))
+        w2 = [[0] * 7 for _ in range(4)]; w2[0][3] = 1         # 只挡最北一行：交点 (1,3)/(1,4) 不可站，必须绕到第 2、3 行
+        bl.append(_blk1376(w2, (1, 1), (1, 6), "east"))
+        bl.append(_blk1376([[0] * 4 for _ in range(4)], (1, 1), (3, 3), "west"))
+        bl.append(_blk1376([[1 if (i, j) == (2, 2) else 0 for j in range(5)] for i in range(5)], (1, 1), (2, 2), "south"))  # 终点贴障碍 -1
+    elif seed <= 20:  # 随机中小规模多组
+        for _ in range(r.randint(2, 8)):
+            bl.append(_rand1376(r, r.randint(2, 25), r.randint(2, 25), r.choice([0, .05, .1, .2, .3]), r.random() < .8))
+    elif seed <= 32:  # 50x50 满规模
+        for _ in range(r.randint(1, 4)):
+            bl.append(_rand1376(r, 50, 50, r.choice([0, .03, .06, .1, .15]), r.random() < .9))
+    elif seed <= 35:  # 蛇形走廊：路很长、转向很多
+        M = N = 50
+        g = [[0] * N for _ in range(M)]
+        for k, row in enumerate(range(3, M - 2, 4)):
+            for j in range(N):
+                g[row][j] = 1
+            gap = (N - 3) if k % 2 == 0 else 1
+            g[row][gap] = g[row][gap + 1] = 0
+            g[row][gap - 1] = 0
+            g[row][gap + 2 if gap + 2 < N else gap - 2] = 0
+        s, e = (1, 1), (M - 1, 1 if seed % 2 else N - 1)
+        if not _ok1376(g, *e): e = next((i, j) for i in range(M - 1, 0, -1) for j in range(1, N) if _ok1376(g, i, j))
+        bl.append(_blk1376(g, s, e, _DIRS1376[seed % 4]))
+    else:             # 多组 50x50（卡每组重新分配的低效写法）
+        for _ in range(20):
+            bl.append(_rand1376(r, 50, 50, r.choice([.02, .08, .12]), True))
+    return "".join(bl) + "0 0\n"
+
 REFERENCE="# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 1376: Robot\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024sp_routine/01376/\n# License: not declared in source collection; no license is inferred.\nimport sys\nfrom collections import deque\n\n\ndef bfs_min_time(grid, start, end, direction):\n    N, M = len(grid), len(grid[0])\n    # 定义朝向：0-东, 1-南, 2-西, 3-北\n    dir_map = {'E': 0, 'S': 1, 'W': 2, 'N': 3}\n    start_dir = dir_map[direction]\n    sr, sc, tr, tc = start[0], start[1], end[0], end[1]\n\n    # 机器人中心只能位于网格交点，合法交点要求其周围四个相邻的格子都不能有障碍。\n    # 对于交点 (i, j) (i,j均从1开始计数，i∈[1,N-1], j∈[1,M-1])，对应的格子为\n    # (i-1,j-1), (i-1,j), (i,j-1), (i,j)\n    valid = [[False] * (M) for _ in range(N)]\n    for i in range(1, N):\n        for j in range(1, M):\n            if grid[i - 1][j - 1] == 0 and grid[i - 1][j] == 0 and grid[i][j - 1] == 0 and grid[i][j] == 0:\n                valid[i][j] = True\n\n    # 检查起始点和目标点是否合法\n    if not valid[sr][sc] or not valid[tr][tc]:\n        return -1\n\n    # 定义方向移动，顺序：东, 南, 西, 北\n    dr = [0, 1, 0, -1]\n    dc = [1, 0, -1, 0]\n\n    # BFS: 状态 (r, c, d)\n    visited = [[[False] * 4 for _ in range(M)] for _ in range(N)]\n    q = deque()\n    q.append((sr, sc, start_dir, 0))\n    visited[sr][sc][start_dir] = True\n\n    while q:\n        r, c, d, steps = q.popleft()\n        # 判断是否到达目标位置（朝向不要求匹配）\n        if r == tr and c == tc:\n            return steps\n\n        # 转向操作\n        # Left: d_new = (d+3)%4, Right: d_new = (d+1)%4\n        for nd in [(d + 3) % 4, (d + 1) % 4]:\n            if not visited[r][c][nd]:\n                visited[r][c][nd] = True\n                q.append((r, c, nd, steps + 1))\n\n        # 前进1,2,3步，每一步中间都必须合法\n        for k in range(1, 4):\n            nr = r + dr[d] * k\n            nc = c + dc[d] * k\n            # 判断越界\n            if nr < 1 or nr >= N or nc < 1 or nc >= M:\n                break\n            # 如果当前位置不合法，则不能继续向前走\n            if not valid[nr][nc]:\n                break\n            if not visited[nr][nc][d]:\n                visited[nr][nc][d] = True\n                q.append((nr, nc, d, steps + 1))\n    return -1\n\n\n# 读取输入数据\nwhile True:\n    n, m = map(int, input().split())\n    if n == 0 and m == 0:\n        break\n    grid = [list(map(int, input().split())) for _ in range(n)]\n    sx, sy, ex, ey, direction = input().split()\n    sx, sy, ex, ey = map(int, [sx, sy, ex, ey])\n\n    direction = direction.upper()  # 确保方向是大写\n\n    # 计算最短时间\n    result = bfs_min_time(grid, (sx, sy), (ex, ey), direction[0])\n    print(result)\n"
 NUMBER=1376
 SAMPLE='9 10\n0 0 0 0 0 0 1 0 0 0\n0 0 0 0 0 0 0 0 1 0\n0 0 0 1 0 0 0 0 0 0\n0 0 1 0 0 0 0 0 0 0\n0 0 0 0 0 0 1 0 0 0\n0 0 0 0 0 1 0 0 0 0\n0 0 0 1 1 0 0 0 0 0\n0 0 0 0 0 0 0 0 0 0\n1 0 0 0 0 0 0 0 1 0\n7 2 2 7 south\n0 0\n'
@@ -164,6 +264,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[g1376_v2(s) for s in range(1, 40)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

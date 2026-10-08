@@ -1,4 +1,4 @@
-"""20743 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+"""20743 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 37 组数据。
 
 出处：build_001d
 生成器与循环取自 scripts/build_001d.py（批次 001d），保持同一形状；
@@ -16,6 +16,71 @@ REFERENCE_SOURCE = "def reverse_parentheses(s):\n    stack = []\n    for char in
 
 def g20743(r): return "("+"".join(r.choice("abcd") for _ in range(r.randint(1,20)))+")"+"".join(r.choice("abcd") for _ in range(r.randint(0,5)))+"\n"
 
+def valid(text):
+    """题面：一个字串 s，由英文字母和括号组成，括号必定合法（左右一一配对）。
+    题面未给长度上限。这里额外要求非空、单行。"""
+    if not text.endswith("\n") or text.count("\n") != 1:
+        return False
+    line = text[:-1]
+    if not line:
+        return False
+    depth = 0
+    for c in line:
+        if c == "(":
+            depth += 1
+        elif c == ")":
+            depth -= 1
+            if depth < 0:
+                return False
+        elif not ("a" <= c <= "z" or "A" <= c <= "Z"):
+            return False
+    return depth == 0
+
+
+LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def nested(r, length, max_depth, p_open, p_close):
+    """随机生成合法括号串：不产生空括号 ()，至少含一个字母。"""
+    out, depth, last = [], 0, ""
+    while len(out) < length:
+        x = r.random()
+        if depth < max_depth and x < p_open:
+            out.append("("); depth += 1; last = "("
+        elif depth > 0 and last != "(" and x < p_open + p_close:
+            out.append(")"); depth -= 1; last = ")"
+        else:
+            out.append(r.choice(LETTERS)); last = "l"
+    if last == "(":
+        out.append(r.choice(LETTERS))
+    out.extend(")" * depth)
+    return "".join(out) + "\n"
+
+
+def extra_cases():
+    """补充：原 20 组只有一层括号、长度 <=26、字母只有 abcd；这里加入无括号、多层嵌套、
+    并列括号、大小写混合、深度数百层（不超过 500）与几千字符的规模组。"""
+    r = random.Random(NUMBER)
+    out = [
+        "a\n",                                   # 最小规模，无括号
+        "HelloWorld\n",                          # 无括号
+        "(a)\n",
+        "((ab))\n",                              # 两次翻转等于不变
+        "(ab)(cd)ef(gh)\n",                      # 并列括号
+        "x(ab(cd)ef)y(g(h(i)j)k)z\n",
+        "(((((((((((abcdefg)))))))))))\n",       # 奇数层
+        "a(b(c(d(e(f(g)h)i)j)k)l)m\n",
+    ]
+    for length, depth, po, pc in [(30, 4, .25, .2), (60, 8, .3, .25), (200, 20, .2, .15),
+                                  (500, 60, .25, .2), (1000, 300, .3, .1), (3000, 30, .2, .2),
+                                  (3000, 500, .45, .05), (5000, 100, .15, .14)]:
+        out.append(nested(r, length, depth, po, pc))
+    # 纯嵌套深度取 500：题面未给长度/深度上限、原题时限 100ms，深度压在 Python 默认递归上限 1000 以内，
+    # 不让未调 setrecursionlimit 的递归写法因数据过深而 RE
+    out.append("(" * 500 + "".join(r.choice(LETTERS) for _ in range(2000)) + ")" * 500 + "\n")
+    return out
+
+
 def build_cases():
     cases = [SAMPLE_IN]
     for i in range(1, 20):
@@ -26,6 +91,9 @@ def build_cases():
                 break
         else:
             raise AssertionError("生成器多样性不足")
+    for value in extra_cases():
+        assert value not in cases
+        cases.append(value)
     return cases
 
 def solve_reference(content):
@@ -44,6 +112,7 @@ def main():
     root = Path(__file__).parent / "data"
     root.mkdir(exist_ok=True)
     for index, content in enumerate(cases):
+        assert valid(content), index
         (root / f"{index}.in").write_text(content, encoding="utf-8")
         (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
 

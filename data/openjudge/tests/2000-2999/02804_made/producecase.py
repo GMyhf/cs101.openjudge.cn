@@ -152,6 +152,71 @@ def generate(number, seed):
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2804: 词典\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02804/\n# License: not declared; no license is inferred.\nimport sys\n# 初始化一个空字典用于存储词典信息\ndictionary = {}\n\n# 读取词典部分\nwhile True:\n    line = input().strip()\n    if not line:\n        break\n    # 按空格分割每行，分别得到英文单词和外语单词\n    english, foreign = line.split()\n    # 将外语单词作为键，英文单词作为值存入字典\n    dictionary[foreign] = english\n\n# 读取需要翻译的文档部分\nwhile True:\n    try:\n        foreign_word = input().strip()\n        if not foreign_word:\n            break\n        # 查找该外语单词是否在词典中\n        if foreign_word in dictionary:\n            print(dictionary[foreign_word])\n        else:\n            print("eh")\n    except EOFError:\n        break\n'
 NUMBER=2804
 SAMPLE='dog ogday\ncat atcay\npig igpay\nfroot ootfray\nloops oopslay\n\natcay\nittenkay\noopslay\n'
+import re as _re
+def valid(text):
+    """题面：词典不超过 100000 条，每条“英文单词 空格 外语单词”，同一外语单词出现不超过两次；
+    之后一个空行；文档不超过 100000 行，每行一个外语单词；单词只含小写字母、长度不超过 10。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if lines.count('') != 1:
+        return False
+    k = lines.index('')
+    entries, doc = lines[:k], lines[k + 1:]
+    if not (1 <= len(entries) <= 100000 and 1 <= len(doc) <= 100000):
+        return False
+    cnt = {}
+    for e in entries:
+        m = _re.fullmatch(r'([a-z]{1,10}) ([a-z]{1,10})', e)
+        if not m:
+            return False
+        cnt[m.group(2)] = cnt.get(m.group(2), 0) + 1
+        if cnt[m.group(2)] > 2:
+            return False
+    return all(_re.fullmatch(r'[a-z]{1,10}', w) for w in doc)
+
+
+def extra_cases():
+    """补充：满规模（文档 100000 行 / 词典 100000 条，受单组 .in<=1MB 限制用短单词）、
+    长度 1 与 10 的单词、全部查不到（全 eh）、最小规模。外语单词互不相同，避免译文二义。"""
+    r = random.Random(2804_2026)
+    L = 'abcdefghijklmnopqrstuvwxyz'
+    rw = lambda k: ''.join(r.choice(L) for _ in range(k))
+    def distinct(cnt, k):
+        s = set()
+        while len(s) < cnt: s.add(rw(k))
+        s = sorted(s); r.shuffle(s); return s
+    out = []
+    # 1) 词典 50000 条，文档 100000 行，约 70% 能查到
+    fs = distinct(60000, 4); known, unknown = fs[:50000], fs[50000:]
+    rows = [f'{rw(3)} {f}' for f in known]
+    doc = [r.choice(known) if r.random() < .7 else r.choice(unknown) for _ in range(100000)]
+    out.append('\n'.join(rows) + '\n\n' + '\n'.join(doc) + '\n')
+    # 2) 词典 100000 条，文档 20000 行
+    fs = distinct(105000, 4); known, unknown = fs[:100000], fs[100000:]
+    rows = [f'{rw(3)} {f}' for f in known]
+    doc = [r.choice(known) if r.random() < .5 else r.choice(unknown) for _ in range(20000)]
+    out.append('\n'.join(rows) + '\n\n' + '\n'.join(doc) + '\n')
+    # 3) 长度 1 与 10 的边界单词；查询含与词条相差一个字母、互为前缀的词
+    rows = [f'{rw(10)} {c}' for c in L] + [f'{rw(1)} {f}' for f in distinct(200, 10)]
+    fl = [x.split()[1] for x in rows]
+    doc = []
+    for _ in range(500):
+        f = r.choice(fl); t = r.random()
+        if t < .5: doc.append(f)
+        elif t < .7 and len(f) > 1: doc.append(f[:-1])
+        elif t < .85 and len(f) < 10: doc.append(f + r.choice(L))
+        else: doc.append(rw(10))
+    out.append('\n'.join(rows) + '\n\n' + '\n'.join(doc) + '\n')
+    # 4) 全部查不到
+    fs = distinct(2000, 6)
+    out.append('\n'.join(f'{rw(5)} {f}' for f in fs[:1000]) + '\n\n' + '\n'.join(fs[1000:]) + '\n')
+    # 5) 最小规模
+    out.append('a b\n\nb\n')
+    out.append('eh x\n\ny\n')
+    return out
+
+
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
@@ -160,6 +225,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

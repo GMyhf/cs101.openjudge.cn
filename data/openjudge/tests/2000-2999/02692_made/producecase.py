@@ -99,10 +99,31 @@ def generate(n, seed):
     if n==2811:return '\n'.join(' '.join(str(r.randint(0,1)) for _ in range(6)) for _ in range(5))+'\n'
     if n==3248:return '\n'.join(f'{r.randint(1,2**31-1)} {r.randint(1,2**31-1)}' for _ in range(r.randint(1,8)))+'\n'
     if n==2692:
-        coins=list('ABCDEFGHIJKL');coin=r.choice(coins);heavy=r.choice([True,False]);normal=[x for x in coins if x!=coin];r.shuffle(normal);x=normal[0]
-        state='down' if heavy else 'up'
-        a,b,c,d=map(''.join,(normal[:4],normal[4:8],normal[3:7],normal[7:11]))
-        return f'1\n{coin} {x} {state}\n{a} {b} even\n{c} {d} even\n'
+        # 每组：随机定假币与轻重，随机称三次（左右等数、互不相交）并如实给出结果，
+        # 只保留恰好能唯一确定"哪枚、轻还是重"的组（题面：保证称三次后确定假币）。
+        coins='ABCDEFGHIJKL'
+        def outcome(L,R,coin,w):
+            d=(w if coin in L else 0)-(w if coin in R else 0)
+            return 'even' if d==0 else ('up' if d>0 else 'down')
+        def one(force=None):
+            while True:
+                coin,w=(force if force else (r.choice(coins),r.choice([-1,1])))
+                rows=[]
+                for _ in range(3):
+                    k=r.choice([1,2,3,4,4,4,5,6]);pick=r.sample(coins,2*k);L,R=''.join(pick[:k]),''.join(pick[k:])
+                    rows.append((L,R,outcome(L,R,coin,w)))
+                ok=[(c,v) for c in coins for v in(-1,1) if all(outcome(L,R,c,v)==res for L,R,res in rows)]
+                if ok==[(coin,w)]:return rows
+        if seed<=24:
+            # 1-24：每枚硬币 × 轻/重 各出现一次，单组一份
+            coin,w=coins[(seed-1)//2],(-1,1)[(seed-1)%2]
+            cases=[one((coin,w))]
+        else:
+            # 25-39：多组输入，最后一份把 24 种情况都放进去
+            m=24 if seed==39 else r.randint(2,30)
+            targets=[(c,v) for c in coins for v in(-1,1)];r.shuffle(targets)
+            cases=[one(targets[i] if seed==39 else None) for i in range(m)]
+        return f'{len(cases)}\n'+''.join(f'{L} {R} {res}\n' for rows in cases for L,R,res in rows)
     if n==3143:return f'{r.randint(4,2000)}\n'
     if n==1860:
         N=r.randint(2,8);edges=[]
@@ -152,6 +173,31 @@ def generate(n, seed):
     if n==1218:
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
+
+def valid(text):
+    """题面：首行 n 组；每组三行"左 右 状态"，硬币标号 A-L，左右硬币数相等，状态为 up/down/even；
+    12 枚中恰有 1 枚假币，且三次称量后能确定假币及其轻重（只有唯一一种解释）。"""
+    import re
+    if not text.endswith("\n"):return False
+    lines=text[:-1].split("\n")
+    if not re.fullmatch(r"[1-9]\d*",lines[0]):return False
+    n=int(lines[0])
+    if len(lines)!=3*n+1:return False
+    coins="ABCDEFGHIJKL"
+    def outcome(L,R,c,w):
+        d=(w if c in L else 0)-(w if c in R else 0)
+        return "even" if d==0 else ("up" if d>0 else "down")
+    for t in range(n):
+        rows=[]
+        for ln in lines[1+3*t:4+3*t]:
+            m=re.fullmatch(r"([A-L]+) ([A-L]+) (up|down|even)",ln)
+            if not m:return False
+            L,R,res=m.groups()
+            if len(L)!=len(R) or len(set(L+R))!=2*len(L):return False
+            rows.append((L,R,res))
+        ok=[(c,v) for c in coins for v in(-1,1) if all(outcome(L,R,c,v)==res for L,R,res in rows)]
+        if len(ok)!=1:return False
+    return True
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2692: 假币问题\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/02692/\n# License: not declared in source collection; no license is inferred.\nimport sys\nn = int(input())\n\ndef check(coins, case):\n    for item in case:\n        left, right, res = item.split()\n\n        left_total = sum(coins[i] for i in left)\n        right_total = sum(coins[i] for i in right)\n\n        if left_total == right_total and res != \'even\':\n            return False\n        elif left_total < right_total and res != \'down\':\n            return False\n        elif left_total > right_total and res != \'up\':\n            return False\n\n    return True\n\nfor _ in range(n):\n    case = [input().strip() for _ in range(3)]\n\n    for counterfeit in \'ABCDEFGHIJKL\':\n        found = False\n        for weight in [-1, 1]:\n            coins = {coin: 0 for coin in \'ABCDEFGHIJKL\'}\n            coins[counterfeit] = weight\n\n            if check(coins, case):\n                found = True\n                tag = "light" if weight == -1 else "heavy"\n                print(f\'{counterfeit} is the counterfeit coin and it is {tag}.\')\n                break\n        if found:\n            break\n'
 NUMBER=2692

@@ -397,10 +397,7 @@ def generate(number, seed):
         values = [r.randint(0, 2_500_000) for _ in range(r.randint(1, 10))]
         return "\n".join(map(str, values)) + "\n-1\n"
     if number == 2983:
-        symbols = "ABCDEFGHIJKLMNOP"; shift = seed % 16
-        grid = [[symbols[(row*4 + row//4 + col + shift) % 16] for col in range(16)] for row in range(16)]
-        for position in r.sample(range(256), 1 + seed % 12): grid[position//16][position%16] = "-"
-        return "\n".join("".join(row) for row in grid) + "\n"
+        return gen_2983(r, seed)
     if number == 2984:
         shift = seed % 9
         grid = [str((row*3 + row//3 + col + shift) % 9 + 1) for row in range(9) for col in range(9)]
@@ -416,6 +413,65 @@ def generate(number, seed):
             chunks.append(f"{capacity}\n{count}\n" + " ".join(str(x) for pair in metals for x in pair))
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
+
+COUNTER_2983 = '// 16x16 数独解计数（DLX），每个盘面输出 min(解数, 2)；读入：每盘 16 行，空行分隔。\n#include <bits/stdc++.h>\nusing namespace std;\nconst int COLS=1024,MAXN=COLS+4096*4+10;\nint L[MAXN],R[MAXN],U[MAXN],D[MAXN],C[MAXN],S[COLS+1],sz,cnt;\nvoid init(){for(int i=0;i<=COLS;i++){L[i]=i-1;R[i]=i+1;U[i]=D[i]=i;S[i]=0;}L[0]=COLS;R[COLS]=0;sz=COLS+1;}\nvoid addRow(const int*cs){int f=-1;for(int k=0;k<4;k++){int c=cs[k]+1,p=sz++;C[p]=c;U[p]=U[c];D[p]=c;D[U[c]]=p;U[c]=p;S[c]++;\n if(f<0){f=p;L[p]=R[p]=p;}else{L[p]=L[f];R[p]=f;R[L[f]]=p;L[f]=p;}}}\nvoid cover(int c){L[R[c]]=L[c];R[L[c]]=R[c];for(int i=D[c];i!=c;i=D[i])for(int j=R[i];j!=i;j=R[j]){U[D[j]]=U[j];D[U[j]]=D[j];S[C[j]]--;}}\nvoid uncover(int c){for(int i=U[c];i!=c;i=U[i])for(int j=L[i];j!=i;j=L[j]){S[C[j]]++;U[D[j]]=j;D[U[j]]=j;}L[R[c]]=c;R[L[c]]=c;}\nvoid dfs(){if(cnt>=2)return;if(R[0]==0){cnt++;return;}int c=R[0];for(int j=R[0];j;j=R[j])if(S[j]<S[c])c=j;if(!S[c])return;\n cover(c);for(int i=D[c];i!=c&&cnt<2;i=D[i]){for(int j=R[i];j!=i;j=R[j])cover(C[j]);dfs();for(int j=L[i];j!=i;j=L[j])uncover(C[j]);}uncover(c);}\nint main(){string line;while(true){vector<string>g;while((int)g.size()<16&&getline(cin,line)){if(line.empty())continue;g.push_back(line);}if(g.size()<16)break;\n init();for(int r=0;r<16;r++)for(int c=0;c<16;c++){int b=(r/4)*4+c/4;char ch=g[r][c];for(int v=0;v<16;v++){if(ch!=\'-\'&&ch-\'A\'!=v)continue;\n int cs[4]={r*16+c,256+r*16+v,512+c*16+v,768+b*16+v};addRow(cs);}}cnt=0;dfs();printf("%d\\n",cnt);fflush(stdout);}}\n'
+_COUNTER_PROC = None
+def _counter():
+    """编译并常驻一个 C++ DLX 解计数器（每盘输出 min(解数,2)），generate 与 valid 共用。"""
+    global _COUNTER_PROC
+    if _COUNTER_PROC is None:
+        import atexit, shutil
+        d = tempfile.mkdtemp(); src = Path(d) / "cnt.cpp"; exe = Path(d) / "cnt"; src.write_text(COUNTER_2983)
+        subprocess.run(["g++", "-O2", "-pipe", str(src), "-o", str(exe)], check=True)
+        _COUNTER_PROC = subprocess.Popen([str(exe)], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True)
+        def _close():
+            _COUNTER_PROC.stdin.close(); _COUNTER_PROC.wait(); shutil.rmtree(d, ignore_errors=True)
+        atexit.register(_close)
+    return _COUNTER_PROC
+def count_2983(rows):
+    p = _counter(); p.stdin.write("\n".join(rows) + "\n\n"); p.stdin.flush(); return int(p.stdout.readline())
+def gen_2983(r, seed):
+    # 由随机终盘挖空得到盘面；每挖一格都用计数器确认解仍唯一（题面保证唯一解）。
+    # 覆盖：极少空格、中等空格、挖到「再挖任何一格都不唯一」的极小盘面（最难，卡无剪枝回溯），
+    # 以及一个文件多组盘面（题面：空行分隔、读到文件尾）。
+    def full():
+        base = [[(row*4 + row//4 + col) % 16 for col in range(16)] for row in range(16)]
+        bands = r.sample(range(4), 4); rows = [b*4 + x for b in bands for x in r.sample(range(4), 4)]
+        stacks = r.sample(range(4), 4); cols = [b*4 + x for b in stacks for x in r.sample(range(4), 4)]
+        g = [[base[a][b] for b in cols] for a in rows]
+        if r.random() < .5: g = [list(t) for t in zip(*g)]
+        lab = r.sample("ABCDEFGHIJKLMNOP", 16)
+        return [[lab[v] for v in row] for row in g]
+    def carve(target):
+        g = full(); blanks = 0; order = r.sample(range(256), 256)
+        for pos in order:
+            if blanks >= target: break
+            a, b = divmod(pos, 16); keep = g[a][b]; g[a][b] = "-"
+            if count_2983(["".join(x) for x in g]) == 1: blanks += 1
+            else: g[a][b] = keep
+        return "\n".join("".join(x) for x in g)
+    if seed <= 3: targets = [(1, 5, 20)[seed - 1]]
+    elif seed <= 19: targets = [256 if seed % 4 == 0 else r.randint(60, 200)]
+    elif seed <= 30: targets = [r.choice((r.randint(30, 200), 256)) for _ in range(r.randint(2, 6))]
+    elif seed == 31: targets = [r.randint(80, 160) for _ in range(20)]
+    else: targets = [256]
+    return "\n\n".join(carve(t) for t in targets) + "\n"
+
+def valid(text):
+    """题面 02983：若干组盘面，组间恰一个空行，读到文件尾；每组 16 行、每行恰 16 个字符，取自 A..P 与 '-'；
+    初始盘面满足行/列/4x4 宫内字母不重复，且保证唯一解（用 DLX 计数器核实）。"""
+    import re
+    if not text.endswith("\n"): return False
+    blocks = text[:-1].split("\n\n")
+    for blk in blocks:
+        rows = blk.split("\n")
+        if len(rows) != 16 or not all(re.fullmatch(r"[A-P-]{16}", x) for x in rows): return False
+        for k in range(16):
+            for cells in (rows[k], [x[k] for x in rows], [rows[(k//4)*4 + i][(k%4)*4 + j] for i in range(4) for j in range(4)]):
+                letters = [ch for ch in cells if ch != "-"]
+                if len(letters) != len(set(letters)): return False
+        if count_2983(rows) != 1: return False
+    return True
 
 REFERENCE='// External reference: http://cs101.openjudge.cn/practice/02983/statistics/\n// Accepted submission: 51696117\n// Source: http://cs101.openjudge.cn/practice/solution/51696117/\n// License: not declared on the submission page; no license is inferred.\n\n#include <iostream>\n#include <string>\n#include <cstring>\n\nusing namespace std;\n\nstatic const int N = 16;\nstatic const int COLS = 1024;                 // 4 * 256\nstatic const int MAXR = 4096;                 // 16*16*16 (worst: all empty)\nstatic const int MAXNODE = COLS + MAXR * 4 + 10;\n\nstruct DLX {\n    int L[MAXNODE], R[MAXNODE], U[MAXNODE], D[MAXNODE];\n    int C[MAXNODE];          // column node index (1..COLS)\n    int S[COLS + 1];         // column sizes\n    int rowId[MAXNODE];      // which exact-cover row this node belongs to\n    int sz;                  // next free node\n    int ans[256];            // selected row ids (solution)\n\n    // mapping row id -> (r,c,v)\n    int rr[MAXR], cc[MAXR], vv[MAXR];\n\n    void init() {\n        // header = 0, columns = 1..COLS\n        for (int i = 0; i <= COLS; i++) {\n            L[i] = i - 1;\n            R[i] = i + 1;\n            U[i] = D[i] = i;\n            S[i] = 0;\n        }\n        L[0] = COLS;\n        R[COLS] = 0;\n        sz = COLS + 1;\n    }\n\n    inline void addRow(int rid, const int cols[4], int r, int c, int v) {\n        rr[rid] = r; cc[rid] = c; vv[rid] = v;\n\n        int first = -1;\n        for (int k = 0; k < 4; k++) {\n            int colNode = cols[k] + 1;       // convert 0..1023 -> 1..1024\n            int p = sz++;\n\n            C[p] = colNode;\n            rowId[p] = rid;\n\n            // link vertically into column\n            U[p] = U[colNode];\n            D[p] = colNode;\n            D[U[colNode]] = p;\n            U[colNode] = p;\n            S[colNode]++;\n\n            // link horizontally within row (circular)\n            if (first == -1) {\n                first = p;\n                L[p] = R[p] = p;\n            } else {\n                L[p] = L[first];\n                R[p] = first;\n                R[L[first]] = p;\n                L[first] = p;\n            }\n        }\n    }\n\n    inline void cover(int c) {\n        L[R[c]] = L[c];\n        R[L[c]] = R[c];\n        for (int i = D[c]; i != c; i = D[i]) {\n            for (int j = R[i]; j != i; j = R[j]) {\n                U[D[j]] = U[j];\n                D[U[j]] = D[j];\n                S[C[j]]--;\n            }\n        }\n    }\n\n    inline void uncover(int c) {\n        for (int i = U[c]; i != c; i = U[i]) {\n            for (int j = L[i]; j != i; j = L[j]) {\n                S[C[j]]++;\n                U[D[j]] = j;\n                D[U[j]] = j;\n            }\n        }\n        L[R[c]] = c;\n        R[L[c]] = c;\n    }\n\n    bool dfs(int k) {\n        if (R[0] == 0) return true; // all columns covered => solved\n\n        // choose column with minimal size (heuristic)\n        int c = R[0];\n        int best = S[c];\n        for (int j = R[0]; j != 0; j = R[j]) {\n            if (S[j] < best) {\n                best = S[j];\n                c = j;\n                if (best <= 1) break;\n            }\n        }\n        if (best == 0) return false;\n\n        cover(c);\n        for (int r = D[c]; r != c; r = D[r]) {\n            ans[k] = rowId[r];\n            for (int j = R[r]; j != r; j = R[j]) cover(C[j]);\n            if (dfs(k + 1)) return true;\n            for (int j = L[r]; j != r; j = L[j]) uncover(C[j]);\n        }\n        uncover(c);\n        return false;\n    }\n};\n\nstatic inline int boxId(int r, int c) {\n    return (r / 4) * 4 + (c / 4);\n}\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    string line;\n    bool firstOut = true;\n\n    while (true) {\n        string gridStr[16];\n        int got = 0;\n\n        // read 16 non-empty lines; datasets separated by empty lines\n        while (got < 16 && std::getline(cin, line)) {\n            if (line.empty()) continue;\n            if ((int)line.size() < 16) continue; // defensive\n            gridStr[got++] = line.substr(0, 16);\n        }\n        if (got < 16) break; // EOF\n\n        DLX dlx;\n        dlx.init();\n\n        int rid = 0;\n        for (int r = 0; r < 16; r++) {\n            for (int c = 0; c < 16; c++) {\n                char ch = gridStr[r][c];\n                int cellCol = r * 16 + c;\n\n                if (ch != \'-\') {\n                    int v = ch - \'A\'; // 0..15\n                    int rowCol = 256 + r * 16 + v;\n                    int colCol = 512 + c * 16 + v;\n                    int boxCol = 768 + boxId(r, c) * 16 + v;\n\n                    int cols[4] = { cellCol, rowCol, colCol, boxCol };\n                    dlx.addRow(rid++, cols, r, c, v);\n                } else {\n                    for (int v = 0; v < 16; v++) {\n                        int rowCol = 256 + r * 16 + v;\n                        int colCol = 512 + c * 16 + v;\n                        int boxCol = 768 + boxId(r, c) * 16 + v;\n\n                        int cols[4] = { cellCol, rowCol, colCol, boxCol };\n                        dlx.addRow(rid++, cols, r, c, v);\n                    }\n                }\n            }\n        }\n\n        dlx.dfs(0);\n\n        int out[16][16];\n        for (int r = 0; r < 16; r++)\n            for (int c = 0; c < 16; c++)\n                out[r][c] = -1;\n\n        // DLX solution has exactly 256 chosen rows (one per cell)\n        for (int i = 0; i < 256; i++) {\n            int id = dlx.ans[i];\n            int r = dlx.rr[id], c = dlx.cc[id], v = dlx.vv[id];\n            out[r][c] = v;\n        }\n\n        if (!firstOut) cout << "\\n";\n        firstOut = false;\n\n        for (int r = 0; r < 16; r++) {\n            for (int c = 0; c < 16; c++) {\n                cout << char(\'A\' + out[r][c]);\n            }\n            cout << "\\n";\n        }\n    }\n    return 0;\n}\n'
 LANGUAGE='G++'

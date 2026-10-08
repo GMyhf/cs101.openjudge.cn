@@ -153,6 +153,54 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
+def valid(text):
+    """题面契约：多组，每组首行 N (1<=N<=10000)，接 N 行 D C (1<=D,C<=10000)，组内无相同 (D,C)；以 N=0 结束。"""
+    import re
+    if not text.endswith('\n'): return False
+    lines = text[:-1].split('\n')
+    INT = re.compile(r'[1-9][0-9]*')
+    i = 0; groups = 0
+    while True:
+        if i >= len(lines): return False
+        if lines[i] == '0':
+            return i == len(lines) - 1 and groups >= 1
+        if not INT.fullmatch(lines[i]): return False
+        n = int(lines[i]); i += 1
+        if not 1 <= n <= 10000 or i + n > len(lines): return False
+        seen = set()
+        for s in lines[i:i + n]:
+            p = s.split(' ')
+            if len(p) != 2 or not all(INT.fullmatch(x) and int(x) <= 10000 for x in p): return False
+            if s in seen: return False
+            seen.add(s)
+        i += n; groups += 1
+
+def extra_cases():
+    """补充覆盖：N=1、N=10000 满规模、D 或 C 大量相同（卡严格/非严格比较）、全为候选（反链）、只有 1 个候选、多组数据。"""
+    r = random.Random(278300)
+    def grp(pairs): return f'{len(pairs)}\n' + '\n'.join(f'{d} {c}' for d, c in pairs) + '\n'
+    def uniq(n, hi_d, hi_c):
+        s = set()
+        while len(s) < n: s.add((r.randint(1, hi_d), r.randint(1, hi_c)))
+        a = list(s); r.shuffle(a); return a
+    cases = []
+    cases.append(grp([(1, 1)]) + grp([(10000, 10000)]) + grp([(5, 7), (7, 5)]) + grp([(5, 7), (5, 6)]) + grp([(5, 7), (6, 7)]) + '0\n')
+    cases.append(grp(uniq(10000, 10000, 10000)) + '0\n')
+    a = [(i, 10001 - i) for i in range(1, 10001)]; r.shuffle(a); cases.append(grp(a) + '0\n')
+    a = [(d, c) for d in range(1, 101) for c in range(1, 101)]; r.shuffle(a); cases.append(grp(a) + '0\n')
+    a = [(5000, c) for c in range(1, 10001)]; r.shuffle(a)
+    b = [(d, 4242) for d in range(1, 10001)]; r.shuffle(b)
+    cases.append(grp(a) + grp(b) + '0\n')
+    cases.append(grp(uniq(10000, 300, 300)) + grp(uniq(8000, 10000, 50)) + '0\n')
+    small = []
+    for _ in range(40):
+        hd, hc = r.randint(1, 8), r.randint(1, 8)
+        small.append(grp(uniq(r.randint(1, min(60, hd * hc)), hd, hc)))
+    cases.append(''.join(small) + '0\n')
+    a = [(i, 10001 - i) for i in range(1, 10001, 2)] + [(i + 1, 10001 - i) for i in range(1, 10001, 2)]; r.shuffle(a)
+    cases.append(grp(a) + '0\n')
+    return cases
+
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2783: Holiday Hotel\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/02783/\n# License: not declared in source collection; no license is inferred.\nimport sys\nwhile True:\n    n=int(input())\n    if n==0:\n        break\n    hotels=[tuple(map(int,input().split())) for _ in range(n)]\n    hotels.sort(key=lambda x:(x[0],x[1]))\n    candidates=1\n    max_cost_so_far=hotels[0][1]\n    for i in range(n):\n        if hotels[i][1]<max_cost_so_far:\n            candidates+=1\n            max_cost_so_far=hotels[i][1]\n    print(candidates)\n'
 NUMBER=2783
 SAMPLE='5\n300 100\n100 300\n400 200\n200 400\n100 500\n0\n'
@@ -164,6 +212,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

@@ -1,4 +1,4 @@
-import random,subprocess,sys,tempfile
+import math,random,subprocess,sys,tempfile
 from pathlib import Path
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
@@ -54,8 +54,7 @@ def generate(number, seed):
         for _ in range(r.randint(1,4)):
             a=[f"{r.choice(cmds)} {r.randint(1,10000)}" for _ in range(r.randint(1,20))];cases.append(f"{len(a)}\n"+"\n".join(a))
         return f"{len(cases)}\n"+"\n".join(cases)+"\n"
-    if number==1905:
-        rows=[f"{r.randint(1,10000)} {r.random()*20:.3f} {r.random()/10000:.7f}" for _ in range(r.randint(1,6))];return "\n".join(rows)+"\n-1 -1 -1\n"
+    if number==1905:return gen1905(r,seed)
     if number==1922:
         n=r.randint(1,15);rows=[(r.randint(1,40),r.randint(-200,500)) for _ in range(n)];rows[0]=(rows[0][0],r.randint(0,500));return f"{n}\n"+"\n".join(f"{a} {b}" for a,b in rows)+"\n0\n"
     if number==1936:return "\n".join(f"{word()} {word(5,18)}" for _ in range(r.randint(1,8)))+"\n"
@@ -146,6 +145,85 @@ def generate(number, seed):
     if number==1836:
         n=r.randint(2,50);return f"{n}\n"+" ".join(f"{r.uniform(.5,2.5):.5f}" for _ in range(n))+"\n"
     raise KeyError(number)
+
+from decimal import Decimal,getcontext,InvalidOperation
+import re as _re
+_NUM=_re.compile(r"-?\d+(\.\d+)?$")
+def valid(text):
+    """题面约束：若干行，每行三个非负数 L n C；保证伸长不超过原长一半，即 n*C<=0.5；
+    最后一行是三个负数（结束标记，不处理），之后不再有内容。"""
+    if not text.endswith("\n"):return False
+    lines=text[:-1].split("\n")
+    if len(lines)<2:return False
+    for i,ln in enumerate(lines):
+        t=ln.split()
+        if len(t)!=3 or not all(_NUM.match(x) for x in t):return False
+        v=[Decimal(x) for x in t]
+        if i==len(lines)-1:
+            if not all(x<0 for x in v):return False
+        else:
+            if any(x<0 for x in v) or v[1]*v[2]>Decimal("0.5"):return False
+    return True
+
+def _sin_cos(x):
+    s=c=Decimal(0);term=Decimal(1);k=0
+    while True:
+        if k%4==0:c+=term
+        elif k%4==1:s+=term
+        elif k%4==2:c-=term
+        else:s-=term
+        k+=1;term=term*x/k
+        if abs(term)<Decimal(10)**(-getcontext().prec+5):break
+    return s,c
+
+def exact1905(L,n,C):
+    """高精度（60 位有效数字）二分求半角 θ：sinθ/θ = 1/(1+nC)，位移 h = L(1-cosθ)/(2sinθ)。"""
+    getcontext().prec=60
+    L,n,C=Decimal(L),Decimal(n),Decimal(C)
+    if L==0 or n*C==0:return Decimal(0)
+    f=1/(1+n*C);lo,hi=Decimal(0),Decimal("3.2")
+    for _ in range(200):
+        mid=(lo+hi)/2;sm,_c=_sin_cos(mid)
+        if sm/mid>f:lo=mid
+        else:hi=mid
+    sm,cm=_sin_cos(lo)
+    return L*(1-cm)/(2*sm)
+
+def _safe1905(L,n,C):
+    # 拒绝结果离三位小数舍入边界太近（< 1e-6 mm）的行，避免正确写法因浮点误差被判错
+    # 浮点二分的绝对误差 ~1e-10 mm，远小于这里的 1e-6 mm 余量；精确值另由 exact1905 抽查
+    L,n,C=float(L),float(n),float(C)
+    if L==0 or n*C==0:return True
+    f=1/(1+n*C);lo,hi=0.0,3.2
+    for _ in range(100):
+        mid=(lo+hi)/2
+        if math.sin(mid)/mid>f:lo=mid
+        else:hi=mid
+    h=L*(1-math.cos(lo))/(2*math.sin(lo))*1000;fr=h-math.floor(h)
+    return abs(fr-0.5)>0.001
+
+def gen1905(r,seed):
+    def rnd_line(big=False):
+        while True:
+            L=str(r.randint(0,100000)) if r.random()<.7 else f"{r.uniform(0,100000):.{r.randint(1,3)}f}"
+            if r.random()<.15:L=str(r.randint(1,20))
+            e=r.uniform(-9,math.log10(.5))           # 伸长率 n*C 在 1e-9..0.5 上取对数均匀
+            nc=10**e
+            n=r.choice([r.randint(1,1000),round(r.uniform(0,1000),r.randint(1,3))])
+            if n==0:n=1
+            C=nc/n
+            Cs=f"{C:.{max(1,-int(math.floor(math.log10(C)))+r.randint(1,3))}f}"
+            ns=str(n)
+            if Decimal(ns)*Decimal(Cs)>Decimal("0.5") or Decimal(Cs)==0:continue
+            if _safe1905(L,ns,Cs):return f"{L} {ns} {Cs}"
+    rows=[]
+    if seed==1:
+        rows=["0 0 0","0 100 0.001","1000 0 0.5","1000 100 0","1000 5000 0.0001","1 1 0.5","100000 1 0.5","100000 0.5 1","10000 1 0.000000001","1 0.001 0.001","99999 499 0.001"]
+        rows=[x for x in rows if _safe1905(*x.split())]
+    elif seed<=12:rows=[rnd_line() for _ in range(r.randint(1,8))]
+    elif seed<=30:rows=[rnd_line() for _ in range(r.randint(50,300))]
+    else:rows=[rnd_line() for _ in range(r.randint(3000,5000))]
+    return "\n".join(rows)+"\n-1 -1 -1\n"
 
 NO_INPUT={3225, 2698}
 REFERENCE='// External reference: http://cs101.openjudge.cn/practice/01905/statistics/\n// Accepted submission: 52503961\n// Source: http://cs101.openjudge.cn/practice/solution/52503961/\n// License: not declared on the submission page; no license is inferred.\n\n#include <algorithm>\n#include <bitset>\n#include <iostream>\n#include <stack>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <vector>\n#include <functional>\n#include <numeric>\n#include <queue>\n#include <set>\n#include <array>\n#include <bit>\n#include <map>\n#include <cmath>\n#include <iomanip>\n#include <cstring>\n\nusing namespace std;\ntypedef long long ll;\ntypedef unsigned long long ull;\n\nint main()\n{\n\twhile (true)\n\t{\n\t\tdouble l, a, b; cin >> l >> a >> b;\n\t\tif (l == -1 && a == -1 && b == -1)break;\n\t\tdouble frac = 1. / (1. + a * b);\n\t\tdouble left = 0, right = 3.14;\n\t\tfor (int i = 0; i < 100; i++)\n\t\t{\n\t\t\tdouble mid = (left + right) / 2;\n\t\t\tif (sin(mid) / mid > frac)left = mid;\n            else right = mid;\n\t\t}\n\t\tdouble h = l * (1 - cos(right)) / (2 * sin(right));\n        cout << fixed << setprecision(3) << h << endl;\n\t}\n\treturn 0;\n}\n'

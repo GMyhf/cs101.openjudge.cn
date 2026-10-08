@@ -1,5 +1,23 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def _sim3141(m, hp):
+    """返回 (m, hp) 是否可用：双方停止时刻都 <=999，且 dragon 士气无 .xx5 恰好舍入的情形。"""
+    idx = {"dragon": 0, "ninja": 1, "iceman": 2, "lion": 3, "wolf": 4}
+    for order in (["iceman", "lion", "wolf", "ninja", "dragon"], ["lion", "dragon", "ninja", "iceman", "wolf"]):
+        life, ptr, t = m, 0, 0
+        while True:
+            for _ in range(5):
+                c = hp[idx[order[ptr]]]; name = order[ptr]; ptr = (ptr + 1) % 5
+                if life >= c:
+                    life -= c
+                    if name == "dragon" and (200 * life) % c == 0 and (200 * life // c) % 2 == 1:
+                        return False
+                    break
+            else:
+                break
+            t += 1
+        if t > 999: return False
+    return True
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     if number == 2236:
@@ -244,9 +262,34 @@ def generate(number, seed):
                       for i, row in enumerate(last)]
         return "1\n" + "\n".join(last + puzzle) + "\n"
     if number == 3141:
+        # 题面：1<=M<=10000，五个生命值 0<h<=10000。时间按三位输出，故只取停止时刻 <=999 的组合，
+        # 并避开 dragon 士气恰为 .xx5 的舍入歧义组合。
+        fixed = {1: (1, [1, 1, 1, 1, 1]), 2: (1, [10000] * 5), 3: (10000, [10000] * 5),
+                 4: (10000, [9999, 10000, 10000, 10000, 10000]), 5: (10000, [10, 11, 12, 13, 14]),
+                 6: (9999, [10000, 9999, 10000, 10000, 10000]), 7: (5000, [4999, 5000, 5001, 1, 10000]),
+                 8: (10000, [11, 7, 23, 5, 13])}
+        def pick_hp(kind):
+            if kind == 0: return [r.randint(1, 10) for _ in range(5)]
+            if kind == 1: return [r.randint(1, 10000) for _ in range(5)]
+            if kind == 2: return [r.choice([r.randint(1, 30), r.randint(9000, 10000)]) for _ in range(5)]
+            return [r.randint(10, 60) for _ in range(5)]
+        def one(kind):
+            while True:
+                if kind == 0: m = r.randint(1, 200)
+                elif kind == 3: m = r.randint(9000, 10000)
+                else: m = r.choice([r.randint(1, 100), r.randint(1, 10000)])
+                hp = pick_hp(kind)
+                if _sim3141(m, hp): return m, hp
+        if seed in fixed:
+            m, hp = fixed[seed]
+            assert _sim3141(m, hp)
+            return f"1\n{m}\n" + " ".join(map(str, hp)) + "\n"
+        kind = seed % 4
+        t = r.randint(5, 20) if kind == 0 else (r.randint(1, 3) if kind == 3 else r.randint(2, 10))
         chunks = []
-        for _ in range(r.randint(1, 4)):
-            chunks.append(f"{r.randint(0,100)}\n" + " ".join(str(r.randint(1,80)) for _ in range(5)))
+        for _ in range(t):
+            m, hp = one(kind)
+            chunks.append(f"{m}\n" + " ".join(map(str, hp)))
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     if number == 3237:
         values = [r.randint(1, 32767) for _ in range(r.randint(1, 12))]
@@ -418,6 +461,21 @@ def generate(number, seed):
     raise KeyError(number)
 
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/03141/statistics/\n# Accepted submission: 52723797\n# Source: http://cs101.openjudge.cn/practice/solution/52723797/\n# License: not declared on the submission page; no license is inferred.\n\n# 武器编号 -> 名称映射\nWEAPON = {0: "sword", 1: "bomb", 2: "arrow"}\n# 武士名称 -> 索引映射（对应输入的5个生命值）\nNAME2IDX = {"dragon": 0, "ninja": 1, "iceman": 2, "lion": 3, "wolf": 4}\n# 红蓝方制造顺序\nRED_ORDER = ["iceman", "lion", "wolf", "ninja", "dragon"]\nBLUE_ORDER = ["lion", "dragon", "ninja", "iceman", "wolf"]\n\n\nclass Headquarter:\n    """司令部类，封装所有状态和制造逻辑"""\n    def __init__(self, color, init_hp, hp_list):\n        self.color = color          # red / blue\n        self.hp = init_hp           # 当前生命元\n        self.hp_list = hp_list      # 5种武士的初始生命值\n        self.stopped = False        # 是否停止制造\n        self.ptr = 0                # 制造顺序指针\n        self.warrior_id = 0         # 武士编号（自增）\n        self.cnt = [0] * 5         # 武士计数：[dragon, ninja, iceman, lion, wolf]\n        # 制造顺序\n        self.order = RED_ORDER if color == "red" else BLUE_ORDER\n\n    def try_make(self):\n        """尝试制造武士，返回(是否成功, 武士名称, 编号, 生命值, 剩余生命元)"""\n        if self.stopped:\n            return (False, "", 0, 0, 0)\n\n        # 遍历5种武士，尝试制造\n        for _ in range(5):\n            name = self.order[self.ptr]\n            idx = NAME2IDX[name]\n            cost = self.hp_list[idx]\n\n            if self.hp >= cost:\n                # 可以制造：扣除生命元，编号+1，计数+1\n                self.hp -= cost\n                self.warrior_id += 1\n                self.cnt[idx] += 1\n                res = (True, name, self.warrior_id, cost, self.hp)\n                # 指针后移（循环）\n                self.ptr = (self.ptr + 1) % 5\n                return res\n\n            # 不足，尝试下一个\n            self.ptr = (self.ptr + 1) % 5\n\n        # 所有都无法制造，停止\n        self.stopped = True\n        return (False, "", 0, 0, 0)\n\n\ndef print_warrior_extra(name, wid, remain_hp, cost_hp):\n    """打印武士的额外属性信息"""\n    if name == "dragon":\n        w = WEAPON[wid % 3]\n        morale = remain_hp / cost_hp\n        print(f"It has a {w},and it\'s morale is {morale:.2f}")\n    elif name == "ninja":\n        w1 = WEAPON[wid % 3]\n        w2 = WEAPON[(wid + 1) % 3]\n        print(f"It has a {w1} and a {w2}")\n    elif name == "iceman":\n        w = WEAPON[wid % 3]\n        print(f"It has a {w}")\n    elif name == "lion":\n        print(f"It\'s loyalty is {remain_hp}")\n    # wolf 无额外信息\n\n\ndef main():\n    import sys\n    input = sys.stdin.read().split()\n    ptr = 0\n    case_num = int(input[ptr])\n    ptr += 1\n\n    for case in range(1, case_num + 1):\n        print(f"Case:{case}")\n        M = int(input[ptr])\n        ptr += 1\n        # 读取5种武士生命值：dragon, ninja, iceman, lion, wolf\n        hp_list = list(map(int, input[ptr:ptr+5]))\n        ptr += 5\n\n        # 初始化红蓝司令部\n        red_hq = Headquarter("red", M, hp_list)\n        blue_hq = Headquarter("blue", M, hp_list)\n        time = 0\n\n        # 循环直到双方都停止制造\n        while not red_hq.stopped or not blue_hq.stopped:\n            events = []  # 存储当前时间的事件，先红后蓝\n\n            # 1. 处理红方\n            if not red_hq.stopped:\n                success, name, wid, hp, remain = red_hq.try_make()\n                if success:\n                    # 生成降生事件\n                    idx = NAME2IDX[name]\n                    cnt = red_hq.cnt[idx]\n                    line = f"{time:03d} red {name} {wid} born with strength {hp},{cnt} {name} in red headquarter"\n                    events.append(("born", line, name, wid, remain, hp))\n                else:\n                    # 生成停止事件\n                    line = f"{time:03d} red headquarter stops making warriors"\n                    events.append(("stop", line))\n\n            # 2. 处理蓝方\n            if not blue_hq.stopped:\n                success, name, wid, hp, remain = blue_hq.try_make()\n                if success:\n                    idx = NAME2IDX[name]\n                    cnt = blue_hq.cnt[idx]\n                    line = f"{time:03d} blue {name} {wid} born with strength {hp},{cnt} {name} in blue headquarter"\n                    events.append(("born", line, name, wid, remain, hp))\n                else:\n                    line = f"{time:03d} blue headquarter stops making warriors"\n                    events.append(("stop", line))\n\n            # 3. 输出当前时间的所有事件\n            for event in events:\n                if event[0] == "stop":\n                    print(event[1])\n                else:\n                    # 打印降生行 + 额外属性行\n                    print(event[1])\n                    print_warrior_extra(event[2], event[3], event[4], event[5])\n\n            time += 1\n\n\nif __name__ == "__main__":\n    main()\n'
+def valid(text):
+    """题面：第一行组数；每组两行：M（1<=M<=10000）、五个整数（0<h<=10000）。"""
+    def num(s, lo, hi):
+        if not s or not (s.isdigit()) or (len(s) > 1 and s[0] == '0'): return False
+        return lo <= int(s) <= hi
+    if not text.endswith("\n"): return False
+    lines = text[:-1].split("\n")
+    if not lines or not num(lines[0], 1, 10**9): return False
+    t = int(lines[0])
+    if len(lines) != 1 + 2 * t: return False
+    for k in range(t):
+        a = lines[1 + 2 * k].split(" "); b = lines[2 + 2 * k].split(" ")
+        if len(a) != 1 or not num(a[0], 1, 10000): return False
+        if len(b) != 5 or not all(num(x, 1, 10000) for x in b): return False
+    return True
 LANGUAGE='Python3'
 NUMBER=3141
 SAMPLE='1\n20\n3 4 5 6 7\n'

@@ -6,14 +6,78 @@ def g4007(r):
     def s(): return "".join(r.choice("abc") for _ in range(r.randint(1,8)))
     q=r.randint(1,5);return str(q)+"\n"+"\n".join(s()+" "+s() for _ in range(q))+"\n"
 
-with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as h:
- h.write(REFERENCE_SOURCE);h.flush();root=Path(__file__).parent/"data";seen=[SAMPLE_IN]
- for i in range(40):
-  if i==0:c=SAMPLE_IN
-  else:
-   for j in range(100):
-    c=g4007(random.Random(4007+i+j*1000))
-    if c not in seen:break
-   else:raise AssertionError("diversity")
-  seen.append(c);p=subprocess.run(["python3",h.name],input=c,text=True,capture_output=True,check=True)
-  (root/f"{i}.in").write_text(c,encoding="utf-8");(root/f"{i}.out").write_text(p.stdout,encoding="utf-8")
+
+def valid(text):
+    """题面契约：首行 n，其后恰 n 行，每行两个非空字符串（空格隔开，样例里有连续两个空格），长度不超过 1000。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not lines[0].isdigit() or lines[0][0] == "0":
+        return False
+    n = int(lines[0])
+    if len(lines) != n + 1:
+        return False
+    for line in lines[1:]:
+        if line != line.strip(" ") or set(line) - {" "} and any(not (33 <= ord(ch) <= 126) for ch in line if ch != " "):
+            return False
+        toks = line.split(" ")
+        toks = [t for t in toks if t]
+        if len(toks) != 2 or not all(1 <= len(t) <= 1000 for t in toks):
+            return False
+    return True
+
+
+def fmt(pairs):
+    return f"{len(pairs)}\n" + "\n".join(f"{x} {y}" for x, y in pairs) + "\n"
+
+
+def extra_cases():
+    """补强：长度取满 1000（单对 1e6 次 DP，Python 每对约 0.3~0.6s，所以一组最多放 3 对满长）、
+    1000 对 1、完全相同、毫无公共字符、只差一个字符、组数较多的小串；字符集放宽到字母数字。"""
+    r = random.Random(40070)
+    def s(n, alpha="abcdefghijklmnopqrstuvwxyz"):
+        return "".join(r.choice(alpha) for _ in range(n))
+    out = []
+    out.append(fmt([(s(1000), s(1000)) for _ in range(3)]))
+    out.append(fmt([(s(1000, "ab"), s(1000, "ab")) for _ in range(3)]))
+    a = s(1000)
+    b = list(a); b[r.randrange(1000)] = "#"; b = "".join(b)
+    out.append(fmt([(a, b), (a[1:], a), ("x" * 1000, "y" * 1000)]))
+    out.append(fmt([(s(1000), "q"), ("q", s(1000)), (a, a), ("a", "a"), ("a", "b"), ("z" * 1000, "z")]))
+    out.append(fmt([(s(r.randint(1, 60), "abc"), s(r.randint(1, 60), "abc")) for _ in range(300)]))
+    al = "ABCDEFGHIJabcdefghij0123456789"
+    out.append(fmt([(s(r.randint(900, 1000), al), s(r.randint(1, 1000), al)) for _ in range(3)]))
+    base = s(1000, "acgt")
+    mut = list(base)
+    for _ in range(80):
+        p = r.randrange(len(mut)); op = r.randrange(3)
+        if op == 0: mut[p] = r.choice("acgt")
+        elif op == 1: del mut[p]
+        else: mut.insert(p, r.choice("acgt"))
+    out.append(fmt([(base, "".join(mut)[:1000])]))
+    return out
+
+
+def main():
+ with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as h:
+  h.write(REFERENCE_SOURCE);h.flush();root=Path(__file__).parent/"data";seen=[SAMPLE_IN]
+  cases=[]
+  for i in range(40):
+   if i==0:c=SAMPLE_IN
+   else:
+    for j in range(100):
+     c=g4007(random.Random(4007+i+j*1000))
+     if c not in seen:break
+    else:raise AssertionError("diversity")
+   seen.append(c);cases.append(c)
+  for c in extra_cases():
+   assert c not in cases
+   cases.append(c)
+  for i,c in enumerate(cases):
+   assert valid(c), i
+   p=subprocess.run(["python3",h.name],input=c,text=True,capture_output=True,check=True)
+   (root/f"{i}.in").write_text(c,encoding="utf-8");(root/f"{i}.out").write_text(p.stdout,encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,4 +1,4 @@
-import random,subprocess,sys,tempfile
+import random,re,subprocess,sys,tempfile
 from pathlib import Path
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
@@ -53,8 +53,43 @@ def generate(number, seed):
     if number == 2735:
         return f"{r.randint(1,65535):o}\n"
     if number == 2576:
-        n = r.randint(1, 24)
-        return f"{n}\n" + "\n".join(str(r.randint(1, 450)) for _ in range(n)) + "\n"
+        # 1-3：最小规模；4-9：小规模随机；10-19：满规模 n=99/100 随机；20-39：各种极端分布
+        if seed <= 3:
+            n = seed
+            w = [r.randint(1, 450) for _ in range(n)]
+        elif seed <= 9:
+            n = r.randint(4, 12)
+            w = [r.randint(1, 450) for _ in range(n)]
+        elif seed <= 19:
+            n = 100 if seed % 2 == 0 else 99
+            w = [r.randint(1, 450) for _ in range(n)]
+        else:
+            kind = seed % 10
+            n = r.choice([100, 99, 98, r.randint(30, 100)])
+            if kind == 0:
+                n = 100 if seed < 30 else 99
+                w = [450] * n
+            elif kind == 1:
+                w = [1] * n
+            elif kind == 2:  # 少数巨人 + 多数轻量，人数约束起作用
+                w = [450] * r.randint(1, 10) + [r.randint(1, 5) for _ in range(n)]
+                w = w[:n]
+            elif kind == 3:
+                w = [r.choice([1, 450]) for _ in range(n)]
+            elif kind == 4:  # 一人极重，其余极轻（奇数人数时人多一方未必更重）
+                w = [450] + [1] * (n - 1)
+            elif kind == 5:
+                w = [r.randint(400, 450) for _ in range(n)]
+            elif kind == 6:
+                w = [r.randint(1, 20) for _ in range(n)]
+            elif kind == 7:  # 偶数个相同重量 + 一个奇数扰动
+                w = [r.randint(1, 450)] * (n - 1) + [r.randint(1, 450)]
+            elif kind == 8:
+                w = [r.choice([449, 450, 2, 3]) for _ in range(n)]
+            else:
+                w = [r.randint(1, 450) for _ in range(n)]
+            r.shuffle(w)
+        return f"{n}\n" + "\n".join(map(str, w)) + "\n"
     if number == 2986:
         rows = []
         for _ in range(r.randint(2, 12)):
@@ -417,7 +452,23 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02576/statistics/\n# Accepted submission: 41410928\n# Source: http://cs101.openjudge.cn/practice/solution/41410928/\n# License: not declared on the submission page; no license is inferred.\n\nimport math\n\n\ndef tow(n, weights):\n    sum_weights = sum(weights)\n    half_n = math.ceil(n / 2)\n    half_sum = math.ceil(sum_weights / 2)\n    dp = [[False] * (half_sum + 10) for _ in range(half_n + 10)]\n    dp[0][0] = True\n\n    for i in range(n):\n        for j in range(half_n, 0, -1):\n            for k in range(half_sum, weights[i] - 1, -1):\n                if dp[j - 1][k - weights[i]]:\n                    dp[j][k] = True\n\n    team1_sum = 0\n    team2_sum = 0\n    for i in range(half_sum,-1,-1):\n        if dp[half_n][i]:\n            team1_sum = i\n            break\n\n    if team1_sum == 0:\n        for i in range(half_sum, -1,-1):\n            if dp[half_n - 1][i]:\n                team1_sum = i\n                break\n\n    team2_sum = sum_weights - team1_sum\n    return min(team1_sum, team2_sum), max(team1_sum, team2_sum)\n\n\nn = int(input())\nweights = []\nfor i in range(n):\n    weights.append(int(input()))\n\nr = tow(n, weights)\nprint(r[0], r[1])\n'
+def valid(text):
+    """题面：首行 n（至多 100 人），随后 n 行各一个 1..450 的整数重量。"""
+    lines = text.split("\n")
+    if not text.endswith("\n"):
+        return False
+    lines = lines[:-1]
+    if not lines or not re.fullmatch(r"[1-9]\d*", lines[0]):
+        return False
+    n = int(lines[0])
+    if not 1 <= n <= 100 or len(lines) != n + 1:
+        return False
+    for x in lines[1:]:
+        if not re.fullmatch(r"[1-9]\d*", x) or not 1 <= int(x) <= 450:
+            return False
+    return True
+
+REFERENCE='# 参考解：按人数分层的位集背包。原内嵌参考解（Accepted submission 41410928）在 n=100 时约 1e8 次\n# Python 循环跑不动满规模数据，且 n 为奇数时只在 ceil(n/2) 人的队里找会漏掉最优解，故换成此写法（已与穷举对拍）。\nimport sys\ndata = sys.stdin.read().split()\nn = int(data[0]); w = list(map(int, data[1:1 + n]))\nS = sum(w); k = n // 2\ndp = [0] * (k + 1); dp[0] = 1\nfor x in w:\n    for c in range(k, 0, -1):\n        dp[c] |= dp[c - 1] << x\nbest = None\nfor v, ch in enumerate(bin(dp[k])[:1:-1]):\n    if ch == "1" and (best is None or abs(2 * v - S) < abs(2 * best - S)):\n        best = v\na, b = best, S - best\nprint(min(a, b), max(a, b))\n'
 LANGUAGE='Python3'
 NUMBER=2576
 SAMPLE='3\n100\n90\n200\n'

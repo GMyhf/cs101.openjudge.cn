@@ -1,17 +1,239 @@
-import random, subprocess, tempfile
-from pathlib import Path
-REFERENCE_SOURCE='P=4037\nimport sys, math\nfrom collections import deque\ndef solve(s):\n a=s.split()\n if P==4140:\n  lo,hi=5.0,6.0\n  for _ in range(70):\n   mid=(lo+hi)/2\n   if mid*mid*mid-5*mid*mid+10*mid-80 < 0:lo=mid\n   else:hi=mid\n  return f"{(lo+hi)/2:.9f}\\n"\n if P==7206:\n  x1,y1,x2,y2=int(a[0]),int(a[1]),int(a[2]),int(a[3]); m=int(a[4]); blocked={(int(a[5+2*i]),int(a[6+2*i])) for i in range(m)}\n  moves=((1,2),(2,1),(-1,2),(-2,1),(1,-2),(2,-1),(-1,-2),(-2,-1));q=deque([(x1,y1)]);dist={(x1,y1):0};ways={(x1,y1):1}\n  while q:\n   u=q.popleft()\n   for dx,dy in moves:\n    z=(u[0]+dx,u[1]+dy)\n    if not(0<=z[0]<=10 and 0<=z[1]<=10) or z in blocked:continue\n    if z not in dist:dist[z]=dist[u]+1;ways[z]=ways[u];q.append(z)\n    elif dist[z]==dist[u]+1:ways[z]+=ways[u]\n  if (x2,y2) not in dist:return "0\\n"\n  if ways[(x2,y2)]!=1:return str(ways[(x2,y2)])+"\\n"\n  path=[(x2,y2)];u=(x2,y2)\n  while u!=(x1,y1):\n   u=next(v for v in dist if dist.get(v)==dist[u]-1 and (u[0]-v[0],u[1]-v[1]) in moves);path.append(u)\n  return "-".join(f"({x},{y})" for x,y in path[::-1])+"\\n"\n if P==22528:\n  scores=list(map(float,a));need=(3*len(scores)+4)//5;lo,hi=1,10**9\n  while lo<hi:\n   b=(lo+hi)//2; aa=b/1e9\n   if sum(aa*x+1.1**(aa*x)>=85 for x in scores) >= need: hi=b\n   else: lo=b+1\n  return str(lo)+"\\n"\n if P==23554:\n  n=int(a[0]);v=list(map(int,a[1:]));return " ".join(map(str,sorted(set(range(1,n+1))-set(v))))+"\\n"+" ".join(map(str,sorted(x for x in v if x>n)))+"\\n"\n if P==25570:\n  n=int(a[0]);v=list(map(int,a[1:]));ans=[]\n  for layer in range((n+1)//2):\n   z=sum(v[layer*n+j] for j in range(layer,n-layer))\n   z+=sum(v[(n-1-layer)*n+j] for j in range(layer,n-layer)) if n-1-layer!=layer else 0\n   z+=sum(v[i*n+layer] for i in range(layer+1,n-1-layer))\n   z+=sum(v[i*n+n-1-layer] for i in range(layer+1,n-1-layer));ans.append(z)\n  if n%2:ans.append(v[(n//2)*n+n//2])\n  return str(max(ans))+"\\n"\n if P==27384:\n  n,k=int(a[0]),int(a[1]); rec=sorted((int(a[2+2*i]),int(a[3+2*i])) for i in range(n)); target=set(map(int,a[2+2*n:]));cnt={};last=0;ans=0;i=0\n  while i<n:\n   t=rec[i][0]\n   top=sorted(cnt,key=lambda c:-cnt[c])\n   if len(top)>=k and set(top[:k])==target and (len(top)==k or cnt[top[k-1]]>cnt[top[k]]):ans+=t-last\n   while i<n and rec[i][0]==t:cnt[rec[i][1]]=cnt.get(rec[i][1],0)+1;i+=1\n   last=t\n  return str(ans)+"\\n"\n if P==3377:\n  n=int(a[0]);v=a[1:1+n];i,j=0,n-1;out=[]\n  while i<=j:\n   if v[i:j+1] <= v[i:j+1][::-1]:out.append(v[i]);i+=1\n   else:out.append(v[j]);j-=1\n  text="".join(out)\n  return "\\n".join(text[i:i+80] for i in range(0,len(text),80))+"\\n"\n if P==3670:\n  v=[list(map(int,a[i*5:i*5+5])) for i in range(5)];ans=[]\n  for i in range(5):\n   for j in range(5):\n    if v[i][j]==max(v[i]) and v[i][j]==min(v[x][j] for x in range(5)):ans.append((i+1,j+1,v[i][j]))\n  return ("%d %d %d\\n"%ans[0]) if len(ans)==1 else "not found\\n"\n if P==4022:\n  n,k=map(int,a);house=200.;saved=0.\n  for y in range(1, 40):\n   saved+=n\n   if saved>=house:return str(y)+"\\n"\n   house*=1+k/100\n  return "Impossible\\n"\n if P==4031:\n  n,R,Q=map(int,a[:3]);s=list(map(int,a[3:3+2*n]));w=list(map(int,a[3+2*n:]))\n  order=list(range(2*n))\n  for _ in range(R):\n   order.sort(key=lambda i:(-s[i],i));\n   for x,y in zip(order[::2],order[1::2]):s[x if w[x]>w[y] else y]+=1\n  order.sort(key=lambda i:(-s[i],i));return str(order[Q-1]+1)+"\\n"\n if P==4037:\n  n,m,S=map(int,a[:3]);v=[(int(a[3+2*i]),int(a[4+2*i])) for i in range(n)];q=[(int(a[3+2*n+2*i]),int(a[4+2*n+2*i])) for i in range(m)];lo,hi=0,max(x[0] for x in v)+1\n  def f(W):\n   z=[0]\n   for w,x in v:z.append(z[-1]+(x if w>=W else 0))\n   return sum((z[r]-z[l-1])*(sum(1 for w,x in v[l-1:r] if w>=W)) for l,r in q)\n  return str(min(abs(f(W)-S) for W in range(lo,hi)))+"\\n"\n if P==4076:\n  m,n=int(a[0]),int(a[1]);g=[list(map(int,a[2+i*n:2+(i+1)*n])) for i in range(m)];k=int(a[2+m*n]);pat=list(map(int,a[3+m*n:]))\n  def dfs(x,y,p,used):\n   if p==k:return True\n   for u,v in ((x+1,y),(x-1,y),(x,y+1),(x,y-1)):\n    if 0<=u<m and 0<=v<n and (u,v) not in used and g[u][v]==pat[p]:\n     used.add((u,v))\n     if dfs(u,v,p+1,used):return True\n     used.remove((u,v))\n   return False\n  return ("1\\n" if any(dfs(i,j,1,{(i,j)}) for i in range(m) for j in range(n) if g[i][j]==pat[0]) else "0\\n")\n if P==4011:\n  p=0;out=[]\n  while p<len(a):\n   N,M=map(int,a[p:p+2]);p+=2\n   if N==0:break\n   edges=[[] for _ in range(N)]\n   for _ in range(M):u,v,w=map(int,a[p:p+3]);p+=3;edges[u].append((v,w));edges[v].append((u,w))\n   agents=int(a[p]);p+=1;prob=[[0.0]+list(map(float,a[p+i*agents:p+(i+1)*agents])) for i in range(N)];p+=N*agents\n   import heapq\n   dist=[10**18]*N;dist[0]=0;h=[(0,0)]\n   while h:\n    du,u=heapq.heappop(h)\n    if du!=dist[u]:continue\n    for v,w in edges[u]:\n     if du+w<dist[v]:dist[v]=du+w;heapq.heappush(h,(dist[v],v))\n   best=0.0\n   def evaluate(plan):\n    q=[0.0]*N\n    for u in sorted(range(N),key=lambda x:-dist[x]):\n     nxt=[v for v,w in edges[u] if dist[v]==dist[u]+w];future=sum(q[v] for v in nxt)/len(nxt) if nxt else 0\n     q[u]=prob[u][plan[u]]+(1-prob[u][plan[u]])*future\n    return q[0]\n   def distribute(i,left,plan):\n    nonlocal best\n    if i==N:\n     if left==0:best=max(best,evaluate(plan))\n     return\n    for x in range(left+1):distribute(i+1,left-x,plan+[x])\n   distribute(0,agents,[]);out.append(f\'{best*100:.2f}\')\n  return \'\\n\'.join(out)+\'\\n\'\n if P==4038:\n  n,m,k=map(int,a[:3]);d=list(map(int,a[3:3+n-1]));ps=[tuple(map(int,a[3+n-1+3*i:3+n-1+3*i+3])) for i in range(m)]\n  def total(cut):\n   travel=[d[i]-cut[i] for i in range(n-1)];clock=0;ans=0;waiting={i:[] for i in range(1,n+1)};active=[]\n   for t,x,y in ps:waiting[x].append((t,y))\n   for station in range(1,n):\n    if waiting[station]:clock=max(clock,max(t for t,_ in waiting[station]));active.extend(waiting[station])\n    clock+=travel[station-1];done=[z for z in active if z[1]==station+1];ans+=sum(clock-t for t,_ in done);active=[z for z in active if z[1]!=station+1]\n   return ans\n  best=10**18\n  def distribute(i,left,cut):\n   nonlocal best\n   if i==n-1:best=min(best,total(cut));return\n   for x in range(min(left,d[i])+1):distribute(i+1,left-x,cut+[x])\n  distribute(0,k,[]);return str(best)+\'\\n\'\n if P==3750:\n  q=0;tc=int(a[q]);q+=1;ans=[];nm=(\'dragon\',\'ninja\',\'iceman\',\'lion\',\'wolf\');ordr=((2,3,4,1,0),(3,0,1,2,4))\n  class W:\n   def __init__(self,s,t,i,h,f,pos):self.s=s;self.t=t;self.i=i;self.h=h;self.f=f;self.pos=pos;self.step=0;self.kills=0\n   def name(self):return (\'red\' if self.s==0 else \'blue\')+\' \'+nm[self.t]+\' \'+str(self.i)\n  for case in range(1,tc+1):\n   M,N,T=map(int,a[q:q+3]);q+=3;hp=list(map(int,a[q:q+5]));q+=5;atk=list(map(int,a[q:q+5]));q+=5;E=[M,M];idx=[0,0];num=[0,0];units=[];cities=[[None,None] for _ in range(N+2)];gold=[0]*(N+2);lastwin=[-1]*(N+2);flag=[-1]*(N+2);lines=[f\'Case:{case}\'];dead=[False]\n   def put(t,s):lines.append(f\'{t//60:03d}:{t%60:02d} \'+s)\n   def born(s,t):\n    z=ordr[s][idx[s]]\n    if E[s]<hp[z]:return\n    E[s]-=hp[z];idx[s]=(idx[s]+1)%5;num[s]+=1;w=W(s,z,num[s],hp[z],atk[z],0 if s==0 else N+1);units.append(w);put(t,w.name()+\' born\')\n   for t in range(0,T+1,10):\n    if dead[0]:break\n    if t%60==0:born(0,t);born(1,t)\n    elif t%60==10:\n     ev=[]\n     for w in units:\n      if w.h<=0 or w.pos==(N+1 if w.s==0 else 0):continue\n      old=w.pos\n      if 1<=old<=N:cities[old][w.s]=None\n      w.pos+=1 if w.s==0 else -1;w.step+=1\n      if w.t==2 and w.step%2==0:w.h=max(1,w.h-9);w.f+=20\n      if 1<=w.pos<=N:cities[w.pos][w.s]=w\n      if w.pos==(N+1 if w.s==0 else 0):msg=w.name()+f" reached {\'blue\' if w.s==0 else \'red\'} headquarter with {w.h} elements and force {w.f}"\n      else:msg=w.name()+f\' marched to city {w.pos} with {w.h} elements and force {w.f}\'\n      ev.append((w.pos,w.s,msg))\n     for _,s,msg in sorted(ev):put(t,msg)\n     for s,label in ((0,\'blue\'),(1,\'red\')):\n      if sum(w.h>0 and w.pos==(N+1 if s==0 else 0) for w in units)>=2:put(t,label+\' headquarter was taken\');dead[0]=True\n    elif t%60==20:\n     for i in range(1,N+1):gold[i]+=10\n    elif t%60==30:\n     for i in range(1,N+1):\n      live=[w for w in cities[i] if w and w.h>0]\n      if len(live)==1: E[live[0].s]+=gold[i];put(t,live[0].name()+f\' earned {gold[i]} elements for his headquarter\');gold[i]=0\n    elif t%60==40:\n     vict=[]\n     for i in range(1,N+1):\n      r,b=cities[i]\n      if not(r and b):continue\n      x,y=(r,b) if i%2 else (b,r);put(t,x.name()+f\' attacked {y.name()} in city {i} with {x.h} elements and force {x.f}\');x_before=x.h;y_before=y.h;y.h-=x.f\n      if y.h<=0:\n       put(t,y.name()+f\' was killed in city {i}\');cities[i][y.s]=None\n       if x.t==4:\n        x.kills+=1\n        if x.kills%2==0:x.h*=2;x.f*=2\n       if y.t==3:x.h+=y_before\n       if x.t==0 and x.h>0:put(t,x.name()+f\' yelled in city {i}\')\n       vict.append((i,x,gold[i]));put(t,x.name()+f\' earned {gold[i]} elements for his headquarter\');gold[i]=0\n       if lastwin[i]==x.s and flag[i]!=x.s:flag[i]=x.s;put(t,(\'red\' if x.s==0 else \'blue\')+f\' flag raised in city {i}\')\n       lastwin[i]=x.s\n      elif y.t!=1:\n       put(t,y.name()+f\' fought back against {x.name()} in city {i}\');x.h-=y.f//2\n       if x.h<=0:\n        put(t,x.name()+f\' was killed in city {i}\');cities[i][x.s]=None\n        if x.t==3:y.h+=x_before\n        vict.append((i,y,gold[i]));put(t,y.name()+f\' earned {gold[i]} elements for his headquarter\');gold[i]=0\n        if lastwin[i]==y.s and flag[i]!=y.s:flag[i]=y.s;put(t,(\'red\' if y.s==0 else \'blue\')+f\' flag raised in city {i}\')\n        lastwin[i]=y.s\n     for i,w,_ in sorted(vict,key=lambda z:(-z[0] if z[1].s==0 else z[0])):\n      if E[w.s]>=8:E[w.s]-=8;w.h+=8\n     for i,w,loot in vict:E[w.s]+=loot\n    elif t%60==50:put(t,f\'{E[0]} elements in red headquarter\');put(t,f\'{E[1]} elements in blue headquarter\')\n   ans.append(\'\\n\'.join(lines))\n  return \'\\n\'.join(ans)+\'\\n\'\n if P==4054:\n  directions=((1,0),(0,1),(-1,0),(0,-1));rotates=((5,2,1,4,3,0),(3,4,5,0,1,2));colors={\'E\':(6,),\'W\':(0,1),\'R\':(2,3),\'B\':(4,5)};p=0;out=[]\n  def possible(target):\n   vals=[6]*9;ans=[]\n   def dfs(i):\n    if i==9:ans.append(sum(7**j*vals[j] for j in range(9)));return\n    for z in colors[target[i]]:vals[i]=z;dfs(i+1)\n   dfs(0);return target.index(\'E\'),ans\n  def solve_one(sx,sy,target):\n   start=3*sx+sy;cur=7**start*6;q1=deque([cur]);start_sum=0\n   for _ in range(9):start_sum+=cur%7;cur//=7\n   s1={start};blank,goals=possible(target);q2=deque();\n   for z in goals:\n    v=z;sm=0\n    for _ in range(9):sm+=v%7;v//=7\n    if (sm-start_sum-blank+start)&1==0:q2.append(z)\n   s2=set(q2)\n   for depth in range(31):\n    if len(q2)<len(q1):q1,q2=q2,q1;s1,s2=s2,s1\n    for _ in range(len(q1)):\n     state=q1.popleft()\n     if state in s2:return depth\n     if depth==30:continue\n     cur=[];v=state;bx=by=pos=-1\n     for i in range(9):\n      z=v%7;v//=7;cur.append(z)\n      if z==6:bx,by,pos=i//3,i%3,i\n     for dx,dy in directions:\n      nx,ny=bx+dx,by+dy\n      if not(0<=nx<3 and 0<=ny<3):continue\n      j=nx*3+ny;new=cur[:];new[pos]=rotates[dx][cur[j]];new[j]=6;z=sum(7**i*new[i] for i in range(9))\n      if z not in s1:s1.add(z);q1.append(z)\n   return -1\n  while p<len(a):\n   sy,sx=int(a[p])-1,int(a[p+1])-1;p+=2\n   if sx==sy==-1:break\n   target=a[p:p+9];p+=9;out.append(str(solve_one(sx,sy,target)))\n  return \'\\n\'.join(out)+\'\\n\'\n if P==4035:\n  n=int(a[0]);g=[[0]*7 for _ in range(5)];p=1\n  for x in range(5):\n   y=0\n   while int(a[p]):g[x][y]=int(a[p]);y+=1;p+=1\n   p+=1\n  def settle(b):\n   while True:\n    rm=[[False]*7 for _ in range(5)]\n    for x in range(5):\n     y=0\n     while y<7:\n      if not b[x][y]:y+=1;continue\n      z=y+1\n      while z<7 and b[x][z]==b[x][y]:z+=1\n      if z-y>=3:\n       for q in range(y,z):rm[x][q]=True\n      y=z\n    for y in range(7):\n     x=0\n     while x<5:\n      if not b[x][y]:x+=1;continue\n      z=x+1\n      while z<5 and b[z][y]==b[x][y]:z+=1\n      if z-x>=3:\n       for q in range(x,z):rm[q][y]=True\n      x=z\n    if not any(any(r) for r in rm):return\n    for x in range(5):\n     vals=[b[x][y] for y in range(7) if not rm[x][y]]\n     b[x]=vals+[0]*(7-len(vals))\n  def move(b,x,y,d):\n   z=[r[:] for r in b];q=x+d\n   if not(0<=q<5) or z[x][y]==0 or z[q][y]==z[x][y] and z[q][y]!=0:return None\n   if z[q][y]:z[x][y],z[q][y]=z[q][y],z[x][y]\n   else:\n    z[q][y]=z[x][y];z[x][y]=0\n    vals=[z[q][j] for j in range(7) if z[q][j]];z[q]=vals+[0]*(7-len(vals))\n   settle(z);return z\n  path=[]\n  def dfs(b,dep):\n   if dep==n:return all(not b[x][y] for x in range(5) for y in range(7))\n   for x in range(5):\n    for y in range(7):\n     if not b[x][y]:continue\n     for d in (1,-1):\n      z=move(b,x,y,d)\n      if z is None:continue\n      path.append((x,y,d))\n      if dfs(z,dep+1):return True\n      path.pop()\n   return False\n  if not dfs(g,0):return \'-1\\n\'\n  return \'\\n\'.join(f\'{x} {y} {d}\' for x,y,d in path)+\'\\n\'\n if P==4012:\n  def one(s):\n   L=len(s);memo={}\n   def smallest(pos,ln,prev):\n    pat=s[pos:pos+ln]\n    if any(ch==\',\' for ch in pat):return None\n    bound=str(int(prev)+1) if prev else \'1\'\n    if len(bound)<ln:bound=\'1\'+\'0\'*(ln-1);strict=False\n    elif len(bound)>ln:return None\n    else:strict=True\n    def build(i,rel,out):\n     if i==ln:return \'\'.join(out) if (not strict or rel in (0,1)) else None\n     low=int(bound[i]) if strict and rel==0 else 0\n     for d in range(low,10):\n      if i==0 and d==0:continue\n      ch=pat[i]\n      if ch!=\'?\' and int(ch)!=d:continue\n      nr=1 if (strict and (rel==1 or d>int(bound[i]))) else 0\n      z=build(i+1,nr,out+[str(d)])\n      if z is not None:return z\n     return None\n    return build(0,0,[])\n   def dfs(pos,prev):\n    key=(pos,prev)\n    if key in memo:return memo[key]\n    if pos==L:return \'\'\n    best=None\n    for ln in range(1,L-pos+1):\n     if pos+ln<L and s[pos+ln] not in \',?\':continue\n     cur=smallest(pos,ln,prev)\n     if cur is None:continue\n     nxt=pos+ln\n     if nxt==L:tail=\'\'\n     else:\n      tail=dfs(nxt+1,cur)\n      if tail is None:continue\n     best=cur+(\',\'+tail if tail else \'\');break\n    memo[key]=best;return best\n   z=dfs(0,\'\')\n   return z if z is not None else \'impossible\'\n  return \'\\n\'.join(one(line.strip()) for line in s.splitlines() if line.strip())+\'\\n\'\n if P==4083:\n  p=0;N=int(a[p]);p+=1;names=a[p:p+N];p+=N;M=int(a[p]);p+=1;adj={x:[] for x in names}\n  for _ in range(M):u,v,w=a[p:p+3];p+=3;w=int(w);adj[u].append((v,w));adj[v].append((u,w))\n  Q=int(a[p]);p+=1;out=[]\n  import heapq\n  for _ in range(Q):\n   src,dst=a[p:p+2];p+=2;d={src:0};prev={};h=[(0,src)]\n   while h:\n    z,u=heapq.heappop(h)\n    if z!=d[u]:continue\n    for v,w in adj[u]:\n     if z+w<d.get(v,10**9):d[v]=z+w;prev[v]=u;heapq.heappush(h,(z+w,v))\n   path=[];u=dst\n   while u!=src:path.append((prev[u],d[u]-d[prev[u]],u));u=prev[u]\n   path.reverse();out.append(src+\'\'.join(f"->({w})->{v}" for _,w,v in path))\n  return \'\\n\'.join(out)+\'\\n\'\n raise LookupError(P)\nsys.stdout.write(solve(sys.stdin.read()))\n'
-SAMPLE_IN='5 3 15 \n1 5 \n2 5 \n3 5 \n4 5 \n5 5 \n1 5 \n2 4 \n3 3\n'
-def g4037(r):
-    n = r.randint(1, 30); m = r.randint(1, n); s = r.randint(0, 500)
-    rows = [(r.randint(1, 20), r.randint(1, 20)) for _ in range(n)]
-    qs = [(r.randint(1, n), r.randint(1, n)) for _ in range(m)]
-    return f"{n} {m} {s}\n" + "\n".join(f"{w} {v}" for w, v in rows) + "\n" + \
-        "\n".join(f"{l} {rr}" for l, rr in qs) + "\n"
+"""4037 聪明的质监员 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 40 组数据。
 
-with tempfile.NamedTemporaryFile("w", suffix=".py") as h:
- h.write(REFERENCE_SOURCE); h.flush(); root=Path(__file__).parent/"data"
- for i in range(40):
-  c=SAMPLE_IN if i == 0 else g4037(random.Random(4037+i))
-  p=subprocess.run(["python3", h.name], input=c, text=True, capture_output=True, check=True)
-  (root/f"{i}.in").write_text(c); (root/f"{i}.out").write_text(p.stdout)
+2026-10 审计重写：
+- 原生成器 n<=30、S 可取 0、区间 L>R 都会出现，越出题面「0<S」「L<=R」约束，且规模远小于
+  n,m<=200000；原参考解（也是原 samplecode）是 O(maxw*n*m) 暴力，而且只枚举 W∈[0,maxw]，
+  漏掉 W>maxw（Y=0、答案为 S）这一支。
+- 现参考解：Y(W) 对 W 单调不增，二分 W∈[1,maxw+1]，每次前缀和 O(n+m)。
+- BRUTE_SOURCE 为独立暴力（枚举全部候选 W，逐区间直接求和），每次生成都对全部小规模组对拍。
+- 大组保证 Y 的最大值 < 9.2e18（64 位有符号可存），同时远超 2^31，卡 int32 溢出。
+"""
+import os
+import random
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+NUMBER = 4037
+SAMPLE_IN = '5 3 15 \n1 5 \n2 5 \n3 5 \n4 5 \n5 5 \n1 5 \n2 4 \n3 3\n'
+SAMPLE_OUT = '10\n'
+
+REFERENCE_SOURCE = r'''import sys
+from itertools import accumulate
+def main():
+    data = sys.stdin.buffer.read().split()
+    n, m, S = int(data[0]), int(data[1]), int(data[2])
+    w = list(map(int, data[3:3 + 2 * n:2]))
+    v = list(map(int, data[4:4 + 2 * n:2]))
+    base = 3 + 2 * n
+    L = list(map(int, data[base:base + 2 * m:2]))
+    R = list(map(int, data[base + 1:base + 2 * m:2]))
+    def Y(W):
+        c = [0] + list(accumulate(1 if x >= W else 0 for x in w))
+        s = [0] + list(accumulate(y if x >= W else 0 for x, y in zip(w, v)))
+        return sum((c[r] - c[l - 1]) * (s[r] - s[l - 1]) for l, r in zip(L, R))
+    lo, hi = 1, max(w) + 1          # Y(maxw+1)=0<=S，找最小的 W 使 Y(W)<=S
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if Y(mid) <= S:
+            hi = mid
+        else:
+            lo = mid + 1
+    ans = S - Y(lo)
+    if lo > 1:
+        ans = min(ans, Y(lo - 1) - S)
+    print(ans)
+main()
+'''
+
+BRUTE_SOURCE = r'''import sys
+a = sys.stdin.read().split()
+n, m, S = int(a[0]), int(a[1]), int(a[2])
+w = [int(a[3 + 2 * i]) for i in range(n)]
+v = [int(a[4 + 2 * i]) for i in range(n)]
+q = [(int(a[3 + 2 * n + 2 * i]), int(a[4 + 2 * n + 2 * i])) for i in range(m)]
+best = None
+for W in sorted(set(w) | {max(w) + 1, 0}):
+    tot = 0
+    for l, r in q:
+        cnt = sum(1 for j in range(l - 1, r) if w[j] >= W)
+        sv = sum(v[j] for j in range(l - 1, r) if w[j] >= W)
+        tot += cnt * sv
+    d = abs(tot - S)
+    best = d if best is None else min(best, d)
+print(best)
+'''
+
+N_MAX = 200000
+V_MAX = 10 ** 6
+S_MAX = 10 ** 12
+Y_LIMIT = 9 * 10 ** 18
+
+
+def valid(text):
+    """严格按题面：第一行 n m S；n 行 w v；m 行 L R。
+    1<=n,m<=200000，0<w,v<=1e6，0<S<=1e12，1<=L<=R<=n。"""
+    try:
+        lines = text.split("\n")
+        while lines and lines[-1].strip() == "":
+            lines.pop()
+        rows = [ln.split() for ln in lines]
+        if not rows or len(rows[0]) != 3:
+            return False
+        n, m, S = map(int, rows[0])
+        if not (1 <= n <= N_MAX and 1 <= m <= N_MAX and 0 < S <= S_MAX):
+            return False
+        if len(rows) != 1 + n + m:
+            return False
+        for i in range(1, 1 + n):
+            if len(rows[i]) != 2:
+                return False
+            w, v = map(int, rows[i])
+            if not (0 < w <= V_MAX and 0 < v <= V_MAX):
+                return False
+        for i in range(1 + n, 1 + n + m):
+            if len(rows[i]) != 2:
+                return False
+            l, r = map(int, rows[i])
+            if not (1 <= l <= r <= n):
+                return False
+        return True
+    except ValueError:
+        return False
+
+
+def y_max(text):
+    a = text.split()
+    n, m = int(a[0]), int(a[1])
+    v = [int(a[4 + 2 * i]) for i in range(n)]
+    pre = [0]
+    for x in v:
+        pre.append(pre[-1] + x)
+    tot = 0
+    for i in range(m):
+        l, r = int(a[3 + 2 * n + 2 * i]), int(a[4 + 2 * n + 2 * i])
+        tot += (r - l + 1) * (pre[r] - pre[l - 1])
+    return tot
+
+
+def y_of(text, W):
+    a = text.split()
+    n, m = int(a[0]), int(a[1])
+    w = [int(a[3 + 2 * i]) for i in range(n)]
+    v = [int(a[4 + 2 * i]) for i in range(n)]
+    c = [0]; s = [0]
+    for x, y in zip(w, v):
+        c.append(c[-1] + (x >= W)); s.append(s[-1] + (y if x >= W else 0))
+    tot = 0
+    for i in range(m):
+        l, r = int(a[3 + 2 * n + 2 * i]), int(a[4 + 2 * n + 2 * i])
+        tot += (c[r] - c[l - 1]) * (s[r] - s[l - 1])
+    return tot
+
+
+def fmt(n, m, S, wv, qs):
+    return (f"{n} {m} {S}\n" + "\n".join(f"{w} {v}" for w, v in wv) + "\n"
+            + "\n".join(f"{l} {r}" for l, r in qs) + "\n")
+
+
+def gen(r, n, m, wmax, vmax, maxlen, s_mode):
+    """s_mode: 'rand' 随机 S；'hit' S 恰为某个 Y(W)（答案 0）；'tiny' S 很小（最优常落在 W>maxw）；
+    'huge' S 取上限附近（最优在 W 很小一侧）。"""
+    wv = [(r.randint(1, wmax), r.randint(1, vmax)) for _ in range(n)]
+    qs = []
+    for _ in range(m):
+        ln = r.randint(1, min(maxlen, n))
+        l = r.randint(1, n - ln + 1)
+        qs.append((l, l + ln - 1))
+    body = fmt(n, m, 1, wv, qs)
+    ymax = y_max(body)
+    assert ymax < Y_LIMIT, ymax
+    if s_mode == "tiny":
+        S = r.randint(1, 3)
+    elif s_mode == "huge":
+        S = r.randint(S_MAX // 2, S_MAX)
+    elif s_mode == "hit":
+        ws = sorted({w for w, _ in wv})
+        W = r.choice(ws)
+        S = y_of(body, W)
+        if not (0 < S <= S_MAX):
+            S = r.randint(1, min(S_MAX, max(1, ymax)))
+    else:
+        S = r.randint(1, min(S_MAX, max(1, ymax)))
+    return fmt(n, m, S, wv, qs)
+
+
+def build_cases():
+    cases = [SAMPLE_IN]
+    r = random.Random(NUMBER)
+    # 最小规模
+    cases.append("1 1 1\n1 1\n1 1\n")                    # Y=1，答案 0
+    cases.append("1 1 1000000000000\n1000000 1000000\n1 1\n")   # 上界 S、w、v
+    cases.append("2 1 7\n3 2\n3 2\n1 2\n")               # 全部相同重量
+    # 小规模随机（与暴力对拍），覆盖各种 S 取法
+    modes = ["rand", "hit", "tiny", "huge"]
+    for i in range(16):
+        n = r.randint(1, 12); m = r.randint(1, 12)
+        cases.append(gen(r, n, m, r.choice([3, 10, 10 ** 6]), r.choice([5, 10 ** 6]), n, modes[i % 4]))
+    # 中等规模
+    for i in range(8):
+        n = r.randint(300, 3000); m = r.randint(300, 3000)
+        cases.append(gen(r, n, m, r.choice([50, 10 ** 6]), 10 ** 6, n, modes[i % 4]))
+    # 大规模：受「单组 .in<=1MB」所限，值域取满时 n=m=35000；n 取满 200000 时 w,v 取个位数、m 收小。
+    # 体积收口（data/ 合计 ≤10MB）：满规模只保留 n=m=35000 值域取满、n=200000、m=200000、
+    # 40000×30000 四类，其余大组规模减半。
+    # 区间长度受限以保证 Y<9.2e18；仍远超 2^31，并能卡掉 O(nm) 与逐个枚举 W 的 O(maxw*(n+m))。
+    big = [
+        (35000, 35000, 10 ** 6, 10 ** 6, 20000, "rand"),
+        (17500, 17500, 10 ** 6, 10 ** 6, 10000, "hit"),
+        (17500, 17500, 10 ** 6, 10 ** 6, 10000, "tiny"),
+        (17500, 17500, 10 ** 6, 10 ** 6, 10000, "huge"),
+        (17500, 17500, 10 ** 6, 10 ** 6, 300, "rand"),
+        (17000, 17000, 1000, 10 ** 6, 8000, "hit"),
+        (200000, 15000, 9, 9, 200000, "rand"),
+        (100000, 15000, 9, 9, 100000, "hit"),
+        (200000, 1, 9, 9, 200000, "tiny"),
+        (1, 200000, 10 ** 6, 10 ** 6, 1, "rand"),
+        (30000, 12500, 9, 10 ** 6, 10000, "huge"),
+        (40000, 30000, 10 ** 6, 10 ** 6, 5, "hit"),
+    ]
+    for n, m, wmax, vmax, maxlen, mode in big:
+        cases.append(gen(r, n, m, wmax, vmax, maxlen, mode))
+    return cases
+
+
+def _run(source, content, limit=600):
+    with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8", delete=False) as fh:
+        fh.write(source)
+        path = fh.name
+    try:
+        return subprocess.run([sys.executable, path], input=content, text=True,
+                              capture_output=True, timeout=limit, check=True).stdout
+    finally:
+        os.unlink(path)
+
+
+def main():
+    cases = build_cases()
+    assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert len(set(cases)) == len(cases), "组间不得重复"
+    for i, c in enumerate(cases):
+        assert valid(c), f"第 {i} 组越出题面约束"
+        assert len(c.encode()) <= 1 << 20, f"第 {i} 组 .in 超过 1MB"
+    assert _run(REFERENCE_SOURCE, SAMPLE_IN) == SAMPLE_OUT, "参考解跑不出样例输出"
+    root = Path(__file__).parent / "data"
+    root.mkdir(exist_ok=True)
+    for old in list(root.glob("*.in")) + list(root.glob("*.out")):
+        old.unlink()
+    for i, c in enumerate(cases):
+        out = _run(REFERENCE_SOURCE, c)
+        if len(c) < 2000:
+            assert _run(BRUTE_SOURCE, c) == out, f"第 {i} 组参考解与暴力不一致"
+        (root / f"{i}.in").write_text(c, encoding="utf-8")
+        (root / f"{i}.out").write_text(out, encoding="utf-8")
+    print(f"generated {len(cases)} cases")
+
+
+if __name__ == "__main__":
+    main()

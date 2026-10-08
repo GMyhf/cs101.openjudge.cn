@@ -10,7 +10,7 @@ def generate(n, seed):
         return '\n'.join(f"{r.randint(1,80)} {r.randint(1,80)}" for _ in range(r.randint(1,5)))+'\n0 0\n'
     if n==2773:
         T=r.randint(20,300);m=r.randint(2,20);return f"{T} {m}\n"+'\n'.join(f"{r.randint(1,100)} {r.randint(1,100)}" for _ in range(m))+'\n'
-    if n==2734:return f"{r.randint(1,65535)}\n"
+    if n == 2734: return _gen_2734(r, seed)
     if n==2488:
         z=[(r.randint(1,6),r.randint(1,6)) for _ in range(r.randint(1,4))];return str(len(z))+'\n'+'\n'.join(f'{a} {b}' for a,b in z)+'\n'
     if n==2810:return f"{r.randint(2,45)}\n"
@@ -155,12 +155,30 @@ def generate(n, seed):
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2734: 十进制到八进制\n# Fenced code block index: 0\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024sp_routine/02734/\n# License: not declared in source collection; no license is inferred.\nimport sys\ndecimal = int(input())  # 读取十进制数\n\n# 创建一个空栈\nstack = []\n\n# 特殊情况：如果输入的数为0，直接输出0\nif decimal == 0:\n    print(0)\nelse:\n    # 不断除以8，并将余数压入栈中\n    while decimal > 0:\n        remainder = decimal % 8\n        stack.append(remainder)\n        decimal = decimal // 8\n\n    # 依次出栈，构成八进制数的各个位\n    octal = ""\n    while stack:\n        octal += str(stack.pop())\n\n    print(octal)\n'
 NUMBER=2734
-SAMPLE='10\n'
+SAMPLE='9\n'
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout
+import re as _re
+_INT=_re.compile(r'(0|-?[1-9][0-9]*)$')
+def _int(tok):
+    return int(tok) if _INT.match(tok) else None
+
+def valid(text):
+    """题面：一行，仅含一个十进制整数 a（0 < a < 65536）。"""
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if len(lines)!=1:return False
+    a=_int(lines[0])
+    return a is not None and 0<a<65536
+
+_SPECIAL_2734 = [1, 7, 8, 63, 64, 511, 512, 4095, 32767, 32768, 65535, 65528]
+def _gen_2734(r, seed):
+    if seed <= len(_SPECIAL_2734): return f"{_SPECIAL_2734[seed - 1]}\n"
+    return f"{r.randint(1, 65535)}\n"
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()

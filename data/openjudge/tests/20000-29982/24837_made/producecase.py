@@ -9,6 +9,51 @@ def g24837(r):
          if r.random() < .55 else r.randint(1, 10**8))
     return f"{p} {q} {x} {y}\n"
 
+def valid(text):
+    """题面：一行 4 个正整数 P Q X Y，0 < P, X, Q <= 2^31，1 < Y <= 225。"""
+    if not text.endswith("\n") or text.count("\n") != 1:
+        return False
+    t = text[:-1].split(" ")
+    if len(t) != 4 or not all(v.isdigit() and v == str(int(v)) for v in t):
+        return False
+    p, q, x, y = map(int, t)
+    M = 2 ** 31
+    return 0 < p <= M and 0 < q <= M and 0 < x <= M and 1 < y <= 225
+
+
+def extra_cases():
+    """补充：题面样例 2、值到 2^31（int 溢出）、Y=225、恰好 52 次与 53 次（Failed）边界、P<X、乘减混合。
+    刻意不放 X=1、Y=2、Q≈2^31 这类稠密状态：题库已 AC 的 BFS（即参考解）会用到 300MB 以上内存。"""
+    M = 2 ** 31
+    r = random.Random(248370)
+    out = [
+        (1264574, 285855522, 26746122, 3),   # 题面样例 2
+        (M, M - 52 * 41297762, 41297762, 225),  # 纯减法恰好 52 次
+        (M, M - 53 * 40518559, 40518559, 225),  # 纯减法要 53 次 -> Failed
+        (M, 1, M - 1, 2),                    # 一次减法，P 取上限
+        (M, M - 1, M, 2),                    # 减到 0 后再也回不来 -> Failed
+        (1, M, M, 2),                        # 连乘 31 次恰到 2^31
+        (M // 2, M, 3, 2),                   # 乘一次即到 2^31，int 会溢出
+        (5, 6, 7, 2),                        # P<X，只能先乘
+        (3, 1, 2, 225),
+        (1, 225 ** 3, 1, 225),               # Y=225 连乘
+        (1, 225 ** 3 + 1, 1, 225),           # 乘出去回不来 -> Failed
+    ]
+    # 乘减混合：a 次乘法、各阶段减法次数 c_k，总次数取 52/52/53/51/40/45
+    for target in (52, 52, 53, 51, 40, 45):
+        for _ in range(1000):
+            y = r.randint(2, 225); a = r.randint(1, 6)
+            x = r.randint(10 ** 3, 10 ** 7)
+            c = [r.randint(0, y - 1) for _ in range(a)]
+            rest = target - a - sum(c)
+            if rest < 0: continue
+            S = rest * y ** a + sum(c[k] * y ** k for k in range(a))
+            P = r.randint(rest * x + 1, M)
+            Q = P * y ** a - x * S
+            if 0 < Q <= M and P != Q:
+                out.append((P, Q, x, y)); break
+    return [f"{p} {q} {x} {y}\n" for p, q, x, y in out]
+
 def run(text):
     with tempfile.TemporaryDirectory(prefix='producecase-') as d:
         p=Path(d)/'main.py'; p.write_text(REFERENCE)
@@ -27,6 +72,6 @@ def scale_case():
     return None
 def main():
     d=Path('data'); d.mkdir(exist_ok=True)
-    extra=scale_case(); cases=[SAMPLE]+([extra] if extra else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+    extra=scale_case(); cases=[SAMPLE]+([extra] if extra else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]+extra_cases()
     for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

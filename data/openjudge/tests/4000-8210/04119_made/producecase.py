@@ -1,10 +1,13 @@
 """4119 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
 
+第 15-19 组为补充的边界组（替换了原先的随机组，组数不变）：N=1、K=1、K=N、N=50 取遍 K，以及全部 1275 个 (N, K) 组合。
+
 出处：build_001b
 生成器与循环取自 scripts/build_001b.py（批次 001b），保持同一形状；
 不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
 """
 import random
+import re
 import subprocess
 import tempfile
 from pathlib import Path
@@ -22,8 +25,31 @@ def g4119(r):
         pairs.append((n, r.randint(1, n)))
     return "\n".join(f"{n} {k}" for n, k in pairs) + "\n"
 
+EXTRA_CASES = [
+    "1 1\n",                                                        # 15 最小规模
+    "".join(f"{n} 1\n" for n in range(1, 51)),                      # 16 K=1，N 取遍 1..50
+    "".join(f"50 {k}\n" for k in range(1, 51)),                     # 17 N=50，K 取遍 1..50
+    "".join(f"{n} {n}\n" for n in range(50, 0, -1)),                # 18 K=N
+    "".join(f"{n} {k}\n" for n in range(1, 51) for k in range(1, n + 1)),  # 19 全部 (N, K)
+]
+
+
+def valid(text):
+    """题面：若干组测试数据，每组一行两个整数 N K（0 < N <= 50，0 < K <= N）。"""
+    if not isinstance(text, str) or not text.endswith("\n") or "\r" in text:
+        return False
+    for line in text[:-1].split("\n"):
+        parts = line.split(" ")
+        if len(parts) != 2 or not all(re.fullmatch(r"[1-9]\d*", x) for x in parts):
+            return False
+        n, k = map(int, parts)
+        if not (0 < n <= 50 and 0 < k <= n):
+            return False
+    return True
+
+
 def build_cases():
-    return [SAMPLE_IN] + [g4119(random.Random(NUMBER + i)) for i in range(1, 20)]
+    return [SAMPLE_IN] + [g4119(random.Random(NUMBER + i)) for i in range(1, 15)] + EXTRA_CASES
 
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
@@ -38,9 +64,11 @@ def main():
     cases = build_cases()
     assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
     assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
+    assert len(set(cases)) == len(cases), "存在重复组"
     root = Path(__file__).parent / "data"
     root.mkdir(exist_ok=True)
     for index, content in enumerate(cases):
+        assert valid(content), index
         (root / f"{index}.in").write_text(content, encoding="utf-8")
         (root / f"{index}.out").write_text(solve_reference(content), encoding="utf-8")
 

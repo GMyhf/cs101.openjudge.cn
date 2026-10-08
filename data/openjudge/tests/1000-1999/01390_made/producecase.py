@@ -147,8 +147,62 @@ def generate(number, seed):
         n=r.randint(2,50);return f"{n}\n"+" ".join(f"{r.uniform(.5,2.5):.5f}" for _ in range(n))+"\n"
     raise KeyError(number)
 
+
+def valid(text):
+    """题面契约：首行 t（1<=t<=15）；每组两行：n（1<=n<=200），n 个 1..n 的颜色。"""
+    lines = [ln.split() for ln in text.split("\n") if ln.strip()]
+    try:
+        if not lines or len(lines[0]) != 1:
+            return False
+        t = int(lines[0][0])
+        if not 1 <= t <= 15 or len(lines) != 1 + 2 * t:
+            return False
+        for k in range(t):
+            a, b = lines[1 + 2 * k], lines[2 + 2 * k]
+            if len(a) != 1:
+                return False
+            n = int(a[0])
+            if not 1 <= n <= 200 or len(b) != n or any(not 1 <= int(x) <= n for x in b):
+                return False
+        return True
+    except ValueError:
+        return False
+
+
+def g1390_v2(seed):
+    r = random.Random(1390 * 1_000_003 + seed)
+    cs = []
+    def add(seq): cs.append(f"{len(seq)}\n" + " ".join(map(str, seq)))
+    if seed == 1:     # 边界：n=1；全同色 200（40000）；全不同色；会让“找到第一个更优分割就停”出错的串
+        add([1]); add([200] * 200); add(list(range(1, 201))); add([1, 1, 2, 1, 2, 2, 1, 2, 2, 1])
+        add([1, 1, 2, 2, 1, 2, 1, 2, 2, 1, 2, 1]); add([2, 1]); add([1, 2, 1])
+    elif seed <= 16:  # 小规模、少颜色，多组（与暴力搜索对拍）
+        for _ in range(15):
+            n = r.randint(1, 12); add([r.randint(1, min(n, r.randint(1, 4))) for _ in range(n)])
+    elif seed <= 28:  # 中规模
+        for _ in range(r.randint(3, 15)):
+            n = r.randint(20, 120); k = r.choice([2, 3, 5, 10, n])
+            add([r.randint(1, min(n, k)) for _ in range(n)])
+    elif seed <= 34:  # 满规模 n=200，t=15，少颜色随机
+        for _ in range(15):
+            add([r.randint(1, r.choice([2, 3, 4, 8])) for _ in range(200)])
+    else:             # 满规模结构化：交替、回文、成段
+        for _ in range(15):
+            kind = r.randrange(3)
+            if kind == 0:
+                seq = [1 + (i % 2) for i in range(200)]
+            elif kind == 1:
+                h = [r.randint(1, 3) for _ in range(100)]; seq = h + h[::-1]
+            else:
+                seq = []
+                while len(seq) < 200:
+                    seq += [r.randint(1, 5)] * r.randint(1, 6)
+                seq = seq[:200]
+            add(seq)
+    return f"{len(cs)}\n" + "\n".join(cs) + "\n"
+
 NO_INPUT={3225, 2698}
-REFERENCE='// External reference: http://cs101.openjudge.cn/practice/01390/statistics/\n// Accepted submission: 44843318\n// Source: http://cs101.openjudge.cn/practice/solution/44843318/\n// License: not declared on the submission page; no license is inferred.\n\n#include <bits/stdc++.h>\nusing namespace std;\nconst int maxn=205;\nint dp[maxn][maxn][maxn],n;\nstruct node{\n    int color,len;\n}box[maxn];\nint click(int l,int r,int len){\n    if(dp[l][r][len])return dp[l][r][len];\n    int res=box[r].len+len;\n    res*=res;\n    if(l==r){\n        return dp[l][r][len]=res;\n    }\n    int tmp;\n    res+=click(l,r-1,0);\n    for(int i=r-1;i>=l;i--){\n        if(box[i].color!=box[r].color)continue;\n        tmp=click(l,i,box[r].len+len)+click(i+1,r-1,0);\n        if(tmp<=res)continue;\n        res=tmp;\n        break;\n    }\n    return dp[l][r][len]=res;\n}\nint main(){\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin>>t;\n    for(int x=1;x<=t;x++){\n        memset(dp,0,sizeof(dp));\n        int tag=1;\n        cin>>n>>box[tag].color;\n        box[tag].len=1;\n        for(int i=2;i<=n;i++){\n            int tmp;\n            cin>>tmp;\n            if(tmp==box[tag].color)box[tag].len++;\n            else{\n                box[++tag].color=tmp;\n                box[tag].len=1;\n            }\n        }\n        cout<<"Case "<<x<<": "<<click(1,tag,0)<<"\\n";\n    }\n    return 0;\n}\n'
+REFERENCE='// External reference: http://cs101.openjudge.cn/practice/01390/statistics/\n// Accepted submission: 44843318\n// Source: http://cs101.openjudge.cn/practice/solution/44843318/\n// License: not declared on the submission page; no license is inferred.\n// 审计修正：原提交在找到第一个更优的同色分割点后就 break，并非全局最优\n// （如 1 1 2 1 2 2 1 2 2 1 原输出 34，正确为 36），这里改为枚举全部分割点取最大。\n\n#include <bits/stdc++.h>\nusing namespace std;\nconst int maxn=205;\nint dp[maxn][maxn][maxn],n;\nstruct node{\n    int color,len;\n}box[maxn];\nint click(int l,int r,int len){\n    if(dp[l][r][len])return dp[l][r][len];\n    int res=box[r].len+len;\n    res*=res;\n    if(l==r){\n        return dp[l][r][len]=res;\n    }\n    int tmp;\n    res+=click(l,r-1,0);\n    for(int i=r-1;i>=l;i--){\n        if(box[i].color!=box[r].color)continue;\n        tmp=click(l,i,box[r].len+len)+click(i+1,r-1,0);\n        if(tmp>res)res=tmp;\n    }\n    return dp[l][r][len]=res;\n}\nint main(){\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int t;\n    cin>>t;\n    for(int x=1;x<=t;x++){\n        memset(dp,0,sizeof(dp));\n        int tag=1;\n        cin>>n>>box[tag].color;\n        box[tag].len=1;\n        for(int i=2;i<=n;i++){\n            int tmp;\n            cin>>tmp;\n            if(tmp==box[tag].color)box[tag].len++;\n            else{\n                box[++tag].color=tmp;\n                box[tag].len=1;\n            }\n        }\n        cout<<"Case "<<x<<": "<<click(1,tag,0)<<"\\n";\n    }\n    return 0;\n}\n'
 LANGUAGE='G++'
 NUMBER=1390
 SAMPLE='2\n9\n1 2 2 2 2 3 3 3 1\n1\n1\n'
@@ -159,7 +213,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [g1390_v2(s) for s in range(1, 40)])
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

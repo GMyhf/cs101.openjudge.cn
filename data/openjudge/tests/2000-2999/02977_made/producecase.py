@@ -152,6 +152,12 @@ def generate(number, seed):
         n=r.randint(2,50);return f"{n}\n"+" ".join(f"{r.uniform(.5,2.5):.5f}" for _ in range(n))+"\n"
     raise KeyError(number)
 
+def valid(text):
+    """题面 02977：一行四个整数 p e i d，单空格分隔，均非负且 <= 365。"""
+    import re
+    m=re.fullmatch(r"(\d+) (\d+) (\d+) (\d+)\n",text)
+    return bool(m) and all(not (g!="0" and g.startswith("0")) and int(g)<=365 for g in m.groups())
+
 NO_INPUT={3225, 2698}
 REFERENCE='# External reference: http://cs101.openjudge.cn/pctbook/M02977/statistics/\n# Accepted submission: 53000288\n# Source: http://cs101.openjudge.cn/pctbook/solution/53000288/\n# License: not declared on the submission page; no license is inferred.\n\ns = input().split()\np,e,i,d = int(s[0])%23,int(s[1])%28,int(s[2])%33,int(s[3])\nt = 0\nwhile t % 23 != p:\n    t += 924\nwhile t % 28 != e:\n    t += 759\nwhile t % 33 != i:\n    t += 644\nt = (t-d) % 21252\nif t == 0:\n    t = 21252\nprint(t)\n'
 LANGUAGE='Python3'

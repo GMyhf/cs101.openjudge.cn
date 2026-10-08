@@ -15,8 +15,77 @@ def run(text):
         x=subprocess.run([sys.executable,str(p)],input=text,text=True,capture_output=True,timeout=120)
         if x.returncode: raise SystemExit(x.stderr)
         return x.stdout
+import re
+from collections import deque
+
+def valid(text):
+    """题面：首行 2<=n<=100；接着 n 行，每行 n 个 0/1（单空格分隔）。
+    另外要求蛇的起点两格 (0,0)(0,1) 为空地，避开“起点在障碍上”这种题面没定义的情形。"""
+    lines = text.split('\n')
+    if not lines or lines[-1] != '' or not re.fullmatch(r'[1-9][0-9]*', lines[0]):
+        return False
+    n = int(lines[0])
+    if not 2 <= n <= 100 or len(lines) != n + 2:
+        return False
+    for row in lines[1:n + 1]:
+        if not re.fullmatch(r'[01]( [01])*', row) or len(row.split()) != n:
+            return False
+    first = lines[1].split()
+    return first[0] == '0' and first[1] == '0'
+
+def bfs(g, accept_vertical=False, one_cell_rotate=False):
+    """生成器自用的 BFS（挑数据用，也可开“常见错误”开关）。"""
+    n = len(g); free = lambda r, c: 0 <= r < n and 0 <= c < n and g[r][c] == 0
+    st = (0, 0, 0); dist = {st: 0}; q = deque([st])
+    while q:
+        r, c, d = q.popleft(); s = dist[(r, c, d)]
+        if (r, c, d) == (n - 1, n - 2, 0) or (accept_vertical and (r, c, d) == (n - 2, n - 1, 1)):
+            return s
+        hr, hc = (r, c + 1) if d == 0 else (r + 1, c)
+        nxt = []
+        if free(r + 1, c) and free(hr + 1, hc): nxt.append((r + 1, c, d))
+        if free(r, c + 1) and free(hr, hc + 1): nxt.append((r, c + 1, d))
+        if d == 0 and free(r + 1, c) and (one_cell_rotate or free(r + 1, c + 1)): nxt.append((r, c, 1))
+        if d == 1 and free(r, c + 1) and (one_cell_rotate or free(r + 1, c + 1)): nxt.append((r, c, 0))
+        for t in nxt:
+            if t not in dist: dist[t] = s + 1; q.append(t)
+    return -1
+
+def fmt(g):
+    return f"{len(g)}\n" + "\n".join(" ".join(map(str, row)) for row in g) + "\n"
+
+def rand_grid(r, n, p):
+    g = [[1 if r.random() < p else 0 for _ in range(n)] for _ in range(n)]
+    g[0][0] = g[0][1] = g[-1][-1] = g[-1][-2] = 0
+    return g
+
+def special_cases():
+    """补 n=2/3 的边界、n=100 的满规模（可达且路径长 / 不可达 / 全空），
+    以及能卡掉“竖着到终点也算”“旋转只查一个格子”两种常见错误的组。"""
+    r = random.Random(28973)
+    out = [fmt([[0, 0], [1, 1]]), fmt([[0, 0], [1, 0]]), fmt([[0, 0], [0, 1]]),
+           fmt([[0, 0, 0], [0, 0, 0], [0, 0, 0]]), fmt([[0, 0, 1], [1, 0, 0], [0, 0, 0]])]
+    full = [[0] * 100 for _ in range(100)]
+    full[99][98] = 1  # 终点被堵：-1
+    out.append(fmt(full))
+    want = [(100, .1, True), (100, .18, True), (100, .2, True), (100, .23, True), (99, .2, True),
+            (100, .25, False), (100, .3, False), (60, .22, True), (37, .25, True)]
+    for n, p, ok in want:
+        while True:
+            g = rand_grid(r, n, p); a = bfs(g)
+            if (a != -1) == ok: out.append(fmt(g)); break
+    # 竖着到终点也算 / 旋转只查一格：各找两组能区分的
+    for flag in ('accept_vertical', 'one_cell_rotate'):
+        got = 0
+        while got < 2:
+            n = r.choice([8, 15, 30, 100]); g = rand_grid(r, n, .15 if n == 100 else r.choice([.2, .25, .3]))
+            if bfs(g) != bfs(g, **{flag: True}): out.append(fmt(g)); got += 1
+    return out
+
 def main():
     d=Path('data'); d.mkdir(exist_ok=True)
-    cases=[SAMPLE]+([EXTRA_CASE] if EXTRA_CASE else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+    cases=[SAMPLE]+([EXTRA_CASE] if EXTRA_CASE else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]+special_cases()
+    assert all(valid(c) for c in cases), [i for i,c in enumerate(cases) if not valid(c)]
+    assert len(set(cases))==len(cases), '组间有重复'
     for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

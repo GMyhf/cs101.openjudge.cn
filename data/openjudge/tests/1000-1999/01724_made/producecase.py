@@ -157,7 +157,105 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
-REFERENCE="# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 1724: ROADS\n# Fenced code block index: 8\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024sp_routine/01724/\n# License: not declared in source collection; no license is inferred.\nimport sys\nclass Road:\n    def __init__(self,d,L,t):\n       self.d,self.L,self.t = d,L,t\n\n\ndef dfs(s, total_cost, total_length, visited, city_map, min_lengths, k):\n    global min_length\n    if s == n:\n        min_length = min(min_length, total_length)\n        return\n    for i in range(len(city_map[s])):\n        d, L, t = city_map[s][i].d, city_map[s][i].L, city_map[s][i].t\n        if visited[d]:\n            continue\n        cost = t + total_cost\n        length = L + total_length\n        if cost > k :   # 可行性剪枝：超过预算\n            continue\n        if (length >= min_length or # 最优性剪枝：超过当前最优解\n                length >= min_lengths[d][cost]): # 处处最优性剪枝：超过已经搜索到的最优解\n            continue\n        min_lengths[d][cost] = length\n        visited[d] = True\n        dfs(d, cost, length, visited, city_map, min_lengths, k)\n        visited[d] = False\n\n\nk,n,r = int(input()),int(input()),int(input())\ncity_map = [[] for i in range(n+1)] #邻接表。city_map[i]是从点i有路连到的城市集合\nfor _ in range(r):\n    r = Road(0, 0, 0)\n    s, r.d, r.L, r.t = map(int, input().split())\n    if s != r.d:\n        city_map[s].append(r)\nINF = float('inf')\nmin_length = INF\n\n#min_lengths[i][j]表示从1到i点，花销为j的最短路径的长度\nmin_lengths = [[INF] * (k + 1) for _ in range(n + 1)]\nvisited = [False] * (n + 1)\nvisited[1] = True\ndfs(1, 0, 0, visited, city_map, min_lengths, k)\nif min_length < INF:\n    print(min_length)\nelse:\n    print(-1)\n"
+# ---- 题面契约与 1724 专用生成器 ----
+def valid(text):
+    """K（0..10000）、N（2..100）、R（1..10000）各占一行，其后恰 R 行 “S D L T”（单空格分隔），
+    1<=S,D<=N，1<=L<=100，0<=T<=100。"""
+    try:
+        if not text.endswith('\n') or '\r' in text: return False
+        lines = text[:-1].split('\n')
+        if len(lines) < 3 or not all(lines[i].isdigit() and lines[i] == str(int(lines[i])) for i in range(3)): return False
+        k, n, r = int(lines[0]), int(lines[1]), int(lines[2])
+        if not (0 <= k <= 10000 and 2 <= n <= 100 and 1 <= r <= 10000) or len(lines) != 3 + r: return False
+        for ln in lines[3:]:
+            f = ln.split(' ')
+            if len(f) != 4 or not all(x.isdigit() and x == str(int(x)) for x in f): return False
+            s, d, l, t = map(int, f)
+            if not (1 <= s <= n and 1 <= d <= n and 1 <= l <= 100 and 0 <= t <= 100): return False
+        return True
+    except Exception:
+        return False
+
+def _brute(text):
+    """暴力：枚举 1 出发的全部简单路径（只用于小图核对）。"""
+    v = list(map(int, text.split())); k, n, r = v[:3]
+    adj = [[] for _ in range(n + 1)]
+    for i in range(r):
+        s, d, l, t = v[3 + 4 * i:7 + 4 * i]; adj[s].append((d, l, t))
+    best = [None]; seen = {1}
+    def go(u, L, C):
+        if u == n:
+            if best[0] is None or L < best[0]: best[0] = L
+            return
+        for d, l, t in adj[u]:
+            if d not in seen and C + t <= k:
+                seen.add(d); go(d, L + l, C + t); seen.discard(d)
+    go(1, 0, 0)
+    return f"{best[0] if best[0] is not None else -1}\n"
+
+def _fmt(k, n, edges):
+    return f"{k}\n{n}\n{len(edges)}\n" + "\n".join("%d %d %d %d" % e for e in edges) + "\n"
+
+def gen_file(seed):
+    r = random.Random(1724 * 1_000_003 + seed)
+    if seed == 1:   # 最小：N=2、R=1，过路费恰好等于 K
+        return "7\n2\n1\n1 2 5 7\n"
+    if seed == 2:   # K=0：只能走免费路
+        return "0\n3\n4\n1 3 10 1\n1 2 4 0\n2 3 9 0\n2 2 1 0\n"
+    if seed == 3:   # 到不了 N（只有反向边）
+        return "100\n4\n3\n2 1 3 0\n4 1 2 0\n1 3 1 0\n"
+    if seed == 4:   # 能到但钱不够
+        return "5\n3\n3\n1 2 1 3\n2 3 1 3\n1 3 50 6\n"
+    if seed <= 18:  # 小图随机，含自环、重边
+        n = r.randint(2, 9); k = r.choice([0, r.randint(0, 30), r.randint(0, 300)])
+        edges = [(r.randint(1, n), r.randint(1, n), r.randint(1, 100), r.choice([0, r.randint(0, 100), r.randint(0, 20)]))
+                 for _ in range(r.randint(1, 30))]
+        if seed % 3:  # 多数小图补一条 1→…→N 的链，免得 -1 太多
+            edges += [(i, i + 1, r.randint(1, 100), r.randint(0, 40)) for i in range(1, n)]
+            r.shuffle(edges)
+        return _fmt(k, n, edges)
+    if seed <= 25:  # 分层“贵而短 / 便宜而长”：每城的帕累托前沿很长，卡掉只记最短或只记最省的贪心
+        n = 100; k = r.choice([r.randint(500, 3000), 10000, r.randint(50, 400)]); edges = []
+        layers = [[1]] + [list(range(2 + 3 * i, 5 + 3 * i)) for i in range(33)] + [[100]]
+        for a, b in zip(layers, layers[1:]):
+            for u in a:
+                for v in b:
+                    for _ in range(r.randint(2, 6)):
+                        l = r.randint(1, 100); t = max(0, min(100, 100 - l + r.randint(-10, 10)))
+                        edges.append((u, v, l, t))
+        while len(edges) < 10000:   # 干扰边只向回连（或自环），不提供捷径
+            u = r.randint(2, 100); v = r.randint(1, u)
+            edges.append((u, v, r.randint(1, 100), r.randint(0, 100)))
+        r.shuffle(edges); return _fmt(k, n, edges[:10000])
+    if seed <= 31:  # 满规模随机
+        n = r.randint(90, 100); k = r.choice([0, r.randint(0, 200), r.randint(0, 10000), 10000])
+        edges = [(r.randint(1, n), r.randint(1, n), r.randint(1, 100), r.randint(0, 100)) for _ in range(10000)]
+        return _fmt(k, n, edges)
+    if seed <= 35:  # 稀疏长链 + 干扰边：路径长、需要跨越很多城市
+        n = 100; k = r.randint(100, 3000); edges = []
+        for i in range(1, n):
+            edges.append((i, i + 1, r.randint(50, 100), r.randint(0, 30)))
+            edges.append((i, i + 1, r.randint(1, 30), r.randint(30, 100)))
+        for _ in range(r.randint(100, 3000)):
+            u = r.randint(1, n - 1); v = r.randint(1, n)
+            edges.append((u, v, r.randint(1, 100), r.randint(0, 100)))
+        r.shuffle(edges); return _fmt(k, n, edges)
+    # 满规模但 N 不可达或钱刚好不够的 -1
+    n = 100; edges = []
+    if seed % 2:
+        for _ in range(9999):
+            u, v = r.randint(1, n - 1), r.randint(1, n - 1)
+            edges.append((u, v, r.randint(1, 100), r.randint(0, 100)))
+        edges.append((n, r.randint(1, n - 1), 1, 0))
+        return _fmt(10000, n, edges)
+    for _ in range(10000):
+        u, v = r.randint(1, n), r.randint(1, n)
+        t = r.randint(0, 100)
+        if v == n and u != n: t = r.randint(60, 100)
+        edges.append((u, v, r.randint(1, 100), t))
+    return _fmt(59, n, edges)
+
+REFERENCE='# 参考解（审计时重写）：按长度做 Dijkstra，状态 (城市, 已花费)；\n# 同一城市后弹出的状态若花费不低于先前弹出者即被支配，直接丢弃。\nimport sys, heapq\ndef main():\n    data = sys.stdin.buffer.read().split()\n    k, n, r = int(data[0]), int(data[1]), int(data[2])\n    adj = [[] for _ in range(n + 1)]\n    p = 3\n    for _ in range(r):\n        s, d, l, t = int(data[p]), int(data[p + 1]), int(data[p + 2]), int(data[p + 3]); p += 4\n        if s != d and t <= k:\n            adj[s].append((d, l, t))\n    best_cost = [k + 1] * (n + 1)\n    pq = [(0, 0, 1)]\n    while pq:\n        length, cost, u = heapq.heappop(pq)\n        if cost >= best_cost[u]:\n            continue\n        best_cost[u] = cost\n        if u == n:\n            print(length); return\n        for v, l, t in adj[u]:\n            c = cost + t\n            if c < best_cost[v]:\n                heapq.heappush(pq, (length + l, c, v))\n    print(-1)\nmain()\n'
 NUMBER=1724
 SAMPLE='5\n6\n7\n1 2 2 3\n2 4 3 3\n3 4 2 4\n1 3 4 1\n4 6 2 1\n3 5 2 0\n5 4 3 2\n'
 def run(x):
@@ -168,6 +266,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[gen_file(s) for s in range(1, 40)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

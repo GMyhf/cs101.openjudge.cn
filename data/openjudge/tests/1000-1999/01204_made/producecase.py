@@ -17,11 +17,7 @@ def generate(number, seed):
         for _ in range(r.randint(1,8)):
             x,y=sorted(r.sample(range(L+1),2));rows.append((x,y))
         return f"{len(rows)} {L}\n{a} {b}\n"+"\n".join(f"{x} {y}" for x,y in rows)+"\n"
-    if number==1204:
-        h,w=8+r.randrange(5),8+r.randrange(5);grid=[[r.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(w)] for _ in range(h)];words=[]
-        for y in range(min(6,h)):
-            x=r.randrange(0,w-3);s="".join(grid[y][x:x+4]);words.append(s)
-        return f"{h} {w} {len(words)}\n"+"\n".join("".join(x) for x in grid)+"\n"+"\n".join(words)+"\n"
+    if number==1204:return gen_1204(r,seed)
     if number==2992:
         n=r.randint(2,16);a=[[0]*n for _ in range(n)]
         for i in range(n):
@@ -148,6 +144,76 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
+DIRS_1204=[(-1,0),(-1,1),(0,1),(1,1),(1,0),(1,-1),(0,-1),(-1,-1)]
+def lines_1204(grid):
+    # 4 族直线（行、列、主对角、副对角）各自正反向拼成的长串，用于统计单词出现次数
+    L,C=len(grid),len(grid[0])
+    cols=["".join(grid[i][j] for i in range(L)) for j in range(C)]
+    d1=["".join(grid[i][i-k] for i in range(max(0,k),min(L,C+k))) for k in range(-(C-1),L)]
+    d2=["".join(grid[i][k-i] for i in range(max(0,k-C+1),min(L,k+1))) for k in range(L+C-1)]
+    f=["#".join(x) for x in (grid,cols,d1,d2)]
+    return f+[x[::-1] for x in f]
+def occ_1204(fams,word,limit=2):
+    # word 在 8 个方向上的 (起点,方向) 出现次数，数到 limit 即停；单字母词在同一格 8 个方向都算
+    if len(word)==1:
+        n=sum(s.count(word) for s in fams[:4])*2
+        return min(n,limit)
+    n=0
+    for s in fams:
+        q=s.find(word)
+        while q!=-1:
+            n+=1
+            if n>=limit:return n
+            q=s.find(word,q+1)
+    return n
+def gen_1204(r,seed):
+    # 按种子分档：小棋盘/小字母表（易重叠）、中等、满规模 1000x1000x1000、长单词、单行单列
+    A="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    if seed<=12:   L,C,W,alpha,lo,hi=r.randint(1,12),r.randint(2,12),r.randint(1,8),r.choice([A,A,"ABCD","ABC"]),2,12
+    elif seed<=24: L,C,W,alpha,lo,hi=r.randint(20,120),r.randint(20,120),r.randint(20,200),r.choice([A,"ABCDEFGH","ABCD"]),2,40
+    elif seed<=30: L,C,W,alpha,lo,hi=r.randint(300,700),r.randint(300,700),r.randint(300,1000),A,3,40
+    elif seed==31: L,C,W,alpha,lo,hi=1,1000,200,A,2,200
+    elif seed==32: L,C,W,alpha,lo,hi=1000,1,200,A,2,200
+    elif seed==33: L,C,W,alpha,lo,hi=1000,1000,40,A,200,1000
+    elif seed==34: L,C,W,alpha,lo,hi=600,600,1000,"ABCDEFGH",8,40
+    elif seed==35: L,C,W,alpha,lo,hi=1000,700,1000,A,2,40
+    elif seed==36: L,C,W,alpha,lo,hi=700,1000,1000,A,2,40
+    else:          L,C,W,alpha,lo,hi=850,850,1000,A,2,40
+    # 注：参考解（Python 字典树逐格逐方向）在 1000x1000 全字母表上约 9.5s，逼近 Python 单组 20s 上限的一半，
+    # 故满 1000 行/列只留在 seed 31~33、35、36（另一维缩小），其余大组取 850x850
+    while True:
+        grid=["".join(r.choice(alpha) for _ in range(C)) for _ in range(L)]
+        if L==1 and C==1: continue
+        fams=lines_1204(grid);words=[];seen=set();tries=0
+        while len(words)<W and tries<W*300:
+            tries+=1
+            k=r.randrange(8);dy,dx=DIRS_1204[k];n=r.randint(lo,hi)
+            ylo,yhi=(0 if dy>=0 else n-1),(L-1 if dy<=0 else L-n)
+            xlo,xhi=(0 if dx>=0 else n-1),(C-1 if dx<=0 else C-n)
+            if ylo>yhi or xlo>xhi:continue
+            y,x=r.randint(ylo,yhi),r.randint(xlo,xhi)
+            w="".join(grid[y+dy*t][x+dx*t] for t in range(n))
+            if w in seen or occ_1204(fams,w)!=1:continue
+            seen.add(w);words.append(w)
+        if words:break
+    return f"{L} {C} {len(words)}\n"+"\n".join(grid)+"\n"+"\n".join(words)+"\n"
+def valid(text):
+    # 题面：首行 L C W（0<L,C,W<=1000）；L 行每行恰 C 个字符；随后 W 行单词。
+    # 输出"第一个字母的位置和方向"隐含每个单词在棋盘中恰好出现一次（起点+方向唯一）。
+    # 字符集按样例取大写字母。
+    if not text.endswith('\n'): return False
+    lines=text[:-1].split('\n')
+    h=lines[0].split(' ')
+    if len(h)!=3 or not all(t.isdigit() for t in h): return False
+    L,C,W=map(int,h)
+    if not (1<=L<=1000 and 1<=C<=1000 and 1<=W<=1000) or len(lines)!=1+L+W: return False
+    grid=lines[1:1+L]
+    up=set("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    if not all(len(g)==C and set(g)<=up for g in grid): return False
+    fams=lines_1204(grid)
+    for w in lines[1+L:]:
+        if not w or not set(w)<=up or occ_1204(fams,w)!=1: return False
+    return True
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01204/statistics/\n# Accepted submission: 43072165\n# Source: http://cs101.openjudge.cn/practice/solution/43072165/\n# License: not declared on the submission page; no license is inferred.\n\n# -*- coding: utf-8 -*-\n"""\nCreated on Tue Nov 14 11:14:39 2023\n\n@author: Lenovo\n"""\n\ndir=[(-1,0),(-1,1),(0,1),(1,1),(1,0),(1,-1),(0,-1),(-1,-1)]\npos=[[0]*3 for _ in range(1001)]\n\nclass Tree:\n    def __init__(self):\n        self.next=[None]*26\n        self.end=False\n        self.order=0\n\ndef create_trie(p,string,j):\n    i=0\n    while i<len(string):\n        value=ord(string[i])-ord(\'A\')\n        if p.next[value] is None:\n            p.next[value]=Tree()\n        p=p.next[value]\n        i+=1\n    p.end=True\n    p.order=j\n\ndef search(p,i,j,k):\n    di=i\n    dj=j\n    while p and 0<=di<l and 0<=dj<c:\n        value=ord(puzzle[di][dj])-ord(\'A\')\n        if p.next[value]:\n            if p.next[value].end:\n                pos[p.next[value].order][0]=i\n                pos[p.next[value].order][1]=j\n                pos[p.next[value].order][2]=k\n            di+=dir[k][0]\n            dj+=dir[k][1]\n            p=p.next[value]\n        else:\n            break\n\nl,c,w=map(int,input().split())\npuzzle=[]\nfor _ in range(l):\n    puzzle.append(list(input()))\nroot=Tree()\nfor i in range(w):\n    word=input()\n    create_trie(root,word,i)\nfor i in range(l):\n    for j in range(c):\n        for k in range(8):\n            search(root,i,j,k)\nfor i in range(w):\n    print(f\'{pos[i][0]} {pos[i][1]} {chr(pos[i][2]+ord("A"))}\')\n'
 LANGUAGE='Python3'
 NUMBER=1204

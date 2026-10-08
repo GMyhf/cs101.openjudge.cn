@@ -420,6 +420,48 @@ def generate(number, seed):
 REFERENCE="# External reference: http://cs101.openjudge.cn/routine/02795/statistics/\n# Accepted submission: 47766167\n# Source: http://cs101.openjudge.cn/routine/solution/47766167/\n# License: not declared on the submission page; no license is inferred.\n\nk=int(input())\nfor _ in range(k):\n    w=int(input())\n    s=int(input())\n    l=list(map(int,input().split()))\n    lis=[]\n    i=0\n    for _ in range(s):\n        a=l[i]\n        b=l[i+1]\n        c=b/a\n        lis.append((c,a,b))\n        i+=2\n    lis.sort()\n    li=lis[::-1]\n    e=0\n    ans=0\n    for k in li:\n        if e+k[1]<=w:\n            ans+=k[2]\n            e+=k[1]\n        else:\n            d=w-e\n            ans+=k[0]*d\n            break\n    print(f'{ans:.2f}')\n"
 LANGUAGE='Python3'
 NUMBER=2795
+def valid(text):
+    """题面：第1行组数k；每组3行：w (1<=w<=10000)；s (1<=s<=100)；2s个正整数 n1 v1 ... ns vs (1<=ni,vi<=10000)。"""
+    if not text.endswith("\n"): return False
+    lines = text[:-1].split("\n")
+    def num(x):
+        return x.isdigit() and x[0] != "0"
+    if not lines or not num(lines[0]): return False
+    k = int(lines[0])
+    if len(lines) != 1 + 3 * k: return False
+    for g in range(k):
+        w, s_, row = lines[1 + 3 * g: 4 + 3 * g]
+        if not (num(w) and num(s_) and int(w) <= 10000 and int(s_) <= 100): return False
+        t = row.split(" ")
+        if len(t) != 2 * int(s_) or not all(num(x) and int(x) <= 10000 for x in t): return False
+    return True
+def extra_cases():
+    """补充：w、s、ni、vi 取满值域；总重不足 w（全拿）、恰好等于 w、单价相同、只能拿一小部分等分支。"""
+    r = random.Random(2795)
+    def grp(w, metals):
+        return f"{w}\n{len(metals)}\n" + " ".join(f"{a} {b}" for a, b in metals)
+    def fmt(gs):
+        return f"{len(gs)}\n" + "\n".join(gs) + "\n"
+    cases = []
+    cases.append(fmt([grp(1, [(1, 1)]), grp(1, [(10000, 10000)]), grp(10000, [(10000, 10000)]), grp(10000, [(1, 10000)]), grp(1, [(10000, 1)]),
+                      grp(30, [(10, 20), (20, 40), (5, 10)]), grp(35, [(10, 20), (20, 40), (5, 10)]), grp(10000, [(100, 7)] * 100)]))
+    gs = []
+    for _ in range(10):
+        s_ = 100; metals = [(r.randint(1, 10000), r.randint(1, 10000)) for _ in range(s_)]
+        gs.append(grp(r.randint(1, 10000), metals))
+    cases.append(fmt(gs))
+    gs = []
+    for _ in range(10):
+        metals = [(r.randint(1, 100), r.randint(1, 10000)) for _ in range(100)]
+        tot = sum(a for a, _ in metals)
+        gs.append(grp(min(10000, r.choice([tot, tot - 1, tot + 1, r.randint(1, 10000)])), metals))
+    cases.append(fmt(gs))
+    gs = []
+    for _ in range(10):
+        metals = [(r.randint(1, 10000), r.randint(1, 3)) for _ in range(r.randint(1, 100))]
+        gs.append(grp(r.randint(1, 10000), metals))
+    cases.append(fmt(gs))
+    return cases
 SAMPLE='2\n50\n4\n10 100 50 30 7 34 87 100\n10000\n5\n1 43 43 323 35 45 43 54 87 43\n'
 def main():
  with tempfile.TemporaryDirectory() as d:
@@ -428,7 +470,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

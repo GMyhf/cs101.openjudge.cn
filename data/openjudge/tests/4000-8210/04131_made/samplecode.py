@@ -155,7 +155,7 @@ def r4131(a):
  n,m=a[:2];d=[0]*(m+1);i=2
  for _ in range(n):
   w,v=a[i:i+2];i+=2
-  for j in range(m,w-1,-1):d[j]=max(d[j],d[j-w]+v)
+  if w<=m:d[w:]=[x if x>y+v else y+v for x,y in zip(d[w:],d)]
  print(d[m])
 F={4087:r4087,4088:r4088,4090:r4090,4091:r4091,4092:r4092,4104:r4104,4105:r4105,4106:r4106,4108:r4108,4110:r4110,4111:r4111,4112:r4112,4114:r4114,4120:r4120,4122:r4122,4125:r4125,4126:r4126,4127:r4127,4128:r4128,4131:r4131}
 a=sys.stdin.read();F[P](a if P in(4090,4104,4112) else list(map(float,a.split())) if P in(4110,4114,4125) else a.splitlines() if P==4128 else [int(a.split()[0])]+a.split()[1:] if P in(4122,4126) else a.split() if P in(4092,4105,4106,4111) else list(map(int,a.split())))

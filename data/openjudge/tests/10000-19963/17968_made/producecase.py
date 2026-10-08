@@ -19,6 +19,24 @@ def next_prime(x):
     while any(y%d==0 for d in range(2,int(y**0.5)+1)): y+=1
     return y
 
+def valid(text):
+    """题面：第一行两个正整数 N（N<=1000）和 M（>=N 的最小素数）；第二行 N 个整型关键字，空格分隔。
+    题面未限定关键字取值范围与互异性。"""
+    if not text.endswith("\n"): return False
+    lines=text[:-1].split("\n")
+    if len(lines)!=2: return False
+    try:
+        head=lines[0].split()
+        if len(head)!=2 or lines[0]!=" ".join(head): return False
+        n,m=map(int,head)
+        if not (1<=n<=1000) or m!=next_prime(n): return False
+        keys=lines[1].split()
+        if len(keys)!=n or lines[1]!=" ".join(keys): return False
+        for x in keys: int(x)
+    except ValueError:
+        return False
+    return True
+
 def g17968(r):
     n=r.choice([1,2,3,5,10,50,200,999,1000]) if r.random()<0.5 else r.randint(1,1000)
     lo,hi=(-100,100) if n<=10 else (-10**6,10**6)

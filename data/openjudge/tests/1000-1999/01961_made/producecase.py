@@ -161,9 +161,77 @@ def run(x):
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout
+def valid(text):
+    # 题面：多组数据，每组两行：N（2<=N<=1000000）、长为 N 的串 S；以只含一个 0 的行结束
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if not lines or lines[-1]!='0':return False
+    body=lines[:-1]
+    if not body or len(body)%2:return False
+    for i in range(0,len(body),2):
+        a,t=body[i],body[i+1]
+        if not a.isdigit() or a!=str(int(a)):return False
+        n=int(a)
+        if not 2<=n<=1000000 or len(t)!=n:return False
+        if any(c.isspace() or not c.isprintable() for c in t):return False
+    return True
+LOW='abcdefghijklmnopqrstuvwxyz'
+def fmt(strs):
+    return ''.join(f'{len(t)}\n{t}\n' for t in strs)+'0\n'
+def planted(r,maxlen,alpha):
+    # 由短基串重复若干次，再随机截断/改一个字符/拼尾巴，制造有、无循环节的前缀
+    b=''.join(r.choice(alpha) for _ in range(r.randint(1,6)))
+    t=b*r.randint(1,max(1,maxlen//len(b)))
+    m=r.random()
+    if m<.3 and len(t)>2:
+        j=r.randrange(len(t));t=t[:j]+r.choice(alpha)+t[j+1:]
+    elif m<.5:
+        t+=''.join(r.choice(alpha) for _ in range(r.randint(1,4)))
+    elif m<.6:
+        t=t*r.randint(2,3)
+    t=t[:maxlen]
+    if len(t)<2:t=t+b[0]*(2-len(t))
+    return t
+def fib_word(n):
+    a,b='a','ab'
+    while len(b)<n:a,b=b,b+a
+    return b[:n]
+def extra_cases():
+    r=random.Random(19611961)
+    cs=[]
+    cs.append(fmt(['aa','ab','ba','bb']))           # 最小 N=2
+    cs.append(fmt(['aba','abab','abcab','aabaab']))  # 长 border 但不整除
+    # 长度 2..10 的全部 ab 串，暴力可核
+    allab=[]
+    for L in range(2,11):
+        for m in range(1<<L):
+            allab.append(''.join('ab'[(m>>k)&1] for k in range(L)))
+    cs.append(fmt(allab))
+    for k in range(10):
+        cs.append(fmt([planted(r,r.choice((10,40,80)),r.choice(('ab','abc','a'+LOW[k+1]))) for _ in range(r.randint(3,30))]))
+    for k in range(4):
+        cs.append(fmt([planted(r,r.randint(500,5000),'ab') for _ in range(r.randint(3,8))]))
+    cs.append(fmt([''.join(r.choice('ab') for _ in range(r.randint(2,40))) for _ in range(3000)]))  # 多组编号
+    N=1000000
+    cs.append(fmt([''.join(r.choice(LOW) for _ in range(N))]))  # 随机，卡 O(N^2)
+    cs.append(fmt(['a'*100000]))                                 # 每个前缀都有循环节
+    b=''.join(r.choice('ab') for _ in range(9))+'c'
+    cs.append(fmt([(b*(300000//10))]))                           # 周期 10，3e4 行输出（控体积）
+    b=''.join(r.choice('ab') for _ in range(7919))
+    t=(b*(N//7919+1))[:N];cs.append(fmt([t]))                    # 素数周期，长 border 多不整除
+    b=''.join(r.choice('ab') for _ in range(1000));t=b*1000
+    cs.append(fmt([t[:-1]+('a' if t[-1]=='b' else 'b')]))        # 最后一位破坏周期
+    cs.append(fmt([fib_word(N)]))                                # Fibonacci 串，border 链长
+    u='a'
+    while len(u)*3+1<=300000:u=u*3+'b'
+    cs.append(fmt([(u*3)[:300000]]))                                  # 嵌套周期
+    cs.append(fmt(['a'*49999+'b'+'a'*50000]))
+    cs.append(fmt(['ab'*15000+'a'*120000+'b'*150000]))
+    return cs
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
+  assert valid(x),i
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

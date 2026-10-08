@@ -417,6 +417,61 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
+
+def valid(text):
+    # 至多 30 组；每组一行 24 个以空格分隔的 1/2/3，各恰好 8 个；最后一行单独的 0
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if len(lines) < 2 or lines[-1] != '0':
+        return False
+    cases = lines[:-1]
+    if len(cases) > 30:
+        return False
+    for ln in cases:
+        t = ln.split(' ')
+        if len(t) != 24 or any(x not in ('1', '2', '3') for x in t):
+            return False
+        if any(t.count(v) != 8 for v in ('1', '2', '3')):
+            return False
+    return True
+
+def _extra():
+    # 追加的覆盖组：No moves needed、浅层打乱、多组随机局面（控制总量，参考解 Python 单组约 30s 内）
+    r = random.Random(22860)
+    line = {"A": [0,2,6,11,15,20,22], "B": [1,3,8,12,17,21,23],
+            "C": [10,9,8,7,6,5,4], "D": [19,18,17,16,15,14,13],
+            "E": [23,21,17,12,8,3,1], "F": [22,20,15,11,6,2,0],
+            "G": [13,14,15,16,17,18,19], "H": [4,5,6,7,8,9,10]}
+    center = [6,7,8,11,12,15,16,17]
+    def solved(t):
+        st = [t if i in center else 0 for i in range(24)]
+        rem = [v for v in (1,2,3) for _ in range(8 - st.count(v))]; r.shuffle(rem)
+        return [x if x else rem.pop() for x in st]
+    def mv(st, c):
+        idx = line[c]; tmp = [st[i] for i in idx]
+        for j in range(7): st[idx[j-1]] = tmp[j]
+    def rand_state():
+        a = [1]*8 + [2]*8 + [3]*8; r.shuffle(a); return a
+    def fmt(states):
+        return '\n'.join(' '.join(map(str, a)) for a in states) + '\n0\n'
+    cases = []
+    cases.append(fmt([solved(1), solved(2), solved(3)]))
+    one = []
+    for c in 'ABCDEFGH':
+        st = solved(r.randint(1, 3)); mv(st, c); one.append(st)
+    cases.append(fmt(one))
+    shallow = []
+    for _ in range(30):
+        st = solved(r.randint(1, 3))
+        for _ in range(r.randint(0, 5)): mv(st, r.choice('ABCDEFGH'))
+        shallow.append(st)
+    cases.append(fmt(shallow))
+    for _ in range(4):
+        cases.append(fmt([rand_state() for _ in range(5)]))
+    cases.append(fmt([rand_state() for _ in range(12)]))
+    return cases
+
 REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02286/statistics/\n# Accepted submission: 44694931\n# Source: http://cs101.openjudge.cn/practice/solution/44694931/\n# License: not declared on the submission page; no license is inferred.\n\nline = {'A': [0, 2, 6, 11, 15, 20, 22],\n        'B': [1, 3, 8, 12, 17, 21, 23],\n        'C': [10, 9, 8, 7, 6, 5, 4],\n        'D': [19, 18, 17, 16, 15, 14, 13],\n        'E': [23, 21, 17, 12, 8, 3, 1],\n        'F': [22, 20, 15, 11, 6, 2, 0],\n        'G': [13, 14, 15, 16, 17, 18, 19],\n        'H': [4, 5, 6, 7, 8, 9, 10]\n        }\ncenter = [6, 7, 8, 11, 12, 15, 16, 17]\n\ndef check():\n    for i in range(8):\n        if mp[center[i]] != mp[center[0]]:\n            return False\n    return True\n\ndef move(r):\n    tmp = [mp[line[r][i]] for i in range(7)]\n    for j in range(7):\n        mp[line[r][j-1]] = tmp[j]\n\ndef move_back(c):\n    tmp = [mp[line[c][i]] for i in range(7)]\n    for j in range(-1, 6):\n        mp[line[c][j+1]] = tmp[j]\n\ndef diff(t):\n    cnt = 0\n    for i in range(8):\n        if mp[center[i]] != t:\n            cnt += 1\n    return cnt\n\ndef h():\n    return min(diff(1), diff(2), diff(3))\n\ndef dfs(dep, max_d):\n    if check():\n        print(''.join(ans))\n        return True\n    if dep+h() > max_d:\n        return False\n    for letter in 'ABCDEFGH':\n        ans.append(letter)\n        move(letter)\n        if dfs(dep+1, max_d):\n            return True\n        ans.pop()\n        move_back(letter)\n    return False\n\nwhile True:\n    mp = list(map(int, input().split()))\n    if mp == [0]:\n        break\n    ans = []\n    if check():\n        print('No moves needed')\n    else:\n        limit = 1\n        while True:\n            if dfs(0, limit):\n                break\n            limit += 1\n    print(mp[6])\n"
 LANGUAGE='Python3'
 NUMBER=2286
@@ -428,7 +483,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]+_extra()
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

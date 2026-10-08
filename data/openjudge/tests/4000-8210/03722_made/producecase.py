@@ -11,12 +11,19 @@
 封顶 500000 以免自己超时。
 """
 import random
+import re
 from pathlib import Path
 
 SAMPLE_IN = '35 10\n'
 SAMPLE_OUT = '5\n'
 NLIMIT = 1000000
 MLIMIT = 500000
+
+
+def valid(text):
+    """题面：两个正整数 N、M，N 不超过 1000000（M 无上界，只要求正整数）。"""
+    m = re.fullmatch(r"([1-9]\d*) ([1-9]\d*)\n", text)
+    return bool(m) and int(m.group(1)) <= NLIMIT
 
 
 def solve_text(text):
@@ -66,13 +73,19 @@ def build_cases():
         if content not in cases:
             cases.append(content)
     # 边界：N 取上界、N=1（只有因子 1）
-    for extra in (f"{NLIMIT} 4\n", "1 2\n", "1 3\n"):
+    # 2026-10 审计补充：M=1（M-a 无正整数可取）、M=N+1（a=1）、M=2N（答案是 N 本身，
+    # 只在 a<=sqrt(N) 里找或只找到 M/2 之前就停的写法会错）、M=2N+1（必为 -1，
+    # 逐个枚举 a 到 M 的写法要跑约 2e6 次）、大质数 N。
+    for extra in (f"{NLIMIT} 4\n", "1 2\n", "1 3\n",
+                  "1 1\n", "35 1\n", f"{NLIMIT} {NLIMIT + 1}\n", f"{NLIMIT} {2 * NLIMIT}\n",
+                  f"{NLIMIT} {2 * NLIMIT + 1}\n", "999983 999984\n", "999983 1999966\n",
+                  "999983 3\n", "720720 1441440\n", "720720 1000\n"):
         if extra not in cases:
             cases.append(extra)
     for c in cases:
         n, m = map(int, c.split())
-        assert 1 <= n <= NLIMIT, "题面 N 不超过 1000000"
-        assert 2 <= m <= MLIMIT
+        assert valid(c), "题面：N、M 为正整数，N 不超过 1000000"
+        assert 1 <= m <= 2 * NLIMIT + 1
     answers = [solve_text(c).strip() for c in cases]
     assert sum(a == "-1" for a in answers) >= 5, "无解分支至少 5 组"
     assert sum(a != "-1" for a in answers) >= 8, "有解分支至少 8 组"

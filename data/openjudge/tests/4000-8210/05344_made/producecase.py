@@ -1,4 +1,4 @@
-"""5344 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+"""5344 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 30 组数据（第 20 组起为边界组）。
 
 出处：build_001b
 生成器与循环取自 scripts/build_001b.py（批次 001b），保持同一形状；
@@ -17,8 +17,25 @@ REFERENCE_SOURCE = "class Node:\n    def __init__(self, number):\n        self.n
 def g5344(r):
     n = r.randint(3, 1000); return f"{n} {r.randint(2, n - 1)}\n"
 
+# 边界组：最小规模 n=3、k 取下界 2 与上界 n-1、满规模 n=1000
+EDGE_CASES = ["3 2\n", "4 3\n", "1000 2\n", "1000 999\n", "1000 500\n", "1000 3\n",
+              "999 998\n", "1000 997\n", "5 4\n", "1000 31\n"]
+
+
+def valid(text):
+    """题面：一行 n k；n 不大于 1000，k 大于等于 2、小于 n。"""
+    lines = text.split("\n")
+    if len(lines) != 2 or lines[1] != "":
+        return False
+    parts = lines[0].split(" ")
+    if len(parts) != 2 or not all(x.isdigit() for x in parts):
+        return False
+    n, k = map(int, parts)
+    return 2 <= k < n <= 1000
+
+
 def build_cases():
-    return [SAMPLE_IN] + [g5344(random.Random(NUMBER + i)) for i in range(1, 20)]
+    return [SAMPLE_IN] + [g5344(random.Random(NUMBER + i)) for i in range(1, 20)] + EDGE_CASES
 
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
@@ -33,6 +50,8 @@ def main():
     cases = build_cases()
     assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
     assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
+    assert all(valid(c) for c in cases), "有数据越出题面约束"
+    assert len(set(cases)) == len(cases), "有重复组"
     root = Path(__file__).parent / "data"
     root.mkdir(exist_ok=True)
     for index, content in enumerate(cases):

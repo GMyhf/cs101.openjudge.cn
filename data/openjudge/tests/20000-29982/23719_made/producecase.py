@@ -3,6 +3,18 @@ from pathlib import Path
 REFERENCE="# External reference: statistics page /practice/23719/\n# Accepted submission: 52527361\n# Source: http://cs101.openjudge.cn/practice/solution/52527361/\n# License: not declared on the submission page; no license is inferred.\n\na,b=map(float,input().split())\nprint(f'{a*b/666.667:.4f}')"
 SAMPLE='126.35 300.72\n'
 GENERATOR_NAME='g23719'
+
+def valid(text):
+    """题面：一行，两个双精度浮点正数 h、w。"""
+    import math
+    lines=text.split('\n')
+    if lines and lines[-1]=='': lines.pop()
+    if len(lines)!=1: return False
+    t=lines[0].split()
+    if len(t)!=2: return False
+    try: v=[float(x) for x in t]
+    except ValueError: return False
+    return all(math.isfinite(x) and x>0 for x in v)
 def g23719(r): return f"{r.uniform(.1,1000):.5f} {r.uniform(.1,1000):.5f}\n"
 
 def run(text):

@@ -58,7 +58,7 @@ def generate(number, seed):
         rows=[f"{r.randint(1,10000)} {r.random()*20:.3f} {r.random()/10000:.7f}" for _ in range(r.randint(1,6))];return "\n".join(rows)+"\n-1 -1 -1\n"
     if number==1922:
         n=r.randint(1,15);rows=[(r.randint(1,40),r.randint(-200,500)) for _ in range(n)];rows[0]=(rows[0][0],r.randint(0,500));return f"{n}\n"+"\n".join(f"{a} {b}" for a,b in rows)+"\n0\n"
-    if number==1936:return "\n".join(f"{word()} {word(5,18)}" for _ in range(r.randint(1,8)))+"\n"
+    if number==1936:return gen1936(r,seed)
     if number==2538:
         chars="1234567890-=WERTYUIOP[]\\SDFGHJKL;'XCVBNM,./ ";return "\n".join("".join(r.choice(chars) for _ in range(r.randint(1,60))) for _ in range(r.randint(1,6)))+"\n"
     if number==2982:
@@ -146,6 +146,67 @@ def generate(number, seed):
     if number==1836:
         n=r.randint(2,50);return f"{n}\n"+" ".join(f"{r.uniform(.5,2.5):.5f}" for _ in range(n))+"\n"
     raise KeyError(number)
+
+import re as _re1936
+_ALNUM=_re1936.compile(r"[A-Za-z0-9]{1,100000} [A-Za-z0-9]{1,100000}")
+def valid(text):
+    """题面约束：多个测试样例，每个占一行：两个由字母数字 ASCII 字符组成的非空字符串 s、t，
+    以空格分隔，长度均不超过 100000。"""
+    if not text.endswith("\n") or text=="\n":return False
+    return all(_ALNUM.fullmatch(ln) for ln in text[:-1].split("\n"))
+
+_AL="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+def _is_sub1936(s,t):
+    it=iter(t);return all(c in it for c in s)
+
+def gen1936(r,seed):
+    def rs(n,alpha=_AL):return "".join(r.choice(alpha) for _ in range(n))
+    def yes(ls,lt,alpha=_AL):
+        # 先造 s，再往 s 里插随机字符得到 t
+        s=rs(ls,alpha);pos=sorted(r.sample(range(lt),ls));t=[None]*lt
+        for k,i in enumerate(pos):t[i]=s[k]
+        return s,"".join(c if c is not None else r.choice(alpha) for c in t)
+    def no(ls,lt,alpha=_AL):
+        if ls>lt:return rs(ls,alpha),rs(lt,alpha)      # s 比 t 长
+        for _ in range(3):
+            u=r.random()
+            if u<.5:
+                s,t=yes(ls,lt,alpha);i=r.randrange(ls);s=s[:i]+r.choice(alpha)+s[i+1:]
+            else:s,t=rs(ls,alpha),rs(lt,alpha)
+            if not _is_sub1936(s,t):return s,t
+        # 构造：s 去掉末字符后是 t 的子列，且贪心匹配结束后 t 的剩余部分不含 s 的末字符
+        x=r.choice(alpha);others=[c for c in alpha if c!=x]
+        if ls==1:return x,"".join(r.choice(others) for _ in range(lt))
+        s0,t=yes(ls-1,lt,alpha);j=0
+        for k,c in enumerate(t):
+            if c==s0[j]:
+                j+=1
+                if j==ls-1:break
+        t=t[:k+1]+"".join(c if c!=x else r.choice(others) for c in t[k+1:])
+        return s0+x,t
+    rows=[]
+    if seed==1:
+        rows=[("a","a"),("a","b"),("A","a"),("ab","ba"),("abc","abc"),("abcd","abc"),("1","0123456789"),("z9","9z"),
+              ("x"*5,"x"*4),("x"*4,"x"*5),("aZ0","a1Z2Z0")]
+    elif seed<=14:
+        for _ in range(r.randint(5,40)):
+            lt=r.randint(1,30);ls=r.randint(1,lt+2);alpha=r.choice([_AL,"ab","abc",_AL[:26]])
+            f=yes if ls<=lt and r.random()<.5 else no
+            rows.append(f(ls,lt,alpha))
+    elif seed<=26:
+        for _ in range(r.randint(20,60)):
+            lt=r.randint(100,5000);ls=r.randint(1,lt);alpha=r.choice([_AL,"ab","abc","01"])
+            rows.append((yes if r.random()<.5 else no)(ls,lt,alpha))
+    else:
+        k=r.randint(2,3)
+        for j in range(k):
+            lt=100000 if r.random()<.7 else r.randint(90000,100000)
+            ls=r.choice([lt,r.randint(lt//2,lt),r.randint(1000,lt),99999 if lt==100000 else lt-1])
+            if seed==39 and j==0:ls=lt=100000
+            alpha=r.choice([_AL,"ab","abc"])
+            rows.append((yes if (seed+j)%2 else no)(ls,lt,alpha))
+        if seed==38:rows.append(("a"*100000,"a"*99999))
+    return "\n".join(f"{a} {b}" for a,b in rows)+"\n"
 
 NO_INPUT={3225, 2698}
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01936/statistics/\n# Accepted submission: 51847642\n# Source: http://cs101.openjudge.cn/practice/solution/51847642/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\nfrom collections import defaultdict, deque, Counter\nfrom itertools import accumulate, permutations, combinations\nfrom heapq import heappush, heappop, heapify\nfrom bisect import bisect_left, bisect_right\nfrom functools import lru_cache\n\nsys.setrecursionlimit(2000000)\n\ninput = sys.stdin.readline\n\nwhile True:\n    line = input()\n    if not line:\n        break\n    s, t = line.split()\n    i = 0\n    for _ in t:\n        if s[i] == _:\n            i += 1\n        if i == len(s):\n            break\n    print("Yes" if i == len(s) else "No")\n'

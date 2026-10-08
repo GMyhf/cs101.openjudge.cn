@@ -417,7 +417,94 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02528/statistics/\n# Accepted submission: 45986421\n# Source: http://cs101.openjudge.cn/practice/solution/45986421/\n# License: not declared on the submission page; no license is inferred.\n\nfor _ in range(int(input())):\n    c=int(input());a=[list(map(int,input().split()))for i in range(c)];b=[[-1,-1],[1<<30,1<<30]]\n    while a:\n        a[-1][1]+=1\n        for i in range(len(b)):\n            if b[i][1]>=a[-1][0]:\n                if b[i][0]<=a[-1][0]and b[i][1]>=a[-1][1]:c-=1;a.pop();break\n                if b[i][0]>a[-1][1]:b.insert(i,a.pop());break\n                b[i][0]=min(b[i][0],a[-1][0])\n                while b[i+1][1]<a[-1][1]:b.pop(i+1)\n                b[i][1]=max(a[-1][1],b[i][1])if a[-1][1]<b[i+1][0]else b.pop(i+1)[1];a.pop();break\n    print(c)\n'
+import re
+
+def valid(text):
+    """题面：首行 c（数据组数）；每组首行 n（1 <= n <= 10000），其后 n 行每行 l r（1 <= l <= r <= 10000000）。"""
+    lines = text.split("\n")
+    if lines and lines[-1] == "":
+        lines.pop()
+    num = re.compile(r"[1-9][0-9]*")
+    if not lines or not num.fullmatch(lines[0]):
+        return False
+    c = int(lines[0]); pos = 1
+    for _ in range(c):
+        if pos >= len(lines) or not num.fullmatch(lines[pos]):
+            return False
+        n = int(lines[pos]); pos += 1
+        if not 1 <= n <= 10000 or pos + n > len(lines):
+            return False
+        for ln in lines[pos:pos + n]:
+            m = re.fullmatch(r"([1-9][0-9]*) ([1-9][0-9]*)", ln)
+            if not m:
+                return False
+            l, rr = int(m.group(1)), int(m.group(2))
+            if not 1 <= l <= rr <= 10000000:
+                return False
+        pos += n
+    return pos == len(lines)
+
+
+W2528 = 10000000
+
+def g2528(seed, kind):
+    r = random.Random(2528_000 + seed)
+    cases = []
+    def rnd(n, W, maxlen):
+        rows = []
+        for _ in range(n):
+            ln = r.randint(1, min(maxlen, W))
+            a = r.randint(1, W - ln + 1)
+            rows.append((a, a + ln - 1))
+        return rows
+    if kind == "gap":
+        # 离散化不留空隙会把中间露出的一段吞掉：[1,10] 上再贴 [1,4]、[6,10]，答案 3
+        cases.append([(1, 10), (1, 4), (6, 10)])
+        cases.append([(1, 1)])
+        cases.append([(W2528, W2528), (1, W2528)])
+        cases.append([(1, W2528), (1, 1), (W2528, W2528)])
+        cases.append([(3, 5), (3, 5), (3, 5)])
+        cases.append([(1, 3), (5, 6), (1, 2), (3, 4), (5, 5), (2, 6)])
+        for _ in range(r.randint(10, 30)):
+            cases.append(rnd(r.randint(1, 30), 40, 12))
+    elif kind == "smallrand":
+        for _ in range(r.randint(1, 10)):
+            cases.append(rnd(r.randint(1, 300), r.choice([50, 1000, 100000]), r.choice([5, 50, 500])))
+    elif kind == "bigrand":
+        cases.append(rnd(10000, W2528, r.choice([1000, 100000, 3000000, W2528])))
+    elif kind == "nested":
+        # 一层套一层、越贴越窄：全部可见，答案 n
+        n = 10000
+        rows = []
+        for i in range(n):
+            rows.append((1 + i * 500, W2528 - i * 500))
+        cases.append(rows)
+    elif kind == "covered":
+        # 最后一张盖住全部：答案 1
+        rows = rnd(9999, W2528, 50000)
+        rows.append((1, W2528))
+        cases.append(rows)
+    elif kind == "disjoint":
+        # 互不相交的短海报，乱序：答案 n
+        n = 10000
+        starts = r.sample(range(0, W2528 // 1000), n)
+        rows = [(s * 1000 + 1, s * 1000 + r.randint(1, 999)) for s in starts]
+        cases.append(rows)
+    elif kind == "multi":
+        for _ in range(r.randint(3, 5)):
+            cases.append(rnd(10000, W2528, r.choice([100, 10000, 1000000])))
+    out = [str(len(cases))]
+    for rows in cases:
+        out.append(str(len(rows)))
+        out += [f"{a} {b}" for a, b in rows]
+    return "\n".join(out) + "\n"
+
+
+PLAN2528 = ["gap"] * 3 + ["smallrand"] * 6 + ["bigrand"] * 5 + ["nested", "covered", "disjoint"] + ["multi"] * 3
+
+# 原参考解（提交 45986421，与 samplecode.py 相同）是 O(n*区间数) 的有序区间表，最慢组接近 Python 时限一半，换成下面的并查集解；
+# samplecode.py 仍用于逐组交叉核对。
+REFERENCE='# 参考解：倒序处理海报，在离散化后的半开基本段上用并查集跳过已覆盖段，O(n log n)。\nimport sys\ndef main():\n    data = sys.stdin.buffer.read().split()\n    pos = 0\n    c = int(data[pos]); pos += 1\n    out = []\n    for _ in range(c):\n        n = int(data[pos]); pos += 1\n        ls = data[pos:pos + 2 * n:2]; rs = data[pos + 1:pos + 2 * n:2]; pos += 2 * n\n        L = [int(x) for x in ls]; R = [int(x) + 1 for x in rs]  # 半开区间 [l, r+1)\n        pts = sorted(set(L) | set(R))\n        idx = {v: i for i, v in enumerate(pts)}\n        m = len(pts)\n        nxt = list(range(m))  # nxt[i]: >= i 的第一个未覆盖基本段（m-1 为哨兵）\n        def find(x):\n            root = x\n            while nxt[root] != root:\n                root = nxt[root]\n            while nxt[x] != root:\n                nxt[x], x = root, nxt[x]\n            return root\n        cnt = 0\n        for k in range(n - 1, -1, -1):\n            a, b = idx[L[k]], idx[R[k]]\n            x = find(a)\n            if x < b:\n                cnt += 1\n                while x < b:\n                    nxt[x] = x + 1\n                    x = find(x + 1)\n        out.append(str(cnt))\n    print("\\n".join(out))\nmain()\n'
 LANGUAGE='Python3'
 NUMBER=2528
 SAMPLE='1\n5\n1 4\n2 6\n8 10\n3 4\n7 10\n'
@@ -428,7 +515,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 20)]+[g2528(s,k) for s,k in enumerate(PLAN2528, start=1)]
+  assert all(valid(x) for x in cases)
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

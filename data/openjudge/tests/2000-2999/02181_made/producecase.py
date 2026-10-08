@@ -152,6 +152,56 @@ def generate(number, seed):
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2181: Jumping Cows\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02181/\n# License: not declared; no license is inferred.\nimport sys\n# 2300010763\t胡睿诚\t数学科学学院\nP = int(input())\npotions = []\nfor i in range(P):\n    potions.append((int(input())))\nresult = 0\nsign = 1\nfor i in range(P-1):\n    if (potions[i + 1] - potions[i]) * sign < 0:\n        result += sign * potions[i]\n        sign = -sign\nif sign == 1:\n    result += potions[P-1]\nprint(result)\n'
 NUMBER=2181
 SAMPLE='8\n7\n2\n1\n8\n4\n3\n5\n6\n'
+def valid(text):
+    """题面契约：第 1 行 P（1 <= P <= 150000），随后 P 行各一个整数 strength（1 <= strength <= 500）。"""
+    if not text.endswith('\n') or '\r' in text:
+        return False
+    lines = text[:-1].split('\n')
+    if not lines[0].isdigit() or lines[0][0] == '0':
+        return False
+    p = int(lines[0])
+    if not (1 <= p <= 150000) or len(lines) != p + 1:
+        return False
+    for t in lines[1:]:
+        if not t.isdigit() or t[0] == '0' or not (1 <= int(t) <= 500):
+            return False
+    return True
+
+
+def gen2181(seed):
+    r = random.Random(2181_000 + seed)
+    MAXP = 150000
+    if seed == 1:   a = [r.randint(1, 500)]                       # P=1
+    elif seed == 2: a = [1]
+    elif seed == 3: a = [500]
+    elif seed == 4: a = [3, 3]
+    elif seed == 5: a = [1, 500]
+    elif seed == 6: a = [500, 1]
+    elif seed == 7: a = [7] * MAXP                                # 全相等
+    elif seed == 8: a = sorted(r.randint(1, 500) for _ in range(MAXP))            # 单调不降：答案是最大值
+    elif seed == 9: a = sorted((r.randint(1, 500) for _ in range(MAXP)), reverse=True)  # 单调不增：答案是首项
+    elif seed == 10: a = [500 if i % 2 == 0 else 1 for i in range(MAXP)]           # 满幅锯齿，答案最大
+    elif seed == 11: a = [1 if i % 2 == 0 else 500 for i in range(MAXP)]
+    elif seed == 12: a = [r.choice([1, 500]) for _ in range(MAXP)]
+    elif seed == 13:                                             # 长平台 + 锯齿
+        a = []
+        while len(a) < MAXP:
+            a += [r.randint(1, 500)] * r.randint(1, 50)
+        a = a[:MAXP]
+    elif seed == 14: a = [r.randint(1, 500) for _ in range(MAXP)]
+    elif seed == 15: a = [r.randint(1, 500) for _ in range(MAXP - 1)]
+    elif seed == 16: a = [r.randint(490, 500) for _ in range(MAXP)]
+    elif seed <= 22:                                             # 小规模随机，值域小（多平台）
+        a = [r.randint(1, r.choice([2, 3, 5, 500])) for _ in range(r.randint(1, 12))]
+    elif seed <= 30:                                             # 中等规模
+        a = [r.randint(1, 500) for _ in range(r.randint(100, 5000))]
+    else:                                                        # 大规模随机，不同波动形态
+        n = r.randint(50000, MAXP); a = []; v = r.randint(1, 500)
+        step = r.choice([1, 5, 50, 500])
+        for _ in range(n):
+            v = min(500, max(1, v + r.randint(-step, step))); a.append(v)
+    return f"{len(a)}\n" + "".join(f"{x}\n" for x in a)
+
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
@@ -160,6 +210,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[gen2181(s) for s in range(1, 40)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

@@ -152,6 +152,14 @@ def generate(number, seed):
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2911: 受限完全平方数\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02911/\n# License: not declared; no license is inferred.\nimport sys\n# 生成所有四位数的完全平方数\nperfect_squares = []\nfor i in range(32, 100):  # 32^2 = 1024 是最小的四位数完全平方数，99^2 = 9801 是最大的四位数完全平方数\n    perfect_squares.append(i ** 2)\n\n# 生成所有每一位数字都相同的四位数\nsame_digit_numbers = []\nfor digit in range(1, 10):\n    same_digit_numbers.append(int(str(digit) * 4))\n\n# 读取输入的 MAX\nMAX = int(input())\n\n# 遍历所有可能的 A 和 B\nfor A in perfect_squares:\n    if A >= MAX:\n        continue\n    for B in perfect_squares:\n        if A > B:\n            C = A - B\n            if C in same_digit_numbers:\n                print(A)\n'
 NUMBER=2911
 SAMPLE='7000\n'
+def valid(text):
+    """题面：输入一个 MAX，四位数。"""
+    if not text.endswith('\n') or text.count('\n')!=1: return False
+    t=text[:-1]
+    if len(t)!=4 or not t.isdigit() or t[0]=='0': return False
+    return 1000<=int(t)<=9999
+# 补充边界：A<MAX 是严格小于，卡 A<=MAX；最小/最大四位数；恰在两个答案之间
+EXTRA=[f"{m}\n" for m in (3136,3137,4489,4490,1000,9999,4000)]
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
@@ -160,6 +168,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+EXTRA):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

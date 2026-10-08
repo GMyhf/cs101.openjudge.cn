@@ -153,6 +153,51 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
+
+def valid(text):
+    # 多组；每组首行 n（1<=n<500000），随后 n 行各一个整数 0<=a[i]<=999999999，组内互不相同；以单独一行 0 结束
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    i = 0; cases = 0
+    while True:
+        if i >= len(lines) or not lines[i].isdigit() or str(int(lines[i])) != lines[i]:
+            return False
+        n = int(lines[i]); i += 1
+        if n == 0:
+            break
+        if n >= 500000 or i + n > len(lines):
+            return False
+        seen = set()
+        for ln in lines[i:i+n]:
+            if not ln.isdigit() or str(int(ln)) != ln:
+                return False
+            v = int(ln)
+            if v > 999999999 or v in seen:
+                return False
+            seen.add(v)
+        i += n; cases += 1
+    return i == len(lines) and cases >= 1
+
+def _extra():
+    # 追加的覆盖组：n=1、已排序/逆序、大规模随机（逆序对超 32 位）、大量小组
+    r = random.Random(22990)
+    def case(a):
+        return f"{len(a)}\n" + '\n'.join(map(str, a)) + "\n"
+    out = []
+    out.append(case([0]) + case([999999999]) + case([5, 3]) + case([3, 5]) + "0\n")
+    n = 140000
+    out.append(case(list(range(n - 1, -1, -1))) + "0\n")
+    out.append(case(list(range(n))) + "0\n")
+    out.append(case(r.sample(range(1000000000), 90000)) + "0\n")
+    a = sorted(r.sample(range(1000000000), 90000), reverse=True)
+    for _ in range(2000):
+        i = r.randrange(len(a) - 1); a[i], a[i+1] = a[i+1], a[i]
+    out.append(case(a) + "0\n")
+    out.append(''.join(case(r.sample(range(r.choice((10, 1000, 1000000000))), r.randint(1, 8))) for _ in range(300)) + "0\n")
+    out.append(''.join(case(r.sample(range(1000000000), 1000)) for _ in range(80)) + "0\n")
+    return out
+
 REFERENCE='# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 2299: Ultra-QuickSort\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024sp_routine/02299/\n# License: not declared in source collection; no license is inferred.\nimport sys\n"""\n问题：分析特定排序算法，通过交换两个相邻的序列元素来处理n个不同的整数序列，直到序列按升序排序。\n任务是确定需要执行多少次交换操作才能对给定的输入序列进行排序。\n\n可以通过使用归并排序的修改版本来解决，计算在每次合并步骤中需要的交换次数。\n在归并排序中，将数组分成两半，对每一半进行排序，然后将它们合并在一起。\n\n在合并步骤中，计算需要交换的次数，因为每当从右半部分取出一个元素时，\n需要交换与左半部分中剩余元素相同数量的次数。\n"""\ndef merge_sort(lst):\n    # The list is already sorted if it contains a single element.\n    if len(lst) <= 1:\n        return lst, 0\n\n    # Divide the input into two halves.\n    middle = len(lst) // 2\n    left, inv_left = merge_sort(lst[:middle])\n    right, inv_right = merge_sort(lst[middle:])\n\n    merged, inv_merge = merge(left, right)\n\n    # The total number of inversions is the sum of inversions in the recursion and the merge process.\n    return merged, inv_left + inv_right + inv_merge\n\ndef merge(left, right):\n    merged = []\n    inv_count = 0\n    i = j = 0\n\n    # Merge smaller elements first.\n    while i < len(left) and j < len(right):\n        if left[i] <= right[j]:\n            merged.append(left[i])\n            i += 1\n        else:\n            merged.append(right[j])\n            j += 1\n            inv_count += len(left) - i #left[i~mid)都比right[j]要大，他们都会与right[j]构成逆序对，将他们加入答案\n\n    # If there are remaining elements in the left or right half, append them to the result.\n    merged += left[i:]\n    merged += right[j:]\n\n    return merged, inv_count\n\nwhile True:\n    n = int(input())\n    if n == 0:\n        break\n\n    lst = []\n    for _ in range(n):\n        lst.append(int(input()))\n\n    _, inversions = merge_sort(lst)\n    print(inversions)\n'
 NUMBER=2299
 SAMPLE='5\n9\n1\n0\n5\n4\n3\n1\n2\n3\n0\n'
@@ -164,6 +209,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+_extra()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

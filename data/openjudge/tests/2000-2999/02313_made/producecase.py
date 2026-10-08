@@ -148,6 +148,40 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
+
+def valid(text):
+    # 首行 N（1<=N<=100），随后 N 行各一个整数 A(i)，-10000<=A(i)<=10000
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    def isint(x):
+        y = x[1:] if x.startswith('-') else x
+        return y.isdigit() and str(int(x)) == x
+    if not lines or not isint(lines[0]):
+        return False
+    n = int(lines[0])
+    if not (1 <= n <= 100) or len(lines) != n + 1:
+        return False
+    return all(isint(x) and -10000 <= int(x) <= 10000 for x in lines[1:])
+
+def _extra():
+    # 追加的覆盖组：N=1、N=2、全相等、N=100 极值交替、单调、小值域大量并列、随机满规模
+    r = random.Random(23130)
+    def case(a):
+        return f"{len(a)}\n" + '\n'.join(map(str, a)) + "\n"
+    out = [case([-10000]), case([10000, -10000]), case([7] * 100),
+           case([10000 if i % 2 else -10000 for i in range(100)]),
+           case([-10000 + 200 * i for i in range(100)]),
+           case([10000 - 200 * i for i in range(100)]),
+           case([r.randint(-2, 2) for _ in range(100)]),
+           case([r.choice((-10000, 0, 10000)) for _ in range(100)])]
+    for _ in range(4):
+        out.append(case([r.randint(-10000, 10000) for _ in range(100)]))
+    # 山峰/山谷形
+    out.append(case([abs(i - 50) * 400 - 10000 for i in range(100)]))
+    out.append(case([r.randint(-10000, 10000) for _ in range(r.randint(2, 5))]))
+    return out
+
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02313/statistics/\n# Accepted submission: 43897847\n# Source: http://cs101.openjudge.cn/practice/solution/43897847/\n# License: not declared on the submission page; no license is inferred.\n\nn=int(input())\na=[int(input()) for _ in range(n)]\nb=[0]*n\nb[0]=a[0];b[-1]=a[-1]\nfor i in range(1,n-1):\n    inf = max(a[i],b[i-1])\n    sup=min(a[i],b[i-1])\n    if a[i+1]>inf:b[i]=inf\n    elif a[i+1]<sup:b[i]=sup\n    else:b[i]=a[i+1]\nans=0\nfor i in range(n-1):\n    ans+=abs(a[i]-b[i])+abs(b[i+1]-b[i])\nprint(ans)\n'
 LANGUAGE='Python3'
 NUMBER=2313
@@ -159,7 +193,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)]+_extra())
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

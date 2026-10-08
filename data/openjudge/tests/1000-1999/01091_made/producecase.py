@@ -152,6 +152,25 @@ REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.op
 LANGUAGE='Python3'
 NUMBER=1091
 SAMPLE='2 4\n'
+def valid(text):
+    """题面契约：一行两个整数 N M，N <= 15，M <= 100000000；卡片数为 M^N，取 N >= 1、M >= 1。"""
+    lines = text.split('\n')
+    if lines and lines[-1] == '':
+        lines.pop()
+    if len(lines) != 1:
+        return False
+    toks = lines[0].split(' ')
+    if len(toks) != 2 or not all(x.isdigit() for x in toks):
+        return False
+    n, m = map(int, toks)
+    return 1 <= n <= 15 and 1 <= m <= 100000000
+
+def extra_cases():
+    """补充覆盖：M=1、N=1、M 为质数/大质数/质数幂、M 含 8 个不同质因子、M=1e8 上限、N=15 上限、可暴力核对的小规模。"""
+    pairs = [(1, 1), (15, 1), (1, 2), (15, 2), (1, 100000000), (15, 100000000), (15, 99999989),
+             (2, 99999989), (15, 9699690), (15, 96996900), (7, 2 ** 26), (15, 3 ** 16), (3, 6), (4, 12),
+             (5, 30), (2, 1), (3, 97), (14, 11741730), (6, 60), (2, 100000000)]
+    return [f"{a} {b}\n" for a, b in pairs]
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -159,7 +178,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])+extra_cases()
+  assert all(valid(x) for x in cases)
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

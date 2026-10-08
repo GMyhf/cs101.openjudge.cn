@@ -150,6 +150,9 @@ def generate(number, seed):
     raise KeyError(number)
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 3247: 回文素数\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/03247/\n# License: not declared; no license is inferred.\nimport sys\nimport math\n\ndef is_prime(num):\n    if num < 2:\n        return False\n    if num in {2, 3, 5, 7}:\n        return True\n    if num % 2 == 0 or num % 5 == 0:\n        return False\n    for i in range(3, int(math.sqrt(num)) + 1, 2):\n        if num % i == 0:\n            return False\n    return True\n\ndef generate_palindromes(n):\n    palindromes = []\n    if n == 1:\n        return [2, 3, 5, 7]  # 1位数的素数回文数\n\n    half_len = (n + 1) // 2  # 只需要构造前半部分\n    start, end = 10**(half_len - 1), 10**half_len\n\n    for first_half in range(start, end):\n        first_half_str = str(first_half)\n        if n % 2 == 0:  # 偶数位\n            palindrome = int(first_half_str + first_half_str[::-1])\n        else:  # 奇数位\n            #palindrome = int(first_half_str + first_half_str[-2::-1])\n            palindrome = int(first_half_str + first_half_str[:-1][::-1])\n\n        if is_prime(palindrome):\n            palindromes.append(palindrome)\n\n    return palindromes\n\ndef find_palindromic_primes(n):\n    primes = generate_palindromes(n)\n    print(len(primes))\n    print(" ".join(map(str, primes)))\n\n# 输入\nn = int(input().strip())\nfind_palindromic_primes(n)\n'
+def valid(text):
+    """题面：输入位数 n，其中 1<=n<=9。"""
+    return text in {f"{n}\n" for n in range(1, 10)}
 NUMBER=3247
 SAMPLE='1\n'
 def run(x):

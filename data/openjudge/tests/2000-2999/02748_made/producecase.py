@@ -1,5 +1,13 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def valid(text):
+    """题面：一行，由不同小写字母组成、长度 1~6，且字母已按从小到大排列。"""
+    import re
+    if not re.fullmatch(r'[a-z]{1,6}\n', text):
+        return False
+    s = text[:-1]
+    return all(s[i] < s[i + 1] for i in range(len(s) - 1))
+
 def generate(n, seed):
     r=random.Random(seed)
     if n==2694:
@@ -130,7 +138,12 @@ def generate(n, seed):
     if n==3254:return '\n'.join(f'{r.randint(2,100)} {r.randint(1,100)} {r.randint(1,100)}' for _ in range(r.randint(1,5)))+'\n0 0 0\n'
     if n==2502:
         hx,hy,sx,sy=[r.randint(0,10000) for _ in range(4)];return f'{hx} {hy} {sx} {sy}\n{r.randint(0,10000)} {r.randint(0,10000)} {r.randint(0,10000)} {r.randint(0,10000)} -1 -1\n'
-    if n==2748:return ''.join(r.sample('abcdefghi',r.randint(1,5)))+'\n'
+    if n==2748:
+        # 题面保证：字母互异、已按从小到大排列、长度 1~6
+        fixed={1:'a',2:'z',3:'abcdef',4:'uvwxyz',5:'az',6:'ayz'}
+        if seed in fixed:return fixed[seed]+'\n'
+        L=6 if seed%3==0 else r.randint(1,6) if seed%3==1 else r.randint(4,6)
+        return ''.join(sorted(r.sample('abcdefghijklmnopqrstuvwxyz',L)))+'\n'
     if n==1191:return f'{r.randint(2,10)}\n'+'\n'.join(' '.join(str(r.randint(0,99)) for _ in range(8)) for _ in range(8))+'\n'
     if n==2287:
         N=r.randint(1,30);return f'{N}\n'+' '.join(str(r.randint(1,100)) for _ in range(N))+'\n'+' '.join(str(r.randint(1,100)) for _ in range(N))+'\n0\n'

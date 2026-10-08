@@ -10,8 +10,7 @@ def generate(number, seed):
         a=[r.randint(-10000,10000) for _ in range(r.randint(1,40))];return f"{len(a)}\n"+"\n".join(map(str,a))+"\n"
     if number==2755:
         a=[r.randint(1,40) for _ in range(r.randint(1,18))];return f"{len(a)}\n"+"\n".join(map(str,a))+"\n"
-    if number==1837:
-        c=r.randint(2,8);g=r.randint(2,8);p=sorted(r.sample(range(-15,16),c));w=sorted(r.sample(range(1,26),g));return f"{c} {g}\n"+" ".join(map(str,p))+"\n"+" ".join(map(str,w))+"\n"
+    if number==1837:return gen1837(r,seed)
     if number==2373:
         L=2*r.randint(8,35);a=r.randint(1,max(1,L//6));b=r.randint(a,min(L//2,a+8));rows=[]
         for _ in range(r.randint(1,8)):
@@ -146,6 +145,60 @@ def generate(number, seed):
     if number==1836:
         n=r.randint(2,50);return f"{n}\n"+" ".join(f"{r.uniform(.5,2.5):.5f}" for _ in range(n))+"\n"
     raise KeyError(number)
+
+def _ways1837(p,w):
+    dp={0:1}
+    for x in w:
+        nd={}
+        for k,v in dp.items():
+            for h in p:nd[k+h*x]=nd.get(k+h*x,0)+v
+        dp=nd
+    return dp.get(0,0)
+
+def valid(text):
+    """题面约束：首行 C G（2<=C<=20, 2<=G<=20）；次行 C 个互异升序整数 ∈[-15,15]；
+    第三行 G 个互异升序整数 ∈[1,25]；保证至少存在一种平衡方案。"""
+    if not text.endswith("\n"):return False
+    lines=text[:-1].split("\n")
+    if len(lines)!=3:return False
+    try:rows=[[int(t) for t in ln.split()] for ln in lines]
+    except ValueError:return False
+    if any(" ".join(map(str,r))!=ln for r,ln in zip(rows,lines)):return False
+    if len(rows[0])!=2:return False
+    c,g=rows[0]
+    if not(2<=c<=20 and 2<=g<=20):return False
+    p,w=rows[1],rows[2]
+    if len(p)!=c or len(w)!=g:return False
+    if any(not -15<=x<=15 for x in p) or any(not 1<=x<=25 for x in w):return False
+    if any(a>=b for a,b in zip(p,p[1:])) or any(a>=b for a,b in zip(w,w[1:])):return False
+    # 答案须在 32 位有符号整数内：原题（POJ 1837）答案用 int 即可，超出就成了大数题，C/C++ 的 int/long long 写法会被误杀
+    return 1<=_ways1837(p,w)<=LIM1837
+
+LIM1837=2**31-1
+def gen1837(r,seed):
+    # 规模分档：小规模 / 随机 / 大规模 / 满规模；只保留有解且答案 <= 2^31-1 的组，否则重抽。
+    # 钩子多、砝码多时方案数会远超 int64，所以大规模组让钩子偏向一侧（另一侧只有少数几个），把方案数压进 int 范围；
+    # 方案总数 C^G 仍在 1e17 以上，暴力枚举照样卡掉。
+    def skew(c):
+        k=r.randint(max(1,c-15),max(1,min(4,c-1),c-15))
+        p=sorted(r.sample(range(-15,0),k))+sorted(r.sample(range(1,16),c-k))
+        return sorted(-x for x in p) if r.random()<.5 else p
+    while True:
+        if seed<=6:c,g=r.randint(2,3),r.randint(2,4)
+        elif seed<=24:c,g=r.randint(2,20),r.randint(2,20)
+        elif seed<=36:c,g=r.randint(14,17),r.randint(15,20)
+        elif seed==37:c,g=20,r.randint(8,10)
+        elif seed==38:c,g=20,r.randint(6,9)
+        else:c,g=r.randint(14,16),20
+        p=sorted(r.sample(range(-15,16),c)) if seed<=24 and r.random()<.6 else skew(c)
+        w=sorted(r.sample(range(1,26),g))
+        if seed==1:p=[-15,15]                      # 钩子在两端极值
+        elif seed==2:p=[0,r.randint(1,15)]         # 只能全挂 0 号钩
+        elif seed==37:p=sorted(r.sample(range(-15,0),r.randint(5,7)));p+=sorted(r.sample(range(1,16),20-len(p)))  # C=20 满钩
+        elif seed==38:p=list(range(-15,-5))+list(range(6,16))  # 远端钩子，力矩最大
+        elif seed==39:w=list(range(6,26))          # 最重的 20 个砝码
+        text=f"{len(p)} {len(w)}\n"+" ".join(map(str,p))+"\n"+" ".join(map(str,w))+"\n"
+        if valid(text):return text
 
 NO_INPUT={3225, 2698}
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01837/statistics/\n# Accepted submission: 43072325\n# Source: http://cs101.openjudge.cn/practice/solution/43072325/\n# License: not declared on the submission page; no license is inferred.\n\n# -*- coding: utf-8 -*-\n"""\nCreated on Sun Nov 19 11:03:55 2023\n\n@author: Lenovo\n"""\n\ndp=[[0]*15001 for _ in range(21)]\nnumc,numg=map(int,input().split())\npos=[0]+list(map(int,input().split()))\nweight=[0]+list(map(int,input().split()))\ndp[0][7500]=1\nfor i in range(1,numg + 1):\n    for j in range(15001):\n        if dp[i-1][j]:\n            for k in range(1,numc+1):\n                dp[i][j+weight[i]*pos[k]]+=dp[i-1][j]\nprint(dp[numg][7500])\n'

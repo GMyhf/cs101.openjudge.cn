@@ -20,7 +20,21 @@ def generate(number, seed):
     if number == 2940: return f"{r.randint(1,9)} {r.randint(1,9)}\n"
     if number == 1178:
         squares = [f"{chr(65+x)}{y+1}" for y in range(8) for x in range(8)]
-        return "".join(r.sample(squares, r.randint(2, 12))) + "\n"
+        if seed <= 25: return "".join(r.sample(squares, r.randint(2, 12))) + "\n"
+        if seed == 26: return r.choice(squares) + "\n"          # 没有骑士
+        if seed == 27: return "A1\n"
+        if seed == 28: pick = squares[:]; r.shuffle(pick); return "".join(pick) + "\n"   # 64 个位置全占
+        if seed == 29: return "".join(squares) + "\n"
+        if seed == 30: return "".join(["H8"] + [q for q in squares if q != "H8"][::-1]) + "\n"
+        if seed == 31: return "D4E5\n"
+        if seed == 32: return "A1H8\n"
+        if seed == 33: return "A1" + "".join(q for q in ("H8", "H1", "A8")) + "\n"
+        if seed == 34: return "".join(["E4"] + r.sample([q for q in squares if q != "E4"], 63)) + "\n"
+        if seed == 35: return "".join(r.sample(squares, 63)) + "\n"
+        if seed == 36: return "".join(r.sample(squares, 32)) + "\n"
+        if seed == 37: return "".join(r.sample(squares, 48)) + "\n"
+        if seed == 38: return "".join(["A8"] + r.sample([q for q in squares if q[0] in "FGH"], 20)) + "\n"
+        return "".join(r.sample(squares, r.randint(13, 64))) + "\n"
     if number == 1190: return f"{r.randint(1, 2000)}\n{r.randint(1, 7)}\n"
     if number == 2899:
         rows = [" ".join(str(r.randint(-1000, 1000)) for _ in range(5)) for _ in range(5)]
@@ -149,7 +163,15 @@ def generate(number, seed):
     if number == 1753:return "\n".join("".join(r.choice("bw") for _ in range(4)) for _ in range(4))+"\n"
     raise KeyError(number)
 
-REFERENCE="# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 1178: Camelot\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01178/\n# License: not declared; no license is inferred.\nimport sys\nimport sys\n\ninf = float('infinity')\nkmove = [(1,0),(1,1),(0,1),(-1,1),(-1,0),(-1,-1),(0,-1),(1,-1)]\nknmove = [(2,1),(1,2),(-1,2),(-2,1),(-2,-1),(-1,-2),(1,-2),(2,-1)]\nkmap = [[inf]*64 for _ in range(64)]\nknmap = [[inf]*64 for _ in range(64)]\n\ndef ok(x, y):\n    return 0 <= x < 8 and 0 <= y < 8\n\ndef getxy(p):\n    return p % 8, p // 8\n\ndef getPosition(x, y):\n    return x + y * 8\n\ndef init():\n    for i in range(64):\n        kmap[i][i] = 0\n        knmap[i][i] = 0\n        x, y = getxy(i)\n        for j in range(8):\n            tx, ty = kmove[j][0] + x, kmove[j][1] + y\n            if ok(tx, ty):\n                next = getPosition(tx, ty)\n                kmap[i][next] = 1\n            tx, ty = knmove[j][0] + x, knmove[j][1] + y\n            if ok(tx, ty):\n                next = getPosition(tx, ty)\n                knmap[i][next] = 1\n\ndef floyd():\n    for k in range(64):\n        for i in range(64):\n            for j in range(64):\n                kmap[i][j] = min(kmap[i][j], kmap[i][k] + kmap[k][j])\n                knmap[i][j] = min(knmap[i][j], knmap[i][k] + knmap[k][j])\n\ninit()\nfloyd()\n\ns = input().strip()\nsize = len(s)\nnum = 0\nposition = [0]*64\n\nfor i in range(0, size, 2):\n    position[num] = ord(s[i]) - ord('A') + (ord(s[i+1]) - ord('1')) * 8\n    num += 1\n\nminmove = inf\ntotal = 0  # Renamed 'sum' to 'total'\nfor ds in range(64):\n    for m in range(64):\n        for k in range(1, num):\n            total = sum(knmap[position[i]][ds] for i in range(1, num))\n            total += kmap[position[0]][m]\n            total += knmap[position[k]][m] + knmap[m][ds]\n            total -= knmap[position[k]][ds]\n            minmove = min(minmove, total)\n\nprint(minmove)\n"
+REFERENCE="# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 1178: Camelot\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01178/\n# License: not declared; no license is inferred.\nimport sys\nimport sys\n\ninf = float('infinity')\nkmove = [(1,0),(1,1),(0,1),(-1,1),(-1,0),(-1,-1),(0,-1),(1,-1)]\nknmove = [(2,1),(1,2),(-1,2),(-2,1),(-2,-1),(-1,-2),(1,-2),(2,-1)]\nkmap = [[inf]*64 for _ in range(64)]\nknmap = [[inf]*64 for _ in range(64)]\n\ndef ok(x, y):\n    return 0 <= x < 8 and 0 <= y < 8\n\ndef getxy(p):\n    return p % 8, p // 8\n\ndef getPosition(x, y):\n    return x + y * 8\n\ndef init():\n    for i in range(64):\n        kmap[i][i] = 0\n        knmap[i][i] = 0\n        x, y = getxy(i)\n        for j in range(8):\n            tx, ty = kmove[j][0] + x, kmove[j][1] + y\n            if ok(tx, ty):\n                next = getPosition(tx, ty)\n                kmap[i][next] = 1\n            tx, ty = knmove[j][0] + x, knmove[j][1] + y\n            if ok(tx, ty):\n                next = getPosition(tx, ty)\n                knmap[i][next] = 1\n\ndef floyd():\n    for k in range(64):\n        for i in range(64):\n            for j in range(64):\n                kmap[i][j] = min(kmap[i][j], kmap[i][k] + kmap[k][j])\n                knmap[i][j] = min(knmap[i][j], knmap[i][k] + knmap[k][j])\n\ninit()\nfloyd()\n\ns = input().strip()\nsize = len(s)\nnum = 0\nposition = [0]*64\n\nfor i in range(0, size, 2):\n    position[num] = ord(s[i]) - ord('A') + (ord(s[i+1]) - ord('1')) * 8\n    num += 1\n\nminmove = inf\ntotal = 0  # Renamed 'sum' to 'total'\nfor ds in range(64):\n    for m in range(64):\n        for k in range(1, num):\n            total = sum(knmap[position[i]][ds] for i in range(1, num))\n            total += kmap[position[0]][m]\n            total += knmap[position[k]][m] + knmap[m][ds]\n            total -= knmap[position[k]][ds]\n            minmove = min(minmove, total)\n\nprint(0 if num == 1 else minmove)  # 只有国王、没有骑士时无需移动\n"
+def valid(text):
+    """题面：一行字符串，由至多 64 个互不相同的棋盘位置（字母 A-H + 数字 1-8）组成，首个为国王，其余为骑士（0..63 个）。"""
+    import re
+    if not text.endswith('\n'):return False
+    body=text[:-1]
+    if '\n' in body or not re.fullmatch(r'([A-H][1-8]){1,64}',body):return False
+    ps=[body[i:i+2] for i in range(0,len(body),2)]
+    return len(set(ps))==len(ps)
 NUMBER=1178
 SAMPLE='D4A3A8H1H8\n'
 def run(x):

@@ -152,6 +152,115 @@ REFERENCE='# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_
 LANGUAGE='Python3'
 NUMBER=2186
 SAMPLE='3 3\n1 2\n2 1\n2 3\n'
+def valid(text):
+    """题面契约：第 1 行 N M（1 <= N <= 10000，1 <= M <= 50000），随后恰 M 行 A B，
+    1 <= A, B <= N（单空格分隔）。题面未禁止自环与重边。"""
+    if not text.endswith('\n') or '\r' in text:
+        return False
+    lines = text[:-1].split('\n')
+    def nums(line):
+        toks = line.split(' ')
+        if len(toks) != 2 or not all(t.isdigit() and t[0] != '0' for t in toks):
+            return None
+        return int(toks[0]), int(toks[1])
+    head = nums(lines[0])
+    if head is None:
+        return False
+    n, m = head
+    if not (1 <= n <= 10000 and 1 <= m <= 50000) or len(lines) != m + 1:
+        return False
+    for line in lines[1:]:
+        e = nums(line)
+        if e is None or not (1 <= e[0] <= n and 1 <= e[1] <= n):
+            return False
+    return True
+
+
+def _fmt2186(n, edges, r, shuffle=True):
+    edges = list(edges)
+    if shuffle:
+        r.shuffle(edges)
+    return f"{n} {len(edges)}\n" + "".join(f"{a} {b}\n" for a, b in edges)
+
+
+def _relabel2186(r, n, edges):
+    p = list(range(1, n + 1)); r.shuffle(p)
+    return [(p[a - 1], p[b - 1]) for a, b in edges]
+
+
+def _sccdag2186(r, n, k, total, sinks=1):
+    """把 1..n 分成 k 个强连通块（每块内一个环），块按拓扑序编号，最后 sinks 块是汇点块（不向外连边）。
+    每个非汇点块至少连向后面某一块，故都能走到汇点；sinks=1 时答案为汇点块大小，否则为 0。
+    总边数补到 total（只加块内边或「非汇点块 -> 更后面块」的边，不破坏结构）。"""
+    cuts = sorted(r.sample(range(1, n), k - 1)) if k > 1 else []
+    bounds = [0] + cuts + [n]
+    blocks = [list(range(bounds[i] + 1, bounds[i + 1] + 1)) for i in range(k)]
+    edges = []
+    for b in blocks:
+        if len(b) > 1:
+            edges += [(b[i], b[(i + 1) % len(b)]) for i in range(len(b))]
+    body = k - sinks
+    for i in range(body):
+        j = r.randrange(i + 1, k)
+        edges.append((r.choice(blocks[i]), r.choice(blocks[j])))
+    while len(edges) < total:
+        i = r.randrange(k)
+        j = i if i >= body else r.randrange(i, k)
+        edges.append((r.choice(blocks[i]), r.choice(blocks[j])))
+    return edges
+
+
+def gen2186(seed):
+    r = random.Random(2186_000 + seed)
+    N, M = 10000, 50000
+    if seed == 1:  return "1 1\n1 1\n"                                   # N=1：唯一一头牛，答案 1
+    if seed == 2:  return "2 1\n1 2\n"                                   # 答案 1
+    if seed == 3:  return "2 2\n1 2\n2 1\n"                              # 答案 2
+    if seed == 4:  return "3 2\n1 2\n3 2\n"                              # 汇点 2：答案 1
+    if seed == 5:  return "3 2\n2 1\n2 3\n"                              # 两个汇点：答案 0
+    if seed == 6:  return "4 3\n1 2\n2 1\n3 4\n"                         # 两个不连通块：0
+    if seed == 7:  return "3 1\n1 1\n"                                   # 只有自环，还有孤立牛：0
+    if seed == 8:  return "5 4\n1 2\n2 3\n3 4\n4 5\n"                    # 链：1
+    if seed == 9:                                                        # 满规模长链（深递归）：答案 1
+        e = [(i, i + 1) for i in range(1, N)]
+        e += [(r.randint(1, N - 1), 0) for _ in range(M - len(e))]
+        e = [(a, b if b else r.randint(a + 1, N)) for a, b in e]
+        return _fmt2186(N, _relabel2186(r, N, e), r)
+    if seed == 10:                                                       # 满规模大环 + 一头只被指向的牛：答案 1
+        e = [(i, i % (N - 1) + 1) for i in range(1, N)] + [(r.randint(1, N - 1), N) for _ in range(M - (N - 1))]
+        return _fmt2186(N, _relabel2186(r, N, e), r)
+    if seed == 11:                                                       # 满规模单个大环：答案 N
+        e = [(i, i % N + 1) for i in range(1, N + 1)] + [(r.randint(1, N), r.randint(1, N)) for _ in range(M - N)]
+        return _fmt2186(N, e, r)
+    if seed == 12:                                                       # 满规模，最后一头牛孤立（出入度 0）：答案 0
+        e = [(i, i % (N - 1) + 1) for i in range(1, N)] + [(r.randint(1, N - 1), r.randint(1, N - 1)) for _ in range(M - (N - 1))]
+        return _fmt2186(N, _relabel2186(r, N, e), r)
+    if seed == 13:                                                       # 星形：所有牛都指向 1 头牛
+        e = [(i, 1) for i in range(2, N + 1)]
+        return _fmt2186(N, _relabel2186(r, N, e), r)
+    if seed == 14:                                                       # 星形反过来：一头牛指向所有牛，N-1 个汇点：0
+        e = [(1, i) for i in range(2, N + 1)]
+        return _fmt2186(N, _relabel2186(r, N, e), r)
+    if seed == 15:                                                       # 重边 + 自环
+        e = [(1, 2)] * 5 + [(2, 2)] * 3 + [(3, 1)] * 2 + [(2, 3)]
+        return _fmt2186(3, e, r)
+    if seed <= 22:                                                       # 满规模 SCC 拓扑结构，单汇点块（答案为汇点块大小）
+        k = [2, 5, 50, 500, 3000, 9000, 10000][seed - 16]
+        e = _sccdag2186(r, N, k, M)
+        return _fmt2186(N, _relabel2186(r, N, e), r)
+    if seed <= 27:                                                       # 满规模多汇点块：答案 0
+        k = [3, 20, 400, 5000, 10000][seed - 23]; sinks = [2, 3, 2, 2, 100][seed - 23]
+        e = _sccdag2186(r, N, k, M, sinks=sinks)
+        return _fmt2186(N, _relabel2186(r, N, e), r)
+    if seed <= 34:                                                       # 中小规模随机图
+        n = r.randint(2, 60); m = r.randint(1, min(M, n * 3))
+        e = [(r.randint(1, n), r.randint(1, n)) for _ in range(m)]
+        return _fmt2186(n, e, r)
+    # 中规模 SCC 结构，答案非零
+    n = r.randint(100, 3000); k = r.randint(2, 40)
+    e = _sccdag2186(r, n, k, r.randint(0, 3 * n))
+    return _fmt2186(n, _relabel2186(r, n, e[:M]), r)
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -159,7 +268,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [gen2186(s) for s in range(1, 40)])
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

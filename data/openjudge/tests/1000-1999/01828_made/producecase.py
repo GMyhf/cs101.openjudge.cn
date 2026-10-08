@@ -421,6 +421,89 @@ REFERENCE="# External reference: http://cs101.openjudge.cn/practice/01828/statis
 LANGUAGE='Python3'
 NUMBER=1828
 SAMPLE='3\n2 1\n1 2\n3 3\n3\n0 1\n1 0\n0 0\n4\n0 0\n1 0\n0 1\n1 1\n0\n'
+LO, HI = -2**31, 2**31 - 1
+
+def _int(tok):
+    return tok == str(int(tok)) if tok.lstrip('-').isdigit() else False
+
+def valid(text):
+    """题面：多组；每组首行 N(1<=N<=50000)，随后 N 行 "x y"（一个空格，32 位有符号整数），同组点互不相同；以单独一行 0 结束。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    i = 0; cases = 0
+    while True:
+        if i >= len(lines) or not lines[i].isdigit() or lines[i] != str(int(lines[i])):
+            return False
+        n = int(lines[i]); i += 1
+        if n == 0:
+            return i == len(lines) and cases >= 1
+        if not 1 <= n <= 50000 or i + n > len(lines):
+            return False
+        pts = set()
+        for ln in lines[i:i + n]:
+            t = ln.split(' ')
+            if len(t) != 2 or not all(_int(v) for v in t):
+                return False
+            x, y = int(t[0]), int(t[1])
+            if not (LO <= x <= HI and LO <= y <= HI):
+                return False
+            pts.add((x, y))
+        if len(pts) != n:
+            return False
+        i += n; cases += 1
+
+def gen_case(seed):
+    r = random.Random(1828 * 1000 + seed)
+    def fmt(pts):
+        return f"{len(pts)}\n" + "\n".join(f"{x} {y}" for x, y in pts)
+    def rand_pts(n, lo, hi):
+        s = set(); out = []
+        while len(out) < n:
+            p = (r.randint(lo, hi), r.randint(lo, hi))
+            if p not in s: s.add(p); out.append(p)
+        return out
+    def stair(n, lo, hi, noise=0):
+        xs = sorted(r.sample(range(lo, hi), n)); ys = sorted(r.sample(range(lo, hi), n), reverse=True)
+        pts = list(zip(xs, ys)); s = set(pts)
+        # 噪声点：严格被某个台阶点支配
+        while noise:
+            k = r.randrange(n); x, y = pts[k]
+            p = (x - r.randint(0, 3), y - r.randint(1, 3))
+            if LO <= p[0] and LO <= p[1] and p not in s: s.add(p); pts.append(p); noise -= 1
+        r.shuffle(pts); return pts
+    def done(blocks):
+        return "\n".join(fmt(b) for b in blocks) + "\n0\n"
+    if seed == 1:
+        return done([[(LO, HI)], [(HI, LO), (LO, HI)], [(HI, HI), (LO, LO)], [(LO, LO)]])
+    if seed == 2:
+        # x 相同或 y 相同的并列：只有一个能当王
+        return done([[(5, 1), (5, 2)], [(1, 5), (2, 5)], [(1, 2), (2, 1)], [(0, 0), (0, 1), (1, 0)],
+                     [(7, 7), (7, 3), (3, 7)], [(-1, -1), (-1, -2), (-2, -1), (-2, -2)]])
+    if seed == 3:
+        return done([rand_pts(r.randint(1, 8), -3, 3) for _ in range(200)])
+    if seed <= 15:
+        lo, hi = r.choice([(-5, 5), (-1000, 1000), (LO, HI), (0, 50)])
+        blocks = []
+        for _ in range(r.randint(1, 4)):
+            n = r.randint(1, min(2000, (hi - lo + 1) ** 2 // 2))
+            blocks.append(stair(n, lo, hi, n // 3) if hi - lo > 10 * n and r.random() < 0.4 else rand_pts(n, lo, hi))
+        return done(blocks)
+    v = seed % 6
+    # 单个文件受 1MB 限制：满值域坐标时 N 取 40000，较小值域时取 50000
+    # 总体积受 10MB 限制：只有 seed 16/18/19/20 保留满规模，其余规模组 N 缩为约 1/10
+    f = 1 if seed in (16, 18, 19, 20) else r.randint(6, 12)
+    if v == 0: return done([rand_pts(40000 // f, LO, HI)])
+    if v == 1: return done([stair(50000 // f, -10**6, 10**6)])            # 全部是王
+    if v == 2: return done([stair(25000 // f, -10**6, 10**6, 25000 // f)])  # 一半是王
+    if v == 3:                                                            # 大量 x 相同
+        m = 50000 // f
+        return done([rand_pts(m, 0, 300) if r.random() < 0.5 else [(r.randint(0, 50), y) for y in r.sample(range(-10**6, 10**6), m)]])
+    if v == 4:                                                            # 满值域台阶，含极值
+        pts = stair(39998 // f, LO + 1, HI - 1)
+        return done([pts + [(LO, LO), (HI, LO)]])
+    return done([rand_pts(r.randint(1, 3000), -10**4, 10**4) for _ in range(12)])
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -428,7 +511,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[gen_case(s) for s in range(1, 40)]
   for i,x in enumerate(cases):
+   assert valid(x),i
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

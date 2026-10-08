@@ -1,11 +1,64 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+import re as _re
+
+def valid(text):
+    """题面契约（POJ 1002）：首行正整数 n（n <= 100000），其后恰 n 行，每行由数字、
+    除 Q、Z 外的英文字母、'-' 组成，数字与字母总数恰为 7，总长不超过 200。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not _re.fullmatch(r"[1-9]\d*", lines[0]):
+        return False
+    n = int(lines[0])
+    if not (1 <= n <= 100000) or len(lines) != n + 1:
+        return False
+    for ln in lines[1:]:
+        if len(ln) > 200 or not _re.fullmatch(r"[0-9A-PR-Ya-pr-y-]+", ln):
+            return False
+        if sum(c != "-" for c in ln) != 7:
+            return False
+    return True
+
+_KEYS1002 = {"2": "ABC", "3": "DEF", "4": "GHI", "5": "JKL", "6": "MNO", "7": "PRS", "8": "TUV", "9": "WXY"}
+
+def _write1002(r, num, p_letter=0.5, p_dash=0.1, pad_to=None):
+    chars = [r.choice(_KEYS1002[c]) if c in _KEYS1002 and r.random() < p_letter else c for c in num]
+    if pad_to is not None:
+        # 在随机位置插入 '-'，把总长补到 pad_to
+        slots = [0] * 8
+        for _ in range(pad_to - 7): slots[r.randrange(8)] += 1
+        return "".join("-" * slots[i] + chars[i] for i in range(7)) + "-" * slots[7]
+    out = ""
+    for c in chars: out += "-" * (r.random() < p_dash) + c
+    return out
+
+def gen1002_large(r, seed):
+    # 满规模组：n = 100000，卡掉 O(n^2) 两两比较的写法
+    if seed == 40:    # 大量重复，号码池 30000
+        pool = [f"{x:07d}" for x in r.sample(range(10**7), 30000)]
+        rows = [_write1002(r, r.choice(pool), 0.5, 0.05) for _ in range(100000)]
+    elif seed == 41:  # 10 万个互不相同的号码 -> No duplicates.
+        rows = [_write1002(r, f"{x:07d}", 0.5, 0.05) for x in r.sample(range(10**7), 100000)]
+    elif seed == 42:  # 长串：每行恰 200 字符（大量 '-'）
+        pool = [f"{x:07d}" for x in r.sample(range(10**7), 1500)]
+        rows = [_write1002(r, r.choice(pool), 0.6, pad_to=200) for _ in range(4500)]
+    elif seed == 43:  # 全部是同一个号码（不同写法），计数 100000
+        num = f"{r.randrange(10**7):07d}"
+        rows = [_write1002(r, num, 0.5, 0.05) for _ in range(100000)]
+    else:             # 只含 0/1 的号码（无字母可写），含 000-0000、前导 0
+        pool = ["0000000", "1111111", "0000001", "1000000"] + [f"{x:07b}" for x in range(128)]
+        pool = sorted(set(pool)) + [f"{r.randrange(2)}{r.randrange(2)}0{r.randrange(10)}{r.randrange(10)}0{r.randrange(2)}" for _ in range(2000)]
+        rows = [_write1002(r, r.choice(pool), 0.0, 0.05) for _ in range(100000)]
+    return f"{len(rows)}\n" + "\n".join(rows) + "\n"
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
     word = lambda a=1, b=10: "".join(r.choice(letters) for _ in range(r.randint(a, b)))
     if number == 3247: return f"{seed % 9 + 1}\n"
     if number == 1002:
+        if seed >= 40: return gen1002_large(r, seed)
         if seed % 5 == 0:
             # "No duplicates." cases: distinct standard numbers written with
             # letters and stray dashes (uppercase only, like the archived data). Seed 20 pairs S/V/Y with the
@@ -182,6 +235,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 45)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

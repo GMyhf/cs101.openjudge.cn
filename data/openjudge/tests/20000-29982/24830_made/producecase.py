@@ -10,6 +10,49 @@ def g24830(r):
         start = r.randint(0, 9999); h = [max(0, start - i * r.randint(1, 100)) for i in range(n)]
     return f"{n}\n{' '.join(map(str, h))}\n"
 
+def valid(text):
+    """题面：第一行整数 n（2<=n<=100）；第二行 n 个整数，每个在 [0,10000]。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if len(lines) != 2 or not lines[0].isdigit():
+        return False
+    n = int(lines[0])
+    if not (2 <= n <= 100) or lines[0] != str(n):
+        return False
+    t = lines[1].split(" ")
+    if len(t) != n or not all(x.isdigit() and x == str(int(x)) for x in t):
+        return False
+    return all(0 <= int(x) <= 10000 for x in t)
+
+
+def extra_cases():
+    """补充：另两组题面样例、全相等（0）、n=2、严格递减一整圈（n-1）、跨越首尾的最长段、平台不算下坡。"""
+    r = random.Random(248300)
+    f = lambda h: f"{len(h)}\n{' '.join(map(str, h))}\n"
+    dec = list(range(10000, 10000 - 100 * 100, -100))  # 10000..100 严格递减
+    k = 37
+    run_ = list(range(9000, 9000 - 60 * 150, -150))  # 长 60 点的下坡（59 米）
+    # 下坡被首尾切开：前 35 点放在末尾、后 25 点放在开头
+    wrap = run_[35:] + [9800] + [r.randint(0, 10000) for _ in range(39)] + run_[:35]
+    plateau = []
+    for i in range(20):
+        plateau += [5000 - i * 10] * 5  # 每段等高，跨段只下降一次
+    return [
+        "5\n2 1 5 4 3\n",
+        "4\n1 1 1 1\n",
+        f([7] * 100),
+        f([0, 0]),
+        f([10000, 0]),
+        f(dec),
+        f(dec[k:] + dec[:k]),
+        f(wrap),
+        f(plateau),
+        f([10000 if i % 2 == 0 else 0 for i in range(100)]),
+        f(list(range(0, 100))),
+        f([r.randint(0, 10000) for _ in range(100)]),
+    ]
+
 def run(text):
     with tempfile.TemporaryDirectory(prefix='producecase-') as d:
         p=Path(d)/'main.py'; p.write_text(REFERENCE)
@@ -28,6 +71,6 @@ def scale_case():
     return None
 def main():
     d=Path('data'); d.mkdir(exist_ok=True)
-    extra=scale_case(); cases=[SAMPLE]+([extra] if extra else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+    extra=scale_case(); cases=[SAMPLE]+([extra] if extra else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]+extra_cases()
     for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

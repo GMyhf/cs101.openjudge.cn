@@ -148,6 +148,66 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
+def valid(text):
+    """题面契约：首行 R C（单个空格分隔，1<=R,C<=20），随后 R 行，每行恰 C 个大写字母 A-Z。"""
+    import re
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    m=re.fullmatch(r'(\d+) (\d+)',lines[0])
+    if not m:return False
+    R,C=int(m.group(1)),int(m.group(2))
+    if not(1<=R<=20 and 1<=C<=20) or len(lines)!=R+1:return False
+    return all(re.fullmatch('[A-Z]{%d}'%C,s) for s in lines[1:])
+
+def _cost1154(g,limit):
+    """朴素 DFS 的递归调用次数（超过 limit 即停），用来控制参考解运行时间。"""
+    R,C=len(g),len(g[0]);cnt=0;best=0
+    import sys
+    sys.setrecursionlimit(10000)
+    def dfs(x,y,mask,n):
+        nonlocal cnt,best
+        cnt+=1
+        if cnt>limit:raise OverflowError
+        best=max(best,n)
+        for dx,dy in ((1,0),(-1,0),(0,1),(0,-1)):
+            a,b=x+dx,y+dy
+            if 0<=a<R and 0<=b<C:
+                bit=1<<(ord(g[a][b])-65)
+                if not mask&bit:dfs(a,b,mask|bit,n+1)
+    try:dfs(0,0,1<<(ord(g[0][0])-65),1)
+    except OverflowError:return None,None
+    return cnt,best
+
+def gen1154(seed):
+    r=random.Random(1154*1000+seed)
+    U='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    fixed={1:['A'],2:['AB','BA'],3:['AAAAAAAAAAAAAAAAAAAA'],4:['A']*20,5:[U[:20]],6:[c for c in U[:20]],
+           7:['A'*20]*20,8:['AB'*10,'BA'*10]*10}
+    if seed in fixed:
+        g=fixed[seed];return f'{len(g)} {len(g[0])}\n'+'\n'.join(g)+'\n'
+    while True:
+        if seed<=12:R,C=r.randint(1,20),r.randint(1,20)
+        else:R,C=20,20
+        if seed>=13 and seed%4==0:R,C=r.choice([(20,20),(20,r.randint(1,20)),(r.randint(1,20),20)])
+        k=r.choice([26,26,26,r.randint(2,25),r.randint(15,26)])
+        al=r.sample(U,k)
+        mode=r.random()
+        if seed in (9,10):  # 蛇形放满 26 个字母，答案为 26
+            R,C=20,20;cells=[(i,j if i%2==0 else C-1-j) for i in range(R) for j in range(C)]
+            g=[[r.choice(U) for _ in range(C)] for _ in range(R)]
+            for t,(i,j) in enumerate(cells[:26]):g[i][j]=U[t]
+            for (i,j) in cells[26:]:g[i][j]=r.choice(U[:26])
+        elif mode<.25 and k>=4:  # 对角线结构：letter=(a*i+b*j)%k，路径多
+            a,b=r.randint(1,3),r.randint(1,3);off=r.randrange(k)
+            g=[[al[(a*i+b*j+off)%k] for j in range(C)] for i in range(R)]
+            for _ in range(r.randint(0,40)):g[r.randrange(R)][r.randrange(C)]=r.choice(al)
+        else:
+            g=[[r.choice(al) for _ in range(C)] for _ in range(R)]
+        g=[''.join(x) for x in g]
+        cnt,best=_cost1154(g,1500000)
+        if cnt is None:continue
+        return f'{R} {C}\n'+'\n'.join(g)+'\n'
+
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1154: LETTERS\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01154/\n# License: not declared; no license is inferred.\nR,C=map(int,input().split())\ngrid=[]\nfor _ in range(R):\n    grid.append(list(input()))\ncondition=[0]*26\ndef r(a):\n    return ord(a)-65\ndef check(x,y):\n    return 0<=x<=R-1 and 0<=y<=C-1\ns=0\nd=[[1,0],[-1,0],[0,1],[0,-1]]\ndef dfs(x,y,n):\n    flag=True\n    for i in range(4):\n        x1=x+d[i][0]\n        y1=y+d[i][1]\n        if check(x1,y1):\n            a=r(grid[x1][y1])\n            if condition[a]==0:\n                flag=False\n                condition[a]=1\n                dfs(x1,y1,n+1)\n                condition[a]=0\n    if flag:\n        global s\n        s=max(s,n)\n        return\ncondition[r(grid[0][0])]=1\ndfs(0,0,1)\nprint(s)\n'
 LANGUAGE='Python3'
 NUMBER=1154
@@ -159,7 +219,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [gen1154(s) for s in range(1, 40)])
   for i,x in enumerate(cases):
+   assert valid(x),i
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

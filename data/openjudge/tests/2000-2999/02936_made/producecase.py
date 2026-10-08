@@ -13,7 +13,17 @@ def generate(number, seed):
         a = [r.randint(0, 1000) for _ in range(r.randint(1, 100))]
         return f"{len(a)}\n" + "\n".join(map(str, a)) + "\n"
     if number == 2936:
-        a = sorted(r.sample(range(1, 9), r.randint(1, 8))); return f"{len(a)}\n" + " ".join(map(str, a)) + "\n"
+        # 全部 255 个非空子集里取 39 个互不相同的配方：先放针对性用例
+        # （全满足 / 只违反某一条规则 / 多条同时违反），其余用固定种子随机补齐。
+        fixed = [(7,), (8,), (7, 8), (1, 3, 5, 6, 7), (2, 4, 5, 6, 8), (1, 4, 5, 6, 7, 8), (5, 6, 7),
+                 (1, 2, 7), (1, 2, 3, 5, 6, 8), (3, 4, 8), (1, 3, 4, 7, 8), (5, 7), (6, 8), (2, 3, 6, 7, 8),
+                 (1,), (5, 6), (1, 3, 5, 6), (2, 4), (1, 2, 3, 4, 5), (1, 2, 3, 4, 5, 6, 7, 8)]
+        rr = random.Random(2936_2936)
+        rest = [t for t in (tuple(i + 1 for i in range(8) if m >> i & 1) for m in range(1, 256))
+                if t not in fixed and t != (1, 2, 3, 4, 5, 6, 7)]
+        rr.shuffle(rest)
+        a = (fixed + rest)[seed - 1]
+        return f"{len(a)}\n" + " ".join(map(str, a)) + "\n"
     if number == 2814: return " ".join(str(r.randrange(4)) for _ in range(9)) + "\n"
     if number == 2910:
         chars = letters + letters.upper() + "0123456789*?-_"; return "".join(r.choice(chars) for _ in range(r.randint(1, 100))) + "\n"
@@ -152,6 +162,15 @@ def generate(number, seed):
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2936: 试剂配制\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02936/\n# License: not declared; no license is inferred.\nimport sys\n# 读取配方中物质的种类数目\nN = int(input())\n# 读取配方中包含的物质编号\nformula = list(map(int, input().split()))\n\n# 检查 1 号和 2 号物质是否同时存在\nif 1 in formula and 2 in formula:\n    print(0)\n# 检查 3 号和 4 号物质是否同时存在\nelif 3 in formula and 4 in formula:\n    print(0)\n# 检查 5 号和 6 号物质是否同时存在或同时不存在\nelif (5 in formula) != (6 in formula):\n    print(0)\n# 检查 7 号和 8 号物质是否至少选择了一种\nelif 7 not in formula and 8 not in formula:\n    print(0)\nelse:\n    # 如果所有条件都满足，输出 1\n    print(1)\n'
 NUMBER=2936
 SAMPLE='7\n1 2 3 4 5 6 7\n'
+def valid(text):
+    """题面：两行；第一行整数 N；第二行 N 个 1~8 之间的整数，按从小到大给出（配方含 1 种或多种物质，编号互异）。"""
+    if not text.endswith('\n') or '\r' in text: return False
+    L = text[:-1].split('\n')
+    if len(L) != 2 or not L[0].isdigit(): return False
+    n = int(L[0]); t = L[1].split(' ')
+    if not 1 <= n <= 8 or len(t) != n or not all(x.isdigit() and len(x) == 1 for x in t): return False
+    a = list(map(int, t))
+    return all(1 <= x <= 8 for x in a) and all(a[i] < a[i + 1] for i in range(n - 1))
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)

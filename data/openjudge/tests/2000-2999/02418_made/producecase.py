@@ -61,8 +61,7 @@ def generate(number, seed):
             n = r.randint(0, 2**31 - 1); rows.append((n, r.randint(0, n)))
         return "\n".join(f"{n} {k}" for n, k in rows) + "\n"
     if number == 2418:
-        names = ["Ash", "Beech", "Red Oak", "Maple", "Pine", f"Species {seed}"]
-        return "\n".join(r.choice(names) for _ in range(20)) + "\n"
+        return gen_2418(r, seed)
     if number == 2816:
         w, h = r.randint(2, 12), r.randint(2, 12)
         grid = [["." if r.random() < .7 else "#" for _ in range(w)] for _ in range(h)]
@@ -421,6 +420,95 @@ REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02418/statis
 LANGUAGE='Python3'
 NUMBER=2418
 SAMPLE='Red Alder\nAsh\nAspen\nBasswood\nAsh\nBeech\nYellow Birch\nAsh\nCherry\nCottonwood\nAsh\nCypress\nRed Elm\nGum\nHackberry\nWhite Oak\nHickory\nPecan\nHard Maple\nWhite Oak\nSoft Maple\nRed Oak\nRed Oak\nWhite Oak\nPoplan\nSassafras\nSycamore\nBlack Walnut\nWillow\n'
+def valid(text):
+    """02418 输入契约：每行一棵树的树种名（1..30 个可打印 ASCII 字符，可含空格），
+    树种数 ≤ 10000，树木数 1..1000000。"""
+    if not text.endswith("\n") or "\r" in text:
+        return False
+    lines = text[:-1].split("\n")
+    if not 1 <= len(lines) <= 1_000_000:
+        return False
+    for s in lines:
+        if not 1 <= len(s) <= 30:
+            return False
+        if s != s.strip(" ") or any(not (32 <= ord(c) < 127) for c in s):
+            return False
+    return len(set(lines)) <= 10_000
+def _name_2418(r, lo=1, hi=30):
+    letters = "abcdefghijklmnopqrstuvwxyz"
+    words = []
+    length = r.randint(lo, hi)
+    while True:
+        w = r.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") + "".join(r.choice(letters) for _ in range(r.randint(1, 9)))
+        cand = (" ".join(words + [w]))
+        if len(cand) > length and words:
+            break
+        words.append(w)
+        if len(cand) >= length:
+            break
+    s = " ".join(words)[:length].rstrip(" ")
+    return s or "X"
+def gen_2418(r, seed):
+    base = ["Red Alder", "Ash", "Aspen", "Basswood", "Beech", "Yellow Birch", "Cherry", "Cottonwood",
+            "Cypress", "Red Elm", "Gum", "Hackberry", "White Oak", "Hickory", "Pecan", "Hard Maple",
+            "Soft Maple", "Red Oak", "Poplan", "Sassafras", "Sycamore", "Black Walnut", "Willow"]
+    # 易错：大小写混排（字典序按 ASCII，大写在前）、前缀关系、含空格、长度恰为 30
+    tricky = ["ash", "Ash", "ASH", "Ash ", "Ash Red", "Ash", "AshRed", "a", "Z", "zebra wood", "Zebra Wood",
+              "Oak", "Oak Red", "Oak  Red", "Oakred", "B" * 30, "B" * 29, "x" * 30, "Mixed Case Name Of Thirty Ch",
+              "1 Numbered", "10 Numbered", "2 Numbered", "Maple-Sugar", "Maple's Tree"]
+    tricky = [t.strip(" ") for t in tricky]
+    if seed == 1:  # 只有一棵树
+        return "Lonely Pine\n"
+    if seed == 2:  # 一个树种多棵
+        return "Ash\n" * 7
+    if seed == 3:  # 两棵不同
+        return "b\nA\n"
+    if seed == 4:  # 三分之一，检验四舍五入
+        return "Oak\nPine\nPine\n"
+    if seed <= 20:
+        pool = r.sample(tricky, r.randint(3, len(tricky))) + r.sample(base, r.randint(1, 10))
+        n = r.randint(5, 200 * (seed - 4))
+        w = [r.random() ** 2 + 0.01 for _ in pool]
+        return "\n".join(r.choices(pool, weights=w, k=n)) + "\n"
+    if seed <= 30:  # 中等规模
+        k = r.randint(50, 3000)
+        pool = sorted({_name_2418(r) for _ in range(k)} | set(r.sample(tricky, 8)))
+        n = r.randint(k, 20000)
+        lines = pool + r.choices(pool, k=n - len(pool)) if n > len(pool) else pool[:]
+        r.shuffle(lines)
+        return "\n".join(lines) + "\n"
+    if seed == 31:  # 10000 个不同树种各一棵，名字长 30
+        pool = set()
+        while len(pool) < 10000:
+            pool.add(_name_2418(r, 30, 30).ljust(30, "q"))
+        lines = sorted(pool); r.shuffle(lines)
+        return "\n".join(lines) + "\n"
+    if seed == 32:  # 满 10000 树种，总量接近 1MB
+        pool = set()
+        while len(pool) < 10000:
+            pool.add(_name_2418(r, 3, 20))
+        pool = sorted(pool)
+        lines = pool + r.choices(pool, k=60000)
+        r.shuffle(lines)
+        return "\n".join(lines) + "\n"
+    if seed == 33:  # 树种极少、行数极多（约 25 万棵）
+        pool = ["Ash", "Elm", "Oak", "Gum", "ash"]
+        return "\n".join(r.choices(pool, weights=[5, 3, 2, 1, 1], k=240000)) + "\n"
+    if seed == 34:  # 单一树种大量
+        return "Fir\n" * 250000
+    if seed == 35:  # 已排序逆序输入，名字前缀链
+        pool = ["A" * i for i in range(1, 31)] + ["A" * i + "B" for i in range(1, 30)]
+        lines = sorted(pool * 300, reverse=True)
+        return "\n".join(lines) + "\n"
+    # 36..39：大规模随机，树种数 2000..10000
+    k = r.randint(2000, 10000)
+    pool = set(r.sample(tricky, 10))
+    while len(pool) < k:
+        pool.add(_name_2418(r, 1, 30))
+    pool = sorted(pool)
+    lines = pool + r.choices(pool, weights=[r.random() + 0.05 for _ in pool], k=max(0, 50000 - k))
+    r.shuffle(lines)
+    return "\n".join(lines) + "\n"
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]

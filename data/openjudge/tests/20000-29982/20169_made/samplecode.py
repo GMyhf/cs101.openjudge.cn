@@ -2,6 +2,7 @@
 # Accepted submission: 52720771
 # Source: http://cs101.openjudge.cn/practice/solution/52720771/
 # License: not declared on the submission page; no license is inferred.
+# 2026-10-08 本地修正：上面引用的原始代码在题面范围内有缺陷，已按题面改过，与原提交不再逐字一致（见 CHANGELOG）。
 
 # External reference: statistics page /practice/20169/
 # Accepted submission: 52720771
@@ -13,10 +14,13 @@ import sys
 
 input = sys.stdin.readline
 
-def find(parent, x):  # 查找编号x的祖先
-    if parent[x] != x:
-        parent[x] = find(parent, parent[x])
-    return parent[x]
+def find(parent, x):  # 查找编号x的祖先（迭代写法：链长可达 n=30000，递归会超过默认递归深度）
+    root = x
+    while parent[root] != root:
+        root = parent[root]
+    while parent[x] != root:
+        parent[x], x = root, parent[x]
+    return root
 
 def main():
     T = int(input())

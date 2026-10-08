@@ -374,7 +374,19 @@ def generate(number, seed):
             rows.append(f"{a} {op} {b}")
         return f"{len(rows)}\n" + "\n".join(rows) + "\n"
     if number == 2713:
-        n = r.randint(5, 20); top = r.randint(1, n-4); bottom = r.randint(top+2, n-2); left = r.randint(1, n-4); right = r.randint(left+2, n-2)
+        # n 上限 1000，但 1000x1000 的输入约 4MB，超过单组 1MB，最大组取 n=495（约 0.98MB）
+        def rect(n, hmin=2, wmin=2):
+            top = r.randint(0, n - hmin); bottom = r.randint(top + hmin - 1, n - 1)
+            left = r.randint(0, n - wmin); right = r.randint(left + wmin - 1, n - 1)
+            return top, bottom, left, right
+        fixed = {1: (2, (0, 1, 0, 1)), 2: (3, (0, 2, 0, 2)), 3: (6, (0, 5, 0, 5)), 4: (7, (2, 3, 1, 5)),
+                 5: (7, (1, 5, 3, 4)), 6: (8, (0, 7, 2, 4)), 7: (8, (3, 5, 0, 7)), 8: (9, (4, 8, 4, 8)),
+                 9: (495, (0, 494, 0, 494)), 10: (495, (1, 493, 2, 490)), 11: (495, (240, 242, 100, 102)),
+                 12: (495, (0, 1, 0, 494)), 13: (495, (7, 480, 300, 301))}
+        if seed in fixed: n, (top, bottom, left, right) = fixed[seed]
+        elif seed <= 18: n = r.randint(400, 495); top, bottom, left, right = rect(n)
+        elif seed <= 26: n = r.randint(4, 12); top, bottom, left, right = rect(n)
+        else: n = r.randint(20, 200); top, bottom, left, right = rect(n)
         grid = [[255] * n for _ in range(n)]
         for y in range(top, bottom + 1):
             for x in range(left, right + 1):
@@ -416,6 +428,28 @@ def generate(number, seed):
             chunks.append(f"{capacity}\n{count}\n" + " ".join(str(x) for pair in metals for x in pair))
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
+
+def valid(text):
+    """题面：第一行整数 n（不大于 1000）为正方形边长；其后 n 行每行 n 个整数，取值 0 或 255，单空格分隔；
+    值为 0 的像素恰好构成一个边平行于图像边缘的矩形的边缘。"""
+    import re
+    if not text.endswith("\n"): return False
+    lines = text[:-1].split("\n")
+    if not re.fullmatch(r"[1-9]\d*", lines[0]): return False
+    n = int(lines[0])
+    if n > 1000 or len(lines) != n + 1: return False
+    zeros = []
+    for i, ln in enumerate(lines[1:]):
+        if not re.fullmatch(r"(0|255)( (0|255))*", ln): return False
+        row = ln.split()
+        if len(row) != n: return False
+        zeros += [(i, j) for j, x in enumerate(row) if x == "0"]
+    if not zeros: return False
+    top = min(i for i, _ in zeros); bottom = max(i for i, _ in zeros)
+    left = min(j for _, j in zeros); right = max(j for _, j in zeros)
+    border = {(i, j) for i in range(top, bottom + 1) for j in range(left, right + 1)
+              if i in (top, bottom) or j in (left, right)}
+    return set(zeros) == border
 
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02713/statistics/\n# Accepted submission: 52515343\n# Source: http://cs101.openjudge.cn/practice/solution/52515343/\n# License: not declared on the submission page; no license is inferred.\n\nn = int(input())\n\npic = [list(map(int, input().split())) for _ in range(n)]\nfound = False\ncnt = 0\nline = 0\nfor i in range(n):\n    num = pic[i].count(0)\n    if num > 0 and not found:\n        line = num\n        found = True\n    if num == 2 and found:\n        cnt += 1\n\ns = (line - 2) * cnt\nprint(s)\n'
 LANGUAGE='Python3'

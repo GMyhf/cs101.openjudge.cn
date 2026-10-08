@@ -1,5 +1,19 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+
+def valid(text):
+    """题面：多行，每行一对整数 n k，0 <= k <= n < 2^31，以 EOF 结束。"""
+    import re
+    if not text.endswith("\n") or text.strip() == "":
+        return False
+    for line in text[:-1].split("\n"):
+        m = re.fullmatch(r"(0|[1-9][0-9]*) (0|[1-9][0-9]*)", line)
+        if not m:
+            return False
+        n, k = int(m.group(1)), int(m.group(2))
+        if not (0 <= k <= n < 2**31):
+            return False
+    return True
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     if number == 2236:
@@ -56,9 +70,29 @@ def generate(number, seed):
         n = r.randint(1, 24)
         return f"{n}\n" + "\n".join(str(r.randint(1, 450)) for _ in range(n)) + "\n"
     if number == 2986:
+        # 按 Lucas 定理 C(n,k) 为奇当且仅当 k 是 n 的二进制子集；一半行刻意取子集（答案 1），
+        # 一半随机（答案几乎全 0）。不取 n=0：题面递归定义未覆盖 C(0,0)。
+        top = 2**31 - 1
+        def submask(n):
+            k = n & r.getrandbits(31)
+            return k
+        def pick_n():
+            t = r.random()
+            if t < .15: return top
+            if t < .3: return r.randint(1, 64)
+            if t < .45: return (1 << r.randint(1, 30)) - r.randint(0, 1)
+            return r.randint(1, top)
+        count = [3, 8, 20, 50, 200, 1000][seed % 6] if seed <= 33 else 30000
         rows = []
-        for _ in range(r.randint(2, 12)):
-            n = r.randint(0, 2**31 - 1); rows.append((n, r.randint(0, n)))
+        if seed == 1:
+            rows = [(1, 0), (1, 1), (2, 0), (2, 1), (2, 2), (3, 1), (4, 2), (top, 0), (top, top), (top, 1), (top, top - 1),
+                    (2**30, 2**29), (2**30, 2**30), (2**30, 1), (2**30 - 1, 2**29 + 7), (top - 1, 1), (top - 1, top - 1)]
+        while len(rows) < count:
+            n = pick_n(); t = r.random()
+            if t < .45: k = submask(n)
+            elif t < .55: k = r.choice([0, n, 1 if n >= 1 else 0, n - 1 if n >= 1 else 0])
+            else: k = r.randint(0, n)
+            rows.append((n, k))
         return "\n".join(f"{n} {k}" for n, k in rows) + "\n"
     if number == 2418:
         names = ["Ash", "Beech", "Red Oak", "Maple", "Pine", f"Species {seed}"]
@@ -417,7 +451,7 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02986/statistics/\n# Accepted submission: 51426424\n# Source: http://cs101.openjudge.cn/practice/solution/51426424/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\nfor l in sys.stdin.read().splitlines():\n    n, k=map(int,l.split())\n    a = k.bit_length()\n    for i in range(1, a + 1):\n        if n // 2 ** i - (n - k) // 2 ** i:\n            print(0)\n            break\n    else:\n        print(1)\n'
+REFERENCE='# 自写参考解（替换原先引用的提交 51426424：它只判 n//2^i - (n-k)//2^i，漏减 k//2^i，\n# 例如 "3 2"、"16777215 5713800" 都会错输出 0）。\n# 由 Lucas 定理：C(n,k) 为奇数当且仅当 k 的二进制位是 n 的子集，即 n & k == k。\nimport sys\n\nout = []\nfor line in sys.stdin.read().splitlines():\n    if not line.strip():\n        continue\n    n, k = map(int, line.split())\n    out.append("1" if n & k == k else "0")\nprint("\\n".join(out))\n'
 LANGUAGE='Python3'
 NUMBER=2986
 SAMPLE='1 1\n1 0\n2 1\n'

@@ -121,6 +121,22 @@ def generate(number, seed):
 
 REFERENCE="# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1185: 炮兵阵地\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01185/\n# License: not declared in source collection; no license is inferred.\nimport sys\nN,M=map(int,input().split())\ngrid=[]\nfor _ in range(N):\n    grid.append(list(input()))\n# 状态a中的炮兵数\ndef num(a):\n    return bin(a).count('1')\n# 生成第i行所有合法的单行状态\ndef state(i):\n    l=grid[i][:]\n    x=0\n    s=0\n    while l:\n        if l.pop()=='H':\n            s+=2**x\n        x+=1\n    l1=[]\n    for a in range(1<<M):\n        if a&(a<<1) or a&(a>>1) or a&(a<<2) or a&(a>>2):\n            continue\n        if not a&s:\n            l1.append(a)\n    return l1\n# N=1情形特判\nif N==1:\n    state0=state(0)\n    print(max([num(a) for a in state0]))\n    exit()\n# 初始化\nstate2=state(0) # 上两行状态\nstate1=state(1) # 上一行状态\ndp=[[0]*len(state2) for _ in range(len(state1))]\nfor i in range(len(state1)):\n    for j in range(len(state2)):\n        b=state1[i]\n        c=state2[j]\n        if not b&c:\n            dp[i][j]=num(b)+num(c)\n# dp的n方向维度是滚动的\nfor n in range(2,N):\n    state0=state(n) # 当前行状态\n    dp1=[[0]*len(state1) for _ in range(len(state0))]\n    for i in range(len(state0)):\n        a=state0[i]\n        m=num(a)\n        for j in range(len(state1)):\n            b=state1[j]\n            if a&b:\n                continue\n            for k in range(len(state2)):\n                c=state2[k]\n                if not a&c and not b&c:\n                    dp1[i][j]=max(dp1[i][j],m+dp[j][k])\n    dp=[row[:] for row in dp1]\n    state2=state1[:]\n    state1=state0[:]\nprint(max([max(row) for row in dp]))\n"
 NUMBER=1185
+def valid(text):
+    # 题面：首行两个正整数 N M（N<=100，M<=10），随后 N 行，每行连续 M 个 'P'/'H'
+    if not text.endswith('\n'): return False
+    lines=text[:-1].split('\n')
+    h=lines[0].split(' ')
+    if len(h)!=2 or not all(t.isdigit() for t in h): return False
+    n,m=map(int,h)
+    if not (1<=n<=100 and 1<=m<=10) or len(lines)!=n+1: return False
+    return all(len(l)==m and set(l)<=set('PH') for l in lines[1:])
+def extra_1185():
+    # 补充：满规模 N=100、M=10，以及最小/全山地/单列/单行等边界
+    r=random.Random(1185_2024)
+    g=lambda n,m,pool:f"{n} {m}\n"+"\n".join("".join(r.choice(pool) for _ in range(m)) for _ in range(n))+"\n"
+    return ["100 10\n"+"PPPPPPPPPP\n"*100, g(100,10,"PPPH"), g(100,10,"PPPPPPPPPH"), g(100,10,"PH"),
+            g(100,9,"PPPH"), g(100,1,"PPH"), g(1,10,"PPPPH"), "1 1\nP\n", "1 1\nH\n",
+            "100 10\n"+"HHHHHHHHHH\n"*100, "2 2\nPP\nPP\n", "3 3\nHHH\nHPH\nHHH\n"]
 SAMPLE='5 4\nPHPP\nPPHH\nPPPP\nPHPP\nPHHP\n'
 def run(x):
  with tempfile.TemporaryDirectory() as d:
@@ -130,6 +146,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_1185()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

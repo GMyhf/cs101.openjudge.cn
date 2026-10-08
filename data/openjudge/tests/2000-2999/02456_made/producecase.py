@@ -44,7 +44,7 @@ def generate(n, seed):
     if n==2386:
         a,b=r.randint(2,15),r.randint(2,15);return f'{a} {b}\n'+'\n'.join(''.join(r.choice('W..') for _ in range(b)) for _ in range(a))+'\n'
     if n==2456:
-        N=r.randint(3,30);C=r.randint(2,N);x=sorted(r.sample(range(1,10000),N));return f'{N} {C}\n'+'\n'.join(map(str,x))+'\n'
+        return gen_2456(r, seed)
     if n==2808:
         L=r.randint(10,1000);m=r.randint(1,15);return f'{L} {m}\n'+'\n'.join(f'{(a:=r.randint(0,L))} {r.randint(a,L)}' for _ in range(m))+'\n'
     if n==2995:
@@ -156,6 +156,70 @@ def generate(n, seed):
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2456: Aggressive cows\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/02456/\n# License: not declared in source collection; no license is inferred.\nimport sys\nfrom typing import List\n\nclass Solution:\n    def maxDistance(self, stalls: List[int], cows: int) -> int:\n        stalls.sort()\n\n        def can_place(distance: int) -> bool:\n            count = 1  # 第一个牛放在第一个stall\n            last_pos = stalls[0]\n            for pos in stalls[1:]:\n                if pos - last_pos >= distance:\n                    count += 1\n                    last_pos = pos\n                    if count >= cows:\n                        return True\n            return False\n\n        left, right = 1, stalls[-1] - stalls[0] + 1  # 开区间写法\n        ans = 0\n        while left < right:\n            mid = (left + right) // 2\n            if can_place(mid):\n                ans = mid\n                left = mid + 1  # 能放，尝试更大\n            else:\n                right = mid  # 不能放，缩小范围\n        return ans\n\n\n# 用法示例\nif __name__ == "__main__":\n    N, C = map(int, input().split())\n    stalls = [int(input()) for _ in range(N)]\n    sol = Solution()\n    print(sol.maxDistance(stalls, C))\n'
 NUMBER=2456
 SAMPLE='5 3\n1\n2\n8\n4\n9\n'
+def valid(text):
+    """02456 输入契约：首行 "N C"（2<=N<=100000，2<=C<=N），随后 N 行各一个 0..1e9 的整数。"""
+    import re
+    if not text.endswith("\n") or "\r" in text:
+        return False
+    lines = text[:-1].split("\n")
+    num = re.compile(r"0|[1-9][0-9]*")
+    h = lines[0].split(" ")
+    if len(h) != 2 or not all(num.fullmatch(x) for x in h):
+        return False
+    N, C = map(int, h)
+    if not (2 <= N <= 100000 and 2 <= C <= N) or len(lines) != N + 1:
+        return False
+    for s in lines[1:]:
+        if not num.fullmatch(s) or int(s) > 10**9:
+            return False
+    return True
+def gen_2456(r, seed):
+    def fmt(xs, C, shuffle=True):
+        xs = list(xs)
+        if shuffle:
+            r.shuffle(xs)
+        return f"{len(xs)} {C}\n" + "".join(f"{x}\n" for x in xs)
+    # 满规模只保留 27/28/32/37 四组（卡复杂度），其余大类缩到 N=20000，控制 data/ 合计 ≤ 10MB
+    big = seed in (27, 28, 32, 37)
+    if seed == 1:
+        return "2 2\n5\n3\n"
+    if seed == 2:  # 位置重复（题面未要求互异），最大最小距离为 0
+        return "4 3\n7\n7\n7\n100\n"
+    if seed == 3:  # 端点 0 与 1e9，答案 1e9（int 范围边缘）
+        return "3 2\n1000000000\n500000000\n0\n"
+    if seed == 4:  # C = N
+        xs = r.sample(range(0, 1000), 12)
+        return fmt(xs, 12)
+    if seed == 5:  # 降序输入，不排序必错
+        xs = sorted(r.sample(range(0, 10**9 + 1), 15), reverse=True)
+        return fmt(xs, 4, False)
+    if seed <= 18:  # 小规模，可暴力
+        N = r.randint(2, 12); C = r.randint(2, N)
+        hi = r.choice([N, 20, 1000, 10**9])
+        xs = [r.randint(0, hi) for _ in range(N)]
+        return fmt(xs, C)
+    if seed <= 26:  # 中等
+        N = r.randint(1000, 15000); C = r.choice([2, 3, r.randint(2, N), N // 2, N])
+        xs = [r.randint(0, 10**9) for _ in range(N)]
+        return fmt(xs, C)
+    if seed <= 31:  # N = 1e5（值域 < 1e8 以控制文件 ≤ 1MB）
+        N = 100000 if big else 20000; C = [2, 50000, N, r.randint(2, N), 1000][seed - 27]
+        xs = r.sample(range(0, 10**8), N)
+        return fmt(xs, C)
+    if seed <= 35:  # 大值域满 1e9，N≈9 万
+        N = 90000 if big else 20000; C = r.choice([2, 10, r.randint(2, N), N])
+        xs = [r.randint(0, 10**9) for _ in range(N)]
+        xs[0] = 0; xs[1] = 10**9
+        return fmt(xs, C)
+    if seed <= 37:  # 等距排列
+        N = 100000 if big else 20000; step = r.randint(1, 900)
+        xs = [i * step for i in range(N)]
+        return fmt(xs, r.choice([N, N // 3]))
+    # 大量重复位置
+    N = 20000; C = r.randint(2, 1000)
+    pool = r.sample(range(0, 10**8), r.randint(C // 2 + 1, 3 * C))
+    xs = [r.choice(pool) for _ in range(N)]
+    return fmt(xs, C)
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)

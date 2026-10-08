@@ -1,5 +1,22 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+import re as _re
+
+def valid(text):
+    """题面契约（POJ 1003）：若干行测试数据，每行一个恰含三位数字的正数 c（d.dd），
+    0.01 <= c <= 5.20；最后一行是 0.00，作为结束标记。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if len(lines) < 2 or lines[-1] != "0.00":
+        return False
+    for ln in lines[:-1]:
+        if not _re.fullmatch(r"\d\.\d\d", ln):
+            return False
+        v = int(ln[0] + ln[2:])
+        if not (1 <= v <= 520):
+            return False
+    return True
 def generate(n, seed):
     r=random.Random(seed)
     if n==2694:
@@ -144,7 +161,13 @@ def generate(n, seed):
     if n==2802:
         w,h=r.randint(2,8),r.randint(2,8);board=[' '*w for _ in range(h)];y2=1 if seed%2==0 else h
         return f'{w} {h}\n'+'\n'.join(board)+f'\n1 1 {w} {y2}\n0 0 0 0\n0 0\n'
-    if n==1003:return '\n'.join(f'{r.uniform(.01,5.20):.2f}' for _ in range(r.randint(1,6)))+'\n0.00\n'
+    if n==1003:
+        if seed==1:return '\n'.join(f'{v/100:.2f}' for v in range(1,521))+'\n0.00\n'  # 全部 520 个取值
+        if seed==2:return '0.01\n5.20\n0.50\n0.49\n0.51\n5.19\n0.83\n0.84\n0.00\n'  # 边界；0.50 恰为 1/2
+        if seed==3:return '0.50\n0.00\n'
+        if seed==4:return '5.20\n0.00\n'
+        vals=[f'{r.randint(1,520)/100:.2f}' for _ in range(r.randint(1,6) if seed<30 else r.randint(50,300))]
+        return '\n'.join(vals)+'\n0.00\n'
     if n==1011:
         a=[r.randint(1,30) for _ in range(r.randint(3,20))];return f'{len(a)}\n'+' '.join(map(str,a))+'\n0\n'
     if n==1017:return ' '.join(str(r.randint(0,20)) for _ in range(6))+'\n0 0 0 0 0 0\n'
@@ -157,7 +180,7 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
-REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1003: Hangover\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/01003/\n# License: not declared in source collection; no license is inferred.\nimport sys\nimport math\n\nwhile True:\n    n = float(input())\n    if math.isclose(n, 0.00, rel_tol=1e-5) :\n        break\n\n    cnt = 0\n    tot = 0\n    while  True:\n        cnt += 1\n        tot += 1/(1+cnt)\n        if tot>n:\n            break\n\n    print(cnt, "card(s)")\n'
+REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1003: Hangover\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/01003/\n# License: not declared in source collection; no license is inferred.\nimport sys\nimport math\n\nwhile True:\n    n = float(input())\n    if math.isclose(n, 0.00, rel_tol=1e-5) :\n        break\n\n    cnt = 0\n    tot = 0\n    while  True:\n        cnt += 1\n        tot += 1/(1+cnt)\n        if tot>=n-1e-9:  # 题面要求“至少 c”，c=0.50 恰等于 1/2，须取 1 张\n            break\n\n    print(cnt, "card(s)")\n'
 NUMBER=1003
 SAMPLE='1.00\n3.71\n0.04\n5.19\n0.00\n'
 def run(x):

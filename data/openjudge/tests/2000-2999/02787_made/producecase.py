@@ -151,6 +151,24 @@ def generate(number, seed):
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2787: 算24\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02787/\n# License: not declared; no license is inferred.\nimport sys\n#gpt\n\'\'\'\n在这个优化的代码中，我们使用了递归和剪枝策略。首先按照题目的要求，输入的4个数字保持不变，\n不进行排序。在每一次运算中，我们首先尝试加法和乘法，因为它们的运算结果更少受到数字大小的影响。\n然后，我们根据数字的大小关系尝试减法和除法，只进行必要的组合运算，避免重复运算。\n\n值得注意的是，这种优化策略可以减少冗余计算，但对于某些输入情况仍需要遍历所有可能的组合。\n因此，在最坏情况下仍然可能需要较长的计算时间。\n\'\'\'\n\ndef find(nums):\n    if len(nums) == 1:\n        return abs(nums[0] - 24) <= 0.000001\n\n    for i in range(len(nums)):\n        for j in range(i+1, len(nums)):\n            a = nums[i]\n            b = nums[j]\n            remaining_nums = []\n\n            for k in range(len(nums)):\n                if k != i and k != j:\n                    remaining_nums.append(nums[k])\n\n            # 尝试加法和乘法运算\n            if find(remaining_nums + [a + b]) or find(remaining_nums + [a * b]):\n                return True\n\n            # 尝试减法运算\n            if a > b and find(remaining_nums + [a - b]):\n                return True\n            if b > a and find(remaining_nums + [b - a]):\n                return True\n\n            # 尝试除法运算\n            if b != 0 and find(remaining_nums + [a / b]):\n                return True\n            if a != 0 and find(remaining_nums + [b / a]):\n                return True\n\n    return False\n\nwhile True:\n    card = [int(x) for x in input().split()]\n    if sum(card) == 0:\n        break\n\n    print("YES" if find(card) else "NO")\n'
 NUMBER=2787
+def valid(text):
+    """题面：多行，每行4个小于10的正整数；最后一行4个0表示结束（之后不再有数据）。"""
+    if not text.endswith("\n"): return False
+    lines = text[:-1].split("\n")
+    if len(lines) < 2 or lines[-1] != "0 0 0 0": return False
+    for line in lines[:-1]:
+        t = line.split(" ")
+        if len(t) != 4 or any(len(x) != 1 or x not in "123456789" for x in t): return False
+    return True
+def extra_cases():
+    """补充：全部 9^4 个有序四元组（打乱）、只用分数中间值才能凑出的易错组、全 NO 组与最小规模组。"""
+    import itertools
+    r = random.Random(2787)
+    allt = [" ".join(map(str, t)) for t in itertools.product(range(1, 10), repeat=4)]
+    r.shuffle(allt)
+    tricky = ["3 3 8 8", "1 5 5 5", "3 3 7 7", "1 3 4 6", "1 4 5 6", "8 3 8 3", "5 1 5 5", "7 3 7 3", "6 4 3 1", "6 5 4 1", "1 1 1 1", "9 9 9 9", "1 1 4 2"]
+    nos = ["1 1 1 1", "1 1 1 2", "1 1 4 2", "9 9 9 9", "1 1 2 2", "7 7 7 7", "5 7 9 9", "1 6 7 7", "1 1 1 3"]
+    return ["\n".join(allt) + "\n0 0 0 0\n", "\n".join(tricky) + "\n0 0 0 0\n", "\n".join(nos) + "\n0 0 0 0\n", "1 1 1 1\n0 0 0 0\n", "4 6 1 1\n0 0 0 0\n"]
 SAMPLE='5 5 5 1\n1 1 4 2\n0 0 0 0\n'
 def run(x):
  with tempfile.TemporaryDirectory() as d:
@@ -160,6 +178,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

@@ -89,7 +89,18 @@ def generate(number, seed):
     if number==1091:return f"{r.randint(1,15)} {r.randint(1,100000000)}\n"
     if number==1154:
         h,w=r.randint(1,7),r.randint(1,7);return f"{h} {w}\n"+"\n".join("".join(r.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(w)) for _ in range(h))+"\n"
-    if number==1183:return f"{r.randint(1,60000)}\n"
+    if number==1183:
+        if seed<30:return f"{r.randint(1,60000)}\n"
+        # 边界与 a*a+1 为质数的组：此时 b+c=a*a+2a+2，a>46340 时超出 32 位有符号整数
+        def isp(m):
+            i=2
+            while i*i<=m:
+                if m%i==0:return False
+                i+=1
+            return True
+        if seed==36:return f"{r.choice([a for a in range(46341,60001) if isp(a*a+1)])}\n"
+        if seed==37:return f"{min(a for a in range(46341,60001) if isp(a*a+1))}\n"
+        return f"{ {30:60000,31:59996,32:59956,33:2,34:3,35:59999,38:7,39:239}[seed] }\n"
     if number==1184:return f"{r.randint(0,999999):06d} {r.randint(0,999999):06d}\n"
     if number==2001:
         a={word(2,15) for _ in range(12)}
@@ -147,6 +158,10 @@ def generate(number, seed):
         n=r.randint(2,50);return f"{n}\n"+" ".join(f"{r.uniform(.5,2.5):.5f}" for _ in range(n))+"\n"
     raise KeyError(number)
 
+def valid(text):
+    """题面：输入只有一个正整数 a，1<=a<=60000。"""
+    import re
+    return re.fullmatch(r'[1-9][0-9]*\n',text) is not None and 1<=int(text)<=60000
 NO_INPUT={3225, 2698}
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1183: 反正切函数的应用\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01183/\n# License: not declared; no license is inferred.\nimport math\na=int(input())\nm=a**2+1\nfor x in range(int(math.sqrt(m)),0,-1):\n    if m%x==0:\n        print(x+m//x+2*a)\n        break\n'
 LANGUAGE='Python3'

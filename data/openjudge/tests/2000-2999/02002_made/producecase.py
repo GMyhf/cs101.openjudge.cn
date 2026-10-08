@@ -152,6 +152,64 @@ REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02002/statis
 LANGUAGE='Python3'
 NUMBER=2002
 SAMPLE='4\n1 0\n0 1\n1 1\n0 0\n9\n0 0\n1 0\n2 0\n0 2\n1 2\n2 2\n0 1\n1 1\n2 1\n4\n-2 5\n3 7\n0 0\n5 2\n0\n'
+def valid(text):
+    # 题面：多组（不超过 15 组），每组首行 n（1<=n<=1000），其后 n 行各两个整数 x y，|x|,|y|<=20000，
+    # 组内点互异；以 n=0 的一组结尾
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n');i=0;groups=0
+    def isint(t):
+        u=t[1:] if t.startswith('-') else t
+        return u.isdigit() and t==str(int(t))
+    while True:
+        if i>=len(lines) or not isint(lines[i]):return False
+        n=int(lines[i]);i+=1
+        if n==0:break
+        if not 1<=n<=1000 or i+n>len(lines):return False
+        pts=set()
+        for t in lines[i:i+n]:
+            v=t.split(' ')
+            if len(v)!=2 or not all(isint(z) and abs(int(z))<=20000 for z in v):return False
+            pts.add((int(v[0]),int(v[1])))
+        if len(pts)!=n:return False
+        i+=n;groups+=1
+    return i==len(lines) and 1<=groups<=15
+def extra_cases():
+    r=random.Random(20022002)
+    L=20000
+    def fmt(groups):
+        out=[]
+        for g in groups:
+            g=list(g);r.shuffle(g);out.append(str(len(g)));out+=[f'{x} {y}' for x,y in g]
+        return '\n'.join(out)+'\n0\n'
+    def grid(w,h,step,ox,oy,n):
+        a=[(ox+i*step,oy+j*step) for i in range(w) for j in range(h)]
+        return r.sample(a,min(n,len(a)))
+    def rand_pts(n,lo=-L,hi=L):
+        a=set()
+        while len(a)<n:a.add((r.randint(lo,hi),r.randint(lo,hi)))
+        return a
+    def tilted(n):
+        # 以 (a,b),(-b,a) 为基的斜格点，制造大量斜正方形
+        a,b=r.randint(1,40),r.randint(1,40);ox,oy=r.randint(-3000,3000),r.randint(-3000,3000)
+        k=int((n*1.0)**.5)+1;pts=set()
+        for i in range(-k,k+1):
+            for j in range(-k,k+1):
+                x,y=ox+i*a-j*b,oy+i*b+j*a
+                if abs(x)<=L and abs(y)<=L:pts.add((x,y))
+        pts=list(pts);r.shuffle(pts);return pts[:n]
+    cs=[]
+    cs.append(fmt([[(5,5)],[(L,L),(-L,-L)],[(0,0),(1,1),(0,1)],[(-L,-L),(-L,L),(L,-L),(L,L)],[(0,0),(1,1),(2,0),(1,-1)]]))
+    cs.append(fmt([grid(32,32,1,-16,-16,1000)]))                 # 稠密格点，正方形极多
+    cs.append(fmt([grid(32,32,1290,-L,-L,1000)]))                # 格点铺满坐标边界
+    cs.append(fmt([tilted(1000)]))
+    cs.append(fmt([rand_pts(1000)]))                              # 稀疏随机，答案多为 0
+    cs.append(fmt([rand_pts(1000,-20,20)]))
+    cs.append(fmt([grid(32,32,1,L-31,L-31,1000)]+[grid(40,25,1,-L,-L,1000)]))
+    for k in range(3):
+        cs.append(fmt([grid(32,32,r.randint(1,3),r.randint(-L,L-100),r.randint(-L,L-100),r.randint(1,1000)) for _ in range(5)]+[tilted(r.randint(1,1000)) for _ in range(5)]))
+    cs.append(fmt([grid(32,32,1,-16,-16,1000) for _ in range(2)]+[tilted(1000) for _ in range(2)]))  # 4 组满规模（limits.json 总限时 1000ms，Python 单组 10s；8 组约 6~8s 超过一半）
+    cs.append(fmt([rand_pts(r.randint(1,60),-6,6) for _ in range(15)]))
+    return cs
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -159,7 +217,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])+extra_cases()
   for i,x in enumerate(cases):
+   assert valid(x),i
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

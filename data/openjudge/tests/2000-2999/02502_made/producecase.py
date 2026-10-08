@@ -158,6 +158,170 @@ def generate(n, seed):
     raise KeyError(n)
 
 REFERENCE="# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 2502: Subway\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024sp_routine/02502/\n# License: not declared in source collection; no license is inferred.\nimport sys\nimport math\nimport heapq\n\n# 计算两点之间的欧几里得距离\ndef get_distance(x1, y1, x2, y2):\n    return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)\n\n# 读取起点（家）和终点（学校）坐标\nsx, sy, ex, ey = map(int, input().split())\n\n# min_time: 记录从起点到每个地铁站/终点的最短时间（单位：小时）\nmin_time = {}\n\n# rails: 记录所有地铁连接（双向）\nrails = set()\n\n# 读取所有地铁线路\nwhile True:\n    try:\n        rail = list(map(int, input().split()))\n        if rail == [-1, -1]:\n            break\n        # 解析当前地铁线路的所有站点\n        stations = [(rail[2 * i], rail[2 * i + 1]) for i in range(len(rail) // 2 - 1)]\n\n        for j, station in enumerate(stations):\n            # 初始化所有地铁站点的最短时间为无穷大\n            min_time[station] = float('inf')\n            # 添加地铁线路中相邻站点的双向连接\n            if j != len(stations) - 1:\n                rails.add((station, stations[j + 1]))\n                rails.add((stations[j + 1], station))\n    except EOFError:\n        break  # 输入结束\n\n# 把起点和终点加入时间表中\nmin_time[(sx, sy)] = 0  # 起点时间为 0\nmin_time[(ex, ey)] = float('inf')  # 终点初始化为无穷大\n\n# 使用小根堆实现 Dijkstra 算法，按时间升序处理节点\nmin_heap = [(0, sx, sy)]  # (当前耗时, 当前x, 当前y)\n\nwhile min_heap:\n    curr_time, x, y = heapq.heappop(min_heap)\n\n    # 如果当前耗时不是最短路径中记录的值，说明已经被更新，跳过\n    if curr_time > min_time[(x, y)]:\n        continue\n\n    # 如果已经到达终点，提前结束\n    if (x, y) == (ex, ey):\n        break\n\n    # 遍历所有可达点（隐式图）\n    for position in min_time.keys():\n        if position == (x, y):\n            continue  # 自己跳过\n        nx, ny = position\n\n        # 计算当前位置到下一个点的距离\n        dis = get_distance(x, y, nx, ny)\n\n        # 判断是否为地铁连接：地铁速度是步行的4倍\n        rail_factor = 4 if ((position, (x, y)) in rails or ((x, y), position) in rails) else 1\n\n        # 计算到该点的所需时间（单位：小时）\n        new_time = curr_time + dis / (10000 * rail_factor)\n\n        # 如果时间更短，则更新并加入堆中\n        if new_time < min_time[position]:\n            min_time[position] = new_time\n            heapq.heappush(min_heap, (new_time, nx, ny))\n\n# 输出从起点到终点的最短时间，转换为分钟并四舍五入\nprint(round(min_time[(ex, ey)] * 60))\n"
+import math, re
+
+def valid(text):
+    """题面：首先是家、学校的 x y 坐标（整数）；随后若干条地铁线，每条线是若干个非负整数坐标 x y（至少两站），
+    以哑坐标 -1 -1 结束；全城地铁站总数至多 200。"""
+    toks = text.split()
+    if not all(re.fullmatch(r"-?[0-9]+", t) for t in toks):
+        return False
+    v = [int(t) for t in toks]
+    if len(v) < 4 or len(v) % 2:
+        return False
+    total = 0
+    cur = 0
+    for k in range(4, len(v), 2):
+        x, y = v[k], v[k + 1]
+        if (x, y) == (-1, -1):
+            if cur < 2:
+                return False
+            cur = 0
+        elif x >= 0 and y >= 0:
+            cur += 1
+            total += 1
+        else:
+            return False
+    if cur != 0:  # 最后一条线没有以 -1 -1 结束
+        return False
+    return total <= 200
+
+
+def solve2502(text):
+    """独立的 O(V^2) Dijkstra，返回精确分钟数（未取整）。"""
+    v = list(map(int, text.split()))
+    home, school = (v[0], v[1]), (v[2], v[3])
+    pts = [home, school]
+    idx = {home: 0}
+    idx.setdefault(school, 1)
+    adj = set()
+    line = []
+    def node(p):
+        if p not in idx:
+            idx[p] = len(pts); pts.append(p)
+        return idx[p]
+    for k in range(4, len(v), 2):
+        p = (v[k], v[k + 1])
+        if p == (-1, -1):
+            for a, b in zip(line, line[1:]):
+                adj.add((a, b)); adj.add((b, a))
+            line = []
+        else:
+            line.append(node(p))
+    n = len(pts)
+    INF = float("inf")
+    dist = [INF] * n
+    dist[0] = 0.0
+    done = [False] * n
+    for _ in range(n):
+        u = min((i for i in range(n) if not done[i]), key=lambda i: dist[i])
+        done[u] = True
+        for w in range(n):
+            if not done[w]:
+                d = math.hypot(pts[u][0] - pts[w][0], pts[u][1] - pts[w][1])
+                speed = 40000.0 if (u, w) in adj else 10000.0
+                nd = dist[u] + d / speed * 60
+                if nd < dist[w]:
+                    dist[w] = nd
+    return dist[idx[school]]
+
+
+def make_lines(r, lines):
+    return "".join(" ".join(f"{x} {y}" for x, y in ln) + " -1 -1\n" for ln in lines)
+
+
+def g2502(r, kind, W):
+    """kind: small/random/commute/zigzag/transfer/max1/maxmany"""
+    def pt():
+        return (r.randint(0, W), r.randint(0, W))
+    def walk(start, k, step):
+        out = [start]; seen = {start}
+        while len(out) < k:
+            x, y = out[-1]
+            q = (min(W, max(0, x + r.randint(-step, step))), min(W, max(0, y + r.randint(-step, step))))
+            if q not in seen:
+                out.append(q); seen.add(q)
+        return out
+    while True:
+        home, school = pt(), pt()
+        if home == school:
+            continue
+        lines = []
+        if kind == "small":
+            a = pt(); b = pt()
+            if a == b:
+                continue
+            lines = [[a, b]]
+        elif kind == "random":
+            budget = r.randint(10, 120)
+            while budget >= 2:
+                k = r.randint(2, min(budget, 25)); budget -= k
+                lines.append(walk(pt(), k, max(1, W // 8)))
+        elif kind == "commute":
+            # 一条从家附近到学校附近的线，站与站之间有轻微抖动，外加若干干扰线
+            k = r.randint(5, 40)
+            ln = []
+            for i in range(k):
+                t = i / (k - 1)
+                x = home[0] + (school[0] - home[0]) * t + r.randint(-W // 50 - 1, W // 50 + 1)
+                y = home[1] + (school[1] - home[1]) * t + r.randint(-W // 50 - 1, W // 50 + 1)
+                q = (min(W, max(0, int(x))), min(W, max(0, int(y))))
+                if not ln or ln[-1] != q:
+                    ln.append(q)
+            if len(ln) < 2:
+                continue
+            lines.append(ln)
+            for _ in range(r.randint(0, 5)):
+                lines.append(walk(pt(), r.randint(2, 15), max(1, W // 6)))
+        elif kind == "zigzag":
+            # 站点来回折返：只能沿相邻站乘车，直接把同线不相邻站连成地铁边的写法会错
+            k = r.randint(6, 60)
+            ln = []
+            for i in range(k):
+                t = i / (k - 1)
+                x = home[0] + (school[0] - home[0]) * t
+                y = home[1] + (school[1] - home[1]) * t
+                off = (W // 3) * (1 if i % 2 else -1)
+                dx, dy = school[1] - home[1], home[0] - school[0]
+                L = math.hypot(dx, dy) or 1
+                q = (min(W, max(0, int(x + off * dx / L))), min(W, max(0, int(y + off * dy / L))))
+                if not ln or ln[-1] != q:
+                    ln.append(q)
+            if len(ln) < 2 or len(set(ln)) != len(ln):
+                continue
+            lines.append(ln)
+        elif kind == "transfer":
+            # 两条线在共享站点处换乘
+            mid = pt()
+            a = walk(home, r.randint(2, 20), max(1, W // 10))
+            b = walk(mid, r.randint(2, 20), max(1, W // 10))
+            a.append(mid) if mid not in a else None
+            b2 = [mid] + [q for q in walk(school, r.randint(2, 20), max(1, W // 10)) if q != mid]
+            lines = [a, b2] if len(b2) >= 2 else [a, b]
+            for _ in range(r.randint(0, 4)):
+                lines.append(walk(pt(), r.randint(2, 10), max(1, W // 6)))
+        elif kind == "max1":
+            lines = [walk(pt(), 200, max(1, W // 10))]
+        elif kind == "maxmany":
+            budget = 200
+            while budget >= 2:
+                k = min(budget, r.randint(2, 30))
+                if budget - k == 1:
+                    k += 1
+                budget -= k
+                lines.append(walk(pt(), k, max(1, W // 8)))
+        r.shuffle(lines)
+        text = f"{home[0]} {home[1]} {school[0]} {school[1]}\n" + make_lines(r, lines)
+        ans = solve2502(text)
+        # 避开 x.5 分钟附近的取整歧义
+        if abs(ans - math.floor(ans) - 0.5) < 1e-4:
+            continue
+        return text
+
+
+PLAN2502 = (["small"] * 4 + ["random"] * 8 + ["commute"] * 8 + ["zigzag"] * 5 + ["transfer"] * 6
+            + ["max1"] * 4 + ["maxmany"] * 4)
+
 NUMBER=2502
 SAMPLE='0 0 10000 1000\n0 200 5000 200 7000 200 -1 -1\n2000 600 5000 600 10000 600 -1 -1\n'
 def run(x):
@@ -168,6 +332,11 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ cases=[SAMPLE]
+ for s,kind in enumerate(PLAN2502, start=1):
+  r=random.Random(2502000+s);W=r.choice([10000,10000,20000,100000]) if kind not in ('small',) else r.choice([100,10000])
+  cases.append(g2502(r,kind,W))
+ assert all(valid(x) for x in cases)
+ for i,x in enumerate(cases):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

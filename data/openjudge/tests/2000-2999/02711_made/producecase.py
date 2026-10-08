@@ -109,7 +109,19 @@ def generate(number, seed):
         total, walks = r.randint(1, 200), r.randint(1, 30)
         return f"{total} {walks}\n" + "\n".join(str(r.randint(1, 2)) for _ in range(total)) + "\n"
     if number == 2711:
-        heights = [r.randint(130, 230) for _ in range(r.randint(2, 100))]
+        special = {
+            1: [150, 150], 2: [130, 230], 3: [230, 130], 4: [180] * 100,
+            5: list(range(131, 231)), 6: list(range(230, 130, -1)),
+            7: list(range(130, 230, 2)) + list(range(229, 130, -2)),     # 恰好是合唱队形，答案 0
+            8: [130 + abs(i - 50) for i in range(100)],                   # V 形
+            9: [130 + (i % 2) * 100 for i in range(100)],                 # 高矮交替
+            10: [130 + i // 2 for i in range(100)],                       # 不降但有相等，卡 <= 写法
+        }
+        if seed in special: heights = special[seed]
+        elif seed <= 16: heights = [r.randint(130, 230) for _ in range(100)]
+        elif seed <= 20: heights = [r.randint(130, 135) for _ in range(r.randint(50, 100))]   # 大量相等身高
+        elif seed <= 24: heights = [r.randint(130, 230) for _ in range(r.randint(2, 12))]
+        else: heights = [r.randint(130, 230) for _ in range(r.randint(2, 100))]
         return f"{len(heights)}\n" + " ".join(map(str, heights)) + "\n"
     if number == 2797:
         words = set(); target = r.randint(2, 60)
@@ -118,6 +130,14 @@ def generate(number, seed):
         words = sorted(words); r.shuffle(words)
         return "\n".join(words) + "\n"
     raise KeyError(number)
+
+def valid(text):
+    """题面：第一行整数 N（2 <= N <= 100）；下一行 N 个空格分隔的整数 Ti（130 <= Ti <= 230）。"""
+    import re
+    if not re.fullmatch(r"[1-9]\d*\n\d+( \d+)*\n", text): return False
+    first, second = text.split("\n")[:2]
+    n = int(first); t = list(map(int, second.split()))
+    return 2 <= n <= 100 and len(t) == n and all(130 <= x <= 230 for x in t)
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2711: 合唱队形\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02711/\n# License: not declared in source collection; no license is inferred.\nimport sys\nn = int(input())\n*h, = map(int, input().split())\n\ndp = [1]*n\n\nfor i in range(1, n) :\n    for j in range(i):\n        if h[j] < h[i]:\n            dp[i] = max(dp[i], dp[j] + 1)\n\n\n*rev_h, = reversed(h)\nrdp = [1]*n\n\nfor i in range(1, n) :\n    for j in range(i):\n        if rev_h[j] < rev_h[i]:\n            rdp[i] = max(rdp[i], rdp[j] + 1)\n\nu = 0\nzip_dp = zip(dp, list(reversed(rdp)))\n*u, = map(lambda x: x[0]+x[1], zip_dp)\n\nans = n - (max(u) - 1)\nprint(ans)\n'
 NUMBER=2711

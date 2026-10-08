@@ -1,31 +1,32 @@
 # Source: /home/ubuntu/hongfei/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md
-n, m = map(int, input().split())
-parent=[i for i in range(n)]
-edges=[]
-diff=[]
-for _ in range(m):
-    a, b, c = map(int, input().split())
-    if c!=1:
-        edges.append((a, b))
-    else:
-        diff.append((a, b))
+# 原样例解只检查“相同”连通块内有无“不同”结论，漏判“不同”构成的奇环（如三株两两不同），已改为带权并查集，与 producecase.py 的 REFERENCE_SOURCE 一致。
+# 2026-10-08 本地修正：上面引用的原始代码在题面范围内有缺陷，已按题面改过，与原提交不再逐字一致（见 CHANGELOG）。
+import sys
+sys.setrecursionlimit(10000)
+data = sys.stdin.read().split()
+n, m = int(data[0]), int(data[1])
+parent = list(range(n))
+rel = [0] * n  # rel[x]: x 与 parent[x] 是否不同种类
+
 
 def find(x):
-    if parent[x] != x:
-        parent[x] = find(parent[x])
-    return parent[x]
-def union(x, y):
-    nx, ny = find(x), find(y)
-    if nx != ny:
-        parent[ny] = nx
-        #return True
-    #return False
+    if parent[x] == x:
+        return x
+    root = find(parent[x])
+    rel[x] ^= rel[parent[x]]
+    parent[x] = root
+    return root
 
-for a, b in edges:
-    union(a, b)
 
-for a, b in diff:
-    if find(a) == find(b):
-        print('NO')
-        exit()
-print('YES')
+ok = True
+for k in range(m):
+    a, b, c = int(data[2 + 3 * k]), int(data[3 + 3 * k]), int(data[4 + 3 * k])
+    ra, rb = find(a), find(b)
+    if ra == rb:
+        if rel[a] ^ rel[b] != c:
+            ok = False
+            break
+    else:
+        parent[rb] = ra
+        rel[rb] = rel[a] ^ rel[b] ^ c
+print('YES' if ok else 'NO')

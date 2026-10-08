@@ -80,6 +80,9 @@ def generate(number, seed):
         rows, cols = r.randint(1, 25), r.randint(1, 10)
         return f"{rows} {cols}\n" + "\n".join("".join(r.choice("PPPH") for _ in range(cols)) for _ in range(rows)) + "\n"
     if number == 2229:
+        # 前 10 组固定：最小 N、奇偶、答案未取模的小 N、上限 N=1e6 与 1e6-1；其余随机
+        fixed = [1, 2, 3, 4, 1_000_000, 999_999, 100, 1000, 2**19, 2**19 + 1]
+        if seed <= len(fixed): return f"{fixed[seed - 1]}\n"
         return f"{r.randint(1, 1_000_000)}\n"
     if number == 2533:
         values = [r.randint(0, 10000) for _ in range(r.randint(1, 200))]
@@ -119,6 +122,11 @@ def generate(number, seed):
         return "\n".join(words) + "\n"
     raise KeyError(number)
 
+def valid(text):
+    """题面：A single line with a single integer, N（1 <= N <= 1,000,000）。"""
+    import re
+    m = re.fullmatch(r"([1-9]\d*)\n?", text)
+    return bool(m) and 1 <= int(m.group(1)) <= 1_000_000
 REFERENCE="# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2229: Sumsets\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02229/\n# License: not declared in source collection; no license is inferred.\nimport sys\n# 按照整数划分来做\n'''\n递推式：\n如果i为奇数：那么它一定可以由f[i-1]转移过来，是前面的那个数所有方案里都加了一个1\n\n如果i为偶数：它可以看成是f[i-2]中的方案加了一个2，或者是f[i/2]的方案里乘了一个2；\n所以应该是f[i-2]和f[i/2]的和\n\n'''\nMOD = 10**9\nN = int(input())\ndp = [1] + [0]*N\nfor i in range(1, N+1):\n    if i & 1:\n        dp[i] = dp[i-1]\n    else:\n        dp[i] = (dp[i-2] + dp[i//2]) % MOD #\n\nprint(dp[-1])\n"
 NUMBER=2229
 SAMPLE='7\n'

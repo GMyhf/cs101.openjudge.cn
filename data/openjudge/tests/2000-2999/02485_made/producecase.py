@@ -348,13 +348,7 @@ def generate(number, seed):
             for j in range(7): state[move[j-1]] = old[j]
         return " ".join(map(str, state)) + "\n0\n"
     if number == 2485:
-        chunks = []
-        for _ in range(r.randint(1, 3)):
-            n = r.randint(3, 10); matrix = [[0] * n for _ in range(n)]
-            for i in range(n):
-                for j in range(i + 1, n): matrix[i][j] = matrix[j][i] = r.randint(1, 65536)
-            chunks.append(str(n) + "\n" + "\n".join(" ".join(map(str, row)) for row in matrix))
-        return f"{len(chunks)}\n" + "\n\n".join(chunks) + "\n"
+        return gen_2485(r, seed)
     if number == 2549:
         chunks = []
         for index in range(r.randint(1, 4)):
@@ -421,6 +415,102 @@ REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02485/statis
 LANGUAGE='Python3'
 NUMBER=2485
 SAMPLE='1\n\n3\n0 990 692\n990 0 179\n692 179 0\n'
+def valid(text):
+    """02485 输入契约：首行 T；每组首行 N（3<=N<=500），随后 N 行各 N 个整数构成距离矩阵
+    （对角线 0，其余 1..65536，对称）。组与组之间（以及 T 之后、末组之后）允许空行
+    （题面说每组后有一个空行，样例则在 T 之后有空行）。"""
+    import re
+    if not text.endswith("\n") or "\r" in text:
+        return False
+    lines = text[:-1].split("\n")
+    num = re.compile(r"0|[1-9][0-9]*")
+    if not num.fullmatch(lines[0]):
+        return False
+    T = int(lines[0]); i = 1
+    if T < 1:
+        return False
+    for _ in range(T):
+        while i < len(lines) and lines[i] == "":
+            i += 1
+        if i >= len(lines) or not num.fullmatch(lines[i]):
+            return False
+        n = int(lines[i]); i += 1
+        if not 3 <= n <= 500 or i + n > len(lines):
+            return False
+        mat = []
+        for a in range(n):
+            tok = lines[i].split(" "); i += 1
+            if len(tok) != n or not all(num.fullmatch(x) for x in tok):
+                return False
+            row = list(map(int, tok))
+            for b, v in enumerate(row):
+                if (v != 0) if a == b else not (1 <= v <= 65536):
+                    return False
+            mat.append(row)
+        for a in range(n):
+            for b in range(a):
+                if mat[a][b] != mat[b][a]:
+                    return False
+    while i < len(lines) and lines[i] == "":
+        i += 1
+    return i == len(lines)
+def oracle_2485(text):
+    tok = list(map(int, text.split())); p = 1; out = []
+    for _ in range(tok[0]):
+        n = tok[p]; p += 1
+        m = tok[p:p + n * n]; p += n * n
+        edges = sorted((m[a * n + b], a, b) for a in range(n) for b in range(a + 1, n))
+        par = list(range(n))
+        def f(x):
+            while par[x] != x:
+                par[x] = par[par[x]]; x = par[x]
+            return x
+        cnt = 0; ans = 0
+        for w, a, b in edges:
+            ra, rb = f(a), f(b)
+            if ra != rb:
+                par[ra] = rb; cnt += 1; ans = w
+                if cnt == n - 1:
+                    break
+        out.append(f"{ans}\n")
+    return "".join(out)
+def gen_2485(r, seed):
+    def mat(n, lo=1, hi=65536, fixed=None):
+        m = [[0] * n for _ in range(n)]
+        for a in range(n):
+            for b in range(a + 1, n):
+                m[a][b] = m[b][a] = fixed if fixed is not None else r.randint(lo, hi)
+        return m
+    def fmt(cases):
+        return f"{len(cases)}\n" + "".join(
+            f"{len(m)}\n" + "".join(" ".join(map(str, row)) + "\n" for row in m) + "\n" for m in cases)
+    if seed == 1:  # 最小 N=3，答案为最大边 65536
+        return fmt([[[0, 65536, 65536], [65536, 0, 1], [65536, 1, 0]]])
+    if seed == 2:  # 全部相等 / 全部为 1 / 全部为 65536
+        return fmt([mat(3, fixed=1), mat(5, fixed=65536), mat(4, fixed=7)])
+    if seed == 3:  # 一条链很短、其余很长：答案不是全局最小也不是最大
+        n = 6; m = mat(n, 50000, 65536)
+        for a in range(n - 1):
+            m[a][a + 1] = m[a + 1][a] = 10 + a
+        return fmt([m])
+    if seed <= 18:  # 小规模多组
+        return fmt([mat(r.randint(3, 12), 1, r.choice([3, 100, 65536])) for _ in range(r.randint(1, 8))])
+    if seed <= 26:  # 中等规模多组
+        return fmt([mat(r.randint(30, 150)) for _ in range(r.randint(2, 4))])
+    # data/ 合计限 10MB：只保留 3 组真正满规模（29：N=500 值域 1..99；33：N≈380 满值域；
+    # 37：N=500 稀疏好边网络），其余规模组把 N 缩到 200..300。
+    if seed <= 32:  # N=500 满规模仅 seed 29（值域缩小控制文件 ≤1MB），其余 N=200..300
+        n = 500 if seed == 29 else r.randint(200, 300)
+        return fmt([mat(n, 1, r.choice([9, 99, 99]))])
+    if seed <= 36:  # 大值域满 65536：seed 33 取 N≈380，其余 N=150..250
+        return fmt([mat(r.randint(360, 380) if seed == 33 else r.randint(150, 250))])
+    # 37..39：一个稀疏“好边”网络，其余边都是 99（随机树边 1..98）；seed 37 为 N=500，其余 N=250..300
+    n = 500 if seed == 37 else r.randint(250, 300); m = mat(n, 99, 99)
+    perm = list(range(n)); r.shuffle(perm)
+    for k in range(1, n):
+        a, b = perm[k], perm[r.randrange(k)]
+        m[a][b] = m[b][a] = r.randint(1, 98)
+    return fmt([m])
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]

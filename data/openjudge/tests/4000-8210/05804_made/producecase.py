@@ -1,4 +1,4 @@
-"""5804 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+"""5804 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 40 组数据。
 
 出处：build_001c
 生成器与循环取自 scripts/build_001c.py（批次 001c），保持同一形状；
@@ -21,7 +21,73 @@ def g5804(r):
         parts.append(" ".join(str(r.randint(1, 10000)) for _ in range(n)))
     return "\n".join(parts) + "\n"
 
+# 题面：第一行 t；每组第一行 n（1<=n<=10），第二行 n 个节点编号，取值 [1,10000]。t 未给上限。
+def valid(text):
+    if not text.endswith("\n") or "\r" in text:
+        return False
+    lines = text[:-1].split("\n")
+    def num(t):
+        return t.isdigit() and (t == "0" or t[0] != "0")
+    if not num(lines[0]):
+        return False
+    t = int(lines[0])
+    if t < 1 or len(lines) != 1 + 2 * t:
+        return False
+    for g in range(t):
+        a, b = lines[1 + 2 * g], lines[2 + 2 * g]
+        if not num(a) or not 1 <= int(a) <= 10:
+            return False
+        toks = b.split(" ")
+        if len(toks) != int(a) or not all(num(x) and 1 <= int(x) <= 10000 for x in toks):
+            return False
+    return True
+
+
+def descendant(r, a):
+    """在 [1,10000] 内随机取 a 的一个子孙（含 a 本身）。"""
+    ks = [k for k in range(15) if a << k <= 10000]
+    k = r.choice(ks)
+    lo = a << k
+    return r.randint(lo, min(10000, lo + (1 << k) - 1))
+
+
+def structured_group(r):
+    mode = r.choice(["sub", "sub", "sub", "one", "same", "anc", "edge", "deep"])
+    if mode == "one":
+        nodes = [r.randint(1, 10000)]
+    elif mode == "same":
+        nodes = [r.randint(1, 10000)] * r.randint(2, 10)
+    elif mode == "edge":
+        nodes = [r.choice([1, 10000, 9999, 8192, 5000, 4999, 2]) for _ in range(r.randint(1, 10))]
+    elif mode == "deep":
+        # 公共祖先很深：取 [4096,10000] 附近的点，子孙很少
+        a = r.randint(2000, 5000)
+        nodes = [descendant(r, a) for _ in range(r.randint(1, 10))]
+    else:
+        a = r.randint(1, 2500) if r.random() < 0.7 else r.randint(1, 10000)
+        nodes = [descendant(r, a) for _ in range(r.randint(1, 10))]
+        if mode == "anc" or r.random() < 0.2:
+            nodes[r.randrange(len(nodes))] = a  # 祖先本身也在其中
+    r.shuffle(nodes)
+    return nodes
+
+
+def g5804_hard(r, t):
+    parts = [str(t)]
+    for _ in range(t):
+        nodes = structured_group(r)
+        parts.append(str(len(nodes)))
+        parts.append(" ".join(map(str, nodes)))
+    return "\n".join(parts) + "\n"
+
+
 def build_cases():
+    return build_cases_base() + [g5804_hard(random.Random(NUMBER * 100 + i), t)
+                                 for i, t in enumerate([1, 1, 5, 20, 50, 100, 200, 500, 1000, 1000,
+                                                        2000, 3000, 5000, 5000, 10, 30, 80, 300, 700, 10000])]
+
+
+def build_cases_base():
     cases = [SAMPLE_IN]
     for i in range(1, 20):
         for attempt in range(100):

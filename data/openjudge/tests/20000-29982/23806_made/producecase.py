@@ -8,19 +8,47 @@ def generate_case(r):
     assert len(values) <= 3000
     return " ".join(map(str, values)) + "\n"
 
-with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
-    handle.write(REFERENCE_SOURCE); handle.flush()
-    root = Path(__file__).parent / "data"
-    seen = [SAMPLE_IN]
-    for index in range(20):
-        if index == 0:
-            content = SAMPLE_IN
-        else:
-            for attempt in range(100):
-                content = generate_case(random.Random(23806 + index + attempt * 1000))
-                if content not in seen: break
-            else: raise AssertionError("insufficient diversity")
-        seen.append(content)
-        result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
-        (root / f"{index}.in").write_text(content, encoding="utf-8")
-        (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+def valid(text):
+    """题面：一行 n 个整数，n<=3000（题面没给数值范围，只核整数格式与个数，另要求 n>=1）。"""
+    import re
+    lines=text.split('\n')
+    if lines and lines[-1]=='': lines.pop()
+    if len(lines)!=1: return False
+    t=lines[0].split()
+    return 1<=len(t)<=3000 and all(re.fullmatch(r'-?[0-9]+',v) for v in t)
+
+def big_case(r,n,lo,hi,kind='rand'):
+    if kind=='zeros': values=[0]*n
+    elif kind=='pos': values=[r.randint(1,hi) for _ in range(n)]
+    elif kind=='mixzero': values=[r.choice([0,0,0,r.randint(lo,hi)]) for _ in range(n)]
+    else: values=[r.randint(lo,hi) for _ in range(n)]
+    return " ".join(map(str,values))+"\n"
+
+def main():
+    with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
+        handle.write(REFERENCE_SOURCE); handle.flush()
+        root = Path(__file__).parent / "data"
+        seen = [SAMPLE_IN]
+        # 第 10..19 组：边界与满规模 n=3000（卡掉 O(n^3) 暴力）
+        special = [(1,0,0,'rand'),(2,-5,5,'rand'),(3,0,0,'zeros'),(3000,0,0,'zeros'),(3000,1,10**6,'pos'),
+                   (3000,-50,50,'rand'),(3000,-1000,1000,'rand'),(3000,-10**5,10**5,'rand'),
+                   (3000,-10**8,10**8,'rand'),(3000,-300,300,'mixzero')]
+        for index in range(20):
+            if index == 0:
+                content = SAMPLE_IN
+            elif index >= 10:
+                n, lo, hi, kind = special[index - 10]
+                content = big_case(random.Random(23806 * 100 + index), n, lo, hi, kind)
+            else:
+                for attempt in range(100):
+                    content = generate_case(random.Random(23806 + index + attempt * 1000))
+                    if content not in seen: break
+                else: raise AssertionError("insufficient diversity")
+            assert valid(content) and content not in seen[1:]
+            seen.append(content)
+            result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=60, check=True)
+            (root / f"{index}.in").write_text(content, encoding="utf-8")
+            (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+
+if __name__ == "__main__":
+    main()

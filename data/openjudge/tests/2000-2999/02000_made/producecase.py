@@ -152,6 +152,26 @@ REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02000/statis
 LANGUAGE='Python3'
 NUMBER=2000
 SAMPLE='10\n6\n7\n11\n15\n16\n100\n10000\n1000\n21\n22\n0\n'
+def valid(text):
+    # 题面：至少一行、不多于 21 行；除最后一行外每行一个整数（1..10000）；最后一行为 0
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if not 1<=len(lines)<=21 or lines[-1]!='0':return False
+    for t in lines[:-1]:
+        if not t.isdigit() or t!=str(int(t)) or not 1<=int(t)<=10000:return False
+    return True
+def extra_cases():
+    r=random.Random(20002000)
+    tri=[k*(k+1)//2 for k in range(1,141) if k*(k+1)//2<=10000]
+    edge=[1,2,3,4,5,6,7,9999,10000,9870,9871,9869]
+    cs=['0\n','1\n0\n','10000\n0\n']
+    cs.append('\n'.join(map(str,edge+[r.randint(1,10000) for _ in range(20-len(edge))]))+'\n0\n')
+    for _ in range(4):
+        v=r.sample(tri,10)+[t+1 for t in r.sample(tri[:-1],10)]
+        r.shuffle(v);cs.append('\n'.join(map(str,v))+'\n0\n')
+    cs.append('\n'.join(['10000']*20)+'\n0\n')
+    cs.append('\n'.join(str(r.randint(1,30)) for _ in range(20))+'\n0\n')
+    return cs
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -159,7 +179,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])+extra_cases()
   for i,x in enumerate(cases):
+   assert valid(x),i
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

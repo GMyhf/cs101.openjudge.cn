@@ -1,4 +1,4 @@
-import random, subprocess, tempfile
+import random, re, subprocess, tempfile
 from pathlib import Path
 REFERENCE_SOURCE = "from collections import defaultdict\nfrom itertools import permutations\n\na = defaultdict(int)\nb = defaultdict(int)\nc = defaultdict(int)\nd = defaultdict(int)\nn = int(input())\n\nfor i in input():\n    a[i] += 1\nfor i in input():\n    b[i] += 1\nfor i in input():\n    c[i] += 1\nfor i in input():\n    d[i] += 1\n\ndicts = [a, b, c, d]\n\ndef check(word):\n    for perm in permutations(dicts, len(word)):\n        for i, d in enumerate(perm):\n            if word[i] not in d:\n                break\n        else:\n            return 'YES'\n    else:\n        return 'NO'\n\nfor _ in range(n):\n    word = input()\n    print(check(word))\n"
 SAMPLE_IN = '6\nMOOOOO\nOOOOOO\nABCDEF\nUVWXYZ\nCOW\nMOO\nZOO\nMOVE\nCODE\nFARM\n'
@@ -15,18 +15,38 @@ def generate_case(r):
     assert all(1 <= len(w) <= 4 and w.isupper() for w in words)
     return str(len(words)) + "\n" + "\n".join(blocks + words) + "\n"
 
-with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
-    handle.write(REFERENCE_SOURCE); handle.flush()
-    root = Path(__file__).parent / "data"
-    seen = [SAMPLE_IN]
-    for index in range(40):
-        if index == 0: content = SAMPLE_IN
-        else:
-            for attempt in range(100):
-                content = generate_case(random.Random(27310 + index + attempt * 1000))
-                if content not in seen: break
-            else: raise AssertionError("insufficient diversity")
-        seen.append(content)
-        result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
-        (root / f"{index}.in").write_text(content, encoding="utf-8")
-        (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+def valid(text):
+    """题面：第一行 N（1<=N<=10）；4 行各 6 个大写字母；N 行单词，各 1~4 个大写字母。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not re.fullmatch(r"[1-9][0-9]*", lines[0]):
+        return False
+    n = int(lines[0])
+    if not (1 <= n <= 10) or len(lines) != 5 + n:
+        return False
+    if not all(re.fullmatch(r"[A-Z]{6}", x) for x in lines[1:5]):
+        return False
+    return all(re.fullmatch(r"[A-Z]{1,4}", x) for x in lines[5:])
+
+
+def main():
+    with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
+        handle.write(REFERENCE_SOURCE); handle.flush()
+        root = Path(__file__).parent / "data"
+        seen = [SAMPLE_IN]
+        for index in range(40):
+            if index == 0: content = SAMPLE_IN
+            else:
+                for attempt in range(100):
+                    content = generate_case(random.Random(27310 + index + attempt * 1000))
+                    if content not in seen: break
+                else: raise AssertionError("insufficient diversity")
+            seen.append(content)
+            result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
+            (root / f"{index}.in").write_text(content, encoding="utf-8")
+            (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

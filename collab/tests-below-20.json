@@ -1,7 +1,7 @@
 {
   "min_cases": 20,
   "description": "每题至少 20 组测试数据。这里登记的是做不到的题及原因；tools/full_sweep.py 第 12 条（check_short_data_is_recorded）会拦下没登记的短数据和已经补够却没删的条目。OpenJudge 按全局题号登记，外部题库按「来源:题号」。",
-  "updated": "2026-09-17",
+  "updated": "2026-10-08",
   "entries": [
     {
       "key": "openjudge:12065",
@@ -90,6 +90,24 @@
       "test_count": 2,
       "category": "small_input_domain",
       "reason": "题面「n∈{5,1001}」「There are only two input files for this problem」：合法输入只有 2 个，2 组即穷举。答案不唯一，由 checker.py 判（诱导子图是长度 ≥⌊n²/e⌋ 的单个环）。"
+    },
+    {
+      "key": "openjudge:24755",
+      "problems": [
+        "practice/24755"
+      ],
+      "test_count": 11,
+      "category": "small_input_domain",
+      "reason": "题面 1<n<13，输入只有一个整数，合法输入共 11 种（n=2..12），11 组即穷举；2026-10-08 去掉了与之重复的 11 组旧数据。"
+    },
+    {
+      "key": "openjudge:26144",
+      "problems": [
+        "practice/26144"
+      ],
+      "test_count": 9,
+      "category": "small_input_domain",
+      "reason": "输入只有一个 1..9 的数字，合法输入共 9 种，9 组即穷举；2026-10-08 去掉了与之重复的 13 组旧数据。"
     }
   ]
 }

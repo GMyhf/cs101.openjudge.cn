@@ -90,8 +90,28 @@ def generate(number, seed):
                  for _ in range(count)]
         return f"{rows} {cols} {count}\n" + "\n".join("%d %d %d %d" % b for b in bombs) + "\n"
     if number == 2946:
-        value, count = r.randint(-100, 100), r.randint(1, 30); operations = []
-        for _ in range(count): operations.append((r.choice(("plus", "minus", "multiply")), r.randint(-5, 5)))
+        # 覆盖：N=1 的三种运算、乘 0 / 乘负数、负的起始值与负的 a、较长的轮数与较大的数值；
+        # 题面未给数值范围，所有中间结果都控制在 32 位有符号整数以内。
+        LIM = 2**31 - 1
+        def ok(v): return -LIM <= v <= LIM
+        if seed <= 3:
+            value, operations = r.randint(-1000, 1000), [(("plus", "minus", "multiply")[seed - 1], r.randint(-1000, 1000))]
+        elif seed == 4:
+            value, operations = r.randint(1, 10**6), [("multiply", 0)]
+        elif seed == 5:
+            value, operations = -r.randint(1, 10**4), [("minus", -r.randint(1, 10**4)), ("multiply", -1), ("plus", -r.randint(1, 10**4))]
+        elif seed >= 30:
+            value, count = r.randint(-10**6, 10**6), r.randint(500, 1000); operations = []; cur = value
+            for _ in range(count):
+                while True:
+                    op = r.choice(("plus", "minus", "multiply")); a = r.randint(-3, 3) if op == "multiply" else r.randint(-10**6, 10**6)
+                    nxt = {"plus": cur + a, "minus": cur - a, "multiply": cur * a}[op]
+                    if ok(nxt): break
+                operations.append((op, a)); cur = nxt
+        else:
+            value, count = r.randint(-100, 100), r.randint(1, 30); operations = []
+            for _ in range(count): operations.append((r.choice(("plus", "minus", "multiply")), r.randint(-5, 5)))
+        count = len(operations)
         return f"{value} {count}\n" + "\n".join(f"{op} {x}" for op, x in operations) + "\n"
     if number == 1037:
         values = []
@@ -118,6 +138,18 @@ def generate(number, seed):
         words = sorted(words); r.shuffle(words)
         return "\n".join(words) + "\n"
     raise KeyError(number)
+
+def valid(text):
+    """题面 02946：首行两个整数 k、N（N 轮，至少 1 轮）；随后恰 N 行「运算符 整数」，运算符为 plus/minus/multiply，单空格分隔。
+    题面未给数值范围，这里只核格式。"""
+    import re
+    if not text.endswith("\n"): return False
+    lines = text[:-1].split("\n")
+    m = re.fullmatch(r"(-?\d+) ([1-9]\d*)", lines[0]) if lines else None
+    if not m: return False
+    n = int(m.group(2))
+    if len(lines) != n + 1: return False
+    return all(re.fullmatch(r"(plus|minus|multiply) -?\d+", line) for line in lines[1:])
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2946: 玩游戏\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02946/\n# License: not declared in source collection; no license is inferred.\nimport sys\n# 读取第一行输入，获取起始整数 k 和游戏轮数 N\nk, N = map(int, input().split())\n\n# 循环进行 N 轮游戏\nfor _ in range(N):\n    # 读取每一轮的运算符和整数\n    operator, a = input().split()\n    a = int(a)\n    # 根据运算符进行相应的运算\n    if operator == "plus":\n        k = k + a\n    elif operator == "minus":\n        k = k - a\n    elif operator == "multiply":\n        k = k * a\n\n# 输出最后一轮的运算结果\nprint(k)\n'
 NUMBER=2946

@@ -161,9 +161,126 @@ def run(x):
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout
+import re as _re
+_NAT = _re.compile(r'(0|[1-9][0-9]*)\Z')
+def _rooms(m, n, g):
+    seen = [[False] * n for _ in range(m)]; sizes = []
+    for si in range(m):
+        for sj in range(n):
+            if seen[si][sj]: continue
+            seen[si][sj] = True; st = [(si, sj)]; cnt = 0
+            while st:
+                i, j = st.pop(); cnt += 1
+                for bit, di, dj in ((1, 0, -1), (2, -1, 0), (4, 0, 1), (8, 1, 0)):
+                    a, b = i + di, j + dj
+                    if not g[i][j] & bit and 0 <= a < m and 0 <= b < n and not seen[a][b]:
+                        seen[a][b] = True; st.append((a, b))
+            sizes.append(cnt)
+    return sizes
+
+def valid(text):
+    """题面契约：第 1、2 行各一个整数 m（南北向）、n（东西向），m,n<=50；
+    其后 m 行各 n 个整数 p（0<=p<=50），单空格分隔；
+    内墙计算两次（东墙与右邻西墙、南墙与下邻北墙一致）；至少两个房间。"""
+    if not text.endswith('\n') or '\r' in text: return False
+    lines = text[:-1].split('\n')
+    if len(lines) < 3 or not _NAT.match(lines[0]) or not _NAT.match(lines[1]): return False
+    m, n = int(lines[0]), int(lines[1])
+    if not (1 <= m <= 50 and 1 <= n <= 50) or len(lines) != m + 2: return False
+    g = []
+    for ln in lines[2:]:
+        p = ln.split(' ')
+        if len(p) != n or not all(_NAT.match(t) for t in p): return False
+        row = list(map(int, p))
+        if not all(0 <= v <= 50 for v in row): return False
+        g.append(row)
+    for i in range(m):
+        for j in range(n):
+            if j + 1 < n and bool(g[i][j] & 4) != bool(g[i][j + 1] & 1): return False
+            if i + 1 < m and bool(g[i][j] & 8) != bool(g[i + 1][j] & 2): return False
+    return len(_rooms(m, n, g)) >= 2
+
+def _grid(m, n, east, south):
+    """east[i][j]/south[i][j] 为 True 表示 (i,j) 与右/下邻之间有墙；外墙一律存在。"""
+    g = [[0] * n for _ in range(m)]
+    for i in range(m):
+        for j in range(n):
+            if j == 0: g[i][j] |= 1
+            if i == 0: g[i][j] |= 2
+            if j == n - 1: g[i][j] |= 4
+            if i == m - 1: g[i][j] |= 8
+            if j + 1 < n and east[i][j]: g[i][j] |= 4; g[i][j + 1] |= 1
+            if i + 1 < m and south[i][j]: g[i][j] |= 8; g[i + 1][j] |= 2
+    return g
+
+def _fmt(m, n, g):
+    return f"{m}\n{n}\n" + "\n".join(" ".join(map(str, row)) for row in g) + "\n"
+
+def _random(r, m, n, prob):
+    while True:
+        east = [[r.random() < prob for _ in range(n)] for _ in range(m)]
+        south = [[r.random() < prob for _ in range(n)] for _ in range(m)]
+        g = _grid(m, n, east, south)
+        if len(_rooms(m, n, g)) >= 2: return _fmt(m, n, g)
+
+def _snake(m, n):
+    """蛇形长走廊占满除右下角外的全部方块（一个 m*n-1 的大房间 + 一个 1 格房间），递归 DFS 会很深。"""
+    east = [[False] * n for _ in range(m)]
+    south = [[True] * n for _ in range(m)]
+    for i in range(m - 1):
+        south[i][n - 1 if i % 2 == 0 else 0] = False
+    last = m - 1
+    # 最后一行与走廊相连，单独隔出右下角或左下角（走廊末端的另一端）
+    lone = 0 if (m - 1) % 2 == 0 else n - 1   # 走廊进入最后一行的位置是 n-1 或 0
+    lone = n - 1 - lone if n > 1 else 0
+    if lone == n - 1: east[last][n - 2] = True
+    else: east[last][0] = True
+    return _fmt(m, n, _grid(m, n, east, south))
+
+def _halves(m, n, vertical):
+    east = [[False] * n for _ in range(m)]; south = [[False] * n for _ in range(m)]
+    if vertical:
+        for i in range(m): east[i][n // 2 - 1] = True
+    else:
+        for j in range(n): south[m // 2 - 1][j] = True
+    return _fmt(m, n, _grid(m, n, east, south))
+
+def cases():
+    r = random.Random(2815_2026)
+    out = []
+    # 最小规模：两个单格房间
+    out.append(_fmt(1, 2, _grid(1, 2, [[True, False]], [[False, False]])))
+    out.append(_fmt(2, 1, _grid(2, 1, [[False], [False]], [[True], [False]])))
+    # 每格都是独立房间
+    out.append(_random(r, 3, 4, 1.0))
+    # 小规模随机，墙密度各异
+    for _ in range(16):
+        m, n = r.randint(1, 10), r.randint(1, 10)
+        while m * n < 4: m, n = r.randint(1, 10), r.randint(1, 10)
+        out.append(_random(r, m, n, r.choice((.15, .3, .5, .7))))
+    # 行列不等的中大规模（m、n 读反会出错）
+    for m, n, p in ((50, 20, .3), (20, 50, .3), (50, 1, .2), (1, 50, .2), (37, 50, .45), (50, 43, .25)):
+        out.append(_random(r, m, n, p))
+    # 满规模 50x50：不同墙密度
+    for p in (.05, .2, .35, .5, .7, .95):
+        out.append(_random(r, 50, 50, p))
+    out.append(_random(r, 50, 50, 1.0))              # 2500 个单格房间
+    # 满规模蛇形长走廊（大房间 2499 格，递归 DFS 默认栈深会爆）
+    out.append(_snake(50, 50))
+    out.append(_snake(49, 50))
+    out.append(_snake(50, 2))
+    # 两半对称
+    out.append(_halves(50, 50, True))
+    out.append(_halves(50, 50, False))
+    out.append(_halves(2, 50, True))
+    # 大房间不在左上角
+    out.append(_random(r, 50, 50, .12))
+    return out
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+cases()):
+  assert valid(x),i
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

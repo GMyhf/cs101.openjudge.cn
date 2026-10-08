@@ -127,7 +127,7 @@ def generate(n, seed):
     if n==2706:return f"{1000+seed}\n"
     if n==2996:
         N=r.randint(2,80);p=list(range(1,N+1));r.shuffle(p);return f'{N}\n{r.randint(1,min(30,N))}\n'+' '.join(map(str,p))+'\n'
-    if n==3254:return '\n'.join(f'{r.randint(2,100)} {r.randint(1,100)} {r.randint(1,100)}' for _ in range(r.randint(1,5)))+'\n0 0 0\n'
+    if n==3254:return gen3254(r,seed)
     if n==2502:
         hx,hy,sx,sy=[r.randint(0,10000) for _ in range(4)];return f'{hx} {hy} {sx} {sy}\n{r.randint(0,10000)} {r.randint(0,10000)} {r.randint(0,10000)} {r.randint(0,10000)} -1 -1\n'
     if n==2748:return ''.join(r.sample('abcdefghi',r.randint(1,5)))+'\n'
@@ -156,6 +156,40 @@ def generate(n, seed):
     if n==1218:
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
+
+def valid(text):
+    """题面：每行三个整数 n p m，0<m,n<300，p 为某个小孩编号(1..n)；最后一行 0 0 0。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if len(lines) < 2 or lines[-1] != '0 0 0':
+        return False
+    for ln in lines[:-1]:
+        t = ln.split(' ')
+        if len(t) != 3 or not all(x.isdigit() and (x == '0' or x[0] != '0') for x in t):
+            return False
+        n, p, m = map(int, t)
+        if not (0 < n < 300 and 0 < m < 300 and 1 <= p <= n):
+            return False
+    return True
+
+def gen3254(r,seed):
+    # 题面：0<m,n<300，p 是 1..n 中某个小孩的编号；多行，以 0 0 0 结束
+    def row(n=None,p=None,m=None):
+        n=n if n is not None else r.randint(1,299)
+        p=p if p is not None else r.randint(1,n)
+        m=m if m is not None else r.randint(1,299)
+        return (n,p,m)
+    if seed==1:rows=[(1,1,1),(1,1,299),(2,1,1),(2,2,1),(2,1,2),(2,2,2),(3,3,299)]
+    elif seed==2:rows=[row(m=1) for _ in range(8)]+[(299,1,1),(299,299,1)]
+    elif seed==3:rows=[(k,k,r.randint(1,299)) for k in r.sample(range(1,300),10)]
+    elif seed==4:rows=[(299,r.randint(1,299),299) for _ in range(12)]+[(299,1,299),(299,299,299)]
+    elif seed==5:rows=[row(n=r.randint(1,20),m=r.randint(200,299)) for _ in range(15)]
+    elif seed==6:rows=[(n,r.randint(1,n),n) for n in r.sample(range(1,300),10)]+[(n,r.randint(1,n),n+1) for n in r.sample(range(1,299),5)]
+    elif seed in (7,8):rows=[row(n=299,m=r.randint(250,299)) for _ in range(30)]
+    elif seed<=20:rows=[row() for _ in range(r.randint(1,6))]
+    else:rows=[row(n=r.randint(1,40),m=r.randint(1,60)) for _ in range(r.randint(1,10))]
+    return ''.join(f'{a} {b} {c}\n' for a,b,c in rows)+'0 0 0\n'
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 3254: 约瑟夫问题No.2\n# Fenced code block index: 3\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/pctbook/03254/\n# License: not declared in source collection; no license is inferred.\nimport sys\nfrom collections import deque\n\nwhile True:\n    n, p, m = map(int, input().split())\n    if n == p == m == 0:\n        break\n    queue = deque([i for i in range(p, n + 1)] + [i for i in range(1, p)])\n    out = []\n    while queue:\n        for _ in range(m - 1):\n            queue.append(queue.popleft())\n        out.append(queue.popleft())\n    print(*out, sep=",")\n'
 NUMBER=3254

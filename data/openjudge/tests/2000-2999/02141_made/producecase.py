@@ -152,6 +152,21 @@ REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02141/statis
 LANGUAGE='Python3'
 NUMBER=2141
 SAMPLE='eydbkmiqugjxlvtzpnwohracsf\nKifq oua zarxa suar bti yaagrj fa xtfgrj\n'
+def valid(text):
+    """题面契约：第 1 行 26 个小写字母（解密钥匙）；第 2 行至多 80 个字符的密文，
+    只含大小写字母与空格（题面：Input text is in upper or lower case，Blanks ... kept in place）。"""
+    if not text.endswith('\n') or '\r' in text:
+        return False
+    lines = text[:-1].split('\n')
+    if len(lines) != 2:
+        return False
+    key, msg = lines
+    if len(key) != 26 or not all('a' <= c <= 'z' for c in key):
+        return False
+    if not (1 <= len(msg) <= 80):
+        return False
+    return all(c == ' ' or ('a' <= c <= 'z') or ('A' <= c <= 'Z') for c in msg)
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]

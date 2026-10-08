@@ -1,4 +1,4 @@
-import random, subprocess, sys, tempfile
+import random, re, subprocess, sys, tempfile
 from pathlib import Path
 REFERENCE='# External reference: statistics page /practice/24607/\n# Accepted submission: 44525274\n# Source: http://cs101.openjudge.cn/practice/solution/44525274/\n# License: not declared on the submission page; no license is inferred.\n\n# -*- coding: utf-8 -*-\n"""\nCreated on Thu Apr  4 10:35:30 2024\n\n@author: Lenovo\n"""\n\nimport heapq\nclass Node:\n    def __init__(self,ind,val,de):\n        self.ind=ind\n        self.val=val\n        self.de=de\n    \n    def __lt__(self,other):\n        if self.val==other.val:\n            return self.de<other.de\n        return self.val<other.val\n\nn,k=map(int,input().split())\ns=" "+input()\nl=[0]*(n+1)\ndp=[0]*(n+1)\nfor i in range(1,n+1):\n    if s[i]=="H":l[i]=l[i-1]+1\n    else:l[i]=l[i-1]-1\nheap=[]\nheapq.heappush(heap,Node(0,0,0))\nfor i in range(1,n+1):\n    while heap[0].ind+k<i:\n        heapq.heappop(heap)\n    tmp=heap[0]\n    dp[i]=tmp.val+int(l[i]-l[tmp.ind]<=0)\n    heapq.heappush(heap,Node(i,dp[i],l[i]))\nprint(dp[n])'
 SAMPLE='7 2\nHGHGGHG\n'
@@ -6,6 +6,46 @@ EXTRA_CASES=['10000 3333\nHGHGHGHGHGHGHGHGHGHGHGHGHGHGHGHGHGHGHGHGHGHGHGHGHGHGHG
 GENERATOR_NAME='g24607'
 def g24607(r):
     n=r.randint(1,1000); k=r.randint(1,n); return f"{n} {k}\n"+"".join(r.choice("HG") for _ in range(n))+"\n"
+
+NMAX=300000
+
+def valid(text):
+    """题面：第一行 N K，1<=K<=N<=3e5；第二行长度为 N 的仅含 H/G 的串。"""
+    lines=text.split('\n')
+    if len(lines)!=3 or lines[2]!='':
+        return False
+    m=re.fullmatch(r'([1-9][0-9]*) ([1-9][0-9]*)', lines[0])
+    if not m:
+        return False
+    n,k=int(m.group(1)),int(m.group(2))
+    if not (1<=k<=n<=NMAX):
+        return False
+    return len(lines[1])==n and re.fullmatch(r'[HG]+', lines[1]) is not None
+
+def walk(r,n,bias=0.5):
+    return "".join('H' if r.random()<bias else 'G' for _ in range(n))
+
+def edge_cases():
+    r=random.Random(24607)
+    c=[]
+    c.append("1 1\nH\n")
+    c.append("1 1\nG\n")
+    c.append("2 2\nHG\n")
+    c.append("2 1\nGH\n")
+    c.append("6 6\nGGGHHH\n")
+    c.append("5 3\nHHHHH\n")
+    # 满规模：K=1、K=N、中等 K、大 K，卡 O(NK) 的朴素 DP
+    c.append(f"{NMAX} 1\n{walk(r,NMAX)}\n")
+    c.append(f"{NMAX} {NMAX}\n{walk(r,NMAX,0.49)}\n")
+    c.append(f"{NMAX} 150000\n{walk(r,NMAX)}\n")
+    c.append(f"{NMAX} 99991\n{walk(r,NMAX,0.45)}\n")
+    c.append(f"{NMAX} 777\n{'G'*NMAX}\n")
+    c.append(f"{NMAX} 2\n{'GH'*(NMAX//2)}\n")
+    c.append(f"299999 1234\n{walk(r,299999,0.55)}\n")
+    return c
+
+def build_cases():
+    return [SAMPLE]+EXTRA_CASES+edge_cases()+[g24607(random.Random(s)) for s in range(1, 40)]
 
 def run(text):
     with tempfile.TemporaryDirectory(prefix='producecase-') as d:
@@ -15,6 +55,7 @@ def run(text):
         return x.stdout
 def main():
     d=Path('data'); d.mkdir(exist_ok=True)
-    cases=[SAMPLE]+EXTRA_CASES+(['8\n','9\n'] if GENERATOR_NAME == 'g22007' else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+    cases=build_cases()
+    assert all(valid(c) for c in cases) and len(set(cases))==len(cases)
     for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

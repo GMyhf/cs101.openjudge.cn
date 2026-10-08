@@ -1,5 +1,137 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+
+# ---- 数独工具：解计数（位掩码 + MRV），供 valid() 与 2985 生成器使用 ----
+_ROW = [i // 9 for i in range(81)]
+_COL = [i % 9 for i in range(81)]
+_BOX = [(i // 27) * 3 + (i % 9) // 3 for i in range(81)]
+
+
+def _sudoku_count(grid, limit=2):
+    """返回 (解的个数，数到 limit 为止, 第一个解)；给定数字自相矛盾时返回 (0, None)。"""
+    g = list(grid); rm = [0] * 9; cm = [0] * 9; bm = [0] * 9
+    for i, v in enumerate(g):
+        if v:
+            b = 1 << (v - 1)
+            if rm[_ROW[i]] & b or cm[_COL[i]] & b or bm[_BOX[i]] & b:
+                return 0, None
+            rm[_ROW[i]] |= b; cm[_COL[i]] |= b; bm[_BOX[i]] |= b
+    empties = [i for i in range(81) if not g[i]]
+    res = [0, None]
+
+    def dfs():
+        best = -1; best_count = 10; best_mask = 0
+        for i in empties:
+            if g[i]:
+                continue
+            m = ~(rm[_ROW[i]] | cm[_COL[i]] | bm[_BOX[i]]) & 511
+            c = bin(m).count("1")
+            if c < best_count:
+                best_count = c; best = i; best_mask = m
+                if c <= 1:
+                    break
+        if best < 0:
+            res[0] += 1
+            if res[1] is None:
+                res[1] = g[:]
+            return res[0] >= limit
+        if best_count == 0:
+            return False
+        i = best; m = best_mask
+        while m:
+            b = m & -m; m -= b; g[i] = b.bit_length()
+            rm[_ROW[i]] |= b; cm[_COL[i]] |= b; bm[_BOX[i]] |= b
+            if dfs():
+                return True
+            rm[_ROW[i]] ^= b; cm[_COL[i]] ^= b; bm[_BOX[i]] ^= b; g[i] = 0
+        return False
+
+    dfs()
+    return res[0], res[1]
+
+
+def _sudoku_transform(g, r):
+    """数字重标 + 行带/行/列栈/列置换 + 可选转置：保持解的唯一性。"""
+    d = list(range(1, 10)); r.shuffle(d)
+    rows = [b * 3 + i for b in r.sample(range(3), 3) for i in r.sample(range(3), 3)]
+    cols = [b * 3 + i for b in r.sample(range(3), 3) for i in r.sample(range(3), 3)]
+    t = r.random() < .5
+    out = [0] * 81
+    for i in range(9):
+        for j in range(9):
+            v = g[rows[i] * 9 + cols[j]] if not t else g[cols[j] * 9 + rows[i]]
+            out[i * 9 + j] = d[v - 1] if v else 0
+    return out
+
+
+def _sudoku_solution(r):
+    g = [0] * 81
+    first = list(range(1, 10)); r.shuffle(first); g[:9] = first
+    return _sudoku_transform(_sudoku_count(g, 1)[1], r)
+
+
+def _sudoku_dig(sol, r, keep=17):
+    """随机挖空，保持唯一解；挖到给定数只剩 keep 个或已极小为止。"""
+    g = sol[:]; order = list(range(81)); r.shuffle(order)
+    for i in order:
+        if 81 - g.count(0) <= keep:
+            break
+        v = g[i]; g[i] = 0
+        if _sudoku_count(g, 2)[0] != 1:
+            g[i] = v
+    return g
+
+
+def _sudoku_solved(g):
+    full = list(range(1, 10))
+    return all(sorted(g[k * 9:k * 9 + 9]) == full and sorted(g[k::9]) == full and
+               sorted(g[(k // 3 * 3 + i) * 9 + k % 3 * 3 + j] for i in range(3) for j in range(3)) == full
+               for k in range(9))
+
+
+def _sudoku_rectangle_swap(g, r):
+    """找一个跨两宫的 2x2 「致命矩形」 a b / b a 并交换，得到仍合法、却通常不等价的新解。"""
+    spots = []
+    for band in range(3):
+        for r1 in range(band * 3, band * 3 + 3):
+            for r2 in range(r1 + 1, band * 3 + 3):
+                for c1 in range(9):
+                    for c2 in range(c1 + 1, 9):
+                        if c1 // 3 != c2 // 3 and g[r1 * 9 + c1] == g[r2 * 9 + c2] and g[r1 * 9 + c2] == g[r2 * 9 + c1]:
+                            spots.append((r1, r2, c1, c2))
+    if not spots:
+        return None
+    r1, r2, c1, c2 = r.choice(spots); g = g[:]
+    for a, b in ((r1 * 9 + c1, r1 * 9 + c2), (r2 * 9 + c1, r2 * 9 + c2)):
+        g[a], g[b] = g[b], g[a]
+    return g
+
+
+def valid(text):
+    """题面：首行 N (0<=N<=50)；每组先 9 行上周的解（每行 9 个 1-9 数字，是合法数独解），
+    再 9 行本周题目（每行 9 个 0-9 数字，0 为空，保证唯一解）；除最后一组外每组后有一个空行。"""
+    lines = text.split("\n")
+    if lines[-1] != "" or not lines[0].isdigit() or lines[0] != str(int(lines[0])):
+        return False
+    n = int(lines[0])
+    if not 0 <= n <= 50:
+        return False
+    body = lines[1:-1]
+    if len(body) != (19 * n - 1 if n else 0):
+        return False
+    for k in range(n):
+        block = body[19 * k:19 * k + 18]
+        if k < n - 1 and body[19 * k + 18] != "":
+            return False
+        if any(len(s) != 9 or not s.isdigit() for s in block):
+            return False
+        sol = [int(ch) for s in block[:9] for ch in s]
+        puz = [int(ch) for s in block[9:] for ch in s]
+        if 0 in sol or not _sudoku_solved(sol):
+            return False
+        if _sudoku_count(puz, 2)[0] != 1:
+            return False
+    return True
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     if number == 2236:
@@ -230,19 +362,33 @@ def generate(number, seed):
             chunks.append(str(n) + "\n" + "\n".join("".join(row) for row in grid) + f"\n{a} {b} {c} {d}")
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     if number == 2985:
-        yes = ["534678912", "672195348", "198342567", "859761423", "426853791", "713924856", "961537284", "287419635", "345286179"]
-        no_solution = ["534678912", "672195348", "198342567", "859761423", "426853791", "713924856", "961537284", "287419635", "345286179"]
-        no_puzzle = ["010900605", "025060070", "870000902", "702050043", "000204000", "490010508", "107000056", "040080210", "208001090"]
-        shift = seed % 9
-        translate = str.maketrans("123456789", "123456789"[shift:] + "123456789"[:shift])
-        last = [row.translate(translate) for row in no_solution]
-        if seed % 2:
-            puzzle = [row.translate(translate) for row in no_puzzle]
+        rows9 = lambda g: ["".join(map(str, g[i * 9:i * 9 + 9])) for i in range(9)]
+        def one(kind):
+            last = _sudoku_solution(r)
+            if kind == "same":            # 题目直接从上周解挖出，不做任何变换
+                target = last[:]
+            elif kind == "yes":           # 允许的变换：数字置换 + 带内行/栈内列/带/栈置换 + 转置（=旋转再镜像）
+                target = _sudoku_transform(last, r)
+            elif kind == "rotate":        # 只旋转 90 度（顺/逆）再换数字
+                k = r.choice([1, 3]); g = last[:]
+                for _ in range(k):
+                    g = [g[(8 - j) * 9 + i] for i in range(9) for j in range(9)]
+                d = list(range(1, 10)); r.shuffle(d); target = [d[v - 1] for v in g]
+            elif kind == "rect":          # 变换后再换一个致命矩形：仍是合法解，一般已不等价
+                target = _sudoku_rectangle_swap(_sudoku_transform(last, r), r) or _sudoku_solution(r)
+            else:                         # 完全不相干的另一个解
+                target = _sudoku_solution(r)
+            puzzle = _sudoku_dig(target, r, r.randint(22, 36))
+            return rows9(last) + rows9(puzzle)
+        if seed == 1:
+            kinds = []
+        elif seed <= 6:
+            kinds = [["same", "yes", "rotate", "rect", "other"][seed - 2]]
         else:
-            last = [row.translate(translate) for row in yes]
-            puzzle = ["".join("0" if (i * 9 + j + seed) % 4 == 0 else ch for j, ch in enumerate(row))
-                      for i, row in enumerate(last)]
-        return "1\n" + "\n".join(last + puzzle) + "\n"
+            count = [2, 3, 5, 10, 20, 35, 50][seed % 7]
+            kinds = [r.choice(["yes", "yes", "rotate", "same", "rect", "rect", "other"]) for _ in range(count)]
+        cases = ["\n".join(one(k)) for k in kinds]
+        return f"{len(cases)}\n" + "".join(c + "\n" + ("\n" if i < len(cases) - 1 else "") for i, c in enumerate(cases))
     if number == 3141:
         chunks = []
         for _ in range(r.randint(1, 4)):

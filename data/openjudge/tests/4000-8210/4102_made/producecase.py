@@ -1,122 +1,128 @@
+"""04102 宠物小精灵之收服 测试数据生成器（固定种子，可复现）。
+
+题面约束：0<N<1000，0<M<500，0<K<100；每只小精灵两个整数（球数、伤害），
+题面未给范围，这里取 1..N+10 与 0..M+10（含收不了的）。
+答案由 samplecode.py 给出，并用另一种 DP（按收服个数与伤害求最少球数）逐组核对。
+"""
 import random
-import time
-import os
+import subprocess
+import sys
+from pathlib import Path
 
-# 确保 data 目录存在
-os.makedirs("data", exist_ok=True)
+SEED = 4102
+SAMPLES = [
+    ("10 100 5\n7 10\n2 40\n2 50\n1 20\n4 20\n", "3 30\n"),
+    ("10 100 5\n8 110\n12 10\n20 10\n5 200\n1 110\n", "0 100\n"),
+]
 
-def solve(N, M, K, items):
-    """
-    模拟 ac.py 的逻辑计算结果
-    N: 精灵球数量
-    M: 皮卡丘初始体力
-    K: 野生小精灵数量
-    items: 一个列表，包含 (cost_ball, cost_health)
-    """
-    # 初始化DP表，dp[i][j]表示用i个球和j点伤害能抓到的最多精灵
-    # 体力必须大于0，所以伤害上限是 M-1 (索引 0 到 M-1)
-    dp = [[0] * (M) for _ in range(N + 1)]
-    
-    for cost_ball, cost_health in items:
-        # 二维0/1背包，逆序遍历
-        # 如果当前精灵需要的球大于拥有的球 N，或者伤害大于等于体力 M，则无法收服，直接跳过循环
-        for i in range(N, cost_ball - 1, -1):
-            # 体力限制：总伤害不能超过 M-1
-            for j in range(M - 1, cost_health - 1, -1):
-                if dp[i - cost_ball][j - cost_health] + 1 > dp[i][j]:
-                    dp[i][j] = dp[i - cost_ball][j - cost_health] + 1
-    
-    # 最大收服数量
-    max_catch = dp[N][M-1]
-    
-    # 寻找达到最大收服数量时的最小伤害
-    min_damage = M - 1
-    # 遍历伤害维度，找到第一个（最小伤害）达到 max_catch 的位置
-    for j in range(M):
-        if dp[N][j] == max_catch:
-            min_damage = j
-            break
-            
-    # 剩余体力 = 初始体力 - 最小伤害
-    remaining_health = M - min_damage
-    
-    return f"{max_catch} {remaining_health}"
 
-def generate_random_case(epoch):
-    """
-    根据轮次生成不同规模的数据
-    题目限制: 0 < N < 1000, 0 < M < 500, 0 < K < 100
-    """
-    if epoch == 0:
-        # 样例1
-        N, M, K = 10, 100, 5
-        items = [(7, 10), (2, 40), (2, 50), (1, 20), (4, 20)]
-        return N, M, K, items
-    
-    if epoch == 1:
-        # 样例2
-        N, M, K = 10, 100, 5
-        items = [(8, 110), (12, 10), (20, 10), (5, 200), (1, 110)]
-        return N, M, K, items
+def valid(text):
+    """严格核输入格式与取值。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    def ints(line, cnt):
+        parts = line.split(" ")
+        if len(parts) != cnt or any(not p.isdigit() or (len(p) > 1 and p[0] == "0") for p in parts):
+            return None
+        return [int(p) for p in parts]
+    head = ints(lines[0], 3)
+    if head is None:
+        return False
+    n, m, k = head
+    if not (0 < n < 1000 and 0 < m < 500 and 0 < k < 100) or len(lines) != k + 1:
+        return False
+    for line in lines[1:]:
+        v = ints(line, 2)
+        if v is None or v[0] < 1 or v[0] > 2000 or v[1] > 2000:
+            return False
+    return True
 
-    if epoch < 5:
-        # 小规模随机数据
-        N = random.randint(5, 50)
-        M = random.randint(10, 100)
-        K = random.randint(1, 10)
-    elif epoch < 15:
-        # 中大规模随机数据 (接近题目上限)
-        N = random.randint(100, 999)
-        M = random.randint(100, 499)
-        K = random.randint(50, 99)
-    else:
-        # 边界/极限数据
-        N = random.randint(900, 999)
-        M = random.randint(450, 499)
-        K = 99 # 最大K
 
+def fmt(n, m, items):
+    return f"{n} {m} {len(items)}\n" + "".join(f"{a} {b}\n" for a, b in items)
+
+
+def check(text):
+    """另一种 DP：best[c][d] = 收服 c 只、总伤害 d 时最少用球数。"""
+    v = list(map(int, text.split()))
+    n, m, k = v[:3]
+    items = [(v[3 + 2 * i], v[4 + 2 * i]) for i in range(k)]
+    inf = 10 ** 9
+    best = [[inf] * m for _ in range(k + 1)]
+    best[0][0] = 0
+    for t, (a, b) in enumerate(items):
+        if a > n or b >= m:
+            continue
+        for c in range(t, -1, -1):
+            row, nxt = best[c], best[c + 1]
+            for d in range(m - 1 - b, -1, -1):
+                if row[d] + a < nxt[d + b]:
+                    nxt[d + b] = row[d] + a
+    for c in range(k, -1, -1):
+        for d in range(m):
+            if best[c][d] <= n:
+                return f"{c} {m - d}\n"
+
+
+def rand_items(r, n, m, k, ball_hi, dmg_hi, hard=0.1, zero_dmg=False):
     items = []
-    for _ in range(K):
-        # 为了保证有解和无解的情况混合：
-        # 消耗球数：大部分在 1 到 N/2 之间，偶尔生成很大的无法捕捉的
-        # 消耗体力：大部分在 0 到 M/2 之间
-        
-        # 90% 概率生成普通精灵，10% 概率生成很难/无法捕捉的精灵
-        if random.random() < 0.9:
-            ball_cost = random.randint(1, max(1, N // 2))
-            dmg_cost = random.randint(0, max(1, M // 2))
+    for _ in range(k):
+        if r.random() < hard:
+            items.append((r.randint(max(1, n // 2), n + 10), r.randint(m // 2, m + 10)))
         else:
-            ball_cost = random.randint(N // 2, N + 10)
-            dmg_cost = random.randint(M // 2, M + 10)
-            
-        items.append((ball_cost, dmg_cost))
-        
-    return N, M, K, items
+            items.append((r.randint(1, max(1, ball_hi)), r.randint(0 if zero_dmg else 1, max(1, dmg_hi))))
+    return items
+
+
+def build():
+    r = random.Random(SEED)
+    cases = [s for s, _ in SAMPLES]
+    # 最小规模与边界
+    cases.append("1 1 1\n1 0\n")                 # 0 伤害可收服 -> 1 1
+    cases.append("1 1 1\n1 1\n")                 # 伤害等于体力，不能收 -> 0 1
+    cases.append("1 2 1\n2 1\n")                 # 球不够 -> 0 2
+    cases.append(fmt(10, 10, [(1, 5), (1, 5)]))  # 伤害和恰为 M 不允许 -> 1 5
+    cases.append(fmt(10, 10, [(5, 1), (5, 1), (6, 1)]))  # 球恰好用完可以 -> 2 8
+    cases.append(fmt(10, 100, [(1, 60), (4, 10), (5, 10), (6, 1)]))  # 球恰好用完收 3 只 -> 3 20
+    cases.append(fmt(20, 50, [(3, 10), (3, 20), (4, 5), (2, 30), (8, 9), (8, 3)]))  # 同数量取最小伤害
+    cases.append(fmt(999, 499, [(1000, 1)] * 50 + [(1, 499)] * 49))  # 全都收不了 -> 0 499
+    cases.append(fmt(500, 300, [(5, 3)] * 99))  # 全部能收 -> 99 3
+    # 小规模随机
+    for _ in range(4):
+        n, m, k = r.randint(5, 50), r.randint(10, 100), r.randint(1, 10)
+        cases.append(fmt(n, m, rand_items(r, n, m, k, n // 2, m // 2, zero_dmg=True)))
+    # 中等规模随机
+    for _ in range(5):
+        n, m, k = r.randint(100, 999), r.randint(100, 499), r.randint(50, 99)
+        cases.append(fmt(n, m, rand_items(r, n, m, k, n // 2, m // 2)))
+    # 满规模：N、M、K 都取上限
+    cases.append(fmt(999, 499, rand_items(r, 999, 499, 99, 499, 249)))
+    cases.append(fmt(600, 400, rand_items(r, 600, 400, 99, 60, 30, hard=0.0)))   # 便宜的多，答案很大
+    cases.append(fmt(999, 499, rand_items(r, 999, 499, 99, 999, 499, hard=0.0)))
+    for _ in range(2):
+        n, m = r.randint(900, 999), r.randint(450, 499)
+        cases.append(fmt(n, m, rand_items(r, n, m, 99, n // 2, m // 2)))
+    return cases
+
 
 def main():
-    # 生成 20 组测试数据
-    for epoch in range(20):
-        # 1. 生成数据
-        N, M, K, items = generate_random_case(epoch)
-        
-        # 2. 写入 .in 文件
-        in_path = f"data/{epoch}.in"
-        with open(in_path, "w") as f:
-            f.write(f"{N} {M} {K}\n")
-            for ball, dmg in items:
-                f.write(f"{ball} {dmg}\n")
-        
-        # 3. 运行逻辑并计时
-        start = time.time()
-        result_str = solve(N, M, K, items)
-        end = time.time() - start
-        
-        print(f"[{epoch}] {end:.4f}s | N={N}, M={M}, K={K}")
-        
-        # 4. 写入 .out 文件
-        out_path = f"data/{epoch}.out"
-        with open(out_path, "w") as f:
-            f.write(result_str + "\n")
+    cases = build()
+    assert len(set(cases)) == len(cases)
+    out = Path("data")
+    out.mkdir(exist_ok=True)
+    for p in out.glob("*"):
+        p.unlink()
+    for i, text in enumerate(cases):
+        assert valid(text), i
+        res = subprocess.run([sys.executable, "-I", "samplecode.py"], input=text, text=True,
+                             capture_output=True, timeout=60, check=True).stdout.rstrip() + "\n"
+        assert res == check(text), (i, res, check(text))
+        if i < len(SAMPLES):
+            assert res == SAMPLES[i][1], i
+        (out / f"{i}.in").write_text(text)
+        (out / f"{i}.out").write_text(res)
+
 
 if __name__ == "__main__":
     main()

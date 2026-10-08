@@ -157,9 +157,80 @@ def run(x):
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout.rstrip()+'\n'
+def valid(text):
+    """题面：输入是若干个整数，每个 2 到 60 位（前导零算位数），每行一个。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not lines or lines == [""]:
+        return False
+    for s in lines:
+        if not (2 <= len(s) <= 60) or not all("0" <= c <= "9" for c in s):
+            return False
+    return True
+
+# 循环数只来自满周期素数 p（10 是 p 的原根）：(10^(p-1)-1)/p 补足 p-1 位；60 位以内只有这 8 个
+CYCLIC = [str((10 ** (p - 1) - 1) // p).zfill(p - 1) for p in (7, 17, 19, 23, 29, 47, 59, 61)]
+
+def gen1047(seed):
+    r = random.Random(1047_000 + seed)
+    def rnd(n, lead=None):
+        s = "".join(r.choice("0123456789") for _ in range(n))
+        if lead is not None:
+            s = lead + s[1:]
+        return s
+    def tweak(c):
+        i = r.randrange(len(c)); d = r.choice([x for x in "0123456789" if x != c[i]])
+        return c[:i] + d + c[i+1:]
+    def rot(c):
+        k = r.randrange(1, len(c)); return c[k:] + c[:k]
+    pool = []
+    if seed <= 8:
+        # 每个循环数各有一组以它为主角，配上它的旋转、改一位、去前导零、两遍拼接
+        c = CYCLIC[seed - 1]
+        pool += [c, rot(c), rot(c), tweak(c), tweak(c), c[::-1]]
+        if c[0] == "0":
+            pool.append(c[1:])           # 去掉前导零后不是循环数
+            pool.append(c[1:] + "0")     # 旋转一位
+        else:
+            pool.append("0" + c)
+        if 2 * len(c) <= 60:
+            pool.append(c + c)
+        pool += [rnd(len(c)) for _ in range(3)]
+    elif seed <= 12:
+        # 小规模：2、3 位全枚举的一部分（含 01、10、99 等）
+        for _ in range(r.randint(30, 60)):
+            n = r.randint(2, 3); s = rnd(n)
+            if set(s) != {"0"}:
+                pool.append(s)
+    elif seed <= 18:
+        # 满 60 位：1/61 的循环数及其变体，加随机 60 位数
+        c = CYCLIC[-1]
+        pool += [c, tweak(c), rot(c), c[1:] + "0"]
+        pool += [rnd(60, r.choice("0123456789")) for _ in range(r.randint(20, 60))]
+    else:
+        # 混合：所有循环数与大量随机长度的干扰项
+        k = r.randint(40, 150)
+        for _ in range(k):
+            t = r.random()
+            if t < 0.15:
+                pool.append(r.choice(CYCLIC))
+            elif t < 0.35:
+                pool.append(rot(r.choice(CYCLIC)))
+            elif t < 0.5:
+                pool.append(tweak(r.choice(CYCLIC)))
+            else:
+                n = r.randint(2, 60); s = rnd(n)
+                if set(s) == {"0"}:
+                    s = s[:-1] + "1"
+                pool.append(s)
+    pool = [s for s in pool if 2 <= len(s) <= 60 and set(s) != {"0"}]
+    r.shuffle(pool)
+    return "\n".join(pool) + "\n"
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[gen1047(s) for s in range(1, 40)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

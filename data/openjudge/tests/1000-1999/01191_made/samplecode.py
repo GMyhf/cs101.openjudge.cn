@@ -4,6 +4,7 @@
 # Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md
 # Upstream problem: http://cs101.openjudge.cn/2024sp_routine/01191/
 # License: not declared in source collection; no license is inferred.
+# 2026-10-08 本地修正：上面引用的原始代码在题面范围内有缺陷，已按题面改过，与原提交不再逐字一致（见 CHANGELOG）。
 import sys
 # https://blog.csdn.net/Dante__Alighieri/article/details/38823005
 # https://blog.csdn.net/qq_40774175/article/details/82704582
@@ -11,7 +12,7 @@ import sys
 from collections import defaultdict
 
 def f(n, x1, y1, x2, y2):
-    if dp[(n, x1, y1, x2, y2)] > 0:
+    if (n, x1, y1, x2, y2) in dp:  # 原写法 dp[...] > 0 在分值全为 0 的区域上记忆化失效，会指数级超时
         return dp[(n, x1, y1, x2, y2)]
     if n == 1:
         su = 0

@@ -156,6 +156,22 @@ def generate(n, seed):
 REFERENCE="# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2811: 熄灯问题\n# Fenced code block index: None\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/02811/\n# License: not declared in source collection; no license is inferred.\nimport sys\nx=[list(map(int,input().split())) for _ in range(5)]\nfor mask in range(64):\n p=[[0]*6 for _ in range(5)];p[0]=[(mask>>j)&1 for j in range(6)]\n for i in range(1,5):\n  for j in range(6):p[i][j]=x[i-1][j]^p[i-1][j]^(p[i-2][j] if i>1 else 0)^(p[i-1][j-1] if j else 0)^(p[i-1][j+1] if j<5 else 0)\n if all((x[4][j]^p[4][j]^p[3][j]^(p[4][j-1] if j else 0)^(p[4][j+1] if j<5 else 0))==0 for j in range(6)):\n  print('\\n'.join(' '.join(map(str,row)) for row in p));break\n"
 NUMBER=2811
 SAMPLE='0 1 1 0 1 0\n1 0 0 1 1 1\n0 0 1 0 0 1\n1 0 0 1 0 1\n0 1 1 1 0 0\n'
+import re as _re
+def valid(text):
+    """题面：5 行，每行 6 个 0/1 数字，相邻两个数字之间用单个空格隔开。"""
+    return bool(_re.fullmatch(r'([01]( [01]){5}\n){5}', text))
+
+
+def extra_cases():
+    """补充：全灭（答案全 0）、全亮、只亮一个角/一条边上的灯、棋盘格。"""
+    fmt = lambda g: '\n'.join(' '.join(map(str, row)) for row in g) + '\n'
+    out = [fmt([[0] * 6 for _ in range(5)]), fmt([[1] * 6 for _ in range(5)])]
+    for (y, x) in ((0, 0), (4, 5), (2, 3)):
+        g = [[0] * 6 for _ in range(5)]; g[y][x] = 1; out.append(fmt(g))
+    out.append(fmt([[(i + j) % 2 for j in range(6)] for i in range(5)]))
+    return out
+
+
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
@@ -164,6 +180,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

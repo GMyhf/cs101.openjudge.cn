@@ -1,4 +1,4 @@
-"""6901 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+"""6901 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 29 组数据（原 20 组 + 9 组追加）。
 
 出处：build_001c
 生成器与循环取自 scripts/build_001c.py（批次 001c），保持同一形状；
@@ -14,12 +14,75 @@ SAMPLE_IN = '5\n1 2 3 4\n1 0\n90 3 1 2 4\n4 2 3 2\n2 1 3\n'
 SAMPLE_OUT = '3\n1 2 4\n'
 REFERENCE_SOURCE = "def find_topic_center_and_mentioners():\n    n = int(input())\n    mention_count = {}  # 记录每个人被提及的次数\n    mention_relations = {}  # 记录提及关系，key为提及的人，value为提及的人的集合\n    \n    for _ in range(n):\n        tweet = input().split()\n        sender, k = int(tweet[0]), int(tweet[1])\n        if k > 0:\n            mentioned = list(map(int, tweet[2:]))\n            for person in mentioned:\n                if person not in mention_count:\n                    mention_count[person] = 1\n                    mention_relations[person] = set([sender])\n                else:\n                    mention_count[person] += 1\n                    mention_relations[person].add(sender)\n    \n    # 找到被提及最多的人\n    topic_center = max(mention_count, key=mention_count.get)\n    \n    # 输出结果\n    print(topic_center)\n    print(' '.join(map(str, sorted(mention_relations[topic_center]))))\n\n# 调用函数处理输入数据\nfind_topic_center_and_mentioners()\n"
 
+def valid(text):
+    """题面：1<N<10000 条微博；每行 a k b1..bk，0<=k<=20，a、bi 为 1..100 的整数，单空格分隔；
+    被提及最多的人有且只有一个（按被提及次数计）。"""
+    try:
+        lines = text.split("\n")
+        if lines[-1] != "": return False
+        lines = lines[:-1]
+        if lines[0] != str(int(lines[0])): return False
+        n = int(lines[0])
+        if not 1 < n < 10000 or len(lines) != n + 1: return False
+        cnt = {}
+        for ln in lines[1:]:
+            t = ln.split(" ")
+            if any(x != str(int(x)) for x in t): return False
+            v = list(map(int, t))
+            if len(v) < 2: return False
+            a, k = v[0], v[1]
+            if not 0 <= k <= 20 or len(v) != k + 2: return False
+            if not all(1 <= x <= 100 for x in [a] + v[2:]): return False
+            for b in v[2:]:
+                cnt[b] = cnt.get(b, 0) + 1
+        if not cnt: return False
+        top = max(cnt.values())
+        return sum(1 for c in cnt.values() if c == top) == 1
+    except Exception:
+        return False
+
+def fmt(posts):
+    return str(len(posts)) + "\n" + "\n".join(" ".join(map(str, [a, len(bs)] + bs)) for a, bs in posts) + "\n"
+
+def make_unique(r, posts):
+    """把并列第一修成唯一：给某个并列者再多一次被提及。"""
+    while True:
+        cnt = {}
+        for _, bs in posts:
+            for b in bs: cnt[b] = cnt.get(b, 0) + 1
+        if cnt:
+            top = max(cnt.values()); tied = sorted(b for b, c in cnt.items() if c == top)
+            if len(tied) == 1: return posts
+            w = r.choice(tied)
+        else:
+            w = r.randint(1, 100)
+        cand = [i for i, (_, bs) in enumerate(posts) if len(bs) < 20 and w not in bs]
+        posts[r.choice(cand)][1].append(w)
+
+def gen(r, n, kmax, ids=100, senders=100):
+    posts = [(r.randint(1, senders), r.sample(range(1, ids + 1), r.randint(0, min(kmax, ids)))) for _ in range(n)]
+    return fmt(make_unique(r, posts))
+
 def g6901(r):
-    n = r.randint(3, 30); rows = []
-    for _ in range(n):
-        sender = r.randint(1, 100); mentioned = r.sample(range(1, 101), r.randint(0, 6))
-        rows.append(" ".join(map(str, [sender, len(mentioned)] + mentioned)))
-    return str(n) + "\n" + "\n".join(rows) + "\n"
+    return gen(r, r.randint(3, 30), 6)
+
+def trap_count(r):
+    # 7 被同一个人提及 5 次（只算一个提及者），8 被 4 个不同的人提及：答案是 7，提及者只有 42
+    posts = [(42, [7]) for _ in range(5)] + [(i, [8]) for i in (1, 2, 3, 4)] + [(9, [])]
+    r.shuffle(posts)
+    return fmt(posts)
+
+EXTRA = [
+    lambda r: "2\n1 0\n1 1 1\n",
+    lambda r: "2\n100 1 100\n100 2 1 100\n",
+    trap_count,
+    lambda r: gen(r, 50, 20, ids=3, senders=5),
+    lambda r: gen(r, 200, 1, ids=100, senders=2),
+    lambda r: gen(r, 9999, 20),
+    lambda r: gen(r, 9999, 3),
+    lambda r: gen(r, 9999, 20, ids=25, senders=100),
+    lambda r: fmt(make_unique(r, [(r.randint(1, 100), [] if r.random() < .9 else [r.randint(1, 100)]) for _ in range(9999)])),
+]
 
 def build_cases():
     cases = [SAMPLE_IN]
@@ -31,6 +94,10 @@ def build_cases():
                 break
         else:
             raise AssertionError("生成器多样性不足")
+    for i, f in enumerate(EXTRA):
+        cases.append(f(random.Random(NUMBER * 10 + i)))
+    assert all(valid(c) for c in cases)
+    assert len(set(cases)) == len(cases)
     return cases
 
 def solve_reference(content):

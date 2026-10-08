@@ -157,6 +157,39 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
+def valid(text):
+    """题面契约：第一行 N (1<=N<=1000)；第二行 N 个整数，取值 0..10000。"""
+    import re
+    if not text.endswith('\n'): return False
+    lines = text[:-1].split('\n')
+    if len(lines) != 2: return False
+    INT = re.compile(r'0|[1-9][0-9]*')
+    if not INT.fullmatch(lines[0]): return False
+    n = int(lines[0])
+    if not 1 <= n <= 1000: return False
+    toks = lines[1].split(' ')
+    if len(toks) != n or not all(INT.fullmatch(t) for t in toks): return False
+    return all(0 <= int(t) <= 10000 for t in toks)
+
+def extra_cases():
+    """补充覆盖：N=1、N=1000 满规模、严格递增/递减/全等、大量重复值（卡把 < 写成 <= 的写法）、取值端点 0 与 10000。"""
+    r = random.Random(275700)
+    def fmt(a): return f'{len(a)}\n' + ' '.join(map(str, a)) + '\n'
+    cases = [fmt([5]), fmt([0]), fmt([10000, 0])]
+    cases.append(fmt([r.randint(0, 10000) for _ in range(1000)]))
+    cases.append(fmt([r.randint(0, 10000) for _ in range(1000)]))
+    cases.append(fmt(sorted(r.sample(range(10001), 1000))))
+    cases.append(fmt(sorted(r.sample(range(10001), 1000), reverse=True)))
+    cases.append(fmt([7777] * 1000))
+    cases.append(fmt(sorted(r.randint(0, 300) for _ in range(1000))))
+    cases.append(fmt([r.randint(0, 20) for _ in range(1000)]))
+    cases.append(fmt([r.choice((0, 10000)) for _ in range(1000)]))
+    cases.append(fmt([i // 2 for i in range(1000)]))
+    cases.append(fmt([10000 - i if i % 2 else i for i in range(1000)]))
+    for _ in range(6):
+        cases.append(fmt([r.randint(0, 4) for _ in range(r.randint(5, 40))]))
+    return cases
+
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2757: 最长上升子序列\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/pctbook/02757/\n# License: not declared in source collection; no license is inferred.\nimport sys\ninput()\nb = [int(x) for x in input().split()]\n\nn = len(b)\ndp = [1]*n\n\nfor i in range(n):\n    for j in range(i):\n        if b[j]<b[i]:\n            dp[i] = max(dp[j]+1, dp[i])\n\nprint(max(dp))\n'
 NUMBER=2757
 SAMPLE='7\n1 7 3 5 9 4 8\n'
@@ -168,6 +201,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

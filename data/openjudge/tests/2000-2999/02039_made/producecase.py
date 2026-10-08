@@ -161,9 +161,26 @@ def run(x):
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout
+def valid(text):
+    # 题面：第一行列数（2..20）；第二行长度不超过 200 的串，只含小写字母；由完整字母矩阵加密而来，故长度为列数的正整数倍
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if len(lines)!=2:return False
+    c,t=lines
+    if not c.isdigit() or c!=str(int(c)) or not 2<=int(c)<=20:return False
+    c=int(c)
+    if not 1<=len(t)<=200 or len(t)%c or not all('a'<=x<='z' for x in t):return False
+    return True
+def extra_cases():
+    r=random.Random(20392039)
+    cs=[]
+    for c,L in ((20,200),(2,200),(2,2),(3,198),(7,196),(13,195),(2,6),(20,180),(11,198),(19,190)):
+        cs.append(f"{c}\n{''.join(r.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(L))}\n")
+    return cs
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
+  assert valid(x),i
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

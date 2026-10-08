@@ -16,6 +16,33 @@ REFERENCE_SOURCE = 'def count_balanced_substrings(s):\n    # 初始化当前字�
 
 def g20625(r): return "".join(r.choice("01") for _ in range(r.randint(2,50)))+"\n"
 
+def valid(text):
+    """题面契约：一行非空字符串，只由 0 和 1 组成。"""
+    if not text.endswith("\n") or text.count("\n") != 1:
+        return False
+    body = text[:-1]
+    return len(body) >= 1 and set(body) <= set("01")
+
+
+def extra_cases():
+    """补充：最短串、全同（答案 0）、两段长块、长游程随机、满规模随机（卡 O(n^2) 枚举子串）。"""
+    r = random.Random(NUMBER * 17 + 1)
+    out = ["0\n", "1\n", "01\n", "1111111\n", "000111\n", "0011100\n"]
+    out.append("0" * 100000 + "1" * 100000 + "\n")
+    out.append("".join(r.choice("01") for _ in range(200000)) + "\n")
+    runs = []
+    total = 0
+    ch = "1"
+    while total < 200000:
+        k = r.randint(1, 3000)
+        runs.append(ch * k)
+        total += k
+        ch = "0" if ch == "1" else "1"
+    out.append("".join(runs)[:200000] + "\n")
+    out.append("10" * 100000 + "\n")
+    return out
+
+
 def build_cases():
     cases = [SAMPLE_IN]
     for i in range(1, 20):
@@ -26,6 +53,11 @@ def build_cases():
                 break
         else:
             raise AssertionError("生成器多样性不足")
+    for value in extra_cases():
+        if value not in cases:
+            cases.append(value)
+    for value in cases:
+        assert valid(value), "生成的数据越出题面约束"
     return cases
 
 def solve_reference(content):

@@ -1,100 +1,45 @@
 # Source: /home/ubuntu/hongfei/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md
+# 2026-10-08 本地重写：上面引用的原始代码在题面范围内有缺陷，下面已换成按题面重写的实现，不再是原提交（原因见下方注释与 CHANGELOG）。
+# 原 samplecode（来源 2020fall_cs101.openjudge.cn_problems.md）在同权值内部节点比较时抛 TypeError，
+# 且没有按「字符集最小字符」打破平局；以下为按题面规则重写的版本，与 producecase.py 的 REFERENCE_SOURCE 相同。
+# 修正版参考解：按题面规则比较节点——先比权值，权值相同比「字符集里最小字符」，小者作左子。
+# 2026-10-08 本地修正：上面引用的原始代码在题面范围内有缺陷，已按题面改过，与原提交不再逐字一致（见 CHANGELOG）。
 import heapq
+import sys
 
-class Node:
-    def __init__(self, weight, char=None):
-        self.weight = weight
-        self.char = char
-        self.left = None
-        self.right = None
-
-    def __lt__(self, other):
-        if self.weight == other.weight:
-            return self.char < other.char
-        return self.weight < other.weight
-
-def build_huffman_tree(characters):
+def main():
+    lines = sys.stdin.read().split("\n")
+    n = int(lines[0])
     heap = []
-    for char, weight in characters.items():
-        heapq.heappush(heap, Node(weight, char))
-
+    for i in range(1, n + 1):
+        c, w = lines[i].split()
+        heapq.heappush(heap, (int(w), c, c))          # (权值, 最小字符, 子树)
     while len(heap) > 1:
-        left = heapq.heappop(heap)
-        right = heapq.heappop(heap)
-        merged = Node(left.weight + right.weight)
-        merged.left = left
-        merged.right = right
-        heapq.heappush(heap, merged)
-
-    return heap[0]
-
-def encode_huffman_tree(root):
+        w1, m1, t1 = heapq.heappop(heap)
+        w2, m2, t2 = heapq.heappop(heap)
+        heapq.heappush(heap, (w1 + w2, min(m1, m2), (t1, t2)))
+    root = heap[0][2]
     codes = {}
-
-    def traverse(node, code):
-        if node.char:
-            codes[node.char] = code
+    def walk(t, path):
+        if isinstance(t, str):
+            codes[t] = path
         else:
-            traverse(node.left, code + '0')
-            traverse(node.right, code + '1')
-
-    traverse(root, '')
-    return codes
-
-def huffman_encoding(codes, string):
-    encoded = ''
-    for char in string:
-        encoded += codes[char]
-    return encoded
-
-def huffman_decoding(root, encoded_string):
-    decoded = ''
-    node = root
-    for bit in encoded_string:
-        if bit == '0':
-            node = node.left
+            walk(t[0], path + "0"); walk(t[1], path + "1")
+    walk(root, "")
+    out = []
+    for line in lines[n + 1:]:
+        s = line.strip()
+        if not s:
+            continue
+        if s[0] in "01":
+            res, t = [], root
+            for b in s:
+                t = t[0] if b == "0" else t[1]
+                if isinstance(t, str):
+                    res.append(t); t = root
+            out.append("".join(res))
         else:
-            node = node.right
+            out.append("".join(codes[c] for c in s))
+    print("\n".join(out))
 
-        if node.char:
-            decoded += node.char
-            node = root
-    return decoded
-
-# 读取输入
-n = int(input())
-characters = {}
-for _ in range(n):
-    char, weight = input().split()
-    characters[char] = int(weight)
-
-#string = input().strip()
-#encoded_string = input().strip()
-
-# 构建哈夫曼编码树
-huffman_tree = build_huffman_tree(characters)
-
-# 编码和解码
-codes = encode_huffman_tree(huffman_tree)
-
-strings = []
-while True:
-    try:
-        line = input()
-        if line:
-            strings.append(line)
-        else:
-            break
-    except EOFError:
-        break
-
-results = []
-#print(strings)
-for string in strings:
-    if string[0] in ('0','1'):
-        results.append(huffman_decoding(huffman_tree, string))
-    else:
-        results.append(huffman_encoding(codes, string))
-
-for result in results:
-    print(result)
+main()

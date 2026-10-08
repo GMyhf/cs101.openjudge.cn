@@ -7,6 +7,29 @@ def g22549(r):
     letters="abcdefghijklmnopqrstuvwxyz"; n=r.randint(1,60)
     return "".join(r.choice(letters) for _ in range(n))+"\n"
 
+def valid(text):
+    # 题面：一个字符串，长度在 100,000 以内，只由小写英文字母组成（单行）
+    if not text.endswith("\n") or text.count("\n") != 1:
+        return False
+    line = text[:-1]
+    return 1 <= len(line) <= 100000 and all("a" <= ch <= "z" for ch in line)
+
+def special_cases():
+    r = random.Random(22549)
+    N = 100000
+    L = "abcdefghijklmnopqrstuvwxyz"
+    out = []
+    out.append("z\n")                                    # 长度 1，答案 0
+    out.append("abcabc\n")                               # 提示，答案 -1
+    out.append("aa\n")                                   # 最小的 -1
+    s = [r.choice(L) for _ in range(N // 2)] * 2
+    r.shuffle(s); out.append("".join(s) + "\n")          # 满规模，每个字母出现偶数次 -> -1
+    t = [r.choice(L[:25]) for _ in range(N - 1)]
+    out.append("".join(t) + "z\n")                       # 满规模，唯一字符在最后
+    u = list(L[:25] * (N // 25))[:N - 1]; r.shuffle(u)
+    u.insert(N // 2, "z"); out.append("".join(u) + "\n") # 满规模，唯一字符在中间
+    return out
+
 def run(text):
     with tempfile.TemporaryDirectory(prefix='producecase-') as d:
         p=Path(d)/'main.py'; p.write_text(REFERENCE)
@@ -15,6 +38,7 @@ def run(text):
         return x.stdout
 def main():
     d=Path('data'); d.mkdir(exist_ok=True)
-    cases=[SAMPLE]+(['8\n','9\n'] if GENERATOR_NAME == 'g22007' else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 34)]+special_cases()
+    for c in cases: assert valid(c), c[:80]
     for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

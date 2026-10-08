@@ -152,6 +152,11 @@ def generate(number, seed):
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2913: 加密技术\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02913/\n# License: not declared; no license is inferred.\nimport sys\ndef encrypt(text):\n    # 数字序列"4962873"\n    pattern = "4962873"\n    encrypted_text = []\n    for i, char in enumerate(text):\n        # ASCII码范围限制在32到122之间，超出范围进行模运算\n        shift = int(pattern[i % len(pattern)])\n        new_char = chr((ord(char) + shift - 32) % (122 - 32 + 1) + 32)\n        encrypted_text.append(new_char)\n    return \'\'.join(encrypted_text)\n\ndef decrypt(encrypted_text):\n    # 数字序列"4962873"\n    pattern = "4962873"\n    decrypted_text = []\n    for i, char in enumerate(encrypted_text):\n        # 解密时反向操作\n        shift = int(pattern[i % len(pattern)])\n        new_char = chr((ord(char) - shift - 32) % (122 - 32 + 1) + 32)\n        decrypted_text.append(new_char)\n    return \'\'.join(decrypted_text)\n\n\ntext = input()\n\nencrypted = encrypt(text)\nprint(encrypted)\n\ndecrypted = decrypt(encrypted)\nprint(decrypted)\n'
 NUMBER=2913
 SAMPLE='aghi lrtq  haha\n'
+def valid(text):
+    """题面：输入一行字符串（含若干空格）；加密规则限定字符在 ASCII 32(空格)~122('z')。"""
+    if not text.endswith('\n') or text.count('\n')!=1: return False
+    t=text[:-1]
+    return len(t)>=1 and all(32<=ord(c)<=122 for c in t)
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)

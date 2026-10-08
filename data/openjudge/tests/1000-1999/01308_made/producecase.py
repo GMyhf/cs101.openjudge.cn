@@ -417,7 +417,115 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01308/statistics/\n# Accepted submission: 52642572\n# Source: http://cs101.openjudge.cn/practice/solution/52642572/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\nfrom collections import defaultdict, deque\ndef main():\n    inputs = map(int, sys.stdin.read().split())\n    cases = 0\n    adj = defaultdict(list)\n    indegree = defaultdict(int)\n    keys = set()\n\n    while True:\n        u = next(inputs)\n        v = next(inputs)\n\n        flag = True\n        if u == -1 and v == -1:\n            return\n\n        elif u == 0 and v == 0:\n            cases += 1\n            root = None\n            for key in keys:\n                if indegree[key] == 0 and root is None:\n                    root = key\n                elif indegree[key] == 0:\n                    flag = False\n                    break\n                elif indegree[key] > 1:\n                    flag = False\n                    break\n            if root is None:\n                flag = False\n\n            if flag:\n                visited = set([root])\n                queue = deque([root])\n                while queue:\n                    curr = queue.popleft()\n                    neighbour = adj[curr]\n                    for nei in neighbour:\n                        if nei in visited:\n                            flag = False\n                            break\n                        queue.append(nei)\n                        visited.add(nei)\n            if len(visited) < len(keys):\n                flag = False\n\n            if not keys:\n                flag = True\n\n            if flag:\n                print(f"Case {cases} is a tree.")\n            else:\n                print(f"Case {cases} is not a tree.")\n            adj = defaultdict(list)\n            indegree = defaultdict(int)\n            keys = set()\n\n        else:\n            adj[u].append(v)\n            keys.add(u)\n            keys.add(v)\n            indegree[v] += 1\n\nif __name__ == "__main__":\n    main()\n'
+
+def valid(text):
+    """题面契约：若干组，每组是若干条边（两个 >0 的整数），以 0 0 结束；
+    全部输入以一对负整数结束，之后不再有内容。"""
+    try:
+        toks = [int(t) for t in text.split()]
+    except ValueError:
+        return False
+    if len(toks) % 2:
+        return False
+    pairs = list(zip(toks[::2], toks[1::2]))
+    if not pairs or not (pairs[-1][0] < 0 and pairs[-1][1] < 0):
+        return False
+    open_case = False
+    for a, b in pairs[:-1]:
+        if a == 0 and b == 0:
+            open_case = False
+        elif a > 0 and b > 0:
+            open_case = True
+        else:
+            return False
+    return not open_case
+
+
+def _tree_edges(r, nodes):
+    """随机有根树：nodes[0] 为根，其余随机挂父亲（含长链/星形混合）。"""
+    edges = []
+    for i in range(1, len(nodes)):
+        p = i - 1 if r.random() < .3 else r.randrange(i)
+        edges.append((nodes[p], nodes[i]))
+    return edges
+
+
+def _labels(r, n, hi):
+    return r.sample(range(1, hi + 1), n)
+
+
+def _make_case(r, kind, n, hi):
+    """kind: tree / forest / twoparent / cycle / rootless / selfloop / island。"""
+    if kind == "selfloop":
+        if n <= 1:
+            return [(v := r.randint(1, hi), v)]
+        nodes = _labels(r, n, hi); e = _tree_edges(r, nodes)
+        v = r.choice(nodes); e.append((v, v))
+    elif kind == "tree":
+        nodes = _labels(r, n, hi); e = _tree_edges(r, nodes)
+    elif kind == "forest":      # 两棵及以上的树：多根
+        nodes = _labels(r, n, hi); k = r.randint(1, n - 1)
+        e = _tree_edges(r, nodes[:k]) + _tree_edges(r, nodes[k:])
+    elif kind == "twoparent":   # 某非根点入度 2；一半再删掉别的入边，使边数 = 点数-1
+        nodes = _labels(r, n, hi); e = _tree_edges(r, nodes)
+        have = set(e)
+        while True:
+            a, b = r.randrange(n), r.randrange(1, n)
+            if a != b and (nodes[a], nodes[b]) not in have:
+                break
+        e.append((nodes[a], nodes[b]))
+        if n >= 3 and r.random() < .5:
+            e.remove(r.choice([x for x in e if x[1] != nodes[b]]))
+    elif kind == "cycle":       # 整体无根：纯环，或环上挂树枝
+        nodes = _labels(r, n, hi)
+        k = n if n < 4 or r.random() < .5 else r.randint(2, n - 1)
+        e = [(nodes[i], nodes[(i + 1) % k]) for i in range(k)]
+        e += [(nodes[r.randrange(i)], nodes[i]) for i in range(k, n)]
+    else:                       # island：一棵树 + 一个独立环；边数 = 点数-1、恰一个入度 0 点、入度都 <=1
+        nodes = _labels(r, n, hi); k = r.randint(2, n - 2)
+        e = _tree_edges(r, nodes[:k])
+        cyc = nodes[k:]
+        e += [(cyc[i], cyc[(i + 1) % len(cyc)]) for i in range(len(cyc))]
+    r.shuffle(e)
+    return e
+
+
+def _fmt(cases):
+    out = []
+    for e in cases:
+        out.append("\n".join(f"{a} {b}" for a, b in e) + ("\n" if e else "") + "0 0")
+    return "\n".join(out) + "\n-1 -1\n"
+
+
+def gen1308(seed):
+    r = random.Random(1308 * 1_000_003 + seed)
+    if seed == 1:     # 手工陷阱：空树（首组）、自环、单边、两根、二父、纯环、树+独立环
+        return ("0 0\n1 1 0 0\n1 2 0 0\n1 2 3 4 0 0\n1 3 2 3 0 0\n1 2 2 1 0 0\n"
+                "1 2 3 4 4 3 0 0\n1 2 2 3 3 4 0 0\n5 5 5 6 0 0\n0 0\n-1 -1\n")
+    if seed == 2:     # 首组即非树（参考解曾在此崩溃），再接空树
+        return "3 8 6 8 6 4 5 3 5 6 5 2 0 0\n0 0\n1 2 0 0\n-1 -1\n"
+    kinds = ["tree", "forest", "twoparent", "cycle", "selfloop", "island"]
+    if seed <= 24:    # 多组随机小中规模
+        cases = []
+        for _ in range(r.randint(3, 12)):
+            kind = r.choice(kinds + ["tree", "tree"])
+            n = r.randint(4 if kind == "island" else 2, 30)
+            cases.append(_make_case(r, kind, n, r.choice([n, 50, 1000])))
+        if r.random() < .3: cases.insert(r.randrange(len(cases) + 1), [])
+        return _fmt(cases)
+    if seed <= 32:    # 中规模，点号可到 1e5
+        return _fmt([_make_case(r, kinds[(seed + i) % 6] if i % 2 else "tree", r.randint(500, 3000), 100000)
+                     for i in range(r.randint(2, 5))])
+    # 大规模单组：长链树 / 随机树 / 各类非树
+    n = 60000
+    if seed == 33:
+        nodes = _labels(r, n, 100000)
+        e = [(nodes[i], nodes[i + 1]) for i in range(n - 1)]; r.shuffle(e)
+        return _fmt([e])
+    kind = ["tree", "island", "twoparent", "cycle", "forest", "selfloop"][seed - 34]
+    return _fmt([_make_case(r, kind, n, 100000)])
+
+REFERENCE='# 修正版参考解（审计时替换）：原 Accepted 提交 52642572 在首组于 BFS 前判否时\n# 引用未定义的 visited 而崩溃，且发现重复访问只跳出内层循环；这里按定义重写：\n# 空集是树；否则入度均 <=1、恰一个入度 0 的根、且从根可达全部点。\nimport sys\nfrom collections import defaultdict\n\n\ndef main():\n    t = list(map(int, sys.stdin.read().split()))\n    out = []\n    case = 0\n    edges = []\n    for i in range(0, len(t) - 1, 2):\n        u, v = t[i], t[i + 1]\n        if u < 0 and v < 0:\n            break\n        if u == 0 and v == 0:\n            case += 1\n            ok = True\n            if edges:\n                indeg = defaultdict(int)\n                adj = defaultdict(list)\n                nodes = set()\n                for a, b in edges:\n                    indeg[b] += 1\n                    adj[a].append(b)\n                    nodes.add(a)\n                    nodes.add(b)\n                roots = [x for x in nodes if indeg[x] == 0]\n                if len(roots) != 1 or any(indeg[x] > 1 for x in nodes):\n                    ok = False\n                else:\n                    seen = {roots[0]}\n                    stack = [roots[0]]\n                    while stack:\n                        x = stack.pop()\n                        for y in adj[x]:\n                            if y not in seen:\n                                seen.add(y)\n                                stack.append(y)\n                    ok = len(seen) == len(nodes)\n            out.append(f"Case {case} is {\'a\' if ok else \'not a\'} tree.")\n            edges = []\n        else:\n            edges.append((u, v))\n    print("\\n".join(out))\n\n\nif __name__ == "__main__":\n    main()\n'
 LANGUAGE='Python3'
 NUMBER=1308
 SAMPLE='6 8  5 3  5 2  6 4\n5 6  0 0\n\n8 1  7 3  6 2  8 9  7 5\n7 4  7 8  7 6  0 0\n\n3 8  6 8  6 4\n5 3  5 6  5 2  0 0\n-1 -1\n'
@@ -428,7 +536,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[gen1308(s) for s in range(1, 40)]
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

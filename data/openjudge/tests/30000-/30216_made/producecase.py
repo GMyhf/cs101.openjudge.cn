@@ -3,6 +3,13 @@ REFERENCE="# External reference: /practice/30216/statistics/\n# Accepted submiss
 SAMPLE='3\n'
 GENERATOR_NAME='g30216'
 CPP=False
+def valid(text):
+    # 题面：一个整数 n，n<=10（题面无下界，矩阵边长 2^n 至少为 1，取 0<=n<=10）
+    if not text.endswith('\n') or text.count('\n') != 1: return False
+    s = text[:-1]
+    if not s.isdigit(): return False
+    return 0 <= int(s) <= 10
+
 def g30216(r): return f"{r.randint(1, 10)}\n"
 
 from pathlib import Path

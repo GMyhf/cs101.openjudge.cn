@@ -1,5 +1,24 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def _reach_levels(plist, links):
+    """按 1cm 逐层模拟，返回水面能到达的 (管号, y) 集合（不含溢出后的情形）。"""
+    p = len(plist); X = [q[0] for q in plist]; T = [q[1] for q in plist]
+    L = [q[1] + q[2] for q in plist]
+    edges = []
+    for x, y, ln in links:
+        edges.append((X.index(x - 1), X.index(x + ln), y))
+    seen = set()
+    while True:
+        R = {0}; ch = True
+        while ch:
+            ch = False
+            for u, v, y in edges:
+                if u in R and v not in R and L[u] <= y: R.add(v); ch = True
+                if v in R and u not in R and L[v] <= y: R.add(u); ch = True
+        M = max(L[i] for i in R); Pm = [i for i in R if L[i] == M]
+        if any(L[i] == T[i] for i in Pm): return seen
+        for i in Pm: seen.add((i + 1, M)); L[i] -= 1
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     if number == 2236:
@@ -261,11 +280,73 @@ def generate(number, seed):
             chunks.append(f"{n}\n" + " ".join(map(str, p)))
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     if number == 1073:
-        chunks = []
-        for _ in range(r.randint(1, 5)):
-            x, top, height = r.randint(0, 100), r.randint(0, 70), r.randint(1, 30)
-            target = r.randint(top, top + height)
-            chunks.append(f"1\n{x} {top} {height}\n0\n1 {target}")
+        # 随机管网：管 x 互异且间距 2..21（连杆长 1..20），高 1..20，坐标 0..100；
+        # 连杆 y 互异、两端落在两管竖直范围内、不穿过中间的管。
+        def one_case(pmax):
+            p = r.randint(1, pmax)
+            while True:
+                gaps = [r.randint(2, 7 if r.random() < .8 else 21) for _ in range(p - 1)]
+                if sum(gaps) <= 99:
+                    break
+            x0 = r.randint(0, 99 - sum(gaps)); xs = [x0]
+            for g in gaps: xs.append(xs[-1] + g)
+            base = r.randint(20, 80)
+            pipes = []
+            chain = r.random() < .35          # 高管成链：水能灌满大部分管，答案偏大
+            for x in xs:
+                h = r.randint(12, 20) if chain else r.randint(1, 20)
+                if chain:
+                    y = min(base - 20 + r.randint(0, 3), 100 - h)
+                elif r.random() < .75:
+                    y = min(max(base - r.randint(0, h), 0), 100 - h)
+                else:
+                    y = r.randint(0, 100 - h)
+                pipes.append([x, y, h])
+            def covers(q, y): return q[1] <= y <= q[1] + q[2]
+            links, used = [], set()
+            density = 2.5 if chain else r.choice([.3, .7, 1.0, 1.5])
+            for _ in range(int(density * 3 * p) + 1):
+                if len(links) >= 50: break
+                i = r.randrange(p)
+                j = i + 1 if r.random() < .8 else r.randint(i + 1, min(p, i + 4) )
+                if j >= p: continue
+                u, v = pipes[i], pipes[j]
+                lo, hi = max(u[1], v[1]), min(u[1] + u[2], v[1] + v[2])
+                ln = v[0] - u[0] - 1
+                if lo > hi or not 1 <= ln <= 20: continue
+                cand = [y for y in range(lo, hi + 1) if y not in used and
+                        not any(covers(pipes[k], y) for k in range(i + 1, j))]
+                if not cand: continue
+                if r.random() < .15 and (u[1] in cand or v[1] in cand):
+                    y = r.choice([c for c in (u[1], v[1]) if c in cand])   # 连杆恰在某管顶部
+                else:
+                    y = r.choice(cand)
+                used.add(y); links.append((u[0] + 1, y, ln))
+            r.shuffle(links)
+            order = list(range(p)); r.shuffle(order)
+            plist = [pipes[k] for k in order]
+            # 仅用于挑目标（让可达/不可达两类都足量出现），答案仍由参考解给出
+            reach = _reach_levels(plist, links)
+            if reach and r.random() < .7:
+                cand = sorted(reach)
+                if chain and r.random() < .6:     # 取最晚到达的那些水位
+                    cand = [k for k in cand if k[1] <= min(y for _, y in cand) + 2]
+                tp, ty = r.choice(cand)
+                return (f"{p}\n" + "\n".join(" ".join(map(str, q)) for q in plist) +
+                        f"\n{len(links)}\n" + "".join(" ".join(map(str, k)) + "\n" for k in links) +
+                        f"{tp} {ty}")
+            tp = r.randint(1, p); q = plist[tp - 1]
+            mode = r.random()
+            if mode < .6: ty = r.randint(q[1], q[1] + q[2])
+            elif mode < .7: ty = q[1]
+            elif mode < .8: ty = q[1] + q[2]
+            else: ty = r.randint(0, 100)
+            return (f"{p}\n" + "\n".join(" ".join(map(str, q)) for q in plist) +
+                    f"\n{len(links)}\n" + "".join(" ".join(map(str, k)) + "\n" for k in links) +
+                    f"{tp} {ty}")
+        t = 1 if seed % 7 == 0 else 10
+        pmax = 4 if seed % 5 == 1 else 20
+        chunks = [one_case(pmax) for _ in range(t)]
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     if number == 1080:
         alphabet = "AGCT"; chunks = []
@@ -421,6 +502,63 @@ REFERENCE='// External reference: http://cs101.openjudge.cn/practice/01073/stati
 LANGUAGE='G++'
 NUMBER=1073
 SAMPLE='1\n2\n2 0 6\n5 1 6\n1\n3 4 2\n2 2\n'
+def valid(text):
+    """题面契约：t(1..10)；每组 p(1..20) 根管 (x y h)，h∈[1,20]；l(0..50) 根连杆 (x y len)，len∈[1,20]；
+    最后一行 目标管号 目标y。坐标均为 0..100 的整数；连杆两端都接在管上、不穿过别的管、y 互不相同；管的 x 互不相同。"""
+    lines = text.split('\n')
+    if lines and lines[-1] == '':
+        lines.pop()
+    pos = 0
+    def row(k):
+        nonlocal pos
+        if pos >= len(lines):
+            raise ValueError
+        toks = lines[pos].split(' ')
+        pos += 1
+        if len(toks) != k or not all(x.isdigit() for x in toks):
+            raise ValueError
+        return list(map(int, toks))
+    try:
+        t, = row(1)
+        if not 1 <= t <= 10:
+            return False
+        for _ in range(t):
+            p, = row(1)
+            if not 1 <= p <= 20:
+                return False
+            pipes = [row(3) for _ in range(p)]
+            for x, y, h in pipes:
+                if not (0 <= x <= 100 and 0 <= y <= 100 and 1 <= h <= 20 and y + h <= 100):  # 管底 (x, y+h) 也是坐标，须在 0..100
+                    return False
+            if len({x for x, _, _ in pipes}) != p:
+                return False
+            l, = row(1)
+            if not 0 <= l <= 50:
+                return False
+            links = [row(3) for _ in range(l)]
+            if len({y for _, y, _ in links}) != l:
+                return False
+            for x, y, ln in links:
+                if not (0 <= x <= 100 and 0 <= y <= 100 and 1 <= ln <= 20 and x + ln <= 100):
+                    return False
+                # 左端接在某管右壁(管 x = 连杆 x-1)，右端接在某管左壁(管 x = x+len)，且 y 落在两管竖直范围内
+                left = [q for q in pipes if q[0] == x - 1]
+                right = [q for q in pipes if q[0] == x + ln]
+                if not left or not right:
+                    return False
+                for q in (left[0], right[0]):
+                    if not q[1] <= y <= q[1] + q[2]:
+                        return False
+                # 不穿过别的管：中间的管若竖直范围覆盖 y 即视为穿过
+                for qx, qy, qh in pipes:
+                    if x - 1 < qx < x + ln and qy <= y <= qy + qh:
+                        return False
+            tp, ty = row(2)
+            if not (1 <= tp <= p and 0 <= ty <= 100):
+                return False
+        return pos == len(lines)
+    except Exception:
+        return False
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -429,6 +567,7 @@ def main():
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
   cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  assert all(valid(x) for x in cases)
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

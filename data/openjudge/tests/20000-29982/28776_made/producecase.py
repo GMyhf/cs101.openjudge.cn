@@ -7,18 +7,83 @@ def generate_case(r):
     ministers = [(r.randint(1, 10), r.randint(1, 10)) for _ in range(n)]
     return f"{n}\n{king_a} {king_b}\n" + "\n".join(f"{a} {b}" for a, b in ministers) + "\n"
 
-with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
-    handle.write(REFERENCE_SOURCE); handle.flush()
-    root = Path(__file__).parent / "data"
-    seen = [SAMPLE_IN]
-    for index in range(40):
-        if index == 0: content = SAMPLE_IN
-        else:
-            for attempt in range(100):
-                content = generate_case(random.Random(28776 + index + attempt * 1000))
-                if content not in seen: break
-            else: raise AssertionError("insufficient diversity")
-        seen.append(content)
-        result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
-        (root / f"{index}.in").write_text(content, encoding="utf-8")
-        (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+
+def valid(text):
+    """题面契约：首行 n（1≤n≤100）；第二行国王 a b；其后恰 n 行大臣 a b；1≤a,b≤10。
+    （题面样例的行尾带空格，故行内按空白切分，但逐行核 token 数。）"""
+    if not text.endswith("\n") or "\r" in text:
+        return False
+    lines = text[:-1].split("\n")
+    def ints(line, cnt):
+        parts = line.split()
+        if len(parts) != cnt or any(not p.isdigit() or (len(p) > 1 and p[0] == "0") for p in parts):
+            return None
+        return [int(p) for p in parts]
+    first = ints(lines[0], 1)
+    if first is None or not 1 <= first[0] <= 100 or len(lines) != first[0] + 2:
+        return False
+    for line in lines[1:]:
+        row = ints(line, 2)
+        if row is None or not all(1 <= v <= 10 for v in row):
+            return False
+    return True
+
+
+def fmt(king, ministers):
+    return f"{len(ministers)}\n{king[0]} {king[1]}\n" + "\n".join(f"{a} {b}" for a, b in ministers) + "\n"
+
+
+def extra_cases():
+    """追加的规模/边界组：n=100 满规模（答案远超 64 位）、题面样例 2、各类排序陷阱。"""
+    r = random.Random(287760)
+    out = []
+    out.append("18\n10 2\n5 2\n8 8\n8 7\n4 2\n8 1\n7 7\n10 1\n8 5\n4 10\n2 6\n1 1\n1 9\n1 7\n4 7\n1 9\n4 8\n8 9\n4 6\n")  # 题面样例 2
+    out.append(fmt((10, 10), [(10, 10)] * 100))                       # 全取上限，答案 10^99
+    out.append(fmt((1, 1), [(1, 1)] * 100))                           # 全取下限，答案 1
+    out.append(fmt((10, 1), [(10, 1)] * 100))                         # 右手 1：答案 10^100
+    out.append(fmt((1, 10), [(1, 10)] * 100))                         # 答案 0
+    out.append(fmt((10, 3), [(r.randint(1, 10), r.randint(1, 10)) for _ in range(100)]))
+    out.append(fmt((7, 9), [(r.randint(1, 10), r.randint(1, 10)) for _ in range(100)]))
+    out.append(fmt((10, 10), [(r.randint(5, 10), r.randint(5, 10)) for _ in range(100)]))
+    # 按 a*b 降序给出，不排序直接算会错
+    ms = sorted([(r.randint(1, 10), r.randint(1, 10)) for _ in range(100)], key=lambda x: -x[0] * x[1])
+    out.append(fmt((9, 2), ms))
+    # 左手大右手小 / 左手小右手大混排：只按 a 或只按 b 或按 a/b 排序都会错
+    ms = [(10, 1)] * 30 + [(1, 10)] * 30 + [(r.randint(1, 10), r.randint(1, 10)) for _ in range(40)]
+    r.shuffle(ms)
+    out.append(fmt((2, 5), ms))
+    # 最大奖赏不在队尾：最后一位右手很大
+    out.append(fmt((10, 1), [(2, 1)] * 98 + [(1, 10), (10, 10)]))
+    out.append(fmt((10, 1), [(10, 1)]))                                # n=1
+    out.append(fmt((1, 1), [(1, 1)]))                                  # n=1 最小
+    out.append(fmt((3, 7), [(r.randint(1, 10), r.randint(1, 10)) for _ in range(50)]))
+    out.append(fmt((5, 5), [(r.randint(1, 3), r.randint(1, 10)) for _ in range(100)]))
+    return out
+
+
+def main():
+    with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
+        handle.write(REFERENCE_SOURCE); handle.flush()
+        root = Path(__file__).parent / "data"
+        seen = [SAMPLE_IN]
+        for index in range(40):
+            if index == 0: content = SAMPLE_IN
+            else:
+                for attempt in range(100):
+                    content = generate_case(random.Random(28776 + index + attempt * 1000))
+                    if content not in seen: break
+                else: raise AssertionError("insufficient diversity")
+            seen.append(content)
+            result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
+            (root / f"{index}.in").write_text(content, encoding="utf-8")
+            (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+        for index, content in enumerate(extra_cases(), start=40):
+            assert content not in seen and valid(content), index
+            seen.append(content)
+            result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
+            (root / f"{index}.in").write_text(content, encoding="utf-8")
+            (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

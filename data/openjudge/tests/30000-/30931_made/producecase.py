@@ -3,14 +3,56 @@ REFERENCE='# External reference: /practice/30931/statistics/\n# Accepted submiss
 SAMPLE='({[]})[]\n'
 GENERATOR_NAME='g30931'
 CPP=False
-def g30931(r):
-    depth = r.randint(1, 20)
-    if r.randint(0, 2) == 0:
-        return "(" * depth + ")" * depth + "\n"
-    if r.randint(0, 1) == 0:
-        return "[" * depth + "]" * depth + "\n"
-    text = "".join(r.choice("()[]{}") for _ in range(r.randint(1, 40)))
-    return text + "\n"
+def valid(text):
+    """题面约束：输入一行字符串 s，1<=len(s)<=100000，只包含 ()[]{} 六种字符。"""
+    if text.endswith('\n'):
+        text = text[:-1]
+    if '\n' in text or not (1 <= len(text) <= 100000):
+        return False
+    return all(c in '()[]{}' for c in text)
+
+_PAIR = {'(': ')', '[': ']', '{': '}'}
+
+def balanced(r, length, p_open=0.5, kinds='([{'):
+    """随机生成长度为 length（偶数）的合法括号串。"""
+    out = []; st = []
+    for pos in range(length):
+        rem = length - pos
+        if not st or (len(st) < rem and r.random() < p_open):
+            c = r.choice(kinds); st.append(c); out.append(c)
+        else:
+            out.append(_PAIR[st.pop()])
+    assert not st
+    return ''.join(out)
+
+def nested(r, depth):
+    opens = [r.choice('([{') for _ in range(depth)]
+    return ''.join(opens) + ''.join(_PAIR[c] for c in reversed(opens))
+
+def build_cases():
+    r = random.Random(30931)
+    s = [SAMPLE.strip()]
+    # 最小规模与各种非法类型
+    s += ['(', ')', '()', '[]', '{}', '([)]', '((())', ']', '([]{})', '(([]))', ')(', '(]', '{[()()]}', '()[]{}', '}{', '((]]']
+    # 小规模随机：一半合法、一半随机串
+    for k in range(8):
+        s.append(balanced(r, 2 * r.randint(1, 15), 0.55))
+        s.append(''.join(r.choice('()[]{}') for _ in range(r.randint(1, 30))))
+    # 大规模
+    s.append(nested(r, 50000))                                  # 最大深度 50000，卡递归
+    s.append(balanced(r, 100000, 0.5))                          # 随机合法
+    s.append(balanced(r, 100000, 0.75))                         # 深度较大的随机合法
+    s.append('()' * 50000)                                      # 深度 1
+    s.append('(' * 100000)                                      # 全左括号
+    s.append(')' * 100000)                                      # 全右括号
+    b = balanced(r, 99998, 0.6); s.append(b[:-1] + {')': ']', ']': '}', '}': ')'}[b[-1]] + '()')  # 末尾附近类型错配，计数却平衡
+    s.append('(' + balanced(r, 99998, 0.6))                     # 多一个左括号
+    s.append(balanced(r, 99998, 0.6) + ']')                     # 多一个右括号
+    # 每种括号各自计数平衡、但交叉错配，长度 1e5
+    s.append('([' * 25000 + ')]' * 25000)
+    s.append(nested(r, 49999) + '[]')                            # 深层合法后再接一对
+    s.append(''.join(r.choice('()[]{}') for _ in range(99999)))  # 奇数长度随机
+    return [x + '\n' for x in s]
 
 from pathlib import Path
 import subprocess, sys, tempfile
@@ -27,6 +69,10 @@ def run(text):
         return x.stdout
 def main():
     data=Path('data'); data.mkdir(exist_ok=True)
-    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
-    for i,c in enumerate(cases): (data/f'{i}.in').write_text(c); (data/f'{i}.out').write_text(run(c))
+    cases=build_cases()
+    assert cases[0]==SAMPLE
+    assert len(set(cases))==len(cases), "存在重复测试组"
+    for i,c in enumerate(cases):
+        assert valid(c), f"第 {i} 组不满足题面约束"
+        (data/f'{i}.in').write_text(c); (data/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

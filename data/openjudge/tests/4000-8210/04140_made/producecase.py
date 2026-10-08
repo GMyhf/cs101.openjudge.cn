@@ -5,9 +5,21 @@ SAMPLE_IN=''
 def g4140(r):
     return ""
 
-with tempfile.NamedTemporaryFile("w", suffix=".py") as h:
- h.write(REFERENCE_SOURCE); h.flush(); root=Path(__file__).parent/"data"
- for i in range(1, 2):
-  c=SAMPLE_IN if i == 1 else g4140(random.Random(4140+i))
-  p=subprocess.run(["python3", h.name], input=c, text=True, capture_output=True, check=True)
-  (root/f"{i}.in").write_text(c); (root/f"{i}.out").write_text(p.stdout)
+
+def valid(text):
+    """题面「输入 -」：本题没有输入，只核格式——输入必须为空（至多含空白）。"""
+    return text.strip() == ""
+
+
+def main():
+ with tempfile.NamedTemporaryFile("w", suffix=".py") as h:
+  h.write(REFERENCE_SOURCE); h.flush(); root=Path(__file__).parent/"data"
+  for i in range(1, 2):
+   c=SAMPLE_IN if i == 1 else g4140(random.Random(4140+i))
+   assert valid(c), f"第 {i} 组越出题面约束"
+   p=subprocess.run(["python3", h.name], input=c, text=True, capture_output=True, check=True)
+   (root/f"{i}.in").write_text(c); (root/f"{i}.out").write_text(p.stdout)
+
+
+if __name__ == "__main__":
+    main()

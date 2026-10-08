@@ -127,9 +127,108 @@ def run(x):
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout.rstrip()+'\n'
+import re as _re
+_POS = _re.compile(r'[1-9][0-9]*\Z')
+def valid(text):
+    """题面契约：第 1 行 R C（1<=R,C<=5000）；第 2 行 N（3<=N<=5000）；
+    其后恰 N 行 "x y"，1<=x<=R、1<=y<=C，且每棵被踩踏水稻只列出一次（坐标互异）。"""
+    if not text.endswith('\n') or '\r' in text: return False
+    lines = text[:-1].split('\n')
+    if len(lines) < 2: return False
+    a = lines[0].split(' ')
+    if len(a) != 2 or not all(_POS.match(t) for t in a): return False
+    R, C = map(int, a)
+    if not (1 <= R <= 5000 and 1 <= C <= 5000): return False
+    if not _POS.match(lines[1]): return False
+    N = int(lines[1])
+    if not (3 <= N <= 5000) or len(lines) != N + 2: return False
+    seen = set()
+    for ln in lines[2:]:
+        b = ln.split(' ')
+        if len(b) != 2 or not all(_POS.match(t) for t in b): return False
+        x, y = map(int, b)
+        if not (1 <= x <= R and 1 <= y <= C) or (x, y) in seen: return False
+        seen.add((x, y))
+    return True
+
+def _fmt(R, C, pts, r):
+    pts = list(pts); r.shuffle(pts)
+    return f"{R} {C}\n{len(pts)}\n" + "\n".join(f"{x} {y}" for x, y in pts) + "\n"
+
+def _line(R, C, x, y, dx, dy):
+    """从 (x,y) 起按步长 (dx,dy) 走到出界为止的全部格点。"""
+    out = []
+    while 1 <= x <= R and 1 <= y <= C:
+        out.append((x, y)); x += dx; y += dy
+    return out
+
+def _entry(R, C, r, dx, dy):
+    """随机取一条从田外跳入、贯穿到田外的完整青蛙路径（长度>=3 时返回）。"""
+    for _ in range(1000):
+        x, y = r.randint(1, R), r.randint(1, C)
+        while 1 <= x - dx <= R and 1 <= y - dy <= C: x -= dx; y -= dy
+        path = _line(R, C, x, y, dx, dy)
+        if len(path) >= 3: return path
+    return []
+
+def _noise(R, C, pts, target, r):
+    while len(pts) < target: pts.add((r.randint(1, R), r.randint(1, C)))
+    return pts
+
+def cases():
+    r = random.Random(2812_2026)
+    out = []
+    # 最小规模与边界：单行/单列刚好 3 棵、贯穿成路径
+    out.append(_fmt(1, 3, {(1, 1), (1, 2), (1, 3)}, r))
+    out.append(_fmt(3, 1, {(1, 1), (2, 1), (3, 1)}, r))
+    # 3 棵等距共线但起点前一跳仍在田内 -> 不是路径，答案 0
+    out.append(_fmt(5, 5, {(2, 2), (3, 3), (4, 4)}, r))
+    # 共线但间距不等 -> 0
+    out.append(_fmt(1, 6, {(1, 1), (1, 2), (1, 4), (1, 6)}, r))
+    # 等距共线贯穿，但终点后一跳落在田内未踩踏的水稻上 -> 不算；另有短路径
+    out.append(_fmt(7, 7, {(1, 1), (2, 2), (3, 3), (4, 4), (5, 5), (6, 6), (1, 7), (2, 7), (3, 7)}, r))
+    # 只有 2 棵的贯穿直线不算（N=3）
+    out.append(_fmt(2, 2, {(1, 1), (2, 2), (1, 2)}, r))
+    # 小规模随机，供暴力核对
+    for _ in range(18):
+        R, C = r.randint(1, 12), r.randint(1, 12)
+        if R * C < 3: R, C = 3, 4
+        cells = [(i, j) for i in range(1, R + 1) for j in range(1, C + 1)]
+        k = r.randint(3, len(cells))
+        pts = set(r.sample(cells, k))
+        if r.random() < .6:
+            pts |= set(_entry(R, C, r, r.randint(-3, 3) or 1, r.randint(-3, 3)))
+        out.append(_fmt(R, C, pts, r))
+    # 中规模：多条方向各异的路径 + 噪声
+    for _ in range(8):
+        R, C = r.randint(50, 600), r.randint(50, 600)
+        pts = set()
+        for _ in range(r.randint(1, 4)):
+            dx, dy = r.randint(0, 9), r.randint(-9, 9)
+            if dx == 0 and dy <= 0: dy = r.randint(1, 9)
+            pts |= set(_entry(R, C, r, dx, dy))
+        out.append(_fmt(R, C, _noise(R, C, pts, min(R * C, len(pts) + r.randint(50, 1500)), r), r))
+    # 满规模：5000x5000，N=5000，斜向长路径 + 一条间隔一跳的“断路”
+    R = C = 5000
+    p1 = set(_line(R, C, 1, 1, 4, 3))           # 1250 棵的贯穿路径
+    p2 = set(_line(R, C, 1, 5000, 3, -3)); p2.discard((301, 4700))  # 断开的长线
+    out.append(_fmt(R, C, _noise(R, C, p1 | p2, 5000, r), r))
+    # 单列 / 单行（参考解在这类退化形状上接近 O(N^2)，规模取 Python 时限一半以内能跑完的）
+    out.append(_fmt(3000, 1, {(i, 1) for i in range(1, 3001)}, r))
+    out.append(_fmt(1, 2200, {(1, j) for j in range(1, 2201) if j != 1100}, r))  # 步长 1 断开，步长 2 奇数列贯穿 -> 1100
+    # 稠密满格 70x70=4900
+    out.append(_fmt(70, 70, {(i, j) for i in range(1, 71) for j in range(1, 71)}, r))
+    # 稀疏随机、无长路径：在 Python 时限内能跑的最大规模
+    out.append(_fmt(5000, 5000, _noise(5000, 5000, set(), 2200, r), r))
+    out.append(_fmt(100, 5000, _noise(100, 5000, set(_line(100, 5000, 1, 7, 1, 50)), 4000, r), r))
+    # 竖直长路径 + 噪声
+    out.append(_fmt(5000, 300, _noise(5000, 300, set(_line(5000, 300, 2, 150, 2, 0)), 5000, r), r))
+    return out
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+cases()):
+  assert valid(x),i
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

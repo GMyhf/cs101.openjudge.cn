@@ -1,11 +1,135 @@
-import random,subprocess,tempfile
-from pathlib import Path
-S='\nimport sys,math,re\nfrom collections import deque\nP=4122\ndef r4087(a):\n n,k=a[:2];print(sorted(a[2:2+n])[k-1])\ndef r4088(a):\n n=a[0];A=set(a[1:n+1]);m=a[n+1];B=set(a[n+2:n+2+m]);print(*sorted(A^B))\ndef r4090(t):\n a=t.split();i=0;n=int(a[i]);i+=1;v=list(map(int,a[i:i+n]));i+=n;q=int(a[i]);i+=1;o=[]\n for _ in range(q):\n  z=a[i];i+=1\n  if z=="ADD":x,y,d=map(int,a[i:i+3]);i+=3;v[x-1:y]=[q+d for q in v[x-1:y]]\n  elif z=="REVERSE":x,y=map(int,a[i:i+2]);i+=2;v[x-1:y]=v[x-1:y][::-1]\n  elif z=="REVOLVE":x,y,k=map(int,a[i:i+3]);i+=3;w=v[x-1:y];k%=len(w);v[x-1:y]=w[-k:]+w[:-k] if k else w\n  elif z=="INSERT":x,d=map(int,a[i:i+2]);i+=2;v.insert(x,d)\n  elif z=="DELETE":x=int(a[i]);i+=1;v.pop(x-1)\n  else:x,y=map(int,a[i:i+2]);i+=2;o.append(str(min(v[x-1:y])))\n print("\\n".join(o))\ndef r4091(a):\n i=0;o=[]\n while i<len(a):\n  n,k=a[i:i+2];i+=2;p=[tuple(a[i+j*k:i+(j+1)*k]) for j in range(n)];i+=n*k;q=a[i];i+=1\n  for _ in range(q):\n   x=tuple(a[i:i+k]);i+=k;m=a[i];i+=1;p2=sorted(p,key=lambda z:sum((z[j]-x[j])**2 for j in range(k)))[:m];o+=["the closest %d points are:"%m]+[" ".join(map(str,z)) for z in p2]\n print("\\n".join(o))\ndef r4092(a):\n i=1;o=[]\n for _ in range(int(a[0])):\n  m=int(a[i]);i+=1;s=a[i:i+m];i+=m;best=""\n  for L in range(60,2,-1):\n   q=sorted({s[0][j:j+L] for j in range(61-L)})\n   q=[x for x in q if all(x in z for z in s[1:])]\n   if q:best=q[0];break\n  o.append(best if len(best)>=3 else"no significant commonalities")\n print("\\n".join(o))\ndef r4104(t):\n print(re.sub(r"\\S+",lambda m:m.group()[::-1],t.splitlines()[0] if t.splitlines() else""))\ndef r4105(a):\n i=1;o=[]\n for _ in range(int(a[0])):\n  R,C,K=map(int,a[i:i+3]);i+=3;g=a[i:i+R];i+=R;S=E=None;ps=[];full=0\n  for r in range(R):\n   for c,ch in enumerate(g[r]):\n    if ch=="S":S=(r,c)\n    if ch=="E":E=(r,c)\n    if ch=="$":ps.append((r,c))\n    if ch.isdigit() and int(ch)<K:full|=1<<int(ch)\n  q=deque([(S[0],S[1],0,0)]);seen={(S[0],S[1],0)};ans=None\n  while q:\n   r,c,m,d=q.popleft()\n   if (r,c)==E and m==full:ans=d;break\n   ns=([(x,y) for x,y in ps if (x,y)!=(r,c)] if g[r][c]=="$" else [])\n   ns += [(r+dr,c+dc) for dr,dc in((1,0),(-1,0),(0,1),(0,-1))]\n   for x,y in ns:\n    if not(0<=x<R and 0<=y<C) or g[x][y]=="#":continue\n    mm=m|(1<<int(g[x][y])) if g[x][y].isdigit() and int(g[x][y])<K else m\n    st=(x,y,mm)\n    if st not in seen:seen.add(st);q.append((x,y,mm,d+(0 if g[r][c]=="$" and (x,y) in ps else 1)))\n  o.append(str(ans) if ans is not None else"oop!")\n print("\\n".join(o))\ndef r4106(a):\n print("\\n".join(next(c for c in s if s.count(c)==2) for s in a[1:1+int(a[0])]))\ndef r4108(a):\n ns=a[1:1+a[0]];f=[1,1,1]\n for n in range(3,max(ns,default=2)+1):f.append(f[-1]+f[n-3])\n print("\\n".join(map(str,(f[n] for n in ns))))\ndef r4110(a):\n n=int(a[0]);cap=a[1];x=[(a[i+2]/a[i+3],a[i+2],a[i+3]) for i in range(0,2*n,2)];o=0\n for z,v,w in sorted(x,reverse=True):q=min(cap,w);o+=q*z;cap-=q\n print("%.1f"%o)\ndef r4111(a):\n def f(x):b=bin(int(x,16))[2:];return sum(c=="1" and (i==0 or b[i-1]=="0") for i,c in enumerate(b))\n print("\\n".join("Alice" if f(x)>f(y) else"Bob" if f(x)<f(y) else"Tie" for x,y in zip(a[1::2],a[2::2])))\ndef r4112(t):\n o=[]\n for line in t.splitlines():\n  num=[0]\n  def f(m):\n   num[0]+=1;k=num[0];return"".join(chr((ord(c)-(65 if c.isupper() else 97)-k)%26+(65 if c.isupper() else 97)) for c in m.group()[::-1])\n  o.append(re.sub("[A-Za-z]+",f,line))\n print("\\n".join(o))\ndef r4114(a):\n i=1;o=[]\n for _ in range(int(a[0])):\n  n=int(a[i]);i+=1;s=[a[i+j*4:i+j*4+4] for j in range(n)];i+=4*n;ok=False\n  for q in range(7200):\n   t=math.pi*q/7200;u,v=math.cos(t),math.sin(t);lo=-1e99;hi=1e99\n   for x,y,X,Y in s:lo=max(lo,min(x*u+y*v,X*u+Y*v));hi=min(hi,max(x*u+y*v,X*u+Y*v))\n   if lo<=hi+1e-8:ok=True;break\n  o.append("Yes!" if ok else"No!")\n print("\\n".join(o))\ndef r4120(a):\n n,x=a[:2];c=a[2:2+n];must=[]\n for k in range(n):\n  d={0}\n  for j,z in enumerate(c):\n   if j!=k:d|={q+z for q in tuple(d) if q+z<=x}\n  if x not in d:must.append(c[k])\n print(len(must));print(*must)\ndef r4122(a):\n o=[]\n for s in a[1:1+a[0]]:\n  n=len(s);d=[n+1]*(n+1);d[0]=-1\n  for j in range(n):\n   for i in range(j+1):\n    if s[i:j+1]==s[i:j+1][::-1]:d[j+1]=min(d[j+1],d[i]+1)\n  o.append(str(d[n]))\n print("\\n".join(o))\ndef r4125(a):\n i=0;o=[]\n while i<len(a):\n  n=int(a[i]);i+=1;p=[(a[i+2*j],a[i+2*j+1]) for j in range(n)];i+=2*n\n  d=lambda x,y:math.hypot(p[x][0]-p[y][0],p[x][1]-p[y][1]);dp=[[1e99]*n for _ in range(n)];dp[0][1]=d(0,1)\n  for j in range(2,n):\n   for k in range(j-1):dp[k][j]=dp[k][j-1]+d(j-1,j)\n   dp[j-1][j]=min(dp[k][j-1]+d(k,j) for k in range(j-1))\n  o.append("%.2f"%(dp[n-2][n-1]+d(n-2,n-1)))\n print("\\n".join(o))\ndef r4126(a):\n i=1;o=[]\n for _ in range(a[0]):\n  n=int(a[i]);i+=1;s=a[i:i+n];i+=n;s=[x for j,x in enumerate(s) if not any(j!=k and x in s[k] for k in range(n))];n=len(s);ov=[[0]*n for _ in range(n)]\n  for x in range(n):\n   for y in range(n):\n    for k in range(min(len(s[x]),len(s[y])),-1,-1):\n     if s[y].endswith(s[x][:k]):ov[x][y]=k;break\n  d={(1<<j,j):len(s[j]) for j in range(n)}\n  for m in range(1,1<<n):\n   for j in range(n):\n    if(m,j)not in d:continue\n    for k in range(n):\n     if not m>>k&1:d[m|1<<k,k]=min(d.get((m|1<<k,k),9999),d[m,j]+len(s[k])-ov[j][k])\n  o.append(str(min(d[(1<<n)-1,j] for j in range(n))))\n print("\\n".join(o))\ndef r4127(a):\n g=[a[i*5:i*5+5] for i in range(5)];q=deque([(0,0)]);p={(0,0):None}\n while q:\n  u=q.popleft()\n  for x,y in((u[0]+1,u[1]),(u[0]-1,u[1]),(u[0],u[1]+1),(u[0],u[1]-1)):\n   if 0<=x<5 and 0<=y<5 and g[x][y]==0 and(x,y)not in p:p[x,y]=u;q.append((x,y))\n u=(4,4);o=[]\n while u is not None:o.append("(%d, %d)"%u);u=p[u]\n print("\\n".join(o[::-1]))\ndef r4128(a):\n s,e=a[0].split();w=a[1].split() if len(a)>1 else[];q=deque([(s,1)]);v={s};ans=0\n while q:\n  x,d=q.popleft()\n  if x==e:ans=d;break\n  for y in w+[e]:\n   if y not in v and len(x)==len(y) and sum(i!=j for i,j in zip(x,y))==1:v.add(y);q.append((y,d+1))\n print(ans)\ndef r4131(a):\n n,m=a[:2];d=[0]*(m+1);i=2\n for _ in range(n):\n  w,v=a[i:i+2];i+=2\n  for j in range(m,w-1,-1):d[j]=max(d[j],d[j-w]+v)\n print(d[m])\nF={4087:r4087,4088:r4088,4090:r4090,4091:r4091,4092:r4092,4104:r4104,4105:r4105,4106:r4106,4108:r4108,4110:r4110,4111:r4111,4112:r4112,4114:r4114,4120:r4120,4122:r4122,4125:r4125,4126:r4126,4127:r4127,4128:r4128,4131:r4131}\na=sys.stdin.read();F[P](a if P in(4090,4104,4112) else list(map(float,a.split())) if P in(4110,4114,4125) else a.splitlines() if P==4128 else [int(a.split()[0])]+a.split()[1:] if P in(4122,4126) else a.split() if P in(4092,4105,4106,4111) else list(map(int,a.split())))\n'
-I='3\nabaacca\nabcd\nabcba\n'
-def g4122(r):return "4\nabaacca\nabcd\nabcba\n"+"".join(r.choice("abcd") for _ in range(8))+"\n"
-B=["1\na\n", "1\naaaaaaaa\n", "1\nabcddcba\n"]
+"""4122 切割回文 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 40 组数据。
 
-with tempfile.NamedTemporaryFile("w") as f:
- f.write(S);f.flush();d=Path(__file__).parent/"data"
- for i in range(40):
-  c=I if i==0 else B[i-1] if i <= 3 else g4122(random.Random(4122+i));p=subprocess.run(["python3",f.name],input=c,text=True,capture_output=True,check=True);(d/f"{i}.in").write_text(c);(d/f"{i}.out").write_text(p.stdout)
+第 0 组为题面样例，1-3 组沿用原有手造组；其余覆盖长度 1、可暴力核对的小规模组、
+T=20 且长度 1000 的满规模组（随机 26 字母 / 二元字母表 / 全同字母 / 回文拼接 / 斐波那契串等）。
+
+参考解 REFERENCE：中心扩展 + 最少切割 DP，O(n^2)。
+原先内嵌的通用脚本（同目录 samplecode.py）对每对 (i, j) 做切片比较，是 O(n^3)，
+只用作交叉核对，不再用来生成答案。
+"""
+import random
+import re
+import subprocess
+import tempfile
+from pathlib import Path
+
+SAMPLE_IN = '3\nabaacca\nabcd\nabcba\n'
+SAMPLE_OUT = '1\n3\n0\n'
+REFERENCE = r'''
+import sys
+
+def min_cut(s):
+    n = len(s)
+    cut = list(range(-1, n))          # cut[i]：前 i 个字符的最少切割数，cut[0] = -1
+    for c in range(n):
+        for l, r in ((c, c), (c, c + 1)):
+            while l >= 0 and r < n and s[l] == s[r]:
+                if cut[l] + 1 < cut[r + 1]:
+                    cut[r + 1] = cut[l] + 1
+                l -= 1
+                r += 1
+    return cut[n]
+
+data = sys.stdin.read().split()
+t = int(data[0])
+print("\n".join(str(min_cut(s)) for s in data[1:1 + t]))
+'''
+B = ["1\na\n", "1\naaaaaaaa\n", "1\nabcddcba\n"]
+LETTERS = "abcdefghijklmnopqrstuvwxyz"
+
+
+def valid(text):
+    """题面：第一行 T（T <= 20）；随后 T 行，每行一个只含小写字母、长度不超过 1000 的字符串
+    （空串没有意义，要求长度至少 1）。"""
+    if not isinstance(text, str) or not text.endswith("\n") or "\r" in text:
+        return False
+    lines = text[:-1].split("\n")
+    if not re.fullmatch(r"[1-9]\d*", lines[0]):
+        return False
+    t = int(lines[0])
+    if not 1 <= t <= 20 or len(lines) != 1 + t:
+        return False
+    return all(re.fullmatch(r"[a-z]{1,1000}", s) for s in lines[1:])
+
+
+def rand_str(r, n, alpha):
+    return "".join(r.choice(alpha) for _ in range(n))
+
+
+def pal_concat(r, n, alpha):
+    # 若干随机回文拼接，长度恰为 n
+    out = ""
+    while len(out) < n:
+        half = rand_str(r, r.randint(1, 40), alpha)
+        p = half + (half[-2::-1] if r.random() < 0.5 else half[::-1])
+        out += p
+    return out[:n]
+
+
+def fib_str(n):
+    a, b = "a", "ab"
+    while len(b) < n:
+        a, b = b, b + a
+    return b[:n]
+
+
+def near_pal(r, n, alpha):
+    half = rand_str(r, n // 2, alpha)
+    s = list(half + ("" if n % 2 == 0 else r.choice(alpha)) + half[::-1])
+    i = r.randrange(n)
+    s[i] = r.choice([c for c in alpha if c != s[i]] or alpha)
+    return "".join(s)
+
+
+def pack(strings):
+    return f"{len(strings)}\n" + "".join(s + "\n" for s in strings)
+
+
+def build_cases():
+    r = random.Random(4122)
+    cases = [SAMPLE_IN] + B
+    cases.append(pack(list(LETTERS[:20])))                                          # 4 T=20，长度 1
+    for _ in range(5, 15):                                                          # 5-14 小规模
+        cases.append(pack([rand_str(r, r.randint(1, 12), LETTERS[:r.randint(1, 3)])
+                           for _ in range(r.randint(5, 20))]))
+    for _ in range(15, 25):                                                         # 15-24 中规模
+        gens = [lambda n: rand_str(r, n, LETTERS[:r.randint(1, 26)]),
+                lambda n: pal_concat(r, n, LETTERS[:r.randint(2, 5)]),
+                lambda n: near_pal(r, n, LETTERS[:r.randint(2, 4)])]
+        cases.append(pack([r.choice(gens)(r.randint(50, 300)) for _ in range(20)]))
+    for _ in range(25, 30):                                                         # 25-29 满规模，26 字母
+        cases.append(pack([rand_str(r, 1000, LETTERS) for _ in range(20)]))
+    for _ in range(30, 33):                                                         # 30-32 满规模，二元字母表
+        cases.append(pack([rand_str(r, 1000, "ab") for _ in range(20)]))
+    cases.append(pack([pal_concat(r, 1000, LETTERS[:r.randint(2, 4)]) for _ in range(20)]))   # 33
+    cases.append(pack([fib_str(1000)] + [fib_str(r.randint(900, 999)) for _ in range(19)]))  # 34
+    cases.append(pack(["a" * 1000, "a" * 999 + "b", "b" + "a" * 999, "a" * 500 + "b" + "a" * 499]
+                      + [rand_str(r, 1000, "abc") for _ in range(16)]))                       # 35 全同字母
+    cases.append(pack([("ab" * 500), ("abc" * 334)[:1000], ("aab" * 334)[:1000]]
+                      + [rand_str(r, 1000, "ab") for _ in range(17)]))                        # 36 周期串
+    cases.append(pack([(LETTERS * 39)[:1000]] + [rand_str(r, 1000, LETTERS) for _ in range(19)]))  # 37 答案 999
+    cases.append(pack([near_pal(r, 1000, LETTERS[:r.randint(2, 26)]) for _ in range(20)]))     # 38 近回文
+    cases.append(pack([r.choice([rand_str(r, 1000, "abcd"), pal_concat(r, 1000, "ab"),
+                                 near_pal(r, 1000, "ab")]) for _ in range(20)]))             # 39 混合
+    return cases
+
+
+def main():
+    cases = build_cases()
+    assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert len(cases) == 40 and len(set(cases)) == len(cases), "组数不对或存在重复组"
+    with tempfile.NamedTemporaryFile("w", suffix=".py") as f:
+        f.write(REFERENCE)
+        f.flush()
+        d = Path(__file__).parent / "data"
+        for i, c in enumerate(cases):
+            assert valid(c), i
+            p = subprocess.run(["python3", f.name], input=c, text=True, capture_output=True, check=True)
+            if i == 0:
+                assert p.stdout == SAMPLE_OUT, "参考解跑不出样例输出"
+            (d / f"{i}.in").write_text(c)
+            (d / f"{i}.out").write_text(p.stdout)
+
+
+if __name__ == "__main__":
+    main()

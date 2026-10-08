@@ -420,6 +420,20 @@ def generate(number, seed):
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02796/statistics/\n# Accepted submission: 50581104\n# Source: http://cs101.openjudge.cn/practice/solution/50581104/\n# License: not declared on the submission page; no license is inferred.\n\nl = [int(x) for x in input().split()]\nres = 0\nfor i in l[1:]:\n    if i < l[0]:\n        res += i\nprint(res)\n'
 LANGUAGE='Python3'
 NUMBER=2796
+def valid(text):
+    """题面：一行6个小于100的正整数，第一个是a；输出「给出一个正整数」即保证5个数里至少有一个小于a。"""
+    if not text.endswith("\n") or text.count("\n") != 1: return False
+    t = text[:-1].split(" ")
+    if len(t) != 6 or not all(x.isdigit() and x[0] != "0" and int(x) < 100 for x in t): return False
+    a, *rest = map(int, t)
+    return any(x < a for x in rest)
+def pick(seed):
+    """原生成器偶尔给出「没有数小于a」（答案0，违反题面输出为正整数）；这种种子按固定方式重抽。"""
+    x = generate(NUMBER, seed); t = 0
+    while not valid(x):
+        t += 1; r = random.Random(seed * 1000 + t); x = " ".join(str(r.randint(1, 99)) for _ in range(6)) + "\n"
+    return x
+EXTRA = ["99 98 98 98 98 98\n", "2 1 1 1 1 1\n", "50 50 50 50 50 49\n", "10 10 9 10 11 10\n", "99 99 99 99 99 1\n", "2 1 2 3 99 2\n", "99 1 99 2 99 3\n"]
 SAMPLE='10 1 2 3 4 11\n'
 def main():
  with tempfile.TemporaryDirectory() as d:
@@ -428,7 +442,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[pick(s) for s in range(1, 40)]+EXTRA
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

@@ -18,8 +18,48 @@ def g4080(r):
     n = r.randint(2, 100)          # 题面：2<=N<=100
     return f"{n}\n" + " ".join(str(r.randint(1, 1000)) for _ in range(n)) + "\n"
 
+def valid(text):
+    """题面契约：第一行 n（2<=N<=100），第二行 n 个整数权值。"""
+    lines = text.split("\n")
+    if not text.endswith("\n") or lines[-1] != "":
+        return False
+    lines = lines[:-1]
+    if len(lines) != 2:
+        return False
+    try:
+        head = lines[0].split()
+        if len(head) != 1:
+            return False
+        n = int(head[0])
+        ws = [int(t) for t in lines[1].split()]
+    except ValueError:
+        return False
+    return 2 <= n <= 100 and len(ws) == n
+
+
+def _fmt(ws):
+    return f"{len(ws)}\n" + " ".join(map(str, ws)) + "\n"
+
+
+def extra_cases():
+    """补边界：n=2/3 最小规模、n=100 满规模、全等权、大量重复、逆序。"""
+    r = random.Random(NUMBER * 7 + 1)
+    return [
+        _fmt([7, 3]),
+        _fmt([5, 5]),
+        _fmt([1, 2, 3]),
+        _fmt([1] * 100),
+        _fmt([1000] * 100),
+        _fmt([r.randint(1, 1000) for _ in range(100)]),
+        _fmt(sorted((r.randint(1, 1000) for _ in range(100)), reverse=True)),
+        _fmt([r.randint(1, 10) for _ in range(100)]),
+        _fmt([2 ** (i % 10) for i in range(100)]),
+        _fmt([r.randint(1, 1000) for _ in range(99)]),
+    ]
+
+
 def build_cases():
-    return [SAMPLE_IN] + [g4080(random.Random(NUMBER + i)) for i in range(1, 20)]
+    return [SAMPLE_IN] + [g4080(random.Random(NUMBER + i)) for i in range(1, 20)] + extra_cases()
 
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:

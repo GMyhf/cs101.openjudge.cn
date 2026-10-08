@@ -1,5 +1,19 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+
+def valid(text):
+    """题面：第 1 行 N (1 <= N <= 10000)，第 2 行 N 个整数（复杂程度，题面未给范围）。"""
+    import re
+    lines = text.split("\n")
+    if len(lines) != 3 or lines[2] != "":
+        return False
+    if not re.fullmatch(r"[1-9][0-9]*", lines[0]):
+        return False
+    n = int(lines[0])
+    if not 1 <= n <= 10000:
+        return False
+    tokens = lines[1].split(" ")
+    return len(tokens) == n and all(re.fullmatch(r"-?(0|[1-9][0-9]*)", t) for t in tokens)
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     if number == 2236:
@@ -14,7 +28,21 @@ def generate(number, seed):
         n = 2 * r.randint(0, 15) + 1
         return f"{n}\n" + "\n".join(str(r.randint(-10000, 10000)) for _ in range(n)) + "\n"
     if number == 2994:
-        n = r.randint(1, 30); values = [r.randint(1, 10000) for _ in range(n)]
+        # 不出 N=1：题面没说只有一个零件时答案是 0 还是该零件本身，参考解输出后者，有歧义。
+        sizes = [2, 2, 3, 4, 5, 8, 10, 16, 30, 50, 100, 300, 1000, 3000, 5000, 9999]
+        n = sizes[seed - 1] if seed <= len(sizes) else (10000 if seed % 3 else r.randint(2, 10000))
+        kind = seed % 5
+        if kind == 0:
+            values = [r.randint(1, 10000) for _ in range(n)]
+        elif kind == 1:
+            values = [r.randint(1, 20) for _ in range(n)]
+        elif kind == 2:
+            values = [10000 if seed % 4 == 2 else r.randint(1, 10000)] * n
+        elif kind == 3:
+            values = sorted(r.randint(1, 10000) for _ in range(n))
+            if seed % 2: values.reverse()
+        else:
+            values = [r.choice([1, 2, 9999, 10000, r.randint(1, 10000)]) for _ in range(n)]
         return f"{n}\n" + " ".join(map(str, values)) + "\n"
     if number == 1089:
         rows = []

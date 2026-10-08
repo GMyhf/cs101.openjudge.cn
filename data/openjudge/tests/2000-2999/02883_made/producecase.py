@@ -157,9 +157,52 @@ def run(x):
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout.rstrip()+'\n'
+import re as _re
+_INT = _re.compile(r'-?(0|[1-9][0-9]*)\Z')
+def valid(text):
+    """题面契约：若干组（"测试数据很多组"，至少 1 组），每组一行 5 个整数，单空格分隔。
+    题面未给数值范围，这里只核整数格式与每行个数。"""
+    if not text.endswith('\n') or '\r' in text: return False
+    lines = text[:-1].split('\n')
+    for ln in lines:
+        p = ln.split(' ')
+        if len(p) != 5 or not all(_INT.match(t) for t in p): return False
+    return len(lines) >= 1
+
+def _row(r):
+    kind = r.randrange(8)
+    hi = r.choice((9, 99, 999))
+    a = [r.randint(0, hi) for _ in range(5)]
+    if kind == 0: a.sort()                               # 非严格升序（可能含相等）
+    elif kind == 1: a = sorted(r.sample(range(hi + 1), 5)) if hi >= 9 else sorted(a)  # 严格升序
+    elif kind == 2: a = [a[0]] * 5                       # 全相等 -> Yes
+    elif kind == 3: a.sort(reverse=True)                 # 降序
+    elif kind == 4:                                      # 升序后交换相邻一对（含最后一对）
+        a = sorted(r.sample(range(hi + 1), 5)) if hi >= 9 else sorted(a)
+        k = r.randrange(4); a[k], a[k + 1] = a[k + 1], a[k]
+    elif kind == 5:                                      # 位数不同：按字符串排序会出错
+        a = sorted([r.randint(0, 9), r.randint(10, 99), r.randint(100, 999), r.randint(0, 9), r.randint(10, 99)])
+        if r.random() < .5: r.shuffle(a)
+    return " ".join(map(str, a))
+
+def cases():
+    r = random.Random(2883_2026)
+    out = []
+    out.append("1 2 3 4 5\n")                 # 单组 Yes
+    out.append("5 4 3 2 1\n")                 # 单组 No
+    out.append("7 7 7 7 7\n")                 # 全相等 -> Yes
+    out.append("1 2 3 5 4\n")                 # 只有最后一对逆序
+    out.append("2 1 3 4 5\n1 2 3 4 5\n")      # 先 No 后 Yes：状态没重置会错
+    out.append("9 10 100 2 30\n0 0 0 0 1\n")  # 多位数 / 0
+    for k in range(33):
+        cnt = r.randint(1, 30) if k < 25 else r.randint(500, 2000)
+        out.append("\n".join(_row(r) for _ in range(cnt)) + "\n")
+    return out
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+cases()):
+  assert valid(x),i
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

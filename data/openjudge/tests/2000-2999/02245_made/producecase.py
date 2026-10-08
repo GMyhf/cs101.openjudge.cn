@@ -1,5 +1,24 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def valid(text):
+    """题面：若干行测试，每行首个整数 k（6<k<13），随后 k 个升序（互异）整数，取自 {1,...,49}，空格分隔；
+    以 k=0 结束。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if lines[-1] != "0" or len(lines) < 2:
+        return False
+    for line in lines[:-1]:
+        parts = line.split(" ")
+        if not all(p.isdigit() and p[0] != "0" for p in parts):
+            return False
+        k, *vals = map(int, parts)
+        if not 6 < k < 13 or len(vals) != k:
+            return False
+        if any(not 1 <= v <= 49 for v in vals) or any(a >= b for a, b in zip(vals, vals[1:])):
+            return False
+    return True
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     if number == 2236:
@@ -327,10 +346,19 @@ def generate(number, seed):
             chunks.append(f"{h} {w}\n" + "\n".join("".join(row) for row in grid))
         return "\n".join(chunks) + "\n0 0\n"
     if number == 2245:
+        # 题面：S 是 {1,...,49} 的子集，6 < k < 13，升序给出
+        line = lambda v: f"{len(v)} " + " ".join(map(str, v))
+        if seed == 1: return line(list(range(43, 50))) + "\n0\n"          # k=7 最小、贴上界 49
+        if seed == 2: return line(list(range(1, 13))) + "\n0\n"           # k=12 最大、一位/两位数混排
+        if seed == 3: return line([1, 2, 3, 10, 11, 20, 21, 30, 40, 49]) + "\n" + line(list(range(1, 8))) + "\n0\n"
+        if seed == 4:  # 多组 k=12：考组间空行与总输出量
+            return "\n".join(line(sorted(r.sample(range(1, 50), 12))) for _ in range(25)) + "\n0\n"
+        if seed == 5:  # 每种 k 各一组
+            return "\n".join(line(sorted(r.sample(range(1, 50), k))) for k in range(7, 13)) + "\n0\n"
         chunks = []
-        for _ in range(r.randint(1, 4)):
-            values = sorted(r.sample(range(1, 100), r.randint(7, 12)))
-            chunks.append(f"{len(values)} " + " ".join(map(str, values)))
+        for _ in range(r.randint(1, 6)):
+            values = sorted(r.sample(range(1, 50), r.randint(7, 12)))
+            chunks.append(line(values))
         return "\n".join(chunks) + "\n0\n"
     if number == 2286:
         line = {"A": [0,2,6,11,15,20,22], "B": [1,3,8,12,17,21,23],

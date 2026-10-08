@@ -117,7 +117,27 @@ def generate(n, seed):
     if n==2757:
         N=r.randint(1,80);return f'{N}\n'+' '.join(str(r.randint(0,10000)) for _ in range(N))+'\n'
     if n==1159:
-        N=r.randint(3,100);s=''.join(r.choice('abcXYZ09') for _ in range(N));return f'{N}\n{s}\n'
+        if seed<=25:
+            N=r.randint(3,100);s=''.join(r.choice('abcXYZ09') for _ in range(N));return f'{N}\n{s}\n'
+        full='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        if seed==26:s=''.join(r.choice(full) for _ in range(3))
+        elif seed==27:c=r.choice(full);s=c+r.choice(full)+c
+        elif seed==28:s=''.join(r.choice(full) for _ in range(5000))
+        elif seed==29:s='Z'*5000
+        elif seed==30:h=''.join(r.choice(full) for _ in range(2500));s=h+h[::-1]
+        elif seed==31:s=(full*81)[:5000]
+        elif seed==32:s=''.join(r.choice('Aa') for _ in range(5000))
+        elif seed==33:h=''.join(r.choice('aA') for _ in range(2499));s=h+r.choice('0123')+h[::-1].swapcase()
+        elif seed==34:
+            h=list(''.join(r.choice('xyz') for _ in range(2500)));h=h+h[::-1]
+            for _ in range(7):h[r.randrange(5000)]=r.choice('xyz9')
+            s=''.join(h)
+        elif seed==35:s=''.join(r.choice('0123456789') for _ in range(4999))
+        elif seed==36:s=''.join(r.choice('ab') for _ in range(5000))
+        elif seed==37:s='aB'*2500
+        elif seed==38:s=''.join(r.choice(full) for _ in range(r.randint(1000,4000)))
+        else:s=''.join(r.choice('abcXYZ09') for _ in range(5000))
+        return f'{len(s)}\n{s}\n'
     if n==1724:
         N=r.randint(2,12);K=r.randint(0,50);edges=[]
         for i in range(1,N):edges.append((i,i+1,r.randint(1,30),r.randint(0,10)))
@@ -158,6 +178,14 @@ def generate(n, seed):
     raise KeyError(n)
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1159: Palindrome\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2025sp_routine/01159/\n# License: not declared in source collection; no license is inferred.\nimport sys\nN=int(input())\ns=input()\nif N==1:\n    print(0)\n    exit()\ndp1=[0]*N\ndp2=[0]*(N-1)\nfor i in range(N-1):\n    if s[i]==s[i+1]:\n        dp2[i]=0\n    else:\n        dp2[i]=1\nfor d in range(2,N):\n    dp3=[0]*(N-d)\n    for i in range(N-d):\n        if s[i]==s[i+d]:\n            dp3[i]=dp1[i+1]\n        else:\n            dp3[i]=min(dp2[i],dp2[i+1])+1\n    dp1=dp2[:]\n    dp2=dp3[:]\nprint(dp2[0])\n'
+def valid(text):
+    """题面：第一行 N（3<=N<=5000），第二行长度为 N 的串，仅含 A-Z a-z 0-9。"""
+    import re
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if len(lines)!=2 or not re.fullmatch(r'[1-9][0-9]*',lines[0]):return False
+    N=int(lines[0])
+    return 3<=N<=5000 and len(lines[1])==N and re.fullmatch(r'[A-Za-z0-9]+',lines[1]) is not None
 NUMBER=1159
 SAMPLE='5\nAb3bd\n'
 def run(x):

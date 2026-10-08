@@ -5,7 +5,24 @@ def generate(n, seed):
     if n==2694:
         return f"+ * {r.randint(-20,20)} {r.randint(-20,20)} / {r.randint(-20,20)} {r.randint(1,20)}\n"
     if n==2945:
-        k=r.randint(3,25);return f"{k}\n"+' '.join(str(r.randint(1,500)) for _ in range(k))+'\n'
+        # 覆盖：k=1、k=25、严格递增（答案 1）、严格递减、全相等（卡把「不高于」写成严格小于）、
+        # 小值域大量相等、大数值高度、末尾才出现长链等。
+        if seed==1:a=[r.randint(1,30000)]
+        elif seed==2:a=sorted(r.sample(range(1,1000),25))
+        elif seed==3:a=sorted(r.sample(range(1,1000),25),reverse=True)
+        elif seed==4:a=[777]*25
+        elif seed==5:a=[5]*12+[3]*13
+        elif seed==6:a=[r.randint(1,3) for _ in range(25)]
+        elif seed==7:a=sorted([r.randint(1,4) for _ in range(25)],reverse=True)
+        elif seed==8:a=[1,1]
+        elif seed==9:a=[1,2]
+        elif seed==10:a=list(range(1,13))+[r.randint(1,100)]*13
+        elif seed==11:a=[30000-i//2 for i in range(25)]
+        elif seed==12:a=[r.randint(1,10**6) for _ in range(25)]
+        elif seed<=20:a=[r.randint(1,6) for _ in range(r.randint(15,25))]
+        else:
+            k=r.randint(2,25) if seed<30 else 25;a=[r.randint(1,500) for _ in range(k)]
+        return f"{len(a)}\n"+' '.join(map(str,a))+'\n'
     if n==2746:
         return '\n'.join(f"{r.randint(1,80)} {r.randint(1,80)}" for _ in range(r.randint(1,5)))+'\n0 0\n'
     if n==2773:
@@ -152,6 +169,16 @@ def generate(n, seed):
     if n==1218:
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
+
+def valid(text):
+    """题面 02945：两行；第一行 k（k<=25，导弹数至少 1）；第二行恰 k 个正整数，单空格分隔。"""
+    import re
+    if not text.endswith("\n"):return False
+    lines=text[:-1].split("\n")
+    if len(lines)!=2 or not re.fullmatch(r"[1-9]\d*",lines[0]):return False
+    k=int(lines[0])
+    if not 1<=k<=25:return False
+    return bool(re.fullmatch(r"[1-9]\d*( [1-9]\d*)*",lines[1])) and len(lines[1].split(" "))==k
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2945: 拦截导弹\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/02945/\n# License: not declared in source collection; no license is inferred.\nimport sys\ndef max_intercepted_missiles(k, heights):\n    # Initialize the dp array\n    dp = [1] * k\n\n    # Fill the dp array\n    for i in range(1, k):\n        for j in range(i):\n            if heights[i] <= heights[j]:\n                dp[i] = max(dp[i], dp[j] + 1)\n\n    # The result is the maximum value in dp array\n    return max(dp)\n\n\nif __name__ == "__main__":\n\n    k = int(input())\n    heights = list(map(int, input().split()))\n\n    result = max_intercepted_missiles(k, heights)\n    print(result)\n'
 NUMBER=2945

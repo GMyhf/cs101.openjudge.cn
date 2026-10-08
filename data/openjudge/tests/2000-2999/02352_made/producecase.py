@@ -1,5 +1,50 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def valid(text):
+    """题面契约：首行 N(1<=N<=15000)；随后恰 N 行，每行两个整数 X Y(0<=X,Y<=32000)；
+    点互不相同；按 Y 升序、Y 相同按 X 升序给出。"""
+    try:
+        if not text.endswith("\n"):return False
+        lines=text[:-1].split("\n")
+        if not lines[0].strip().isdigit():return False
+        n=int(lines[0])
+        if not 1<=n<=15000 or len(lines)!=n+1:return False
+        prev=None
+        for ln in lines[1:]:
+            t=ln.split(" ")
+            if len(t)!=2 or not all(x.isdigit() for x in t):return False
+            x,y=int(t[0]),int(t[1])
+            if not (0<=x<=32000 and 0<=y<=32000):return False
+            if prev is not None and (y,x)<=prev:return False
+            prev=(y,x)
+        return True
+    except Exception:
+        return False
+
+def gen2352(r,seed):
+    M=32000
+    def fmt(pts):
+        pts=sorted(set(pts),key=lambda p:(p[1],p[0]));return f"{len(pts)}\n"+"\n".join(f"{x} {y}" for x,y in pts)+"\n"
+    def rnd(n,xr=M,yr=M):
+        s=set()
+        while len(s)<n:s.add((r.randint(0,xr),r.randint(0,yr)))
+        return list(s)
+    if seed==1:return fmt([(0,0)])
+    if seed==2:return fmt([(M,M)])
+    if seed==3:return fmt([(M,0),(0,M)])
+    if seed==4:return fmt([(0,y) for y in range(15000)])            # 同一列：各级恰好 1 个
+    if seed==5:return fmt([(x,0) for x in range(M-14999,M+1)])        # 同一行，含 X=32000
+    if seed==6:return fmt([(14999-i,i) for i in range(15000)])        # 反对角：全部 0 级
+    if seed==7:return fmt([(2*i,2*i) for i in range(15000)])          # 主对角：各级 1 个
+    if seed==8:return fmt(rnd(14998)+[(0,0),(M,M)])
+    if 9<=seed<=14:return fmt(rnd(15000))
+    if seed==15:return fmt(rnd(15000,200,M))                          # X 集中，重复 X 多
+    if seed==16:return fmt(rnd(15000,M,50))                           # Y 集中，同 Y 很多
+    if seed==17:return fmt(rnd(15000,122,122))                        # 密集小方阵
+    if seed==18:return fmt([(x,y) for x in range(M-99,M+1) for y in range(M-149,M+1)])
+    if seed<=28:return fmt(rnd(r.randint(1,30),r.choice([3,10,100]),r.choice([3,10,100])))
+    return fmt(rnd(r.randint(100,5000)))
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -133,8 +178,7 @@ def generate(number, seed):
     if number==2663:return "\n".join(str(r.randint(0,30)) for _ in range(r.randint(1,10)))+"\n-1\n"
     if number==2745:return "\n".join(f"{r.randint(1,10)} {r.randint(0,99999999)}" for _ in range(r.randint(1,5)))+"\n0 0\n"
     if number==2977:return " ".join(str(r.randint(0,365)) for _ in range(4))+"\n"
-    if number==2352:
-        pts=sorted({(r.randint(0,100),r.randint(0,100)) for _ in range(30)},key=lambda p:(p[1],p[0]));return f"{len(pts)}\n"+"\n".join(f"{x} {y}" for x,y in pts)+"\n"
+    if number==2352:return gen2352(r,seed)
     if number==2599:
         n=r.randint(2,40);edges=[(i,r.randint(1,i-1)) for i in range(2,n+1)];return f"{n} {r.randint(1,n)}\n"+"\n".join(f"{a} {b}" for a,b in edges)+"\n"
     if number==2937:

@@ -2,15 +2,88 @@ import random, subprocess, tempfile
 from pathlib import Path
 REFERENCE_SOURCE = '# T-004-r5 参考实现：人提供的平台 Accepted 版本（2026-07-26 替换）\n# 原自写实现平台判 Wrong Answer，生成的数据是错的。\nimport sys\nfrom dataclasses import dataclass\n\n# 兵种编号：\n# 0 dragon\n# 1 ninja\n# 2 iceman\n# 3 lion\n# 4 wolf\nNAMES = ["dragon", "ninja", "iceman", "lion", "wolf"]\n\nRED_ORDER = [2, 3, 4, 1, 0]\nBLUE_ORDER = [3, 0, 1, 2, 4]\n\n@dataclass\nclass Warrior:\n    side: str\n    kind: int\n    number: int\n    hp: int\n    attack: int\n    position: int\n\n    steps: int = 0\n    wolf_kills: int = 0\n    alive: bool = True\n    reached: bool = False\n\nclass Headquarter:\n    def __init__(self, side, elements, position):\n        self.side = side\n        self.elements = elements\n        self.position = position\n        self.next_index = 0\n        self.warrior_count = 0\n        self.invaders = 0\n\nclass City:\n    def __init__(self):\n        self.elements = 0\n        self.flag = None\n        self.last_winner = None\n\nclass World:\n    def __init__(self, initial_elements, city_count, time_limit,\n                 initial_hp, initial_attack):\n        self.n = city_count\n        self.time_limit = time_limit\n        self.initial_hp = initial_hp\n        self.initial_attack = initial_attack\n        self.cities = [City() for _ in range(self.n + 1)]\n        self.headquarters = {\n            "red": Headquarter("red", initial_elements, 0),\n            "blue": Headquarter("blue", initial_elements, self.n + 1)\n        }\n        self.warriors = []\n        self.answer = []\n        self.war_ended = False\n\n    @staticmethod\n    def format_time(current_time):\n        hour = current_time // 60\n        minute = current_time % 60\n        return f"{hour:03d}:{minute:02d}"\n\n    @staticmethod\n    def warrior_name(warrior):\n        return (\n            f"{warrior.side} "\n            f"{NAMES[warrior.kind]} "\n            f"{warrior.number}"\n        )\n\n    def create_warrior(self, current_time, side):\n        hq = self.headquarters[side]\n        order = RED_ORDER if side == "red" else BLUE_ORDER\n        kind = order[hq.next_index]\n        cost = self.initial_hp[kind]\n        if hq.elements < cost:\n            return\n        hq.elements -= cost\n        hq.warrior_count += 1\n        warrior = Warrior(\n            side=side,\n            kind=kind,\n            number=hq.warrior_count,\n            hp=self.initial_hp[kind],\n            attack=self.initial_attack[kind],\n            position=hq.position\n        )\n        self.warriors.append(warrior)\n        hq.next_index = (hq.next_index + 1) % 5\n        self.answer.append(\n            f"{self.format_time(current_time)} "\n            f"{self.warrior_name(warrior)} born"\n        )\n\n    def march(self, current_time):\n        moved = []\n        for warrior in self.warriors:\n            if not warrior.alive or warrior.reached:\n                continue\n            if warrior.side == "red":\n                warrior.position += 1\n            else:\n                warrior.position -= 1\n            warrior.steps += 1\n            if warrior.kind == 2 and warrior.steps % 2 == 0:\n                warrior.hp = max(1, warrior.hp - 9)\n                warrior.attack += 20\n            reached_enemy_hq = (\n                warrior.side == "red"\n                and warrior.position == self.n + 1\n            ) or (\n                warrior.side == "blue"\n                and warrior.position == 0\n            )\n            if reached_enemy_hq:\n                warrior.reached = True\n                enemy_side = (\n                    "blue" if warrior.side == "red" else "red"\n                )\n                self.headquarters[enemy_side].invaders += 1\n            moved.append(warrior)\n\n        moved_by_position = {}\n        for warrior in moved:\n            moved_by_position.setdefault(\n                warrior.position, []\n            ).append(warrior)\n\n        captured = False\n        for position in range(self.n + 2):\n            group = moved_by_position.get(position, [])\n            group.sort(\n                key=lambda warrior:\n                0 if warrior.side == "red" else 1\n            )\n            for warrior in group:\n                if position == 0 or position == self.n + 1:\n                    enemy_side = (\n                        "blue"\n                        if warrior.side == "red"\n                        else "red"\n                    )\n                    self.answer.append(\n                        f"{self.format_time(current_time)} "\n                        f"{self.warrior_name(warrior)} reached "\n                        f"{enemy_side} headquarter with "\n                        f"{warrior.hp} elements and force "\n                        f"{warrior.attack}"\n                    )\n                else:\n                    self.answer.append(\n                        f"{self.format_time(current_time)} "\n                        f"{self.warrior_name(warrior)} marched "\n                        f"to city {position} with "\n                        f"{warrior.hp} elements and force "\n                        f"{warrior.attack}"\n                    )\n            if (\n                position == 0\n                and self.headquarters["red"].invaders >= 2\n            ):\n                self.answer.append(\n                    f"{self.format_time(current_time)} "\n                    f"red headquarter was taken"\n                )\n                captured = True\n            if (\n                position == self.n + 1\n                and self.headquarters["blue"].invaders >= 2\n            ):\n                self.answer.append(\n                    f"{self.format_time(current_time)} "\n                    f"blue headquarter was taken"\n                )\n                captured = True\n        self.war_ended = captured\n\n    def get_city_warriors(self, city_number):\n        red_warrior = None\n        blue_warrior = None\n        for warrior in self.warriors:\n            if (\n                warrior.alive\n                and not warrior.reached\n                and warrior.position == city_number\n            ):\n                if warrior.side == "red":\n                    red_warrior = warrior\n                else:\n                    blue_warrior = warrior\n        return red_warrior, blue_warrior\n\n    def collect_city_elements(self, current_time):\n        for city_number in range(1, self.n + 1):\n            red_warrior, blue_warrior = self.get_city_warriors(\n                city_number\n            )\n            if (red_warrior is None) != (blue_warrior is None):\n                warrior = (\n                    red_warrior\n                    if red_warrior is not None\n                    else blue_warrior\n                )\n                amount = self.cities[city_number].elements\n                if amount > 0:\n                    self.headquarters[warrior.side].elements += amount\n                    self.cities[city_number].elements = 0\n                    self.answer.append(\n                        f"{self.format_time(current_time)} "\n                        f"{self.warrior_name(warrior)} earned "\n                        f"{amount} elements for his headquarter"\n                    )\n\n    def battle(self, current_time):\n        battle_records = []\n        winners = {\n            "red": [],\n            "blue": []\n        }\n        for city_number in range(1, self.n + 1):\n            red_warrior, blue_warrior = self.get_city_warriors(\n                city_number\n            )\n            if red_warrior is None or blue_warrior is None:\n                continue\n            city = self.cities[city_number]\n            red_attacks = (\n                city.flag == "red"\n                or (\n                    city.flag is None\n                    and city_number % 2 == 1\n                )\n            )\n            if red_attacks:\n                attacker = red_warrior\n                defender = blue_warrior\n            else:\n                attacker = blue_warrior\n                defender = red_warrior\n            logs = []\n            logs.append(\n                f"{self.format_time(current_time)} "\n                f"{self.warrior_name(attacker)} attacked "\n                f"{self.warrior_name(defender)} in city "\n                f"{city_number} with {attacker.hp} elements "\n                f"and force {attacker.attack}"\n            )\n            attacker_lion_hp = attacker.hp\n            defender_lion_hp = defender.hp\n            winner = None\n            defender.hp -= attacker.attack\n            if defender.hp <= 0:\n                defender.alive = False\n                logs.append(\n                    f"{self.format_time(current_time)} "\n                    f"{self.warrior_name(defender)} was killed "\n                    f"in city {city_number}"\n                )\n                winner = attacker\n                if attacker.kind == 4:\n                    attacker.wolf_kills += 1\n                    if attacker.wolf_kills % 2 == 0:\n                        attacker.hp *= 2\n                        attacker.attack *= 2\n                if defender.kind == 3:\n                    attacker.hp += defender_lion_hp\n            else:\n                if defender.kind != 1:\n                    logs.append(\n                        f"{self.format_time(current_time)} "\n                        f"{self.warrior_name(defender)} fought "\n                        f"back against "\n                        f"{self.warrior_name(attacker)} "\n                        f"in city {city_number}"\n                    )\n                    attacker.hp -= defender.attack // 2\n                    if attacker.hp <= 0:\n                        attacker.alive = False\n                        logs.append(\n                            f"{self.format_time(current_time)} "\n                            f"{self.warrior_name(attacker)} "\n                            f"was killed in city {city_number}"\n                        )\n                        winner = defender\n                        if attacker.kind == 3:\n                            defender.hp += attacker_lion_hp\n            if attacker.kind == 0 and attacker.alive:\n                logs.append(\n                    f"{self.format_time(current_time)} "\n                    f"{self.warrior_name(attacker)} yelled "\n                    f"in city {city_number}"\n                )\n            flag_log = None\n            if winner is not None:\n                side = winner.side\n                winners[side].append((city_number, winner))\n                if (\n                    city.last_winner == side\n                    and city.flag != side\n                ):\n                    city.flag = side\n                    flag_log = (\n                        f"{self.format_time(current_time)} "\n                        f"{side} flag raised in city "\n                        f"{city_number}"\n                    )\n                city.last_winner = side\n            else:\n                city.last_winner = None\n            battle_records.append(\n                (\n                    city_number,\n                    logs,\n                    winner,\n                    city.elements,\n                    flag_log\n                )\n            )\n\n        for city_number, warrior in sorted(\n            winners["red"],\n            key=lambda item: -item[0]\n        ):\n            red_hq = self.headquarters["red"]\n            if red_hq.elements >= 8:\n                red_hq.elements -= 8\n                warrior.hp += 8\n\n        for city_number, warrior in sorted(\n            winners["blue"],\n            key=lambda item: item[0]\n        ):\n            blue_hq = self.headquarters["blue"]\n            if blue_hq.elements >= 8:\n                blue_hq.elements -= 8\n                warrior.hp += 8\n\n        for (\n            city_number,\n            logs,\n            winner,\n            amount,\n            flag_log\n        ) in battle_records:\n            if winner is not None:\n                self.headquarters[winner.side].elements += amount\n                self.cities[city_number].elements = 0\n\n        for (\n            city_number,\n            logs,\n            winner,\n            amount,\n            flag_log\n        ) in battle_records:\n            self.answer.extend(logs)\n            if winner is not None:\n                self.answer.append(\n                    f"{self.format_time(current_time)} "\n                    f"{self.warrior_name(winner)} earned "\n                    f"{amount} elements for his headquarter"\n                )\n            if flag_log is not None:\n                self.answer.append(flag_log)\n\n    def simulate(self):\n        for current_time in range(self.time_limit + 1):\n            if self.war_ended:\n                break\n            minute = current_time % 60\n            if minute == 0:\n                self.create_warrior(current_time, "red")\n                self.create_warrior(current_time, "blue")\n            elif minute == 10:\n                self.march(current_time)\n            elif minute == 20:\n                for city_number in range(1, self.n + 1):\n                    self.cities[city_number].elements += 10\n            elif minute == 30:\n                self.collect_city_elements(current_time)\n            elif minute == 40:\n                self.battle(current_time)\n            elif minute == 50:\n                red_elements = self.headquarters["red"].elements\n                blue_elements = self.headquarters["blue"].elements\n                self.answer.append(\n                    f"{self.format_time(current_time)} "\n                    f"{red_elements} elements in red headquarter"\n                )\n                self.answer.append(\n                    f"{self.format_time(current_time)} "\n                    f"{blue_elements} elements in blue headquarter"\n                )\n        return self.answer\n\ndef solve():\n    data = list(map(int, sys.stdin.buffer.read().split()))\n    iterator = iter(data)\n    case_count = next(iterator)\n    output = []\n    for case_number in range(1, case_count + 1):\n        initial_elements = next(iterator)\n        city_count = next(iterator)\n        time_limit = next(iterator)\n        initial_hp = [next(iterator) for _ in range(5)]\n        initial_attack = [next(iterator) for _ in range(5)]\n        world = World(\n            initial_elements,\n            city_count,\n            time_limit,\n            initial_hp,\n            initial_attack\n        )\n        output.append(f"Case:{case_number}")\n        output.extend(world.simulate())\n    sys.stdout.write("\\n".join(output))\n\nif __name__ == "__main__":\n    solve()\n'
 SAMPLE_IN='2\n99 2 1000\n10 20 50 50  30\n20 50 50 50  50\n40 1 1000\n20 20 20 20 20\n20 20 20 20 20\n'
-def g3750(r):
-    m = r.randint(20, 80); n = r.randint(1, 3); t = 0
-    hp = [r.randint(10, 40) for _ in range(5)]
-    atk = [r.randint(5, 40) for _ in range(5)]
-    return f"1\n{m} {n} {t}\n{' '.join(map(str, hp))}\n{' '.join(map(str, atk))}\n"
 
-with tempfile.NamedTemporaryFile("w", suffix=".py") as h:
- h.write(REFERENCE_SOURCE); h.flush(); root=Path(__file__).parent/"data"
- for i in range(40):
-  c=SAMPLE_IN if i == 0 else g3750(random.Random(3750+i))
-  p=subprocess.run(["python3", h.name], input=c, text=True, capture_output=True, check=True)
-  (root/f"{i}.in").write_text(c); (root/f"{i}.out").write_text(p.stdout)
+
+def valid(text):
+    """题面：首行测试组数；每组三行：M N T（1<=M<=1000，1<=N<=20，0<=T<=1000），
+    五个初始生命值、五个攻击力（均大于 0 小于等于 100）。题面样例行内有双空格，故行内按空白切分。"""
+    if not text.endswith("\n"):
+        return False
+    lines=text[:-1].split("\n")
+
+    def ints(line,k):
+        t=line.split()
+        if len(t)!=k or not all(x.isdigit() for x in t):
+            return None
+        return [int(x) for x in t]
+
+    head=ints(lines[0],1)
+    if head is None or head[0]<1 or len(lines)!=1+3*head[0]:
+        return False
+    for c in range(head[0]):
+        mnt=ints(lines[1+3*c],3);hp=ints(lines[2+3*c],5);atk=ints(lines[3+3*c],5)
+        if mnt is None or hp is None or atk is None:
+            return False
+        m,n,t=mnt
+        if not (1<=m<=1000 and 1<=n<=20 and 0<=t<=1000):
+            return False
+        if not all(1<=x<=100 for x in hp+atk):
+            return False
+    return True
+
+
+def one_case(r,kind):
+    if kind=="full":
+        m,n,t=r.randint(500,1000),r.randint(15,20),1000
+    elif kind=="small_m":
+        m,n,t=r.randint(1,30),r.randint(1,20),r.randint(0,1000)
+    elif kind=="short":
+        m,n,t=r.randint(1,1000),r.randint(1,3),r.randint(0,1000)
+    elif kind=="edge_t":
+        m,n=r.randint(1,1000),r.randint(1,20)
+        t=r.choice([0,9,10,19,20,29,30,39,40,49,50,59,60,61,999,1000])
+    else:
+        m,n,t=r.randint(1,1000),r.randint(1,20),r.randint(0,1000)
+    style=r.random()
+    if style<0.15:   # 兵种强弱悬殊，便于触发 lion 转移、wolf 加倍、反击致死
+        hp=[r.choice([1,100,r.randint(1,100)]) for _ in range(5)]
+        atk=[r.choice([1,100,r.randint(1,100)]) for _ in range(5)]
+    elif style<0.5:
+        hp=[r.randint(1,40) for _ in range(5)];atk=[r.randint(1,40) for _ in range(5)]
+    else:
+        hp=[r.randint(1,100) for _ in range(5)];atk=[r.randint(1,100) for _ in range(5)]
+    return f"{m} {n} {t}\n{' '.join(map(str,hp))}\n{' '.join(map(str,atk))}\n"
+
+
+def g3750(index,r):
+    if index==1: cases=["1 1 0\n1 1 1 1 1\n1 1 1 1 1\n"]
+    elif index==2: cases=["1000 20 1000\n100 100 100 100 100\n100 100 100 100 100\n"]
+    elif index==3: cases=["1000 20 1000\n1 1 1 1 1\n1 1 1 1 1\n"]
+    elif index==4: cases=["1000 1 1000\n100 100 100 100 100\n1 1 1 1 1\n"]
+    elif index==5: cases=["1 20 1000\n1 1 1 1 1\n100 100 100 100 100\n"]
+    elif index==6: cases=[one_case(r,"edge_t") for _ in range(16)]
+    elif index==7: cases=[one_case(r,"small_m") for _ in range(10)]
+    elif index<=17: cases=[one_case(r,"full")]
+    elif index<=22: cases=[one_case(r,"short") for _ in range(8)]
+    else: cases=[one_case(r,r.choice(["rand","rand","full","small_m","short","edge_t"])) for _ in range(r.randint(1,5))]
+    return f"{len(cases)}\n"+"".join(cases)
+
+
+def main():
+    with tempfile.NamedTemporaryFile("w", suffix=".py") as h:
+        h.write(REFERENCE_SOURCE); h.flush(); root=Path(__file__).parent/"data"; seen=[SAMPLE_IN]
+        for i in range(40):
+            if i==0: c=SAMPLE_IN
+            else:
+                for j in range(100):
+                    c=g3750(i,random.Random(3750+i+j*1000))
+                    if c not in seen: break
+                else: raise AssertionError("diversity")
+                seen.append(c)
+            assert valid(c), i
+            p=subprocess.run(["python3", h.name], input=c, text=True, capture_output=True, check=True)
+            (root/f"{i}.in").write_text(c); (root/f"{i}.out").write_text(p.stdout)
+
+
+if __name__=="__main__":
+    main()

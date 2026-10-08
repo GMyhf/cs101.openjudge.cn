@@ -421,6 +421,33 @@ REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02800/statis
 LANGUAGE='Python3'
 NUMBER=2800
 SAMPLE='THE QUICK BROWN FOX JUMPED OVER THE LAZY DOG.\nTHIS IS AN EXAMPLE TO TEST FOR YOUR\nHISTOGRAM PROGRAM.\nHELLO!\n'
+def valid(text):
+    """题面：4 行文本，每行字符数不超过 80；字母全部为大写（允许空格、数字、标点）。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if len(lines) != 4:
+        return False
+    for s in lines:
+        if len(s) > 80 or any(not (32 <= ord(c) <= 126) or c.islower() for c in s):
+            return False
+    return True
+
+
+def extra_cases():
+    """补充：每行满 80 字符、同一字母极高柱（320）、只出现 Z/只出现 A（首末列）、含数字与标点、空行。"""
+    r = random.Random(2800_2026)
+    U = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    out = []
+    out.append('\n'.join(''.join(r.choice(U) for _ in range(80)) for _ in range(4)) + '\n')
+    out.append('\n'.join('A' * 80 for _ in range(4)) + '\n')
+    out.append('ZZZ\n...\n0123456789\nZ Z\n')
+    out.append('A\n\n!\n \n')
+    out.append('\n'.join(''.join(r.choice(U + '0123456789 .,!?;:\'"-()') for _ in range(80)) for _ in range(4)) + '\n')
+    out.append('THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG\nPACK MY BOX WITH FIVE DOZEN LIQUOR JUGS\nABCDEFGHIJKLMNOPQRSTUVWXYZ\nQ\n')
+    return out
+
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -428,7 +455,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

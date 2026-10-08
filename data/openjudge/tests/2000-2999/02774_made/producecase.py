@@ -153,6 +153,32 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
+def valid(text):
+    """题面契约：第一行 N K (1<=N,K<=10000)；接下来 N 行，每行一个 1..10000 的正整数。"""
+    import re
+    if not text.endswith('\n'): return False
+    lines = text[:-1].split('\n')
+    INT = re.compile(r'[1-9][0-9]*')
+    h = lines[0].split(' ')
+    if len(h) != 2 or not all(INT.fullmatch(x) for x in h): return False
+    n, k = map(int, h)
+    if not (1 <= n <= 10000 and 1 <= k <= 10000) or len(lines) != n + 1: return False
+    return all(INT.fullmatch(s) and int(s) <= 10000 for s in lines[1:])
+
+def extra_cases():
+    """补充覆盖：N=1/K=1、切不出 1cm（答案 0）、恰好切 1cm、N=K=10000 满规模、K=1（答案为最长原木）、全 10000。"""
+    r = random.Random(277400)
+    def fmt(k, a): return f'{len(a)} {k}\n' + '\n'.join(map(str, a)) + '\n'
+    cases = [fmt(1, [1]), fmt(10000, [10000]), fmt(10000, [9999]), fmt(10000, [1] * 9999), fmt(10000, [1] * 10000)]
+    cases.append(fmt(10000, [r.randint(1, 10000) for _ in range(10000)]))
+    cases.append(fmt(1, [r.randint(1, 10000) for _ in range(10000)]))
+    cases.append(fmt(r.randint(5000, 10000), [r.randint(1, 10000) for _ in range(10000)]))
+    cases.append(fmt(10000, [10000] * 10000))
+    cases.append(fmt(7, [r.randint(1, 10000) for _ in range(10000)]))
+    cases.append(fmt(10000, [r.randint(1, 3) for _ in range(5000)]))
+    cases.append(fmt(9973, [r.randint(1, 10000) for _ in range(r.randint(1, 50))]))
+    return cases
+
 REFERENCE='# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 2774: 木材加工\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024sp_routine/02774/\n# License: not declared in source collection; no license is inferred.\nimport sys\nn, k = map(int, input().split())\nexpenditure = []\nfor _ in range(n):\n    expenditure.append(int(input()))\n\n\ndef check(x):\n    num = 0\n    for i in range(n):\n        num += expenditure[i] // x\n\n    return num >= k\n\nlo = 1\nhi = max(expenditure) + 1\n\nif sum(expenditure) < k:\n    print(0)\n    exit()\n\nans = 1\nwhile lo < hi:\n    mid = (lo + hi) // 2\n    if check(mid):\n        ans = mid\n        lo = mid + 1\n    else:\n        hi = mid\n\nprint(ans)\n'
 NUMBER=2774
 SAMPLE='3 7\n232\n124\n456\n'
@@ -164,6 +190,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

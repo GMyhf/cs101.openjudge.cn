@@ -1,5 +1,106 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+
+# ---- 数独工具：解计数（位掩码 + MRV），供 valid() 与 2984 生成器使用 ----
+_ROW = [i // 9 for i in range(81)]
+_COL = [i % 9 for i in range(81)]
+_BOX = [(i // 27) * 3 + (i % 9) // 3 for i in range(81)]
+
+
+def _sudoku_count(grid, limit=2):
+    """返回 (解的个数，数到 limit 为止, 第一个解)；给定数字自相矛盾时返回 (0, None)。"""
+    g = list(grid); rm = [0] * 9; cm = [0] * 9; bm = [0] * 9
+    for i, v in enumerate(g):
+        if v:
+            b = 1 << (v - 1)
+            if rm[_ROW[i]] & b or cm[_COL[i]] & b or bm[_BOX[i]] & b:
+                return 0, None
+            rm[_ROW[i]] |= b; cm[_COL[i]] |= b; bm[_BOX[i]] |= b
+    empties = [i for i in range(81) if not g[i]]
+    res = [0, None]
+
+    def dfs():
+        best = -1; best_count = 10; best_mask = 0
+        for i in empties:
+            if g[i]:
+                continue
+            m = ~(rm[_ROW[i]] | cm[_COL[i]] | bm[_BOX[i]]) & 511
+            c = bin(m).count("1")
+            if c < best_count:
+                best_count = c; best = i; best_mask = m
+                if c <= 1:
+                    break
+        if best < 0:
+            res[0] += 1
+            if res[1] is None:
+                res[1] = g[:]
+            return res[0] >= limit
+        if best_count == 0:
+            return False
+        i = best; m = best_mask
+        while m:
+            b = m & -m; m -= b; g[i] = b.bit_length()
+            rm[_ROW[i]] |= b; cm[_COL[i]] |= b; bm[_BOX[i]] |= b
+            if dfs():
+                return True
+            rm[_ROW[i]] ^= b; cm[_COL[i]] ^= b; bm[_BOX[i]] ^= b; g[i] = 0
+        return False
+
+    dfs()
+    return res[0], res[1]
+
+
+def _sudoku_transform(g, r):
+    """数字重标 + 行带/行/列栈/列置换 + 可选转置：保持解的唯一性。"""
+    d = list(range(1, 10)); r.shuffle(d)
+    rows = [b * 3 + i for b in r.sample(range(3), 3) for i in r.sample(range(3), 3)]
+    cols = [b * 3 + i for b in r.sample(range(3), 3) for i in r.sample(range(3), 3)]
+    t = r.random() < .5
+    out = [0] * 81
+    for i in range(9):
+        for j in range(9):
+            v = g[rows[i] * 9 + cols[j]] if not t else g[cols[j] * 9 + rows[i]]
+            out[i * 9 + j] = d[v - 1] if v else 0
+    return out
+
+
+def _sudoku_solution(r):
+    g = [0] * 81
+    first = list(range(1, 10)); r.shuffle(first); g[:9] = first
+    return _sudoku_transform(_sudoku_count(g, 1)[1], r)
+
+
+def _sudoku_dig(sol, r, keep=17):
+    """随机挖空，保持唯一解；挖到给定数只剩 keep 个或已极小为止。"""
+    g = sol[:]; order = list(range(81)); r.shuffle(order)
+    for i in order:
+        if 81 - g.count(0) <= keep:
+            break
+        v = g[i]; g[i] = 0
+        if _sudoku_count(g, 2)[0] != 1:
+            g[i] = v
+    return g
+
+
+# 两道公认对朴素回溯很难的唯一解题：Wikipedia「对暴力搜索不友好」的一题、Arto Inkala 2012
+_SUDOKU_HARD = [
+    "..............3.85..1.2.......5.7.....4...1...9.......5......73..2.1........4...9",
+    "8..........36......7..9.2...5...7.......457.....1...3...1....68..85...1..9....4..",
+]
+
+
+def valid(text):
+    """题面：多行，每行 81 个字符（数字 1-9 或 '.'），按行给出；每题恰有唯一解；
+    最后一行是单词 end 表示结束。"""
+    lines = text.split("\n")
+    if len(lines) < 2 or lines[-1] != "" or lines[-2] != "end":
+        return False
+    for line in lines[:-2]:
+        if len(line) != 81 or any(ch not in "123456789." for ch in line):
+            return False
+        if _sudoku_count([0 if ch == "." else int(ch) for ch in line], 2)[0] != 1:
+            return False
+    return True
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     if number == 2236:
@@ -402,10 +503,26 @@ def generate(number, seed):
         for position in r.sample(range(256), 1 + seed % 12): grid[position//16][position%16] = "-"
         return "\n".join("".join(row) for row in grid) + "\n"
     if number == 2984:
-        shift = seed % 9
-        grid = [str((row*3 + row//3 + col + shift) % 9 + 1) for row in range(9) for col in range(9)]
-        for position in r.sample(range(81), 1 + seed % 20): grid[position] = "."
-        return "".join(grid) + "\nend\n"
+        fmt = lambda g: "".join(str(v) if v else "." for v in g)
+        if seed == 1:
+            puzzles = [_sudoku_solution(r)]                      # 没有空格，原样输出
+        elif seed == 2:
+            g = _sudoku_solution(r); g[r.randrange(81)] = 0; puzzles = [g]   # 只空一格
+        elif seed in (3, 4):
+            puzzles = [[0 if ch == "." else int(ch) for ch in _SUDOKU_HARD[seed - 3]]]
+        else:
+            count = [1, 2, 3, 5, 8, 12, 20, 30, 50][seed % 9]
+            puzzles = []
+            for k in range(count):
+                if seed % 4 == 0 and k < 3:
+                    # 难题的等价变形，卡掉不带剪枝的逐格回溯
+                    base = [0 if ch == "." else int(ch) for ch in _SUDOKU_HARD[k % 2]]
+                    puzzles.append(_sudoku_transform(base, r))
+                else:
+                    keep = 17 if r.random() < .7 else r.randint(26, 45)
+                    puzzles.append(_sudoku_dig(_sudoku_solution(r), r, keep))
+            r.shuffle(puzzles)
+        return "".join(fmt(g) + "\n" for g in puzzles) + "end\n"
     if number == 3259:
         return "4\n" if seed % 2 else "6\n"
     if number == 2795:

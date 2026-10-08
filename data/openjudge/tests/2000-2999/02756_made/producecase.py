@@ -1,5 +1,13 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def valid(text):
+    """题面：一行，两个正整数 x 和 y，都不大于 1000。"""
+    import re
+    if not re.fullmatch(r'[1-9]\d* [1-9]\d*\n', text):
+        return False
+    x, y = map(int, text.split())
+    return 1 <= x <= 1000 and 1 <= y <= 1000
+
 def generate(n, seed):
     r=random.Random(seed)
     if n==2694:
@@ -113,7 +121,18 @@ def generate(n, seed):
         words=['cat','dog','apple','word'+chr(97+seed%26)];queries=[words[-1],words[-1][:-1]+'z','dogs'];return '\n'.join(words+['#']+queries+['#'])+'\n'
     if n==2431:
         N=r.randint(1,20);L=r.randint(20,500);stops=sorted({r.randint(1,L-1):r.randint(1,100) for _ in range(N)}.items(),reverse=True);return str(len(stops))+'\n'+'\n'.join(f'{d} {f}' for d,f in stops)+f'\n{L} {r.randint(1,100)}\n'
-    if n==2756:return f'{r.randint(1,1000)} {r.randint(1,1000)}\n'
+    if n==2756:
+        # 边界：根结点、x==y、一方是另一方祖先、上界 1000
+        fixed={1:(1,1),2:(1000,1000),3:(1,1000),4:(1000,1),5:(1000,125),6:(7,1000),7:(999,1000),8:(512,513),9:(512,1000),10:(1000,999)}
+        if seed in fixed:return '%d %d\n'%fixed[seed]
+        x=r.randint(1,1000)
+        if seed%4==0:y=x
+        elif seed%4==1:
+            y=x
+            for _ in range(r.randint(1,9)):y=max(1,y//2)
+            if seed%8==1:x,y=y,x
+        else:y=r.randint(1,1000)
+        return f'{x} {y}\n'
     if n==2757:
         N=r.randint(1,80);return f'{N}\n'+' '.join(str(r.randint(0,10000)) for _ in range(N))+'\n'
     if n==1159:

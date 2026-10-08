@@ -161,9 +161,68 @@ def run(x):
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout
+def _pint(t):
+    return t.isascii() and t.isdigit() and t == str(int(t))
+
+def valid(text):
+    """题面：首行正整数 m；随后 m 组，每组一行 "n k"（1<=n<1024，1<=k<=64），一行 n 个数为 1..n 的一个排列（单空格分隔）。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if not _pint(lines[0]) or int(lines[0]) < 1:
+        return False
+    m = int(lines[0])
+    if len(lines) != 1 + 2 * m:
+        return False
+    for c in range(m):
+        h = lines[1 + 2 * c].split(' ')
+        if len(h) != 2 or not all(_pint(t) for t in h):
+            return False
+        n, k = map(int, h)
+        if not (1 <= n < 1024 and 1 <= k <= 64):
+            return False
+        a = lines[2 + 2 * c].split(' ')
+        if len(a) != n or not all(_pint(t) for t in a) or sorted(map(int, a)) != list(range(1, n + 1)):
+            return False
+    return True
+
+def gen_case(seed):
+    r = random.Random(1833 * 1000 + seed)
+    def rp(n):
+        p = list(range(1, n + 1)); r.shuffle(p); return p
+    def near_end(n):
+        # 接近字典序最后一个排列：前缀降序，末尾几位打乱，k 步内会绕回 1 2 ... n
+        p = list(range(n, 0, -1)); t = min(n, r.randint(1, 4))
+        tail = p[n - t:]; r.shuffle(tail); return p[:n - t] + tail
+    def done(cs):
+        return f"{len(cs)}\n" + "\n".join(f"{len(p)} {k}\n" + " ".join(map(str, p)) for p, k in cs) + "\n"
+    if seed == 1:
+        return done([([1], 1), ([1], 64), ([1, 2], 1), ([2, 1], 1), ([1, 2], 64), ([2, 1], 63)])
+    if seed == 2:
+        from itertools import permutations
+        return done([(list(p), k) for p in permutations([1, 2, 3]) for k in (1, 5, 6, 7, 64)] +
+                    [(list(p), r.randint(1, 64)) for p in permutations([1, 2, 3, 4])])
+    if seed == 3:
+        return done([(list(range(1023, 0, -1)), 1), (list(range(1023, 0, -1)), 64), (near_end(1023), 64),
+                     (list(range(1, 1024)), 64)] + [(near_end(r.randint(5, 1023)), 64) for _ in range(20)])
+    if seed <= 15:
+        cs = []
+        for _ in range(r.randint(1, 20)):
+            n = r.randint(1, 200)
+            cs.append((near_end(n) if r.random() < 0.25 else rp(n), r.randint(1, 64)))
+        return done(cs)
+    m = r.choice([1, 10, 100, 200])
+    if m >= 100 and seed not in (17, 20, 21):   # 只留 3 组 m>=100 的满载组，其余缩到 20~40 组以控制总体积
+        m = r.randint(20, 40)
+    cs = []
+    for _ in range(m):
+        n = 1023 if r.random() < 0.8 else r.randint(900, 1023)
+        cs.append((near_end(n) if r.random() < 0.2 else rp(n), 64 if r.random() < 0.7 else r.randint(1, 64)))
+    return done(cs)
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[gen_case(s) for s in range(1, 40)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

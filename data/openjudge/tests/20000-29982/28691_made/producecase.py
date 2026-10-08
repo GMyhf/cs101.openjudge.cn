@@ -7,18 +7,37 @@ def generate_case(r):
     a, b = r.randint(0, 99), r.randint(0, 99)
     return f"{a:02d}{r.choice('ABCD')} {b:02d}{r.choice('WXYZ')}\n"
 
-with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
-    handle.write(REFERENCE_SOURCE); handle.flush()
-    root = Path(__file__).parent / "data"
-    seen = [SAMPLE_IN]
-    for index in range(20):
-        if index == 0: content = SAMPLE_IN
-        else:
-            for attempt in range(100):
-                content = generate_case(random.Random(28691 + index + attempt * 1000))
-                if content not in seen: break
-            else: raise AssertionError("insufficient diversity")
-        seen.append(content)
-        result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
-        (root / f"{index}.in").write_text(content, encoding="utf-8")
-        (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+def valid(text):
+    """题面：一行，两个长度为 3 的字符串，每个串前两个字符是数字、后一个字符是字母。"""
+    if not isinstance(text, str) or not text.endswith("\n"):
+        return False
+    toks = text[:-1].split(" ")
+    if len(toks) != 2:
+        return False
+    for t in toks:
+        if len(t) != 3 or not ("0" <= t[0] <= "9" and "0" <= t[1] <= "9"):
+            return False
+        if not ("A" <= t[2] <= "Z" or "a" <= t[2] <= "z"):
+            return False
+    return True
+
+def main():
+    with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
+        handle.write(REFERENCE_SOURCE); handle.flush()
+        root = Path(__file__).parent / "data"
+        seen = [SAMPLE_IN]
+        for index in range(20):
+            if index == 0: content = SAMPLE_IN
+            else:
+                for attempt in range(100):
+                    content = generate_case(random.Random(28691 + index + attempt * 1000))
+                    if content not in seen: break
+                else: raise AssertionError("insufficient diversity")
+            assert valid(content), index
+            seen.append(content)
+            result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
+            (root / f"{index}.in").write_text(content, encoding="utf-8")
+            (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+
+if __name__ == "__main__":
+    main()

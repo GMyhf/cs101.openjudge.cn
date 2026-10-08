@@ -1,5 +1,21 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def valid(text):
+    """题面：第一行正整数 n（1 <= n <= 20），接下来 n 行每行一个 1 到 40 之间的正整数。"""
+    import re
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if not re.fullmatch(r'[1-9]\d*', lines[0]):
+        return False
+    n = int(lines[0])
+    if not (1 <= n <= 20) or len(lines) != n + 1:
+        return False
+    for line in lines[1:]:
+        if not re.fullmatch(r'[1-9]\d*', line) or not (1 <= int(line) <= 40):
+            return False
+    return True
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -9,7 +25,13 @@ def generate(number, seed):
     if number==2313:
         a=[r.randint(-10000,10000) for _ in range(r.randint(1,40))];return f"{len(a)}\n"+"\n".join(map(str,a))+"\n"
     if number==2755:
-        a=[r.randint(1,40) for _ in range(r.randint(1,18))];return f"{len(a)}\n"+"\n".join(map(str,a))+"\n"
+        # 边界：n=1、n=20 上限、无解、全 1（DFS 不剪枝的最坏情形）、方案数很大
+        fixed={1:[40],2:[1],3:[2]*20,4:[4]*20,5:[20]*20,6:[1]*20,7:[40]*20,8:[39,1],9:[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],10:[2,2,2,2,2,2,2,2,2,2,4,4,4,4,4,4,4,4,4,4]}
+        if seed in fixed:a=fixed[seed]
+        elif seed<=20:a=[r.randint(1,10) for _ in range(20)]
+        elif seed<=26:a=[r.randint(1,40) for _ in range(20)]
+        else:a=[r.randint(1,40) for _ in range(r.randint(1,19))]
+        return f"{len(a)}\n"+"\n".join(map(str,a))+"\n"
     if number==1837:
         c=r.randint(2,8);g=r.randint(2,8);p=sorted(r.sample(range(-15,16),c));w=sorted(r.sample(range(1,26),g));return f"{c} {g}\n"+" ".join(map(str,p))+"\n"+" ".join(map(str,w))+"\n"
     if number==2373:

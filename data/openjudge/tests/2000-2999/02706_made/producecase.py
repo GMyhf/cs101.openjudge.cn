@@ -124,7 +124,13 @@ def generate(n, seed):
         for _ in range(r.randint(0,20)):
             a,b=r.sample(range(1,N+1),2);edges.append((a,b,r.randint(1,50),r.randint(0,15)))
         return f'{K}\n{N}\n{len(edges)}\n'+'\n'.join(' '.join(map(str,e)) for e in edges)+'\n'
-    if n==2706:return f"{1000+seed}\n"
+    if n==2706:
+        # 下界附近、位数跨过 500 的 1657~1662、真实麦森指数、p*log10(2) 极接近整数的 325147/1950882、上界附近
+        fixed=[1001,1002,1003,1500,1657,1658,1659,1660,1661,1662,2203,2281,3217,4253,9689,19937,44497,86243,
+               110503,216091,325147,756839,1257787,1950882,2976221,3021377,3000000,3099997,3099998,3099999]
+        if seed<=len(fixed):return f"{fixed[seed-1]}\n"
+        rr=random.Random(2706*1000+seed);lo,hi=(1001,1700) if seed%3==0 else (100000,3099999)
+        return f"{rr.randint(lo,hi)}\n"
     if n==2996:
         N=r.randint(2,80);p=list(range(1,N+1));r.shuffle(p);return f'{N}\n{r.randint(1,min(30,N))}\n'+' '.join(map(str,p))+'\n'
     if n==3254:return '\n'.join(f'{r.randint(2,100)} {r.randint(1,100)} {r.randint(1,100)}' for _ in range(r.randint(1,5)))+'\n0 0 0\n'
@@ -156,6 +162,12 @@ def generate(n, seed):
     if n==1218:
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
+
+def valid(text):
+    """题面：只包含一个整数 P（1000<P<3100000）。"""
+    import re
+    m = re.fullmatch(r"([1-9]\d*)\n", text)
+    return bool(m) and 1000 < int(m.group(1)) < 3100000
 
 REFERENCE="# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2706: 麦森数\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/pctbook/02706/\n# License: not declared in source collection; no license is inferred.\nimport sys\np=int(input())\nprint(int(0.30102999566398114*p)+1)\nr=str(pow(2,p,10**500)-1)\nr='0'*(500-len(r))+r\nfor i in range(10):\n    print(r[50*i:50*(i+1)])\n"
 NUMBER=2706

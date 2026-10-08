@@ -1,5 +1,44 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+import re as _re
+
+_HAAB1008 = "pop no zip zotz tzec xul yoxkin mol chen yax zac ceh mac kankin muan pax koyab cumhu uayet".split()
+
+def valid(text):
+    """题面契约（POJ 1008）：首行为日期个数 n，其后恰 n 行 Haab 日期“NumberOfTheDay. Month Year”；
+    前 18 个月的日为 0..19，uayet 为 0..4；年份为非负整数且小于 5000。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not _re.fullmatch(r"0|[1-9]\d*", lines[0]):
+        return False
+    n = int(lines[0])
+    if len(lines) != n + 1:
+        return False
+    for ln in lines[1:]:
+        mt = _re.fullmatch(r"(0|[1-9]\d?)\. ([a-z]+) (0|[1-9]\d*)", ln)
+        if not mt or mt.group(2) not in _HAAB1008:
+            return False
+        day, mon, year = int(mt.group(1)), _HAAB1008.index(mt.group(2)), int(mt.group(3))
+        if day >= (5 if mon == 18 else 20) or year >= 5000:
+            return False
+    return True
+
+def _haab1008(total):
+    y, d = divmod(total, 365)
+    return f"{d % 20}. {_HAAB1008[d // 20]} {y}"
+
+def gen1008(r, seed):
+    if seed == 1: days = [0]                                                  # 最小规模：世界第一天
+    elif seed == 2: days = list(range(365))                                   # 第 0 年全部 365 天（含 uayet）
+    elif seed == 3:   # 极值：最后一天、各 Tzolkin 年末/年初、数字 13、名字 ahau
+        last = 5000 * 365 - 1
+        days = [last, last - 1, 4999 * 365, 259, 260, 519, 520, 12, 13, 19, 20, 364, 365, 365 * 4999 + 360]
+        days += [260 * k - 1 for k in range(1, 7020, 701)] + [260 * k for k in range(1, 7020, 701)]
+    elif seed == 4: days = [4999 * 365 + d for d in range(365)]               # 最后一年全部 365 天
+    else: days = [r.randrange(5000 * 365) for _ in range(5000)]               # 多组
+    return f"{len(days)}\n" + "\n".join(_haab1008(t) for t in days) + "\n"
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -84,9 +123,10 @@ def generate(number, seed):
             n=r.randint(1,20);m=r.randint(1,n);cases.append(f"{n} {m}\n"+"\n".join(f"{r.randint(0,20)} {r.randint(0,20)}" for _ in range(n)))
         return "\n".join(cases)+"\n0 0\n"
     if number == 1008:
+        if seed <= 4 or seed >= 36: return gen1008(r, seed)
         months="pop no zip zotz tzec xul yoxkin mol chen yax zac ceh mac kankin muan pax koyab cumhu uayet".split();rows=[]
         for _ in range(r.randint(1,12)):
-            m=r.randrange(19);day=r.randrange(5 if m==18 else 20);rows.append(f"{day}. {months[m]} {r.randint(0,5000)}")
+            m=r.randrange(19);day=r.randrange(5 if m==18 else 20);rows.append(f"{day}. {months[m]} {r.randint(0,4999)}")  # 题面：年份小于 5000
         return f"{len(rows)}\n"+"\n".join(rows)+"\n"
     if number == 1019:
         a=[r.randint(1,2_147_483_647) for _ in range(r.randint(1,10))];return f"{len(a)}\n"+"\n".join(map(str,a))+"\n"

@@ -5,6 +5,10 @@ SAMPLE = ''
 GENERATOR_NAME = 'g4142'
 def g4142(r): return ""
 
+def valid(text):
+    """题面「输入 无。」：本题没有输入，只核格式——输入必须为空（至多含空白）。"""
+    return text.strip() == ""
+
 def run(text):
     with tempfile.TemporaryDirectory(prefix="producecase-") as d:
         p=Path(d)/"main.py"
@@ -16,6 +20,7 @@ def main():
     data=Path("data"); data.mkdir(exist_ok=True)
     cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(seed)) for seed in range(1, 40)]
     for i,text in enumerate(cases):
+        assert valid(text), f"第 {i} 组越出题面约束"
         (data/f"{i}.in").write_text(text, encoding="utf-8")
         (data/f"{i}.out").write_text(run(text), encoding="utf-8")
 if __name__=="__main__": main()

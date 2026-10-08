@@ -42,14 +42,7 @@ def generate(number, seed):
             y,x=divmod(pos,3); choices=[q for q in (pos-3,pos+3,pos-1,pos+1) if 0<=q<9 and abs(q%3-x)+abs(q//3-y)==1]
             q=r.choice(choices);board[pos],board[q]=board[q],board[pos];pos=q
         return " ".join(board)+"\n"
-    if number == 1230:
-        cases=[]
-        for _ in range(r.randint(1,4)):
-            n=r.randint(1,20); k=r.randint(0,10); walls=[]
-            for _ in range(n):
-                x1,x2=sorted((r.randint(0,100),r.randint(0,100))); y=r.randint(0,100);walls.append(f"{x1} {y} {x2} {y}")
-            cases.append(f"{n} {k}\n"+"\n".join(walls))
-        return f"{len(cases)}\n"+"\n".join(cases)+"\n"
+    if number == 1230: return gen_1230(r,seed)
     if number == 1276:
         cases=[]
         for _ in range(r.randint(1,5)):
@@ -150,6 +143,67 @@ def generate(number, seed):
     raise KeyError(number)
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1230: Pass-Muraille\n# Fenced code block index: 0\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01230/\n# License: not declared; no license is inferred.\nimport sys\nfor _ in range(int(input())):\n    n,k=map(int,input().split())\n    wall=[]\n    for _ in range(n):\n        x1,y1,x2,y2=map(int,input().split())\n        if x1>x2:\n            x1,x2=x2,x1\n        wall.append((x1,x2))\n    wall.sort(key=lambda x:(x[1],x[0]))\n    condition=[0]*101\n    s=0\n    for t in wall:\n        x1,x2=t[0],t[1]\n        if all(condition[x]<k for x in range(x1,x2+1)):\n            for x in range(x1,x2+1):\n                condition[x]+=1\n        else:\n            s+=1\n    print(s)\n'
+def gen_1230(r,seed):
+    # 每行内的墙互不重叠（题面：no grid cell belongs to two or more walls）；端点顺序随机；
+    # 按种子分档：小规模（便于暴力核对）、满规模 t=10/n=100、k=0、k>=n、窄列密集覆盖等
+    def one(n,k,rows,xlo,xhi,lmax):
+        occ={};walls=[];tries=0
+        while len(walls)<n and tries<200000:
+            tries+=1
+            y=r.choice(rows);L=r.randint(1,lmax);x1=r.randint(xlo,max(xlo,xhi-L+1));x2=min(xhi,x1+L-1)
+            cells=occ.setdefault(y,set())
+            if any(x in cells for x in range(x1,x2+1)):continue
+            cells.update(range(x1,x2+1))
+            walls.append((x2,y,x1,y) if r.random()<.5 else (x1,y,x2,y))
+        return f"{len(walls)} {k}\n"+"\n".join(" ".join(map(str,w)) for w in walls)
+    cases=[]
+    if seed<=15:
+        for _ in range(r.randint(1,10)):
+            n=r.randint(1,12);k=r.randint(0,4);w=r.randint(3,15)
+            cases.append(one(n,k,list(range(r.randint(2,12))),0,w,r.randint(1,8)))
+    elif seed<=30:
+        for _ in range(r.randint(5,10)):
+            n=r.randint(30,100);k=r.choice([0,1,2,3,5,8,r.randint(0,100)])
+            cases.append(one(n,k,list(range(101)),0,100,r.choice([5,20,60,101])))
+    else:
+        for i in range(10):
+            if seed==31: k=0
+            elif seed==32: k=100
+            elif seed==33: k=r.randint(1,3)
+            else: k=r.randint(0,30)
+            # 窄列区间 + 多行，制造高覆盖度
+            w=r.choice([10,30,100]);off=r.randint(0,100-w)
+            cases.append(one(100,k,list(range(101)),off,off+w,r.choice([3,10,w+1])))
+    return f"{len(cases)}\n"+"\n".join(cases)+"\n"
+def valid(text):
+    # 题面：首行 t（1<=t<=10）；每组首行 n k（1<=n<=100，0<=k<=100），随后 n 行 x1 y1 x2 y2，
+    # 坐标为 0..100 的非负整数；墙平行于 X 轴（y1==y2）；任何格子不属于两堵及以上的墙
+    if not text.endswith('\n'): return False
+    lines=text[:-1].split('\n')
+    def ints(l,k):
+        t=l.split(' ')
+        if len(t)!=k or not all(x.isdigit() and (x=='0' or x[0]!='0') for x in t): return None
+        return list(map(int,t))
+    h=ints(lines[0],1)
+    if not h or not 1<=h[0]<=10: return False
+    p=1
+    for _ in range(h[0]):
+        if p>=len(lines): return False
+        nk=ints(lines[p],2);p+=1
+        if not nk: return False
+        n,k=nk
+        if not (1<=n<=100 and 0<=k<=100) or p+n>len(lines): return False
+        used=set()
+        for l in lines[p:p+n]:
+            v=ints(l,4)
+            if not v or max(v)>100: return False
+            x1,y1,x2,y2=v
+            if y1!=y2: return False
+            for x in range(min(x1,x2),max(x1,x2)+1):
+                if (x,y1) in used: return False
+                used.add((x,y1))
+        p+=n
+    return p==len(lines)
 NUMBER=1230
 SAMPLE='2\n3 1\n2 0 4 0\n0 1 1 1\n1 2 2 2\n7 3\n0 0 3 0\n6 1 8 1\n2 3 6 3\n4 4 6 4\n0 5 1 5\n5 6 7 6\n1 7 3 7\n'
 def run(x):

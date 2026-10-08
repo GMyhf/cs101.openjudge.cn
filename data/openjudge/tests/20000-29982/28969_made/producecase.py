@@ -13,8 +13,25 @@ def run(text):
         x=subprocess.run([sys.executable,str(p)],input=text,text=True,capture_output=True,timeout=120)
         if x.returncode: raise SystemExit(x.stderr)
         return x.stdout
+import re
+
+def valid(text):
+    """题面：一行，长度 n（1<=n<=50000）、仅由数字构成的字符串。"""
+    return re.fullmatch(r'[0-9]{1,50000}\n', text) is not None
+
+def special_cases():
+    """补边界与满规模：n=1/2/3、2 的幂附近、n=50000 随机与全同数字等。"""
+    r = random.Random(28969)
+    rnd = lambda n: ''.join(r.choice('0123456789') for _ in range(n)) + '\n'
+    out = ['7\n', '90\n', '381\n', '0000000000\n', rnd(1023), rnd(1024), rnd(4097),
+           rnd(32767), rnd(32768), rnd(49999), rnd(50000), rnd(50000), '9' * 50000 + '\n',
+           ''.join('10'[i % 2] for i in range(50000)) + '\n']
+    return out
+
 def main():
     d=Path('data'); d.mkdir(exist_ok=True)
-    cases=[SAMPLE]+([EXTRA_CASE] if EXTRA_CASE else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+    cases=[SAMPLE]+([EXTRA_CASE] if EXTRA_CASE else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]+special_cases()
+    assert all(valid(c) for c in cases), [i for i,c in enumerate(cases) if not valid(c)]
+    assert len(set(cases))==len(cases), '组间有重复'
     for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

@@ -2,111 +2,58 @@
 # Accepted submission: 45991187
 # Source: http://cs101.openjudge.cn/practice/solution/45991187/
 # License: not declared on the submission page; no license is inferred.
+# 2026-10-08 本地重写：上面引用的原始代码在题面范围内有缺陷，下面已换成按题面重写的实现，不再是原提交（原因见下方注释与 CHANGELOG）。
+# 修正版参考解（2026-10 数据审计）：原 Accepted 提交只按 A..E 顺序尝试开门一轮，
+# 开 B 门后才拿齐 A 门钥匙时不会回头再开 A，会把 YES 判成 NO。这里反复 BFS 直到不再有新门可开。
+import sys
+from collections import deque
 
-def valid(i,j):
-    if (0<=i)&(0<=j)&(i<h)&(j<w):
-        return True
-    else:
-        return False
-tile_free=['.','a','b','c','d','e']
-def check(i,j):
-    f=False
-    if valid(i-1,j):
-        if m[i-1][j] in tile_free:
-            f=True
-    if valid(i+1,j):
-        if m[i+1][j] in tile_free:
-            f=True
-    if valid(i,j-1):
-        if m[i][j-1] in tile_free:
-            f=True
-    if valid(i,j+1):
-        if m[i][j+1] in tile_free:
-            f=True
-    return f
-def door_check(i,j):
-    f=False
-    if valid(i-1,j):
-        if m[i-1][j]=='@':
-            f=True
-    if valid(i+1,j):
-        if m[i+1][j]=='@':
-            f=True
-    if valid(i,j-1):
-        if m[i][j-1]=='@':
-            f=True
-    if valid(i,j+1):
-        if m[i][j+1]=='@':
-            f=True
-    return f
-def search(i,j):
-    # global m
-    if check(i,j)==False:
-        return
-    if valid(i-1,j):
-        if m[i-1][j]=='.':
-            m[i-1][j]='@'
-            search(i-1,j)
-        if m[i-1][j] in ['a','b','c','d','e']:
-            key[['a','b','c','d','e'].index(m[i-1][j])]-=1
-            m[i-1][j]='@'
-            search(i-1,j)
-    if valid(i+1,j):
-        if m[i+1][j]=='.':
-            m[i+1][j]='@'
-            search(i+1,j)
-        if m[i+1][j] in ['a','b','c','d','e']:
-            key[['a','b','c','d','e'].index(m[i+1][j])]-=1
-            m[i+1][j]='@'
-            search(i+1,j)
-    if valid(i,j-1):
-        if m[i][j-1]=='.':
-            m[i][j-1]='@'
-            search(i,j-1)
-        if m[i][j-1] in ['a','b','c','d','e']:
-            key[['a','b','c','d','e'].index(m[i][j-1])]-=1
-            m[i][j-1]='@'
-            search(i,j-1)
-    if valid(i,j+1):
-        if m[i][j+1]=='.':
-            m[i][j+1]='@'
-            search(i,j+1)
-        if m[i][j+1] in ['a','b','c','d','e']:
-            key[['a','b','c','d','e'].index(m[i][j+1])]-=1
-            m[i][j+1]='@'
-            search(i,j+1)
-while True:
-    h,w=map(int,input().split())
-    if h==0 & w==0:
-        break
-    m=[]
-    door=[None,None,None,None,None]
-    key=[0,0,0,0,0]
+def solve(g, h, w):
+    total = {}
+    for row in g:
+        for c in row:
+            if 'a' <= c <= 'e':
+                total[c] = total.get(c, 0) + 1
     for i in range(h):
-        m.append(list(input()))
         for j in range(w):
-            if m[i][j]=='S':
-                i0=i
-                j0=j
-                m[i][j]='@'
-            if m[i][j]=='G':
-                i1=i
-                j1=j
-                m[i][j]='.'
-            if m[i][j] in ['A','B','C','D','E']:
-                door[['A','B','C','D','E'].index(m[i][j])]=(i,j)
-            if m[i][j] in ['a','b','c','d','e']:
-                key[['a','b','c','d','e'].index(m[i][j])]+=1
-    search(i0,j0)
-    key_p=[]
-    while key_p!=key:
-        key_p=key
-        for _ in range(5):
-            if (key[_]==0)&(door[_]!=None):
-                if door_check(door[_][0],door[_][1])==True:
-                    m[door[_][0]][door[_][1]]='@'
-                    search(door[_][0],door[_][1])
-    if m[i1][j1]=='@':
-        print('YES')
-    else:
-        print('NO')
+            if g[i][j] == 'S':
+                si, sj = i, j
+    opened = set()
+    while True:
+        seen = [[False] * w for _ in range(h)]
+        seen[si][sj] = True
+        q = deque([(si, sj)])
+        got = {}
+        while q:
+            i, j = q.popleft()
+            c = g[i][j]
+            if c == 'G':
+                return True
+            if 'a' <= c <= 'e':
+                got[c] = got.get(c, 0) + 1
+            for x, y in ((i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)):
+                if 0 <= x < h and 0 <= y < w and not seen[x][y]:
+                    d = g[x][y]
+                    if d == 'X' or ('A' <= d <= 'E' and d not in opened):
+                        continue
+                    seen[x][y] = True
+                    q.append((x, y))
+        new = {d for d in 'ABCDE' if d not in opened and total.get(d.lower(), 0) > 0
+               and got.get(d.lower(), 0) == total[d.lower()]}
+        if not new:
+            return False
+        opened |= new
+
+def main():
+    t = sys.stdin.read().split()
+    p = 0
+    out = []
+    while p + 1 < len(t):
+        h, w = int(t[p]), int(t[p + 1]); p += 2
+        if h == 0 and w == 0:
+            break
+        g = t[p:p + h]; p += h
+        out.append('YES' if solve(g, h, w) else 'NO')
+    print('\n'.join(out))
+
+main()

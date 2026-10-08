@@ -1,10 +1,18 @@
-import random, subprocess, sys, tempfile
+import random, re, subprocess, sys, tempfile
 from pathlib import Path
 REFERENCE="# External reference: statistics page /practice/26144/\n# Accepted submission: 51527404\n# Source: http://cs101.openjudge.cn/practice/solution/51527404/\n# License: not declared on the submission page; no license is inferred.\n\nn = int(input())\ntemp = []\nfor i in range(1, n+1):\n    for j in range(1, i+1):\n        temp.append(f'{j}x{i}={i*j}')\n    print(*temp)\n    temp = []"
 SAMPLE='6\n'
 EXTRA_CASE='7\n'
 GENERATOR_NAME='g26144'
 def g26144(r): return f"{r.randint(1, 9)}\n"
+
+def valid(text):
+    """题面：一个整数 n，1<=n<=9。"""
+    return re.fullmatch(r'[1-9]\n', text) is not None
+
+def build_cases():
+    # 合法输入只有 n=1..9 共 9 种：第 0 组样例 6，其余每个 n 各一组，不重复
+    return [SAMPLE]+[f"{n}\n" for n in (9, 1, 2, 3, 4, 5, 7, 8)]
 
 def run(text):
     with tempfile.TemporaryDirectory(prefix='producecase-') as d:
@@ -25,6 +33,7 @@ def scale_case():
     return None
 def main():
     d=Path('data'); d.mkdir(exist_ok=True)
-    extra=scale_case(); cases=[SAMPLE]+([extra] if extra else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+    cases=build_cases()
+    assert all(valid(c) for c in cases) and len(set(cases))==len(cases)
     for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

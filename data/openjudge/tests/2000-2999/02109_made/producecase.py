@@ -421,6 +421,79 @@ REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02109/statis
 LANGUAGE='Python3'
 NUMBER=2109
 SAMPLE='2 16\n3 27\n7 4357186184021382204544\n'
+def _iroot(p, n):
+    """最大的 k 使 k**n <= p（纯整数运算）。"""
+    lo, hi = 0, 1
+    while hi ** n <= p:
+        hi *= 2
+    while hi - lo > 1:
+        mid = (lo + hi) // 2
+        if mid ** n <= p: lo = mid
+        else: hi = mid
+    return lo
+
+
+def valid(text):
+    """题面契约：若干对 n p（与样例一致，每行一对、单空格分隔），1<=n<=200，1<=p<10^101，
+    且存在整数 1<=k<=10^9 使 k^n=p。至少一对。"""
+    if not text.endswith('\n') or '\r' in text:
+        return False
+    lines = text[:-1].split('\n')
+    if not lines or lines == ['']:
+        return False
+    for line in lines:
+        toks = line.split(' ')
+        if len(toks) != 2 or not all(t.isdigit() and t[0] != '0' for t in toks):
+            return False
+        n, p = int(toks[0]), int(toks[1])
+        if not (1 <= n <= 200 and 1 <= p < 10 ** 101):
+            return False
+        k = _iroot(p, n)
+        if k ** n != p or not (1 <= k <= 10 ** 9):
+            return False
+    return True
+
+
+def _kmax2109(n):
+    return min(10 ** 9, _iroot(10 ** 101 - 1, n))
+
+
+def gen2109(seed):
+    r = random.Random(2109_000 + seed)
+    pairs = []
+    if seed == 1:      # 边界：k=1、n=1、n=200、k=10^9
+        pairs = [(1, 1), (200, 1), (1, 10 ** 9), (200, 3), (200, 2), (11, 10 ** 9), (1, 2), (2, 10 ** 9),
+                 (100, 10), (101, 9), (3, 10 ** 9 - 1), (50, 103)]
+    elif seed == 2:    # p 贴近 10^101 的上沿：每个 n 取最大可行的 k
+        pairs = [(n, _kmax2109(n)) for n in range(1, 201)]
+    elif seed == 3:    # k=10^9 附近、n 取 1..11（p 最长 100 位）
+        pairs = [(n, 10 ** 9 - d) for n in range(1, 12) for d in range(0, 6)]
+    elif seed == 4:    # 浮点开方后直接截断（不四舍五入）容易错的组：k^n 的浮点根略小于 k
+        cand = []
+        for _ in range(200000):
+            n = r.randint(2, 60); k = r.randint(2, _kmax2109(n))
+            if int(float(k ** n) ** (1.0 / n)) != k:
+                cand.append((n, k))
+            if len(cand) >= 300:
+                break
+        pairs = cand
+    elif seed == 5:    # 全部 k=1（p=1）与 n=1（p=k）
+        pairs = [(r.randint(1, 200), 1) for _ in range(50)] + [(1, r.randint(1, 10 ** 9)) for _ in range(50)]
+        r.shuffle(pairs)
+    elif seed <= 15:   # 大批随机：n 在 1..200 均匀，k 在可行范围均匀
+        for _ in range(r.randint(200, 1000)):
+            n = r.randint(1, 200); pairs.append((n, r.randint(1, _kmax2109(n))))
+    elif seed <= 25:   # 偏向小 n、大 k
+        for _ in range(r.randint(100, 800)):
+            n = r.randint(1, 12); pairs.append((n, r.randint(max(1, _kmax2109(n) // 10), _kmax2109(n))))
+    elif seed <= 32:   # 偏向大 n、小 k
+        for _ in range(r.randint(50, 500)):
+            n = r.randint(30, 200); pairs.append((n, r.randint(1, _kmax2109(n))))
+    else:              # 少量混合
+        for _ in range(r.randint(1, 30)):
+            n = r.randint(1, 200); pairs.append((n, r.randint(1, _kmax2109(n))))
+    return "".join(f"{n} {k ** n}\n" for n, k in pairs)
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -428,7 +501,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[gen2109(s) for s in range(1, 40)]
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

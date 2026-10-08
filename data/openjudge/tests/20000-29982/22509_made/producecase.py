@@ -8,20 +8,67 @@ def generate_case(r):
     assert all(10 <= y <= 100000000 for y in values)
     return "\n".join(map(str, values)) + "\n"
 
-assert SAMPLE_IN == '10\n49\n'
-with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
-    handle.write(REFERENCE_SOURCE); handle.flush()
-    root = Path(__file__).parent / "data"
-    seen = [SAMPLE_IN]
-    for index in range(20):
-        if index == 0:
-            content = SAMPLE_IN
-        else:
-            for attempt in range(100):
-                content = generate_case(random.Random(22509 + index + attempt * 1000))
-                if content not in seen: break
-            else: raise AssertionError('insufficient diversity')
-        seen.append(content)
-        result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
-        (root / f"{index}.in").write_text(content, encoding="utf-8")
-        (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+def valid(text):
+    """题面：多组测试用例，每组一行，一个正整数 y（10≤y≤100000000）。"""
+    if not text.endswith("\n") or text == "\n":
+        return False
+    for line in text[:-1].split("\n"):
+        if not line.isdigit() or line != str(int(line)) or not 10 <= int(line) <= 100000000:
+            return False
+    return True
+
+
+def safe(y):
+    """解离四舍五入到 4 位小数的边界足够远（> 1e-3 个末位单位），避免浮点误差导致答案不唯一。"""
+    from decimal import Decimal as D, localcontext
+    with localcontext() as ctx:
+        ctx.prec = 50
+        ln2 = D(2).ln(); Y = D(y); x = Y.sqrt()
+        for _ in range(200):
+            nx = x - (x * x + x + 1 + x.ln() / ln2 - Y) / (2 * x + 1 + 1 / (x * ln2))
+            if abs(nx - x) < D(10) ** -40: x = nx; break
+            x = nx
+        return abs((x * 10000) % 1 - D("0.5")) > D("0.001")
+
+
+def many(r, cnt, lo, hi):
+    out = []
+    while len(out) < cnt:
+        y = r.randint(lo, hi)
+        if safe(y): out.append(y)
+    return "\n".join(map(str, out)) + "\n"
+
+
+def main():
+    assert SAMPLE_IN == '10\n49\n'
+    with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
+        handle.write(REFERENCE_SOURCE); handle.flush()
+        root = Path(__file__).parent / "data"
+        seen = [SAMPLE_IN]
+        cases = []
+        for index in range(20):
+            if index == 0:
+                content = SAMPLE_IN
+            else:
+                for attempt in range(100):
+                    content = generate_case(random.Random(22509 + index + attempt * 1000))
+                    if content not in seen: break
+                else: raise AssertionError('insufficient diversity')
+            seen.append(content)
+            cases.append(content)
+        # 补充：上下界、小 y 密集、大量用例（每行一个 y，组数不设上限，卡掉每次都慢速求解的写法）
+        bounds = [y for y in [10, 11, 12, 13, 100000000, 99999999, 99999998] if safe(y)]
+        cases.append("\n".join(map(str, bounds)) + "\n")
+        cases.append(many(random.Random(2250901), 300, 10, 1000))
+        cases.append(many(random.Random(2250902), 2000, 10, 100000000))
+        cases.append(many(random.Random(2250903), 10000, 10, 100000000))
+        assert len(set(cases)) == len(cases)
+        for index, content in enumerate(cases):
+            assert valid(content), index
+            result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=60, check=True)
+            (root / f"{index}.in").write_text(content, encoding="utf-8")
+            (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

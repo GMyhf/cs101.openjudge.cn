@@ -7,18 +7,80 @@ def generate_case(r):
     rows = [(r.randint(1, 5), r.randint(1, 3), r.randint(1, 20)) for _ in range(r.randint(2, 8))]
     return str(len(rows)) + "\n" + "\n".join(f"{m} {k} {n}" for m, k, n in rows) + "\n"
 
-with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
-    handle.write(REFERENCE_SOURCE); handle.flush()
-    root = Path(__file__).parent / "data"
-    seen = [SAMPLE_IN]
-    for index in range(20):
-        if index == 0: content = SAMPLE_IN
-        else:
-            for attempt in range(100):
-                content = generate_case(random.Random(28702 + index + attempt * 1000))
-                if content not in seen: break
-            else: raise AssertionError("insufficient diversity")
-        seen.append(content)
-        result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
-        (root / f"{index}.in").write_text(content, encoding="utf-8")
-        (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+
+def valid(text):
+    """题面契约：首行正整数 P，其后恰 P 行，每行三个正整数 m k n，n ≤ 500。"""
+    if not text.endswith("\n") or "\r" in text:
+        return False
+    lines = text[:-1].split("\n")
+    def ints(line, cnt):
+        parts = line.split(" ")
+        if len(parts) != cnt or any(not p.isdigit() or (len(p) > 1 and p[0] == "0") for p in parts):
+            return None
+        return [int(p) for p in parts]
+    first = ints(lines[0], 1)
+    if first is None or first[0] < 1 or len(lines) != first[0] + 1:
+        return False
+    for line in lines[1:]:
+        row = ints(line, 3)
+        if row is None:
+            return False
+        m, k, n = row
+        if m < 1 or k < 1 or not 1 <= n <= 500:
+            return False
+    return True
+
+
+def fmt(rows):
+    return str(len(rows)) + "\n" + "\n".join(f"{m} {k} {n}" for m, k, n in rows) + "\n"
+
+
+# 追加的规模/边界组：(m,k,n) 取各参数下方案数最多的 n、覆盖上限 n 及其 +1（答案 0），
+# 以及 m=1、m>n、k>n、k=1 长链等边界；最后几组为中等规模随机行。
+EXTRA_CASES = [
+    fmt([(1, 1, 1), (1, 500, 500), (1, 499, 500), (1, 501, 500), (500, 1, 500), (2, 1, 2), (3, 1, 2),
+         (50, 1, 50), (2, 40, 460), (2, 40, 461), (2, 1, 1), (1, 1, 500)]),
+    fmt([(7, 3, 42), (9, 2, 26), (6, 3, 33), (8, 2, 22), (5, 3, 27), (4, 5, 46)]),
+    fmt([(4, 10, 214), (5, 5, 82), (3, 25, 358), (4, 8, 142), (3, 20, 328), (5, 4, 46)]),
+    fmt([(7, 3, 70), (9, 2, 40), (4, 10, 427), (5, 5, 126), (3, 10, 146), (2, 40, 460), (5, 5, 127), (3, 10, 147)]),
+    fmt([(6, 4, 100), (5, 6, 150), (6, 3, 52), (8, 2, 32), (7, 2, 26)]),
+]
+
+
+def random_mid_case(r):
+    rows = []
+    for _ in range(r.randint(10, 20)):
+        m = r.randint(2, 6)
+        k = r.randint(2, 4 if m == 6 else 5)  # m=6,k=5 时参考解单行可达数秒，避免整组超时
+        rows.append((m, k, r.randint(1, 100)))
+    return fmt(rows)
+
+
+def main():
+    with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
+        handle.write(REFERENCE_SOURCE); handle.flush()
+        root = Path(__file__).parent / "data"
+        seen = [SAMPLE_IN]
+        cases = []
+        for index in range(20):
+            if index == 0: content = SAMPLE_IN
+            else:
+                for attempt in range(100):
+                    content = generate_case(random.Random(28702 + index + attempt * 1000))
+                    if content not in seen: break
+                else: raise AssertionError("insufficient diversity")
+            seen.append(content)
+            cases.append(content)
+        cases += EXTRA_CASES
+        cases += [random_mid_case(random.Random(287020 + i)) for i in range(5)]
+        assert len(set(cases)) == len(cases)
+        for index, content in enumerate(cases):
+            assert valid(content), index
+            result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
+            (root / f"{index}.in").write_text(content, encoding="utf-8")
+            (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+        assert (root / "0.out").read_text(encoding="utf-8") == SAMPLE_OUT
+
+
+if __name__ == "__main__":
+    main()

@@ -10,6 +10,74 @@ def g25139(r):
     known = r.choice(["A A BC", "ABCD BCD ACEA", "A A B"])
     return f"3\nA A BC\n{a} {b} {c}\n{known}\n"
 
+def valid(text):
+    """题面：首行整数 n；接下来 n 行，每行三个空格分隔的字符串 s1 s2 s3，长度至多 10，只含 'A'-'E'。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not lines[0].isdigit() or lines[0] != str(int(lines[0])):
+        return False
+    n = int(lines[0])
+    if n < 1 or len(lines) != n + 1:
+        return False
+    for line in lines[1:]:
+        t = line.split(" ")
+        if len(t) != 3:
+            return False
+        if not all(1 <= len(w) <= 10 and set(w) <= set("ABCDE") for w in t):
+            return False
+    return True
+
+
+def _solvable_eq(r):
+    """先定字母到数字的映射，再造出必有解的等式（解未必是最小解，最小解由参考解求）。"""
+    while True:
+        k = r.randint(2, 5)
+        letters = "ABCDE"[:k]
+        digits = r.sample(range(10), k)
+        mp = dict(zip(letters, digits)); inv = {d: ch for ch, d in mp.items()}
+        la, lb = r.randint(1, 9), r.randint(1, 9)
+        w1 = "".join(r.choice(letters) for _ in range(la)); w2 = "".join(r.choice(letters) for _ in range(lb))
+        if (len(w1) > 1 and mp[w1[0]] == 0) or (len(w2) > 1 and mp[w2[0]] == 0):
+            continue
+        c = str(int("".join(str(mp[x]) for x in w1)) + int("".join(str(mp[x]) for x in w2)))
+        if len(c) <= 10 and all(int(d) in inv for d in c):
+            return f"{w1} {w2} {''.join(inv[int(d)] for d in c)}"
+
+
+def _random_eq(r, maxlen):
+    w = lambda: "".join(r.choice("ABCDE") for _ in range(r.randint(1, maxlen)))
+    return f"{w()} {w()} {w()}"
+
+
+def extra_cases():
+    """补充：有解等式（原数据随机等式全是 No Solution）、长度 10、最小解比较、单个 0 合法、多解取最小。"""
+    r = random.Random(251390)
+    fmt = lambda eqs: f"{len(eqs)}\n" + "\n".join(eqs) + "\n"
+    cases = []
+    for _ in range(4):
+        cases.append(fmt([_solvable_eq(r) for _ in range(20)]))
+    mix = []
+    for _ in range(20):
+        mix.append(_solvable_eq(r) if r.random() < .5 else _random_eq(r, 10))
+    cases.append(fmt(mix))
+    cases.append(fmt([
+        "ABC ACDE DCABC",                       # 题面描述中的等式形式
+        "A B C",                                 # 多解取最小：1+2=3
+        "B A B",                                 # 单个字母可为 0，A 最小取 0：1+0=1
+        "A B A",
+        "AB A AB",                               # A 只能为 0 但是前导 -> No Solution
+        "D E DE",                                # 不含 A-C 的字母
+        "AAAAAAAAAA AAAAAAAAAA BBBBBBBBBB",      # 长度 10
+        "EDCBAEDCBA ABCDEABCDE AAAAAAAAAA",
+        "A A A",                                 # 只能 0+0=0
+        "AB BA CC",
+        "ABCDE ABCDE ABCDE",
+        "E E AB",
+    ]))
+    cases.append(fmt(["ABCDEABCDE EDCBAEDCBA AAAAAAAAAA"] + [_random_eq(r, 10) for _ in range(19)]))
+    return cases
+
 def run(text):
     with tempfile.TemporaryDirectory(prefix='producecase-') as d:
         p=Path(d)/'main.py'; p.write_text(REFERENCE)
@@ -28,6 +96,6 @@ def scale_case():
     return None
 def main():
     d=Path('data'); d.mkdir(exist_ok=True)
-    extra=scale_case(); cases=[SAMPLE]+([extra] if extra else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+    extra=scale_case(); cases=[SAMPLE]+([extra] if extra else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]+extra_cases()
     for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

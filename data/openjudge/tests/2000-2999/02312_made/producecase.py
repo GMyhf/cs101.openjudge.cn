@@ -417,6 +417,67 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
+
+def valid(text):
+    # 多组；每组首行 M N（2<=M,N<=300），随后 M 行各 N 个 Y/T/S/B/R/E，Y、T 各恰好一个；以 "0 0" 结束
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    i = 0; cases = 0
+    while True:
+        if i >= len(lines):
+            return False
+        t = lines[i].split(' ')
+        if len(t) != 2 or not all(x.isdigit() and str(int(x)) == x for x in t):
+            return False
+        m, n = map(int, t); i += 1
+        if m == 0 and n == 0:
+            break
+        if not (2 <= m <= 300 and 2 <= n <= 300) or i + m > len(lines):
+            return False
+        g = lines[i:i+m]
+        if any(len(row) != n or set(row) - set('YTSBRE') for row in g):
+            return False
+        if sum(row.count('Y') for row in g) != 1 or sum(row.count('T') for row in g) != 1:
+            return False
+        i += m; cases += 1
+    return i == len(lines) and cases >= 1
+
+def _extra():
+    # 追加的覆盖组：2x2 边界、300x300 满规模（随机/全砖/蛇形/不可达）、细长 2x300、砖墙捷径优于绕路
+    r = random.Random(23120)
+    def fmt(gs):
+        return ''.join(f"{len(g)} {len(g[0])}\n" + '\n'.join(''.join(row) for row in g) + '\n' for g in gs) + '0 0\n'
+    def place(g, a, b):
+        g[a[0]][a[1]] = 'Y'; g[b[0]][b[1]] = 'T'; return g
+    out = []
+    out.append(fmt([[list('YT'), list('EE')], [list('YB'), list('BT')], [list('YS'), list('ST')],
+                    [list('YR'), list('RT')], [list('YE'), list('RT')], [list('TB'), list('EY')]]))
+    def rnd(h, w, pool):
+        g = [[r.choice(pool) for _ in range(w)] for _ in range(h)]
+        return place(g, (0, 0), (h-1, w-1))
+    out.append(fmt([rnd(300, 300, 'EEEEBBBRS')]))
+    out.append(fmt([rnd(300, 300, 'EBBBBBBBRS'), rnd(300, 300, 'EEEEEEEBRS')]))
+    g = [['B'] * 300 for _ in range(300)]; out.append(fmt([place(g, (0, 0), (299, 299))]))
+    # 蛇形：每隔一行一道钢墙，缺口左右交替，通道里铺满砖/空地
+    g = [[r.choice('EB') for _ in range(300)] for _ in range(299)]
+    for y in range(1, 299, 2):
+        g[y] = ['S'] * 300; g[y][299 if y % 4 == 1 else 0] = 'E'
+    out.append(fmt([place(g, (0, 0), (298, 0))]))
+    # 目标被钢墙/河流围住 -> -1，其余全是空地
+    g = [['E'] * 300 for _ in range(300)]
+    for y, x in ((149, 149), (149, 150), (149, 151), (150, 149), (150, 151), (151, 149), (151, 150), (151, 151)):
+        g[y][x] = r.choice('SR')
+    out.append(fmt([place(g, (0, 0), (150, 150))]))
+    out.append(fmt([rnd(2, 300, 'EEBBR'), rnd(300, 2, 'EEBBR'), rnd(2, 300, 'BBBBB'), rnd(300, 2, 'EEEEB')]))
+    # 一块砖挡在直线上，绕路要很远：答案应走砖墙
+    g = [['E'] * 300 for _ in range(300)]
+    for y in range(299): g[y][150] = 'S'
+    g[0][150] = 'B'; out.append(fmt([place(g, (0, 0), (0, 299))]))
+    # 多组中等规模随机
+    out.append(fmt([rnd(r.randint(2, 60), r.randint(2, 60), r.choice(('EEEBRS', 'EBBBRS', 'EEEEES', 'BBBBRS'))) for _ in range(30)]))
+    return out
+
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02312/statistics/\n# Accepted submission: 44796635\n# Source: http://cs101.openjudge.cn/practice/solution/44796635/\n# License: not declared on the submission page; no license is inferred.\n\n# -*- coding: utf-8 -*-\n"""\nCreated on Thu Apr 25 16:43:06 2024\n\n@author: Lenovo\n"""\n\nimport heapq\nmove=[(-1,0),(0,1),(1,0),(0,-1)]\nwhile True:\n    m,n=map(int,input().split())\n    if m==0 and n==0:\n        break\n    maze=[list(input()) for i in range(m)]\n    for i in range(m):\n        for j in range(n):\n            if maze[i][j]=="Y":\n                sx,sy=i,j\n            elif maze[i][j]=="T":\n                ex,ey=i,j\n                maze[i][j]="E"\n    heap=[]\n    vis=set()\n    flag=False\n    heapq.heappush(heap,(0,sx,sy))\n    vis.add((sx,sy))\n    while heap:\n        step,x,y=heapq.heappop(heap)\n        if x==ex and y==ey:\n            flag=True\n            break\n        for i in range(4):\n            dx,dy=x+move[i][0],y+move[i][1]\n            if 0<=dx<m and 0<=dy<n and (dx,dy) not in vis:\n                vis.add((dx,dy))\n                if maze[dx][dy]=="E":\n                    heapq.heappush(heap,(step+1,dx,dy))\n                elif maze[dx][dy]=="B":\n                    heapq.heappush(heap,(step+2,dx,dy))\n    print(step if flag else -1)\n'
 LANGUAGE='Python3'
 NUMBER=2312
@@ -428,7 +489,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]+_extra()
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

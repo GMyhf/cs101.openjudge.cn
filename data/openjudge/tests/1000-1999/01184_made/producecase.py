@@ -148,6 +148,17 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
+import re
+def valid(text):
+    # 题面：仅一行，两个长度为 6 的数（初始密码、目标密码），用一个空格隔开
+    if not text.endswith('\n'): return False
+    lines=text[:-1].split('\n')
+    if len(lines)!=1: return False
+    return re.fullmatch(r'[0-9]{6} [0-9]{6}', lines[0]) is not None
+# 补充边界组：数字极值（0/9 越界）、只需交换、只差末位、最长路径等
+EXTRA_1184=['000000 999999\n','999999 000000\n','123456 123457\n','000000 000001\n',
+            '123456 623451\n','900000 000009\n','012345 543210\n','999999 999990\n',
+            '090909 909090\n','100000 000001\n']
 REFERENCE='// External reference: http://cs101.openjudge.cn/practice/01184/statistics/\n// Accepted submission: 52500637\n// Source: http://cs101.openjudge.cn/practice/solution/52500637/\n// License: not declared on the submission page; no license is inferred.\n\n#include <algorithm>\n#include <bitset>\n#include <iostream>\n#include <stack>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <vector>\n#include <functional>\n#include <numeric>\n#include <queue>\n#include <set>\n#include <array>\n#include <bit>\n#include <map>\n#include <cmath>\n#include <iomanip>\n#include <cstring>\n\nusing namespace std;\ntypedef long long ll;\ntypedef unsigned long long ull;\n\nbitset<6000000> vis;\nint main()\n{\n\tint pow[7] = { 1,10,100,1000,10000,100000,1000000 };\n\tint s, t; cin >> s >> t;\n\ts += pow[6] * 5;\n\tvis[s] = 1;\n\tqueue<int> q;\n\tq.push(s);\n\tint dist = 0;\n\twhile (!q.empty())\n\t{\n\t\tint size = q.size();\n\t\tfor (int i = 0; i < size; i++)\n\t\t{\n\t\t\tint x = q.front();\n\t\t\tq.pop();\n\t\t\tif (x % pow[6] == t)\n\t\t\t{\n\t\t\t\tcout << dist << endl;\n\t\t\t\treturn 0;\n\t\t\t}\n\t\t\tint cursor = x / pow[6];\n\t\t\tint digit = (x / pow[cursor]) % 10;\n\t\t\t// swap 0\n\t\t\tif (cursor != 0)\n\t\t\t{\n\t\t\t\tint x2 = x;\n\t\t\t\tint digit0 = x2 % 10;\n\t\t\t\tx2 -= digit0;\n\t\t\t\tx2 -= digit * pow[cursor];\n\t\t\t\tx2 += digit0 * pow[cursor];\n\t\t\t\tx2 += digit;\n\t\t\t\tif (!vis[x2])\n\t\t\t\t{\n\t\t\t\t\tvis[x2] = true;\n\t\t\t\t\tq.push(x2);\n\t\t\t\t}\n\t\t\t}\n\t\t\t// swap 1\n\t\t\tif (cursor != 5)\n\t\t\t{\n\t\t\t\tint x2 = x;\n\t\t\t\tint digit5 = (x2 / pow[5]) % 10;\n\t\t\t\tx2 -= digit5 * pow[5];\n\t\t\t\tx2 -= digit * pow[cursor];\n\t\t\t\tx2 += digit5 * pow[cursor];\n\t\t\t\tx2 += digit * pow[5];\n\t\t\t\tif (!vis[x2])\n\t\t\t\t{\n\t\t\t\t\tvis[x2] = true;\n\t\t\t\t\tq.push(x2);\n\t\t\t\t}\n\t\t\t}\n\t\t\t// up\n\t\t\tif (digit < 9)\n\t\t\t{\n\t\t\t\tint x2 = x + pow[cursor];\n\t\t\t\tif (!vis[x2])\n\t\t\t\t{\n\t\t\t\t\tvis[x2] = true;\n\t\t\t\t\tq.push(x2);\n\t\t\t\t}\n\t\t\t}\n\t\t\t// down\n\t\t\tif (digit > 0)\n\t\t\t{\n\t\t\t\tint x2 = x - pow[cursor];\n\t\t\t\tif (!vis[x2])\n\t\t\t\t{\n\t\t\t\t\tvis[x2] = true;\n\t\t\t\t\tq.push(x2);\n\t\t\t\t}\n\t\t\t}\n\t\t\t// left\n\t\t\tif (cursor != 0)\n\t\t\t{\n\t\t\t\tint x2 = x - pow[6];\n\t\t\t\tif (!vis[x2])\n\t\t\t\t{\n\t\t\t\t\tvis[x2] = true;\n\t\t\t\t\tq.push(x2);\n\t\t\t\t}\n\t\t\t}\n\t\t\t// right\n\t\t\tif (cursor != 5)\n\t\t\t{\n\t\t\t\tint x2 = x + pow[6];\n\t\t\t\tif (!vis[x2])\n\t\t\t\t{\n\t\t\t\t\tvis[x2] = true;\n\t\t\t\t\tq.push(x2);\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\tdist++;\n\t}\n\treturn 0;\n}\n'
 LANGUAGE='G++'
 NUMBER=1184
@@ -159,7 +170,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)]+EXTRA_1184)
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

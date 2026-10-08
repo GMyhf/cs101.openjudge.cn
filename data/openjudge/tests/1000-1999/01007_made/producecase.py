@@ -1,5 +1,44 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+import re as _re
+
+def valid(text):
+    """题面契约（POJ 1007）：首行两个整数 n m（0<n<=50，0<m<=100），
+    其后恰 m 行，每行是长度为 n、只由 ACGT 组成的串。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    t = lines[0].split(" ")
+    if len(t) != 2 or not all(_re.fullmatch(r"[1-9]\d*", z) for z in t):
+        return False
+    n, m = map(int, t)
+    if not (0 < n <= 50 and 0 < m <= 100) or len(lines) != m + 1:
+        return False
+    return all(len(x) == n and _re.fullmatch(r"[ACGT]+", x) for x in lines[1:])
+
+def gen1007(r, seed):
+    rnd = lambda n: "".join(r.choice("ACGT") for _ in range(n))
+    if seed == 1: n, rows = 1, ["G"]                                       # 最小规模
+    elif seed == 2: n, rows = 50, [rnd(50) for _ in range(100)]              # 满规模
+    elif seed == 3:   # 逆序对数相同但内容不同的串大量并列，卡不稳定排序
+        n = 50; base = "".join(sorted(rnd(50)))
+        rows = []
+        for _ in range(100):
+            s = list(base)
+            for _ in range(r.randint(0, 3)):
+                i = r.randrange(n - 1)
+                if s[i] < s[i + 1]: s[i], s[i + 1] = s[i + 1], s[i]
+            rows.append("".join(s))
+    elif seed == 4:   # 逆序对最多（降序）与 0 个（升序）、全相同字母
+        n = 50; rows = ["T" * 13 + "G" * 12 + "C" * 13 + "A" * 12, "A" * 12 + "C" * 13 + "G" * 12 + "T" * 13, "A" * 50, "T" * 50, "G" * 50]
+        rows += [rnd(50) for _ in range(95)]
+    elif seed == 5:   # 含重复串
+        n = 20; pool = [rnd(20) for _ in range(10)]; rows = [r.choice(pool) for _ in range(100)]
+    elif seed >= 30: n, rows = r.randint(40, 50), [rnd(50) for _ in range(r.randint(80, 100))]; rows = [x[:n] for x in rows]
+    else:
+        n, m = r.randint(1, 30), r.randint(1, 30); rows = [rnd(n) for _ in range(m)]
+    return f"{n} {len(rows)}\n" + "\n".join(rows) + "\n"
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -141,14 +180,13 @@ def generate(number, seed):
         n=r.randint(3,12);return f"{n}\n"+"\n".join(" ".join(str(r.randint(0,255)) for _ in range(n)) for _ in range(n))+"\n"
     if number==2943:
         n=r.randint(1,20);weights=r.sample(range(1,1001),n);return f"{n}\n"+"\n".join(f"{x} c{i}" for i,x in enumerate(weights))+"\n"
-    if number==1007:
-        n,m=r.randint(1,30),r.randint(1,30);return f"{n} {m}\n"+"\n".join("".join(r.choice("ACGT") for _ in range(n)) for _ in range(m))+"\n"
+    if number==1007:return gen1007(r, seed)
     if number==1836:
         n=r.randint(2,50);return f"{n}\n"+" ".join(f"{r.uniform(.5,2.5):.5f}" for _ in range(n))+"\n"
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
-REFERENCE="# External reference: http://cs101.openjudge.cn/practice/01007/statistics/\n# Accepted submission: 52544822\n# Source: http://cs101.openjudge.cn/practice/solution/52544822/\n# License: not declared on the submission page; no license is inferred.\n\nv = {'A':0, 'C':1, 'G':2, 'T':3}\nn, m = map(int, input().split())\ndna = [input().strip() for _ in range(m)]\n\n# 计算逆序对（极简暴力法）\ndef count(s):\n    return sum(v[s[i]] > v[s[j]] for i in range(n) for j in range(i+1, n))\n\n# 按逆序对+输入顺序排序，直接输出\nfor s in sorted(dna, key=lambda x: (count(x), dna.index(x))):\n    print(s)\n"
+REFERENCE="# External reference: http://cs101.openjudge.cn/practice/01007/statistics/\n# Accepted submission: 52544822\n# Source: http://cs101.openjudge.cn/practice/solution/52544822/\n# License: not declared on the submission page; no license is inferred.\n\nv = {'A':0, 'C':1, 'G':2, 'T':3}\nn, m = map(int, input().split())\ndna = [input().strip() for _ in range(m)]\n\n# 计算逆序对（极简暴力法）\ndef count(s):\n    return sum(v[s[i]] > v[s[j]] for i in range(n) for j in range(i+1, n))\n\n# 按逆序对+输入顺序排序，直接输出\nfor s in sorted(dna, key=count):  # sorted 稳定，并列时保持输入顺序；dna.index 遇重复串会把后一个提前\n    print(s)\n"
 LANGUAGE='Python3'
 NUMBER=1007
 SAMPLE='10 6\nAACATGAAGG\nTTTTGGCCAA\nTTTGGCCAAA\nGATCAGATTT\nCCCGGGGGGA\nATCGATGCAT\n'

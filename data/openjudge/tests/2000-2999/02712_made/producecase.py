@@ -138,9 +138,28 @@ def generate(number, seed):
     if number == 2712:
         md=[31,28,31,30,31,30,31,31,30,31,30,31];days=[]
         for m,d in enumerate(md,1):days.extend((m,x) for x in range(1,d+1))
-        rows=[]
-        for _ in range(r.randint(1,8)):
-            a=r.randint(0,350);b=r.randint(a+1,min(364,a+30));rows.append(f"{days[a][0]} {days[a][1]} {r.randint(1,1000)} {days[b][0]} {days[b][1]}")
+        LIM=2**63-1   # 题面「long 范围」按 64 位有符号整数理解
+        def row(a=None,b=None,cnt=None,big=False):
+            if a is None:a=r.randint(0,363)
+            if b is None:
+                b=r.randint(a+1,min(364,a+62)) if big else r.randint(a+1,min(364,a+30))
+            if cnt is None:
+                cap=LIM>>(b-a)
+                cnt=r.randint(max(1,cap//2),cap) if big else r.randint(1,min(1000,cap))
+            assert 0<=a<b<=364 and cnt>=1 and cnt*2**(b-a)<=LIM
+            return f"{days[a][0]} {days[a][1]} {cnt} {days[b][0]} {days[b][1]}"
+        di={md_:i for i,md_ in enumerate(days)}
+        if seed==1:   # 跨月边界：1/31→2/1、2/28→3/1（非闰年）、11/30→12/1、12/30→12/31、首日 1/1
+            rows=[row(di[(1,31)],di[(2,1)],1),row(di[(2,28)],di[(3,1)],5),row(di[(2,27)],di[(3,1)],5),
+                  row(di[(11,30)],di[(12,1)],7),row(di[(12,30)],di[(12,31)],1),row(0,1,1),row(di[(4,30)],di[(5,1)],3)]
+        elif seed==2: # 结果贴近 2^63-1：卡 32 位整型与 double（pow）写法
+            rows=[row(0,62,1),row(di[(3,1)],di[(3,1)]+62,1),row(0,1,LIM>>1),row(0,31,(LIM>>31)),row(0,40,LIM>>40),
+                  row(di[(12,1)],364,LIM>>30),row(di[(6,15)],di[(6,15)]+53,1023)]
+        elif seed==3: # 结果恰在 2^31 附近
+            rows=[row(0,31,1),row(0,30,1),row(0,30,2),row(0,30,3),row(di[(2,20)],di[(3,5)],131072)]
+        elif seed<=5: rows=[row(big=r.random()<.5) for _ in range(1000)]
+        elif seed%4==0: rows=[row(big=True) for _ in range(r.randint(1,10))]
+        else: rows=[row() for _ in range(r.randint(1,8))]
         return f"{len(rows)}\n"+"\n".join(rows)+"\n"
     if number == 2883:return "\n".join(" ".join(str(r.randint(-99,99)) for _ in range(5)) for _ in range(r.randint(1,12)))+"\n"
     if number == 2911:return f"{r.randint(1000,9999)}\n"
@@ -148,6 +167,22 @@ def generate(number, seed):
         chars="".join(chr(i) for i in range(32,123));return "".join(r.choice(chars) for _ in range(r.randint(1,100)))+"\n"
     if number == 1753:return "\n".join("".join(r.choice("bw") for _ in range(4)) for _ in range(4))+"\n"
     raise KeyError(number)
+
+def valid(text):
+    """题面：第一行测试数目 n；其后 n 行每行 5 个整数（单空格分隔）：首日月、日、首日细菌数、目标日月、日。
+    同一非闰年内、目标日在首日之后，目标日细菌数在 long（按 64 位有符号）范围内。"""
+    import re
+    md = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    if not text.endswith("\n"): return False
+    lines = text[:-1].split("\n")
+    if not re.fullmatch(r"[1-9]\d*", lines[0]) or len(lines) != int(lines[0]) + 1: return False
+    for ln in lines[1:]:
+        if not re.fullmatch(r"\d+( \d+){4}", ln): return False
+        m1, d1, c, m2, d2 = map(int, ln.split())
+        if not (1 <= m1 <= 12 and 1 <= m2 <= 12 and 1 <= d1 <= md[m1 - 1] and 1 <= d2 <= md[m2 - 1]): return False
+        k = (sum(md[:m2 - 1]) + d2) - (sum(md[:m1 - 1]) + d1)
+        if k <= 0 or c * 2 ** k > 2**63 - 1: return False
+    return True
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2712: 细菌繁殖\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02712/\n# License: not declared; no license is inferred.\nimport sys\n# 定义每个月的天数（非闰年）\ndays_in_month = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]\n\n\n# 计算某一天是这一年的第几天\ndef day_of_year(month, day):\n    return sum(days_in_month[:month - 1]) + day\n\n\n# 主程序\nn = int(input())\nresults = []\n\nfor _ in range(n):\n    # 输入一组测试数据\n    month1, day1, count1, month2, day2 = map(int, input().split())\n\n    # 计算第一天和要求的那一天分别是这一年的第几天\n    day_of_year1 = day_of_year(month1, day1)\n    day_of_year2 = day_of_year(month2, day2)\n\n    # 计算相差的天数\n    days_diff = day_of_year2 - day_of_year1\n\n    # 计算细菌数目\n    bacteria_count = count1 * (2 ** days_diff)\n\n    # 存储结果\n    results.append(bacteria_count)\n\n# 输出所有结果\nfor result in results:\n    print(result)\n'
 NUMBER=2712

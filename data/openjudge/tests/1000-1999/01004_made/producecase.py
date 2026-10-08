@@ -1,5 +1,33 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+import re as _re
+
+def valid(text):
+    """题面契约（POJ 1004）：恰 12 行，每行一个不大于 1,000,000 的正数，保留两位小数，无 '$'。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if len(lines) != 12:
+        return False
+    for ln in lines:
+        if not _re.fullmatch(r"(0|[1-9]\d*)\.\d\d", ln):
+            return False
+        c = int(ln.replace(".", ""))
+        if not (0 < c <= 100000000):
+            return False
+    return True
+
+def gen1004(r, seed):
+    if seed == 1: cents = [100000000] * 12                       # 全部取上限
+    elif seed == 2: cents = [1] * 12                             # 全部取下限 0.01
+    elif seed == 3: cents = [1, 100000000] * 6                   # 上下限交替
+    elif seed == 4: cents = [r.randint(1, 99) for _ in range(12)]  # 全是不足 1 元的小数
+    else: cents = [r.randint(1, 100000000) for _ in range(12)]
+    # 题面未规定平均值恰为 x.xx5 时的舍入方向，避开这种“半分”平局，任何合理舍入都给同一答案
+    while sum(cents) % 12 == 6:
+        cents[-1] += 1 if cents[-1] < 100000000 else -1
+    return "\n".join(f"{c // 100}.{c % 100:02d}" for c in cents) + "\n"
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -117,7 +145,7 @@ def generate(number, seed):
     if number==3129:
         cases=[f"{r.randint(1,10000)}\n"+" ".join(str(r.randint(1,10000)) for _ in range(5)) for _ in range(r.randint(1,4))];return f"{len(cases)}\n"+"\n".join(cases)+"\n"
     if number==1001:return "\n".join(f"{r.randint(1,999999)/10000:.4f} {r.randint(1,25)}" for _ in range(r.randint(1,6)))+"\n"
-    if number==1004:return "\n".join(f"{r.randint(1,100000000)/100:.2f}" for _ in range(12))+"\n"
+    if number==1004:return gen1004(r, seed)
     if number==1005:
         rows=[]
         for _ in range(r.randint(1,8)):

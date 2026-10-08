@@ -1,165 +1,170 @@
-import random,subprocess,sys,tempfile
+import random, subprocess, sys, tempfile
 from pathlib import Path
-def generate(number, seed):
-    r = random.Random(number * 1_000_003 + seed)
-    letters = "abcdefghijklmnopqrstuvwxyz"
-    word = lambda a=1, b=10: "".join(r.choice(letters) for _ in range(r.randint(a, b)))
-    if number == 3247: return f"{seed % 9 + 1}\n"
-    if number == 1002:
-        base = ["4873279", "ITS-EASY", "888-4567", "3-10-10-10"]
-        rows = [r.choice(base) for _ in range(r.randint(2, 30))]
-        return f"{len(rows)}\n" + "\n".join(rows) + "\n"
-    if number == 2181:
-        a = [r.randint(0, 1000) for _ in range(r.randint(1, 100))]
-        return f"{len(a)}\n" + "\n".join(map(str, a)) + "\n"
-    if number == 2936:
-        a = sorted(r.sample(range(1, 9), r.randint(1, 8))); return f"{len(a)}\n" + " ".join(map(str, a)) + "\n"
-    if number == 2814: return " ".join(str(r.randrange(4)) for _ in range(9)) + "\n"
-    if number == 2910:
-        chars = letters + letters.upper() + "0123456789*?-_"; return "".join(r.choice(chars) for _ in range(r.randint(1, 100))) + "\n"
-    if number == 2940: return f"{r.randint(1,9)} {r.randint(1,9)}\n"
-    if number == 1178:
-        squares = [f"{chr(65+x)}{y+1}" for y in range(8) for x in range(8)]
-        return "".join(r.sample(squares, r.randint(2, 12))) + "\n"
-    if number == 1190: return f"{r.randint(1, 2000)}\n{r.randint(1, 7)}\n"
-    if number == 2899:
-        rows = [" ".join(str(r.randint(-1000, 1000)) for _ in range(5)) for _ in range(5)]
-        return "\n".join(rows) + f"\n{r.randint(-2,6)} {r.randint(-2,6)}\n"
-    if number == 2942: return f"{seed % 19 + 1}\n"
-    if number == 2791:
-        pts=set(); n=r.randint(2,8)
-        while len(pts)<n: pts.add((r.randint(-20,20),r.randint(-20,20)))
-        return f"{n}\n"+"\n".join(f"{x} {y}" for x,y in pts)+"\n0\n"
-    if number == 2804:
-        foreign=[]; rows=[]
-        for _ in range(r.randint(2,15)):
-            f=word(); foreign.append(f); rows.append(f"{word()} {f}")
-        docs=[r.choice(foreign+[word()]) for _ in range(r.randint(2,20))]
-        return "\n".join(rows)+"\n\n"+"\n".join(docs)+"\n"
-    if number == 1077:
-        board=list("12345678x"); pos=8
-        for _ in range(r.randint(0,30)):
-            y,x=divmod(pos,3); choices=[q for q in (pos-3,pos+3,pos-1,pos+1) if 0<=q<9 and abs(q%3-x)+abs(q//3-y)==1]
-            q=r.choice(choices);board[pos],board[q]=board[q],board[pos];pos=q
-        return " ".join(board)+"\n"
-    if number == 1230:
-        cases=[]
-        for _ in range(r.randint(1,4)):
-            n=r.randint(1,20); k=r.randint(0,10); walls=[]
-            for _ in range(n):
-                x1,x2=sorted((r.randint(0,100),r.randint(0,100))); y=r.randint(0,100);walls.append(f"{x1} {y} {x2} {y}")
-            cases.append(f"{n} {k}\n"+"\n".join(walls))
-        return f"{len(cases)}\n"+"\n".join(cases)+"\n"
-    if number == 1276:
-        cases=[]
-        for _ in range(r.randint(1,5)):
-            n=r.randint(1,12); pairs=[(r.randint(1,20),r.randint(1,200)) for _ in range(n)]
-            cases.append(f"{r.randint(0,3000)} {n} "+" ".join(f"{c} {v}" for c,v in pairs))
-        return "\n".join(cases)+"\n"
-    if number == 1481:
-        w=h=r.randint(5,15); grid=[["."]*w for _ in range(h)]
-        for y,x in [(2,2),(2,3),(3,2),(3,3)]: grid[y][x]="*"
-        for y,x in r.sample([(2,2),(2,3),(3,2),(3,3)],r.randint(1,4)):grid[y][x]="X"
-        return f"{w} {h}\n"+"\n".join("".join(x) for x in grid)+"\n0 0\n"
-    if number == 2049:
-        if seed % 2:
-            x,y=r.randint(1,198),r.randint(1,198);return f"0 0\n{x}.5 {y}.5\n-1 -1\n"
-        # The statement sample exercises walls and doors; translate it so even
-        # seeds remain distinct without changing its topology.
-        d=seed % 30
-        return ("8 9\n"+"\n".join((f"{1+d} 1 1 3",f"{2+d} 1 1 3",f"{3+d} 1 1 3",f"{4+d} 1 1 3",
-          f"{1+d} 1 0 3",f"{1+d} 2 0 3",f"{1+d} 3 0 3",f"{1+d} 4 0 3",
-          f"{2+d} 1 1",f"{2+d} 2 1",f"{2+d} 3 1",f"{3+d} 1 1",f"{3+d} 2 1",f"{3+d} 3 1",
-          f"{1+d} 2 0",f"{3+d} 3 0",f"{4+d} 3 1"))+f"\n{1.5+d} 1.5\n-1 -1\n")
-    if number == 2767:
-        chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ ,.'!?";return "".join(r.choice(chars) for _ in range(r.randint(1,200)))+"\n"
-    if number == 2787:
-        rows=[" ".join(str(r.randint(1,9)) for _ in range(4)) for _ in range(r.randint(1,12))]
-        return "\n".join(rows)+"\n0 0 0 0\n"
-    if number == 2927:
-        chars=letters+"0123456789 &^$#@*";return "\n".join("".join(r.choice(chars) for _ in range(r.randint(1,80))) for _ in range(r.randint(1,8)))+"\n"
-    if number == 2979:
-        cases=[]
-        for _ in range(r.randint(1,3)):
-            n=r.randint(1,20);m=r.randint(1,n);cases.append(f"{n} {m}\n"+"\n".join(f"{r.randint(0,20)} {r.randint(0,20)}" for _ in range(n)))
-        return "\n".join(cases)+"\n0 0\n"
-    if number == 1008:
-        months="pop no zip zotz tzec xul yoxkin mol chen yax zac ceh mac kankin muan pax koyab cumhu uayet".split();rows=[]
-        for _ in range(r.randint(1,12)):
-            m=r.randrange(19);day=r.randrange(5 if m==18 else 20);rows.append(f"{day}. {months[m]} {r.randint(0,5000)}")
-        return f"{len(rows)}\n"+"\n".join(rows)+"\n"
-    if number == 1019:
-        a=[r.randint(1,2_147_483_647) for _ in range(r.randint(1,10))];return f"{len(a)}\n"+"\n".join(map(str,a))+"\n"
-    if number in (1026,2818):
-        n=r.randint(1,30);perm=list(range(1,n+1));r.shuffle(perm);rows=[]
-        for _ in range(r.randint(1,8)):
-            msg="".join(r.choice(letters+" ") for _ in range(r.randint(1,n)));rows.append(f"{r.randint(1,10**6)} {msg}")
-        return f"{n}\n"+" ".join(map(str,perm))+"\n"+"\n".join(rows)+"\n0\n0\n"
-    if number == 1047:
-        return "\n".join("".join(r.choice("0123456789") for _ in range(r.randint(2,35))) for _ in range(r.randint(1,8)))+"\n"
-    if number == 1056:
-        groups=[]
-        for _ in range(r.randint(1,5)):
-            codes=set()
-            while len(codes)<r.randint(2,8):codes.add("".join(r.choice("01") for _ in range(r.randint(1,10))))
-            groups.extend(sorted(codes));groups.append("9")
-        return "\n".join(groups)+"\n"
-    if number == 1742:
-        cases=[]
-        for _ in range(r.randint(1,4)):
-            n=r.randint(1,20);m=r.randint(1,1000);a=[r.randint(1,100) for _ in range(n)];c=[r.randint(1,20) for _ in range(n)]
-            cases.append(f"{n} {m}\n"+" ".join(map(str,a+c)))
-        return "\n".join(cases)+"\n0 0\n"
-    if number == 1789:
-        cases=[]
-        for _ in range(r.randint(1,3)):
-            codes=set()
-            while len(codes)<r.randint(2,30):codes.add("".join(r.choice(letters) for _ in range(7)))
-            cases.append(f"{len(codes)}\n"+"\n".join(sorted(codes)))
-        return "\n".join(cases)+"\n0\n"
-    if number == 1941:return "\n".join(map(str,[r.randint(1,8) for _ in range(r.randint(1,5))]))+"\n0\n"
-    if number == 2092:
-        cases=[]
-        for _ in range(r.randint(1,4)):
-            n,m=r.randint(2,20),r.randint(1,20);cases.append(f"{n} {m}\n"+"\n".join(" ".join(str(r.randint(1,60)) for _ in range(m)) for _ in range(n)))
-        return "\n".join(cases)+"\n0 0\n"
-    if number == 2253:
-        cases=[]
-        for _ in range(r.randint(1,4)):
-            n=r.randint(2,30);cases.append(f"{n}\n"+"\n".join(f"{r.randint(0,1000)} {r.randint(0,1000)}" for _ in range(n)))
-        return "\n".join(cases)+"\n0\n"
-    if number == 2337:
-        cases=[]
-        for _ in range(r.randint(1,5)):
-            words=[word() for _ in range(r.randint(3,40))];cases.append(f"{len(words)}\n"+"\n".join(words))
-        return f"{len(cases)}\n"+"\n".join(cases)+"\n"
-    if number == 2676:
-        a=[r.randint(1,20) for _ in range(r.randint(1,100))];return f"{len(a)}\n"+" ".join(map(str,a))+"\n"
-    if number == 2712:
-        md=[31,28,31,30,31,30,31,31,30,31,30,31];days=[]
-        for m,d in enumerate(md,1):days.extend((m,x) for x in range(1,d+1))
-        rows=[]
-        for _ in range(r.randint(1,8)):
-            a=r.randint(0,350);b=r.randint(a+1,min(364,a+30));rows.append(f"{days[a][0]} {days[a][1]} {r.randint(1,1000)} {days[b][0]} {days[b][1]}")
-        return f"{len(rows)}\n"+"\n".join(rows)+"\n"
-    if number == 2883:return "\n".join(" ".join(str(r.randint(-99,99)) for _ in range(5)) for _ in range(r.randint(1,12)))+"\n"
-    if number == 2911:return f"{r.randint(1000,9999)}\n"
-    if number == 2913:
-        chars="".join(chr(i) for i in range(32,123));return "".join(r.choice(chars) for _ in range(r.randint(1,100)))+"\n"
-    if number == 1753:return "\n".join("".join(r.choice("bw") for _ in range(4)) for _ in range(4))+"\n"
-    raise KeyError(number)
+
+def _components(grid, h, w, ok):
+    seen = [[False] * w for _ in range(h)]; comps = []
+    for i in range(h):
+        for j in range(w):
+            if ok(grid[i][j]) and not seen[i][j]:
+                seen[i][j] = True; st = [(i, j)]; comp = []
+                while st:
+                    y, x = st.pop(); comp.append((y, x))
+                    for yy, xx in ((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)):
+                        if 0 <= yy < h and 0 <= xx < w and not seen[yy][xx] and ok(grid[yy][xx]):
+                            seen[yy][xx] = True; st.append((yy, xx))
+                comps.append(comp)
+    return comps
+
+def picture_dice(grid):
+    # 返回每个骰子的点数列表（4 连通）
+    h, w = len(grid), len(grid[0])
+    dot_id = {}
+    for k, comp in enumerate(_components(grid, h, w, lambda c: c == "X")):
+        for p in comp: dot_id[p] = k
+    res = []
+    for comp in _components(grid, h, w, lambda c: c != "."):
+        res.append(len({dot_id[p] for p in comp if p in dot_id}))
+    return res
+
+def valid(text):
+    # 题面：每张图 w h（5<=w,h<=50），随后 h 行各 w 个字符，只含 . * X；至少一个骰子；
+    # 每个骰子点数在 1..6；以 w=h=0 结束（其后不再有内容）。
+    lines = text.split("\n")
+    if lines and lines[-1] == "": lines.pop()
+    i = 0
+    while True:
+        if i >= len(lines): return False
+        p = lines[i].split()
+        if len(p) != 2 or not all(t.isdigit() for t in p): return False
+        w, h = map(int, p); i += 1
+        if w == 0 and h == 0:
+            return i == len(lines)
+        if not (5 <= w <= 50 and 5 <= h <= 50): return False
+        rows = lines[i:i + h]; i += h
+        if len(rows) != h or any(len(r) != w or set(r) - set(".*X") for r in rows): return False
+        dice = picture_dice(rows)
+        if not dice or any(not 1 <= d <= 6 for d in dice): return False
+
+DOT_SHAPES = [[(0, 0)], [(0, 0), (0, 1)], [(0, 0), (1, 0)], [(0, 0), (0, 1), (1, 0), (1, 1)],
+              [(0, 1), (1, 0), (1, 1), (1, 2), (2, 1)], [(0, 0), (1, 0), (1, 1)]]
+
+def free4(grid, h, w, cells):
+    cs = set(cells)
+    for y, x in cells:
+        if not (0 <= y < h and 0 <= x < w) or grid[y][x] != ".": return False
+        for yy, xx in ((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)):
+            if (yy, xx) not in cs and 0 <= yy < h and 0 <= xx < w and grid[yy][xx] != ".": return False
+    return True
+
+def add_die(r, grid, h, w, dh, dw, k):
+    for _ in range(60):
+        y0, x0 = r.randint(0, h - dh), r.randint(0, w - dw)
+        cells = [(y0 + a, x0 + b) for a in range(dh) for b in range(dw)]
+        if dh >= 3 and dw >= 3 and r.random() < 0.5:  # 光学畸变：去掉几个角
+            corners = [(y0, x0), (y0, x0 + dw - 1), (y0 + dh - 1, x0), (y0 + dh - 1, x0 + dw - 1)]
+            for c in r.sample(corners, r.randint(1, 4)): cells.remove(c)
+        if r.random() < 0.3:  # 边上鼓出一块
+            side = r.choice(["t", "b"]); xx = r.randint(x0, x0 + dw - 1)
+            cells.append((y0 - 1, xx) if side == "t" else (y0 + dh, xx))
+        if not free4(grid, h, w, cells): continue
+        local = {c: "*" for c in cells}
+        placed = 0
+        for _ in range(400):
+            if placed == k: break
+            shape = r.choice(DOT_SHAPES if dh * dw > 30 else DOT_SHAPES[:3])
+            cy, cx = r.choice(cells)
+            dot = [(cy + a, cx + b) for a, b in shape]
+            if any(local.get(p) != "*" for p in dot): continue
+            bad = False
+            for y, x in dot:
+                for nb in ((y + 1, x), (y - 1, x), (y, x + 1), (y, x - 1)):
+                    if nb not in dot and local.get(nb) == "X": bad = True
+            if bad: continue
+            for p in dot: local[p] = "X"
+            placed += 1
+        if placed != k or "*" not in local.values(): continue
+        for (y, x), c in local.items(): grid[y][x] = c
+        return True
+    return False
+
+def picture(r, w, h, ndice, size=(2, 9)):
+    while True:
+        grid = [["."] * w for _ in range(h)]
+        counts = []
+        for _ in range(ndice):
+            dh, dw = r.randint(*size), r.randint(*size)
+            dh, dw = min(dh, h), min(dw, w)
+            k = r.randint(1, 6) if dh * dw >= 12 else r.randint(1, max(1, min(6, dh * dw // 3)))
+            if add_die(r, grid, h, w, dh, dw, k): counts.append(k)
+        rows = ["".join(x) for x in grid]
+        if counts and sorted(picture_dice(rows)) == sorted(counts):
+            return f"{w} {h}\n" + "\n".join(rows) + "\n"
+
+def serpentine(w, h):
+    # 一条蛇形的单宽骰子，路径很长；两端各一个点
+    grid = [["."] * w for _ in range(h)]
+    for y in range(0, h, 2):
+        for x in range(w): grid[y][x] = "*"
+        if y + 1 < h: grid[y + 1][w - 1 if (y // 2) % 2 == 0 else 0] = "*"
+    grid[0][0] = "X"; grid[0][2] = "X"; grid[h - 1 - (h - 1) % 2][w // 2] = "X"
+    return f"{w} {h}\n" + "\n".join("".join(x) for x in grid) + "\n"
+
+def build_cases():
+    r = random.Random(1481)
+    cases = []
+    # 最小图 5x5、单骰子
+    cases.append("5 5\n.....\n.***.\n.*X*.\n.***.\n.....\n5 5\nXXX**\n*****\nX*X*X\n*****\n**X**\n0 0\n")
+    # 斜角相接的两个骰子 / 斜角相接的两个点 / 点贴着骰子边缘
+    cases.append("6 6\n***...\n*X*...\n***...\n...***\n...*XX\n...***\n"
+                 "7 5\n*******\n*X*X***\n**X*X**\n*X*****\n*******\n"
+                 "8 5\nX*****X.\n******..\n..**....\n.*X*X*..\n.*****..\n0 0\n")
+    for _ in range(12):
+        pics = []
+        for _ in range(r.randint(1, 4)):
+            w, h = r.randint(5, 25), r.randint(5, 25)
+            pics.append(picture(r, w, h, r.randint(1, 5)))
+        cases.append("".join(pics) + "0 0\n")
+    for _ in range(10):
+        pics = []
+        for _ in range(r.randint(2, 6)):
+            w, h = r.randint(30, 50), r.randint(30, 50)
+            pics.append(picture(r, w, h, r.randint(5, 30)))
+        cases.append("".join(pics) + "0 0\n")
+    # 满规模 50x50：很多小骰子 / 一个大骰子 / 蛇形长骰子
+    cases.append("".join(picture(r, 50, 50, 80, size=(2, 5)) for _ in range(5)) + "0 0\n")
+    cases.append(picture(r, 50, 50, 1, size=(40, 50)) + picture(r, 50, 50, 3, size=(15, 25)) + "0 0\n")
+    cases.append(serpentine(50, 50) + serpentine(49, 50) + serpentine(5, 5) + "0 0\n")
+    cases.append("".join(picture(r, 50, 50, 40) for _ in range(20)) + "0 0\n")
+    while len(cases) < 39:
+        pics = [picture(r, r.randint(5, 50), r.randint(5, 50), r.randint(1, 20)) for _ in range(r.randint(1, 8))]
+        cases.append("".join(pics) + "0 0\n")
+    return cases
 
 REFERENCE="# External reference: statistics page /practice/01481/\n# Accepted submission: 42325727\n# Source: http://cs101.openjudge.cn/practice/solution/42325727/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\nsys.setrecursionlimit(10**8)\ndx=[0,0,1,-1]\ndy=[1,-1,0,0]\ndef ddfs(s,e):\n    mmap[s][e]='*'\n    for i in range(4):\n        xx=s+dx[i]\n        yy=e+dy[i]\n        if 0<=xx<h and 0<=yy<w and mmap[xx][yy]=='X':\n            ddfs(xx,yy)\n\ndef dfs(s,e):\n    mmap[s][e]='.'\n    for i in range(4):\n        xx=s+dx[i]\n        yy=e+dy[i]\n        if not (0<=xx<h and 0<=yy<w) or mmap[xx][yy]=='.':\n            continue\n        if mmap[xx][yy]=='X':\n            ddfs(xx,yy)\n            num[l]+=1\n        if mmap[xx][yy]=='*':\n            dfs(xx,yy)\n\nk=1\nwhile True:\n    w,h=map(int,input().split())\n    if w==0 and h==0:\n        break\n    mmap=[]\n    for _ in range(h):\n        row=list(input().strip())\n        mmap.append(row)\n    num=[0]*1000\n    l=0\n    for i in range(h):\n        for j in range(w):\n            if mmap[i][j]=='*':\n                dfs(i,j)\n                l+=1\n    print(f'Throw {k}')\n    k+=1\n    sorted_nums=sorted(num[:l])\n    print(' '.join(map(str,sorted_nums)))\n    print()\n"
-NUMBER=1481
 SAMPLE='30 15\n..............................\n..............................\n...............*..............\n...*****......****............\n...*X***.....**X***...........\n...*****....***X**............\n...***X*.....****.............\n...*****.......*..............\n..............................\n........***........******.....\n.......**X****.....*X**X*.....\n......*******......******.....\n.....****X**.......*X**X*.....\n........***........******.....\n..............................\n0 0\n'
-def run(x):
- with tempfile.TemporaryDirectory() as d:
-  p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
-  if q.returncode:raise SystemExit(q.stderr)
-  return q.stdout.rstrip()+'\n'
+LANGUAGE='Python3'
+
+def run_all(cases):
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp); src = tmp/('s.py' if LANGUAGE == 'Python3' else 's.cpp'); src.write_text(REFERENCE)
+        cmd = [sys.executable, '-I', str(src)]
+        if LANGUAGE != 'Python3':
+            exe = tmp/'s'; subprocess.run(['g++', '-std=c++20', '-O2', '-pipe', str(src), '-o', str(exe)], check=True); cmd = [str(exe)]
+        outs = []
+        for x in cases:
+            q = subprocess.run(cmd, input=x, text=True, capture_output=True, timeout=120, check=True)
+            outs.append('\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines()) + '\n')
+        return outs
+
 def main():
- d=Path('data');d.mkdir(exist_ok=True)
- for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
-  (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
-if __name__=='__main__':main()
+    cases = [SAMPLE] + build_cases()
+    for i, x in enumerate(cases):
+        assert valid(x), f"第 {i} 组不满足题面约束"
+    outs = run_all(cases)
+    out = Path('data'); out.mkdir(exist_ok=True)
+    for p in out.glob('*'): p.unlink()
+    for i, (x, y) in enumerate(zip(cases, outs)):
+        (out/f'{i}.in').write_text(x); (out/f'{i}.out').write_text(y)
+
+if __name__ == '__main__':
+    main()

@@ -148,6 +148,10 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
+def valid(text):
+    """题面：无输入。"""
+    return text == ""
+
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2698: 八皇后问题解输出\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02698/\n# License: not declared; no license is inferred.\ndef is_safe(board, row, col):\n    # 检查当前位置是否安全\n    # 检查同一列是否有皇后\n    for i in range(row):\n        if board[i][col] == 1:\n            return False\n    # 检查左上方是否有皇后\n    i = row - 1\n    j = col - 1\n    while i >= 0 and j >= 0:\n        if board[i][j] == 1:\n            return False\n        i -= 1\n        j -= 1\n    # 检查右上方是否有皇后\n    i = row - 1\n    j = col + 1\n    while i >= 0 and j < 8:\n        if board[i][j] == 1:\n            return False\n        i -= 1\n        j += 1\n    return True\n\ndef solve_n_queens(board, row, solutions):\n    # 递归回溯求解八皇后问题\n    if row == 8:\n        # 找到一个解，将解添加到结果列表\n        solutions.append([board[i].copy() for i in range(8)])\n        return\n    for col in range(8):\n        if is_safe(board, row, col):\n            # 当前位置安全，放置皇后\n            board[row][col] = 1\n            # 继续递归放置下一行的皇后\n            solve_n_queens(board, row + 1, solutions)\n            # 回溯，撤销当前位置的皇后\n            board[row][col] = 0\n\n# 初始化棋盘\nboard = [[0] * 8 for _ in range(8)]\nsolutions = []\n# 求解八皇后问题\nsolve_n_queens(board, 0, solutions)\n# 输出结果\n\ndef transpose_matrix(matrix):\n    return [[matrix[j][i] for j in range(len(matrix))] for i in range(len(matrix[0]))]\n\nfor i, solution in enumerate(solutions):\n    print(f"No. {i+1}")\n    for row in transpose_matrix(solution):\n        print(\' \'.join(map(str, row)))\n'
 LANGUAGE='Python3'
 NUMBER=2698

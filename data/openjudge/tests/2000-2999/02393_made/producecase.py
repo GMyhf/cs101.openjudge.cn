@@ -1,5 +1,41 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def valid(text):
+    """题面契约：第 1 行 N S（1<=N<=10000，1<=S<=100）；随后恰 N 行，每行 C_i Y_i（1<=C_i<=5000，0<=Y_i<=10000）。"""
+    try:
+        if not text.endswith("\n"):return False
+        lines=text[:-1].split("\n")
+        def two(ln):
+            t=ln.split(" ")
+            if len(t)!=2 or not all(x.isdigit() for x in t):raise ValueError
+            return int(t[0]),int(t[1])
+        n,S=two(lines[0])
+        if not (1<=n<=10000 and 1<=S<=100) or len(lines)!=n+1:return False
+        for ln in lines[1:]:
+            c,y=two(ln)
+            if not (1<=c<=5000 and 0<=y<=10000):return False
+        return True
+    except Exception:
+        return False
+
+def gen2393(r,seed):
+    f=lambda S,rows:f"{len(rows)} {S}\n"+"\n".join(f"{c} {y}" for c,y in rows)+"\n"
+    N=10000
+    if seed==1:return f(1,[(1,0)])                                  # 最小，答案 0
+    if seed==2:return f(100,[(5000,10000)])
+    if seed==3:return f(100,[(5000,10000)]*N)                       # 答案 5e11，超 32 位
+    if seed==4:return f(1,[(5000-i//2,10000) for i in range(N)])    # 价格缓降，囤货不划算
+    if seed==5:return f(1,[(1,10000)]+[(5000,10000)]*(N-1))         # 第一周囤到底
+    if seed==6:return f(100,[(1,10000)]+[(5000,10000)]*(N-1))
+    if seed==7:return f(1,[(1+i,10000) for i in range(5000)]+[(5000,10000)]*5000)  # C 每周涨 1 = S，相等边界
+    if seed==8:return f(100,[(r.randint(1,5000),r.randint(0,10000)) for _ in range(N)])
+    if seed==9:return f(1,[(r.randint(1,5000),r.randint(0,10000)) for _ in range(N)])
+    if 10<=seed<=16:return f(r.randint(1,100),[(r.randint(1,5000),r.randint(0,10000)) for _ in range(N)])
+    if 17<=seed<=19:return f(r.randint(1,10),[(r.randint(4900,5000),r.choice([0,10000])) for _ in range(N)])
+    if seed==20:return f(50,[(5000,0)]*N)                           # 全无需求，0
+    n=r.randint(1,25);return f(r.randint(1,30),[(r.randint(1,1000),r.randint(0,1000)) for _ in range(n)])
+
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     if number == 2236:
@@ -28,10 +64,7 @@ def generate(number, seed):
         left = "+".join(terms); answers = [left, "+".join(reversed(terms))]
         answers += [left + "+H", "2" + left]
         return left + f"\n{len(answers)}\n" + "\n".join(answers) + "\n"
-    if number == 2393:
-        n, storage = r.randint(1, 25), r.randint(0, 30)
-        rows = [(r.randint(1, 1000), r.randint(0, 1000)) for _ in range(n)]
-        return f"{n} {storage}\n" + "\n".join(f"{c} {y}" for c, y in rows) + "\n"
+    if number == 2393:return gen2393(r,seed)
     if number == 2800:
         chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ .,!"
         return "\n".join("".join(r.choice(chars) for _ in range(r.randint(1, 50)))

@@ -103,7 +103,13 @@ def generate(n, seed):
         state='down' if heavy else 'up'
         a,b,c,d=map(''.join,(normal[:4],normal[4:8],normal[3:7],normal[7:11]))
         return f'1\n{coin} {x} {state}\n{a} {b} even\n{c} {d} even\n'
-    if n==3143:return f'{r.randint(4,2000)}\n'
+    if n==3143:
+        # 边界与 Error! 分支（含 4=2+2 这一陷阱、奇数、最小值 1、上限 2000），其余为互不相同的随机数
+        special=[1,2,3,4,5,6,7,8,2000,1999,1998,100,12,1997]
+        if seed<=len(special):return f'{special[seed-1]}\n'
+        pool=[x for x in range(1,2001) if x not in special and x!=10]
+        random.Random(3143).shuffle(pool)
+        return f'{pool[seed-len(special)-1]}\n'
     if n==1860:
         N=r.randint(2,8);edges=[]
         for _ in range(r.randint(N-1,20)):
@@ -154,6 +160,12 @@ def generate(n, seed):
     raise KeyError(n)
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 3143: 验证“歌德巴赫猜想”\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/03143/\n# License: not declared in source collection; no license is inferred.\nimport sys\npri=[0]*2001\npri[1]=1\nfor i in range(2,50):\n    if pri[i]==0:\n        for j in range(i*2,2001,i):\n            pri[j]=1\n\nt=int(input())\nif t<6 or t%2!=0:\n    print(\'Error!\')\nelse:\n    for m in range(3,int(t/2)+1):\n        if pri[m]==0 and pri[t-m]==0:\n            print(f"{t}={m}+{t-m}")\n'
+def valid(text):
+    """题面：输入只有一个正整数 x（x<=2000）。"""
+    if not text.endswith('\n'):return False
+    s=text[:-1]
+    if not s.isdigit() or s[0]=='0':return False
+    return 1<=int(s)<=2000
 NUMBER=3143
 SAMPLE='10\n'
 def run(x):

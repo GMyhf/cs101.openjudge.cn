@@ -17,6 +17,49 @@ REFERENCE_SOURCE = "m,n,p,q = map(int, input().split())\nyuan=[[int(x) for x in 
 def g19942(r):
     m,n=r.randint(2,7),r.randint(2,7); p,q=r.randint(1,m),r.randint(1,n); rows=[" ".join(str(r.randint(-5,5)) for _ in range(n)) for _ in range(m)]; ker=[" ".join(str(r.randint(-5,5)) for _ in range(q)) for _ in range(p)]; return f"{m} {n} {p} {q}\n"+"\n".join(rows+ker)+"\n"
 
+def valid(text):
+    """题面：第一行 m n p q（1 <= p <= m; 1 <= q <= n）；接着 m 行每行 n 个整数，再 p 行每行 q 个整数。
+    题面未给 m、n 与元素取值的上限，只核格式与 p<=m、q<=n。"""
+    lines=text.split("\n")
+    if lines[-1]!="": return False
+    lines=lines[:-1]
+    def ints(line):
+        t=line.split(" ")
+        try: v=[int(x) for x in t]
+        except ValueError: return None
+        if any(str(a)!=b for a,b in zip(v,t)): return None
+        return v
+    if not lines: return False
+    h=ints(lines[0])
+    if h is None or len(h)!=4: return False
+    m,n,p,q=h
+    if not (1<=p<=m and 1<=q<=n): return False
+    if len(lines)!=1+m+p: return False
+    for k,line in enumerate(lines[1:]):
+        v=ints(line)
+        if v is None or len(v)!=(n if k<m else q): return False
+    return True
+
+def _mat(r,rows,cols,lo,hi):
+    return [" ".join(str(r.randint(lo,hi)) for _ in range(cols)) for _ in range(rows)]
+
+def extra_cases():
+    """补充：题面样例 2；1x1；核与矩阵同大小；1x1 核；行/列向量；较大规模（100x100、核 10x10）与较大元素值。"""
+    r=random.Random(NUMBER*7+1)
+    def mk(m,n,p,q,lo=-9,hi=9):
+        return f"{m} {n} {p} {q}\n"+"\n".join(_mat(r,m,n,lo,hi)+_mat(r,p,q,lo,hi))+"\n"
+    out=["5 4 4 4\n10 -8 6 9\n7 -9 1 0\n1 -9 2 -5\n-3 6 -1 2\n-10 -2 -1 -2\n-9 -1 -6 10\n3 -2 -5 9\n-10 -3 -10 7\n3 -2 -7 0\n"]
+    out.append(mk(1,1,1,1))
+    out.append(mk(6,8,6,8))
+    out.append(mk(9,7,1,1))
+    out.append(mk(1,30,1,5))
+    out.append(mk(30,1,7,1))
+    out.append(mk(50,60,3,4,-100,100))
+    out.append(mk(100,100,10,10,-1000,1000))
+    out.append(mk(100,100,1,100,-1000,1000))
+    out.append(mk(100,100,50,50,0,1000))
+    return out
+
 def build_cases():
     cases = [SAMPLE_IN]
     for i in range(1, 20):
@@ -27,6 +70,7 @@ def build_cases():
                 break
         else:
             raise AssertionError("生成器多样性不足")
+    cases += extra_cases()
     return cases
 
 def solve_reference(content):

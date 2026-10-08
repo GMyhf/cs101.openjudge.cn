@@ -157,9 +157,42 @@ def run(x):
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout.rstrip()+'\n'
+import re as _re
+def valid(text):
+    """题面契约：一行字符串，不含空格等空白符；长度取交集为 1..30
+    （描述说"长度不超过30"，输入段说"最大长度为100"，按更严的 30）；
+    描述说"内有数字字符和非数字字符"，故两类字符都至少出现一次；
+    其中每段连续数字表示的非负整数在 int 范围内（<=2147483647）。"""
+    if not text.endswith('\n') or text.count('\n') != 1: return False
+    s = text[:-1]
+    if not 1 <= len(s) <= 30: return False
+    if any(not (33 <= ord(c) <= 126) for c in s): return False
+    if not any(c.isdigit() for c in s) or all(c.isdigit() for c in s): return False
+    return all(int(x) <= 2**31 - 1 for x in _re.findall(r'[0-9]+', s))
+
+_NON = "".join(chr(c) for c in range(33, 127) if not chr(c).isdigit())
+
+def _rand(r, length, pdig):
+    while True:
+        s = "".join(r.choice("0123456789") if r.random() < pdig else r.choice(_NON) for _ in range(length))
+        if valid(s + "\n"): return s
+
+def cases():
+    r = random.Random(2910_2026)
+    fixed = ["a7", "x0", "7#", "0?", "000a", "b007", "2147483647!", "a0b00c000d", "00000000002147483647x",
+             "1a2b3c4d5e6f7g8h9i0j1k2l3m4n5o", "123456789*987654321?1000000000", "-12+34", "1.5e10",
+             "A" * 29 + "1", "9" * 9 + "x" + "0" * 10 + "y1", "**0**", "abc0", "0abc", "Z1"]
+    out = [s + "\n" for s in fixed]
+    while len(out) < 39:
+        L = r.choice((2, 2, 5, 10, 20, 29, 30, 30, 30))
+        s = _rand(r, L, r.choice((.2, .5, .8)))
+        if s + "\n" not in out: out.append(s + "\n")
+    return out
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+cases()):
+  assert valid(x),i
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

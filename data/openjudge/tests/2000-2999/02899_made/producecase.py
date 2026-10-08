@@ -157,9 +157,42 @@ def run(x):
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout.rstrip()+'\n'
+import re as _re
+_INT = _re.compile(r'-?(0|[1-9][0-9]*)\Z')
+def valid(text):
+    """题面契约：5 行各 5 个整数（5*5 矩阵），单空格分隔；第 6 行两个整数 n m（行下标，可能越界）。
+    题面未给矩阵元素与 n、m 的取值范围，只核格式。"""
+    if not text.endswith('\n') or '\r' in text: return False
+    lines = text[:-1].split('\n')
+    if len(lines) != 6: return False
+    for ln in lines[:5]:
+        p = ln.split(' ')
+        if len(p) != 5 or not all(_INT.match(t) for t in p): return False
+    p = lines[5].split(' ')
+    return len(p) == 2 and all(_INT.match(t) for t in p)
+
+def _mat(r):
+    # 元素宽度不超过 3 个字符：题面要求 setw(4) 输出，宽度 >=4 的数会与前一个数粘连，
+    # 按 token 比对时只有逐字照抄 setw(4) 的写法才能过，用空格分隔的正确写法反被判错。
+    hi = r.choice((9, 99, 999))
+    return "\n".join(" ".join(str(r.randint(-99 if r.random() < .2 else 0, hi)) for _ in range(5)) for _ in range(5))
+
+def cases():
+    r = random.Random(2899_2026)
+    pairs = [(0, 4), (4, 0), (1, 3), (3, 1), (0, 0), (2, 2), (4, 4), (0, 1), (3, 4), (2, 0),
+             (-1, 2), (2, -1), (5, 0), (0, 5), (-1, 5), (5, 5), (-1, -1), (6, 2), (100, 1), (1, -100),
+             (-2147483648, 3), (2, 2147483647), (4, 5), (5, 4), (-1, 0)]
+    out = [f"{_mat(r)}\n{n} {m}\n" for n, m in pairs]
+    while len(out) < 39:
+        n = r.randint(0, 4) if r.random() < .6 else r.randint(-10, 15)
+        m = r.randint(0, 4) if r.random() < .6 else r.randint(-10, 15)
+        out.append(f"{_mat(r)}\n{n} {m}\n")
+    return out
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+cases()):
+  assert valid(x),i
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

@@ -2,6 +2,7 @@
 # Accepted submission: 52760611
 # Source: http://cs101.openjudge.cn/practice/solution/52760611/
 # License: not declared on the submission page; no license is inferred.
+# 2026-10-08 本地修正：上面引用的原始代码在题面范围内有缺陷，已按题面改过，与原提交不再逐字一致（见 CHANGELOG）。
 
 import sys
 from array import array
@@ -20,7 +21,8 @@ INF = 10**9
 def count_factor(x, p):
     """计算 x 中包含质因数 p 的个数"""
     if x == 0:
-        return INF  
+        # 修正：原提交返回 INF，多个 0 累加会溢出 32 位有符号数组；0 按 10 处理（2、5 各计 1 个），最后再与 1 取 min
+        return 1
     cnt = 0
     while x % p == 0:
         cnt += 1

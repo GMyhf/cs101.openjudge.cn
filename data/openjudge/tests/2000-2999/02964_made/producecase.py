@@ -394,7 +394,24 @@ def generate(number, seed):
             chunks.append(str(len(strings)) + "\n" + "\n".join(strings))
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     if number == 2964:
-        values = [r.randint(0, 2_500_000) for _ in range(r.randint(1, 10))]
+        # 题面：每行一个正整数（>=1），结果年份不超过 9999（即天数 <= 2921939）。
+        # 覆盖：1、闰年 2/29 前后、2100/2200/2300 非闰年与 2400 闰年的 2/28、3/1、年末 12/31、
+        # 上界 9999-12-31、以及每组较多行。
+        import datetime
+        base = datetime.date(2000, 1, 1); top = (datetime.date(9999, 12, 31) - base).days
+        def off(y, m, d): return (datetime.date(y, m, d) - base).days
+        special = [1, 2, 6, 7, 30, 31, 58, 59, 60, 365, 366, 1460, 1461, top, top - 1]
+        for y in (2004, 2096, 2100, 2200, 2300, 2400, 2800, 3000, 4000, 9996, 9999):
+            for md in ((2, 28), (3, 1), (12, 31), (1, 1)):
+                special.append(off(y, *md))
+            if y % 4 == 0 and (y % 100 or y % 400 == 0): special.append(off(y, 2, 29))
+        special = sorted({v for v in special if 1 <= v <= top})
+        if seed == 1: values = special
+        elif seed == 2: values = [top]
+        elif seed == 3: values = [1]
+        elif seed >= 30: values = [r.randint(1, top) for _ in range(r.randint(800, 1200))]
+        elif seed % 2: values = r.sample(special, r.randint(1, 10)) + [r.randint(1, top) for _ in range(r.randint(0, 5))]
+        else: values = [r.randint(1, 2_500_000) for _ in range(r.randint(1, 10))]
         return "\n".join(map(str, values)) + "\n-1\n"
     if number == 2983:
         symbols = "ABCDEFGHIJKLMNOP"; shift = seed % 16
@@ -416,6 +433,17 @@ def generate(number, seed):
             chunks.append(f"{capacity}\n{count}\n" + " ".join(str(x) for pair in metals for x in pair))
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
+
+def valid(text):
+    """题面 02964：若干行，每行一个正整数（从 2000-01-01 起逝去的天数），最后一行 -1；结果年份不超过 9999，
+    即天数 <= 2921939（9999-12-31 距 2000-01-01 的天数）。"""
+    import re
+    if not text.endswith("\n"): return False
+    lines = text[:-1].split("\n")
+    if len(lines) < 1 or lines[-1] != "-1": return False
+    for line in lines[:-1]:
+        if not re.fullmatch(r"[1-9]\d*", line) or int(line) > 2921939: return False
+    return True
 
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02964/statistics/\n# Accepted submission: 46688207\n# Source: http://cs101.openjudge.cn/practice/solution/46688207/\n# License: not declared on the submission page; no license is inferred.\n\nimport calendar\n\ndef is_leap_year(year):\n    """判断是否为闰年"""\n    return (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0)\n\ndef find_date_from_days(days):\n    # 2000年1月1日是星期六\n    start_year = 2000\n    start_day_of_week = 6  # 0代表星期一，6代表星期日\n\n    # 存储每个星期的名字\n    week_days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]\n\n    # 逐年减少天数，直到找出是哪一年\n    year = start_year\n    while True:\n        days_in_year = 366 if is_leap_year(year) else 365\n        if days < days_in_year:\n            break\n        days -= days_in_year\n        year += 1\n\n    # 每年每个月的天数\n    days_in_months = [31, 28 + is_leap_year(year), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]\n\n    # 逐月减少天数，直到找出是哪一月\n    month = 1\n    for days_in_month in days_in_months:\n        if days < days_in_month:\n            break\n        days -= days_in_month\n        month += 1\n\n    # 此时days是当月的第几天（从0开始，所以要加1）\n    day = days + 1\n\n    # 计算总天数，并根据它确定星期几\n    total_days = (days + (year - start_year) * 365 + sum([is_leap_year(y) for y in range(start_year, year)]))\n    day_of_week = calendar.weekday(year, month, day)\n\n    # 返回日期格式\n    return f"{year:04d}-{month:02d}-{day:02d} {week_days[day_of_week]}"\n\n# 处理输入输出\nwhile True:\n    days_since_2000 = int(input())\n    if days_since_2000 == -1:\n        break\n    print(find_date_from_days(days_since_2000))\n'
 LANGUAGE='Python3'

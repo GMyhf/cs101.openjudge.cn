@@ -41,6 +41,13 @@ def generate(number, seed):
         return f"{n}\n" + "\n".join(" ".join(str(r.randint(0, 99)) for _ in range(i))
                                       for i in range(1, n + 1)) + "\n"
     if number == 3177:
+        # 边界：X=Y（素数/非素数/1）、端点 1 与 1e5、X>Y、区间内无素数；其余随机
+        special = {1: (1, 1), 2: (2, 2), 3: (1, 100000), 4: (100000, 1), 5: (99991, 99991),
+                   6: (100000, 100000), 7: (24, 28), 8: (2, 3), 9: (99990, 100000), 10: (1, 2),
+                   11: (90, 96), 12: (100000, 99989)}
+        if seed in special:
+            x, y = special[seed]
+            return f"{x} {y}\n"
         return f"{r.randint(1,100000)} {r.randint(1,100000)}\n"
     if number == 3186:
         n = 3; m = n * n
@@ -418,6 +425,14 @@ def generate(number, seed):
     raise KeyError(number)
 
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/03177/statistics/\n# Accepted submission: 50653216\n# Source: http://cs101.openjudge.cn/practice/solution/50653216/\n# License: not declared on the submission page; no license is inferred.\n\ndef primes(limit):\n    l = [False]*2 + [True]*(limit-1)\n    for p in range(2, int(limit**0.5)+1):\n        if l[p]:\n            for i in range(p*2, limit+1, p):\n                l[i] = False\n    return [1 if x else 0 for x in l]\nX, Y = map(int, input().split())\nL = primes(max(X, Y))\nprint(max(sum(L[X:]), sum(L[Y:])))\n'
+def valid(text):
+    """题面：两个整数 X 和 Y（1 <= X,Y <= 10^5）。"""
+    if not text.endswith("\n"): return False
+    lines = text[:-1].split("\n")
+    if len(lines) != 1: return False
+    a = lines[0].split(" ")
+    if len(a) != 2: return False
+    return all(s.isdigit() and s[0] != "0" and 1 <= int(s) <= 100000 for s in a)
 LANGUAGE='Python3'
 NUMBER=3177
 SAMPLE='1 100\n'

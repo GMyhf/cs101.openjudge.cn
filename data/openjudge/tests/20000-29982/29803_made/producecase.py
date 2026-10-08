@@ -10,6 +10,7 @@
 题面保证「100 的防护等级下可以按时到达」-> 链路总耗时 <= T，生成器内断言。
 另用 Floyd + 枚举迷彩边的独立实现复核（参考解法是二分 + Dijkstra，不同族）。
 """
+import heapq
 import random
 from pathlib import Path
 
@@ -44,11 +45,78 @@ def min_armor(n, edges, limit):
     return 100
 
 
+def _dijkstra(n, adj, src):
+    dist = [INF] * (n + 1)
+    dist[src] = 0
+    pq = [(0, src)]
+    while pq:
+        d, u = heapq.heappop(pq)
+        if d > dist[u]:
+            continue
+        for v, t in adj[u]:
+            if d + t < dist[v]:
+                dist[v] = d + t
+                heapq.heappush(pq, (dist[v], v))
+    return dist
+
+
+def fast_armor(n, edges, limit):
+    """第二种独立实现：枚举防护等级 x，从 1 和 n 各跑一次 Dijkstra，再枚举迷彩边。"""
+    for x in range(0, 101):
+        adj = [[] for _ in range(n + 1)]
+        for u, v, t, a in edges:
+            if a <= x:
+                adj[u].append((v, t))
+                adj[v].append((u, t))
+        d1 = _dijkstra(n, adj, 1)
+        dn = _dijkstra(n, adj, n)
+        best = d1[n]
+        for u, v, t, a in edges:
+            best = min(best, d1[u] + t + dn[v], d1[v] + t + dn[u])
+        if best <= limit:
+            return x
+    return None
+
+
+def valid(text):
+    """题面契约：首行 n m T；随后恰 m 行 u v t a；节点在 1..n，交火等级 a 为 0~100 的整数；
+    数据保证 100 的防护等级下可以按时到达；输出为正整数（答案 >= 1）。
+    题面未给 n、m、t、T 的上下界，只要求非负的通过时间与时限。"""
+    try:
+        if not text.endswith("\n"):
+            return False
+        rows = text[:-1].split("\n")
+        head = rows[0].split()
+        if len(head) != 3:
+            return False
+        n, m, limit = map(int, head)
+        if n < 1 or m < 0 or limit < 0 or len(rows) != m + 1:
+            return False
+        edges = []
+        for row in rows[1:]:
+            tok = row.split()
+            if len(tok) != 4 or row != " ".join(tok):
+                return False
+            u, v, t, a = map(int, tok)
+            if not (1 <= u <= n and 1 <= v <= n and t >= 0 and 0 <= a <= 100):
+                return False
+            edges.append((u, v, t, a))
+        ans = fast_armor(n, edges, limit)
+        return ans is not None and ans >= 1
+    except ValueError:
+        return False
+
+
 def solve_text(text):
     rows = text.split("\n")
     n, m, limit = map(int, rows[0].split())
     edges = [tuple(map(int, rows[1 + i].split())) for i in range(m)]
-    return str(min_armor(n, edges, limit)) + "\n"
+    if n <= 12:                               # 小图：Floyd 枚举，再与 Dijkstra 版互证
+        ans = min_armor(n, edges, limit)
+        assert ans == fast_armor(n, edges, limit)
+    else:
+        ans = fast_armor(n, edges, limit)
+    return str(ans) + "\n"
 
 
 def one_case(r):
@@ -73,6 +141,65 @@ def one_case(r):
     return body
 
 
+def random_case(r, n, m, mode):
+    """随机图（含重边）：不再只有「链 + 无用边」一种形状。
+    mode=trap：耗时最短的路交火等级高，稍慢但仍在时限内的路交火等级低，
+    卡掉「先求最短时间路径再取第二大等级」的贪心。"""
+    edges = []
+    if mode == "trap":
+        k = r.randint(3, max(3, n // 3))
+        mid = r.sample(range(2, n), 2 * k)
+        fast_path = [1] + mid[:k] + [n]
+        slow_path = [1] + mid[k:] + [n]
+        for a, b in zip(fast_path, fast_path[1:]):
+            edges.append((a, b, r.randint(1, 3), r.randint(70, 100)))
+        for a, b in zip(slow_path, slow_path[1:]):
+            edges.append((a, b, r.randint(4, 8), r.randint(1, 40)))
+        slow = sum(e[2] for e in edges[-(k + 1):])
+    else:
+        order = list(range(2, n))
+        r.shuffle(order)
+        path = [1] + order[: r.randint(1, n - 2)] + [n]
+        for a, b in zip(path, path[1:]):
+            edges.append((a, b, r.randint(1, 20), r.randint(0, 100)))
+        slow = sum(e[2] for e in edges)
+    while len(edges) < m:
+        u = r.randint(1, n)
+        v = r.randint(1, n)
+        if u == v:
+            continue
+        if r.random() < .1 and edges:            # 重边
+            u, v = edges[r.randrange(len(edges))][:2]
+        edges.append((u, v, r.randint(1, 20), r.randint(0, 100)))
+    r.shuffle(edges)
+    # 时限：在「全部可走」最短时间与保底路径耗时之间取值
+    adj = [[] for _ in range(n + 1)]
+    for u, v, t, a in edges:
+        adj[u].append((v, t))
+        adj[v].append((u, t))
+    best = _dijkstra(n, adj, 1)[n]
+    limit = r.randint(best, max(best, slow)) if mode != "tight" else best
+    body = f"{n} {len(edges)} {limit}\n" + "".join("%d %d %d %d\n" % e for e in edges)
+    return body
+
+
+def extra_cases():
+    """追加组：随机图、重边、紧时限、陷阱图；规模逐步加大到 n=100、m=500。"""
+    plan = [(5, 8, "rand"), (6, 12, "tight"), (8, 20, "rand"), (10, 30, "trap"),
+            (12, 40, "tight"), (15, 60, "rand"), (20, 60, "trap"), (30, 120, "rand"),
+            (40, 150, "tight"), (50, 200, "trap"), (60, 250, "rand"), (80, 350, "tight"),
+            (100, 450, "rand"), (100, 500, "trap"), (100, 500, "tight")]
+    out = []
+    for i, (n, m, mode) in enumerate(plan):
+        r = random.Random(298030 + i * 7919)
+        while True:
+            body = random_case(r, n, m, mode)
+            if valid(body):
+                break
+        out.append(body)
+    return out
+
+
 def build_cases():
     cases = [SAMPLE_IN]
     for index in range(1, 40):
@@ -85,6 +212,9 @@ def build_cases():
     assert len(set(answers)) >= 10, "答案要真的分散，不能塌缩"
     assert max(int(a) for a in answers) >= 50, "要有需要高防护等级的组"
     assert len(set(cases)) >= 15, "去重后至少 15 组"
+    cases += extra_cases()
+    assert len(set(cases)) == len(cases)
+    assert all(valid(c) for c in cases)
     return cases
 
 

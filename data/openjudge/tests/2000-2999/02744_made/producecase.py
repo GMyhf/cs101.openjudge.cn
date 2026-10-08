@@ -383,16 +383,7 @@ def generate(number, seed):
     if number == 2714:
         ages = [r.randint(15, 25) for _ in range(r.randint(1, 100))]
         return f"{len(ages)}\n" + "\n".join(map(str, ages)) + "\n"
-    if number == 2744:
-        chunks = []
-        for _ in range(r.randint(1, 5)):
-            common = "".join(r.choice("ABCDE") for _ in range(r.randint(1, 12)))
-            strings = ["".join(r.choice("XYZ") for _ in range(r.randint(0, 5))) +
-                       (common if i % 2 == 0 else common[::-1]) +
-                       "".join(r.choice("UVW") for _ in range(r.randint(0, 5)))
-                       for i in range(r.randint(1, 8))]
-            chunks.append(str(len(strings)) + "\n" + "\n".join(strings))
-        return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
+    if number == 2744: return _gen_2744(r, seed)
     if number == 2964:
         values = [r.randint(0, 2_500_000) for _ in range(r.randint(1, 10))]
         return "\n".join(map(str, values)) + "\n-1\n"
@@ -417,10 +408,62 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02744/statistics/\n# Accepted submission: 46688613\n# Source: http://cs101.openjudge.cn/practice/solution/46688613/\n# License: not declared on the submission page; no license is inferred.\n\ndef find_i(x,y):\n    mmax=[0,0,0]\n    lx=len(x)\n    ly=len(y)\n    for i in range(lx):\n        for j in range(ly):\n            px,py=i,j\n            while px<lx and py<ly and x[px]==y[py]:\n                px+=1\n                py+=1\n            if(px-i)>mmax[0]:\n                mmax[0]=px-i\n                mmax[1:]=i,px\n    return x[mmax[1]:mmax[2]]\ndef find_x(x,y):\n    cur1=find_i(x,y)\n    cur2=find_i(x,y[::-1])\n    return cur1 if len(cur1)>len(cur2) else cur2\nfor i in range(int(input())):\n    n=int(input())\n    ss=sorted([input() for _ in range(n)],key=lambda x:len(x))\n    cur=ss[0]\n    for i in range(1,n):cur=find_x(cur,ss[i])\n    print(len(cur))\n'
+REFERENCE='# 暴力参考解：枚举最短串的全部子串（由长到短），检查它或其反串是否为每个串的子串。\nimport sys\ndef main():\n    data = sys.stdin.read().split()\n    p = 0; t = int(data[p]); p += 1; out = []\n    for _ in range(t):\n        n = int(data[p]); p += 1\n        ss = data[p:p + n]; p += n\n        s = min(ss, key=len); best = 0\n        for L in range(len(s), 0, -1):\n            if any(all(x in y or x[::-1] in y for y in ss) for x in (s[i:i + L] for i in range(len(s) - L + 1))):\n                best = L; break\n        out.append(str(best))\n    print("\\n".join(out))\nmain()\n'
 LANGUAGE='Python3'
 NUMBER=2744
 SAMPLE='2\n3\nABCD\nBCDFF\nBRCD\n2\nrose\norchid\n'
+import re as _re
+_INT=_re.compile(r'(0|-?[1-9][0-9]*)$')
+def _int(tok):
+    return int(tok) if _INT.match(tok) else None
+
+def valid(text):
+    """题面：第一行 t（1<=t<=10）；每组先给 n（1<=n<=100），再 n 行长度 1..100 的英文字母串。"""
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    t=_int(lines[0])
+    if t is None or not 1<=t<=10:return False
+    p=1
+    for _ in range(t):
+        if p>=len(lines):return False
+        n=_int(lines[p]);p+=1
+        if n is None or not 1<=n<=100 or p+n>len(lines):return False
+        for s in lines[p:p+n]:
+            if not _re.fullmatch(r'[A-Za-z]{1,100}',s):return False
+        p+=n
+    return p==len(lines)
+
+def _gen_2744_one(r, kind, n=None):
+    abc = r.choice(["ab", "abc", "aA", "AaBb", "ABCDE", "abcdefghij", "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"])
+    rnd = lambda L: "".join(r.choice(abc) for _ in range(L))
+    if kind == "one":
+        return [rnd(r.randint(1, 100))]
+    if kind == "zero":
+        # 最后一个串与其余串字符集不相交，答案为 0
+        n = n or r.randint(2, 100)
+        return ["".join(r.choice("abc") for _ in range(r.randint(1, 100))) for _ in range(n - 1)] + \
+               ["".join(r.choice("ABC") for _ in range(r.randint(1, 100)))]
+    n = n or r.randint(2, 100)
+    if kind == "random":
+        # 小字符集随机串：答案非零且常让“先取前两串最长公共子串”的贪心出错
+        abc = r.choice(["ab", "abc", "aA", "AaBb", "ABC"]); lo = r.choice([5, 20, 50])
+        return [rnd(r.randint(lo, 100)) for _ in range(n)]
+    # plant：在随机串中嵌入公共串或其反串
+    k = r.randint(1, 60); common = rnd(k); res = []
+    for _ in range(n):
+        x = common if r.random() < .5 else common[::-1]
+        L = r.randint(k, 100); pre = r.randint(0, L - k)
+        res.append(rnd(pre) + x + rnd(L - k - pre))
+    return res
+def _gen_2744(r, seed):
+    if seed == 1: tests = [["a"]]
+    elif seed == 2: tests = [_gen_2744_one(r, "zero") for _ in range(10)]
+    elif seed == 3: tests = [["Ab", "bA", "ab"], ["abc", "cba"], ["ABCD", "DCBA", "BC"], ["aB", "Ab"]]
+    elif seed <= 15: tests = [_gen_2744_one(r, r.choice(["plant", "random"]), 100) for _ in range(10)]
+    else:
+        tests = [_gen_2744_one(r, r.choice(["plant", "plant", "random", "random", "one"])) for _ in range(r.randint(1, 10))]
+    return f"{len(tests)}\n" + "\n".join(f"{len(t)}\n" + "\n".join(t) for t in tests) + "\n"
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]

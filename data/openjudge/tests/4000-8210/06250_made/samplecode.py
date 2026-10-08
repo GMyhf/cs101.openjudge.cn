@@ -1,5 +1,6 @@
 # Source: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md
 # 23n2300017735(夏天明BrightSummer)
+# 2026-10-08 本地修正：上面引用的原始代码在题面范围内有缺陷，已按题面改过，与原提交不再逐字一致（见 CHANGELOG）。
 def find(s, pat):
     nex = [0]
     for i, p in enumerate(pat[1:], 1):
@@ -22,7 +23,7 @@ def find(s, pat):
                     return i
                 break
             elif j:
-                j -= nex[j]
+                j = nex[j-1]
             else:
                 break
 

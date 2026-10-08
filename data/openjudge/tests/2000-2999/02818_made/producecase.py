@@ -157,9 +157,104 @@ def run(x):
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout.rstrip()+'\n'
+import re as _re
+_NAT = _re.compile(r'(0|[1-9][0-9]*)\Z')
+_POS = _re.compile(r'[1-9][0-9]*\Z')
+def valid(text):
+    """题面契约：若干块。每块第一行 n（0<n<=200）；接下来的行共 n 个互不相同、取值 1..n 的整数；
+    再是若干行 "k 信息"（k 为正整数，与信息之间用一个空格隔开，信息长度<=n、为不含换行的可打印字符）；
+    每块最后一行只有一个 0。最后一个块后有一行只有一个 0，其后不再有内容。"""
+    if not text.endswith('\n') or '\r' in text: return False
+    lines = text[:-1].split('\n'); i = 0; blocks = 0
+    while True:
+        if i >= len(lines) or not _NAT.match(lines[i]): return False
+        n = int(lines[i]); i += 1
+        if n == 0: break
+        if not 1 <= n <= 200: return False
+        keys = []
+        while len(keys) < n:
+            if i >= len(lines): return False
+            p = lines[i].split(' '); i += 1
+            if not all(_POS.match(t) for t in p): return False
+            keys += map(int, p)
+        if sorted(keys) != list(range(1, n + 1)): return False
+        while True:
+            if i >= len(lines): return False
+            ln = lines[i]; i += 1
+            if ln == '0': break
+            k, sp, msg = ln.partition(' ')
+            if not sp or not _POS.match(k) or len(msg) > n: return False
+            if any(not (32 <= ord(c) < 127) for c in msg): return False
+        blocks += 1
+    return i == len(lines) and blocks >= 1
+
+_CH = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?'-"
+
+def _msg(r, n, length=None):
+    """信息首尾不放空格（题面只说 k 与信息之间用空格隔开），中间可含空格。"""
+    L = length if length is not None else r.randint(1, n)
+    s = [r.choice(_CH + "   ") for _ in range(L)]
+    s[0] = r.choice(_CH); s[-1] = r.choice(_CH)
+    return "".join(s)
+
+def _block(n, perm, rows):
+    return f"{n}\n" + " ".join(map(str, perm)) + "\n" + "".join(f"{k} {m}\n" for k, m in rows) + "0\n"
+
+def _cycle_perm(r, n, lens):
+    """按给定循环长度拼出排列（lens 之和为 n）。"""
+    idx = list(range(n)); r.shuffle(idx); a = [0] * n; p = 0
+    for L in lens:
+        c = idx[p:p + L]; p += L
+        for t in range(L): a[c[t]] = c[(t + 1) % L] + 1
+    return a
+
+def _rand_block(r, n, nrows, kmax):
+    perm = list(range(1, n + 1)); r.shuffle(perm)
+    return _block(n, perm, [(r.randint(1, kmax), _msg(r, n)) for _ in range(nrows)])
+
+def cases():
+    r = random.Random(2818_2026)
+    out = []
+    # n=1；单字符信息
+    out.append(_block(1, [1], [(1, "x"), (1000000000, "Z")]) + "0\n")
+    # 恒等排列，k 很大
+    out.append(_block(5, [1, 2, 3, 4, 5], [(7, "abcde"), (999999999, "ab c")]) + "0\n")
+    # 单个 200 长循环：k 为循环长度的倍数（结果应等于原文补空格）、k=1、k=199、超大 k
+    a = _cycle_perm(r, 200, [200])
+    out.append(_block(200, a, [(200, _msg(r, 200, 200)), (400000, _msg(r, 200, 150)), (1, _msg(r, 200, 200)),
+                              (199, _msg(r, 200, 1)), (2000000000, _msg(r, 200, 200))]) + "0\n")
+    # 多个不同长度循环（lcm 很大），k 取大值，卡朴素逐次模拟
+    lens = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 3]
+    a = _cycle_perm(r, sum(lens), lens)
+    out.append(_block(sum(lens), a, [(r.randint(10**8, 2 * 10**9), _msg(r, sum(lens), sum(lens))) for _ in range(30)]) + "0\n")
+    # 多块、短信息需要补空格
+    out.append("".join(_rand_block(r, n, r.randint(1, 4), 20) for n in (3, 10, 1, 25)) + "0\n")
+    # 小规模随机（暴力可核）
+    for _ in range(14):
+        out.append("".join(_rand_block(r, r.randint(1, 15), r.randint(1, 6), 30) for _ in range(r.randint(1, 4))) + "0\n")
+    # 中规模随机
+    for _ in range(10):
+        out.append("".join(_rand_block(r, r.randint(20, 200), r.randint(1, 15), 10**6) for _ in range(r.randint(1, 5))) + "0\n")
+    # 满规模：多块 n=200、每块大量信息、k 到 2e9
+    for _ in range(10):
+        blocks = []
+        for _ in range(r.randint(3, 8)):
+            n = 200 if r.random() < .7 else r.randint(150, 200)
+            if r.random() < .5:
+                lens = []; rest = n
+                while rest: L = min(rest, r.randint(1, 60)); lens.append(L); rest -= L
+                a = _cycle_perm(r, n, lens)
+            else:
+                a = list(range(1, n + 1)); r.shuffle(a)
+            blocks.append(_block(n, a, [(r.randint(1, 2 * 10**9), _msg(r, n, r.choice((n, r.randint(1, n)))))
+                                        for _ in range(r.randint(20, 60))]))
+        out.append("".join(blocks) + "0\n")
+    return out
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+cases()):
+  assert valid(x),i
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

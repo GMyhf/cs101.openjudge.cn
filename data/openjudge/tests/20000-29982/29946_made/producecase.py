@@ -3,10 +3,58 @@ REFERENCE="# External reference: /practice/29946/statistics/\n# Accepted submiss
 SAMPLE='175438 \n4\n'
 GENERATOR_NAME='g29946'
 def g29946(r):
-    n = r.randint(1, 100); s = str(r.randint(1, 9)) + "".join(str(r.randint(0, 9)) for _ in range(n - 1)); return f"{s}\n{r.randint(0, n - 1)}\n"
+    # 题面：k 是正整数 -> k >= 1（原来是 randint(0, n-1)，第 2、16、22 组 k=0 越界）；
+    # 删 k 个后要剩下数字 -> k < 位数，所以一位数时补一位。
+    n = r.randint(1, 100); s = str(r.randint(1, 9)) + "".join(str(r.randint(0, 9)) for _ in range(n - 1))
+    if n == 1:
+        s += str(r.randint(0, 9)); n = 2
+    return f"{s}\n{r.randint(1, n - 1)}\n"
 
 from pathlib import Path
 import random, subprocess, sys, tempfile
+
+
+def valid(text):
+    """题面契约：两行。第一行高精度正整数 n（不超过 250 位，无前导零）；第二行正整数 k，
+    删去 k 个数字后要剩下数字 -> 1 <= k < n 的位数。题面样例第一行带一个行尾空格，
+    所以行尾空格放行，其余格式严格。"""
+    if not text.endswith("\n"):
+        return False
+    rows = text[:-1].split("\n")
+    if len(rows) != 2:
+        return False
+    n, k = rows[0].rstrip(" "), rows[1].rstrip(" ")
+    if not (n.isdigit() and k.isdigit()) or n[0] == "0" or k != str(int(k)):
+        return False
+    return len(n) <= 250 and 1 <= int(k) < len(n)
+
+
+def brute(text):
+    """独立 oracle（短串）：枚举保留哪些位，取最小值。"""
+    from itertools import combinations
+    n, k = text.split()
+    k = int(k)
+    return str(min(int("".join(n[i] for i in keep)) for keep in combinations(range(len(n)), len(n) - k)))
+
+
+def extra_cases():
+    """追加：原数据最长 100 位、没有删完只剩 0 / 删出前导零 / 单调串要从尾部删的专门组。"""
+    r = random.Random(299460)
+    def rnd(m):
+        return str(r.randint(1, 9)) + "".join(str(r.randint(0, 9)) for _ in range(m - 1))
+    out = [
+        "10\n1\n", "100000\n1\n", "1000000\n3\n", "10200\n1\n", "102030\n2\n",
+        "123456789\n3\n", "987654321\n3\n", "11111\n4\n", "90909090\n4\n",
+        "1" + "0" * 249 + "\n1\n",                    # 250 位，删 1 得 0
+        "9" * 250 + "\n249\n",
+        "123456789" * 27 + "1234567\n125\n",          # 250 位非降段 -> 尾删
+        "".join(str(9 - i % 10) for i in range(250)) + "\n100\n",
+        rnd(250) + "\n1\n", rnd(250) + "\n249\n", rnd(250) + "\n125\n",
+        rnd(250) + "\n200\n", rnd(250) + "\n37\n",
+        "5" + "".join(r.choice("05") for _ in range(249)) + "\n120\n",
+        "1" + "".join(r.choice("0123") for _ in range(249)) + "\n60\n",
+    ]
+    return out
 REFERENCE = REFERENCE
 def solve(text):
     with tempfile.TemporaryDirectory(prefix='producecase-run-') as d:
@@ -17,6 +65,8 @@ def solve(text):
 def main():
     data=Path('data'); data.mkdir(exist_ok=True)
     cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(seed)) for seed in range(1, 40)]
+    cases+=extra_cases()
+    assert all(valid(c) for c in cases) and len(set(cases)) == len(cases)
     for i, case in enumerate(cases):
         (data/f'{i}.in').write_text(case); (data/f'{i}.out').write_text(solve(case))
 if __name__=='__main__': main()

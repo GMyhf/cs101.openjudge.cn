@@ -148,10 +148,57 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01084/statistics/\n# Accepted submission: 45386897\n# Source: http://cs101.openjudge.cn/practice/solution/45386897/\n# License: not declared on the submission page; no license is inferred.\n\nimport copy\nimport sys\nsys.setrecursionlimit(1 << 30)\nfound = False\n\ndef check1(x, tmp):\n    for y in graph[x]:\n        if tmp[y]:\n            return False\n    return True\n\ndef check2(x):\n    for y in graph[x]:\n        if judge[y]:\n            return False\n    return True\n\ndef estimate():\n    cnt = 0\n    tmp = copy.deepcopy(judge)\n    for x in range(1, total+1):\n        if check1(x, tmp):\n            cnt += 1\n            for u in graph[x]:\n                tmp[u] = True\n    return cnt\n\ndef dfs(t):\n    global found\n    if t + estimate() > limit:\n        return\n    for x in range(1, total+1):\n        if check2(x):\n            for y in graph[x]:\n                judge[y] = True\n                dfs(t+1)\n                judge[y] = False\n                if found:\n                    return\n            return\n    found = True\n\nfor _ in range(int(input())):\n    n = int(input())\n    lst = list(map(int, input().split()))\n    d, m, nums, total = 2*n+1, lst[0], lst[1:], 0\n    graph = {}\n    for i in range(n):\n        for j in range(n):\n            for k in range(1, n+1):\n                if i+k <= n and j+k <= n:\n                    total += 1\n                    graph[total] = []\n                    for p in range(1, k+1):\n                        graph[total] += [d*i+j+p, d*(i+p)+j-n, d*(i+p)+j-n+k, d*(i+k)+j+p]\n    judge = [False for _ in range(2*n*(n+1)+1)]\n    for num in nums:\n        judge[num] = True\n    limit = estimate()\n    found = False\n    while True:\n        dfs(0)\n        if found:\n            print(limit)\n            break\n        limit += 1\n'
+# 原收录的 AC 提交（即 samplecode.py）答案正确，但 n=5 且火柴齐全时 Python 要跑一分钟以上，
+# 生成 n=4/5 的规模组改用下面的位掩码 IDA*（与独立 C++ oracle 及原提交在小数据上逐组一致）。
+ACCEPTED_REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01084/statistics/\n# Accepted submission: 45386897\n# Source: http://cs101.openjudge.cn/practice/solution/45386897/\n# License: not declared on the submission page; no license is inferred.\n\nimport copy\nimport sys\nsys.setrecursionlimit(1 << 30)\nfound = False\n\ndef check1(x, tmp):\n    for y in graph[x]:\n        if tmp[y]:\n            return False\n    return True\n\ndef check2(x):\n    for y in graph[x]:\n        if judge[y]:\n            return False\n    return True\n\ndef estimate():\n    cnt = 0\n    tmp = copy.deepcopy(judge)\n    for x in range(1, total+1):\n        if check1(x, tmp):\n            cnt += 1\n            for u in graph[x]:\n                tmp[u] = True\n    return cnt\n\ndef dfs(t):\n    global found\n    if t + estimate() > limit:\n        return\n    for x in range(1, total+1):\n        if check2(x):\n            for y in graph[x]:\n                judge[y] = True\n                dfs(t+1)\n                judge[y] = False\n                if found:\n                    return\n            return\n    found = True\n\nfor _ in range(int(input())):\n    n = int(input())\n    lst = list(map(int, input().split()))\n    d, m, nums, total = 2*n+1, lst[0], lst[1:], 0\n    graph = {}\n    for i in range(n):\n        for j in range(n):\n            for k in range(1, n+1):\n                if i+k <= n and j+k <= n:\n                    total += 1\n                    graph[total] = []\n                    for p in range(1, k+1):\n                        graph[total] += [d*i+j+p, d*(i+p)+j-n, d*(i+p)+j-n+k, d*(i+k)+j+p]\n    judge = [False for _ in range(2*n*(n+1)+1)]\n    for num in nums:\n        judge[num] = True\n    limit = estimate()\n    found = False\n    while True:\n        dfs(0)\n        if found:\n            print(limit)\n            break\n        limit += 1\n'
 LANGUAGE='Python3'
 NUMBER=1084
 SAMPLE='2\n2\n0\n3\n3 12 17 23\n'
+REFERENCE='import sys\ndef solve(n, gone):\n    H = lambda r, c: r * (2 * n + 1) + c\n    V = lambda r, c: r * (2 * n + 1) + n + c\n    sq = []\n    for s in range(1, n + 1):\n        for r in range(n - s + 1):\n            for c in range(n - s + 1):\n                m = 0\n                for i in range(s):\n                    m |= 1 << H(r, c + i) | 1 << H(r + s, c + i) | 1 << V(r + i, c) | 1 << V(r + i, c + s)\n                sq.append(m)\n    bits = {m: [1 << b for b in range(64) if m >> b & 1] for m in sq}\n    def h(g):\n        c = 0\n        for s in sq:\n            if not s & g:\n                c += 1; g |= s\n        return c\n    def dfs(g, d, lim):\n        hv = h(g)\n        if d + hv > lim: return False\n        if hv == 0: return True\n        for s in sq:\n            if not s & g: break\n        for b in bits[s]:\n            if dfs(g | b, d + 1, lim): return True\n        return False\n    lim = 0\n    while not dfs(gone, 0, lim): lim += 1\n    return lim\ndata = sys.stdin.read().split(); t = int(data[0]); k = 1; out = []\nfor _ in range(t):\n    n = int(data[k]); m = int(data[k + 1]); g = 0\n    for x in data[k + 2:k + 2 + m]: g |= 1 << (int(x) - 1)\n    k += 2 + m; out.append(str(solve(n, g)))\nprint("\\n".join(out))\n'
+def valid(text):
+    """题面契约：首行 T；每组一行 n(1..5)，下一行 k 及 k 个被移走的火柴编号（1..2n(n+1)，互不相同）。"""
+    lines = text.split('\n')
+    if lines and lines[-1] == '':
+        lines.pop()
+    try:
+        if not lines or not lines[0].isdigit():
+            return False
+        t = int(lines[0])
+        if t < 1 or len(lines) != 1 + 2 * t:
+            return False
+        for c in range(t):
+            if not lines[1 + 2 * c].isdigit():
+                return False
+            n = int(lines[1 + 2 * c])
+            if not 1 <= n <= 5:
+                return False
+            toks = lines[2 + 2 * c].split(' ')
+            if not all(x.isdigit() for x in toks):
+                return False
+            k, ids = int(toks[0]), list(map(int, toks[1:]))
+            if len(ids) != k or len(set(ids)) != k or any(not 1 <= x <= 2 * n * (n + 1) for x in ids):
+                return False
+        return True
+    except Exception:
+        return False
+
+def extra_cases():
+    """补充覆盖：n=4、n=5（含火柴齐全的最难情形）、n=1 边界、全部移走（答案 0）、多组混合。"""
+    r = random.Random(1084_2026)
+    def grp(n, k):
+        gone = sorted(r.sample(range(1, 2 * n * (n + 1) + 1), k))
+        return f"{n}\n{k}" + "".join(f" {x}" for x in gone)
+    fmt = lambda rows: f"{len(rows)}\n" + "\n".join(rows) + "\n"
+    return [
+        fmt([grp(5, 0)]),
+        fmt([grp(4, 0)]),
+        fmt([grp(1, 0), grp(1, 4), grp(1, 1), grp(2, 12), grp(5, 60), grp(3, 24)]),
+        fmt([grp(5, r.randint(1, 8)) for _ in range(5)]),
+        fmt([grp(4, r.randint(1, 8)) for _ in range(5)]),
+        fmt([grp(r.randint(1, 5), r.randint(0, 10)) for _ in range(10)]),
+        fmt([grp(5, 0), grp(4, 0), grp(3, 0), grp(2, 0), grp(1, 0)]),
+        fmt([grp(5, k) for k in (1, 2, 3, 15, 30)]),
+    ]
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -159,7 +206,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])+extra_cases()
+  assert all(valid(x) for x in cases)
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

@@ -417,7 +417,211 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01686/statistics/\n# Accepted submission: 48613173\n# Source: http://cs101.openjudge.cn/practice/solution/48613173/\n# License: not declared on the submission page; no license is inferred.\n\nfrom random import random\ndef check(s1,s2):\n    for _ in range(10):\n        a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z = random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random(), random()\n        if abs(eval(s1)-eval(s2))>0.000001:\n            return False\n    return True\nn=int(input())\nfor _ in range(n):\n    s1=input()\n    s2=input()\n    print("YES" if check(s1,s2) else "NO")\n'
+# ---- 题面契约与 1686 专用生成器 ----
+# 题面写“所有运算符的优先级相同，运算次序从左至右”，而原数据（及外部 AC 代码）按常规优先级，
+# 二者在 a+b*2 这类写法上结论相反。新数据只生成“两种理解结果一致”的表达式（gen_file 里逐条断言），
+# 不论按哪种理解都能得到同一答案。
+_ALLOWED = set("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()+-* \t")
+LIM16 = 32767
+
+def _padd(p, q, s=1):
+    r = dict(p)
+    for k, v in q.items():
+        r[k] = r.get(k, 0) + s * v
+        if r[k] == 0: del r[k]
+    return r
+
+def _pmul(p, q):
+    r = {}
+    for k1, v1 in p.items():
+        for k2, v2 in q.items():
+            e = dict(k1)
+            for var, ex in k2: e[var] = e.get(var, 0) + ex
+            k = tuple(sorted(e.items()))
+            r[k] = r.get(k, 0) + v1 * v2
+            if r[k] == 0: del r[k]
+    return r
+
+def _poly(expr, usual=False):
+    """把表达式展开成多项式 {单项式: 系数}；usual=False 按题面（同级、从左至右），True 按常规优先级。语法错抛异常。"""
+    toks = [c for c in expr if c not in ' \t']
+    pos = [0]
+    def peek(): return toks[pos[0]] if pos[0] < len(toks) else None
+    def atom():
+        c = peek()
+        if c is None: raise ValueError
+        pos[0] += 1
+        if c == '(':
+            v = seq()
+            if peek() != ')': raise ValueError
+            pos[0] += 1; return v
+        if c.isdigit(): return {(): int(c)} if c != '0' else {}
+        if c.isalpha(): return {((c, 1),): 1}
+        raise ValueError
+    def apply(op, a, b):
+        return _padd(a, b) if op == '+' else _padd(a, b, -1) if op == '-' else _pmul(a, b)
+    def term():
+        v = atom()
+        while peek() == '*':
+            pos[0] += 1; v = _pmul(v, atom())
+        return v
+    def seq():
+        if usual:
+            v = term()
+            while peek() in ('+', '-'):
+                op = peek(); pos[0] += 1; v = apply(op, v, term())
+            return v
+        v = atom()
+        while peek() in ('+', '-', '*'):
+            op = peek(); pos[0] += 1; v = apply(op, v, atom())
+        return v
+    v = seq()
+    if pos[0] != len(toks): raise ValueError
+    return v
+
+def valid(text):
+    try:
+        if not text.endswith('\n') or '\r' in text: return False
+        lines = text[:-1].split('\n')
+        if not lines[0].isdigit(): return False
+        n = int(lines[0])
+        if not 1 <= n <= 20 or len(lines) != 2 * n + 1: return False
+        for ln in lines[1:]:
+            if not ln.strip() or len(ln) > 80 or set(ln) - _ALLOWED: return False   # 无空行、≤80 字符、字符集
+            p = _poly(ln)                                                          # 语法正确（按题面的同级从左至右）
+            if any(abs(c) > LIM16 for c in p.values()): return False             # 系数不超过 16 位整数
+            if any(ex > LIM16 for k in p for _, ex in k): return False           # 指数不超过 16 位整数
+        return True
+    except Exception:
+        return False
+
+def _solve_text(text):
+    lines = text[:-1].split('\n'); out = []
+    for i in range(int(lines[0])):
+        out.append("YES" if _poly(lines[2 * i + 1]) == _poly(lines[2 * i + 2]) else "NO")
+    return "\n".join(out) + "\n"
+
+# AST：叶子为字符串，内部节点为 (op, l, r)
+def _show(t, r, ws):
+    def sp():
+        if ws and r.random() < ws: return r.choice([' ', '\t', '  ', ' \t'])
+        return ''
+    def go(t, need):
+        if isinstance(t, str): s = t
+        else:
+            op, a, b = t
+            la = go(a, op == '*' and not isinstance(a, str) and a[0] in '+-')
+            rb = go(b, not isinstance(b, str))
+            s = la + sp() + op + sp() + rb
+        if need or (not isinstance(t, str) and r.random() < .08) or (isinstance(t, str) and r.random() < .03):
+            s = '(' + sp() + s + sp() + ')'
+        return s
+    return go(t, False)
+
+def _rand_tree(r, size, vars_, digits='123456789'):
+    if size <= 1:
+        return r.choice(vars_) if vars_ and r.random() < .7 else r.choice(digits)
+    k = r.randint(1, size - 1)
+    op = r.choice('++--**' if size < 6 else '++--*')
+    return (op, _rand_tree(r, k, vars_, digits), _rand_tree(r, size - k, vars_, digits))
+
+def _rewrite(r, t):
+    """保持等价的随机变形。"""
+    if isinstance(t, str):
+        c = r.random()
+        if t.isdigit() and t != '0' and int(t) >= 2 and c < .3:
+            a = r.randint(1, int(t) - 1); return ('+', str(a), str(int(t) - a))
+        if c < .1: return ('*', t, '1') if r.random() < .5 else ('*', '1', t)
+        if c < .15: return ('+', t, '0') if r.random() < .5 else ('-', t, '0')
+        return t
+    op, a, b = t
+    if r.random() < .5:
+        a = _rewrite(r, a); b = _rewrite(r, b)
+    c = r.random()
+    if op in '+*' and c < .35: return (op, b, a)
+    if op == '*' and c < .55 and not isinstance(b, str) and b[0] in '+-':
+        return (b[0], ('*', a, b[1]), ('*', a, b[2]))
+    if op == '*' and c < .55 and not isinstance(a, str) and a[0] in '+-':
+        return (a[0], ('*', a[1], b), ('*', a[2], b))
+    if op == '-' and c < .7 and not isinstance(b, str) and b[0] in '+-':
+        return ('-' if b[0] == '+' else '+', ('-', a, b[1]), b[2])
+    if op == '+' and c < .7 and not isinstance(b, str) and b[0] in '+-':
+        return (b[0], ('+', a, b[1]), b[2])
+    if op == '+' and c < .8 and a == b: return ('*', '2', a)
+    return (op, a, b)
+
+def _perturb(r, t, vars_):
+    if isinstance(t, str):
+        c = r.random()
+        if t.isalpha() and c < .4: return t.swapcase()
+        if t.isdigit() and c < .7: return str((int(t) + r.choice([1, 8])) % 10)
+        return r.choice(vars_ + ['1', '2'])
+    op, a, b = t
+    c = r.random()
+    if c < .25: return (r.choice([o for o in '+-*' if o != op]), a, b)
+    if c < .35 and op == '-': return (op, b, a)
+    if c < .7: return (op, _perturb(r, a, vars_), b)
+    return (op, a, _perturb(r, b, vars_))
+
+def _ok(s):
+    if len(s) > 80: return False
+    p = _poly(s)
+    if p != _poly(s, usual=True): return False
+    return not (any(abs(c) > LIM16 for c in p.values()) or any(ex > LIM16 for k in p for _, ex in k))
+
+def _pair(r, style):
+    while True:
+        if style == 'case':
+            vars_ = list('aAbB')
+        elif style == 'many':
+            vars_ = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        else:
+            vars_ = r.sample(list('abcdexyzXYZ'), r.randint(1, 4))
+        ws = r.choice([0, 0, .15, .5]) if style != 'ws' else .7
+        if style == 'power':
+            # 高次幂：x 的 k 次方 vs k±1 次方，卡掉随机代 [0,1) 小数再比差值的写法
+            v = r.choice('abcxyzAB'); k = r.randint(14, 36)
+            e1 = '*'.join([v] * k)
+            k2 = k if r.random() < .4 else k + r.choice([-1, 1])
+            parts = [v] * k2; e2 = ''
+            while parts:
+                g = r.randint(1, min(4, len(parts))); grp = '*'.join(parts[:g]); parts = parts[g:]
+                e2 = (e2 + '*' if e2 else '') + ('(' + grp + ')' if g > 1 else grp)
+            if r.random() < .5: e1, e2 = e2, e1
+        elif style == 'const':
+            t1 = _rand_tree(r, r.randint(2, 9), [], '0123456789')
+            t2 = _rand_tree(r, r.randint(1, 5), [], '0123456789')
+            e1, e2 = _show(t1, r, ws), _show(t2, r, ws)
+            if r.random() < .5:
+                # 找一个数值相同的 t2
+                val = _poly(e1).get((), 0)
+                if 0 <= val <= 9: e2 = str(val)
+                elif -9 <= val < 0: e2 = '0-' + str(-val)
+        else:
+            t1 = _rand_tree(r, r.randint(1, 12 if style != 'big' else 20), vars_)
+            t2 = t1
+            for _ in range(r.randint(1, 6)): t2 = _rewrite(r, t2)
+            if r.random() < .5:
+                t2 = _perturb(r, t2, vars_)
+            e1, e2 = _show(t1, r, ws), _show(t2, r, ws)
+            if r.random() < .5: e1, e2 = e2, e1
+        if e1 and e2 and _ok(e1) and _ok(e2):
+            return e1, e2
+
+def gen_file(seed):
+    r = random.Random(1686 * 1_000_003 + seed)
+    if seed <= 3: styles = ['const']
+    elif seed <= 6: styles = ['case']
+    elif seed <= 9: styles = ['power']
+    elif seed <= 12: styles = ['ws']
+    elif seed <= 15: styles = ['many']
+    else: styles = ['rand', 'rand', 'big', 'case', 'power', 'ws', 'const', 'many']
+    n = 1 if seed in (1, 4) else 20 if seed >= 30 else r.randint(2, 20)
+    rows = []
+    for _ in range(n): rows += _pair(r, r.choice(styles))
+    return f"{n}\n" + "\n".join(rows) + "\n"
+
+REFERENCE='# 参考解（审计时重写）：把两边精确展开成多项式再比较；按题面“同级、从左至右”求值。\n# 生成的数据保证按常规优先级求值结论相同。原外部 AC 代码（samplecode.py）用随机小数代入 eval，\n# 碰上大写变量会 NameError，碰上高次幂会因下溢误判，故不再作为参考解。\nimport sys\ndef padd(p, q, s=1):\n    r = dict(p)\n    for k, v in q.items():\n        r[k] = r.get(k, 0) + s * v\n        if r[k] == 0: del r[k]\n    return r\ndef pmul(p, q):\n    r = {}\n    for k1, v1 in p.items():\n        for k2, v2 in q.items():\n            e = dict(k1)\n            for var, ex in k2: e[var] = e.get(var, 0) + ex\n            k = tuple(sorted(e.items()))\n            r[k] = r.get(k, 0) + v1 * v2\n            if r[k] == 0: del r[k]\n    return r\ndef poly(expr):\n    toks = [c for c in expr if c not in \' \\t\\r\']\n    pos = 0\n    def atom():\n        nonlocal pos\n        c = toks[pos]; pos += 1\n        if c == \'(\':\n            v = seq(); pos += 1; return v\n        if c.isdigit(): return {(): int(c)} if c != \'0\' else {}\n        return {((c, 1),): 1}\n    def seq():\n        nonlocal pos\n        v = atom()\n        while pos < len(toks) and toks[pos] in \'+-*\':\n            op = toks[pos]; pos += 1; w = atom()\n            v = padd(v, w) if op == \'+\' else padd(v, w, -1) if op == \'-\' else pmul(v, w)\n        return v\n    return seq()\nlines = sys.stdin.read().split(\'\\n\')\nn = int(lines[0])\nfor i in range(n):\n    print("YES" if poly(lines[2 * i + 1]) == poly(lines[2 * i + 2]) else "NO")\n'
 LANGUAGE='Python3'
 NUMBER=1686
 SAMPLE='3\n(a+b-c)*2\n(a+a)+(b*2)-(3*c)+c\na*2-(a+c)+((a+c+e)*2)\n3*a+c+(2*e)\n(a-b)*(a-b)\n(a*a)-(2*a*b)-(b*b)\n'
@@ -428,7 +632,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[gen_file(s) for s in range(1, 40)]
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

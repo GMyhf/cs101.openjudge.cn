@@ -5,14 +5,61 @@ SAMPLE_IN='3\n5\n28\n792\n'
 def g4010(r):
     q=r.randint(1,5);return str(q)+"\n"+"\n".join(str(r.randint(1,100000)) for _ in range(q))+"\n"
 
-with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as h:
- h.write(REFERENCE_SOURCE);h.flush();root=Path(__file__).parent/"data";seen=[SAMPLE_IN]
- for i in range(40):
-  if i==0:c=SAMPLE_IN
-  else:
-   for j in range(100):
-    c=g4010(random.Random(4010+i+j*1000))
-    if c not in seen:break
-   else:raise AssertionError("diversity")
-  seen.append(c);p=subprocess.run(["python3",h.name],input=c,text=True,capture_output=True,check=True)
-  (root/f"{i}.in").write_text(c,encoding="utf-8");(root/f"{i}.out").write_text(p.stdout,encoding="utf-8")
+
+def valid(text):
+    """题面契约：首行 k（1<=k<=200），其后恰 k 行，每行一个位数 <=200 的正整数。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not lines[0].isdigit() or lines[0][0] == "0" or not 1 <= int(lines[0]) <= 200:
+        return False
+    if len(lines) != int(lines[0]) + 1:
+        return False
+    return all(x.isdigit() and x[0] != "0" and len(x) <= 200 for x in lines[1:])
+
+
+def fmt(ns):
+    return f"{len(ns)}\n" + "\n".join(map(str, ns)) + "\n"
+
+
+def extra_cases():
+    """补强：200 位满长（long long 读不下）、k=200、n=1、周期 500 的倍数（结果为 1）、
+    结果不足 4 位要去前导 0、10^199 / 99..9 这类极端串。"""
+    r = random.Random(40100)
+    big = lambda d: r.randint(10 ** (d - 1), 10 ** d - 1)
+    out = []
+    out.append(fmt([big(200) for _ in range(200)]))
+    out.append(fmt([big(r.randint(1, 200)) for _ in range(200)]))
+    out.append(fmt([1, 2, 3, 4, 499, 500, 501, 1000, 10 ** 199, 10 ** 200 - 1, 5 * 10 ** 199, 500 * (10 ** 197 + 7)]))
+    small = [x for x in range(1, 2001) if pow(2011, x, 10000) < 1000]
+    out.append(fmt(small[:200]))
+    out.append(fmt([x + 500 * big(197) for x in small[:100]]))
+    out.append(fmt([1]))
+    out.append(fmt([10 ** 199]))
+    out.append(fmt([big(19), big(20), 2 ** 63, 2 ** 64, 2 ** 63 - 1, 10 ** 18]))
+    return out
+
+
+def main():
+ with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as h:
+  h.write(REFERENCE_SOURCE);h.flush();root=Path(__file__).parent/"data";seen=[SAMPLE_IN]
+  cases=[]
+  for i in range(40):
+   if i==0:c=SAMPLE_IN
+   else:
+    for j in range(100):
+     c=g4010(random.Random(4010+i+j*1000))
+     if c not in seen:break
+    else:raise AssertionError("diversity")
+   seen.append(c);cases.append(c)
+  for c in extra_cases():
+   assert c not in cases
+   cases.append(c)
+  for i,c in enumerate(cases):
+   assert valid(c), i
+   p=subprocess.run(["python3",h.name],input=c,text=True,capture_output=True,check=True)
+   (root/f"{i}.in").write_text(c,encoding="utf-8");(root/f"{i}.out").write_text(p.stdout,encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

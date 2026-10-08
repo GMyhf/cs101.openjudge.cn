@@ -1,5 +1,28 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+
+def valid(text):
+    """题面：第一行 n (2<=n<=100)，随后 n×n 矩阵，元素属于 {0,1,2,3}；对角线为 0；
+    i!=j 时 a_ij 与 a_ji 恰有一个是 3，另一个小于 3。"""
+    lines=text.split("\n")
+    if not lines or lines[-1]!="" or not lines[0].isdigit() or lines[0]!=str(int(lines[0])):
+        return False
+    n=int(lines[0])
+    if not 2<=n<=100 or len(lines)!=n+2:
+        return False
+    a=[]
+    for line in lines[1:n+1]:
+        row=line.split(" ")
+        if len(row)!=n or any(t not in ("0","1","2","3") for t in row):
+            return False
+        a.append(list(map(int,row)))
+    for i in range(n):
+        if a[i][i]!=0:
+            return False
+        for j in range(i+1,n):
+            if sorted((a[i][j],a[j][i]))[1]!=3 or min(a[i][j],a[j][i])==3:
+                return False
+    return True
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -23,9 +46,33 @@ def generate(number, seed):
             x=r.randrange(0,w-3);s="".join(grid[y][x:x+4]);words.append(s)
         return f"{h} {w} {len(words)}\n"+"\n".join("".join(x) for x in grid)+"\n"+"\n".join(words)+"\n"
     if number==2992:
-        n=r.randint(2,16);a=[[0]*n for _ in range(n)]
+        sizes=[2,2,3,3,4,5,7,9,10,15,20,33,50,64,99,100,100,100]
+        n=sizes[seed-1] if seed<=len(sizes) else r.choice([r.randint(2,100),100,r.randint(90,100)])
+        kind=seed%6
+        # beats[i][j]=True 表示 i 赢 j
+        if kind==0 and n%2==1:
+            # 正则锦标赛：人人赢 (n-1)/2 场，全部平分，答案 1
+            h=(n-1)//2;win=lambda i,j:(j-i)%n in range(1,h+1)
+        elif kind==1:
+            # 平分的头名都不是 1 号且有多个：考「取编号最小」与「取编号最大」的区别
+            order=list(range(n));r.shuffle(order);rank={v:k for k,v in enumerate(order)}
+            win=lambda i,j:rank[i]<rank[j]
+        elif kind==2:
+            # 唯一冠军是最后一名学生
+            win=lambda i,j:True if i==n-1 else (False if j==n-1 else r.random()<.5)
+        else:
+            win=lambda i,j:r.random()<.5
+        a=[[0]*n for _ in range(n)]
         for i in range(n):
-            for j in range(i):a[i][j],a[j][i]=(3,r.randrange(3)) if r.randrange(2) else (r.randrange(3),3)
+            for j in range(i+1,n):
+                w=win(i,j)
+                lose=r.randrange(3)
+                a[i][j],a[j][i]=(3,lose) if w else (lose,3)
+        if kind==1 and n>=3:
+            # 把全序锦标赛前几名之间做成循环，造出多个并列冠军
+            top=sorted(range(n),key=lambda v:rank[v])[:3]
+            x,y,z=top
+            a[z][x],a[x][z]=3,r.randrange(3)
         return f"{n}\n"+"\n".join(" ".join(map(str,row)) for row in a)+"\n"
     if number==1084:
         rows=[]

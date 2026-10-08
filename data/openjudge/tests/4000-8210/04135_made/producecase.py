@@ -14,13 +14,57 @@ SAMPLE_IN = '7 5\n100\n400\n300\n100\n500\n101\n400\n'
 SAMPLE_OUT = '500\n'
 REFERENCE_SOURCE = 'def minMaxMonthlyExpense(N, M, expenses):\n    def can_split(max_expense):\n        """ 判断是否能合并至多 M 个花费，使最大花费不超过 max_expense """\n        months = 1  # 记录当前使用的月份数\n        current_sum = 0 # 当前月的开销\n        for cost in expenses:\n            if current_sum + cost > max_expense:\n                months += 1\n                if months > M:\n                    return False\n                current_sum = cost\n            else:\n                current_sum += cost\n        return True\n\n    # 可能的最小开销范围。所以二分是在 [left, right) 区间内进行的\n    left, right = max(expenses), sum(expenses) + 1\n    ans = -1\n    while left < right: # 二分查找最小的 "最大月度开销"\n        mid = (left + right) // 2\n        if can_split(mid):\n            ans = mid   # 记录可行的 `mid`\n            right = mid # 继续尝试更小的值\n        else:\n            left = mid + 1\n    return ans\n\n# 读取输入\nN, M = map(int, input().split())\nexpenses = [int(input()) for _ in range(N)]\n\n# 计算并输出答案\nprint(minMaxMonthlyExpense(N, M, expenses))\n'
 
+def valid(text):
+    """题面：首行 N M（1≤N≤100000，1≤M≤N），随后恰 N 行，每行一个 1..10000 的整数。"""
+    if not text.endswith("\n"):
+        return False
+    L = text[:-1].split("\n")
+    isint = lambda x: x.isdigit() and x[0] != "0"
+    h = L[0].split(" ")
+    if len(h) != 2 or not all(isint(x) for x in h):
+        return False
+    n, m = map(int, h)
+    if not (1 <= n <= 100000 and 1 <= m <= n) or len(L) != n + 1:
+        return False
+    return all(isint(x) and int(x) <= 10000 for x in L[1:])
+
+
+def fmt(months, values):
+    return f"{len(values)} {months}\n" + "\n".join(map(str, values)) + "\n"
+
+
 def g4135(r):
     n = r.randint(5, 100); months = r.randint(1, n)
     values = [r.randint(1, 10000) for _ in range(n)]
-    return f"{n} {months}\n" + "\n".join(map(str, values)) + "\n"
+    return fmt(months, values)
+
+
+def special(i):
+    r = random.Random(NUMBER * 100 + i)
+    if i == 10:
+        return "1 1\n1\n"
+    if i == 11:  # M=1：答案为总和
+        return fmt(1, [r.randint(1, 10000) for _ in range(10)])
+    if i == 12:  # M=N：答案为最大值
+        return fmt(12, [r.randint(1, 10000) for _ in range(12)])
+    n = 100000
+    if i == 13:  # 满规模 M=1，答案 1e9（卡逐个枚举答案）
+        return fmt(1, [10000] * n)
+    if i == 14:  # 满规模 M=N
+        return fmt(n, [r.randint(1, 10000) for _ in range(n)])
+    if i == 15:  # 一个极大值淹没在小值里
+        v = [1] * n; v[r.randrange(n)] = 10000
+        return fmt(r.randint(2, 50), v)
+    if i == 16:
+        return fmt(2, [r.randint(1, 10000) for _ in range(n)])
+    if i == 17:
+        return fmt(n - 1, [r.randint(1, 10000) for _ in range(n)])
+    return fmt(r.randint(2, 5000) if i % 2 else r.randint(5000, n), [r.randint(1, 10000) for _ in range(n)])
+
 
 def build_cases():
-    return [SAMPLE_IN] + [g4135(random.Random(NUMBER + i)) for i in range(1, 20)]
+    # 1..9 沿用原生成器的随机小数据；10..19 补边界与满规模组（组数保持 20）
+    return [SAMPLE_IN] + [g4135(random.Random(NUMBER + i)) for i in range(1, 10)] + [special(i) for i in range(10, 20)]
 
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
@@ -33,6 +77,7 @@ def solve_reference(content):
 
 def main():
     cases = build_cases()
+    assert all(valid(c) for c in cases) and len(set(cases)) == len(cases)
     assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
     assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
     root = Path(__file__).parent / "data"

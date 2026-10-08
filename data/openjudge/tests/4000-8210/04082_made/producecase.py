@@ -58,8 +58,121 @@ def g4082(r):
     values = tokens(root)
     return str(len(values)) + "\n" + " ".join(values) + "\n"
 
+def valid(text):
+    """题面契约：第一行结点数 n（不大于 50），第二行 n 个两字符结点，
+    编号为小写字母或虚结点 $，标记 0/1；整体须是一棵合法“伪满二叉树”的前序：
+    内部结点恰有两个孩子、虚结点只能是叶且不会成对出现、根（原树根无兄弟）
+    若非叶则右孩子为 $。"""
+    lines = text.split("\n")
+    if not text.endswith("\n") or len(lines) != 3:
+        return False
+    head = lines[0].split()
+    if len(head) != 1 or not head[0].isdigit():
+        return False
+    n = int(head[0])
+    toks = lines[1].split(" ")
+    if not (1 <= n <= 50) or len(toks) != n:
+        return False
+    for t in toks:
+        if len(t) != 2 or t[1] not in "01":
+            return False
+        if not ("a" <= t[0] <= "z" or t[0] == "$"):
+            return False
+        if t[0] == "$" and t[1] != "1":
+            return False
+    pos = 0
+
+    def parse():
+        # 返回子树是否为虚结点；失败抛 ValueError
+        nonlocal pos
+        if pos >= n:
+            raise ValueError
+        t = toks[pos]
+        pos += 1
+        if t[1] == "1":
+            return t[0] == "$"
+        left = parse()
+        right = parse()
+        if left and right:
+            raise ValueError
+        return False
+
+    try:
+        if toks[0][0] == "$":
+            return False
+        pos = 1
+        if toks[0][1] == "0":
+            if parse():          # 根的左孩子（第一个子结点）必须是真结点
+                return False
+            if pos >= n or toks[pos] != "$1":
+                return False     # 原树根没有兄弟，右孩子只能是虚结点
+            pos += 1
+    except (ValueError, RecursionError):
+        return False
+    return pos == n
+
+
+def tokens_from_parents(parent, labels):
+    """parent[i] < i；按左儿子右兄弟转二叉树、补 $、前序输出。"""
+    k = len(parent)
+    children = [[] for _ in range(k)]
+    for v in range(1, k):
+        children[parent[v]].append(v)
+    left = [None] * k
+    right = [None] * k
+    for v in range(k):
+        if children[v]:
+            left[v] = children[v][0]
+            for a, b in zip(children[v], children[v][1:]):
+                right[a] = b
+    out = []
+    stack = [0]
+    while stack:
+        v = stack.pop()
+        if v == "$":
+            out.append("$1")
+            continue
+        l, r = left[v], right[v]
+        if l is None and r is None:
+            out.append(labels[v] + "1")
+            continue
+        out.append(labels[v] + "0")
+        stack.append("$" if r is None else r)
+        stack.append("$" if l is None else l)
+    return str(len(out)) + "\n" + " ".join(out) + "\n"
+
+
+def extra_cases():
+    """补规模与形状：原数据最多 23 个结点，题面上限 50。"""
+    r = random.Random(NUMBER * 7 + 1)
+    letters = "abcdefghijklmnopqrstuvwxyz"
+    cases = ["1\na1\n"]                                       # 只有根
+    cases.append(tokens_from_parents([-1, 0], "ab"))            # 两个结点
+    cases.append(tokens_from_parents([-1, 0, 0], "abc"))
+    cases.append(tokens_from_parents([-1] + list(range(24)), letters))        # 链：25 个真结点 + 24 个 $
+    cases.append(tokens_from_parents([-1] + [0] * 24, letters))               # 菊花：25 个结点（共 49 个 token）
+    cases.append(tokens_from_parents([-1] + [(v - 1) // 3 for v in range(1, 26)], letters[::-1]))
+    tries = 0
+    while len(cases) < 16:
+        tries += 1
+        k = r.randint(20, 26)
+        mode = len(cases) % 3
+        if mode == 0:
+            par = [-1] + [r.randrange(v) for v in range(1, k)]
+        elif mode == 1:
+            par = [-1] + [r.randrange(max(0, v - 3), v) for v in range(1, k)]
+        else:
+            par = [-1] + [r.randrange(min(v, 3)) for v in range(1, k)]
+        labs = list(letters)
+        r.shuffle(labs)
+        c = tokens_from_parents(par, labs[:k])
+        if int(c.split()[0]) <= 50 and c not in cases:
+            cases.append(c)
+    return cases
+
+
 def build_cases():
-    return [SAMPLE_IN] + [g4082(random.Random(NUMBER + i)) for i in range(1, 20)]
+    return [SAMPLE_IN] + [g4082(random.Random(NUMBER + i)) for i in range(1, 20)] + extra_cases()
 
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:

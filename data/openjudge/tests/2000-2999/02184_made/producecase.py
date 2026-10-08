@@ -148,10 +148,78 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02184/statistics/\n# Accepted submission: 41485620\n# Source: http://cs101.openjudge.cn/practice/solution/41485620/\n# License: not declared on the submission page; no license is inferred.\n\n#import pdb\n#pdb.set_trace()\nn=int(input())\ndata=[]\nfor i in range(n):\n    data.append(list(map(int,input().split())))\ndata.sort(key=lambda x:x[0],reverse=True)\nmx=0\nfor i in range(n):\n    if data[i][0]>0:\n        mx+=data[i][0]\n    else:\n        break\ninf=10000000;\ndp=[-inf for i in range(mx+1)]\nmx=0\ndp[0]=0\nfor i in range(n):\n    if data[i][0]>0:\n        mx+=data[i][0]\n        for j in range(mx,data[i][0]-1,-1):\n            dp[j]=max(dp[j],dp[j-data[i][0]]+data[i][1])\n    else:\n        for j in range(0,mx+data[i][0]+1):\n            dp[j]=max(dp[j],dp[j-data[i][0]]+data[i][1])\n\nans=0\nfor i in range(mx+1):\n    if dp[i]>0:\n        ans=max(ans,dp[i]+i)\nprint(ans)\n'
+REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02184/statistics/\n# Accepted submission: 41485620\n# Source: http://cs101.openjudge.cn/practice/solution/41485620/\n# License: not declared on the submission page; no license is inferred.\n\n#import pdb\n#pdb.set_trace()\nn=int(input())\ndata=[]\nfor i in range(n):\n    data.append(list(map(int,input().split())))\ndata.sort(key=lambda x:x[0],reverse=True)\nmx=0\nfor i in range(n):\n    if data[i][0]>0:\n        mx+=data[i][0]\n    else:\n        break\ninf=10000000;\ndp=[-inf for i in range(mx+1)]\nmx=0\ndp[0]=0\nfor i in range(n):\n    if data[i][0]>0:\n        mx+=data[i][0]\n        for j in range(mx,data[i][0]-1,-1):\n            dp[j]=max(dp[j],dp[j-data[i][0]]+data[i][1])\n    else:\n        for j in range(0,mx+data[i][0]+1):\n            dp[j]=max(dp[j],dp[j-data[i][0]]+data[i][1])\n\n# 2026-10 数据审计修正：原提交写成 dp[i]>0，漏掉了 TF 恰为 0 的方案（如单头牛 5 0 应输出 5）\nans=0\nfor i in range(mx+1):\n    if dp[i]>=0:\n        ans=max(ans,dp[i]+i)\nprint(ans)\n'
 LANGUAGE='Python3'
 NUMBER=2184
 SAMPLE='5\n-5 7\n8 -6\n6 -3\n2 1\n-8 -5\n'
+def valid(text):
+    """题面契约：第 1 行 N（1 <= N <= 100），随后 N 行各两个整数 Si Fi（单空格分隔），
+    -1000 <= Si, Fi <= 1000。"""
+    if not text.endswith('\n') or '\r' in text:
+        return False
+    lines = text[:-1].split('\n')
+    if not lines[0].isdigit() or lines[0][0] == '0':
+        return False
+    n = int(lines[0])
+    if not (1 <= n <= 100) or len(lines) != n + 1:
+        return False
+    for line in lines[1:]:
+        toks = line.split(' ')
+        if len(toks) != 2:
+            return False
+        for t in toks:
+            body = t[1:] if t.startswith('-') else t
+            if not body.isdigit() or (body[0] == '0' and body != '0') or t == '-0':
+                return False
+            if not (-1000 <= int(t) <= 1000):
+                return False
+    return True
+
+
+def _best2184(cows, strict=False):
+    """小规模精确解（字典 DP：TS -> 最大 TF）；strict=True 模拟把 TF>=0 写成 TF>0 的错法。"""
+    dp = {0: 0}
+    for s, f in cows:
+        nd = dict(dp)
+        for ts, tf in dp.items():
+            k = ts + s
+            if nd.get(k, -10 ** 9) < tf + f: nd[k] = tf + f
+        dp = nd
+    ok = [ts + tf for ts, tf in dp.items() if ts >= 0 and (tf > 0 if strict else tf >= 0)]
+    return max(ok + [0])
+
+
+def gen2184(seed):
+    r = random.Random(2184_000 + seed)
+    v = lambda lo=-1000, hi=1000: r.randint(lo, hi)
+    if seed == 1:   cows = [(5, 0)]                          # 最优解 TF 恰为 0
+    elif seed == 2: cows = [(0, 7)]                          # 最优解 TS 恰为 0
+    elif seed == 3: cows = [(-1, -1)]                        # 无可选：0
+    elif seed == 4: cows = [(0, 0)]
+    elif seed == 5: cows = [(1000, 1000)] * 70               # 全取，答案 140000（再多 DP 参考解就逼近时限一半）
+    elif seed == 6: cows = [(-1000, -1000)] * 100
+    elif seed == 7: cows = [(1000, -1000), (-1000, 1000)] * 50   # 只能成对取，和为 0
+    elif seed == 8: cows = [(5, -3), (-1, 3)]                # 两头都选才最优，TF=0
+    elif seed == 9: cows = [(1000, -999), (-999, 1000)] + [(-1, -1)] * 98
+    elif seed <= 16:                                         # 专挑「最优解 TS 或 TF 恰为 0」的小中规模组
+        while True:
+            n = r.randint(2, 18); cows = [(v(-30, 30), v(-30, 30)) for _ in range(n)]
+            if _best2184(cows) != _best2184(cows, strict=True) and _best2184(cows) > 0: break
+    elif seed <= 22:                                         # 正负混杂的满规模
+        cows = [(v(), v()) for _ in range(100)]
+    elif seed <= 25:                                         # 一边大正、一边大负，需要权衡
+        cows = [(v(1, 1000), v(-1000, -1)) if r.random() < .5 else (v(-1000, -1), v(1, 1000)) for _ in range(100)]
+    elif seed <= 27:                                         # 正 S 偏多（DP 宽度大，接近时限可承受的最大）
+        cows = [(v(500, 1000), v()) for _ in range(60)] + [(v(), v()) for _ in range(40)]
+        r.shuffle(cows)
+    elif seed <= 30:                                         # 大多为负，答案常为 0 或很小
+        cows = [(v(-1000, 50), v(-1000, 50)) for _ in range(r.randint(1, 100))]
+    elif seed <= 35:                                         # 小规模随机
+        cows = [(v(), v()) for _ in range(r.randint(1, 10))]
+    else:                                                    # 中规模随机，小值域
+        cows = [(v(-100, 100), v(-100, 100)) for _ in range(r.randint(20, 100))]
+    return f"{len(cows)}\n" + "".join(f"{s} {f}\n" for s, f in cows)
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -159,7 +227,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [gen2184(s) for s in range(1, 40)])
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

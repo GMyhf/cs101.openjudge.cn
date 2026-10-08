@@ -421,6 +421,54 @@ REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01089/statis
 LANGUAGE='Python3'
 NUMBER=1089
 SAMPLE='5\n5 6\n1 4\n10 10\n6 9\n8 10\n'
+def valid(text):
+    """题面契约：首行 n(3..50000)，随后 n 行「a b」，1 <= a <= b <= 1000000，单个空格分隔。"""
+    lines = text.split('\n')
+    if lines and lines[-1] == '':
+        lines.pop()
+    try:
+        if not lines or not lines[0].isdigit():
+            return False
+        n = int(lines[0])
+        if not 3 <= n <= 50000 or len(lines) != 1 + n:
+            return False
+        for line in lines[1:]:
+            toks = line.split(' ')
+            if len(toks) != 2 or not all(x.isdigit() for x in toks):
+                return False
+            a, b = map(int, toks)
+            if not 1 <= a <= b <= 1000000:
+                return False
+        return True
+    except Exception:
+        return False
+
+def extra_cases():
+    """补充覆盖：n=50000 满规模（随机宽/窄、全相同、全不相交、相邻不相交、端点相接、嵌套、长区间在前）、n=3 最小、端点 1 与 1e6。"""
+    r = random.Random(1089_2026)
+    M = 1000000
+    fmt = lambda rows: f"{len(rows)}\n" + "".join(f"{a} {b}\n" for a, b in rows)
+    def rnd(n, span):
+        rows = []
+        for _ in range(n):
+            a = r.randint(1, M); rows.append((a, min(M, a + r.randint(0, span))))
+        return rows
+    sh = lambda rows: r.sample(rows, len(rows))
+    N = 50000
+    return [
+        fmt(rnd(N, 40)),                                         # 大量碎片区间
+        fmt(rnd(N, 5000)),                                       # 基本连成一片
+        fmt([(1, M)] * N),
+        fmt(sh([(20 * i + 1, 20 * i + 10) for i in range(N)])),     # 全不相交，输出 50000 行
+        fmt(sh([(i, i) for i in range(1, N + 1)])),              # 相邻整点不相交（[1,1] 与 [2,2] 不合并）
+        fmt(sh([(5 * i + 1, 5 * i + 6) for i in range(N)])),     # 端点相接，必须合并
+        fmt(sh([(i, M + 1 - i) for i in range(1, N + 1)])),      # 层层嵌套
+        fmt([(1, M)] + [(r.randint(2, M - 1), M - 1) for _ in range(N - 2)] + [(M, M)]),
+        fmt([(1, 1), (M, M), (2, M - 1)]),
+        fmt([(3, 3), (1, 2), (2, 3)]),
+        fmt([(1, 1), (1, 1), (1, 1)]),
+        fmt(sh([(a, a + r.randint(0, 3)) for a in r.sample(range(1, 200), 3)] + rnd(N - 3, 20))),
+    ]
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -428,7 +476,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()
+  assert all(valid(x) for x in cases)
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

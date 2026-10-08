@@ -5,6 +5,7 @@
 不再内嵌 CASES —— 输入由种子重新生成，避免同一份数据在仓库里存两遍。
 """
 import random
+import re
 import subprocess
 import tempfile
 from pathlib import Path
@@ -17,6 +18,37 @@ REFERENCE_SOURCE = 'def subarray_sum(nums, k):\n    count = 0\n    sums = 0\n   
 def g20453(r):
     a=[r.randint(-5,8) for _ in range(r.randint(2,20))]; return " ".join(map(str,a))+"\n"+str(r.randint(-8,15))+"\n"
 
+INT_RE = re.compile(r"-?(0|[1-9][0-9]*)")
+
+
+def valid(text):
+    """题面契约：第一行是空格分隔的一组整数（至少一个），第二行是整数 k，恰两行。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if len(lines) != 2:
+        return False
+    nums = lines[0].split(" ")
+    if not nums or not all(INT_RE.fullmatch(t) for t in nums):
+        return False
+    return INT_RE.fullmatch(lines[1]) is not None
+
+
+def extra_cases():
+    """补充：最小规模、全零（答案很大）、满规模随机（卡 O(n^2) 枚举）。"""
+    r = random.Random(NUMBER * 7 + 1)
+    out = []
+    out.append("5\n5\n")                     # n=1，命中
+    out.append("-3\n4\n")                    # n=1，不命中，答案 0
+    out.append(" ".join(["0"] * 20000) + "\n0\n")  # 全零 k=0，答案 n(n+1)/2
+    for k in (0, 7, -1000):
+        a = [r.randint(-1000, 1000) for _ in range(100000)]
+        out.append(" ".join(map(str, a)) + "\n" + str(k) + "\n")
+    a = [r.randint(-2, 2) for _ in range(100000)]  # 小值域满规模，答案较大
+    out.append(" ".join(map(str, a)) + "\n1\n")
+    return out
+
+
 def build_cases():
     cases = [SAMPLE_IN]
     for i in range(1, 20):
@@ -27,6 +59,11 @@ def build_cases():
                 break
         else:
             raise AssertionError("生成器多样性不足")
+    for value in extra_cases():
+        assert value not in cases
+        cases.append(value)
+    for value in cases:
+        assert valid(value), "生成的数据越出题面约束"
     return cases
 
 def solve_reference(content):

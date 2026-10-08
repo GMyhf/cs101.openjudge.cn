@@ -17,8 +17,69 @@ def run(text):
         x=subprocess.run([sys.executable,str(p)],input=text,text=True,capture_output=True,timeout=120)
         if x.returncode: raise SystemExit(x.stderr)
         return x.stdout
+import re
+
+def valid(text):
+    """题面：首行 N M（1<=N<=100，1<=M<=10^3）；后续恰好 M 行 u v w（1<=u,v<=N，1<=w<=10^5）。
+    另外要求 N>=2：N=1 时“存在孤立节点”与“已全连通（代价 0）”两种读法冲突，数据避开。"""
+    lines = text.split('\n')
+    if lines[-1] != '':
+        return False
+    lines = lines[:-1]
+    num = r'[1-9][0-9]*'
+    if not lines or not re.fullmatch(num + ' ' + num, lines[0]):
+        return False
+    n, m = map(int, lines[0].split())
+    if not (2 <= n <= 100 and 1 <= m <= 1000 and len(lines) == m + 1):
+        return False
+    for ln in lines[1:]:
+        if not re.fullmatch(num + ' ' + num + ' ' + num, ln):
+            return False
+        u, v, w = map(int, ln.split())
+        if not (1 <= u <= n and 1 <= v <= n and 1 <= w <= 10**5):
+            return False
+    return True
+
+def fmt(n, edges):
+    return f"{n} {len(edges)}\n" + "".join(f"{u} {v} {w}\n" for u, v, w in edges)
+
+def special_cases():
+    """样例 2；N=2 的连通/不连通；自环很便宜、重边取小；满规模 N=100、M=1000（连通 / 恰好孤立第 N 号点 /
+    孤立第 1 号点 / 两大连通块）；树形 M=N-1；权值全相同；权值取到 1 与 10^5。"""
+    r = random.Random(29622)
+    out = ['3 2\n1 2 1\n1 3 1\n', fmt(2, [(1, 2, 100000)]), fmt(2, [(1, 1, 5), (2, 2, 7)]),
+           fmt(2, [(2, 1, 9), (1, 2, 3), (1, 1, 1), (2, 1, 5)]),
+           fmt(4, [(1, 1, 1), (2, 2, 1), (1, 2, 10), (2, 3, 10), (3, 4, 10), (4, 4, 1), (3, 3, 1)])]
+    def rand_conn(n, m, lo=1, hi=10**5, nodes=None):
+        nodes = nodes or list(range(1, n + 1)); p = nodes[:]; r.shuffle(p)
+        e = [(p[i], p[r.randrange(i)], r.randint(lo, hi)) for i in range(1, len(p))]
+        while len(e) < m: e.append((r.choice(nodes), r.choice(nodes), r.randint(lo, hi)))
+        r.shuffle(e); return e
+    out.append(fmt(100, rand_conn(100, 1000)))
+    out.append(fmt(100, rand_conn(100, 1000, 1, 10)))
+    out.append(fmt(100, rand_conn(100, 1000, 99000, 100000)))
+    out.append(fmt(100, rand_conn(100, 99)))
+    out.append(fmt(100, rand_conn(100, 99, 100000, 100000)))
+    out.append(fmt(100, rand_conn(100, 1000, 7, 7)))
+    out.append(fmt(100, rand_conn(100, 1000, nodes=list(range(1, 100)))))      # 第 100 号点孤立
+    out.append(fmt(100, rand_conn(100, 1000, nodes=list(range(2, 101)))))      # 第 1 号点孤立
+    e = rand_conn(100, 500, nodes=list(range(1, 51))) + rand_conn(100, 500, nodes=list(range(51, 101)))
+    r.shuffle(e); out.append(fmt(100, e))                                       # 两大块：orz
+    out.append(fmt(100, [(i, i + 1, 100000) for i in range(1, 100)] + [(i, i, 1) for i in range(1, 101)]))
+    return out
+
+def gen_random():
+    """沿用原随机生成器的种子序列，跳过 N=1 的种子（见 valid 的说明）。"""
+    res, s = [], 1
+    while len(res) < 39:
+        c = globals()[GENERATOR_NAME](random.Random(s)); s += 1
+        if not c.startswith('1 '): res.append(c)
+    return res
+
 def main():
     d=Path('data'); d.mkdir(exist_ok=True)
-    cases=[SAMPLE]+([EXTRA_CASE] if EXTRA_CASE else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+    cases=[SAMPLE]+([EXTRA_CASE] if EXTRA_CASE else [])+gen_random()+special_cases()
+    assert all(valid(c) for c in cases), [i for i,c in enumerate(cases) if not valid(c)]
+    assert len(set(cases))==len(cases), '组间有重复'
     for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

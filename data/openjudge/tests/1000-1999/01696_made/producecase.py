@@ -417,7 +417,90 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01696/statistics/\n# Accepted submission: 43692664\n# Source: http://cs101.openjudge.cn/practice/solution/43692664/\n# License: not declared on the submission page; no license is inferred.\n\nfrom math import acos\ndef f(a,b):\n    c,d=vector\n    t=(a*c+b*d)/(((a**2+b**2)**0.5)*((c**2+d**2)**0.5))\n    return acos(t)\nfor _ in range(int(input())):\n    try:\n        n=int(input())\n    except:\n        n=int(input())\n    l=[tuple(map(int,input().split())) for i in range(n)]\n    x,y=0,1e9\n    for i in range(n):\n        if l[i][2]<y:\n            y=l[i][2]\n    ans=[n]\n    vector=(1,0)\n    for i in range(n):\n        l.sort(key=lambda p:f((p[1]-x),(p[2]-y)))\n        ans.append(l[0][0])\n        vector=(l[0][1]-x,l[0][2]-y)\n        x,y=l[0][1],l[0][2]\n        l=l[1:]\n    print(*ans)\n'
+# ---- 题面契约与 1696 专用生成器 ----
+def valid(text):
+    """M（1..10）组；每组 N（1..50）后跟 N 行 “编号 x y”，编号依次为 1..N，坐标为 1..100 的正整数，
+    任意两株植物 x 互不相同、y 互不相同。"""
+    try:
+        if not text.endswith('\n') or '\r' in text: return False
+        lines = text[:-1].split('\n')
+        if any(ln != ln.strip() or '  ' in ln or not ln for ln in lines): return False
+        rows = [ln.split() for ln in lines]
+        if len(rows[0]) != 1: return False
+        m = int(rows[0][0])
+        if not 1 <= m <= 10: return False
+        p = 1
+        for _ in range(m):
+            if p >= len(rows) or len(rows[p]) != 1: return False
+            n = int(rows[p][0]); p += 1
+            if not 1 <= n <= 50: return False
+            xs = set(); ys = set()
+            for k in range(1, n + 1):
+                if p >= len(rows) or len(rows[p]) != 3: return False
+                i, x, y = map(int, rows[p]); p += 1
+                if i != k or not (1 <= x <= 100 and 1 <= y <= 100): return False
+                if x in xs or y in ys: return False
+                xs.add(x); ys.add(y)
+        return p == len(rows)
+    except Exception:
+        return False
+
+def _solve_text(text):
+    """独立解：精确叉积的卷包裹；共线时先走近的。"""
+    tok = list(map(int, text.split())); pos = 1; out = []
+    for _ in range(tok[0]):
+        n = tok[pos]; pos += 1
+        pts = [tuple(tok[pos + 3 * k:pos + 3 * k + 3]) for k in range(n)]; pos += 3 * n
+        ya = min(p[2] for p in pts)
+        cur = (0, ya); rest = pts[:]; path = []
+        while rest:
+            best = None
+            for q in rest:
+                if best is None: best = q; continue
+                ax, ay = best[1] - cur[0], best[2] - cur[1]
+                bx, by = q[1] - cur[0], q[2] - cur[1]
+                cr = ax * by - ay * bx
+                if cr < 0 or (cr == 0 and bx * bx + by * by < ax * ax + ay * ay):
+                    best = q
+            path.append(best[0]); rest.remove(best); cur = (best[1], best[2])
+        out.append(" ".join(map(str, [len(path)] + path)))
+    return "\n".join(out) + "\n"
+
+def _points(r, n, kind):
+    if kind == 'line':
+        # 尽量多的点落在若干条斜线上（x、y 仍各不相同），考共线时“先近后远”
+        xs = set(); ys = set(); pts = []
+        while len(pts) < n:
+            dx, dy = r.choice([(1, 1), (1, 2), (2, 1), (1, -1), (2, -1), (1, 3), (3, 2), (1, -2)])
+            x0, y0 = r.randint(1, 100), r.randint(1, 100)
+            for t in range(r.randint(2, 12)):
+                x, y = x0 + dx * t, y0 + dy * t
+                if not (1 <= x <= 100 and 1 <= y <= 100) or x in xs or y in ys: break
+                xs.add(x); ys.add(y); pts.append((x, y))
+                if len(pts) == n: break
+        return pts
+    lo, hi = (1, 100) if kind != 'small' else (1, r.randint(n, max(n, 15)))
+    xs = r.sample(range(lo, hi + 1), n); ys = r.sample(range(lo, hi + 1), n)
+    return list(zip(xs, ys))
+
+def gen_file(seed):
+    r = random.Random(1696 * 1_000_003 + seed)
+    if seed <= 3:
+        sizes = [1, 2, 3][:seed] if seed < 3 else [1, 2, 3, 4, 5]
+        kinds = ['small']
+    elif seed <= 14:
+        sizes = [r.randint(1, 50) for _ in range(r.randint(1, 10))]; kinds = ['rand', 'small', 'line']
+    elif seed <= 26:
+        sizes = [r.randint(30, 50) for _ in range(r.randint(5, 10))]; kinds = ['line']
+    else:
+        sizes = [50] * 10; kinds = ['rand', 'line']
+    chunks = []
+    for n in sizes:
+        pts = _points(r, n, r.choice(kinds)); r.shuffle(pts)
+        chunks.append(str(n) + "\n" + "\n".join(f"{i} {x} {y}" for i, (x, y) in enumerate(pts, 1)))
+    return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
+
+REFERENCE='# 参考解（审计时重写）：卷包裹，精确整数叉积；共线时先走近的点。\n# 原外部 AC 代码（samplecode.py）用 acos 浮点角度排序、共线时不按距离决胜，会先走远点再折回压过自己的红线。\nimport sys\ntok = list(map(int, sys.stdin.read().split())); pos = 1; out = []\nfor _ in range(tok[0]):\n    n = tok[pos]; pos += 1\n    pts = [tuple(tok[pos + 3 * k:pos + 3 * k + 3]) for k in range(n)]; pos += 3 * n\n    cur = (0, min(p[2] for p in pts)); rest = pts[:]; path = []\n    while rest:\n        best = rest[0]\n        for q in rest[1:]:\n            ax, ay = best[1] - cur[0], best[2] - cur[1]\n            bx, by = q[1] - cur[0], q[2] - cur[1]\n            cr = ax * by - ay * bx\n            if cr < 0 or (cr == 0 and bx * bx + by * by < ax * ax + ay * ay):\n                best = q\n        path.append(best[0]); rest.remove(best); cur = (best[1], best[2])\n    out.append(" ".join(map(str, [len(path)] + path)))\nprint("\\n".join(out))\n'
 LANGUAGE='Python3'
 NUMBER=1696
 SAMPLE='2\n10\n1 4 5\n2 9 8\n3 5 9\n4 1 7\n5 3 2\n6 6 3\n7 10 10\n8 8 1\n9 2 4\n10 7 6\n14\n1 6 11\n2 11 9\n3 8 7\n4 12 8\n5 9 20\n6 3 2\n7 1 6\n8 2 13\n9 15 1\n10 14 17\n11 13 19\n12 5 18\n13 7 3\n14 10 16\n'
@@ -428,7 +511,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[gen_file(s) for s in range(1, 40)]
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

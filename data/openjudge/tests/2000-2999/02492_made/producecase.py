@@ -214,13 +214,7 @@ def generate(number, seed):
             chunks.append(f"{a} {b} {c}\n" + "\n".join(rows) + "\n#")
         return "\n".join(chunks) + "\n0 0 0\n"
     if number == 2492:
-        chunks = []
-        for index in range(r.randint(1, 4)):
-            n = r.randint(3, 20); edges = {(i, i + 1) for i in range(1, n)}
-            if index % 2:
-                edges.update({(1, 2), (2, 3), (1, 3)})
-            chunks.append(f"{n} {len(edges)}\n" + "\n".join(f"{a} {b}" for a, b in sorted(edges)))
-        return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
+        return gen_2492(r, seed)
     if number == 2790:
         chunks = []
         for _ in range(r.randint(1, 4)):
@@ -421,6 +415,110 @@ REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02492/statis
 LANGUAGE='Python3'
 NUMBER=2492
 SAMPLE='2\n3 3\n1 2\n2 3\n1 3\n4 2\n1 2\n3 4\n'
+def valid(text):
+    """02492 输入契约：首行场景数；每个场景首行 "n m"（1<=n<=2000，0<=m<=1000000），
+    随后 m 行，每行两个不同的虫子编号（1..n）。"""
+    import re
+    if not text.endswith("\n") or "\r" in text:
+        return False
+    lines = text[:-1].split("\n")
+    num = re.compile(r"0|[1-9][0-9]*")
+    if not num.fullmatch(lines[0]) or int(lines[0]) < 1:
+        return False
+    T = int(lines[0]); i = 1
+    for _ in range(T):
+        if i >= len(lines):
+            return False
+        tok = lines[i].split(" "); i += 1
+        if len(tok) != 2 or not all(num.fullmatch(x) for x in tok):
+            return False
+        n, m = map(int, tok)
+        if not (1 <= n <= 2000 and 0 <= m <= 1_000_000) or i + m > len(lines):
+            return False
+        for s in lines[i:i + m]:
+            tok = s.split(" ")
+            if len(tok) != 2 or not all(num.fullmatch(x) for x in tok):
+                return False
+            a, b = int(tok[0]), int(tok[1])
+            if not (1 <= a <= n and 1 <= b <= n and a != b):
+                return False
+        i += m
+    return i == len(lines)
+def oracle_2492(text):
+    from collections import deque
+    tok = list(map(int, text.split())); p = 1; out = []
+    for k in range(tok[0]):
+        n, m = tok[p], tok[p + 1]; p += 2
+        adj = [[] for _ in range(n + 1)]
+        for _ in range(m):
+            a, b = tok[p], tok[p + 1]; p += 2
+            adj[a].append(b); adj[b].append(a)
+        col = [-1] * (n + 1); ok = True
+        for s in range(1, n + 1):
+            if col[s] < 0:
+                col[s] = 0; dq = deque([s])
+                while dq and ok:
+                    u = dq.popleft()
+                    for v in adj[u]:
+                        if col[v] < 0:
+                            col[v] = col[u] ^ 1; dq.append(v)
+                        elif col[v] == col[u]:
+                            ok = False; break
+        out.append(f"Scenario #{k + 1}:\n" + ("No suspicious bugs found!" if ok else "Suspicious bugs found!") + "\n\n")
+    return "".join(out)
+def gen_2492(r, seed):
+    def bip(n, m, odd=False, where=None):
+        perm = list(range(1, n + 1)); r.shuffle(perm)
+        k = r.randint(1, n - 1)
+        L, R = perm[:k], perm[k:]
+        edges = [(r.choice(L), r.choice(R)) for _ in range(m)]
+        edges = [(a, b) if r.random() < .5 else (b, a) for a, b in edges]
+        if odd and n >= 2:
+            same = L if len(L) >= 2 else (R if len(R) >= 2 else L + R)
+            a, b = r.sample(same, 2)
+            pos = r.randint(0, len(edges)) if where is None else (len(edges) if where == "last" else 0)
+            edges.insert(pos, (a, b))
+        return edges
+    def chain(n, odd):
+        perm = list(range(1, n + 1)); r.shuffle(perm)
+        edges = [(perm[i], perm[i + 1]) for i in range(n - 1)]
+        if odd:
+            edges.append((perm[0], perm[-1] if n % 2 == 1 else perm[-2]))
+        else:
+            edges.append((perm[0], perm[-1] if n % 2 == 0 else perm[-2]))
+        r.shuffle(edges)
+        return edges
+    def fmt(cases):
+        return f"{len(cases)}\n" + "".join(f"{n} {len(e)}\n" + "".join(f"{a} {b}\n" for a, b in e) for n, e in cases)
+    if seed == 1:  # n=1, m=0；n=2 单边
+        return fmt([(1, []), (2, [(1, 2)]), (2, [(2, 1), (1, 2), (2, 1)])])
+    if seed == 2:  # 三角形只在最后一条边出现；三角形出现在第一条后，后续边仍需读完
+        return fmt([(3, [(1, 2), (2, 3), (3, 1)]), (5, [(1, 2), (2, 3), (1, 3), (4, 5), (3, 4), (5, 1)]), (4, [(1, 2), (3, 4)])])
+    if seed == 3:  # 多个连通分量，只有一个含奇环
+        return fmt([(10, [(1, 2), (3, 4), (5, 6), (6, 7), (7, 5), (8, 9)]), (10, [(1, 2), (3, 4), (5, 6), (6, 7), (7, 8), (8, 5)])])
+    if seed == 4:  # 发现矛盾后立刻 break 而不读完剩余边会错位
+        return fmt([(6, [(1, 2), (2, 3), (3, 1), (4, 5), (5, 6), (4, 6), (1, 4)]), (4, [(1, 2), (2, 3), (3, 4)]),
+                    (3, [(1, 3)])])
+    if seed <= 20:  # 小规模多组
+        cases = []
+        for _ in range(r.randint(1, 8)):
+            n = r.randint(1, 30)
+            if n == 1:
+                cases.append((1, [])); continue
+            m = r.randint(0, 60)
+            cases.append((n, bip(n, m, r.random() < .5)))
+        return fmt(cases)
+    if seed <= 26:  # n=2000 长链 / 大偶环 / 大奇环（并查集不按秩合并会很深）
+        return fmt([(2000, chain(2000, seed % 2 == 1)), (1999, chain(1999, seed % 2 == 0))])
+    if seed <= 34:  # 满 n=2000，单场景大量边（受 1MB 文件限制约 10 万条）
+        odd = seed % 2 == 0
+        return fmt([(2000, bip(2000, 99000, odd, "last" if seed % 4 == 0 else None))])
+    # 35..39：多场景中等规模
+    cases = []
+    for _ in range(r.randint(5, 15)):
+        n = r.randint(500, 2000)
+        cases.append((n, bip(n, r.randint(1000, 8000), r.random() < .5)))
+    return fmt(cases)
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]

@@ -303,46 +303,68 @@ def solve(s):
   if not dfs(g,0):return '-1\n'
   return '\n'.join(f'{x} {y} {d}' for x,y,d in path)+'\n'
  if P==4012:
+  # 自右向左求 M[pos]=后缀 s[pos:] 合法拆分时首个数的最大可能值，再自左向右贪心取最小可行数；O(L^3)
+  def mn(pat,lo):
+   n=len(pat);t=str(lo+1)
+   if pat[0]=='0' or len(t)>n:return None
+   if len(t)<n:return ''.join(('1' if i==0 else '0') if c=='?' else c for i,c in enumerate(pat))
+   if all(c=='?' or c==d for c,d in zip(pat,t)):return t
+   pre=0
+   while pre<n and (pat[pre]=='?' or pat[pre]==t[pre]):pre+=1
+   for i in range(min(pre,n-1),-1,-1):
+    c=pat[i];td=int(t[i])
+    if c=='?':
+     if td==9:continue
+     d=str(td+1)
+    elif int(c)<=td:continue
+    else:d=c
+    return t[:i]+d+''.join('0' if x=='?' else x for x in pat[i+1:])
+   return None
+  def mx(pat,hi):
+   n=len(pat)
+   if pat[0]=='0':return None
+   if hi is None or len(str(hi-1))>n:return ''.join('9' if c=='?' else c for c in pat)
+   t=str(hi-1)
+   if hi-1<=0 or len(t)<n:return None
+   if all(c=='?' or c==d for c,d in zip(pat,t)):return t
+   pre=0
+   while pre<n and (pat[pre]=='?' or pat[pre]==t[pre]):pre+=1
+   for i in range(min(pre,n-1),-1,-1):
+    c=pat[i];td=int(t[i]);lowd=1 if i==0 else 0
+    if c=='?':
+     if td-1<lowd:continue
+     d=str(td-1)
+    elif int(c)>=td:continue
+    else:d=c
+    return t[:i]+d+''.join('9' if x=='?' else x for x in pat[i+1:])
+   return None
   def one(s):
-   L=len(s);memo={}
-   def smallest(pos,ln,prev):
-    pat=s[pos:pos+ln]
-    if any(ch==',' for ch in pat):return None
-    bound=str(int(prev)+1) if prev else '1'
-    if len(bound)<ln:bound='1'+'0'*(ln-1);strict=False
-    elif len(bound)>ln:return None
-    else:strict=True
-    def build(i,rel,out):
-     if i==ln:return ''.join(out) if (not strict or rel in (0,1)) else None
-     low=int(bound[i]) if strict and rel==0 else 0
-     for d in range(low,10):
-      if i==0 and d==0:continue
-      ch=pat[i]
-      if ch!='?' and int(ch)!=d:continue
-      nr=1 if (strict and (rel==1 or d>int(bound[i]))) else 0
-      z=build(i+1,nr,out+[str(d)])
-      if z is not None:return z
-     return None
-    return build(0,0,[])
-   def dfs(pos,prev):
-    key=(pos,prev)
-    if key in memo:return memo[key]
-    if pos==L:return ''
-    best=None
+   L=len(s);M=[False]*(L+1)
+   def segs(pos):
     for ln in range(1,L-pos+1):
-     if pos+ln<L and s[pos+ln] not in ',?':continue
-     cur=smallest(pos,ln,prev)
-     if cur is None:continue
-     nxt=pos+ln
-     if nxt==L:tail=''
-     else:
-      if nxt+1>=L:continue
-      tail=dfs(nxt+1,cur)
-      if tail is None:continue
-     best=cur+(','+tail if tail else '');break
-    memo[key]=best;return best
-   z=dfs(0,'')
-   return z if z is not None else 'impossible'
+     if s[pos+ln-1]==',':break
+     e=pos+ln
+     if e==L:yield ln,None
+     elif s[e] in ',?' and e+1<L:yield ln,e+1
+   for pos in range(L-1,-1,-1):
+    best=False
+    for ln,nx in segs(pos):
+     if nx is not None and M[nx] is False:continue
+     x=mx(s[pos:pos+ln],None if nx is None else M[nx])
+     if x is not None and (best is False or int(x)>best):best=int(x)
+    M[pos]=best
+   if M[0] is False:return 'impossible'
+   out=[];pos=0;prev=0
+   while True:
+    for ln,nx in segs(pos):
+     x=mn(s[pos:pos+ln],prev)
+     if x is None:continue
+     if nx is not None and (M[nx] is False or int(x)>=M[nx]):continue
+     break
+    out.append(x)
+    if nx is None:break
+    pos=nx;prev=int(x)
+   return ','.join(out)
   return '\n'.join(one(line.strip()) for line in s.splitlines() if line.strip())+'\n'
  if P==4083:
   p=0;N=int(a[p]);p+=1;names=a[p:p+N];p+=N;M=int(a[p]);p+=1;adj={x:[] for x in names}

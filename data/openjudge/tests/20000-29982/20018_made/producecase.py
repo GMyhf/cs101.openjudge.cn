@@ -21,9 +21,38 @@ def g20018(r):
     hi=1000 if (n>=99000 or not wide) else 10**9      # 小值域保留并列（不算赶超）的覆盖；贴上界那组也用小值域压体积
     return str(n)+"\n"+"\n".join(str(r.randint(0,hi)) for _ in range(n))+"\n"
 
+def valid(text):
+    """题面契约：首行 N（2<=N<=100000），其后恰 N 行，每行一个非负整数（速度，题面无上界）。"""
+    import re
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not re.fullmatch(r"\d+", lines[0]):
+        return False
+    n = int(lines[0])
+    return 2 <= n <= 100000 and len(lines) == n + 1 and all(re.fullmatch(r"\d+", x) for x in lines[1:])
+
+def extra_cases():
+    """追加组：题面第二个样例、N=2 两种方向、满规模的全相等 / 严格递增（答案 N(N-1)/2≈5e9，
+    卡 32 位）/ 严格递减 / 含 0 与 1e9 的大值域。"""
+    r = random.Random(NUMBER * 7)
+    n = 100000
+    def mk(vals):
+        return f"{len(vals)}\n" + "\n".join(map(str, vals)) + "\n"
+    inc = sorted(r.sample(range(10**9 + 1), n))
+    return [
+        "5\n1\n5\n5\n7\n6\n",
+        mk([3, 7]), mk([7, 3]), mk([0, 0]),
+        mk([5] * n),
+        mk(inc),
+        mk(inc[::-1]),
+        mk([r.choice((0, 10**9, r.randint(0, 10**9))) for _ in range(n)]),
+        mk([r.randint(0, 1) for _ in range(n)]),
+    ]
+
 def build_cases():
     cases = [SAMPLE_IN]
-    for i in range(1, 20):
+    for i in range(1, 11):  # 后 9 组让给 extra_cases()，总数仍为 20（catalog 按文件列组）
         for attempt in range(100):
             value = g20018(random.Random(NUMBER + i + attempt * 1000))
             if value not in cases:
@@ -31,6 +60,8 @@ def build_cases():
                 break
         else:
             raise AssertionError("生成器多样性不足")
+    cases += extra_cases()
+    assert all(valid(c) for c in cases) and len(set(cases)) == len(cases) == 20
     return cases
 
 def solve_reference(content):

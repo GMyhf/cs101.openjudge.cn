@@ -159,6 +159,16 @@ def generate(n, seed):
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1218: THE DRUNK JAILER\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/01218/\n# License: not declared in source collection; no license is inferred.\nimport sys\nfor i in range(int(input())):\n    print(int(int(input())**0.5))\n'
 NUMBER=1218
+def valid(text):
+    # 题面：首行一个正整数 t（后续行数），随后 t 行，每行一个 5..100 的整数 n
+    if not text.endswith('\n'): return False
+    lines=text[:-1].split('\n')
+    if not lines[0].isdigit() or int(lines[0])<1 or len(lines)!=int(lines[0])+1: return False
+    return all(l.isdigit() and l[0]!='0' and 5<=int(l)<=100 for l in lines[1:])
+# 补充：5..100 全部取值各一次；完全平方数及其两侧
+EXTRA_1218=['96\n'+'\n'.join(map(str,range(5,101)))+'\n',
+            '16\n'+'\n'.join(map(str,[8,9,10,15,16,17,24,25,26,35,36,37,80,81,99,100]))+'\n',
+            '1\n5\n','1\n100\n']
 SAMPLE='2\n5\n100\n'
 def run(x):
  with tempfile.TemporaryDirectory() as d:
@@ -168,6 +178,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+EXTRA_1218):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

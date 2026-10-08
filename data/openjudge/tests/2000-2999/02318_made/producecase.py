@@ -113,7 +113,12 @@ def generate(number, seed):
     if number==1324:
         L=2+(seed-1)%6;n,m=10,12;row=2+(seed-1)%5;col=2+(seed-1)//5;body=[(row,col+i) for i in range(L)];return f"{n} {m} {L}\n"+"\n".join(f"{a} {b}" for a,b in body)+"\n0\n\n0 0 0\n"
     if number==2318:
-        n=r.randint(1,8);m=r.randint(1,15);xs=sorted(r.sample(range(5,95),n));toys=[(r.randint(1,99),r.randint(1,9)) for _ in range(m)];return f"{n} {m} 0 10 100 0\n"+"\n".join(f"{x} {x}" for x in xs)+"\n"+"\n".join(f"{x} {y}" for x,y in toys)+"\n0\n"
+        # 原写法玩具 x 与竖直隔板 x 可能重合（落在隔板上，违反题面），改为生成斜隔板并用叉积剔除压线玩具
+        probs=[]
+        for _ in range(r.randint(1,3)):
+            n=r.randint(1,8);m=r.randint(1,15)
+            probs.append(_toys_problem(r,n,m,r.choice((0,-50,r.randint(-1000,1000))),r.randint(20,200),r.randint(10,200)))
+        return "".join(probs)+"0\n"
     if number==3129:
         cases=[f"{r.randint(1,10000)}\n"+" ".join(str(r.randint(1,10000)) for _ in range(5)) for _ in range(r.randint(1,4))];return f"{len(cases)}\n"+"\n".join(cases)+"\n"
     if number==1001:return "\n".join(f"{r.randint(1,999999)/10000:.4f} {r.randint(1,25)}" for _ in range(r.randint(1,6)))+"\n"
@@ -148,6 +153,105 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
+
+def _toys_problem(r, n, m, x1, w, h, boundary=True):
+    # 生成一个问题：盒子左上 (x1,y1)、右下 (x2,y2)；隔板上下端各取严格递增的 x，保证有序且不相交
+    x2 = x1 + max(w, n + 2); y2 = r.randint(-h, h); y1 = y2 + h
+    U = sorted(r.sample(range(x1 + 1, x2), n)); L = sorted(r.sample(range(x1 + 1, x2), n))
+    def side(k, X, Y):
+        u, l = U[k], L[k]
+        return (l - u) * (Y - y1) - (y2 - y1) * (X - u)
+    toys = []
+    corners = [(x1, y1), (x2, y2), (x1, y2), (x2, y1)]
+    while len(toys) < m:
+        if boundary and corners and r.random() < 0.3:
+            X, Y = corners.pop()
+        elif boundary and r.random() < 0.1:
+            X, Y = r.choice(((x1, r.randint(y2, y1)), (x2, r.randint(y2, y1)), (r.randint(x1, x2), y1), (r.randint(x1, x2), y2)))
+        else:
+            X, Y = r.randint(x1, x2), r.randint(y2, y1)
+        # side>0 表示点在隔板右侧，随隔板编号单调变小；二分找第一个 side<=0 的隔板，再看相邻隔板是否压线
+        lo, hi = 0, n
+        while lo < hi:
+            mid = (lo + hi) // 2
+            if side(mid, X, Y) <= 0: hi = mid
+            else: lo = mid + 1
+        if (lo < n and side(lo, X, Y) == 0) or (lo > 0 and side(lo - 1, X, Y) == 0):
+            continue
+        toys.append((X, Y))
+    return (f"{n} {m} {x1} {y1} {x2} {y2}\n" + "".join(f"{u} {l}\n" for u, l in zip(U, L))
+            + "".join(f"{X} {Y}\n" for X, Y in toys))
+
+def _extra():
+    # 追加的覆盖组：n=m=1、所有玩具挤在同一格、n=m=5000 满规模、14 个问题、竖直隔板
+    r = random.Random(23180)
+    out = []
+    out.append(_toys_problem(r, 1, 1, 0, 2, 2) + _toys_problem(r, 1, 5, -3, 3, 1) + "0\n")
+    # 全在最左格 / 最右格
+    x1, y1, x2, y2 = 0, 100, 10000, 0
+    U = list(range(5000, 10000, 1000)); L = [u + 500 for u in U]
+    toys = [(r.randint(0, 4000), r.randint(0, 100)) for _ in range(20)]
+    out.append(f"{len(U)} 20 {x1} {y1} {x2} {y2}\n" + "".join(f"{u} {l}\n" for u, l in zip(U, L)) + "".join(f"{a} {b}\n" for a, b in toys)
+               + f"{len(U)} 20 {x1} {y1} {x2} {y2}\n" + "".join(f"{u} {l}\n" for u, l in zip(U, L)) + "".join(f"{10000 - a//10} {b}\n" for a, b in toys) + "0\n")
+    out.append(_toys_problem(r, 5000, 5000, -10000, 20000, 20000) + "0\n")
+    out.append(_toys_problem(r, 5000, 5000, 0, 5002, 3) + "0\n")
+    out.append(_toys_problem(r, 100, 5000, -10000, 20000, 10000) + _toys_problem(r, 5000, 100, -10000, 20000, 10000) + "0\n")
+    out.append("".join(_toys_problem(r, r.randint(1, 1500), r.randint(1, 1500), r.randint(-5000, 0), r.randint(1, 10000), r.randint(1, 10000)) for _ in range(14)) + "0\n")
+    return out
+
+def valid(text):
+    # 1..14 个问题；首行 n m x1 y1 x2 y2（0<n<=5000, 0<m<=5000，左上 (x1,y1)、右下 (x2,y2)）；
+    # n 行 Ui Li：隔板端点 (Ui,y1)-(Li,y2)，从左到右有序且互不相交；m 行 Xj Yj：玩具在盒内（含边界）且不落在隔板上；
+    # 以单独一行 0 结束。注：题面样例有一行带前导空格（" 5 10"），故行内按空白切分。
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    def ints(ln, k):
+        t = ln.split()
+        if len(t) != k:
+            return None
+        for x in t:
+            y = x[1:] if x.startswith('-') else x
+            if not y.isdigit():
+                return None
+        return list(map(int, t))
+    i = 0; probs = 0
+    while True:
+        if i >= len(lines):
+            return False
+        if lines[i] == '0':
+            i += 1; break
+        h = ints(lines[i], 6); i += 1
+        if h is None:
+            return False
+        n, m, x1, y1, x2, y2 = h
+        if not (0 < n <= 5000 and 0 < m <= 5000) or not (x1 < x2 and y1 > y2):
+            return False
+        if i + n + m > len(lines):
+            return False
+        parts = []
+        for k in range(n):
+            p = ints(lines[i + k], 2)
+            if p is None or not (x1 <= p[0] <= x2 and x1 <= p[1] <= x2):
+                return False
+            if parts and not (parts[-1][0] < p[0] and parts[-1][1] < p[1]):
+                return False
+            parts.append(p)
+        i += n
+        for k in range(m):
+            q = ints(lines[i + k], 2)
+            if q is None:
+                return False
+            X, Y = q
+            if not (x1 <= X <= x2 and y2 <= Y <= y1):
+                return False
+            for u, l in parts:
+                # 叉积为 0 即落在隔板所在直线上（盒内即在隔板上）
+                if (l - u) * (Y - y1) - (y2 - y1) * (X - u) == 0:
+                    return False
+        i += m; probs += 1
+    return i == len(lines) and 1 <= probs < 15
+
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2318: TOYS\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02318/\n# License: not declared; no license is inferred.\ndef compute_bin(toy_x, toy_y, y1, y2, partitions):\n    # 二分查找找到 toy 落在哪个 bin 中\n    left, right = 0, len(partitions)\n    while left < right:\n        mid = (left + right) // 2\n        u, l = partitions[mid]\n        # 计算直线 (u,y1) 到 (l,y2) 在 toy_y 高度的 x 坐标\n        part_x = u + (l - u) * (y1 - toy_y) / (y1 - y2)\n        if toy_x < part_x:\n            right = mid\n        else:\n            left = mid + 1\n    return left\n\ndef main():\n    import sys\n    input_lines = sys.stdin.read().splitlines()\n    idx = 0\n    output = []\n\n    while idx < len(input_lines):\n        line = input_lines[idx].strip()\n        idx += 1\n        if line == \'0\':\n            break\n        if not line:\n            continue\n        n, m, x1, y1, x2, y2 = map(int, line.split())\n        partitions = []\n        for _ in range(n):\n            u, l = map(int, input_lines[idx].split())\n            partitions.append((u, l))\n            idx += 1\n        toys = []\n        for _ in range(m):\n            x, y = map(int, input_lines[idx].split())\n            toys.append((x, y))\n            idx += 1\n\n        bin_counts = [0] * (n + 1)\n        for tx, ty in toys:\n            bin_index = compute_bin(tx, ty, y1, y2, partitions)\n            bin_counts[bin_index] += 1\n\n        for i, count in enumerate(bin_counts):\n            output.append(f"{i}: {count}")\n        output.append("")  # blank line between problems\n\n    print("\\n".join(output).strip())  # strip the last blank line\n\nif __name__ == "__main__":\n    main()\n'
 LANGUAGE='Python3'
 NUMBER=2318
@@ -159,7 +263,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)]+_extra())
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

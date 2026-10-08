@@ -119,6 +119,34 @@ def generate(number, seed):
         return "\n".join(words) + "\n"
     raise KeyError(number)
 
+# ---- 题面契约与 1664 专用生成 ----
+def valid(text):
+    """t（0<=t<=20）后跟 t 行，每行两个整数 M N，1<=M,N<=10。"""
+    try:
+        if not text.endswith('\n') or '\r' in text: return False
+        lines = text[:-1].split('\n')
+        if any(ln != ln.strip() or '  ' in ln for ln in lines): return False
+        if len(lines[0].split()) != 1: return False
+        t = int(lines[0])
+        if not 0 <= t <= 20 or len(lines) != t + 1: return False
+        for ln in lines[1:]:
+            a = ln.split()
+            if len(a) != 2: return False
+            m, n = map(int, a)
+            if not (1 <= m <= 10 and 1 <= n <= 10): return False
+        return True
+    except Exception:
+        return False
+
+def gen_file(seed):
+    # 1..34 沿用原随机数据；35..39 五组各 20 行，合起来恰好覆盖全部 100 个 (M,N)
+    if seed < 35:
+        return generate(NUMBER, seed)
+    pairs = [(m, n) for m in range(1, 11) for n in range(1, 11)]
+    random.Random(1664).shuffle(pairs)
+    part = pairs[(seed - 35) * 20:(seed - 34) * 20]
+    return "20\n" + "\n".join(f"{m} {n}" for m, n in part) + "\n"
+
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1664: 放苹果\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01664/\n# License: not declared in source collection; no license is inferred.\nimport sys\ndef apple_distribution(t, cases):\n    # 最大苹果数和盘子数\n    max_m = max(c[0] for c in cases)\n    max_n = max(c[1] for c in cases)\n\n    # 初始化DP数组\n    dp = [[0] * (max_n + 1) for _ in range(max_m + 1)]\n\n    # 基础情况\n    for m in range(max_m + 1):\n        dp[m][1] = 1  # 只有一个盘子\n    for n in range(max_n + 1):\n        dp[0][n] = 1  # 没有苹果\n\n    # 填表\n    for m in range(1, max_m + 1):\n        for n in range(2, max_n + 1):\n            if n > m:\n                dp[m][n] = dp[m][m]  # 盘子多于苹果\n            else:\n                dp[m][n] = dp[m][n-1] + dp[m-n][n]\n\n    # 处理每个测试用例\n    results = []\n    for m, n in cases:\n        results.append(dp[m][n])\n\n    return results\n\n# 主函数\ndef main():\n    t = int(input())  # 测试数据数目\n    cases = []\n    for _ in range(t):\n        m, n = map(int, input().split())\n        cases.append((m, n))\n    results = apple_distribution(t, cases)\n    for res in results:\n        print(res)\n\n# 样例测试\nif __name__ == "__main__":\n    main()\n'
 NUMBER=1664
 SAMPLE='1\n7 3\n'
@@ -130,6 +158,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[gen_file(s) for s in range(1, 40)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

@@ -421,6 +421,58 @@ REFERENCE="# External reference: http://cs101.openjudge.cn/practice/01068/statis
 LANGUAGE='Python3'
 NUMBER=1068
 SAMPLE='2\n6\n4 5 6 6 6 6\n9\n4 6 6 6 6 8 9 9 9\n'
+def valid(text):
+    """题面契约：t(1..10)；每组 n(1..20) 一行，下一行 n 个正整数为某合法括号串的 P 序列。"""
+    lines = text.split('\n')
+    if lines and lines[-1] == '':
+        lines.pop()
+    try:
+        if not lines or lines[0].strip() != lines[0] or not lines[0].isdigit():
+            return False
+        t = int(lines[0])
+        if not 1 <= t <= 10 or len(lines) != 1 + 2 * t:
+            return False
+        for c in range(t):
+            nl, pl = lines[1 + 2 * c], lines[2 + 2 * c]
+            if not nl.isdigit():
+                return False
+            n = int(nl)
+            if not 1 <= n <= 20:
+                return False
+            toks = pl.split(' ')
+            if len(toks) != n or not all(x.isdigit() for x in toks):
+                return False
+            p = list(map(int, toks))
+            # 合法括号串：非降、第 i 个右括号前左括号数 >= i、总左括号数 n
+            if any(p[i] < i + 1 or p[i] > n for i in range(n)) or p[-1] != n:
+                return False
+            if any(p[i] > p[i + 1] for i in range(n - 1)):
+                return False
+        return True
+    except Exception:
+        return False
+
+def extra_cases():
+    """补充覆盖：t=10 满组数、n=20 满规模、n=1、全嵌套、全并列等结构。"""
+    r = random.Random(1068_2026)
+    def rand_p(n):
+        opened = closed = 0; p = []
+        while closed < n:
+            if opened < n and (opened == closed or r.random() < .5): opened += 1
+            else: closed += 1; p.append(opened)
+        return p
+    def fmt(ps):
+        return f"{len(ps)}\n" + "".join(f"{len(p)}\n" + " ".join(map(str, p)) + "\n" for p in ps)
+    nested = [20] * 20                      # ((((...))))
+    flat = list(range(1, 21))               # ()()()...
+    mixed = [1] + [20] * 19                 # ()((...))
+    stair = [2 * (i // 2) + 2 for i in range(20)]   # (())(())...
+    return [
+        fmt([rand_p(20) for _ in range(10)]),
+        fmt([[1], nested, flat, mixed, stair, [2, 2], [1, 2], rand_p(20), rand_p(19), [3, 3, 3]]),
+        fmt([[1]]),
+        fmt([rand_p(r.randint(1, 20)) for _ in range(10)]),
+    ]
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -428,7 +480,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()
+  assert all(valid(x) for x in cases)
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

@@ -3,7 +3,37 @@ from pathlib import Path
 def generate(n, seed):
     r=random.Random(seed)
     if n==2694:
-        return f"+ * {r.randint(-20,20)} {r.randint(-20,20)} / {r.randint(-20,20)} {r.randint(1,20)}\n"
+        # 随机表达式树：1-2 单个运算数；3-10 小树；11-24 中大树（最多约 300 个运算符）；
+        # 25-30 左偏/右偏长链（卡运算数顺序、- 与 / 不可交换）；31-39 混合。
+        # 运算数取非负浮点数（如 11.0、3.25）；除数绝对值 >=0.5，中间值与结果绝对值控制在 1e7 内。
+        def num():
+            k=r.choice([0,1,1,2,3]);v=r.randint(0,999 if k else 99)/10**k
+            return f"{v:.{max(k,1)}f}"
+        def build(ops,shape):
+            # 自底向上建树，只选让值保持在范围内的运算符，免得反复重抽
+            if ops==0:
+                x=num();return [x],float(x)
+            if shape=='left':a,b=ops-1,0
+            elif shape=='right':a,b=0,ops-1
+            else:a=r.randint(0,ops-1);b=ops-1-a
+            while True:
+                ta,va=build(a,shape);tb,vb=build(b,shape)
+                cand=[]
+                for op in '+-*/':
+                    if op=='/' and abs(vb)<0.5:continue
+                    v=va+vb if op=='+' else va-vb if op=='-' else va*vb if op=='*' else va/vb
+                    if abs(v)<=1e7:cand.append((op,v))
+                if cand:
+                    op,v=r.choice(cand);return [op]+ta+tb,v
+        if seed<=2:ops,shape=0,'rand'
+        elif seed<=10:ops,shape=r.randint(1,6),'rand'
+        elif seed<=24:ops,shape=r.randint(30,300),'rand'
+        elif seed<=30:ops,shape=r.randint(20,150),('left','right')[seed%2]
+        else:ops,shape=r.randint(1,120),'rand'
+        while True:
+            t,v=build(ops,shape)
+            if -5e-7<v<0:continue
+            return ' '.join(t)+'\n'
     if n==2945:
         k=r.randint(3,25);return f"{k}\n"+' '.join(str(r.randint(1,500)) for _ in range(k))+'\n'
     if n==2746:
@@ -152,6 +182,29 @@ def generate(n, seed):
     if n==1218:
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
+
+def valid(text):
+    """题面：一行波兰（前缀）表达式，运算符 + - * /，运算符与运算数之间用空格分隔，运算数是浮点数。
+    另核：整行恰好构成一个完整表达式、除数不为 0。"""
+    import re
+    if not text.endswith("\n") or text.count("\n")!=1:return False
+    t=text[:-1].split(" ")
+    num=re.compile(r"[+-]?(\d+(\.\d*)?|\.\d+)")
+    need=1
+    for x in t:
+        if need==0:return False
+        if x in("+","-","*","/"):need+=1
+        elif num.fullmatch(x):need-=1
+        else:return False
+    if need!=0:return False
+    st=[]
+    for x in reversed(t):
+        if x in("+","-","*","/"):
+            a=st.pop();b=st.pop()
+            if x=="/" and b==0:return False
+            st.append(a+b if x=="+" else a-b if x=="-" else a*b if x=="*" else a/b)
+        else:st.append(float(x))
+    return True
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2694: 波兰表达式\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/02694/\n# License: not declared in source collection; no license is inferred.\nimport sys\n\'\'\'\n前缀表达式是运算符在前，操作数其后，\n就是假如碰到一个运算符，其后就需要有连续的两个操作数才能运算消去，\n否则就一直等待输入或者等待后面的运算结束得到操作数,\n这恰好能用递归实现。\n\'\'\'\n# pylint: skip-file\ndef Exp():\n    global pos\n    pos += 1\n    chr = calculatelist[pos]\n    if chr == \'+\':\n        return Exp() + Exp()\n    elif chr == \'-\':\n        return Exp() - Exp()\n    elif chr == \'*\':\n        return Exp() * Exp()\n    elif chr == \'/\':\n        return Exp() / Exp()\n    else:\n        return float(chr)\n\n\n\ncalculatelist = []\npos = -1\ncalculatelist = list(input().split())\nresult = Exp()\nprint(f"{result:.6f}")\n'
 NUMBER=2694

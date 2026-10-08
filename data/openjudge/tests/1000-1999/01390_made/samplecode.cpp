@@ -2,6 +2,8 @@
 // Accepted submission: 44843318
 // Source: http://cs101.openjudge.cn/practice/solution/44843318/
 // License: not declared on the submission page; no license is inferred.
+// 审计修正：原提交在找到第一个更优的同色分割点后就 break，并非全局最优
+// （如 1 1 2 1 2 2 1 2 2 1 原输出 34，正确为 36），这里改为枚举全部分割点取最大。
 
 #include <bits/stdc++.h>
 using namespace std;
@@ -22,9 +24,7 @@ int click(int l,int r,int len){
     for(int i=r-1;i>=l;i--){
         if(box[i].color!=box[r].color)continue;
         tmp=click(l,i,box[r].len+len)+click(i+1,r-1,0);
-        if(tmp<=res)continue;
-        res=tmp;
-        break;
+        if(tmp>res)res=tmp;
     }
     return dp[l][r][len]=res;
 }

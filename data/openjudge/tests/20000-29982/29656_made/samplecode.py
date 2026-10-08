@@ -2,6 +2,7 @@
 # Accepted submission: 52686108
 # Source: http://cs101.openjudge.cn/practice/solution/52686108/
 # License: not declared on the submission page; no license is inferred.
+# 2026-10-08 本地修正：上面引用的原始代码在题面范围内有缺陷，已按题面改过，与原提交不再逐字一致（见 CHANGELOG）。
 
 n = int(input())
 left = [0] * (n + 1)
@@ -40,8 +41,12 @@ for u in order:
         right_len[u] = 1 + right_len[right[u]]
 
 # 计算 up_len（向上直线可达节点数，包括自身）
+# 修正：题面不保证父节点编号小于子节点，须按自顶向下的顺序（后序的逆序）计算，
+# 原写法 for v in range(2, n + 1) 会在父亲编号更大时读到未计算的 up_len[p]。
 up_len = [1] * (n + 1)  # 根节点 up_len[1]=1
-for v in range(2, n + 1):
+for v in reversed(order):
+    if v == 1:
+        continue
     p = parent[v]
     # 判断是否与父节点的方向一致，且父节点也满足相同方向（或父节点为根）
     if (left[p] == v and (p == 1 or (parent[p] and left[parent[p]] == p))) or \

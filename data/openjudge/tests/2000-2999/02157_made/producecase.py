@@ -417,10 +417,162 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
-REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02157/statistics/\n# Accepted submission: 45991187\n# Source: http://cs101.openjudge.cn/practice/solution/45991187/\n# License: not declared on the submission page; no license is inferred.\n\ndef valid(i,j):\n    if (0<=i)&(0<=j)&(i<h)&(j<w):\n        return True\n    else:\n        return False\ntile_free=['.','a','b','c','d','e']\ndef check(i,j):\n    f=False\n    if valid(i-1,j):\n        if m[i-1][j] in tile_free:\n            f=True\n    if valid(i+1,j):\n        if m[i+1][j] in tile_free:\n            f=True\n    if valid(i,j-1):\n        if m[i][j-1] in tile_free:\n            f=True\n    if valid(i,j+1):\n        if m[i][j+1] in tile_free:\n            f=True\n    return f\ndef door_check(i,j):\n    f=False\n    if valid(i-1,j):\n        if m[i-1][j]=='@':\n            f=True\n    if valid(i+1,j):\n        if m[i+1][j]=='@':\n            f=True\n    if valid(i,j-1):\n        if m[i][j-1]=='@':\n            f=True\n    if valid(i,j+1):\n        if m[i][j+1]=='@':\n            f=True\n    return f\ndef search(i,j):\n    # global m\n    if check(i,j)==False:\n        return\n    if valid(i-1,j):\n        if m[i-1][j]=='.':\n            m[i-1][j]='@'\n            search(i-1,j)\n        if m[i-1][j] in ['a','b','c','d','e']:\n            key[['a','b','c','d','e'].index(m[i-1][j])]-=1\n            m[i-1][j]='@'\n            search(i-1,j)\n    if valid(i+1,j):\n        if m[i+1][j]=='.':\n            m[i+1][j]='@'\n            search(i+1,j)\n        if m[i+1][j] in ['a','b','c','d','e']:\n            key[['a','b','c','d','e'].index(m[i+1][j])]-=1\n            m[i+1][j]='@'\n            search(i+1,j)\n    if valid(i,j-1):\n        if m[i][j-1]=='.':\n            m[i][j-1]='@'\n            search(i,j-1)\n        if m[i][j-1] in ['a','b','c','d','e']:\n            key[['a','b','c','d','e'].index(m[i][j-1])]-=1\n            m[i][j-1]='@'\n            search(i,j-1)\n    if valid(i,j+1):\n        if m[i][j+1]=='.':\n            m[i][j+1]='@'\n            search(i,j+1)\n        if m[i][j+1] in ['a','b','c','d','e']:\n            key[['a','b','c','d','e'].index(m[i][j+1])]-=1\n            m[i][j+1]='@'\n            search(i,j+1)\nwhile True:\n    h,w=map(int,input().split())\n    if h==0 & w==0:\n        break\n    m=[]\n    door=[None,None,None,None,None]\n    key=[0,0,0,0,0]\n    for i in range(h):\n        m.append(list(input()))\n        for j in range(w):\n            if m[i][j]=='S':\n                i0=i\n                j0=j\n                m[i][j]='@'\n            if m[i][j]=='G':\n                i1=i\n                j1=j\n                m[i][j]='.'\n            if m[i][j] in ['A','B','C','D','E']:\n                door[['A','B','C','D','E'].index(m[i][j])]=(i,j)\n            if m[i][j] in ['a','b','c','d','e']:\n                key[['a','b','c','d','e'].index(m[i][j])]+=1\n    search(i0,j0)\n    key_p=[]\n    while key_p!=key:\n        key_p=key\n        for _ in range(5):\n            if (key[_]==0)&(door[_]!=None):\n                if door_check(door[_][0],door[_][1])==True:\n                    m[door[_][0]][door[_][1]]='@'\n                    search(door[_][0],door[_][1])\n    if m[i1][j1]=='@':\n        print('YES')\n    else:\n        print('NO')\n"
+REFERENCE="# 修正版参考解（2026-10 数据审计）：原 Accepted 提交只按 A..E 顺序尝试开门一轮，\n# 开 B 门后才拿齐 A 门钥匙时不会回头再开 A，会把 YES 判成 NO。这里反复 BFS 直到不再有新门可开。\nimport sys\nfrom collections import deque\n\ndef solve(g, h, w):\n    total = {}\n    for row in g:\n        for c in row:\n            if 'a' <= c <= 'e':\n                total[c] = total.get(c, 0) + 1\n    for i in range(h):\n        for j in range(w):\n            if g[i][j] == 'S':\n                si, sj = i, j\n    opened = set()\n    while True:\n        seen = [[False] * w for _ in range(h)]\n        seen[si][sj] = True\n        q = deque([(si, sj)])\n        got = {}\n        while q:\n            i, j = q.popleft()\n            c = g[i][j]\n            if c == 'G':\n                return True\n            if 'a' <= c <= 'e':\n                got[c] = got.get(c, 0) + 1\n            for x, y in ((i - 1, j), (i + 1, j), (i, j - 1), (i, j + 1)):\n                if 0 <= x < h and 0 <= y < w and not seen[x][y]:\n                    d = g[x][y]\n                    if d == 'X' or ('A' <= d <= 'E' and d not in opened):\n                        continue\n                    seen[x][y] = True\n                    q.append((x, y))\n        new = {d for d in 'ABCDE' if d not in opened and total.get(d.lower(), 0) > 0\n               and got.get(d.lower(), 0) == total[d.lower()]}\n        if not new:\n            return False\n        opened |= new\n\ndef main():\n    t = sys.stdin.read().split()\n    p = 0\n    out = []\n    while p + 1 < len(t):\n        h, w = int(t[p]), int(t[p + 1]); p += 2\n        if h == 0 and w == 0:\n            break\n        g = t[p:p + h]; p += h\n        out.append('YES' if solve(g, h, w) else 'NO')\n    print('\\n'.join(out))\n\nmain()\n"
 LANGUAGE='Python3'
 NUMBER=2157
 SAMPLE='4 4\nS.X.\na.X.\n..XG\n....\n3 4\nS.Xa\n.aXB\nb.AG\n0 0\n'
+def valid(text):
+    """题面契约：多组，每组首行 M N（1 < N, M < 20），随后 M 行各 N 个字符，字符只取
+    X . S G A-E a-e；起点 S、宝藏 G 各恰一个；门至多 5 扇且 A..E 各至多一扇，
+    每扇出现的门至少有一把钥匙（题面：needs to find all the door's keys (at least one)）。以 "0 0" 结束。"""
+    if not text.endswith('\n') or '\r' in text:
+        return False
+    lines = text[:-1].split('\n')
+    i = 0
+    cases = 0
+    while True:
+        if i >= len(lines):
+            return False
+        head = lines[i].split(' ')
+        if len(head) != 2 or not all(t.isdigit() for t in head):
+            return False
+        h, w = map(int, head); i += 1
+        if h == 0 and w == 0:
+            return i == len(lines) and cases >= 1
+        if not (1 < h < 20 and 1 < w < 20) or i + h > len(lines):
+            return False
+        g = lines[i:i + h]; i += h
+        if any(len(row) != w or any(c not in 'X.SGABCDEabcde' for c in row) for row in g):
+            return False
+        flat = ''.join(g)
+        if flat.count('S') != 1 or flat.count('G') != 1:
+            return False
+        for d in 'ABCDE':
+            if flat.count(d) > 1 or (flat.count(d) == 1 and flat.count(d.lower()) == 0):
+                return False
+        cases += 1
+
+
+def _solve2157(g, mode):
+    """mode='ok' 正解；'any' 拿到一把钥匙就开门（错解）；'once' 按 A..E 只试一轮（原参考解的错法）。"""
+    h, w = len(g), len(g[0])
+    total = {}
+    for row in g:
+        for c in row:
+            if c in 'abcde': total[c] = total.get(c, 0) + 1
+    si, sj = next((i, j) for i in range(h) for j in range(w) if g[i][j] == 'S')
+    def bfs(opened):
+        seen = {(si, sj)}; st = [(si, sj)]; got = {}; reach_g = False
+        while st:
+            i, j = st.pop()
+            c = g[i][j]
+            if c == 'G': reach_g = True
+            if c in 'abcde': got[c] = got.get(c, 0) + 1
+            for x, y in ((i-1, j), (i+1, j), (i, j-1), (i, j+1)):
+                if 0 <= x < h and 0 <= y < w and (x, y) not in seen:
+                    d = g[x][y]
+                    if d == 'X' or (d in 'ABCDE' and d not in opened): continue
+                    seen.add((x, y)); st.append((x, y))
+        return reach_g, got, seen
+    opened = set()
+    if mode == 'once':
+        ok, got, seen = bfs(opened)
+        for d in 'ABCDE':
+            k = d.lower()
+            if total.get(k) and got.get(k, 0) == total[k]:
+                pos = [(i, j) for i in range(h) for j in range(w) if g[i][j] == d]
+                if pos and any((x, y) in seen for x, y in ((pos[0][0]+a, pos[0][1]+b) for a, b in ((1,0),(-1,0),(0,1),(0,-1)))):
+                    opened.add(d); ok, got, seen = bfs(opened)
+        return ok
+    while True:
+        ok, got, seen = bfs(opened)
+        if ok: return True
+        if mode == 'any':
+            new = {d for d in 'ABCDE' if d not in opened and got.get(d.lower(), 0) >= 1}
+        else:
+            new = {d for d in 'ABCDE' if d not in opened and total.get(d.lower()) and got.get(d.lower(), 0) == total[d.lower()]}
+        if not new: return False
+        opened |= new
+
+
+def _maze2157(r, h, w, ndoor, density):
+    g = [['X' if r.random() < density else '.' for _ in range(w)] for _ in range(h)]
+    doors = r.sample('ABCDE', ndoor)
+    for d in doors:            # 每扇门做成一整条墙上的缺口，把迷宫切成几块
+        if r.random() < .5 and h >= 3:
+            y = r.randrange(1, h - 1); x = r.randrange(w)
+            for j in range(w): g[y][j] = 'X'
+        else:
+            x = r.randrange(1, w - 1) if w >= 3 else r.randrange(w); y = r.randrange(h)
+            for i in range(h): g[i][x] = 'X'
+        g[y][x] = d
+        # 门已占的格子可能被后面的墙覆盖，最后统一检查
+    free = [(i, j) for i in range(h) for j in range(w) if g[i][j] in '.X' and r.random() < 1.0]
+    free = [(i, j) for i, j in free if g[i][j] == '.'] or [(i, j) for i in range(h) for j in range(w) if g[i][j] not in 'ABCDE']
+    present = [d for d in 'ABCDE' if any(d in row for row in g)]
+    need = 2 + sum(1 for _ in present) * 4
+    if len(free) < need:
+        cells = [(i, j) for i in range(h) for j in range(w) if g[i][j] not in 'ABCDE']
+        r.shuffle(cells); free = cells
+    r.shuffle(free)
+    (a, b), (c, e) = free[0], free[1]
+    g[a][b] = 'S'; g[c][e] = 'G'
+    p = 2
+    for d in present:
+        for _ in range(r.choice([1, 1, 2, 2, 3, 4])):
+            if p < len(free):
+                i, j = free[p]; p += 1; g[i][j] = d.lower()
+        if not any(d.lower() in row for row in g):   # 无处放钥匙就拆掉这扇门
+            for row in g:
+                for j, ch in enumerate(row):
+                    if ch == d: row[j] = 'X'
+    # 偶尔放几把没有门的钥匙
+    if r.random() < .2:
+        for _ in range(r.randint(1, 3)):
+            if p < len(free):
+                i, j = free[p]; p += 1; g[i][j] = r.choice('abcde')
+    return [''.join(row) for row in g]
+
+
+def gen2157(seed):
+    r = random.Random(2157_000 + seed)
+    mazes = []
+    if seed == 1:      # 手工边界组
+        mazes = [["SG", "XX"], ["SX", "XG"], ["S.", ".G"], ["Sa", "AG"], ["SA", "aG"],
+                 ["SbBaAG", "XXXXXX"],                       # 先开 B 才拿齐 A 的钥匙（按字母顺序只扫一轮会错）
+                 ["SaAaG", "XXXXX"],                         # A 有两把钥匙，第二把在门后：NO
+                 ["SaaAG", "XXXXX"],                         # 两把都在门前：YES
+                 ["S.....G", "XXXXXXX"],
+                 ["S" + "." * 17 + "G"] + ["." * 19] * 18,   # 19x19 空地
+                 ["SeEdDcCbBaAG", "XXXXXXXXXXXX"],           # 逆序链：E->D->C->B->A
+                 ["SaAbBcCdDeEG", "XXXXXXXXXXXX"]]           # 顺序链
+    elif seed <= 6:    # 专挑「按 A..E 只开一轮」与正解不同的组
+        while len(mazes) < 40:
+            m = _maze2157(r, r.randint(2, 19), r.randint(2, 19), r.randint(2, 5), r.choice([0, .1, .2]))
+            if _solve2157(m, 'ok') != _solve2157(m, 'once'): mazes.append(m)
+            elif r.random() < .05: mazes.append(m)
+    elif seed <= 11:   # 专挑「拿到一把钥匙就开门」与正解不同的组
+        while len(mazes) < 40:
+            m = _maze2157(r, r.randint(2, 19), r.randint(2, 19), r.randint(1, 5), r.choice([0, .1, .2, .3]))
+            if _solve2157(m, 'ok') != _solve2157(m, 'any'): mazes.append(m)
+            elif r.random() < .05: mazes.append(m)
+    elif seed <= 18:   # 满规模 19x19，YES/NO 各半
+        want = [True, False] * 30
+        for x in want:
+            while True:
+                m = _maze2157(r, 19, 19, r.randint(0, 5), r.choice([0, .1, .25, .35, .45]))
+                if _solve2157(m, 'ok') == x: mazes.append(m); break
+    elif seed <= 22:   # 极窄：2 行或 2 列
+        for _ in range(60):
+            h, w = (2, r.randint(2, 19)) if r.random() < .5 else (r.randint(2, 19), 2)
+            mazes.append(_maze2157(r, h, w, r.randint(0, 5), r.choice([0, .2, .4])))
+    else:              # 随机混合，YES/NO 尽量平衡
+        for k in range(r.randint(20, 100)):
+            while True:
+                m = _maze2157(r, r.randint(2, 19), r.randint(2, 19), r.randint(0, 5), r.choice([0, .1, .2, .3, .45]))
+                if _solve2157(m, 'ok') == (k % 2 == 0) or r.random() < .3: mazes.append(m); break
+    return "".join(f"{len(m)} {len(m[0])}\n" + "".join(row + "\n" for row in m) for m in mazes) + "0 0\n"
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -428,7 +580,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[gen2157(s) for s in range(1, 40)]
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

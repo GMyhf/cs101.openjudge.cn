@@ -1,4 +1,4 @@
-"""12757 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+"""12757 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 60 组数据。
 
 出处：build_001c
 生成器与循环取自 scripts/build_001c.py（批次 001c），保持同一形状；
@@ -32,6 +32,51 @@ def number_words(n):
 def g12757(r):
     return number_words(r.randint(-9_999_999, 9_999_999)) + "\n"
 
+WORDS = set(ONES + TEENS + TENS[2:] + ["negative", "hundred", "thousand", "million"])
+
+
+def parse_words(words):
+    """独立于参考解的解析：逐词累加，遇 hundred 乘百，遇 thousand/million 结算一段。"""
+    sign = 1
+    if words and words[0] == "negative":
+        sign, words = -1, words[1:]
+    total = cur = 0
+    for w in words:
+        if w == "hundred":
+            cur *= 100
+        elif w == "thousand":
+            total += cur * 1000; cur = 0
+        elif w == "million":
+            total += cur * 1_000_000; cur = 0
+        else:
+            cur += (ONES + TEENS).index(w) if w in ONES + TEENS else TENS.index(w) * 10
+    return sign * (total + cur)
+
+
+def valid(text):
+    """题面：一行英文数词（长度不超过 200），值在 [-999999999, 999999999]，只用题面列出的单词，
+    千以上不用 "sixteen hundred" 这类写法；按标准写法（与 number_words 一致）核对。"""
+    if not text.endswith("\n") or text.count("\n") != 1:
+        return False
+    line = text[:-1]
+    if len(line) > 200 or line != line.strip() or "  " in line:
+        return False
+    words = line.split(" ")
+    if not words or not all(w in WORDS for w in words):
+        return False
+    n = parse_words(words)
+    if not -999_999_999 <= n <= 999_999_999:
+        return False
+    return number_words(n) == line
+
+
+# 固定覆盖：0、±1、各数量级整点、上下界 ±999999999、题面提示里的例子、最长词串、含 teen/整十的各段
+FIXED = [0, -1, 1, 6, 10, 19, 20, 99, 100, 101, 1000, 1600, 1000000, 1000101, 814022,
+         -1000, -1000000, 999999999, -999999999, 100000000, -100000000, 100000001,
+         777777777, -777777777, 999000999, 13013013, -19000019, 110010100, 800000080,
+         -40014, 512000000, 2147483 ]
+
+
 def build_cases():
     cases = [SAMPLE_IN]
     for i in range(1, 20):
@@ -42,6 +87,18 @@ def build_cases():
                 break
         else:
             raise AssertionError("生成器多样性不足")
+    # 第 20 组起：固定边界 + 全值域（到 ±999999999，原 19 组只到 ±9999999）随机
+    for v in FIXED:
+        c = number_words(v) + "\n"
+        if c not in cases:
+            cases.append(c)
+    r = random.Random(NUMBER)
+    while len(cases) < 60:
+        c = number_words(r.randint(-999_999_999, 999_999_999)) + "\n"
+        if c not in cases:
+            cases.append(c)
+    assert len(set(cases)) == len(cases)
+    assert all(valid(c) for c in cases), "有数据越出题面约束"
     return cases
 
 def solve_reference(content):

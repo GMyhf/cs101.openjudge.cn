@@ -152,6 +152,34 @@ REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02001/statis
 LANGUAGE='Python3'
 NUMBER=2001
 SAMPLE='carbohydrate\ncart\ncarburetor\ncaramel\ncaribou\ncarbonic\ncartilage\ncarbon\ncarriage\ncarton\ncar\ncarbonate\n'
+def valid(text):
+    # 题面：至少 2 行、至多 1000 行；每行一个由 1..20 个小写字母组成的单词；"a set of words" 视为互异
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if not 2<=len(lines)<=1000 or len(set(lines))!=len(lines):return False
+    return all(1<=len(w)<=20 and all('a'<=c<='z' for c in w) for w in lines)
+def extra_cases():
+    r=random.Random(20012001)
+    cs=['a\nb\n','a\naa\n','ab\nabc\n','z'*20+'\n'+'z'*19+'y\n']
+    cs.append('\n'.join('a'*k for k in range(20,0,-1))+'\n')  # 前缀链，全靠“精确匹配优先”
+    def dense(n,alpha,lo,hi):
+        a=set()
+        while len(a)<n:a.add(''.join(r.choice(alpha) for _ in range(r.randint(lo,hi))))
+        a=sorted(a);r.shuffle(a);return '\n'.join(a)+'\n'
+    for _ in range(4):cs.append(dense(r.randint(10,40),'ab',1,6))
+    for _ in range(3):cs.append(dense(r.randint(50,200),'abc',1,8))
+    cs.append(dense(1000,'ab',1,20))
+    cs.append(dense(1000,'abc',15,20))
+    cs.append(dense(1000,'abcdefghijklmnopqrstuvwxyz',1,20))
+    # 公共长前缀 + 随机尾
+    base=''.join(r.choice('xyz') for _ in range(14))
+    a=set()
+    while len(a)<1000:
+        a.add(base[:r.randint(1,14)]+''.join(r.choice('xy') for _ in range(r.randint(0,6))))
+    a=sorted(a);r.shuffle(a);cs.append('\n'.join(a)+'\n')
+    a=sorted(set(''.join(r.choice('ab') for _ in range(20)) for _ in range(1000)))[:999]+['a'];r.shuffle(a)
+    cs.append('\n'.join(a)+'\n')
+    return cs
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -159,7 +187,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])+extra_cases()
   for i,x in enumerate(cases):
+   assert valid(x),i
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

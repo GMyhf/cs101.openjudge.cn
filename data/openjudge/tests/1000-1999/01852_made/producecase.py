@@ -59,11 +59,7 @@ def generate(n, seed):
     if n==2806:
         return '\n'.join(f"{''.join(r.choice('abcd') for _ in range(r.randint(1,20)))} {''.join(r.choice('abcd') for _ in range(r.randint(1,20)))}" for _ in range(r.randint(1,6)))+'\n'
     if n==1426:return '\n'.join(str(r.randint(1,200)) for _ in range(r.randint(1,6)))+'\n0\n'
-    if n==1852:
-        out=[str(r.randint(1,4))]
-        for _ in range(int(out[0])):
-            L=r.randint(10,1000);x=sorted(r.sample(range(1,L),r.randint(1,min(20,L-1))));out += [f'{L} {len(x)}',' '.join(map(str,x))]
-        return '\n'.join(out)+'\n'
+    if n==1852:return gen1852(r,seed)
     if n==2039:
         c=r.randint(2,20);s=''.join(r.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(c*r.randint(1,10)));return f'{c}\n{s}\n'
     if n==2754:
@@ -152,6 +148,49 @@ def generate(n, seed):
     if n==1218:
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
+
+def valid(text):
+    """题面约束：首个整数为组数；每组 L n 后跟 n 个蚂蚁位置（距左端距离，故 0<=x<=L）；
+    所有整数不超过 1000000，以空白分隔。另要求组数>=1、L>=1、n>=1（有蚂蚁才谈得上落下时间）。"""
+    try:a=[int(t) for t in text.split()]
+    except ValueError:return False
+    if any(t<0 or t>1000000 for t in a):return False
+    if not a or a[0]<1:return False
+    p=1
+    for _ in range(a[0]):
+        if p+2>len(a):return False
+        L,n=a[p],a[p+1];p+=2
+        if L<1 or n<1 or p+n>len(a):return False
+        if any(x>L for x in a[p:p+n]):return False
+        p+=n
+    return p==len(a)
+
+def gen1852(r,seed):
+    def case(L,n,edge=False):
+        x=[r.randint(0,L) for _ in range(n)]
+        if edge:x[r.randrange(n)]=0;x[r.randrange(n)]=L
+        r.shuffle(x);return f"{L} {n}\n"+" ".join(map(str,x))
+    cs=[]
+    if seed==1:cs=[case(1,1),"1 1\n0","1 1\n1","2 1\n1","1000000 1\n0","1000000 1\n500000","1000000 1\n1000000","7 2\n0 7"]
+    elif seed<=12:
+        for _ in range(r.randint(1,6)):
+            L=r.randint(1,30);cs.append(case(L,r.randint(1,10),r.random()<.3))
+    elif seed<=24:
+        for _ in range(r.randint(1,5)):
+            L=r.randint(1,1000000);cs.append(case(L,r.randint(1,2000),r.random()<.3))
+    elif seed<=28:
+        for _ in range(r.randint(3000,6000)):
+            L=r.randint(1,1000000);cs.append(case(L,r.randint(1,3),r.random()<.2))
+    elif seed<=32:
+        L=r.randint(900000,1000000);cs.append(case(L,120000,seed%2==0))
+    elif seed<=35:
+        # 所有蚂蚁都挤在中点附近 / 一端附近
+        L=1000000;n=100000;c=500000 if seed==33 else (3 if seed==34 else 999990)
+        x=[min(L,max(0,c+r.randint(-10,10))) for _ in range(n)];cs.append(f"{L} {n}\n"+" ".join(map(str,x)))
+    else:
+        for _ in range(r.randint(2,5)):
+            L=r.randint(1,1000000);cs.append(case(L,r.randint(10000,25000),r.random()<.5))
+    return f"{len(cs)}\n"+"\n".join(cs)+"\n"
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1852: Ants\n# Fenced code block index: None\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/01852/\n# License: not declared in source collection; no license is inferred.\nimport sys\na=list(map(int,sys.stdin.buffer.read().split()));p=1\nfor _ in range(a[0]):\n L,n=a[p:p+2];p+=2;x=a[p:p+n];p+=n\n print(max(min(v,L-v) for v in x),max(max(v,L-v) for v in x))\n'
 NUMBER=1852

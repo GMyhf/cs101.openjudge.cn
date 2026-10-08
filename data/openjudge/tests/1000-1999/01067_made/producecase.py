@@ -148,10 +148,81 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
-REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1067: 取石子游戏\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01067/\n# License: not declared; no license is inferred.\nimport math\n\ndef wythoff(a, b):\n    if a > b:\n        a, b = b, a  # Make sure a <= b.\n    k = b - a\n    ak = k * (math.sqrt(5) + 1) / 2  # ak is the k-th element in the Beatty sequence.\n    return 1 if a != int(ak) else 0\n\nwhile True:\n    try:\n        a, b = map(int, input().split())\n    except:\n        break\n\n    ans = wythoff(a, b)\n\n    print(ans)\n'
+REFERENCE='# 参考解：威佐夫博弈。原先引用的 2020fall 代码用浮点 k*(sqrt5+1)/2 求 Beatty 数，在 k 为某些斐波那契数\n# （如 102334155、267914296）时差 1；这里改成精确整数 floor(k*phi) = (k + isqrt(5k^2)) // 2。\nimport sys\nfrom math import isqrt\nout = []\nfor line in sys.stdin.read().split("\\n"):\n    t = line.split()\n    if len(t) < 2:\n        continue\n    a, b = sorted(map(int, t[:2]))\n    k = b - a\n    out.append("0" if a == (k + isqrt(5 * k * k)) // 2 else "1")\nprint("\\n".join(out))\n'
 LANGUAGE='Python3'
 NUMBER=1067
 SAMPLE='2 1\n8 4\n4 7\n'
+def valid(text):
+    """题面：若干行，每行两个非负整数 a b，均不大于 1,000,000,000。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not lines or lines == [""]:
+        return False
+    for s in lines:
+        t = s.split(" ")
+        if len(t) != 2:
+            return False
+        for z in t:
+            if not (z.isascii() and z.isdigit()) or str(int(z)) != z or int(z) > 1_000_000_000:
+                return False
+    return True
+
+def gen1067(seed):
+    """另行约定：剔除「浮点 k*(sqrt5+1)/2 与精确值不一致」的行（只在 k 为个别斐波那契数时出现），
+    不拿浮点精度去卡常见写法；原题数据是否含这类行无从考证，留给人决定。"""
+    import math
+    r = random.Random(1067_000 + seed)
+    MX = 1_000_000_000
+    def beat(k):
+        return (k + math.isqrt(5 * k * k)) // 2
+    KMAX = 381_966_011                       # beat(k)+k <= 1e9 的最大 k
+    def lose(k):                             # P 局面（先手败）
+        a = beat(k); return (a, a + k)
+    def fl_ok(a, b):
+        x, y = sorted((a, b)); k = y - x
+        return (x != int(k * (math.sqrt(5) + 1) / 2)) == (x != beat(k))
+    def line(a, b):
+        return f"{a} {b}" if r.random() < 0.5 else f"{b} {a}"
+    rows = []
+    def add(a, b):
+        if 0 <= a <= MX and 0 <= b <= MX and fl_ok(a, b):
+            rows.append(line(a, b))
+    if seed == 1:
+        add(0, 0)
+    elif seed == 2:
+        for k in range(0, 30):
+            a, b = lose(k); add(a, b)
+        for a in range(0, 12):
+            for b in range(0, 12):
+                add(a, b)
+    elif seed == 3:
+        add(*lose(KMAX)); add(MX, MX); add(0, MX); add(MX, 0); add(MX - 1, MX)
+        a, b = lose(KMAX); add(a + 1, b); add(a, b - 1); add(a - 1, b - 1)
+    else:
+        if seed <= 10:
+            m, kmax = r.randint(5, 50), 1000
+        elif seed <= 25:
+            m, kmax = r.randint(500, 5000), KMAX
+        elif seed <= 28:                      # 3 组满载（4 万行），其余缩小以控制总体积 <= 10MB
+            m, kmax = 40000, KMAX
+        else:
+            m, kmax = r.randint(5000, 15000), KMAX
+        for _ in range(m):
+            t = r.random(); k = r.randint(0, kmax)
+            a, b = lose(k)
+            if t < 0.45:
+                add(a, b)                                      # 先手败
+            elif t < 0.65:
+                d = r.choice([-1, 1]); add(a + d, b + d) if r.random() < 0.5 else add(a + d, b)
+            elif t < 0.75:
+                x = r.randint(0, MX); add(x, x)                # 相等两堆（含 0 0）
+            elif t < 0.8:
+                add(0, r.randint(0, MX))
+            else:
+                add(r.randint(0, MX), r.randint(0, MX))
+    return "\n".join(rows) + "\n"
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -159,7 +230,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [gen1067(s) for s in range(1, 40)])
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

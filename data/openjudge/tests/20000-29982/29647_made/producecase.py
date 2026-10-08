@@ -9,6 +9,119 @@ def g29647(r):
 
 from pathlib import Path
 import random, subprocess, sys, tempfile
+
+
+def valid(text):
+    """题面：第一行 n（1<=n<=1000）；接下来 n 行各一个整数 ri（-128<=ri<=127）；
+    再 n-1 行，每行 l k（1<=l,k<=n），k 是 l 的直接上司；关系保证是一棵树。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    try:
+        if len(lines[0].split()) != 1:
+            return False
+        n = int(lines[0])
+        if not 1 <= n <= 1000 or len(lines) != 2 * n:
+            return False
+        for line in lines[1:n + 1]:
+            toks = line.split()
+            if len(toks) != 1 or not -128 <= int(toks[0]) <= 127:
+                return False
+        parent = [0] * (n + 1)
+        for line in lines[n + 1:]:
+            toks = line.split()
+            if len(toks) != 2:
+                return False
+            l, k = map(int, toks)
+            if not (1 <= l <= n and 1 <= k <= n) or l == k or parent[l]:
+                return False
+            parent[l] = k
+    except ValueError:
+        return False
+    roots = [v for v in range(1, n + 1) if not parent[v]]
+    if len(roots) != 1:
+        return False
+    # 无环：从每个点沿上司走，必须走到根
+    state = [0] * (n + 1)          # 0 未访问，1 在路径上，2 已确认可达根
+    state[roots[0]] = 2
+    for v in range(1, n + 1):
+        path = []
+        while state[v] == 0:
+            state[v] = 1; path.append(v); v = parent[v]
+        if state[v] == 1:
+            return False
+        for u in path:
+            state[u] = 2
+    return True
+
+
+def _emit(r, n, par, value, shuffle=True):
+    """par[v] 为 v 的上司（根为 0）；随机重标号使根不总是 1，并打乱关系行的顺序。"""
+    perm = list(range(1, n + 1))
+    r.shuffle(perm)
+    lab = [0] + perm
+    val = [0] * (n + 1)
+    for v in range(1, n + 1):
+        val[lab[v]] = value[v - 1]
+    edges = [(lab[v], lab[par[v]]) for v in range(1, n + 1) if par[v]]
+    if shuffle:
+        r.shuffle(edges)
+    body = "\n".join(map(str, val[1:])) + "\n"
+    if edges:
+        body += "\n".join(f"{a} {b}" for a, b in edges) + "\n"
+    return f"{n}\n" + body
+
+
+def _values(r, n, lo=-128, hi=127):
+    v = [r.randint(lo, hi) for _ in range(n)]
+    if max(v) <= 0:                 # 保证至少一人快乐指数为正，避免“一个都不请”的歧义
+        v[r.randrange(n)] = r.randint(1, 127)
+    return v
+
+
+def special_case(index):
+    """第 25..39 组：补 n=1、n=1000、负快乐指数、链/菊花/二叉/随机深树、根不为 1 等情形。"""
+    r = random.Random(296470 + index)
+    k = index - 25
+    if k == 0:
+        return "1\n5\n"
+    if k == 1:
+        return "2\n-3\n7\n2 1\n"            # 根值为负，子为正
+    if k in (2, 3, 4, 5):                     # 小规模、带负值，可暴力核对
+        n = [3, 8, 12, 16][k - 2]
+        par = [0, 0] + [r.randint(1, v - 1) for v in range(2, n + 1)]
+        return _emit(r, n, par, _values(r, n))
+    n = 1000
+    if k == 6:                                # 长链（深度 1000）
+        par = [0, 0] + list(range(1, n))
+        val = _values(r, n)
+    elif k == 7:                              # 长链，正负交替
+        par = [0, 0] + list(range(1, n))
+        val = [127 if i % 2 else -128 for i in range(n)]
+    elif k == 8:                              # 菊花：根值很大，叶子小
+        par = [0, 0] + [1] * (n - 1)
+        val = [127] + [r.randint(-128, 0) for _ in range(n - 1)]
+        val[r.randrange(1, n)] = 1
+    elif k == 9:                              # 菊花：根值小、叶子正
+        par = [0, 0] + [1] * (n - 1)
+        val = [-128] + [r.randint(-5, 127) for _ in range(n - 1)]
+    elif k == 10:                             # 完全二叉树
+        par = [0, 0] + [v // 2 for v in range(2, n + 1)]
+        val = _values(r, n)
+    elif k == 11:                             # 全为 127
+        par = [0, 0] + [r.randint(1, v - 1) for v in range(2, n + 1)]
+        val = [127] * n
+    elif k == 12:                             # 绝大多数为负
+        par = [0, 0] + [r.randint(max(1, v - 5), v - 1) for v in range(2, n + 1)]
+        val = _values(r, n, -128, 10)
+    elif k == 13:                             # 深随机树（父亲在前 3 个之内）
+        par = [0, 0] + [r.randint(max(1, v - 3), v - 1) for v in range(2, n + 1)]
+        val = _values(r, n)
+    else:                                     # 均匀随机树
+        par = [0, 0] + [r.randint(1, v - 1) for v in range(2, n + 1)]
+        val = _values(r, n)
+    return _emit(r, n, par, val)
+
 REFERENCE = REFERENCE
 def solve(text):
     with tempfile.TemporaryDirectory(prefix='producecase-run-') as d:
@@ -18,7 +131,8 @@ def solve(text):
         return result.stdout
 def main():
     data=Path('data'); data.mkdir(exist_ok=True)
-    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(seed)) for seed in range(1, 40)]
+    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(seed)) if seed < 25 else special_case(seed) for seed in range(1, 40)]
+    assert all(valid(c) for c in cases) and len(set(cases)) == len(cases)
     for i, case in enumerate(cases):
         (data/f'{i}.in').write_text(case); (data/f'{i}.out').write_text(solve(case))
 if __name__=='__main__': main()

@@ -7,6 +7,49 @@ GENERATOR_NAME='g19974'
 def g19974(r):
     t=r.randint(1,8); return f"{t}\n"+"\n".join(f"{r.randint(-5,5)} {r.randint(1,15)} {r.randint(1,15)}" for _ in range(t))+"\n"
 
+def valid(text):
+    """题面契约：首行正整数 t，其后恰 t 行，每行三个整数 m p q，p、q 为正数。
+    题面没给 m、p、q、t 的上界，这里只核格式与 p,q>=1。"""
+    import re
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not re.fullmatch(r"[1-9]\d*", lines[0]) or len(lines) != int(lines[0]) + 1:
+        return False
+    for ln in lines[1:]:
+        m = re.fullmatch(r"(-?\d+) (\d+) (\d+)", ln)
+        if not m or int(m[2]) < 1 or int(m[3]) < 1:
+            return False
+    return True
+
+def gwide(r, t, mlo, mhi, pqmax, fixed=()):
+    """追加组：题面无上界，取 p+q<=60 使答案 C(60,30)≈1.2e17 仍在 64 位内，
+    同时足以卡掉不带记忆化的递归（指数级）。fixed 为固定的边界行。"""
+    rows = [f"{m} {p} {q}" for m, p, q in fixed]
+    while len(rows) < t:
+        p = r.randint(1, pqmax); q = r.randint(1, min(pqmax, 60 - p))
+        rows.append(f"{r.randint(mlo, mhi)} {p} {q}")
+    return f"{t}\n" + "\n".join(rows) + "\n"
+
+FIXED = [
+    (0, 1, 1), (0, 30, 30),        # m=0：起点就在边境线上
+    (1, 1, 1), (-1, 1, 1),         # 一侧路径被挡，只剩 1 条
+    (1, 1, 2), (-1, 2, 1),         # 终点落在边境线上：0
+    (2, 1, 2), (-2, 2, 1), (1, 1, 5), (-1, 5, 1),  # 后两行终点在线另一侧：0
+    (1, 30, 30), (-1, 30, 30),     # 紧贴对角线，答案是 Catalan 型
+    (100, 30, 30), (-100, 30, 30), # 边境线够远：全部 C(60,30) 条路
+    (31, 30, 30), (-31, 30, 30), (30, 1, 29), (-30, 29, 1),
+    (5, 1, 59), (-5, 59, 1), (60, 1, 59), (-60, 59, 1),
+]
+EXTRA = [  # (种子, t, m 下界, m 上界, p/q 上界, 是否带固定行)
+    (301, len(FIXED), 0, 0, 1, True),
+    (302, 20, -10, 10, 59, False),
+    (303, 20, -60, 60, 59, False),
+    (304, 20, 1, 3, 30, False),
+    (305, 20, -3, -1, 30, False),
+    (306, 1, 2, 2, 30, False),
+]
+
 def run(text):
     with tempfile.TemporaryDirectory(prefix="producecase-") as d:
         d=Path(d); src=d/'main.py'
@@ -19,7 +62,9 @@ def run(text):
         return x.stdout
 def main():
     data=Path("data"); data.mkdir(exist_ok=True)
-    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(seed)) for seed in range(1, 40)]
+    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(seed)) for seed in range(1, 34)]  # 尾部 6 组让给下面的定制组，总数仍为 40（catalog 按文件列组）
+    cases+=[gwide(random.Random(sd), t, a, b, pq, FIXED if f else ()) for sd, t, a, b, pq, f in EXTRA]
+    assert len(cases) == 40 and len(set(cases)) == 40 and all(valid(c) for c in cases)
     for i,text in enumerate(cases):
         (data/f"{i}.in").write_text(text)
         (data/f"{i}.out").write_text(run(text))

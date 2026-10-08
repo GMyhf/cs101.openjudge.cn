@@ -14,8 +14,80 @@ def run(text):
         x=subprocess.run([sys.executable,str(p)],input=text,text=True,capture_output=True,timeout=120)
         if x.returncode: raise SystemExit(x.stderr)
         return x.stdout
+import re
+from collections import deque
+
+INT = r'(0|-?[1-9][0-9]*)'
+
+def valid(text):
+    """题面：第一行 n（提示 1<=n<=10^4）；第二行 n 个整数；第三行整数 k。
+    题面未给元素与 k 的范围，本数据自限 |nums[i]|<=10^6、0<=k<=2*10^6+1（int 不溢出）。"""
+    lines = text.split('\n')
+    if len(lines) != 4 or lines[3] != '':
+        return False
+    if not re.fullmatch(r'[1-9][0-9]*', lines[0]) or not 1 <= int(lines[0]) <= 10**4:
+        return False
+    if not re.fullmatch(INT + r'( ' + INT + r')*', lines[1]) or not re.fullmatch(INT, lines[2]):
+        return False
+    nums = list(map(int, lines[1].split()))
+    return len(nums) == int(lines[0]) and all(abs(x) <= 10**6 for x in nums) and 0 <= int(lines[2]) <= 2 * 10**6 + 1
+
+def solve_fast(text):
+    """二分长度 + 单调队列求滑窗极差，O(n log n)。
+    外部参考解（samplecode.py）是 O(n^2) 暴力，满规模要 20 秒以上，只用来离线逐组核对。"""
+    it = text.split(); n = int(it[0]); a = list(map(int, it[1:n + 1])); k = int(it[n + 1])
+    def ok(L):
+        mx, mn = deque(), deque()
+        for j, x in enumerate(a):
+            while mx and a[mx[-1]] <= x: mx.pop()
+            while mn and a[mn[-1]] >= x: mn.pop()
+            mx.append(j); mn.append(j)
+            if mx[0] <= j - L: mx.popleft()
+            if mn[0] <= j - L: mn.popleft()
+            if j >= L - 1 and a[mx[0]] - a[mn[0]] >= k: return True
+        return False
+    if not ok(n): return '-1\n'
+    lo, hi = 1, n
+    while lo < hi:
+        m = (lo + hi) // 2
+        if ok(m): hi = m
+        else: lo = m + 1
+    return f'{lo}\n'
+
+def fmt(a, k):
+    return f"{len(a)}\n" + " ".join(map(str, a)) + f"\n{k}\n"
+
+def walk(r, n, step, lo=-10**6, hi=10**6):
+    x = r.randint(lo // 2, hi // 2); a = []
+    for _ in range(n):
+        x = min(hi, max(lo, x + r.randint(-step, step))); a.append(x)
+    return a
+
+def special_cases():
+    """边界（n=1、n=2、k=0、k 恰等于整体极差 / 大 1、±10^6）与满规模 n=10^4。
+    满规模里有 3 组专卡 O(n^2) 暴力：全相等答 -1、严格递增答 n、随机游走答几千。"""
+    r = random.Random(29340)
+    out = [fmt([5], 0), fmt([-7], 1), fmt([3, 3], 1), fmt([1, -1], 2), fmt([1, -1], 3),
+           fmt([10**6, -10**6], 2 * 10**6), fmt([0, 10**6, 0, -10**6, 0], 2 * 10**6 + 1)]
+    out.append(fmt([42] * 10**4, 1))                       # 卡暴力：-1
+    out.append(fmt(list(range(10**4)), 10**4 - 1))         # 卡暴力：答案 n
+    a = walk(r, 10**4, 50); out.append(fmt(a, (max(a) - min(a)) * 3 // 4))  # 卡暴力：答案很长
+    a = [r.randint(-10**6, 10**6) for _ in range(10**4)]; out.append(fmt(a, 1999000))
+    a = [r.randint(-10**6, 10**6) for _ in range(10**4)]; out.append(fmt(a, 0))
+    a = [r.randint(-100, 100) for _ in range(10**4)]; out.append(fmt(a, 200))
+    for n, step in [(3000, 30), (5000, 10), (1000, 1000)]:
+        a = walk(r, n, step); out.append(fmt(a, max(a) - min(a)))       # 恰等于整体极差
+        a = walk(r, n, step); out.append(fmt(a, max(a) - min(a) + 1))   # 大 1：-1
+        a = walk(r, n, step); out.append(fmt(a, (max(a) - min(a)) // 3))
+    # 最短段不在开头、且不是相邻两项
+    a = [5] * 30 + list(range(11)) + [5] * 30; out.append(fmt(a, 10))           # 答 11，在中间
+    a = [0, 2, 4, 6, 8, 10, 7, 4, 1, 3, 5, 7, 9, 11, 12]; out.append(fmt(a, 11))  # 答案段不在开头
+    return out
+
 def main():
     d=Path('data'); d.mkdir(exist_ok=True)
-    cases=[SAMPLE]+([EXTRA_CASE] if EXTRA_CASE else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
-    for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
+    cases=[SAMPLE]+([EXTRA_CASE] if EXTRA_CASE else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]+special_cases()
+    assert all(valid(c) for c in cases), [i for i,c in enumerate(cases) if not valid(c)]
+    assert len(set(cases))==len(cases), '组间有重复'
+    for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(solve_fast(c))
 if __name__=='__main__': main()

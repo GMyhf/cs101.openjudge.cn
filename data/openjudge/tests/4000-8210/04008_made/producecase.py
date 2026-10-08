@@ -6,14 +6,77 @@ def g4008(r):
     a=[r.randint(1,30) for _ in range(r.randint(1,12))]
     return f"{len(a)} {r.randint(1,10)}\n"+"\n".join(map(str,a))+"\n"
 
-with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as h:
- h.write(REFERENCE_SOURCE);h.flush();root=Path(__file__).parent/"data";seen=[SAMPLE_IN]
- for i in range(40):
-  if i==0:c=SAMPLE_IN
-  else:
-   for j in range(100):
-    c=g4008(random.Random(4008+i+j*1000))
-    if c not in seen:break
-   else:raise AssertionError("diversity")
-  seen.append(c);p=subprocess.run(["python3",h.name],input=c,text=True,capture_output=True,check=True)
-  (root/f"{i}.in").write_text(c,encoding="utf-8");(root/f"{i}.out").write_text(p.stdout,encoding="utf-8")
+
+def valid(text):
+    """题面契约：首行 N K（1<=N<=100，1<=K<=100），其后恰 N 行，每行一个不超过 1000000 的非负整数。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    first = lines[0].split(" ")
+    if len(first) != 2 or not all(t.isdigit() and t[0] != "0" for t in first):
+        return False
+    n, k = map(int, first)
+    if not (1 <= n <= 100 and 1 <= k <= 100) or len(lines) != n + 1:
+        return False
+    for line in lines[1:]:
+        if not line.isdigit() or (line != "0" and line[0] == "0") or int(line) > 1000000:
+            return False
+    return True
+
+
+def fmt(k, values):
+    return f"{len(values)} {k}\n" + "\n".join(map(str, values)) + "\n"
+
+
+def extra_cases():
+    """补强：N=K=100 满规模、数值取到 1e6（总和近 1e8）、K=1、K 为大质数、
+    非空子集都凑不出 K 的倍数（答案 0）、全选恰好、只差丢掉一件。新数据里各件糖果数互不相同。"""
+    r = random.Random(40080)
+    def distinct(n, lo, hi, pred=lambda x: True):
+        out = set()
+        while len(out) < n:
+            x = r.randint(lo, hi)
+            if pred(x):
+                out.add(x)
+        v = list(out); r.shuffle(v); return v
+    out = []
+    out.append(fmt(100, distinct(100, 1, 1000000)))
+    out.append(fmt(100, distinct(100, 900000, 1000000)))
+    out.append(fmt(97, distinct(100, 1, 1000000)))
+    out.append(fmt(1, distinct(100, 1, 1000000)))
+    out.append(fmt(100, distinct(99, 1, 1000000, lambda x: x % 100 == 1)))      # 答案 0
+    out.append(fmt(100, distinct(100, 1, 1000000, lambda x: x % 100 == 0)))     # 全选
+    v = distinct(100, 1, 1000000, lambda x: x % 100 == 0); v[0] += 37
+    out.append(fmt(100, v))                                                     # 丢掉一件
+    out.append(fmt(64, distinct(100, 1, 1000000, lambda x: x % 64 in (32, 48))))
+    out.append(fmt(100, [100]))
+    out.append(fmt(100, [99]))
+    out.append(fmt(2, distinct(18, 1, 1000000)))
+    out.append(fmt(53, distinct(18, 1, 1000)))
+    out.append(fmt(99, distinct(60, 1, 1000000)))
+    return out
+
+
+def main():
+ with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as h:
+  h.write(REFERENCE_SOURCE);h.flush();root=Path(__file__).parent/"data";seen=[SAMPLE_IN]
+  cases=[]
+  for i in range(40):
+   if i==0:c=SAMPLE_IN
+   else:
+    for j in range(100):
+     c=g4008(random.Random(4008+i+j*1000))
+     if c not in seen:break
+    else:raise AssertionError("diversity")
+   seen.append(c);cases.append(c)
+  for c in extra_cases():
+   assert c not in cases
+   cases.append(c)
+  for i,c in enumerate(cases):
+   assert valid(c), i
+   p=subprocess.run(["python3",h.name],input=c,text=True,capture_output=True,check=True)
+   (root/f"{i}.in").write_text(c,encoding="utf-8");(root/f"{i}.out").write_text(p.stdout,encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

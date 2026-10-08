@@ -119,6 +119,52 @@ def generate(number, seed):
         return "\n".join(words) + "\n"
     raise KeyError(number)
 
+import re
+
+def valid(text):
+    """题面：第一行 N（1 <= N <= 1000），第二行 N 个 0..10000 的整数，空格分隔。"""
+    lines = text.split("\n")
+    if lines and lines[-1] == "":
+        lines.pop()
+    if len(lines) != 2 or not re.fullmatch(r"[1-9][0-9]*", lines[0]):
+        return False
+    n = int(lines[0])
+    if not 1 <= n <= 1000:
+        return False
+    toks = lines[1].split(" ")
+    if len(toks) != n or not all(re.fullmatch(r"0|[1-9][0-9]*", t) for t in toks):
+        return False
+    return all(0 <= int(t) <= 10000 for t in toks)
+
+
+def g2533(seed, kind):
+    """补充组：满规模 N=1000、最小 N=1、全相等（考严格递增）、单调、值域端点。"""
+    r = random.Random(2533_000 + seed)
+    if kind == "one":
+        a = [r.choice([0, 10000])]
+    elif kind == "equal":
+        a = [r.randint(0, 10000)] * 1000
+    elif kind == "inc":
+        a = sorted(r.sample(range(0, 10001), 1000))
+    elif kind == "dec":
+        a = sorted(r.sample(range(0, 10001), 1000), reverse=True)
+    elif kind == "nondec":
+        a = sorted(r.randint(0, 30) for _ in range(1000))  # 大量相等：非严格写法会得到 1000
+    elif kind == "rand":
+        a = [r.randint(0, 10000) for _ in range(1000)]
+    elif kind == "smallrange":
+        a = [r.randint(0, 5) for _ in range(1000)]
+    elif kind == "zigzag":
+        a = []
+        for i in range(1000):
+            a.append(i * 10 if i % 2 == 0 else 10000 - i * 10)
+    elif kind == "ends":
+        a = [r.choice([0, 10000, r.randint(0, 10000)]) for _ in range(1000)]
+    return f"{len(a)}\n" + " ".join(map(str, a)) + "\n"
+
+
+PLAN2533 = ["one", "equal", "inc", "dec", "nondec", "rand", "rand", "smallrange", "zigzag", "ends"]
+
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2533: Longest Ordered Subsequence\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02533/\n# License: not declared in source collection; no license is inferred.\nimport sys\nn = int(input())\n*b, = map(int, input().split())\ndp = [1]*n\n\nfor i in range(1, n):\n    for j in range(i):\n        if b[j] < b[i]:\n            dp[i] = max(dp[i], dp[j]+1)\n\nprint(max(dp))\n'
 NUMBER=2533
 SAMPLE='7\n1 7 3 5 9 4 8\n'
@@ -130,6 +176,8 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ cases=[SAMPLE]+[generate(NUMBER,s) for s in range(1, 30)]+[g2533(s,k) for s,k in enumerate(PLAN2533, start=1)]
+ assert all(valid(x) for x in cases)
+ for i,x in enumerate(cases):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

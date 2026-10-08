@@ -6,6 +6,48 @@ CPP=False
 def g30917(r):
     t=r.randint(1,20); return str(t)+"\n"+"\n".join("".join(r.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(r.randint(1,40))) for _ in range(t))+"\n"
 
+
+def valid(text):
+    """题面契约：第一行 T（1<=T<=1e4）；接下来 T 行，每行一个由小写字母组成的（非空）字符串，长度和<=2e5。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not lines[0].isdigit() or str(int(lines[0])) != lines[0]:
+        return False
+    t = int(lines[0])
+    if not 1 <= t <= 10**4 or len(lines) != t + 1:
+        return False
+    total = 0
+    for s in lines[1:]:
+        if not s or any(not ("a" <= c <= "z") for c in s):
+            return False
+        total += len(s)
+    return total <= 2 * 10**5
+
+
+def special_cases():
+    """替换原第 30..39 组：原数据 T<=20、|s|<=40，规模与 T 上限都没碰到。"""
+    r = random.Random(309170)
+    A = "abcdefghijklmnopqrstuvwxyz"
+    rnd = lambda k, al=A: "".join(r.choice(al) for _ in range(k))
+    fmt = lambda ss: f"{len(ss)}\n" + "\n".join(ss) + "\n"
+    out = []
+    out.append(fmt(["a"]))                                            # 最小
+    out.append(fmt([rnd(200000)]))                                    # 单串满长
+    out.append(fmt([A * (200000 // 26)]))                             # 升序循环：栈反复弹出
+    out.append(fmt(["zyxwvutsrqponmlkjihgfedcba" * (200000 // 26)]))  # 降序循环：一次成型
+    out.append(fmt([rnd(200000, "ab")]))                              # 小字母表
+    out.append(fmt([rnd(20) for _ in range(10000)]))                  # T 满、每串 20
+    out.append(fmt([r.choice(A) for _ in range(10000)]))             # T 满、每串 1 个字符
+    lens = [r.randint(1, 60) for _ in range(5000)]
+    out.append(fmt([rnd(k) for k in lens]))                           # 混合长度
+    s = rnd(199974, "abcdefghijklm") + A                              # 每个字母的最后一次都挤在末尾
+    out.append(fmt([s]))
+    ss = [rnd(r.randint(1, 3000), A[: r.randint(1, 26)]) for _ in range(120)]
+    while sum(map(len, ss)) > 200000: ss.pop()
+    out.append(fmt(ss))
+    return out
+
 from pathlib import Path
 import subprocess, sys, tempfile
 def run(text):
@@ -21,6 +63,7 @@ def run(text):
         return x.stdout
 def main():
     data=Path('data'); data.mkdir(exist_ok=True)
-    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 30)]+special_cases()
+    assert len(cases)==40 and all(valid(c) for c in cases) and len(set(cases))==40
     for i,c in enumerate(cases): (data/f'{i}.in').write_text(c); (data/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

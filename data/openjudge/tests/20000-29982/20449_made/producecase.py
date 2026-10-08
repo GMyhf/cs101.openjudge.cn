@@ -14,13 +14,37 @@ SAMPLE_IN = '011\n'
 SAMPLE_OUT = '100\n'
 REFERENCE_SOURCE = "def binary_divisible_by_five(binary_string):\n    result = ''\n    num = 0\n    for bit in binary_string:\n        num = (num * 2 + int(bit)) % 5\n        if num == 0:\n            result += '1'\n        else:\n            result += '0'\n    return result\n\nbinary_string = input().strip()\nprint(binary_divisible_by_five(binary_string))\n"
 
-def g20449(r): return "".join(r.choice("01") for _ in range(r.randint(1,30)))+"\n"
+# 题面：输入一个由 0 和 1 组成的字串（未给长度上限）。
+
+
+def valid(text):
+    import re
+    return re.fullmatch(r"[01]+\n", text) is not None
+
+
+_EDGE = ["0", "1", "101", "1010", "0000000000", "1111111111", "000101", "110010110", "11110000"]
+
+
+def g20449(r, i):
+    if i <= len(_EDGE):
+        return _EDGE[i - 1] + "\n"
+    if i <= 12:        # 原来的形状
+        return "".join(r.choice("01") for _ in range(r.randint(1, 30))) + "\n"
+    if i <= 14:        # 中等长度、带前导 0
+        return "0" * r.randint(1, 50) + "".join(r.choice("01") for _ in range(r.randint(500, 5000))) + "\n"
+    if i <= 16:        # 长串：逐位把整个前缀当大整数算（不取模）会平方级变慢
+        return "".join(r.choice("01") for _ in range(r.choice((100000, 300000)))) + "\n"
+    if i == 17:        # 多数位为 1，能被 5 整除的前缀稀少
+        return "".join("1" if r.random() < .9 else "0" for _ in range(500000)) + "\n"
+    if i == 18:        # 周期 1010…：每 4 位出现一次 1010=10
+        return "1010" * 250000 + "\n"
+    return "".join(r.choice("01") for _ in range(1000000)) + "\n"   # 满 1MB
 
 def build_cases():
     cases = [SAMPLE_IN]
     for i in range(1, 20):
         for attempt in range(100):
-            value = g20449(random.Random(NUMBER + i + attempt * 1000))
+            value = g20449(random.Random(NUMBER + i + attempt * 1000), i)
             if value not in cases:
                 cases.append(value)
                 break

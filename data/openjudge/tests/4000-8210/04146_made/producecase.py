@@ -12,6 +12,19 @@ SAMPLE_OUT = '5\n'
 PICKS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 17, 19, 21, 23, 25, 28, 31, 34, 38, 42, 46, 50, 55, 60, 65, 70, 75, 80, 85, 90, 93, 95, 98, 100]
 
 
+
+def valid(text):
+    """题面：一行，包含一个整数 n (0 <= n <= 100)。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if len(lines) != 1:
+        return False
+    tok = lines[0]
+    if not tok.isdigit() or (tok != "0" and tok[0] == "0"):
+        return False
+    return 0 <= int(tok) <= 100
+
 def solve_text(text):
     n = int(text.split()[0])
     ans = 0
@@ -27,7 +40,7 @@ def main():
     assert solve_text(SAMPLE_IN).strip() == SAMPLE_OUT.strip(), "参考解法跑不出样例输出"
     cases = [SAMPLE_IN] + [f"{n}\n" for n in PICKS if f"{n}\n" != SAMPLE_IN]
     assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
-    assert all(0 <= int(c) <= 100 for c in cases), "题面 0<=n<=100"
+    assert all(valid(c) for c in cases), "越出题面约束：一行一个整数 0<=n<=100"
     assert "0\n" in cases and "100\n" in cases, "上下界都要有数据"
     assert len(set(cases)) >= 35, "去重后至少 35 组"
     root = Path(__file__).parent / "data"

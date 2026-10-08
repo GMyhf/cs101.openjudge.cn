@@ -117,7 +117,7 @@ def generate(number, seed):
             while len(codes)<r.randint(2,30):codes.add("".join(r.choice(letters) for _ in range(7)))
             cases.append(f"{len(codes)}\n"+"\n".join(sorted(codes)))
         return "\n".join(cases)+"\n0\n"
-    if number == 1941:return "\n".join(map(str,[r.randint(1,8) for _ in range(r.randint(1,5))]))+"\n0\n"
+    if number == 1941:return gen1941(r,seed)
     if number == 2092:
         cases=[]
         for _ in range(r.randint(1,4)):
@@ -149,7 +149,28 @@ def generate(number, seed):
     if number == 1753:return "\n".join("".join(r.choice("bw") for _ in range(4)) for _ in range(4))+"\n"
     raise KeyError(number)
 
-REFERENCE="# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 1941: The Sierpinski Fractal\n# Fenced code block index: 3\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01941/\n# License: not declared; no license is inferred.\nimport sys\ndef f(n):\n    if n == 1:\n        return [' /\\\\ ', '/__\\\\']\n    t = f(n - 1)\n    x = 2 ** (n - 1)\n    res = [' ' * x + u + ' ' * x for u in t]\n    res.extend([u + u for u in t])\n    return res\n\n\nal = [f(i) for i in range(1, 11)]\nwhile True:\n    n = int(input())\n    if n == 0:\n        break\n    for u in al[n - 1]:\n        print(u)\n    print()\n"
+def valid(text):
+    """题面约束：若干行，每行一个整数 n（1<=n<=10），以 n=0 结束（之后无内容）。"""
+    if not text.endswith("\n"):return False
+    lines=text[:-1].split("\n")
+    if len(lines)<2 or lines[-1]!="0":return False
+    return all(x.isdigit() and str(int(x))==x and 1<=int(x)<=10 for x in lines[:-1])
+
+def gen1941(r,seed):
+    if seed<=10:ns=[seed]                     # 每个深度单独一组，含满规模 n=10
+    elif seed==11:ns=list(range(1,10))
+    elif seed==12:ns=list(range(9,0,-1))
+    elif seed==13:ns=[1,1,1,1,1]
+    elif seed==14:ns=[10,1]
+    elif seed==15:ns=[2,10]
+    else:
+        while True:
+            k=r.randint(2,10);ns=[r.randint(1,9) if r.random()<.5 else r.randint(1,6) for _ in range(k)]
+            # 满规模 n=10 只留在 seed 10/14/15；随机组限制输出体积，使 data/ 合计 <=10MB
+            if sum(4**n*3//2 for n in ns)<450_000 and ns.count(9)<=1:break
+    return "\n".join(map(str,ns))+"\n0\n"
+
+REFERENCE="# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 1941: The Sierpinski Fractal\n# Fenced code block index: 3\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01941/\n# License: not declared; no license is inferred.\nimport sys\ndef f(n):\n    if n == 1:\n        return [' /\\\\ ', '/__\\\\']\n    t = f(n - 1)\n    x = 2 ** (n - 1)\n    res = [' ' * x + u + ' ' * x for u in t]\n    res.extend([u + u for u in t])\n    return res\n\n\nal = [f(i) for i in range(1, 11)]\nwhile True:\n    n = int(input())\n    if n == 0:\n        break\n    for u in al[n - 1]:\n        print(u.rstrip())\n    print()\n"
 NUMBER=1941
 SAMPLE='3\n2\n1\n0\n'
 def run(x):
@@ -161,5 +182,6 @@ def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
  for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+  assert valid(x),i
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

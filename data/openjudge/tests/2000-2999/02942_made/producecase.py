@@ -152,6 +152,11 @@ def generate(number, seed):
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2942: 吃糖果\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02942/\n# License: not declared; no license is inferred.\nimport sys\n# 读取输入的巧克力数量\nn = int(input())\n\n# 初始化 dp 数组，长度为 n，用于存储不同巧克力数量对应的方案数\ndp = [0] * n\n\n# 当 n 为 1 时，只有 1 种方案\nif n >= 1:\n    dp[0] = 1\n# 当 n 为 2 时，有 2 种方案\nif n >= 2:\n    dp[1] = 2\n\n# 从第 3 块巧克力开始，利用动态规划递推公式计算方案数\nfor i in range(2, n):\n    dp[i] = dp[i - 1] + dp[i - 2]\n\n# 输出吃完 n 块巧克力的方案数\nprint(dp[n - 1])\n'
 NUMBER=2942
 SAMPLE='4\n'
+def valid(text):
+    """题面：输入只有 1 行，即整数 N（20 > N > 0）。"""
+    import re
+    m = re.fullmatch(r'([1-9][0-9]*)\n', text)
+    return m is not None and 0 < int(m.group(1)) < 20
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)

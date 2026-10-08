@@ -1,5 +1,44 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def _check3186(n, b):
+    m = n * n; bad = set()
+    for i in range(m):
+        row = [v for v in b[i] if v]; col = [b[k][i] for k in range(m) if b[k][i]]
+        blk = [b[(i // n) * n + x][(i % n) * n + y] for x in range(n) for y in range(n)]
+        blk = [v for v in blk if v]
+        if len(row) != len(set(row)): bad.add(1)
+        if len(col) != len(set(col)): bad.add(2)
+        if len(blk) != len(set(blk)): bad.add(3)
+    return bad
+def _sudoku3186(r, n, kind, blank):
+    m = n * n
+    while True:
+        base = [[(row * n + row // n + col) % m + 1 for col in range(m)] for row in range(m)]
+        digits = list(range(1, m + 1)); r.shuffle(digits)
+        bands = list(range(n)); r.shuffle(bands)
+        rows = [bd * n + x for bd in bands for x in r.sample(range(n), n)]
+        stacks = list(range(n)); r.shuffle(stacks)
+        cols = [st * n + y for st in stacks for y in r.sample(range(n), n)]
+        b = [[digits[base[i][j] - 1] for j in cols] for i in rows]
+        if r.random() < .5: b = [list(x) for x in zip(*b)]
+        keep = set()
+        if kind:
+            i, j = r.randrange(m), r.randrange(m)
+            if kind == 1: i2 = i; j2 = r.choice([y for y in range(m) if y // n != j // n])
+            elif kind == 2: j2 = j; i2 = r.choice([x for x in range(m) if x // n != i // n])
+            else:
+                i2 = r.choice([x for x in range(i // n * n, i // n * n + n) if x != i])
+                j2 = r.choice([y for y in range(j // n * n, j // n * n + n) if y != j])
+            v = b[i2][j2]; b[i][j] = v; keep = {(i, j), (i2, j2)}
+            for x in range(m):
+                for y in range(m):
+                    if b[x][y] == v and (x, y) not in keep and (x == i or y == j or (x // n == i // n and y // n == j // n)):
+                        b[x][y] = 0
+        for x in range(m):
+            for y in range(m):
+                if (x, y) not in keep and r.random() < blank: b[x][y] = 0
+        if _check3186(n, b) == ({kind} if kind else set()):
+            return f"{n}\n" + "\n".join(" ".join(map(str, row)) for row in b) + "\n"
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     if number == 2236:
@@ -43,13 +82,19 @@ def generate(number, seed):
     if number == 3177:
         return f"{r.randint(1,100000)} {r.randint(1,100000)}\n"
     if number == 3186:
-        n = 3; m = n * n
-        board = [[((row * n + row // n + col) % m) + 1 for col in range(m)] for row in range(m)]
-        for position in r.sample(range(m * m), 1 + seed % 35):
-            board[position // m][position % m] = 0
-        if seed % 2 == 0:
-            board[0][0] = board[0][1] = 1
-        return f"{n}\n" + "\n".join(" ".join(map(str, row)) for row in board) + "\n"
+        # 题面：1<=N<=10，N^4 个数，0 表示空，其余在 1..N^2。
+        # INCORRECT 分三类且只违反一类约束：仅行重复 / 仅列重复 / 仅宫重复，防止只查一部分的写法。
+        if seed == 1:
+            return "2\n2 1 3 0\n3 2 4 0\n1 3 2 4\n0 0 0 1\n"  # 题面样例 2
+        if seed == 2: return "1\n0\n"
+        if seed == 3: return "1\n1\n"
+        sizes = [2, 3, 4, 5, 6, 7, 8, 9, 10, 10]
+        if seed == 4: n, kind, blank = 10, 0, 1.0
+        elif seed == 5: n, kind, blank = 10, 0, 0.0
+        else:
+            n = sizes[seed % len(sizes)]; kind = (seed // 2) % 4
+            blank = r.choice([0.0, r.random() * 0.3, r.random() * 0.8])
+        return _sudoku3186(r, n, kind, blank)
     if number == 2735:
         return f"{r.randint(1,65535):o}\n"
     if number == 2576:
@@ -418,6 +463,15 @@ def generate(number, seed):
     raise KeyError(number)
 
 REFERENCE='// External reference: http://cs101.openjudge.cn/practice/03186/statistics/\n// Accepted submission: 51696137\n// Source: http://cs101.openjudge.cn/practice/solution/51696137/\n// License: not declared on the submission page; no license is inferred.\n\n#include <bits/stdc++.h>\nusing namespace std;\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n\n    int N;\n    if (!(cin >> N)) return 0;\n    int M = N * N;\n\n    vector<int> a(M * M);\n    for (int i = 0; i < M * M; ++i) {\n        cin >> a[i];\n        if (a[i] < 0 || a[i] > M) { // 非法数字\n            cout << "INCORRECT\\n";\n            return 0;\n        }\n    }\n\n    bitset<101> seen; // M<=100\n\n    // Check rows\n    for (int r = 0; r < M; ++r) {\n        seen.reset();\n        int base = r * M;\n        for (int c = 0; c < M; ++c) {\n            int v = a[base + c];\n            if (v == 0) continue;\n            if (seen.test(v)) {\n                cout << "INCORRECT\\n";\n                return 0;\n            }\n            seen.set(v);\n        }\n    }\n\n    // Check columns\n    for (int c = 0; c < M; ++c) {\n        seen.reset();\n        for (int r = 0; r < M; ++r) {\n            int v = a[r * M + c];\n            if (v == 0) continue;\n            if (seen.test(v)) {\n                cout << "INCORRECT\\n";\n                return 0;\n            }\n            seen.set(v);\n        }\n    }\n\n    // Check sub-squares (N x N blocks, each of size N x N)\n    for (int br = 0; br < N; ++br) {\n        for (int bc = 0; bc < N; ++bc) {\n            seen.reset();\n            int r0 = br * N, c0 = bc * N;\n            for (int dr = 0; dr < N; ++dr) {\n                int rowBase = (r0 + dr) * M;\n                for (int dc = 0; dc < N; ++dc) {\n                    int v = a[rowBase + (c0 + dc)];\n                    if (v == 0) continue;\n                    if (seen.test(v)) {\n                        cout << "INCORRECT\\n";\n                        return 0;\n                    }\n                    seen.set(v);\n                }\n            }\n        }\n    }\n\n    cout << "CORRECT\\n";\n    return 0;\n}\n'
+def valid(text):
+    """题面：整数 N（1<=N<=10），随后 N^4 个整数，0 表示空格，其余为 1..N^2。"""
+    t = text.split()
+    if not t or not all(x.isdigit() and (x == "0" or x[0] != "0") for x in t): return False
+    n = int(t[0])
+    if not 1 <= n <= 10 or len(t) != 1 + n ** 4: return False
+    if not all(0 <= int(x) <= n * n for x in t[1:]): return False
+    lines = text.rstrip("\n").split("\n")
+    return text.endswith("\n") and all(l == " ".join(l.split()) and l for l in lines)
 LANGUAGE='G++'
 NUMBER=3186
 SAMPLE='2\n0 0 0 0\n0 0 0 0\n0 0 2 0\n0 0 0 1\n'

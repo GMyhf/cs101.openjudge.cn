@@ -157,9 +157,70 @@ def run(x):
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout.rstrip()+'\n'
+def valid(text):
+    """题面：多组；每组首行 N(2<=N<=2000)，随后 N 行互不相同、恰 7 个小写字母的代码；以单独一行 0 结束。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    i = 0; cases = 0
+    while True:
+        if i >= len(lines) or not lines[i].isdigit() or lines[i] != str(int(lines[i])):
+            return False
+        n = int(lines[i]); i += 1
+        if n == 0:
+            return i == len(lines) and cases >= 1
+        if not 2 <= n <= 2000 or i + n > len(lines):
+            return False
+        codes = lines[i:i + n]; i += n
+        if len(set(codes)) != n:
+            return False
+        if any(len(c) != 7 or not all('a' <= ch <= 'z' for ch in c) for c in codes):
+            return False
+        cases += 1
+
+def gen_case(seed):
+    r = random.Random(1789 * 1000 + seed)
+    abc = "abcdefghijklmnopqrstuvwxyz"
+    def block(n, k):
+        al = abc[:k] if k < 26 else abc
+        if k ** 7 < n:
+            al = abc[:3]
+        codes = set()
+        if r.random() < 0.5:
+            # 从一个根出发不断变异，得到有层次的“派生”结构
+            codes.add("".join(r.choice(al) for _ in range(7)))
+            lst = list(codes)
+            while len(codes) < n:
+                b = list(r.choice(lst))
+                for _ in range(r.randint(1, 3)):
+                    b[r.randrange(7)] = r.choice(al)
+                b = "".join(b)
+                if b not in codes:
+                    codes.add(b); lst.append(b)
+            out = lst
+        else:
+            out = []
+            while len(codes) < n:
+                c = "".join(r.choice(al) for _ in range(7))
+                if c not in codes:
+                    codes.add(c); out.append(c)
+        r.shuffle(out)
+        return f"{n}\n" + "\n".join(out)
+    if seed == 1:
+        return "2\nabcdefg\nhijklmn\n0\n"       # 答案 7
+    if seed == 2:
+        return "2\nzzzzzzz\nzzzzzzy\n0\n"       # 答案 1
+    if seed == 3:
+        return "\n".join(block(r.randint(2, 10), r.choice([2, 3, 26])) for _ in range(30)) + "\n0\n"
+    if seed <= 20:
+        return "\n".join(block(r.randint(2, 300), r.choice([2, 3, 4, 8, 26])) for _ in range(r.randint(1, 4))) + "\n0\n"
+    if seed <= 32:
+        return block(2000, [26, 26, 3, 4, 5, 8][seed % 6]) + "\n0\n"
+    return block(2000, r.choice([3, 26])) + "\n" + block(r.randint(2, 50), 26) + "\n" + block(2000, r.choice([4, 26])) + "\n0\n"
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[gen_case(s) for s in range(1, 40)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

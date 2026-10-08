@@ -1,5 +1,17 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+
+def valid(text):
+    """题面：第 1 行 N (2 <= N <= 1000)，第 2 行 N 个非负整数海拔 (<= 1000)。"""
+    import re
+    lines=text.split("\n")
+    if len(lines)!=3 or lines[2]!="" or not re.fullmatch(r"[1-9][0-9]*",lines[0]):
+        return False
+    N=int(lines[0])
+    if not 2<=N<=1000:
+        return False
+    t=lines[1].split(" ")
+    return len(t)==N and all(re.fullmatch(r"0|[1-9][0-9]*",x) and int(x)<=1000 for x in t)
 def generate(n, seed):
     r=random.Random(seed)
     if n==2694:
@@ -48,7 +60,32 @@ def generate(n, seed):
     if n==2808:
         L=r.randint(10,1000);m=r.randint(1,15);return f'{L} {m}\n'+'\n'.join(f'{(a:=r.randint(0,L))} {r.randint(a,L)}' for _ in range(m))+'\n'
     if n==2995:
-        N=r.randint(2,80);return f'{N}\n'+' '.join(str(r.randint(1,1000)) for _ in range(N))+'\n'
+        sizes=[2,2,2,3,3,5,8,10,20,50,100,200,500,999,1000,1000]
+        N=sizes[seed-1] if seed<=len(sizes) else r.choice([1000,1000,r.randint(2,1000)])
+        kind=seed%8
+        if kind==0:h=[r.randint(0,1000) for _ in range(N)]
+        elif kind==1:h=[r.randint(0,3) for _ in range(N)]          # 大量相等海拔，卡 <= 写法
+        elif kind==2:
+            h=[[0,1000,r.randint(0,1000)][seed%3]]*N  # 全相等，答案 1
+            if seed>16:
+                for _ in range(r.randint(1,4)):h[r.randrange(N)]=r.randint(0,1000)  # 平原上几个孤点
+        elif kind==3:h=sorted(r.sample(range(1001),N));h=h if seed%2 else h[::-1]  # 严格单调，只上或只下
+        elif kind==4:
+            # 先升后降的山形，夹杂相等的平台和噪声
+            p=r.randint(0,N-1);up=sorted(r.randint(0,1000) for _ in range(p+1));down=sorted((r.randint(0,1000) for _ in range(N-p-1)),reverse=True)
+            h=up+down
+            for _ in range(N//20):h[r.randrange(N)]=r.randint(0,1000)
+        elif kind==5:
+            # 锯齿：相邻相等对很多，最优路线要跳过相等点
+            h=[];v=r.randint(0,1000)
+            while len(h)<N:
+                h+=[v]*r.randint(1,3);v=max(0,min(1000,v+r.randint(-30,30)))
+            h=h[:N]
+        elif kind==6:
+            # 先降后升（谷形），最优往往只取一侧
+            p=r.randint(0,N-1);h=sorted((r.randint(0,1000) for _ in range(p+1)),reverse=True)+sorted(r.randint(0,1000) for _ in range(N-p-1))
+        else:h=[r.randint(0,1000) for _ in range(N)]
+        return f'{N}\n'+' '.join(map(str,h))+'\n'
     if n==2760:
         N=r.randint(2,20);return f'{N}\n'+'\n'.join(' '.join(str(r.randint(0,100)) for _ in range(i)) for i in range(1,N+1))+'\n'
     if n==3151:

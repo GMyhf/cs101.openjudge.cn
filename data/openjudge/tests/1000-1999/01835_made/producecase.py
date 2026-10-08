@@ -152,6 +152,62 @@ REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01835/statis
 LANGUAGE='Python3'
 NUMBER=1835
 SAMPLE='1\n6\nleft 10\nright 11\nup 12\ndown 13\nforward 14\nback 15\n'
+CMDS = ("forward", "back", "left", "right", "up", "down")
+
+def _pint(t):
+    return t.isdigit() and t == str(int(t))
+
+def valid(text):
+    """题面：首行正整数 m；每组首行 n(1<=n<=10000)，随后 n 行 "命令 x"，命令为 forward/back/left/right/up/down，1<=x<=10000。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if not _pint(lines[0]) or int(lines[0]) < 1:
+        return False
+    m = int(lines[0]); i = 1
+    for _ in range(m):
+        if i >= len(lines) or not _pint(lines[i]):
+            return False
+        n = int(lines[i]); i += 1
+        if not 1 <= n <= 10000 or i + n > len(lines):
+            return False
+        for ln in lines[i:i + n]:
+            t = ln.split(' ')
+            if len(t) != 2 or t[0] not in CMDS or not _pint(t[1]) or not 1 <= int(t[1]) <= 10000:
+                return False
+        i += n
+    return i == len(lines)
+
+def gen_case(seed):
+    r = random.Random(1835 * 1000 + seed)
+    def group(n, w=None, xs=(1, 10000)):
+        return f"{n}\n" + "\n".join(f"{r.choices(CMDS, w)[0]} {r.randint(*xs)}" for _ in range(n))
+    def done(gs):
+        return f"{len(gs)}\n" + "\n".join(gs) + "\n"
+    if seed == 1:
+        return done([f"1\n{c} {x}" for c in CMDS for x in (1, 10000)])
+    if seed == 2:
+        return done([group(r.randint(1, 5)) for _ in range(500)])
+    if seed == 3:
+        # 连续转向组合：up/down 后再 left/right，考察朝向与头顶方向的联动
+        return done([group(r.randint(5, 40), [1, 1, 3, 3, 3, 3]) for _ in range(100)])
+    if seed <= 15:
+        return done([group(r.randint(1, 2000), r.choice([None, [5, 1, 1, 1, 1, 1], [1, 1, 1, 1, 4, 4]])) for _ in range(r.randint(1, 10))])
+    v = seed % 4
+    # 总体积受 10MB 限制：seed 16..19 各变体保留多组满规模，之后只放一组、n 随机缩小
+    big = seed <= 19
+    def cnt(a, b):
+        return r.randint(a, b) if big else 1
+    def nn():
+        return 10000 if big else r.randint(2000, 10000)
+    if v == 0:   # 全部 forward 10000：坐标达 1e8 量级
+        return done(["10000\n" + "\n".join(["forward 10000"] * 10000)] + [group(nn()) for _ in range(cnt(1, 6))])
+    if v == 1:
+        return done([group(nn()) for _ in range(cnt(8, 8))])
+    if v == 2:
+        return done([group(nn(), [1, 1, 1, 1, 6, 6]) for _ in range(cnt(1, 8))])
+    return done([group(nn(), [6, 1, 1, 6, 1, 1], (9000, 10000)) for _ in range(cnt(1, 7))])
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -159,7 +215,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [gen_case(s) for s in range(1, 40)])
   for i,x in enumerate(cases):
+   assert valid(x),i
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

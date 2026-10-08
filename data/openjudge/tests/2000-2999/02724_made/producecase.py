@@ -45,8 +45,7 @@ def generate(number, seed):
     if number==2191:return f"{r.randint(2,63)}\n"
     if number==2503:
         foreign=[word() for _ in range(5)];rows=[f"{word()} {x}" for x in foreign];queries=foreign[:3]+[word()];return "\n".join(rows)+"\n\n"+"\n".join(queries)+"\n"
-    if number==2724:
-        n=r.randint(3,20);rows=[f"s{seed}_{i} {r.randint(1,12)} {r.randint(1,28)}" for i in range(n)];return f"{n}\n"+"\n".join(rows)+"\n"
+    if number == 2724: return _gen_2724(r, seed)
     if number==1273:
         n=r.randint(2,10);edges=[(i,i+1,r.randint(1,1000)) for i in range(1,n)];edges += [(r.randint(1,n-1),r.randint(2,n),r.randint(0,1000)) for _ in range(r.randint(0,8))];return f"{len(edges)} {n}\n"+"\n".join(f"{a} {b} {c}" for a,b,c in edges)+"\n"
     if number==1835:
@@ -152,6 +151,47 @@ REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02724/statis
 LANGUAGE='Python3'
 NUMBER=2724
 SAMPLE='5\n00508192 3 2\n00508153 4 5\n00508172 3 2\n00508023 4 5\n00509122 4 5\n'
+import re as _re
+_INT=_re.compile(r'(0|-?[1-9][0-9]*)$')
+def _int(tok):
+    return int(tok) if _INT.match(tok) else None
+
+def valid(text):
+    """题面：第一行 n（n<100），其后 n 行“学号 月 日”，单空格分隔；学号长度<10，1<=m<=12，1<=d<=31。"""
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    n=_int(lines[0])
+    if n is None or not 1<=n<100 or len(lines)!=n+1:return False
+    for l in lines[1:]:
+        p=l.split(' ')
+        if len(p)!=3:return False
+        sid,m,d=p
+        if not 1<=len(sid)<10 or any(c.isspace() for c in sid):return False
+        m=_int(m);d=_int(d)
+        if m is None or d is None or not 1<=m<=12 or not 1<=d<=31:return False
+    return True
+
+def _gen_2724(r, seed):
+    days = [(m, d) for m in range(1, 13) for d in range(1, 32)
+            if d <= [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][m - 1]]
+    if seed == 1: n, pool = 1, r.sample(days, 1)            # 无相同生日
+    elif seed == 2: n, pool = 99, None                       # 99 人生日互不相同
+    elif seed == 3: n, pool = 99, r.sample(days, 1)          # 全员同一天
+    elif seed == 4: n, pool = 2, r.sample(days, 1)
+    elif seed <= 12: n = 99; pool = r.sample(days, r.randint(5, 60))
+    else: n = r.randint(3, 99); pool = r.sample(days, r.randint(1, max(1, n // 2)))
+    if pool is None: chosen = r.sample(days, n)
+    else:
+        # 刻意混入两位数的月/日，卡掉按字符串排序的写法
+        if seed > 4: pool += [(r.randint(10, 12), r.randint(1, 9)), (r.randint(1, 9), r.randint(10, 28))]
+        chosen = [r.choice(pool) for _ in range(n)]
+    ids, seen = [], set()   # 用列表保序，避免 set 迭代顺序受哈希随机化影响
+    while len(ids) < n:
+        x = (str(r.randint(0, 10 ** 8 - 1)).zfill(8) if r.random() < .7
+             else "".join(r.choice("0123456789abcdefgh") for _ in range(r.randint(1, 9))))
+        if x not in seen: seen.add(x); ids.append(x)
+    return f"{n}\n" + "\n".join(f"{i} {m} {d}" for i, (m, d) in zip(ids, chosen)) + "\n"
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]

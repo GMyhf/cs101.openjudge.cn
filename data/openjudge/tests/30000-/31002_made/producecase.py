@@ -7,6 +7,31 @@ def g31002(r):
     s_len=r.randint(8,100); s="".join(r.choice("abcde") for _ in range(s_len)); t="".join(r.choice("abcde") for _ in range(r.randint(1,min(8,s_len))))
     return f"{s}\n{t}\n"
 
+def valid(text):
+    """题面契约：两行；地图串长度 ≤200，标记串长度 ≤10；格子为非空白字符。"""
+    if not text.endswith('\n'): return False
+    lines=text[:-1].split('\n')
+    if len(lines)!=2: return False
+    m,t=lines
+    if not (1<=len(m)<=200 and 1<=len(t)<=10): return False
+    return all(c.isprintable() and not c.isspace() for c in m+t)
+
+def extra_cases():
+    """补充：满长度 200 / 标记长度 10、大量重叠命中、最短串、整串即宝藏、末尾命中、满规模无宝藏。"""
+    r=random.Random(310020)
+    out=[]
+    out.append('a'*200+'\n'+'a'*10+'\n')                       # 191 处重叠命中
+    out.append('ab'*100+'\n'+'ababababab'+'\n')                # 周期串重叠
+    out.append('a\n'+'a\n')                                     # 最小规模
+    out.append('b\n'+'a\n')                                     # 最小规模无宝藏
+    out.append('abcdefghij\n'+'abcdefghij\n')                   # 整串即宝藏
+    out.append('x'*190+'abcdefghij\n'+'abcdefghij\n')           # 只在末尾命中
+    out.append('a'*199+'b\n'+'a'*9+'c\n')                       # 满规模几乎匹配但无宝藏
+    s=''.join(r.choice('ab') for _ in range(200)); out.append(s+'\n'+'aba\n')
+    s=''.join(r.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(200)); out.append(s+'\n'+s[57:67]+'\n')
+    out.append('aaaaaaaaab'*20+'\n'+'aab\n')
+    return out
+
 from pathlib import Path
 import subprocess, sys, tempfile
 def run(text):
@@ -25,6 +50,6 @@ def main():
     if GENERATOR_NAME == 'g30216':
         cases=[SAMPLE]+[f'{n}\n' for n in range(1,11)]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1,11)]
     else:
-        cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+        cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 30)]+extra_cases()
     for i,c in enumerate(cases): (data/f'{i}.in').write_text(c); (data/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

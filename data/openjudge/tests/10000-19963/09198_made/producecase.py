@@ -20,6 +20,52 @@ def g9198(r):
     if r.random() < .5: text = text[:-1] + r.choice(")]}{")
     return text + "\n"
 
+def valid(text):
+    """题面：一行括号序列，只含 ()[]{}，长度不超过 10000。"""
+    if not text.endswith("\n") or text.count("\n") != 1:
+        return False
+    body = text[:-1]
+    return len(body) <= 10000 and all(c in "()[]{}" for c in body)
+
+
+def nested(r, pairs):
+    """随机生成恰含 pairs 对括号的美观序列（随机嵌套 + 并列）。"""
+    out, stack, opened = [], [], 0
+    while opened < pairs or stack:
+        if opened < pairs and (not stack or r.random() < .5):
+            c = r.choice("([{")
+            stack.append(c)
+            out.append(c)
+            opened += 1
+        else:
+            out.append({"(": ")", "[": "]", "{": "}"}[stack.pop()])
+    return "".join(out)
+
+
+def extra_cases():
+    """2026-10 审计补充：原数据只有并列的 () [] {}，没有任何嵌套，
+    只查相邻配对或只数各类括号个数的写法都能过；最长也只有约 40 字符。"""
+    r = random.Random(91980)
+    out = ["(", ")", "()", ")(", "([)]", "{[()]}", "{[(])}", "(((", ")))", "[(])",
+           "((([[[{{{}}}]]])))", "{}{}{}{}{}{}{}{}{}{}(}"]
+    out.append("(" * 5000 + ")" * 5000)                       # 深嵌套 Yes
+    out.append("[" * 5000 + ")" * 5000)                       # 深嵌套类型全错 No
+    out.append("{" * 4999 + "()" + "}" * 4999)                 # Yes
+    for pairs in (50, 300, 2000, 5000, 5000):
+        out.append(nested(r, pairs))                          # Yes
+    for pairs in (50, 300, 2000, 5000):                       # 换掉一个括号的类型 No
+        t = list(nested(r, pairs))
+        k = r.randrange(len(t))
+        t[k] = r.choice([c for c in "()[]{}" if c != t[k] and
+                         (c in "([{") == (t[k] in "([{")])
+        out.append("".join(t))
+    t = nested(r, 4999)
+    out.append(t + "(]")                                     # 只在末尾出错 No
+    out.append(nested(r, 2500) + ")" + nested(r, 2499) + "(") # 个数平衡但次序错 No
+    out.append(nested(r, 4999) + "(")                          # 奇数长度 No
+    return [c + "\n" for c in out]
+
+
 def build_cases():
     cases = [SAMPLE_IN]
     for i in range(1, 20):
@@ -30,6 +76,10 @@ def build_cases():
                 break
         else:
             raise AssertionError("生成器多样性不足")
+    for c in extra_cases():
+        if c not in cases:
+            cases.append(c)
+    assert all(valid(c) for c in cases), "题面：只含 ()[]{}，长度不超过 10000"
     return cases
 
 def solve_reference(content):

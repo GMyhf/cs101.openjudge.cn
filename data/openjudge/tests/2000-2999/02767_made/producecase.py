@@ -149,6 +149,22 @@ def generate(number, seed):
     if number == 1753:return "\n".join("".join(r.choice("bw") for _ in range(4)) for _ in range(4))+"\n"
     raise KeyError(number)
 
+def valid(text):
+    """题面契约：一行密文，非空，字符数不超过 200；其中的字母都是大写字母。"""
+    if not text.endswith('\n') or text.count('\n') != 1: return False
+    s = text[:-1]
+    if not 1 <= len(s) <= 200: return False
+    return all(32 <= ord(c) <= 126 and not ('a' <= c <= 'z') for c in s)
+
+def extra_cases():
+    """补充覆盖：长度 200 满长、含数字等其他非字母字符、单个字符、回绕字母 A..E、只有非字母。"""
+    r = random.Random(276700)
+    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.'!?;:-()\"&"
+    cases = ['A\n', '7\n', 'ABCDE VWXYZ\n', '2024: HELLO-WORLD (OK)!\n', '... ,,, 123 ???\n']
+    cases.append(''.join(r.choice(chars) for _ in range(200)) + '\n')
+    cases.append(''.join(r.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ') for _ in range(200)) + '\n')
+    return cases
+
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2767: 简单密码\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02767/\n# License: not declared; no license is inferred.\nimport sys\ndef decrypt_caesar_cipher(ciphertext):\n    # 定义字母表\n    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"\n\n    # 创建一个映射字典：密文字母 -> 明文字母\n    decrypt_map = {}\n    shift = 5  # 密文向后移动5位\n    for i in range(len(alphabet)):\n        decrypt_map[alphabet[i]] = alphabet[(i - shift) % len(alphabet)]\n\n    # 解密过程\n    plaintext = []\n    for char in ciphertext:\n        if char in decrypt_map:  # 如果是大写字母，进行解密\n            plaintext.append(decrypt_map[char])\n        else:  # 非字母字符保持不变\n            plaintext.append(char)\n\n    return \'\'.join(plaintext)\n\n# Input adapter: accept both this mirror\'s one-line form and the historical START/END wrapper.\nlines = sys.stdin.read().splitlines()\nif lines and lines[0] == "START":\n    for line in lines[1:]:\n        if line == "ENDOFINPUT": break\n        if line not in ("START", "END"): print(decrypt_caesar_cipher(line))\nelif lines:\n    print(decrypt_caesar_cipher(lines[0]))\n'
 NUMBER=2767
 SAMPLE='NS BFW, JAJSYX TK NRUTWYFSHJ FWJ YMJ WJXZQY TK YWNANFQ HFZXJX\n'
@@ -160,6 +176,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

@@ -42,7 +42,11 @@ def generate(number, seed):
         for _ in range(r.randint(1,3)):
             n=r.randint(1,20);cases.append(f"{n}\n"+" ".join(str(r.randint(1,n)) for _ in range(n)))
         return f"{len(cases)}\n"+"\n".join(cases)+"\n"
-    if number==2191:return f"{r.randint(2,63)}\n"
+    if number==2191:
+        # 前 23 组固定覆盖 p=k 边界、每个合数梅森数出现/不出现的交界、k=63 上限与无输出的小 k；其余组取不重复的随机 k
+        must=[63,62,61,60,59,58,53,52,47,46,43,42,41,40,37,36,29,28,23,22,11,10,2]
+        if seed<=len(must):return f"{must[seed-1]}\n"
+        rest=[k for k in range(2,64) if k not in must and k!=31];random.Random(2191).shuffle(rest);return f"{rest[seed-len(must)-1]}\n"
     if number==2503:
         foreign=[word() for _ in range(5)];rows=[f"{word()} {x}" for x in foreign];queries=foreign[:3]+[word()];return "\n".join(rows)+"\n\n"+"\n".join(queries)+"\n"
     if number==2724:
@@ -148,6 +152,12 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
+import re as _re
+def valid(text):
+    """题面：Input contains a single number, without leading or trailing blanks, giving the value of k. k <= 63（2^k 有意义，取 k>=1）。"""
+    m=_re.fullmatch(r"(\d+)\n?",text)
+    if not m or (len(m.group(1))>1 and m.group(1)[0]=="0"):return False
+    return 1<=int(m.group(1))<=63
 REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02191/statistics/\n# Accepted submission: 51717401\n# Source: http://cs101.openjudge.cn/practice/solution/51717401/\n# License: not declared on the submission page; no license is inferred.\n\nl = [(11, '23 * 89'), (23, '47 * 178481'), (29, '233 * 1103 * 2089'), (37, '223 * 616318177'), (41, '13367 * 164511353'), (43, '431 * 9719 * 2099863'), (47, '2351 * 4513 * 13264529'), (53, '6361 * 69431 * 20394401'), (59, '179951 * 3203431780337')]\nk = int(input())\nfor p, line in l:\n    if p > k:\n        break\n    print(f'{line} = {2**p-1} = ( 2 ^ {p} ) - 1')\n"
 LANGUAGE='Python3'
 NUMBER=2191

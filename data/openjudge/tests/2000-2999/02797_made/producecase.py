@@ -122,6 +122,55 @@ def generate(number, seed):
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2797: 最短前缀\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02797/\n# License: not declared in source collection; no license is inferred.\nimport sys\nwords = []\nwhile True:\n    try:\n        words.append(input())\n    except EOFError:\n        break\nn = len(words)\nsorted_words = sorted(words)\nbuffer = set()\npre_dict = dict()\nfor i, w in enumerate(sorted_words):\n    for j in range(len(w)):\n        pre = w[:j+1]\n        if (pre in buffer):\n            continue\n        if i+1 < n and sorted_words[i+1].startswith(pre):\n            buffer.add(pre)\n        else:\n            break\n    pre_dict[w] = w[:j+1]\nfor w in words:\n    print(w, pre_dict[w])\n'
 NUMBER=2797
 SAMPLE='carbohydrate\ncart\ncarburetor\ncaramel\ncaribou\ncarbonic\ncartilage\ncarbon\ncarriage\ncarton\ncar\ncarbonate\n'
+import re as _re
+def valid(text):
+    """题面：至少 2 行、至多 1000 行；每行一个由小写字母组成的单词，长度 1..20。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if not 2 <= len(lines) <= 1000:
+        return False
+    return all(_re.fullmatch(r'[a-z]{1,20}', w) for w in lines)
+
+
+def extra_cases():
+    """补充：满规模 1000 行、大量公共前缀/精确匹配、最小规模 n=2、长度 1 与 20 的边界。"""
+    r = random.Random(2797_2026)
+    out = []
+    def pack(ws):
+        ws = sorted(ws); r.shuffle(ws); return '\n'.join(ws) + '\n'
+    # 1) 字母表 {a,b}、长度 1..20，大量互为前缀
+    s = set()
+    while len(s) < 1000:
+        s.add(''.join(r.choice('ab') for _ in range(r.randint(1, 20))))
+    out.append(pack(s))
+    # 2) 30 个词干加后缀，词干本身也在表中（精确匹配覆盖前缀匹配）
+    s = set()
+    stems = set()
+    while len(stems) < 30:
+        stems.add(''.join(r.choice('abcdefghij') for _ in range(r.randint(1, 8))))
+    s |= stems
+    stems = sorted(stems)
+    while len(s) < 1000:
+        st = r.choice(stems)
+        s.add((st + ''.join(r.choice('abcde') for _ in range(r.randint(1, 20 - len(st)))))[:20])
+    out.append(pack(s))
+    # 3) 前缀链 a, aa, ..., a*20，外加 b 链
+    out.append(pack(['a' * k for k in range(1, 21)] + ['b' * k for k in range(1, 21)]))
+    # 4) 最小规模
+    out.append('ab\nabc\n')
+    out.append('z\ny\n')
+    # 5) 1000 个随机长度 20 的单词
+    s = set()
+    while len(s) < 1000:
+        s.add(''.join(r.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(20)))
+    out.append(pack(s))
+    # 6) 长公共前缀：19 位相同前缀，仅末位不同，再加该前缀本身
+    base = 'qwertyuiopasdfghjkl'
+    out.append(pack([base] + [base + c for c in 'abcdefghijklmnopqrstuvwxyz']))
+    return out
+
+
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
@@ -130,6 +179,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

@@ -15,8 +15,28 @@ def run(text):
         x=subprocess.run([sys.executable,str(p)],input=text,text=True,capture_output=True,timeout=120)
         if x.returncode: raise SystemExit(x.stderr)
         return x.stdout
+import re
+
+
+def valid(text):
+    """题面契约：一行，1-3 句 [变量]:=[一位整数]; ，变量只有 a/b/c，总长不超过 255。"""
+    if not text.endswith("\n") or text.count("\n") != 1 or len(text) - 1 > 255:
+        return False
+    return re.fullmatch(r"(?:[abc]:=[0-9];){1,3}", text[:-1]) is not None
+
+
+# 追加：题面样例 2、倒序赋值（按 a,b,c 位置硬取会错）、全 9、全 0、同变量连写三次
+EXTRA_CASES=['a:=3;b:=4;\n', 'c:=1;b:=2;a:=3;\n', 'a:=9;b:=9;c:=9;\n', 'c:=0;b:=0;a:=0;\n', 'c:=7;c:=0;c:=4;\n', 'b:=5;a:=1;b:=0;\n']
+
+
 def main():
     d=Path('data'); d.mkdir(exist_ok=True)
-    cases=[SAMPLE]+([EXTRA_CASE] if EXTRA_CASE else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
-    for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
+    cases=[SAMPLE]+([EXTRA_CASE] if EXTRA_CASE else [])+EXTRA_CASES
+    seed=1
+    while len(cases) < 46:  # 随机组去重（原先 39 组里有 4 组与别组重复）
+        c=globals()[GENERATOR_NAME](random.Random(seed)); seed+=1
+        if c not in cases: cases.append(c)
+    for i,c in enumerate(cases):
+        assert valid(c), i
+        (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

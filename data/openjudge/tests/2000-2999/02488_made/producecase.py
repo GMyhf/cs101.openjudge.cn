@@ -12,7 +12,7 @@ def generate(n, seed):
         T=r.randint(20,300);m=r.randint(2,20);return f"{T} {m}\n"+'\n'.join(f"{r.randint(1,100)} {r.randint(1,100)}" for _ in range(m))+'\n'
     if n==2734:return f"{r.randint(1,65535)}\n"
     if n==2488:
-        z=[(r.randint(1,6),r.randint(1,6)) for _ in range(r.randint(1,4))];return str(len(z))+'\n'+'\n'.join(f'{a} {b}' for a,b in z)+'\n'
+        return gen_2488(r, seed)
     if n==2810:return f"{r.randint(2,45)}\n"
     if n==2299:
         a=[r.randint(0,10**9) for _ in range(r.randint(2,40))];return f"{len(a)}\n"+'\n'.join(map(str,a))+'\n0\n'
@@ -156,6 +156,44 @@ def generate(n, seed):
 REFERENCE='# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 2488: A Knight\'s Journey\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024sp_routine/02488/\n# License: not declared in source collection; no license is inferred.\nimport sys\ndef knight_tour(p, q):\n    moves = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1)]\n\n    total = p * q\n    path = []\n    visited = [[False for _ in range(q)] for _ in range(p)]\n\n    def backtrack(row, col):\n        path.append(f"{chr(ord(\'A\') + col)}{row + 1}")\n        visited[row][col] = True\n\n        if len(path) == total:\n            return True\n\n        next_steps = []\n        for dr, dc in moves:\n            nr, nc = row + dr, col + dc\n            if 0 <= nr < p and 0 <= nc < q and not visited[nr][nc]:\n                next_steps.append((nc, nr))\n\n        for nc, nr in sorted(next_steps):\n            if backtrack(nr, nc):\n                return True\n\n        path.pop()\n        visited[row][col] = False\n        return False\n\n    for start_row in range(p):\n        for start_col in range(q):\n            if backtrack(start_row, start_col):\n                return \'\'.join(path)\n    return "impossible"\n\nn = int(input())\nfor i in range(n):\n    p, q = map(int, input().split())\n    result = knight_tour(p, q)\n    print(f"Scenario #{i+1}:")\n    print(result)\n    print()\n'
 NUMBER=2488
 SAMPLE='3\n1 1\n2 3\n4 3\n'
+def valid(text):
+    """02488 输入契约：首行正整数 n；随后 n 行，每行两个正整数 p q，1 <= p*q <= 26。"""
+    import re
+    if not text.endswith("\n") or "\r" in text:
+        return False
+    lines = text[:-1].split("\n")
+    num = re.compile(r"[1-9][0-9]*")
+    if not num.fullmatch(lines[0]) or len(lines) != int(lines[0]) + 1:
+        return False
+    for s in lines[1:]:
+        tok = s.split(" ")
+        if len(tok) != 2 or not all(num.fullmatch(x) for x in tok):
+            return False
+        if not 1 <= int(tok[0]) * int(tok[1]) <= 26:
+            return False
+    return True
+def gen_2488(r, seed):
+    boards = [(p, q) for p in range(1, 27) for q in range(1, 27) if p * q <= 26]
+    # 有解的棋盘（p 为行数=数字，q 为列数=字母）
+    good = [(1, 1), (3, 4), (3, 7), (3, 8), (4, 3), (4, 5), (4, 6), (5, 4), (5, 5), (6, 4), (7, 3), (8, 3)]
+    tricky = [(4, 4), (3, 3), (3, 5), (5, 3), (3, 6), (6, 3), (2, 13), (13, 2), (26, 1), (1, 26), (2, 3), (3, 2)]
+    if seed == 1:  # 全部 91 种棋盘
+        z = boards[:]
+    elif seed == 2:  # 全部棋盘的逆序
+        z = boards[::-1]
+    elif seed == 3:  # 只有 1x1
+        z = [(1, 1)]
+    elif seed == 4:  # 全部有解棋盘（p、q 互换后答案不同）
+        z = good[:]
+    elif seed == 5:  # 一行 / 一列的长条
+        z = [(1, q) for q in range(1, 27)] + [(p, 1) for p in range(1, 27)]
+    elif seed <= 25:
+        k = r.randint(1, 12)
+        z = [r.choice(r.choice([good, good, tricky, boards])) for _ in range(k)]
+    else:  # 多组：大量重复的有解与难判无解棋盘
+        k = r.randint(40, 200)
+        z = [r.choice(r.choice([good, tricky, boards])) for _ in range(k)]
+    return f"{len(z)}\n" + "".join(f"{p} {q}\n" for p, q in z)
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)

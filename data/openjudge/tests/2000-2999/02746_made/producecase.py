@@ -1,5 +1,21 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def valid(text):
+    """题面：每行两个整数 n m（0 < m,n <= 300），最后一行是 0 0。"""
+    import re
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if len(lines) < 2 or lines[-1] != '0 0':
+        return False
+    for line in lines[:-1]:
+        if not re.fullmatch(r'[1-9]\d* [1-9]\d*', line):
+            return False
+        n, m = map(int, line.split())
+        if not (1 <= n <= 300 and 1 <= m <= 300):
+            return False
+    return True
+
 def generate(n, seed):
     r=random.Random(seed)
     if n==2694:
@@ -7,7 +23,15 @@ def generate(n, seed):
     if n==2945:
         k=r.randint(3,25);return f"{k}\n"+' '.join(str(r.randint(1,500)) for _ in range(k))+'\n'
     if n==2746:
-        return '\n'.join(f"{r.randint(1,80)} {r.randint(1,80)}" for _ in range(r.randint(1,5)))+'\n0 0\n'
+        # 边界组：n、m 取 1 与 300 的各种组合；规模组：n、m 覆盖到题面上限 300
+        if seed==1:pairs=[(1,1),(1,300),(300,1),(300,300),(2,1),(1,2),(2,2),(300,299),(299,300)]
+        elif seed==2:pairs=[(300,r.randint(1,300)) for _ in range(100)]
+        elif seed==3:pairs=[(k,300) for k in range(3,301,3)]
+        elif seed==4:pairs=[(k,1) for k in range(1,301,7)]+[(1,k) for k in range(1,301,7)]
+        elif seed<=12:pairs=[(r.randint(250,300),r.randint(250,300)) for _ in range(r.randint(1,30))]
+        elif seed<=20:pairs=[(r.randint(1,300),r.randint(1,300)) for _ in range(r.randint(1,50))]
+        else:pairs=[(r.randint(1,300),r.randint(1,300)) for _ in range(r.randint(1,8))]
+        return '\n'.join(f"{a} {b}" for a,b in pairs)+'\n0 0\n'
     if n==2773:
         T=r.randint(20,300);m=r.randint(2,20);return f"{T} {m}\n"+'\n'.join(f"{r.randint(1,100)} {r.randint(1,100)}" for _ in range(m))+'\n'
     if n==2734:return f"{r.randint(1,65535)}\n"

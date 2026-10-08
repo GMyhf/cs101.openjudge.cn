@@ -60,7 +60,7 @@ public:
         state = 1;
         loyalty = 0;
         morale = 0;
-        for (int i = 0; i <= 3; i++)
+        for (int i = 0; i < 3; i++)  // 原为 i <= 3，越界写 weapons[3]
         {
             weapons[i].num = 0;
         }
@@ -615,13 +615,16 @@ void marching() {
 
     for (int i = 0; i <= N + 1; i++)
         allcity[i].soldier_n = 0, allcity[i].blue = NULL, allcity[i].red = NULL, allcity[i].redarrowmatk = false, allcity[i].bluearrowmark = false;
+    // 已死亡/逃跑的武士 posi 为 -1，原代码仍写 allcity[-1]（越界，污染相邻全局变量），这里跳过
     for (int i = 1; i <= r.warriors; i++)
     {
+        if (redwaror[i]->posi < 0) continue;
         allcity[redwaror[i]->posi].soldier_n++;
         allcity[redwaror[i]->posi].red = redwaror[i];
     }
     for (int i = 1; i <= b.warriors; i++)
     {
+        if (bluewaror[i]->posi < 0) continue;
         allcity[bluewaror[i]->posi].soldier_n++;
         allcity[bluewaror[i]->posi].blue = bluewaror[i];
     }
@@ -1332,7 +1335,7 @@ void reportwaror() {
 
                             if (j == 0)
                             {
-                                if (allcity[i].blue->forcew[j] >= 1)
+                                if (bluebase[i].red->forcew[j] >= 1)  // 原误写为 allcity[i].blue（可能为空指针）
                                 {
                                     cout << bluebase[i].red->weapons[j].name;
                                     cout << "(" << bluebase[i].red->forcew[j] << ")";
@@ -1560,6 +1563,9 @@ int main()
                 break;
             reportwaror();
             hour++;
+            // 原代码只在 hour==_hour 且 minute>_minute 时退出，T%60>=55 时永不退出
+            if (hour > _hour)
+                break;
         }
     }
 

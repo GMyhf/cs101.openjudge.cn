@@ -421,6 +421,72 @@ REFERENCE='// External reference: http://cs101.openjudge.cn/practice/01816/stati
 LANGUAGE='G++'
 NUMBER=1816
 SAMPLE='5 4\nt*\n?h*s\n??e*\n*s\n?*e\nthis\nthe\nan\nis\n'
+import re as _re
+_PAT = _re.compile(r'[a-z?*]{1,6}')
+_WORD = _re.compile(r'[a-z]{1,20}')
+
+def valid(text):
+    """题面：首行 N M（0<N<=100000，0<M<=100）；随后 N 行模式（小写/?/*，长度<=6），再 M 行单词（小写，长度<=20）。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    head = lines[0].split(' ')
+    if len(head) != 2 or not all(h.isascii() and h.isdigit() and h == str(int(h)) for h in head):
+        return False
+    n, m = map(int, head)
+    if not (1 <= n <= 100000 and 1 <= m <= 100) or len(lines) != 1 + n + m:
+        return False
+    return all(_PAT.fullmatch(p) for p in lines[1:1 + n]) and all(_WORD.fullmatch(w) for w in lines[1 + n:])
+
+def gen_case(seed):
+    r = random.Random(1816 * 1000 + seed)
+    abc = "abcdefghijklmnopqrstuvwxyz"
+    def pat(al, pq, ps, lo=1, hi=6, need_lit=False):
+        while True:
+            p = "".join(r.choices([r.choice(al), "?", "*"], [1 - pq - ps, pq, ps])[0] for _ in range(r.randint(lo, hi)))
+            if not need_lit or any(c.isalpha() for c in p):
+                return p
+    def inst(p, al):
+        # 随机实例化一个模式，得到必然匹配它的单词（截到 20 以内）
+        out = []
+        for ch in p:
+            if ch == "?": out.append(r.choice(al))
+            elif ch == "*": out.append("".join(r.choice(al) for _ in range(r.choice([0, 0, 1, 2, 5]))))
+            else: out.append(ch)
+        return "".join(out)[:20] or r.choice(al)
+    def word(al):
+        return "".join(r.choice(al) for _ in range(r.randint(1, 20)))
+    def make(n, m, al, pq, ps, hit, lo=1, hi=6):
+        ps_ = [pat(al, pq, ps, lo, hi) for _ in range(n)]
+        ws = [inst(r.choice(ps_), al) if r.random() < hit else word(al) for _ in range(m)]
+        return f"{n} {m}\n" + "\n".join(ps_ + ws) + "\n"
+    if seed == 1:
+        return "1 1\n*\na\n"
+    if seed == 2:
+        return "1 1\n??\na\n"
+    if seed == 3:
+        # 连续 * 、满长单词、长度恰好 6 的模式、重复模式
+        ps_ = ["**", "******", "?*?*?*", "a*****", "*?????", "??????", "abcdef", "*z", "z*", "*", "?", "*z", "**"]
+        ws = ["a" * 20, "abcdef", "abcdefz", "z", "zz", "abcdefghijklmnopqrst", "aaaaaa", "q", "z" * 20]
+        return f"{len(ps_)} {len(ws)}\n" + "\n".join(ps_ + ws) + "\n"
+    if seed <= 15:
+        al = abc[:r.choice([1, 2, 3, 4, 26])]
+        return make(r.randint(1, 1000), r.randint(1, 100), al, r.choice([0.1, 0.3]), r.choice([0.1, 0.25]), 0.6)
+    # 只保留 3 组满规模 N=100000、M=100（seed 17 卡回溯、18/20 输出接近 2MB），其余同类构造缩到 N=10000~15000 控制总体积
+    v = seed % 6
+    N = 100000 if seed in (17, 18, 20) else r.randint(10000, 15000)
+    if v == 0: return make(N, 100, abc, 0.15, 0.1, 0.7, 2, 6)
+    if v == 1: return make(N, 100, abc[:3], 0.1, 0.05, 0.7, 5, 6)
+    if v == 2: return make(N, 100, abc[:2], 0.05, 0.03, 0.7, 6, 6)
+    if v == 3: return make(N, 100, abc[:5], 0.1, 0.1, 0.7, 3, 6)
+    if v == 4: return make(N, 100, abc[:4], 0.15, 0.1, 0.7, 4, 6)
+    # 通配符密集的模式树 + 基本匹配不上的单词：卡回溯/逐个模式暴力匹配，输出却很小
+    al = abc[:25]
+    ps_ = [pat(al, 0.25, 0.35, 3, 6, need_lit=True) for _ in range(N)]
+    ws = ["z" * r.randint(1, 20) for _ in range(90)] + [inst(r.choice(ps_), al) for _ in range(10)]
+    r.shuffle(ws)
+    return f"{N} 100\n" + "\n".join(ps_ + ws) + "\n"
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -428,7 +494,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[gen_case(s) for s in range(1, 40)]
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

@@ -18,8 +18,30 @@ def run(text):
         x=subprocess.run(cmd,input=text,text=True,capture_output=True,timeout=120)
         if x.returncode: raise SystemExit(x.stderr)
         return x.stdout
+import re
+
+def valid(text):
+    """题面：输入为一个整数 n（1<=n<=10^9）。"""
+    return re.fullmatch(r'[1-9][0-9]*\n', text) is not None and 1 <= int(text) <= 10**9
+
+def all_ns():
+    """各组的 n，两两不同。原随机生成器 g30547 只取 1..30 且会重复，改成显式列表：
+    小 n（可用暴力枚举核对）、生成部分首项 a_{k+1} 切换处的编号（如 4/5、6635/6636）、样例 2 的 1235 及其邻居、
+    中等 n，以及接近上限 10^9 的大 n。"""
+    r = random.Random(30547)
+    ns = [3, 1, 2, 6, 7, 8, 10, 13, 21, 55, 100,
+          4, 5, 11, 12, 29, 30, 72, 73, 180, 181, 443, 444, 1094, 1095, 2693, 2694, 6635, 6636, 16333, 16334,
+          40223, 40224, 99028, 1234, 1235, 1236]
+    ns += sorted(r.sample(range(200, 99028), 5))
+    ns += sorted(r.randint(10**5, 10**7) for _ in range(4))
+    ns += sorted(r.randint(10**7, 10**9) for _ in range(6))
+    ns += [10**8, 123456789, 536870912, 999999999, 10**9]
+    assert len(set(ns)) == len(ns)
+    return ns
+
 def main():
     data=Path('data'); data.mkdir(exist_ok=True)
-    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+    cases=[f"{n}\n" for n in all_ns()]
+    assert cases[0]==SAMPLE and all(valid(c) for c in cases) and len(set(cases))==len(cases)
     for i,c in enumerate(cases): (data/f'{i}.in').write_text(c); (data/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

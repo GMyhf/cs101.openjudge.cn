@@ -46,7 +46,7 @@ def generate(n, seed):
     if n==2456:
         N=r.randint(3,30);C=r.randint(2,N);x=sorted(r.sample(range(1,10000),N));return f'{N} {C}\n'+'\n'.join(map(str,x))+'\n'
     if n==2808:
-        L=r.randint(10,1000);m=r.randint(1,15);return f'{L} {m}\n'+'\n'.join(f'{(a:=r.randint(0,L))} {r.randint(a,L)}' for _ in range(m))+'\n'
+        return gen_2808(r, seed)
     if n==2995:
         N=r.randint(2,80);return f'{N}\n'+' '.join(str(r.randint(1,1000)) for _ in range(N))+'\n'
     if n==2760:
@@ -156,6 +156,61 @@ def generate(n, seed):
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2808: 校门外的树\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/02808/\n# License: not declared in source collection; no license is inferred.\nimport sys\nL, m = map(int, input().split())\n\ndp = [1]*(L+1)\n\nfor i in range(m):\n    s, e = map(int, input().split())\n    for j in range(s, e+1):\n        dp[j] = 0\n\nprint(dp.count(1))\n'
 NUMBER=2808
 SAMPLE='500 3\n150 300\n100 200\n470 471\n'
+import re as _re
+def valid(text):
+    """题面：首行 L M（1<=L<=10000，1<=M<=100），以一个空格隔开；
+    接下来 M 行每行两个不同的整数（马路上的坐标 0..L），以一个空格隔开。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    num = r'(0|[1-9][0-9]*)'
+    m = _re.fullmatch(num + ' ' + num, lines[0])
+    if not m:
+        return False
+    L, M = map(int, m.groups())
+    if not (1 <= L <= 10000 and 1 <= M <= 100) or len(lines) != M + 1:
+        return False
+    for s in lines[1:]:
+        m = _re.fullmatch(num + ' ' + num, s)
+        if not m:
+            return False
+        a, b = map(int, m.groups())
+        if a == b or not (0 <= a <= L and 0 <= b <= L):
+            return False
+    return True
+
+
+def gen_2808(r, seed):
+    """区域两端点必须是不同的整数（题面原话：两个不同的整数），按起点<终点给出。
+    覆盖：L=10000、M=100 满规模，L=1 最小规模，全部移走（答案 0），端点 0 与 L，区间重叠/相接/包含。"""
+    if seed == 1:
+        return '1 1\n0 1\n'
+    if seed == 2:
+        L = 10000
+        return f'{L} 3\n0 5000\n4000 {L}\n100 200\n'
+    if seed % 4 == 0:
+        L, M = 10000, 100
+    elif seed % 3 == 0:
+        L, M = r.randint(1, 10000), r.randint(1, 100)
+    else:
+        L, M = r.randint(10, 1000), r.randint(1, 15)
+    rows = []
+    for _ in range(M):
+        t = r.random()
+        if t < .3:
+            a = r.randint(0, L - 1); b = r.randint(a + 1, min(L, a + 3))
+        elif t < .35:
+            a, b = 0, r.randint(1, max(1, L // 10))
+        elif t < .4:
+            a, b = r.randint(L - max(1, L // 10), L - 1), L
+        elif t < .45 and M <= 15:
+            a, b = sorted(r.sample(range(L + 1), 2))
+        else:
+            a = r.randint(0, L - 1); b = r.randint(a + 1, min(L, a + max(1, 2 * L // M)))
+        rows.append(f'{a} {b}')
+    return f'{L} {M}\n' + '\n'.join(rows) + '\n'
+
+
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)

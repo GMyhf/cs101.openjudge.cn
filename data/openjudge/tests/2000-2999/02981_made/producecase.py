@@ -134,7 +134,24 @@ def generate(n, seed):
     if n==1191:return f'{r.randint(2,10)}\n'+'\n'.join(' '.join(str(r.randint(0,99)) for _ in range(8)) for _ in range(8))+'\n'
     if n==2287:
         N=r.randint(1,30);return f'{N}\n'+' '.join(str(r.randint(1,100)) for _ in range(N))+'\n'+' '.join(str(r.randint(1,100)) for _ in range(N))+'\n0\n'
-    if n==2981:return str(r.randrange(10**50))+'\n'+str(r.randrange(10**50))+'\n'
+    if n==2981:
+        # 题面：两个不超过 200 位的非负整数，可能有多余前导 0。
+        # 覆盖：满 200 位、200 位进位到 201 位、长串 9 连续进位、0+0、全 0 带前导 0、前导 0 拖到 200 位、
+        # 长短悬殊、结果需去前导 0，以及超出 64 位的一般情形。
+        def num(L,lead=0):
+            body=str(r.randint(1,9))+''.join(r.choice('0123456789') for _ in range(L-1)) if L>0 else ''
+            return '0'*lead+body if body or lead else '0'
+        fixed={1:('0','0'),2:('000','0000'),3:('9'*200,'1'),4:('9'*200,'9'*200),5:('1'+'0'*199,'9'*199),
+               6:('0'*199+'1','0'*199+'9'),7:('0'*150+'5'*50,'0'*10+'4'*50),8:('0'*200,'7'),9:('1','0'*200),
+               10:('5'*200,'4'*200),11:('0','9'*200),12:('99999999999999999999','1'),13:('18446744073709551615','18446744073709551615'),
+               14:('0'*100+'9'*100,'0'*190+'1')}
+        if seed in fixed:a,b=fixed[seed]
+        elif seed<=24:a,b=num(200),num(200)
+        elif seed<=30:a,b=num(r.randint(1,200)),num(r.randint(1,20))
+        else:
+            la=r.randint(1,190);lb=r.randint(1,190);a=num(la,r.randint(0,200-la));b=num(lb,r.randint(0,200-lb))
+        if r.random()<.5:a,b=b,a
+        return a+'\n'+b+'\n'
     if n==2750:return f'{r.randint(1,32767)}\n'
     if n==2788:
         rows=[]
@@ -156,6 +173,11 @@ def generate(n, seed):
     if n==1218:
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
+
+def valid(text):
+    """题面 02981：两行，每行一个不超过 200 位的非负整数（可能有多余的前导 0）。"""
+    import re
+    return bool(re.fullmatch(r"\d{1,200}\n\d{1,200}\n",text))
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2981: 大整数加法\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/02981/\n# License: not declared in source collection; no license is inferred.\nimport sys\nprint(int(input()) + int(input()))\n'
 NUMBER=2981

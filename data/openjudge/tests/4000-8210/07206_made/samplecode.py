@@ -12,20 +12,24 @@ def solve(s):
    else:hi=mid
   return f"{(lo+hi)/2:.9f}\n"
  if P==7206:
+  # 棋子既不能落脚，也会憋马脚：走 (±1,±2) 时马脚在 (0,±1)，走 (±2,±1) 时马脚在 (±1,0)
   x1,y1,x2,y2=int(a[0]),int(a[1]),int(a[2]),int(a[3]); m=int(a[4]); blocked={(int(a[5+2*i]),int(a[6+2*i])) for i in range(m)}
-  moves=((1,2),(2,1),(-1,2),(-2,1),(1,-2),(2,-1),(-1,-2),(-2,-1));q=deque([(x1,y1)]);dist={(x1,y1):0};ways={(x1,y1):1}
+  moves=((1,2,0,1),(-1,2,0,1),(1,-2,0,-1),(-1,-2,0,-1),(2,1,1,0),(2,-1,1,0),(-2,1,-1,0),(-2,-1,-1,0))
+  def nb(u):
+   for dx,dy,lx,ly in moves:
+    z=(u[0]+dx,u[1]+dy)
+    if 0<=z[0]<=10 and 0<=z[1]<=10 and z not in blocked and (u[0]+lx,u[1]+ly) not in blocked:yield z
+  q=deque([(x1,y1)]);dist={(x1,y1):0};ways={(x1,y1):1}
   while q:
    u=q.popleft()
-   for dx,dy in moves:
-    z=(u[0]+dx,u[1]+dy)
-    if not(0<=z[0]<=10 and 0<=z[1]<=10) or z in blocked:continue
+   for z in nb(u):
     if z not in dist:dist[z]=dist[u]+1;ways[z]=ways[u];q.append(z)
     elif dist[z]==dist[u]+1:ways[z]+=ways[u]
   if (x2,y2) not in dist:return "0\n"
   if ways[(x2,y2)]!=1:return str(ways[(x2,y2)])+"\n"
   path=[(x2,y2)];u=(x2,y2)
   while u!=(x1,y1):
-   u=next(v for v in dist if dist.get(v)==dist[u]-1 and (u[0]-v[0],u[1]-v[1]) in moves);path.append(u)
+   u=next(v for v in dist if dist[v]==dist[u]-1 and u in nb(v));path.append(u)
   return "-".join(f"({x},{y})" for x,y in path[::-1])+"\n"
  if P==22528:
   scores=list(map(float,a));need=(3*len(scores)+4)//5;lo,hi=1,10**9

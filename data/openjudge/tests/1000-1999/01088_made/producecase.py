@@ -161,9 +161,58 @@ def run(x):
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout
+def valid(text):
+    """题面契约：首行 R C(1..100)，随后 R 行、每行 C 个整数高度 h(0..10000)。"""
+    lines = text.split('\n')
+    if lines and lines[-1] == '':
+        lines.pop()
+    try:
+        head = lines[0].split(' ')
+        if len(head) != 2 or not all(x.isdigit() for x in head):
+            return False
+        R, C = map(int, head)
+        if not (1 <= R <= 100 and 1 <= C <= 100) or len(lines) != 1 + R:
+            return False
+        for line in lines[1:]:
+            toks = line.split(' ')
+            if len(toks) != C or not all(x.isdigit() and int(x) <= 10000 for x in toks):
+                return False
+        return True
+    except Exception:
+        return False
+
+def extra_cases():
+    """补充覆盖：100x100 满规模（随机/蛇形/螺旋长路径/全相等/大量相等/平滑坡面）、1x1、单行、单列、高度 0 与 10000。"""
+    r = random.Random(1088_2026)
+    fmt = lambda g: f"{len(g)} {len(g[0])}\n" + "".join(" ".join(map(str, row)) + "\n" for row in g)
+    N = 100
+    snake = [[i * N + (j if i % 2 == 0 else N - 1 - j) for j in range(N)] for i in range(N)]
+    spiral = [[0] * N for _ in range(N)]
+    y = x = 0; dy, dx = 0, 1
+    for v in range(N * N):                      # 外圈高、向中心递减：最长路径 10000
+        spiral[y][x] = 10000 - v
+        ny, nx = y + dy, x + dx
+        if not (0 <= ny < N and 0 <= nx < N) or spiral[ny][nx]:
+            dy, dx = dx, -dy; ny, nx = y + dy, x + dx
+        y, x = ny, nx
+    return [
+        fmt([[r.randint(0, 10000) for _ in range(N)] for _ in range(N)]),
+        fmt(snake),
+        fmt(spiral),
+        fmt([[0] * N for _ in range(N)]),
+        fmt([[10000]]),
+        fmt([list(range(0, 10000, 100))]),
+        fmt([[r.randint(0, 10000)] for _ in range(N)]),
+        fmt([[r.randint(0, 3) for _ in range(N)] for _ in range(N)]),
+        fmt([[10000 * ((i + j) % 2) for j in range(N)] for i in range(N)]),
+        fmt([[min(10000, i * 50 + j * 50 + r.randint(0, 60)) for j in range(N)] for i in range(N)]),
+        fmt([[r.randint(0, 10000) for _ in range(r.randint(50, 100))] for _ in range(1)] * 1),
+    ]
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ cases=[SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()
+ assert all(valid(x) for x in cases)
+ for i,x in enumerate(cases):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

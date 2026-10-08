@@ -206,13 +206,7 @@ def generate(number, seed):
             chunks.append(f"{h} {w}\n" + "\n".join("".join(row) for row in grid))
         return "\n".join(chunks) + "\n0 0\n"
     if number == 2424:
-        chunks = []
-        for _ in range(r.randint(1, 3)):
-            a, b, c = r.randint(1, 5), r.randint(1, 5), r.randint(1, 5)
-            minutes = sorted(r.sample(range(8 * 60, 22 * 60 + 1), r.randint(2, 15)))
-            rows = [f"{minute//60:02d}:{minute%60:02d} {r.randint(1,6)}" for minute in minutes]
-            chunks.append(f"{a} {b} {c}\n" + "\n".join(rows) + "\n#")
-        return "\n".join(chunks) + "\n0 0 0\n"
+        return gen_2424(r, seed)
     if number == 2492:
         chunks = []
         for index in range(r.randint(1, 4)):
@@ -417,10 +411,106 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
-REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02424/statistics/\n# Accepted submission: 44298654\n# Source: http://cs101.openjudge.cn/practice/solution/44298654/\n# License: not declared on the submission page; no license is inferred.\n\nwhile 1:\n    a,b,c=map(int,input().split())\n    pa=[a,b,c]\n    l=[a,b,c]\n    now=[[],[],[]]\n    flag=[0,0,0]\n    ans=0\n    if a==0 and b==0 and c==0:\n        break\n    while 1:\n        x=input()\n        if x=='#':\n            break\n        t,p=x.split()\n        p=int(p)\n        h,m=map(int,t.split(':'))\n        t=60*h+m-480\n        i=(p-1)//2\n        for u in range(flag[i],len(now[i])):\n                if now[i][u]+30<=t:\n                    l[i]+=1\n                else:\n                    flag[i]=u\n                    break\n        if l[i]>0:\n                now[i].append(t)\n                l[i]-=1\n                ans+=p\n        elif abs(l[i])<pa[i]:\n\n            now[i].append(now[i][flag[i]+abs(l[i])]+30)\n            l[i]-=1\n            ans+=p\n    print(ans)\n"
+REFERENCE='# 参考解（审计重写）：原外部 AC 提交 44298654 在释放桌子时会把同一张桌子反复计入空闲数\n# （每次都从 flag 位置重新扫描已释放的桌子），弱数据下侥幸通过，这里改为按桌型维护释放时刻小根堆。\nimport sys, heapq\n\ndef main():\n    data = sys.stdin.read().split()\n    pos = 0; out = []\n    while pos + 2 < len(data):\n        a, b, c = int(data[pos]), int(data[pos + 1]), int(data[pos + 2]); pos += 3\n        if a == 0 and b == 0 and c == 0:\n            break\n        heaps = [[0] * a, [0] * b, [0] * c]\n        ans = 0\n        while data[pos] != "#":\n            hh, mm = data[pos].split(":"); n = int(data[pos + 1]); pos += 2\n            t = int(hh) * 60 + int(mm)\n            h = heaps[(n - 1) // 2]\n            seat = max(t, h[0])\n            if seat - t <= 30:  # 等待不超过半小时就留下\n                heapq.heapreplace(h, seat + 30)\n                ans += n\n        pos += 1\n        out.append(str(ans))\n    sys.stdout.write("\\n".join(out) + "\\n")\n\nmain()\n'
 LANGUAGE='Python3'
 NUMBER=2424
 SAMPLE='1 1 1\n10:40 1\n10:50 2\n11:00 4\n#\n1 1 1\n10:40 1\n10:50 2\n11:00 2\n#\n1 2 1\n10:30 1\n10:40 3\n10:50 2\n11:00 1\n11:20 5\n#\n0 0 0\n'
+def valid(text):
+    """02424 输入契约：若干组；每组首行 A B C（均 >0，A+B+C<=100），随后若干行 "HH:MM N"
+    （08:00..22:00，严格递增，1<=N<=6），以单独一行 "#" 结束；最后一行 "0 0 0"。"""
+    import re
+    if not text.endswith("\n") or "\r" in text:
+        return False
+    lines = text[:-1].split("\n")
+    i = 0; cases = 0
+    while True:
+        if i >= len(lines):
+            return False
+        tok = lines[i].split(" ")
+        if len(tok) != 3 or not all(re.fullmatch(r"0|[1-9][0-9]*", x) for x in tok):
+            return False
+        a, b, c = map(int, tok); i += 1
+        if a == b == c == 0:
+            return i == len(lines) and cases >= 1
+        if min(a, b, c) <= 0 or a + b + c > 100:
+            return False
+        prev = -1
+        while True:
+            if i >= len(lines):
+                return False
+            if lines[i] == "#":
+                i += 1; break
+            m = re.fullmatch(r"([0-9]{2}):([0-9]{2}) ([1-6])", lines[i])
+            if not m:
+                return False
+            hh, mm = int(m.group(1)), int(m.group(2))
+            if mm >= 60:
+                return False
+            t = hh * 60 + mm
+            if not 8 * 60 <= t <= 22 * 60 or t <= prev:
+                return False
+            prev = t; i += 1
+        cases += 1
+def oracle_2424(text):
+    import heapq
+    lines = text.split("\n"); i = 0; out = []
+    while True:
+        a, b, c = map(int, lines[i].split()); i += 1
+        if a == b == c == 0:
+            return "".join(out)
+        heaps = [[0] * a, [0] * b, [0] * c]
+        ans = 0
+        while lines[i] != "#":
+            tm, n = lines[i].split(); n = int(n); i += 1
+            t = int(tm[:2]) * 60 + int(tm[3:])
+            h = heaps[(n - 1) // 2]
+            seat = max(t, h[0])
+            if seat - t <= 30:
+                heapq.heapreplace(h, seat + 30); ans += n
+        i += 1
+        out.append(f"{ans}\n")
+def gen_2424(r, seed):
+    def case(a, b, c, minutes, sizes=None):
+        rows = [f"{m//60:02d}:{m%60:02d} {sizes[k] if sizes else r.randint(1, 6)}" for k, m in enumerate(minutes)]
+        return f"{a} {b} {c}\n" + "".join(x + "\n" for x in rows) + "#\n"
+    def tables(total):
+        a = r.randint(1, total - 2); b = r.randint(1, total - a - 1); c = r.randint(1, total - a - b)
+        return a, b, c
+    allm = list(range(8 * 60, 22 * 60 + 1))
+    chunks = []
+    if seed == 1:  # 最小：1 1 1 一组
+        chunks.append(case(1, 1, 1, [8 * 60], [1]))
+    elif seed == 2:  # 等待恰好 30 分钟（留下）与 31 分钟（离开）、释放时刻恰好到达
+        chunks.append(case(1, 1, 1, [600, 601, 630, 631, 660], [2, 1, 2, 1, 2]))
+        chunks.append(case(1, 1, 1, [600, 610, 629, 640], [6, 5, 6, 5]))
+        chunks.append(case(1, 1, 1, [480, 510, 540, 1320], [3, 4, 3, 4]))
+        chunks.append(case(2, 1, 1, [600, 601, 602, 631, 632, 633], [1, 2, 1, 2, 1, 2]))
+    elif seed == 3:  # 边界时刻 08:00 与 22:00，每分钟一组
+        chunks.append(case(1, 1, 1, allm))
+        chunks.append(case(98, 1, 1, allm, [r.choice([1, 2]) for _ in allm]))
+    elif seed == 4:  # 前面离开的组不占座、后面的组仍能入座
+        chunks.append(case(1, 1, 1, [700, 701, 702, 703, 731, 732, 760], [1, 1, 2, 1, 2, 2, 1]))
+    elif seed <= 15:
+        for _ in range(r.randint(1, 4)):
+            k = r.randint(1, 60)
+            chunks.append(case(*tables(r.randint(3, 8)), sorted(r.sample(allm[:r.randint(k, 841)], k))))
+    elif seed <= 25:  # 高峰期密集到达，大量排队与离开
+        for _ in range(r.randint(2, 6)):
+            st = r.randint(480, 1200); span = r.randint(30, 1320 - st)
+            k = r.randint(span // 3 + 1, span + 1)
+            ms = sorted(r.sample(range(st, st + span + 1), k))
+            chunks.append(case(*tables(r.randint(3, 20)), ms))
+    elif seed <= 32:  # 满规模：每组数据 841 个到达时刻，桌子总数 3..100，多组
+        for _ in range(r.randint(5, 12)):
+            k = r.randint(600, 841)
+            chunks.append(case(*tables(r.choice([3, 4, 10, 30, 60, 100])), sorted(r.sample(allm, k))))
+    else:  # 偏斜的人数分布（某一种桌子特别紧张）
+        for _ in range(r.randint(3, 8)):
+            k = r.randint(200, 841)
+            w = [r.random() ** 3 for _ in range(6)]
+            sizes = r.choices(range(1, 7), weights=w, k=k)
+            chunks.append(case(*tables(r.choice([3, 5, 12, 50, 100])), sorted(r.sample(allm, k)), sizes))
+    return "".join(chunks) + "0 0 0\n"
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]

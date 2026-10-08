@@ -416,8 +416,220 @@ def generate(number, seed):
             chunks.append(f"{capacity}\n{count}\n" + " ".join(str(x) for pair in metals for x in pair))
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
+def _is_planar(n,adj):
+    """DMP 路径添加法判定平面性（逐个双连通分量）。adj: list of set。"""
+    import sys
+    E=sum(len(a) for a in adj)//2
+    if n>=3 and E>3*n-6:return False
+    # 双连通分量（边集）
+    sys.setrecursionlimit(10000)
+    disc=[-1]*n;low=[0]*n;t=[0];st=[];blocks=[]
+    def dfs(u,p):
+        disc[u]=low[u]=t[0];t[0]+=1
+        for v in adj[u]:
+            if v==p:continue
+            if disc[v]<0:
+                st.append((u,v));dfs(v,u)
+                low[u]=min(low[u],low[v])
+                if low[v]>=disc[u]:
+                    b=[]
+                    while True:
+                        e=st.pop();b.append(e)
+                        if e==(u,v):break
+                    blocks.append(b)
+            elif disc[v]<disc[u]:
+                st.append((u,v));low[u]=min(low[u],disc[v])
+    for s in range(n):
+        if disc[s]<0:dfs(s,-1)
+    for b in blocks:
+        if len(b)<9:continue  # 边数 < 9 的块必为平面（K5 有 10 边，K3,3 有 9 边）
+        if not _dmp(b):return False
+    return True
 
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01129/statistics/\n# Accepted submission: 52288382\n# Source: http://cs101.openjudge.cn/practice/solution/52288382/\n# License: not declared on the submission page; no license is inferred.\n\ndef is_possible(g, n, colors):\n    for u in range(n):\n        for v in g[u]:\n            if colors[u] == colors[v]:\n                return False\n    return True\ndef backtrack(g, u, n, max_color, colors):\n    if u == n:\n        return is_possible(g, n, colors)\n    for c in range(max_color):\n        colors[u] = c\n        if backtrack(g, u + 1, n, max_color, colors):\n            return True\n        colors[u] = -1\n    return False\ndef min_color(g, n):\n    if n == 0:\n        return 0\n    for k in range(1, 5):\n        colors = [-1] * n\n        if backtrack(g, 0, n, k, colors):\n            return k\n    return 4\nwhile True:\n    n = int(input())\n    if n == 0:\n        break\n    g = [[] for _ in range(n)]\n    for i in range(n):\n        s = input().strip()\n        adj = s.split(\':\')[1]\n        for ch in adj:\n            j = ord(ch) - ord(\'A\')\n            g[i].append(j)\n    res = min_color(g, n)\n    if res == 1:\n        print(f"{res} channel needed.")\n    else:\n        print(f"{res} channels needed.")\n'
+def _dmp(edges):
+    g={}
+    for u,v in edges:
+        g.setdefault(u,set()).add(v);g.setdefault(v,set()).add(u)
+    V=list(g)
+    if len(V)>=3 and len(edges)>3*len(V)-6:return False
+    # 找一个环
+    par={};start=V[0];stack=[(start,None)];seen=set();cyc=None
+    order=[]
+    def find_cycle():
+        par={start:None};depth={start:0};stk=[start]
+        while stk:
+            u=stk.pop()
+            for v in g[u]:
+                if v==par[u]:continue
+                if v in par:
+                    # 回边 u-v，构造环
+                    a,b=u,v;pa=[a];pb=[b]
+                    sa={a:0}
+                    x=a
+                    while par[x] is not None:x=par[x];pa.append(x)
+                    sa={x:i for i,x in enumerate(pa)}
+                    y=b;pb=[b]
+                    while y not in sa:y=par[y];pb.append(y)
+                    return pa[:sa[y]+1]+pb[-2::-1]
+                par[v]=u;stk.append(v)
+        return None
+    cyc=find_cycle()
+    Hv=set(cyc);He=set()
+    for i in range(len(cyc)):
+        a,b=cyc[i],cyc[(i+1)%len(cyc)];He.add(frozenset((a,b)))
+    faces=[list(cyc),list(cyc)]
+    total=len(edges)
+    while len(He)<total:
+        frags=[]
+        for u,v in edges:
+            if frozenset((u,v)) not in He and u in Hv and v in Hv:
+                frags.append(({u,v},('e',u,v)))
+        seenc=set()
+        for s in V:
+            if s in Hv or s in seenc:continue
+            comp={s};stk=[s];att=set()
+            while stk:
+                x=stk.pop()
+                for y in g[x]:
+                    if y in Hv:att.add(y)
+                    elif y not in comp:comp.add(y);stk.append(y)
+            seenc|=comp
+            frags.append((att,('c',comp)))
+        best=None
+        for att,info in frags:
+            adm=[i for i,f in enumerate(faces) if att<=set(f)]
+            if not adm:return False
+            if best is None or len(adm)<len(best[2]):best=(att,info,adm)
+            if len(adm)==1:break
+        att,info,adm=best;fi=adm[0]
+        if info[0]=='e':path=[info[1],info[2]]
+        else:
+            comp=info[1];a=next(iter(att))
+            # BFS 从 a 经 comp 内部到另一个附着点
+            prev={a:None};q=[a];end=None
+            for x in q:
+                for y in g[x]:
+                    if x==a and y not in comp:continue
+                    if y in comp and y not in prev:prev[y]=x;q.append(y)
+                    elif y in Hv and y!=a and x!=a and x in comp:
+                        end=(y,x);break
+                if end:break
+            y,x=end;path=[y]
+            while x is not None:path.append(x);x=prev[x]
+            path=path[::-1]
+        f=faces[fi];u,v=path[0],path[-1]
+        i,j=f.index(u),f.index(v);L=len(f)
+        def walk(i,j):
+            r=[f[i]]
+            while i!=j:i=(i+1)%L;r.append(f[i])
+            return r
+        inner=path[1:-1]
+        f1=walk(i,j)+inner[::-1];f2=walk(j,i)+inner
+        faces[fi]=f1;faces.append(f2)
+        for k in range(len(path)-1):He.add(frozenset((path[k],path[k+1])))
+        Hv|=set(path)
+    return True
+
+def valid(text):
+    """题面契约：多组地图，每组首行中继站数 N（1<=N<=26），随后 N 行，第 i 行形如 X:YZ...，
+    X 为第 i 个大写字母，冒号后为前 N 个字母中的相邻站（不含自身、不重复）；相邻关系对称；
+    图是平面图；以单独一行 0 结束。"""
+    import re
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n');i=0;maps=0
+    while True:
+        if i>=len(lines) or not re.fullmatch(r'\d+',lines[i]):return False
+        N=int(lines[i]);i+=1
+        if N==0:break
+        if not 1<=N<=26 or i+N>len(lines):return False
+        adj=[set() for _ in range(N)]
+        for k in range(N):
+            s=lines[i+k]
+            if len(s)<2 or s[0]!=chr(65+k) or s[1]!=':':return False
+            rest=s[2:]
+            if len(set(rest))!=len(rest):return False
+            for ch in rest:
+                if not('A'<=ch<=chr(64+N)) or ch==s[0]:return False
+                adj[k].add(ord(ch)-65)
+        i+=N
+        if any((k in adj[j])!=(j in adj[k]) for k in range(N) for j in range(N)):return False
+        if not _is_planar(N,adj):return False
+        maps+=1
+    return i==len(lines) and maps>=1
+
+def _fmt1129(n,E):
+    adj=[set() for _ in range(n)]
+    for u,v in E:adj[u].add(v);adj[v].add(u)
+    return f'{n}\n'+''.join(chr(65+i)+':'+''.join(chr(65+j) for j in sorted(adj[i]))+'\n' for i in range(n))
+
+def _geo1129(r,n,keep):
+    # 平面上随机整点，按随机顺序（或按长度）尝试加线段，不与已有线段交叉 => 直线平面图
+    while True:
+        P=list({(r.randint(0,60),r.randint(0,60)) for _ in range(n*2)})[:n]
+        if len(P)==n:break
+    def cr(o,a,b):return (a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0])
+    def cross(a,b,c,d):
+        return cr(a,b,c)*cr(a,b,d)<0 and cr(c,d,a)*cr(c,d,b)<0
+    def through(a,b):
+        for q in P:
+            if q!=a and q!=b and cr(a,b,q)==0 and min(a[0],b[0])<=q[0]<=max(a[0],b[0]) and min(a[1],b[1])<=q[1]<=max(a[1],b[1]):return True
+        return False
+    cand=[(i,j) for i in range(n) for j in range(i+1,n)]
+    if r.random()<.5:cand.sort(key=lambda e:(P[e[0]][0]-P[e[1]][0])**2+(P[e[0]][1]-P[e[1]][1])**2)
+    else:r.shuffle(cand)
+    E=[]
+    for i,j in cand:
+        if through(P[i],P[j]):continue
+        if any(cross(P[i],P[j],P[a],P[b]) for a,b in E if len({a,b,i,j})==4):continue
+        E.append((i,j))
+    E=[e for e in E if r.random()<keep]
+    perm=list(range(n));r.shuffle(perm)
+    return [(perm[a],perm[b]) for a,b in E]
+
+def _special1129(r,kind,n):
+    if kind=='empty':return []
+    if kind=='path':return [(i,i+1) for i in range(n-1)]
+    if kind=='cycle':return [(i,(i+1)%n) for i in range(n)]
+    if kind=='tree':return [(i,r.randrange(i)) for i in range(1,n)]
+    if kind=='wheel':return [(0,i) for i in range(1,n)]+[(i,i+1 if i<n-1 else 1) for i in range(1,n)]
+    if kind=='grid':
+        w=r.randint(2,5);h=n//w;E=[]
+        for a in range(h):
+            for b in range(w):
+                if b<w-1:E.append((a*w+b,a*w+b+1))
+                if a<h-1:E.append((a*w+b,(a+1)*w+b))
+        return E
+    if kind=='apollonian':  # 极大平面 3-树，含 K4
+        E={(0,1),(1,2),(0,2)};F=[(0,1,2)];m=3
+        while m<n:
+            a,b,c=F.pop(r.randrange(len(F)));E|={(a,m),(b,m),(c,m)};F+=[(a,b,m),(b,c,m),(a,c,m)];m+=1
+        return list(E)
+    raise KeyError(kind)
+
+def _relabel(r,n,E):
+    perm=list(range(n));r.shuffle(perm)
+    return [(perm[a],perm[b]) for a,b in E]
+
+def gen1129(seed):
+    r=random.Random(1129*1000+seed)
+    maps=[]
+    if seed==1:
+        maps=[_fmt1129(1,[]),_fmt1129(2,[(0,1)]),_fmt1129(26,[]),_fmt1129(3,[(0,1),(1,2),(0,2)]),_fmt1129(4,[(a,b) for a in range(4) for b in range(a+1,4)]),_fmt1129(26,_special1129(r,'path',26))]
+    elif seed==2:
+        maps=[_fmt1129(n,_relabel(r,n,_special1129(r,'cycle',n))) for n in (3,4,5,25,26)]+[_fmt1129(n,_relabel(r,n,_special1129(r,'wheel',n))) for n in (4,5,6,7,25,26)]
+    elif seed==3:
+        maps=[_fmt1129(26,_relabel(r,26,_special1129(r,k,26))) for k in ('tree','grid','apollonian','apollonian')]+[_fmt1129(24,_relabel(r,24,_special1129(r,'grid',24)))]
+    else:
+        cnt=r.randint(1,4) if seed<30 else 12
+        for _ in range(cnt):
+            n=26 if seed>=30 or r.random()<.4 else r.randint(1,26)
+            t=r.random()
+            if t<.6:E=_geo1129(r,n,r.choice([1,1,.97,.9,.7,.5,.3]))
+            else:E=_relabel(r,n,_special1129(r,r.choice(['tree','cycle','wheel','grid','apollonian','path']),n if n>=4 else 4)) if n>=4 else []
+            maps.append(_fmt1129(n,E))
+    return ''.join(maps)+'0\n'
+
+REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01129/statistics/\n# Accepted submission: 52288382\n# Source: http://cs101.openjudge.cn/practice/solution/52288382/\n# License: not declared on the submission page; no license is inferred.\n# 注：原提交的回溯只在全部着色后才检查冲突，n=26 时指数爆炸；改为 DSATUR 剪枝回溯。\n\nimport sys\nsys.setrecursionlimit(10000)\ndef min_channels(n, adj):\n    # DSATUR 回溯：每次选饱和度最大的未着色点，只试与邻居不冲突的颜色\n    for k in range(1, 5):\n        col = [-1] * n\n        def bt(cnt):\n            if cnt == n:\n                return True\n            best = -1; bs = -1; bd = -1\n            for v in range(n):\n                if col[v] < 0:\n                    s = len({col[u] for u in adj[v] if col[u] >= 0})\n                    if s > bs or (s == bs and len(adj[v]) > bd):\n                        best, bs, bd = v, s, len(adj[v])\n            used = {col[u] for u in adj[best]}\n            for c in range(k):\n                if c not in used:\n                    col[best] = c\n                    if bt(cnt + 1):\n                        return True\n            col[best] = -1\n            return False\n        if bt(0):\n            return k\n    return 4\ntok = sys.stdin.read().split()\np = 0\nout = []\nwhile True:\n    n = int(tok[p]); p += 1\n    if n == 0:\n        break\n    adj = [set() for _ in range(n)]\n    for i in range(n):\n        s = tok[p]; p += 1\n        for ch in s.split(\':\', 1)[1]:\n            j = ord(ch) - 65\n            adj[i].add(j); adj[j].add(i)\n    k = min_channels(n, adj)\n    out.append(f"{k} channel needed." if k == 1 else f"{k} channels needed.")\nprint(\'\\n\'.join(out))\n'
 LANGUAGE='Python3'
 NUMBER=1129
 SAMPLE='2\nA:\nB:\n4\nA:BC\nB:ACD\nC:ABD\nD:BC\n4\nA:BCD\nB:ACD\nC:ABD\nD:ABC\n0\n'
@@ -428,7 +640,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[gen1129(s) for s in range(1, 40)]
   for i,x in enumerate(cases):
+   assert valid(x),i
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

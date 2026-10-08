@@ -152,6 +152,27 @@ def generate(number, seed):
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2927: 判断数字个数\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02927/\n# License: not declared; no license is inferred.\nimport sys\nimport sys\nfrom collections import Counter\n\ndef count_digits_in_string(line):\n    # 统计字符串中的数字出现次数\n    digit_count = Counter(char for char in line if char.isdigit())\n\n    # 按数字大小排序\n    sorted_digit_count = sorted(digit_count.items(), key=lambda x: int(x[0]))\n\n    # 输出结果\n    for digit, count in sorted_digit_count:\n        print(f"{digit}:{count}")\n\ndef main():\n    # 读取所有输入行\n    input_lines = sys.stdin.read().strip().split(\'\\n\')\n\n    # 遍历每一行并处理\n    for line in input_lines:\n        count_digits_in_string(line)\n\nif __name__ == "__main__":\n    main()\n'
 NUMBER=2927
 SAMPLE='ldksfj857ld*&%&^%00000\n138****0055end\n'
+def valid(text):
+    """题面：输入有多行，每行一个字符串，可含任意符号及空格（按可见 ASCII 与空格处理）。"""
+    if not text.endswith('\n') or '\r' in text: return False
+    lines = text[:-1].split('\n')
+    return len(lines) >= 1 and all(len(x) >= 1 and all(32 <= ord(c) <= 126 for c in x) for x in lines)
+def extra_cases():
+    # 补充：单数字出现 >=10、>=100 次（卡把次数当单个字符输出的写法）；整行全是数字；
+    # 首尾带空格的行；不含数字的行夹在中间；较长的行。
+    r = random.Random(2927_0001)
+    sym = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&^$#@*%!()-+=~ "
+    def line(n, pd):
+        t = [r.choice("0123456789") if r.random() < pd else r.choice(sym) for _ in range(n)]
+        t[0] = t[0] if t[0] != " " else "x"
+        return "".join(t)
+    cs = []
+    cs.append("0123456789" * 12 + "\n" + "7" * 105 + "\n")
+    cs.append("\n".join([line(300, 0.5), "  no digits here &^$ ", line(500, 0.9), " 1 1 1 1 1 1 1 1 1 1 1 "]) + "\n")
+    cs.append("\n".join(line(r.randint(1, 2000), r.random()) for _ in range(30)) + "\n")
+    cs.append("\n".join(line(5000, 0.95) for _ in range(20)) + "\n")
+    cs.append("abc\n9\n@@@\n0000000000\n")
+    return cs
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
@@ -160,6 +181,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

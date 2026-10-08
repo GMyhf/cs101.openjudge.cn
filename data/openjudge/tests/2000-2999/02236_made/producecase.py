@@ -1,15 +1,112 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def _ops2236(r, n, order, queries, bias=None):
+    """把修复序列 order 与 queries 次查询随机交错；不重复修复同一台，
+    且不出现「S p p 而 p 尚未修复」（题面没说清这种情况算不算能通信）。"""
+    ops, fixed, k = [], set(), 0
+    total = len(order) + queries
+    for t in range(total):
+        left_o = len(order) - k
+        if left_o and (queries <= 0 or r.random() < left_o / (left_o + queries)):
+            x = order[k]; k += 1; fixed.add(x); ops.append(f"O {x}")
+        else:
+            queries -= 1
+            if bias is not None and fixed and r.random() < .5:
+                p, q = bias(r, fixed)
+            else:
+                p, q = r.randint(1, n), r.randint(1, n)
+            if p == q and p not in fixed:
+                if n == 1: continue
+                q = p % n + 1
+            ops.append(f"S {p} {q}")
+    return ops
+
+def _fmt2236(n, d, pts, ops):
+    return f"{n} {d}\n" + "\n".join(f"{x} {y}" for x, y in pts) + "\n" + "\n".join(ops) + "\n"
+
+def _pick_fixed(r, fixed):
+    f = tuple(fixed); return r.choice(f), r.choice(f)
+
+def gen2236(r, seed):
+    if seed == 1:
+        return "1 0\n5 5\nO 1\nS 1 1\n"  # N=1 最小
+    if seed == 2:  # d=0 且坐标重合：距离 0<=0 可直接通信
+        return "3 0\n7 7\n7 7\n7 8\nO 1\nS 1 2\nO 2\nS 1 2\nO 3\nS 2 3\nS 3 3\n"
+    if seed <= 10:  # 小规模随机（含 d=0、重合坐标）
+        n, d = r.randint(2, 14), r.choice([0, 1, 2, 3, 5, 8])
+        pts = [(r.randrange(12), r.randrange(12)) for _ in range(n)]
+        order = list(range(1, n + 1)); r.shuffle(order); order = order[:r.randint(1, n)]
+        return _fmt2236(n, d, pts, _ops2236(r, n, order, r.randint(3, 20), _pick_fixed))
+    if seed <= 14:  # 链：相邻点距离恰好 d（含 3-4-5 斜向），或恰好 d+1；乱序修复
+        n = 1001
+        pts, d = {11: ([(i * 10, 0) for i in range(n)], 10),
+                  12: ([(i * 3, i * 4) for i in range(n)], 5),
+                  13: ([(i * 6, i * 8) for i in range(n)], 10),
+                  14: ([(i * 10, 5000) for i in range(n)], 9)}[seed]
+        order = list(range(1, n + 1)); r.shuffle(order)
+        ends = lambda r, f: (1, n) if r.random() < .5 else _pick_fixed(r, f)
+        return _fmt2236(n, d, pts, _ops2236(r, n, order, 10000, ends))
+    if seed == 15:  # 链按 1..N 顺序修复：朴素并查集会形成长链
+        n, d = 1001, 10
+        pts = [(i * 10, 0) for i in range(n)]
+        order = list(range(1, n + 1))
+        return _fmt2236(n, d, pts, _ops2236(r, n, order, 40000, lambda r, f: (1, max(f))))
+    if seed == 16:  # d=20000：所有修好的都连通
+        n = 1001; pts = [(r.randint(0, 10000), r.randint(0, 10000)) for _ in range(n)]
+        order = list(range(1, n + 1)); r.shuffle(order)
+        return _fmt2236(n, 20000, pts, _ops2236(r, n, order, 60000))
+    if seed == 17:  # 只修一部分，大量查询涉及未修复的点
+        n = 1001; pts = [(r.randint(0, 10000), r.randint(0, 10000)) for _ in range(n)]
+        order = list(range(1, n + 1)); r.shuffle(order)
+        return _fmt2236(n, 1500, pts, _ops2236(r, n, order[:300], 20000))
+    # data/ 合计限 10MB：满规模查询只留 15（顺序链）、16（d=20000）、18（约 1MB）三组，其余组查询数缩小
+    if seed == 18:  # 满规模：约 1MB
+        n = 1001; pts = [(r.randint(0, 10000), r.randint(0, 10000)) for _ in range(n)]
+        order = list(range(1, n + 1)); r.shuffle(order)
+        return _fmt2236(n, 600, pts, _ops2236(r, n, order, 82000, _pick_fixed))
+    # 其余：中大规模随机，不同 d 与簇状分布
+    n = r.choice([200, 500, 1001]); d = r.choice([0, 100, 300, 500, 800, 1200, 3000])
+    if r.random() < .5:
+        centers = [(r.randint(0, 10000), r.randint(0, 10000)) for _ in range(r.randint(3, 12))]
+        pts = []
+        for _ in range(n):
+            cx, cy = r.choice(centers)
+            pts.append((min(10000, max(0, cx + r.randint(-400, 400))), min(10000, max(0, cy + r.randint(-400, 400)))))
+    else:
+        pts = [(r.randint(0, 10000), r.randint(0, 10000)) for _ in range(n)]
+    order = list(range(1, n + 1)); r.shuffle(order); order = order[:r.randint(n // 2, n)]
+    return _fmt2236(n, d, pts, _ops2236(r, n, order, r.randint(3000, 15000), _pick_fixed))
+
+def valid(text):
+    """题面：首行 N d（1<=N<=1001，0<=d<=20000）；N 行坐标 xi yi（0..10000）；
+    之后每行一个操作 "O p" 或 "S p q"（1<=p,q<=N）；输入不超过 300000 行。"""
+    import re
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if len(lines) > 300000:
+        return False
+    num = r"(0|[1-9]\d*)"
+    m = re.fullmatch(num + " " + num, lines[0])
+    if not m:
+        return False
+    n, d = int(m.group(1)), int(m.group(2))
+    if not (1 <= n <= 1001 and 0 <= d <= 20000) or len(lines) < n + 1:
+        return False
+    for line in lines[1:n + 1]:
+        m = re.fullmatch(num + " " + num, line)
+        if not m or not all(0 <= int(v) <= 10000 for v in m.groups()):
+            return False
+    for line in lines[n + 1:]:
+        m = re.fullmatch(r"O " + num + r"|S " + num + " " + num, line)
+        if not m or not all(1 <= int(v) <= n for v in m.groups() if v is not None):
+            return False
+    return True
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     if number == 2236:
-        n, d = r.randint(4, 12), r.randint(1, 8)
-        points = r.sample([(x, y) for x in range(20) for y in range(20)], n)
-        order = list(range(1, n + 1)); r.shuffle(order)
-        ops = [f"O {x}" for x in order[:r.randint(2, n)]]
-        ops += [f"S {r.randint(1,n)} {r.randint(1,n)}" for _ in range(r.randint(3, 9))]
-        r.shuffle(ops)
-        return f"{n} {d}\n" + "\n".join(f"{x} {y}" for x, y in points) + "\n" + "\n".join(ops) + "\n"
+        return gen2236(r, seed)
     if number == 2388:
         n = 2 * r.randint(0, 15) + 1
         return f"{n}\n" + "\n".join(str(r.randint(-10000, 10000)) for _ in range(n)) + "\n"
@@ -417,7 +514,7 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
-REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02236/statistics/\n# Accepted submission: 51279119\n# Source: http://cs101.openjudge.cn/practice/solution/51279119/\n# License: not declared on the submission page; no license is inferred.\n\nN,d=map(int,input().split())\nposition=[(0,0)]\nconnection=[[0]*(N+1) for _ in range(N+1)]\nfor i in range(1,N+1):\n    x,y=map(int,input().split())\n    position.append((x,y))\n    for j in range(1,i+1):\n        x1,y1=position[j]\n        if (x-x1)**2+(y-y1)**2<=d**2:\n            connection[i][j]=1\n            connection[j][i]=1\np=[i for i in range(N+1)]\ncondition=[False]*(N+1)\ndef find(x):\n    if p[x]!=x:\n        p[x]=find(p[x])\n    return p[x]\nwhile True:\n    try:\n        line=input().split()\n    except EOFError:\n        break\n    if line[0]=='O':\n        x=int(line[1])\n        condition[x]=True\n        for y in range(1,N+1):\n            if condition[y] and connection[x][y]:\n                p[find(y)]=x\n    elif line[0]=='S':\n        x,y=int(line[1]),int(line[2])\n        if not condition[x] or not condition[y]:\n            print('FAIL')\n            continue\n        if find(x)==find(y):\n            print('SUCCESS')\n        else:\n            print('FAIL')\n"
+REFERENCE='# 参考解（本仓重写）：迭代并查集；修复 p 时与所有已修复且距离 <= d 的点合并。\nimport sys\ndef main():\n    data = sys.stdin.buffer.read().split()\n    n, d = int(data[0]), int(data[1]); d2 = d * d\n    xs = [0] * (n + 1); ys = [0] * (n + 1)\n    for i in range(1, n + 1):\n        xs[i] = int(data[2 * i]); ys[i] = int(data[2 * i + 1])\n    parent = list(range(n + 1)); fixed = [False] * (n + 1); done = []\n    def find(x):\n        root = x\n        while parent[root] != root: root = parent[root]\n        while parent[x] != root: parent[x], x = root, parent[x]\n        return root\n    out = []; k = 2 * n + 2; L = len(data)\n    while k < L:\n        if data[k] == b"O":\n            p = int(data[k + 1]); k += 2\n            if fixed[p]: continue\n            fixed[p] = True; px, py = xs[p], ys[p]\n            for q in done:\n                if (xs[q] - px) ** 2 + (ys[q] - py) ** 2 <= d2:\n                    a, b = find(p), find(q)\n                    if a != b: parent[a] = b\n            done.append(p)\n        else:\n            p, q = int(data[k + 1]), int(data[k + 2]); k += 3\n            out.append("SUCCESS" if fixed[p] and fixed[q] and find(p) == find(q) else "FAIL")\n    sys.stdout.write("\\n".join(out) + ("\\n" if out else ""))\nmain()\n'
 LANGUAGE='Python3'
 NUMBER=2236
 SAMPLE='4 1\n0 1\n0 2\n0 3\n0 4\nO 1\nO 2\nO 4\nS 1 4\nO 3\nS 1 4\n'

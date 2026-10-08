@@ -1,37 +1,15 @@
 # Source: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md
-# 蒋子轩23工学院
-'''
-深度优先搜索算法，用于计算一组给定权重的砝码的不同重量组合的数量。
-
-代码中的变量weights是权重列表，表示不同砝码的重量。变量max_w是一个列表，
-用于表示每个砝码的最大使用数量。
-
-函数dfs是一个递归函数，用于遍历所有可能的砝码组合。index参数表示当前考虑的砝码索引，
-cur_w参数表示当前已经组合的重量。当index等于6时，表示已经尝试了所有的砝码，递归结束。
-如果cur_w不等于0，则将其添加到集合w中。递归过程中，
-使用一个循环遍历所有可能的使用该砝码个数，并递归调用dfs函数计算下一个砝码的组合。
-
-在主程序部分，将输入的最大使用数量存储在max_w列表中。通过调用dfs(0,0)开始计算所有可能的
-砝码重量组合。最后，输出集合w的长度，即不同重量组合的数量。
-'''
-
-weights = [1, 2, 3, 5, 10, 20]
-
-
-def dfs(index, cur_w):
-	# 已尝试所有可能砝码，递归结束
-    if index == 6:
-        if cur_w != 0:
-            w.add(cur_w)
-        return
-    #遍历所有可能的使用该砝码个数
-    for i in range(max_w[index]+1):
-        dfs(index+1, cur_w+i*weights[index])
-
-
-max_w = list(map(int, input().split()))
-#使用set自动去重
-w = set()
-dfs(0, 0)
-print(f'Total={len(w)}')
-
+# 原为 蒋子轩23工学院 的 DFS 写法（按每种砝码的枚数逐一枚举，组合数是各 (ai+1) 之积）。
+# 2026-10-07 审计：数据加了总重贴近 1000 的满规模组，DFS 要枚举上亿种组合、单组跑数十秒，
+# 换成与 producecase.py 内嵌 REFERENCE_SOURCE 相同的按重量可达性 DP；原 DFS 仍保留在
+# producecase.py 的 DFS_SOURCE 里，第 0..19 组两者输出一致。
+# 2026-10-08 本地修正：上面引用的原始代码在题面范围内有缺陷，已按题面改过，与原提交不再逐字一致（见 CHANGELOG）。
+a = list(map(int, input().split()))
+w = (1, 2, 3, 5, 10, 20)
+ok = [True] + [False] * 1000
+for cnt, wt in zip(a, w):
+    for _ in range(cnt):
+        for x in range(1000, wt - 1, -1):
+            if ok[x - wt]:
+                ok[x] = True
+print(f'Total={sum(ok) - 1}')

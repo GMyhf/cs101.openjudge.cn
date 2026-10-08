@@ -1,5 +1,40 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def valid(text):
+    """题面契约：一行四个整数 a c m R0；0<=a,c,R0<=10^7，1<=m<=16000000，a*m+c<2^32。"""
+    try:
+        if not text.endswith("\n") or text.count("\n")!=1:return False
+        t=text[:-1].split(" ")
+        if len(t)!=4 or not all(x.isdigit() for x in t):return False
+        a,c,m,r0=map(int,t)
+        return 0<=a<=10**7 and 0<=c<=10**7 and 0<=r0<=10**7 and 1<=m<=16000000 and a*m+c<2**32
+    except Exception:
+        return False
+
+def gen2381(r,seed):
+    # 说明：R0 一律取 < m 且 <= 10^7（题面只写 R0<=10^7；R0>=m 时它是否计入序列的约定不明，避开）
+    U=2**32-1
+    def amax(m,c):return min(10**7,(U-c)//m)
+    f=lambda a,c,m,r0:f"{a} {c} {m} {r0}\n"
+    if seed==1:return f(0,0,2,1)                   # 两个元素 {1,0}
+    if seed==2:return f(0,5,1000,999)              # {999,5}
+    if seed==3:return f(1,1,2,0)
+    if seed==4:return f(21,7,16000000,5)           # 满周期，m 取上限，答案 1
+    if seed==5:return f(1,4000000,16000000,3)      # 等差，间隔 4000000
+    if seed==6:return f(10**7,4967295,429,r.randrange(429))   # a*m+c 恰为 2^32-1，a*R 超 int
+    if seed==7:return f(10**7,10**7,400,399)
+    if seed==8:return f(268,6967295,16000000,r.randrange(10**7+1))
+    if seed==9:return f(1,7,15999999,10**7)     # 满周期，答案 1
+    if 10<=seed<=16:
+        m=r.randint(1000000,16000000);c=r.randint(0,10**7);a=r.randint(max(0,amax(m,c)-20),amax(m,c))
+        return f(a,c,m,r.randrange(min(m,10**7+1)))
+    if 17<=seed<=22:
+        m=r.randint(430,1000000);c=r.randint(0,10**7);a=amax(m,c)-r.randint(0,3)
+        return f(a,c,m,r.randrange(m))
+    m=r.randint(2,1000);c=r.randint(0,10**7) if seed%2 else r.randint(0,1000);a=r.randint(0,amax(m,c)) if seed%3 else r.randint(0,30)
+    return f(a,c,m,r.randrange(m))
+
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -72,8 +107,7 @@ def generate(number, seed):
         n=r.randint(2,100);a="".join(r.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(n));b="".join(r.sample(list(a),len(a))) if seed%2 else a[:-1]+("A" if a[-1]!="A" else "B");return a+"\n"+b+"\n"
     if number==1113:
         w,h=r.randint(2,200),r.randint(2,200);x,y=r.randint(-100,100),r.randint(-100,100);return f"4 {r.randint(1,100)}\n{x} {y}\n{x} {y+h}\n{x+w} {y+h}\n{x+w} {y}\n"
-    if number==2381:
-        m=r.randint(2,20000);a=r.randint(0,min(10000,(2**32-2)//m));c=r.randint(0,10000);return f"{a} {c} {m} {r.randrange(m)}\n"
+    if number==2381:return gen2381(r,seed)
     if number==2186:
         n=r.randint(2,20);edges={(i,i+1) for i in range(1,n)}|{(n,1)}
         for _ in range(r.randint(0,30)):edges.add((r.randint(1,n),r.randint(1,n)))
@@ -148,7 +182,7 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
-REFERENCE='// External reference: http://cs101.openjudge.cn/practice/02381/statistics/\n// Accepted submission: 52506143\n// Source: http://cs101.openjudge.cn/practice/solution/52506143/\n// License: not declared on the submission page; no license is inferred.\n\n#include <algorithm>\n#include <bitset>\n#include <iostream>\n#include <stack>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <vector>\n#include <functional>\n#include <numeric>\n#include <queue>\n#include <set>\n#include <array>\n#include <bit>\n#include <map>\n#include <cmath>\n#include <iomanip>\n#include <cstring>\n\nusing namespace std;\ntypedef long long ll;\ntypedef unsigned long long ull;\n\nbitset<16000001> bs;\n\nint main()\n{\n\tint a, c, m, r;\n\tcin >> a >> c >> m >> r;\n\tbs[r] = true;\n\tr = (a * r + c) % m;\n\twhile (!bs[r])\n\t{\n\t\tbs[r] = true;\n\t\tr = (a * r + c) % m;\n\t}\n\tint last = -1;\n\tint ans = 0;\n\tfor (int i = 0; i <= m; i++)\n\t{\n\t\tif (!bs[i])continue;\n\t\tif (last != -1)ans = max(ans, i - last);\n\t\tlast = i;\n\t}\n    cout << ans << endl;\n\treturn 0;\n}\n'
+REFERENCE='// External reference: http://cs101.openjudge.cn/practice/02381/statistics/\n// Accepted submission: 52506143\n// Source: http://cs101.openjudge.cn/practice/solution/52506143/\n// License: not declared on the submission page; no license is inferred.\n\n#include <algorithm>\n#include <bitset>\n#include <iostream>\n#include <stack>\n#include <string>\n#include <unordered_map>\n#include <unordered_set>\n#include <vector>\n#include <functional>\n#include <numeric>\n#include <queue>\n#include <set>\n#include <array>\n#include <bit>\n#include <map>\n#include <cmath>\n#include <iomanip>\n#include <cstring>\n\nusing namespace std;\ntypedef long long ll;\ntypedef unsigned long long ull;\n\nbitset<16000001> bs;\n\nint main()\n{\n\tlong long a, c, m, r; // 原提交用 int，a*R 可达 2^32-1 会溢出，改 long long\n\tcin >> a >> c >> m >> r;\n\tbs[r] = true;\n\tr = (a * r + c) % m;\n\twhile (!bs[r])\n\t{\n\t\tbs[r] = true;\n\t\tr = (a * r + c) % m;\n\t}\n\tint last = -1;\n\tint ans = 0;\n\tfor (int i = 0; i <= m; i++)\n\t{\n\t\tif (!bs[i])continue;\n\t\tif (last != -1)ans = max(ans, i - last);\n\t\tlast = i;\n\t}\n    cout << ans << endl;\n\treturn 0;\n}\n'
 LANGUAGE='G++'
 NUMBER=2381
 SAMPLE='15 7 100 1\n'

@@ -1,5 +1,24 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+
+def valid(text):
+    """题面：第一行测试数据组数；每组两行：M (1<=M<=10000)，
+    以及 dragon ninja iceman lion wolf 五个初始生命值（都 >0 且 <=10000）。"""
+    import re
+    lines=text.split("\n")
+    if lines[-1]!="" or not re.fullmatch(r"[1-9][0-9]*",lines[0]):
+        return False
+    T=int(lines[0])
+    if len(lines)!=2+2*T:
+        return False
+    for i in range(T):
+        a,b=lines[1+2*i],lines[2+2*i]
+        if not re.fullmatch(r"[1-9][0-9]*",a) or not 1<=int(a)<=10000:
+            return False
+        t=b.split(" ")
+        if len(t)!=5 or not all(re.fullmatch(r"[1-9][0-9]*",x) and int(x)<=10000 for x in t):
+            return False
+    return True
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -115,7 +134,50 @@ def generate(number, seed):
     if number==2318:
         n=r.randint(1,8);m=r.randint(1,15);xs=sorted(r.sample(range(5,95),n));toys=[(r.randint(1,99),r.randint(1,9)) for _ in range(m)];return f"{n} {m} 0 10 100 0\n"+"\n".join(f"{x} {x}" for x in xs)+"\n"+"\n".join(f"{x} {y}" for x,y in toys)+"\n0\n"
     if number==3129:
-        cases=[f"{r.randint(1,10000)}\n"+" ".join(str(r.randint(1,10000)) for _ in range(5)) for _ in range(r.randint(1,4))];return f"{len(cases)}\n"+"\n".join(cases)+"\n"
+        # 题面要求时间输出三位；M<=10000 而生命值可小到 1，会出现 >=1000 小时，题面没说怎么打印，
+        # 所以只保留双方都在 999 点前停产的组合（停产时刻 = 该方造出的武士数）。
+        def made(m,c):
+            # 双方各自能造多少个武士；顺序与题面一致：dragon ninja iceman lion wolf 的下标
+            res=[]
+            for order in ([2,3,4,1,0],[3,0,1,2,4]):
+                left=m;k=0;cnt=0
+                while True:
+                    for t in range(5):
+                        if left>=c[order[(k+t)%5]]:
+                            left-=c[order[(k+t)%5]];k=(k+t+1)%5;cnt+=1;break
+                    else:break
+                res.append(cnt)
+            return res
+        def one():
+            for _ in range(1000):
+                t=r.random()
+                if t<.08:
+                    c=[r.randint(1,10000) for _ in range(5)];m=r.randint(1,min(c)-1) if min(c)>1 else 1
+                    if m>=min(c):continue
+                elif t<.2:
+                    c=[r.randint(1,30) for _ in range(5)];m=r.randint(1,200)
+                elif t<.4:
+                    # 一两种很贵、其余便宜：频繁跳过
+                    c=[r.randint(11,60) for _ in range(5)]
+                    for i in r.sample(range(5),r.randint(1,3)):c[i]=r.randint(2000,10000)
+                    m=r.randint(1,10000)
+                elif t<.55:
+                    # 长输出：M 大、生命值偏小但保证 <1000 小时
+                    c=[r.randint(11,40) for _ in range(5)];m=10000
+                elif t<.7:
+                    c=[r.randint(1,10000) for _ in range(5)];m=r.choice([sum(c),sum(c)-1,sum(c)+1,c[r.randrange(5)],10000])
+                    m=max(1,min(m,10000))
+                else:
+                    c=[r.randint(1,r.choice([100,1000,10000])) for _ in range(5)];m=r.randint(1,10000)
+                if max(made(m,c))<=999:return m,c
+            raise RuntimeError
+        k=[1,1,2,3,5,8,10,15,20][seed%9]
+        cases=[one() for _ in range(k)]
+        if seed==1:cases=[(1,[1,1,1,1,1])]
+        if seed==2:cases=[(10000,[10000]*5)]
+        if seed==3:cases=[(9999,[10000]*5),(1,[2,3,4,5,6]),(5,[5,5,5,5,5])]
+        if seed==4:cases=[(999,[1,1000,1000,1000,1000]),(10000,[10000,10000,10000,10000,11])]
+        return f"{len(cases)}\n"+"\n".join(f"{m}\n"+" ".join(map(str,c)) for m,c in cases)+"\n"
     if number==1001:return "\n".join(f"{r.randint(1,999999)/10000:.4f} {r.randint(1,25)}" for _ in range(r.randint(1,6)))+"\n"
     if number==1004:return "\n".join(f"{r.randint(1,100000000)/100:.2f}" for _ in range(12))+"\n"
     if number==1005:

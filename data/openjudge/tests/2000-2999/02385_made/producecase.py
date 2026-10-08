@@ -12,6 +12,41 @@ def fence_counts(n):
             count[size][first][1] = sum(count[size - 1][second][0]
                                             for second in range(1, first))
     return sum(sum(count[n][first]) for first in range(1, n + 1))
+def valid(text):
+    """题面契约：第 1 行 T W（1<=T<=1000，1<=W<=30）；随后恰 T 行，每行 1 或 2。"""
+    try:
+        if not text.endswith("\n"):return False
+        lines=text[:-1].split("\n");t=lines[0].split(" ")
+        if len(t)!=2 or not all(x.isdigit() for x in t):return False
+        T,W=map(int,t)
+        if not (1<=T<=1000 and 1<=W<=30) or len(lines)!=T+1:return False
+        return all(x in ("1","2") for x in lines[1:])
+    except Exception:
+        return False
+
+def gen2385(r,seed):
+    f=lambda W,a:f"{len(a)} {W}\n"+"\n".join(map(str,a))+"\n"
+    def runs(T,k):  # 由 k 段交替的连续块组成
+        cuts=sorted(r.sample(range(1,T),k-1)) if k>1 else [];b=[0]+cuts+[T];st=r.randint(1,2);a=[]
+        for i in range(k):a+= [st if i%2==0 else 3-st]*(b[i+1]-b[i])
+        return a
+    if seed==1:return f(1,[1])
+    if seed==2:return f(1,[2])                       # 开局就得走一次
+    if seed==3:return f(30,[2])
+    if seed==4:return f(1,[2]*1000)
+    if seed==5:return f(30,[1]*1000)
+    if seed==6:return f(30,[1,2]*500)                # 交替，W 不够用
+    if seed==7:return f(1,[2,1]*500)
+    if seed==8:return f(30,[2]*500+[1]*500)
+    if seed==9:return f(30,runs(1000,31))
+    if seed==10:return f(30,runs(1000,32))
+    if seed==11:return f(29,runs(1000,31))
+    if seed==12:return f(1,runs(1000,3))
+    if 13<=seed<=20:return f(r.randint(1,30),[r.randint(1,2) for _ in range(1000)])
+    if 21<=seed<=24:return f(r.choice([1,30,r.randint(2,29)]),runs(1000,r.randint(2,200)))
+    T=r.randint(2,14);return f(r.randint(1,min(30,T+2)),[r.randint(1,2) for _ in range(T)])
+
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     if number == 1258:
@@ -105,9 +140,7 @@ def generate(number, seed):
         n = r.randint(2, 80); all_pairs = [(a, b) for a in range(1, n + 1) for b in range(a + 1, n + 1)]
         pairs = r.sample(all_pairs, r.randint(1, min(200, len(all_pairs))))
         return f"{n} {len(pairs)}\n" + "\n".join(f"{a} {b}" for a, b in pairs) + "\n"
-    if number == 2385:
-        total, walks = r.randint(1, 200), r.randint(1, 30)
-        return f"{total} {walks}\n" + "\n".join(str(r.randint(1, 2)) for _ in range(total)) + "\n"
+    if number == 2385:return gen2385(r,seed)
     if number == 2711:
         heights = [r.randint(130, 230) for _ in range(r.randint(2, 100))]
         return f"{len(heights)}\n" + " ".join(map(str, heights)) + "\n"

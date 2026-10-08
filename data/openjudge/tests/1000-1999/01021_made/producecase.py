@@ -1,152 +1,146 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+import re
+def valid(text):
+    """题面契约：首行 t（1..10）；每组一行 W H n（1 ≤ W,H ≤ 100），随后两行各 n 对坐标
+    0 ≤ x < W、0 ≤ y < H。棋子落在格点上，同一块棋盘上的坐标互不相同（故 n ≤ W*H）。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    num = re.compile(r'(0|[1-9][0-9]*)$')
+    def ints(line, cnt):
+        toks = line.split(' ')
+        if len(toks) != cnt or not all(num.match(x) for x in toks):
+            return None
+        return list(map(int, toks))
+    head = ints(lines[0], 1) if lines else None
+    if head is None or not 1 <= head[0] <= 10 or len(lines) != 1 + 3 * head[0]:
+        return False
+    for c in range(head[0]):
+        whn = ints(lines[1 + 3 * c], 3)
+        if whn is None:
+            return False
+        W, H, n = whn
+        if not (1 <= W <= 100 and 1 <= H <= 100 and 1 <= n <= W * H):
+            return False
+        for line in lines[2 + 3 * c:4 + 3 * c]:
+            v = ints(line, 2 * n)
+            if v is None:
+                return False
+            pts = list(zip(v[::2], v[1::2]))
+            if len(set(pts)) != n or not all(x < W and y < H for x, y in pts):
+                return False
+    return True
+_TRANS = [lambda x, y: (x, y), lambda x, y: (y, -x), lambda x, y: (-x, -y), lambda x, y: (-y, x),
+          lambda x, y: (-x, y), lambda x, y: (y, x), lambda x, y: (x, -y), lambda x, y: (-y, -x)]
+def _grow(r, size):
+    """随机生长一个 size 格的四连通块，返回归一化坐标集合。"""
+    cells = {(0, 0)}; frontier = [(0, 0)]
+    while len(cells) < size:
+        x, y = r.choice(frontier)
+        dx, dy = r.choice([(1, 0), (-1, 0), (0, 1), (0, -1)])
+        c = (x + dx, y + dy)
+        if c not in cells:
+            cells.add(c); frontier.append(c)
+    return _norm(cells)
+def _norm(cells):
+    mx = min(x for x, _ in cells); my = min(y for _, y in cells)
+    return {(x - mx, y - my) for x, y in cells}
+def _place(r, shapes, W, H, tries=400):
+    """把若干块放进 W×H，块与块之间不四连通相邻；失败返回 None。"""
+    occ = set(); pts = []
+    for sh in shapes:
+        w = max(x for x, _ in sh) + 1; h = max(y for _, y in sh) + 1
+        if w > W or h > H:
+            return None
+        for _ in range(tries):
+            ox = r.randrange(W - w + 1); oy = r.randrange(H - h + 1)
+            cur = [(x + ox, y + oy) for x, y in sh]
+            if all((a, b) not in occ and (a + 1, b) not in occ and (a - 1, b) not in occ
+                   and (a, b + 1) not in occ and (a, b - 1) not in occ for a, b in cur):
+                occ.update(cur); pts += cur; break
+        else:
+            return None
+    return pts
+def _shape_key(sh):
+    best = None
+    for t in _TRANS:
+        k = tuple(sorted(_norm({t(x, y) for x, y in sh})))
+        best = k if best is None or k < best else best
+    return best
+def _fmt(pts, r):
+    pts = list(pts); r.shuffle(pts)
+    return ' '.join(f'{x} {y}' for x, y in pts)
+def _case(r, W, H, kind, budget):
+    """kind: yes / no_shape（同尺寸不同形）/ no_split（总数相同、块划分不同）。
+    放不下就重抽，连续失败 20 次把总格数减半（确定性，只依赖种子）。"""
+    if kind == 'no_shape' and (budget < 4 or min(W, H) == 1):
+        kind = 'no_split'                    # 太少的格子或一条线的棋盘造不出「同尺寸不同形」
+    fails = 0
+    while True:
+        fails += 1
+        if fails % 20 == 0:
+            budget = max({'yes': 1, 'no_split': 2, 'no_shape': 4}[kind], budget // 2)
+        if fails >= 200:
+            kind = 'yes'                     # 兜底，保证必然终止
+        shapes = []; total = 0
+        while total < budget:
+            s = min(budget - total, r.choice([1, 1, 2, 3, 4, 5, 6, 8, 12, 20, 40]))
+            shapes.append(_grow(r, s)); total += s
+        if kind == 'no_shape':
+            cand = [i for i, s in enumerate(shapes) if len(s) >= 4]
+            if not cand:
+                continue
+            i = r.choice(cand)
+            for _ in range(50):
+                other = _grow(r, len(shapes[i]))
+                if _shape_key(other) != _shape_key(shapes[i]):
+                    break
+            else:
+                continue
+            shapes2 = shapes[:i] + [other] + shapes[i + 1:]
+        elif kind == 'no_split':
+            cand = [i for i, s in enumerate(shapes) if len(s) >= 2]
+            if not cand:
+                continue
+            i = r.choice(cand); s = len(shapes[i]); a = r.randint(1, s - 1)
+            shapes2 = shapes[:i] + [_grow(r, a), _grow(r, s - a)] + shapes[i + 1:]
+        else:
+            shapes2 = list(shapes)
+        shapes2 = [_norm({t(x, y) for x, y in sh}) for sh, t in ((sh, r.choice(_TRANS)) for sh in shapes2)]
+        r.shuffle(shapes2)
+        b1 = _place(r, shapes, W, H); b2 = _place(r, shapes2, W, H)
+        if b1 is None or b2 is None:
+            continue
+        if r.random() < 0.5:
+            b1, b2 = b2, b1
+        return f"{W} {H} {len(b1)}\n{_fmt(b1, r)}\n{_fmt(b2, r)}"
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
-    letters = "abcdefghijklmnopqrstuvwxyz"
-    word = lambda a=2,b=8: "".join(r.choice(letters) for _ in range(r.randint(a,b)))
-    if number==2184:
-        a=[(r.randint(-20,30),r.randint(-20,30)) for _ in range(r.randint(2,14))];return f"{len(a)}\n"+"\n".join(f"{x} {y}" for x,y in a)+"\n"
-    if number==2313:
-        a=[r.randint(-10000,10000) for _ in range(r.randint(1,40))];return f"{len(a)}\n"+"\n".join(map(str,a))+"\n"
-    if number==2755:
-        a=[r.randint(1,40) for _ in range(r.randint(1,18))];return f"{len(a)}\n"+"\n".join(map(str,a))+"\n"
-    if number==1837:
-        c=r.randint(2,8);g=r.randint(2,8);p=sorted(r.sample(range(-15,16),c));w=sorted(r.sample(range(1,26),g));return f"{c} {g}\n"+" ".join(map(str,p))+"\n"+" ".join(map(str,w))+"\n"
-    if number==2373:
-        L=2*r.randint(8,35);a=r.randint(1,max(1,L//6));b=r.randint(a,min(L//2,a+8));rows=[]
-        for _ in range(r.randint(1,8)):
-            x,y=sorted(r.sample(range(L+1),2));rows.append((x,y))
-        return f"{len(rows)} {L}\n{a} {b}\n"+"\n".join(f"{x} {y}" for x,y in rows)+"\n"
-    if number==1204:
-        h,w=8+r.randrange(5),8+r.randrange(5);grid=[[r.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(w)] for _ in range(h)];words=[]
-        for y in range(min(6,h)):
-            x=r.randrange(0,w-3);s="".join(grid[y][x:x+4]);words.append(s)
-        return f"{h} {w} {len(words)}\n"+"\n".join("".join(x) for x in grid)+"\n"+"\n".join(words)+"\n"
-    if number==2992:
-        n=r.randint(2,16);a=[[0]*n for _ in range(n)]
-        for i in range(n):
-            for j in range(i):a[i][j],a[j][i]=(3,r.randrange(3)) if r.randrange(2) else (r.randrange(3),3)
-        return f"{n}\n"+"\n".join(" ".join(map(str,row)) for row in a)+"\n"
-    if number==1084:
-        rows=[]
-        for _ in range(r.randint(1,3)):
-            n=r.randint(1,3);total=2*n*(n+1);gone=sorted(r.sample(range(1,total+1),r.randint(0,min(total,5))));rows.append(f"{n}\n{len(gone)}"+(" "+" ".join(map(str,gone)) if gone else ""))
-        return f"{len(rows)}\n"+"\n".join(rows)+"\n"
-    if number==1251:
-        n=r.randint(2,12);rows=[]
-        for i in range(n-1):
-            edges=[(j,r.randint(1,100)) for j in range(i+1,n) if j==i+1 or r.random()<.25];rows.append(chr(65+i)+f" {len(edges)} "+" ".join(f"{chr(65+j)} {c}" for j,c in edges))
-        return f"{n}\n"+"\n".join(x.rstrip() for x in rows)+"\n0\n"
-    if number==1390:
-        cases=[]
-        for _ in range(r.randint(1,3)):
-            n=r.randint(1,20);cases.append(f"{n}\n"+" ".join(str(r.randint(1,n)) for _ in range(n)))
-        return f"{len(cases)}\n"+"\n".join(cases)+"\n"
-    if number==2191:return f"{r.randint(2,63)}\n"
-    if number==2503:
-        foreign=[word() for _ in range(5)];rows=[f"{word()} {x}" for x in foreign];queries=foreign[:3]+[word()];return "\n".join(rows)+"\n\n"+"\n".join(queries)+"\n"
-    if number==2724:
-        n=r.randint(3,20);rows=[f"s{seed}_{i} {r.randint(1,12)} {r.randint(1,28)}" for i in range(n)];return f"{n}\n"+"\n".join(rows)+"\n"
-    if number==1273:
-        n=r.randint(2,10);edges=[(i,i+1,r.randint(1,1000)) for i in range(1,n)];edges += [(r.randint(1,n-1),r.randint(2,n),r.randint(0,1000)) for _ in range(r.randint(0,8))];return f"{len(edges)} {n}\n"+"\n".join(f"{a} {b} {c}" for a,b,c in edges)+"\n"
-    if number==1835:
-        cases=[];cmds="forward back left right up down".split()
-        for _ in range(r.randint(1,4)):
-            a=[f"{r.choice(cmds)} {r.randint(1,10000)}" for _ in range(r.randint(1,20))];cases.append(f"{len(a)}\n"+"\n".join(a))
-        return f"{len(cases)}\n"+"\n".join(cases)+"\n"
-    if number==1905:
-        rows=[f"{r.randint(1,10000)} {r.random()*20:.3f} {r.random()/10000:.7f}" for _ in range(r.randint(1,6))];return "\n".join(rows)+"\n-1 -1 -1\n"
-    if number==1922:
-        n=r.randint(1,15);rows=[(r.randint(1,40),r.randint(-200,500)) for _ in range(n)];rows[0]=(rows[0][0],r.randint(0,500));return f"{n}\n"+"\n".join(f"{a} {b}" for a,b in rows)+"\n0\n"
-    if number==1936:return "\n".join(f"{word()} {word(5,18)}" for _ in range(r.randint(1,8)))+"\n"
-    if number==2538:
-        chars="1234567890-=WERTYUIOP[]\\SDFGHJKL;'XCVBNM,./ ";return "\n".join("".join(r.choice(chars) for _ in range(r.randint(1,60))) for _ in range(r.randint(1,6)))+"\n"
-    if number==2982:
-        base="534678912 672195348 198342567 859761423 426853791 713924856 961537284 287419635 345286179".split();shift=seed%9;grid=[row[shift:]+row[:shift] for row in base];
-        for _ in range(12+seed%20):
-            y,x=r.randrange(9),r.randrange(9);grid[y]=grid[y][:x]+"0"+grid[y][x+1:]
-        return "1\n"+"\n".join(grid)+"\n"
-    if number in NO_INPUT:return ""
-    if number==1006:return "\n".join(" ".join(str(r.randint(0,365)) for _ in range(4)) for _ in range(r.randint(1,5)))+"\n-1 -1 -1 -1\n"
-    if number==2159:
-        n=r.randint(2,100);a="".join(r.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(n));b="".join(r.sample(list(a),len(a))) if seed%2 else a[:-1]+("A" if a[-1]!="A" else "B");return a+"\n"+b+"\n"
-    if number==1113:
-        w,h=r.randint(2,200),r.randint(2,200);x,y=r.randint(-100,100),r.randint(-100,100);return f"4 {r.randint(1,100)}\n{x} {y}\n{x} {y+h}\n{x+w} {y+h}\n{x+w} {y}\n"
-    if number==2381:
-        m=r.randint(2,20000);a=r.randint(0,min(10000,(2**32-2)//m));c=r.randint(0,10000);return f"{a} {c} {m} {r.randrange(m)}\n"
-    if number==2186:
-        n=r.randint(2,20);edges={(i,i+1) for i in range(1,n)}|{(n,1)}
-        for _ in range(r.randint(0,30)):edges.add((r.randint(1,n),r.randint(1,n)))
-        return f"{n} {len(edges)}\n"+"\n".join(f"{a} {b}" for a,b in sorted(edges))+"\n"
-    if number==1236:
-        n=r.randint(2,18);rows=[]
-        for i in range(1,n+1):
-            a=sorted({j for j in range(1,n+1) if j!=i and r.random()<.2});rows.append((" ".join(map(str,a))+" " if a else "")+"0")
-        return f"{n}\n"+"\n".join(rows)+"\n"
-    if number==1062:
-        n=r.randint(1,12);rows=[f"{r.randint(1,10000)} {r.randint(1,20)} 0" for _ in range(n)];return f"{r.randint(1,10)} {n}\n"+"\n".join(rows)+"\n"
-    if number==1067:return "\n".join(f"{r.randint(0,10**9)} {r.randint(0,10**9)}" for _ in range(r.randint(1,10)))+"\n"
-    if number==1091:return f"{r.randint(1,15)} {r.randint(1,100000000)}\n"
-    if number==1154:
-        h,w=r.randint(1,7),r.randint(1,7);return f"{h} {w}\n"+"\n".join("".join(r.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(w)) for _ in range(h))+"\n"
-    if number==1183:return f"{r.randint(1,60000)}\n"
-    if number==1184:return f"{r.randint(0,999999):06d} {r.randint(0,999999):06d}\n"
-    if number==2001:
-        a={word(2,15) for _ in range(12)}
-        while len(a)<8:a.add(word(2,15))
-        return "\n".join(sorted(a))+"\n"
-    if number==2141:
-        key=list(letters);r.shuffle(key);msg="".join(r.choice(letters+letters.upper()+" ") for _ in range(r.randint(1,80)));return "".join(key)+"\n"+msg+"\n"
-    if number==1164:
-        h,w=1+(seed-1)%8,2+(seed-1)//8;return f"{h}\n{w}\n"+"\n".join(" ".join(["15"]*w) for _ in range(h))+"\n"
-    if number==1166:return "\n".join(" ".join(str(r.randrange(4)) for _ in range(3)) for _ in range(3))+"\n"
-    if number==1193:
-        N=r.randint(5,100);rows=[];t=0
-        for _ in range(r.randint(2,20)):t+=r.randint(0,4);rows.append(f"{t} {r.randint(1,N)} {r.randint(1,30)}")
-        return f"{N}\n"+"\n".join(rows)+"\n0 0 0\n"
-    if number==2002:
-        pts=set()
-        while len(pts)<r.randint(2,30):pts.add((r.randint(-30,30),r.randint(-30,30)))
-        if seed%2:pts.update({(0,0),(0,seed),(seed,0),(seed,seed)})
-        return f"{len(pts)}\n"+"\n".join(f"{x} {y}" for x,y in sorted(pts))+"\n0\n"
-    if number==2000:return "\n".join(str(r.randint(1,10000)) for _ in range(r.randint(1,10)))+"\n0\n"
-    if number==1324:
-        L=2+(seed-1)%6;n,m=10,12;row=2+(seed-1)%5;col=2+(seed-1)//5;body=[(row,col+i) for i in range(L)];return f"{n} {m} {L}\n"+"\n".join(f"{a} {b}" for a,b in body)+"\n0\n\n0 0 0\n"
-    if number==2318:
-        n=r.randint(1,8);m=r.randint(1,15);xs=sorted(r.sample(range(5,95),n));toys=[(r.randint(1,99),r.randint(1,9)) for _ in range(m)];return f"{n} {m} 0 10 100 0\n"+"\n".join(f"{x} {x}" for x in xs)+"\n"+"\n".join(f"{x} {y}" for x,y in toys)+"\n0\n"
-    if number==3129:
-        cases=[f"{r.randint(1,10000)}\n"+" ".join(str(r.randint(1,10000)) for _ in range(5)) for _ in range(r.randint(1,4))];return f"{len(cases)}\n"+"\n".join(cases)+"\n"
-    if number==1001:return "\n".join(f"{r.randint(1,999999)/10000:.4f} {r.randint(1,25)}" for _ in range(r.randint(1,6)))+"\n"
-    if number==1004:return "\n".join(f"{r.randint(1,100000000)/100:.2f}" for _ in range(12))+"\n"
-    if number==1005:
-        rows=[]
-        for _ in range(r.randint(1,8)):
-            x,y=r.uniform(-100,100),r.uniform(0,100);rows.append(f"{x:.3f} {y:.3f}")
-        return f"{len(rows)}\n"+"\n".join(rows)+"\n"
-    if number==1021:
-        cases=[]
-        for _ in range(r.randint(1,3)):
-            w=h=r.randint(4,12);n=r.randint(1,min(12,w*h));p=r.sample([(x,y) for x in range(w) for y in range(h)],n);q=p[:] if r.random()<.5 else r.sample([(x,y) for x in range(w) for y in range(h)],n);cases.append(f"{w} {h} {n}\n"+" ".join(f"{x} {y}" for x,y in p)+"\n"+" ".join(f"{x} {y}" for x,y in q))
-        return f"{len(cases)}\n"+"\n".join(cases)+"\n"
-    if number==2251:
-        R,C=3+(seed-1)%7,3+(seed-1)//7;grid=[["."]*C for _ in range(R)];grid[0][0]="S";grid[-1][-1]="E";return f"1 {R} {C}\n"+"\n".join("".join(x) for x in grid)+"\n0 0 0\n"
-    if number==2663:return "\n".join(str(r.randint(0,30)) for _ in range(r.randint(1,10)))+"\n-1\n"
-    if number==2745:return "\n".join(f"{r.randint(1,10)} {r.randint(0,99999999)}" for _ in range(r.randint(1,5)))+"\n0 0\n"
-    if number==2977:return " ".join(str(r.randint(0,365)) for _ in range(4))+"\n"
-    if number==2352:
-        pts=sorted({(r.randint(0,100),r.randint(0,100)) for _ in range(30)},key=lambda p:(p[1],p[0]));return f"{len(pts)}\n"+"\n".join(f"{x} {y}" for x,y in pts)+"\n"
-    if number==2599:
-        n=r.randint(2,40);edges=[(i,r.randint(1,i-1)) for i in range(2,n+1)];return f"{n} {r.randint(1,n)}\n"+"\n".join(f"{a} {b}" for a,b in edges)+"\n"
-    if number==2937:
-        n=r.randint(3,12);return f"{n}\n"+"\n".join(" ".join(str(r.randint(0,255)) for _ in range(n)) for _ in range(n))+"\n"
-    if number==2943:
-        n=r.randint(1,20);weights=r.sample(range(1,1001),n);return f"{n}\n"+"\n".join(f"{x} c{i}" for i,x in enumerate(weights))+"\n"
-    if number==1007:
-        n,m=r.randint(1,30),r.randint(1,30);return f"{n} {m}\n"+"\n".join("".join(r.choice("ACGT") for _ in range(n)) for _ in range(m))+"\n"
-    if number==1836:
-        n=r.randint(2,50);return f"{n}\n"+" ".join(f"{r.uniform(.5,2.5):.5f}" for _ in range(n))+"\n"
-    raise KeyError(number)
-
+    cases = []
+    if seed == 1:
+        cases = ["1 1 1\n0 0\n0 0", "2 1 1\n0 0\n1 0", "2 2 2\n0 0 1 1\n0 0 0 1",
+                 "2 2 2\n0 1 1 0\n1 1 0 0", "3 3 3\n0 0 1 0 2 0\n1 0 1 1 1 2", "3 3 3\n0 0 2 0 1 1\n0 0 1 1 2 2"]
+    elif seed == 2:
+        full = ' '.join(f'{x} {y}' for x in range(100) for y in range(100))
+        rev = ' '.join(f'{x} {y}' for x in reversed(range(100)) for y in range(100))
+        cases = [f"100 100 10000\n{full}\n{rev}"]
+    elif seed == 3:
+        line = ' '.join(f'{x} 0' for x in range(100)); col = ' '.join(f'0 {y}' for y in range(100))
+        cases = [f"100 100 100\n{line}\n{col}", f"100 1 100\n{line}\n{line}", f"1 100 100\n{col}\n{col}"]
+    else:
+        t = 10 if seed % 3 else r.randint(1, 10)
+        big = seed >= 28
+        for _ in range(t):
+            W = r.randint(60, 100) if big else r.randint(1, 30)
+            H = r.randint(60, 100) if big else r.randint(1, 30)
+            cap = W * H // (6 if big else 5)
+            budget = r.randint(1, max(1, cap if big else min(cap, 60)))
+            kind = r.choice(['yes', 'yes', 'no_shape', 'no_split'])
+            if budget < 2:
+                kind = 'yes'
+            cases.append(_case(r, W, H, kind, budget))
+    return f"{len(cases)}\n" + "\n".join(cases) + "\n"
 NO_INPUT={3225, 2698}
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01021/statistics/\n# Accepted submission: 48421084\n# Source: http://cs101.openjudge.cn/practice/solution/48421084/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\nfrom collections import deque\n\ndef find_clusters(points):\n    visited = set()\n    clusters = []\n    points = set(points)\n    for point in points:\n        if point not in visited:\n            queue = deque()\n            queue.append(point)\n            visited.add(point)\n            cluster = []\n            while queue:\n                x, y = queue.popleft()\n                cluster.append((x, y))\n                for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:\n                    neighbor = (x + dx, y + dy)\n                    if neighbor in points and neighbor not in visited:\n                        visited.add(neighbor)\n                        queue.append(neighbor)\n            clusters.append(cluster)\n    return clusters\n\ndef get_feature(cluster):\n    transforms = [\n        lambda x, y: (x, y),\n        lambda x, y: (y, -x),\n        lambda x, y: (-x, -y),\n        lambda x, y: (-y, x),\n        lambda x, y: (-x, y),\n        lambda x, y: (y, x),\n        lambda x, y: (x, -y),\n        lambda x, y: (-y, -x),\n    ]\n    min_feature = None\n    for t in transforms:\n        transformed = [t(x, y) for x, y in cluster]\n        min_x = min(p[0] for p in transformed)\n        min_y = min(p[1] for p in transformed)\n        normalized = [(p[0] - min_x, p[1] - min_y) for p in transformed]\n        normalized.sort()\n        feature = tuple(normalized)\n        if (min_feature is None) or (feature < min_feature):\n            min_feature = feature\n    return min_feature\n\ndef main():\n    t = int(sys.stdin.readline())\n    for _ in range(t):\n        W, H, n = map(int, sys.stdin.readline().split())\n        points1 = list(map(int, sys.stdin.readline().split()))\n        points1 = [(points1[i], points1[i+1]) for i in range(0, 2*n, 2)]\n        points2 = list(map(int, sys.stdin.readline().split()))\n        points2 = [(points2[i], points2[i+1]) for i in range(0, 2*n, 2)]\n        clusters1 = find_clusters(points1)\n        clusters2 = find_clusters(points2)\n        features1 = [get_feature(cluster) for cluster in clusters1]\n        features2 = [get_feature(cluster) for cluster in clusters2]\n        features1.sort()\n        features2.sort()\n        print("YES" if features1 == features2 else "NO")\n\nif __name__ == "__main__":\n    main()\n'
 LANGUAGE='Python3'

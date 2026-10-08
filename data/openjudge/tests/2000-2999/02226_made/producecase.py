@@ -69,9 +69,33 @@ def generate(number, seed):
                                      " ".join(map(str, decreases)), " ".join(map(str, travel)))))
         return "\n".join(cases) + "\n0\n"
     if number == 2226:
-        rows, cols = r.randint(1, 18), r.randint(1, 18)
-        grid = ["".join(r.choice("***...") for _ in range(cols)) for _ in range(rows)]
-        return f"{rows} {cols}\n" + "\n".join(grid) + "\n"
+        def out(g): return f"{len(g)} {len(g[0])}\n" + "\n".join(g) + "\n"
+        def rnd(R, C, p): return ["".join("*" if r.random() < p else "." for _ in range(C)) for _ in range(R)]
+        if seed == 1: return out(["."])                       # 无泥：0
+        if seed == 2: return out(["*"])
+        if seed == 3: return out(["*" * 50] * 50)             # 全泥：50
+        if seed == 4: return out(["." * 50] * 50)
+        if seed == 5: return out(["".join("*" if (i + j) % 2 == 0 else "." for j in range(50)) for i in range(50)])  # 孤立格 1250
+        if seed == 6: return out(rnd(1, 50, .6))
+        if seed == 7: return out(rnd(50, 1, .6))
+        if seed in (8, 9):                                     # 阶梯：增广路很长
+            g = [["."] * 50 for _ in range(50)]
+            for i in range(50):
+                g[i][i] = "*"
+                if i + 1 < 50: g[i][i + 1] = "*"
+                if seed == 9 and i + 1 < 50: g[i + 1][i] = "*"
+            return out(["".join(x) for x in g])
+        if seed in (10, 11):                                   # 十字/格栅：行列数都多但答案远小于 min(行,列)
+            g = [["*" if (i % 7 == 3 or j % 9 == 4) else "." for j in range(50)] for i in range(50)]
+            if seed == 11:
+                for _ in range(200): g[r.randrange(50)][r.randrange(50)] = "."
+            return out(["".join(x) for x in g])
+        if seed <= 22:                                         # 小规模随机
+            return out(rnd(r.randint(1, 18), r.randint(1, 18), r.choice([.2, .5, .7, .9])))
+        if seed <= 34:                                         # 满规模随机，不同密度
+            return out(rnd(50, 50, [.1, .3, .45, .5, .55, .6, .65, .7, .8, .85, .9, .95][seed - 23]))
+        R, C = r.randint(30, 50), r.randint(30, 50)
+        return out(rnd(R, C, r.uniform(.3, .8)))
     if number == 1064:
         n, k = r.randint(1, 80), r.randint(1, 500)
         lengths = [r.randint(100, 10_000_000) for _ in range(n)]
@@ -119,6 +143,18 @@ def generate(number, seed):
         return "\n".join(words) + "\n"
     raise KeyError(number)
 
+def valid(text):
+    """题面：首行两个以空格分隔的整数 R C（1<=R,C<=50）；随后 R 行，每行恰好 C 个字符，只含 '*' 与 '.'，无空格。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    head = lines[0].split(" ")
+    if len(head) != 2 or not all(x.isdigit() and (x == "0" or x[0] != "0") for x in head):
+        return False
+    R, C = map(int, head)
+    if not (1 <= R <= 50 and 1 <= C <= 50) or len(lines) != R + 1:
+        return False
+    return all(len(row) == C and set(row) <= set("*.") for row in lines[1:])
 REFERENCE='# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 2226: Muddy Fields\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02226/\n# License: not declared in source collection; no license is inferred.\nimport sys\ndef min_boards(R, C, field):\n    # Label horizontal segments.\n    hor = [[0] * C for _ in range(R)]\n    hor_id = 0\n    for r in range(R):\n        c = 0\n        while c < C:\n            if field[r][c] == \'*\':\n                hor_id += 1\n                # label contiguous \'*\' segment in row r\n                while c < C and field[r][c] == \'*\':\n                    hor[r][c] = hor_id\n                    c += 1\n            else:\n                c += 1\n\n    # Label vertical segments.\n    ver = [[0] * C for _ in range(R)]\n    ver_id = 0\n    for c in range(C):\n        r = 0\n        while r < R:\n            if field[r][c] == \'*\':\n                ver_id += 1\n                # label contiguous \'*\' segment in column c\n                while r < R and field[r][c] == \'*\':\n                    ver[r][c] = ver_id\n                    r += 1\n            else:\n                r += 1\n\n    # Build bipartite graph: for each horizontal segment, list all vertical segments that intersect it.\n    graph = {i: set() for i in range(1, hor_id + 1)}\n    for r in range(R):\n        for c in range(C):\n            if field[r][c] == \'*\':\n                h = hor[r][c]\n                v = ver[r][c]\n                graph[h].add(v)\n\n    # Use DFS to find an augmenting path in the bipartite graph.\n    match = {}  # maps vertical segment -> horizontal segment\n\n    def dfs(u, seen):\n        for v in graph[u]:\n            if v in seen:\n                continue\n            seen.add(v)\n            if v not in match or dfs(match[v], seen):\n                match[v] = u\n                return True\n        return False\n\n    result = 0\n    for u in range(1, hor_id + 1):\n        if dfs(u, set()):\n            result += 1\n    return result\n\nif __name__ == "__main__":\n    import sys\n    data = sys.stdin.read().strip().split()\n    if not data:\n        exit(0)\n    R = int(data[0])\n    C = int(data[1])\n    field = data[2:]\n    print(min_boards(R, C, field))\n'
 NUMBER=2226
 SAMPLE='4 4\n*.*.\n.***\n***.\n..*.\n'

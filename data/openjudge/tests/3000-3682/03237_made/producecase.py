@@ -249,6 +249,14 @@ def generate(number, seed):
             chunks.append(f"{r.randint(0,100)}\n" + " ".join(str(r.randint(1,80)) for _ in range(5)))
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     if number == 3237:
+        # 小值与上限边界（1、2、4、6、32766、32767 等）单独成组，另加一组多数据
+        special = {1: [1, 2, 4, 6, 8, 32766, 32767, 32764], 2: [2], 3: [32767], 4: [4]}
+        if seed in special:
+            values = special[seed]
+            return f"{len(values)}\n" + "\n".join(map(str, values)) + "\n"
+        if seed == 5:
+            values = [r.randint(1, 32767) for _ in range(2000)]
+            return f"{len(values)}\n" + "\n".join(map(str, values)) + "\n"
         values = [r.randint(1, 32767) for _ in range(r.randint(1, 12))]
         return f"{len(values)}\n" + "\n".join(map(str, values)) + "\n"
     if number == 1068:
@@ -418,6 +426,15 @@ def generate(number, seed):
     raise KeyError(number)
 
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/03237/statistics/\n# Accepted submission: 50653280\n# Source: http://cs101.openjudge.cn/practice/solution/50653280/\n# License: not declared on the submission page; no license is inferred.\n\nn = int(input())\nfor _ in range(n):\n    a = int(input())\n    if a % 2 == 1:\n        print(0, 0)\n    else:\n        print((a+2)//4, a//2)\n'
+def valid(text):
+    """题面：第 1 行组数 n，后跟 n 行，每行一个正整数 a（a < 32768）。"""
+    if not text.endswith("\n"): return False
+    lines = text[:-1].split("\n")
+    ok = lambda s: s.isdigit() and s[0] != "0"
+    if not lines or not ok(lines[0]): return False
+    n = int(lines[0])
+    if len(lines) != n + 1: return False
+    return all(ok(s) and 1 <= int(s) < 32768 for s in lines[1:])
 LANGUAGE='Python3'
 NUMBER=3237
 SAMPLE='2\n3\n20\n'

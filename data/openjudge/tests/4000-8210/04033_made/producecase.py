@@ -2,19 +2,131 @@ import random,subprocess,tempfile
 from pathlib import Path
 REFERENCE_SOURCE='import sys, heapq\nfrom collections import deque\nP=4033\ndef go(s):\n a=s.split()\n if P==3723:\n  n=int(a[0]);g=a[1:];seen=set();z=[sum(row.count("B") for row in g),sum(row.count("W") for row in g)]\n  for i in range(n):\n   for j in range(n):\n    if g[i][j]!="." or (i,j) in seen:continue\n    q=[(i,j)];seen.add((i,j));e=set();c=0\n    while q:\n     x,y=q.pop();c+=1\n     for u,v in ((x-1,y),(x+1,y),(x,y-1),(x,y+1)):\n      if 0<=u<n and 0<=v<n:\n       if g[u][v]=="." and (u,v) not in seen:seen.add((u,v));q.append((u,v))\n       elif g[u][v] in "BW":e.add(g[u][v])\n    if len(e)==1:z["BW".index(next(iter(e)))]+=c\n  return f"{z[0]} {z[1]}\\n"\n if P==3725:\n  x=list(map(int,a));v=sorted(x[1:],reverse=True);M=max(v);best=(10**9,0)\n  for k in range(1,len(v)+1):\n   q=[0]*k\n   for y in v:q[q.index(min(q))]+=y\n   best=min(best,(sum(abs(y-M) for y in q),-k))\n  return f"{-best[1]}\\n"\n if P==3726 or P==3866:\n  p=0;out=[]\n  while p<len(a):\n   R,C=map(int,a[p:p+2]);p+=2\n   if not R:break\n   g=a[p:p+(R if P==3726 else C)];p+=len(g)\n   target="*" if P==3726 else "@"; src=next((i,j) for i in range(len(g)) for j in range(len(g[0]) if g else 0) if g[i][j]==target)\n   q=deque([src]);seen={src}\n   while q:\n    x,y=q.popleft()\n    for u,v in ((x-1,y),(x+1,y),(x,y-1),(x,y+1)):\n     if 0<=u<len(g) and 0<=v<len(g[0]) and g[u][v]!="#" and (u,v) not in seen:seen.add((u,v));q.append((u,v))\n   if P==3726:\n    start=next((i,j) for i in range(R) for j in range(C) if g[i][j]=="@");q=deque([(start[0],start[1],0)]);vis={start};ans=-1\n    while q:\n     x,y,d=q.popleft()\n     if g[x][y]=="*":ans=d;break\n     for u,v in ((x-1,y),(x+1,y),(x,y-1),(x,y+1)):\n      if 0<=u<R and 0<=v<C and g[u][v]!="#" and (u,v) not in vis:vis.add((u,v));q.append((u,v,d+1))\n    out.append(str(ans))\n   else:out.append(str(len(seen)))\n  return "\\n".join(out)+"\\n"\n if P==3727:\n  p=1;out=[]\n  for _ in range(int(a[0])):\n   R,C=map(int,a[p:p+2]);p+=2;d=[0]*C\n   for i in range(R):\n    for j in range(C):d[j]=max(d[j],d[j-1] if j else 0)+int(a[p]);p+=1\n   out.append(str(d[-1]))\n  return "\\n".join(out)+"\\n"\n if P==3728:\n  out=[]\n  for line in s.splitlines():\n   b,n=map(int,line.split());q={b};h=[b];outv=[]\n   while len(outv)<n:\n    x=heapq.heappop(h);outv.append(x)\n    for y in (2*x+1,3*x+1):\n     if y not in q:q.add(y);heapq.heappush(h,y)\n   out.append(str(outv[-1]))\n  return "\\n".join(out)+"\\n"\n if P==3744:\n  return "\\n".join(str(min(2*(x*y+x*w+y*w) for x in range(1,n+1) for y in range(x,n+1) if n%(x*y)==0 for w in [n//(x*y)])) for n in map(int,a[1:]))+"\\n"\n if P==3789:\n  n,k=map(int,a[:2]);v=list(map(int,a[2:]))\n  for L in range(n,0,-1):\n   if any(sum(v[i:i+L]==v[j:j+L] for j in range(n-L+1))>=k for i in range(n-L+1)):return str(L)+"\\n"\n if P==3791:\n  p=1;out=[]\n  for _ in range(int(a[0])):\n   n=int(a[p]);p+=1;q=sorted(a[p:p+n]);p+=n;out.append("NO" if any(y.startswith(x) for x,y in zip(q,q[1:])) else "YES")\n  return "\\n".join(out)+"\\n"\n if P==3906:\n  m,n=map(int,a[:2]);v=list(map(int,a[2:]));D={(0,0,0,0):v[0]}\n  for _ in range(m+n-2):\n   N={}\n   for (x,y,u,w),z in D.items():\n    for dx,dy in ((1,0),(0,1)):\n     for du,dw in ((1,0),(0,1)):\n      X,Y=x+dx,y+dy;U,W=u+du,w+dw\n      if X<m and Y<n and U<m and W<n and ((X,Y)!=(U,W) or (X,Y)==(m-1,n-1)):N[X,Y,U,W]=max(N.get((X,Y,U,W),-1),z+v[X*n+Y]+v[U*n+W])\n   D=N\n  return str(max(D.values()))+"\\n"\n if P==4001:\n  n,k=map(int,a);q=deque([(n,0)]);vis={n}\n  while q:\n   x,d=q.popleft()\n   if x==k:return str(d)+"\\n"\n   for y in (x-1,x+1,2*x):\n    if 0<=y<=100000 and y not in vis:vis.add(y);q.append((y,d+1))\n if P==4002:\n  v=list(map(int,a[2:]));return "".join((str(v.count(x)-1) if v.count(x)>1 else "BeiJu")+"\\n" for x in v)\n if P==4006:\n  q,n=map(int,a[:2]);out=[]\n  for i,j in zip(map(int,a[2::2]),map(int,a[3::2])):\n   l=min(i-1,j-1,n-i,n-j);z=n-2*l;st=n*n-z*z+1;u=i-l-1;v=j-l-1\n   out.append(str(st+v if u==0 else st+z-1+u if v==z-1 else st+2*z-2+z-1-v if u==z-1 else st+3*z-3+z-1-u))\n  return "\\n".join(out)+"\\n"\n if P==4007:\n  p=1;out=[]\n  for _ in range(int(a[0])):\n   x,y=a[p:p+2];p+=2;d=list(range(len(y)+1))\n   for c in x:\n    old=d;d=[old[0]+1]\n    for j in range(len(y)):d.append(min(old[j+1]+1,d[-1]+1,old[j]+(c!=y[j])))\n   out.append(str(d[-1]))\n  return "\\n".join(out)+"\\n"\n if P==4008:\n  n,k=map(int,a[:2]);d=[-10**9]*k;d[0]=0\n  for x in map(int,a[2:]):d=[max(d[j],d[(j-x)%k]+x) for j in range(k)]\n  return str(d[0])+"\\n"\n if P==4009:\n  pc=[bin(x).count("1") for x in range(65536)]\n  def pop(x):return pc[x&65535]+pc[x>>16]\n  out=[]\n  for n in map(int,a):\n   if not n:break\n   c=0\n   for mask in range(1<<n):\n    row=mask;z=2*pop(mask)-n\n    for width in range(n,1,-1):\n     row=(~(row^(row>>1)))&((1<<(width-1))-1);z+=2*pop(row)-(width-1)\n    c+=z==0\n   out.append(f"{n} {c}")\n  return "\\n".join(out)+"\\n"\n if P==4010:return "\\n".join(str(pow(2011,int(x),10000)) for x in a[1:])+"\\n"\n if P==4021:\n  p=1;out=[]\n  for _ in range(int(a[0])):\n   n=int(a[p]);v=list(map(int,a[p+1:p+1+n]));p+=n+1\n   z=[__import__("math").prod(v[:i]+v[i+1:]) for i in range(n)];out.append(str(v[z.index(max(z))]))\n  return "\\n".join(out)+"\\n"\n if P==4033:\n  n=int(a[0]);x,y=map(int,a[1+4*n:]);ans=-1\n  for i in range(n):\n   A,B,G,K=map(int,a[1+4*i:5+4*i])\n   if A<=x<=A+G and B<=y<=B+K:ans=i+1\n  return str(ans)+"\\n"\n if P==4034:\n  n,k,p=map(int,a[:3]);v=[tuple(map(int,a[i:i+2])) for i in range(3,3+2*n,2)]\n  return str(sum(v[i][0]==v[j][0] and min(x[1] for x in v[i:j+1])<=p for i in range(n) for j in range(i+1,n)))+"\\n"\nfor line in []:pass\nsys.stdout.write(go(sys.stdin.read()))\n'
 SAMPLE_IN='3 \n1 0 2 3 \n0 2 3 3 \n2 1 3 3  \n2 2\n'
-def g4033(r):
-    n=r.randint(1,8);z=[str(n)]
-    for _ in range(n):z.append(f"{r.randint(0,8)} {r.randint(0,8)} {r.randint(1,5)} {r.randint(1,5)}")
-    z.append(f"{r.randint(0,12)} {r.randint(0,12)}");return "\n".join(z)+"\n"
 
-with tempfile.NamedTemporaryFile("w",suffix=".py",encoding="utf-8") as h:
- h.write(REFERENCE_SOURCE);h.flush();root=Path(__file__).parent/"data";seen=[SAMPLE_IN]
- for i in range(40):
-  if i==0:c=SAMPLE_IN
-  else:
-   for j in range(100):
-    c=g4033(random.Random(4033+i+j*1000))
-    if c not in seen:break
-   else:raise AssertionError("diversity")
-  seen.append(c);p=subprocess.run(["python3",h.name],input=c,text=True,capture_output=True,check=True)
-  (root/f"{i}.in").write_text(c,encoding="utf-8");(root/f"{i}.out").write_text(p.stdout,encoding="utf-8")
+
+def valid(text):
+    """题面契约：第一行 n；接下来 n 行各 4 个整数 a b g k；最后一行 x y；共 n+2 行。
+    题面称“正整数”，但题面样例里 a、b 出现了 0，故 a、b、x、y 按非负核，g、k 按正整数核。
+    题面没给 n 与坐标上界。样例行尾带空格，行尾空白放过。"""
+    if not text.endswith("\n"):
+        return False
+    lines = [ln.rstrip(" ") for ln in text[:-1].split("\n")]
+    try:
+        rows = []
+        for ln in lines:
+            if ln == "" or ln.startswith(" ") or "  " in ln:
+                return False
+            rows.append([int(x) for x in ln.split(" ")])
+    except ValueError:
+        return False
+    if len(rows[0]) != 1:
+        return False
+    n = rows[0][0]
+    if n < 1 or len(rows) != n + 2:
+        return False
+    for row in rows[1:n + 1]:
+        if len(row) != 4:
+            return False
+        a, b, g, k = row
+        if a < 0 or b < 0 or g < 1 or k < 1:
+            return False
+    if len(rows[n + 1]) != 2 or min(rows[n + 1]) < 0:
+        return False
+    return True
+
+
+C = 10 ** 5   # 题面未给范围，取原题（NOIP2011）的 n<=10000、坐标与边长 <=1e5
+
+
+def build(carpets, x, y):
+    return "\n".join([str(len(carpets))] + [f"{a} {b} {g} {k}" for a, b, g, k in carpets] + [f"{x} {y}"]) + "\n"
+
+
+def covering(r, x, y, hi):
+    """随机生成一张覆盖 (x,y) 的地毯，(x,y) 常落在边界或顶点上。"""
+    mode = r.random()
+    a = x if mode < 0.2 else max(1, x - r.randint(0, hi))
+    b = y if mode > 0.8 else max(1, y - r.randint(0, hi))
+    g = max(1, x - a + r.randint(0, hi)) if r.random() < 0.7 else max(1, x - a)
+    k = max(1, y - b + r.randint(0, hi)) if r.random() < 0.7 else max(1, y - b)
+    return a, b, g, k
+
+
+def missing(r, x, y, hi):
+    """随机生成一张不覆盖 (x,y) 的地毯（常常差一格）。"""
+    while True:
+        a = r.randint(1, x + hi)
+        b = r.randint(1, y + hi)
+        g = r.randint(1, hi)
+        k = r.randint(1, hi)
+        if r.random() < 0.5:   # 紧贴着点的一侧，差一格
+            side = r.randrange(4)
+            if side == 0 and x >= 2:
+                a, g = max(1, x - g), max(1, x - 1 - max(1, x - g))
+            elif side == 1:
+                a = x + 1
+            elif side == 2 and y >= 2:
+                b, k = max(1, y - k), max(1, y - 1 - max(1, y - k))
+            else:
+                b = y + 1
+        if not (a <= x <= a + g and b <= y <= b + k):
+            return a, b, g, k
+
+
+def random_case(r, n, hi, cover_rate, top=None):
+    x, y = r.randint(1, hi), r.randint(1, hi)
+    cs = [covering(r, x, y, hi) if r.random() < cover_rate else missing(r, x, y, hi) for _ in range(n)]
+    if top == "last":
+        cs[-1] = covering(r, x, y, hi)
+    elif top == "first":
+        cs = [covering(r, x, y, hi)] + [missing(r, x, y, hi) for _ in range(n - 1)]
+    elif top == "none":
+        cs = [missing(r, x, y, hi) for _ in range(n)]
+    return build(cs, x, y)
+
+
+FIXED = [
+    build([(1, 1, 1, 1)], 1, 1),           # 左下顶点
+    build([(1, 1, 1, 1)], 2, 2),           # 右上顶点
+    build([(1, 1, 1, 1)], 3, 2),           # 差一格
+    build([(5, 5, 3, 4)], 8, 7),           # 右边界上
+    build([(5, 5, 3, 4)], 6, 9),           # 上边界上
+    build([(5, 5, 3, 4)], 4, 6),           # 左边一格外
+    build([(1, 1, C - 1, C - 1), (C, C, C, C), (C + 1, 1, 5, C)], C, C),  # 两张恰在一点相接
+    build([(1, 1, C, C)] * 3, C + 2, C + 1),          # 都差一格
+]
+
+
+def gen(i):
+    r = random.Random(4033 * 1000 + i)
+    if i == 0:
+        return SAMPLE_IN
+    if i <= len(FIXED):
+        return FIXED[i - 1]
+    if i <= 20:
+        return random_case(r, r.randint(1, 10), r.choice([3, 10, 50]), r.choice([0.1, 0.3, 0.6]),
+                           r.choice([None, None, "last", "first", "none"]))
+    if i <= 30:
+        return random_case(r, r.randint(100, 3000), r.choice([100, 1000, C]), r.choice([0.01, 0.1, 0.5]),
+                           r.choice([None, "last", "first", "none"]))
+    top = [None, None, "last", "first", "none", None, "first", None, "none"][i - 31]
+    return random_case(r, 10 ** 4, C, [0.001, 0.05, 0.3, 0, 0, 0.5, 0, 0.0002, 0][i - 31], top)
+
+
+def main():
+    with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as h:
+        h.write(REFERENCE_SOURCE)
+        h.flush()
+        root = Path(__file__).parent / "data"
+        seen = set()
+        for i in range(40):
+            c = gen(i)
+            assert valid(c) and c not in seen, i
+            seen.add(c)
+            p = subprocess.run(["python3", h.name], input=c, text=True, capture_output=True, check=True)
+            (root / f"{i}.in").write_text(c, encoding="utf-8")
+            (root / f"{i}.out").write_text(p.stdout, encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

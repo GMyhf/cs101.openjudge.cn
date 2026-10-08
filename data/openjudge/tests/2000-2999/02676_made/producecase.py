@@ -134,7 +134,15 @@ def generate(number, seed):
             words=[word() for _ in range(r.randint(3,40))];cases.append(f"{len(words)}\n"+"\n".join(words))
         return f"{len(cases)}\n"+"\n".join(cases)+"\n"
     if number == 2676:
-        a=[r.randint(1,20) for _ in range(r.randint(1,100))];return f"{len(a)}\n"+" ".join(map(str,a))+"\n"
+        # 题面：1<k<100，每个数 1..10。1-3：k=2；4-8：k=99；9-15：全同/缺某类；其余随机
+        if seed<=3:k=2
+        elif seed<=8:k=99
+        else:k=r.randint(2,99)
+        if 9<=seed<=15:
+            pool=[[1],[5],[10],[2,3,4,6,7,8,9],[1,10],[5,7],[1,5,10]][seed-9]
+        else:
+            pool=list(range(1,11)) if seed%2 else [1,5,10,r.randint(1,10)]
+        a=[r.choice(pool) for _ in range(k)];return f"{k}\n"+" ".join(map(str,a))+"\n"
     if number == 2712:
         md=[31,28,31,30,31,30,31,31,30,31,30,31];days=[]
         for m,d in enumerate(md,1):days.extend((m,x) for x in range(1,d+1))
@@ -148,6 +156,17 @@ def generate(number, seed):
         chars="".join(chr(i) for i in range(32,123));return "".join(r.choice(chars) for _ in range(r.randint(1,100)))+"\n"
     if number == 1753:return "\n".join("".join(r.choice("bw") for _ in range(4)) for _ in range(4))+"\n"
     raise KeyError(number)
+
+def valid(text):
+    """题面：两行；第一行正整数 k（1<k<100），第二行 k 个 1..10 的正整数，单空格分隔。"""
+    import re
+    if not text.endswith("\n"):return False
+    lines=text[:-1].split("\n")
+    if len(lines)!=2 or not re.fullmatch(r"[1-9]\d*",lines[0]):return False
+    k=int(lines[0])
+    if not 1<k<100:return False
+    a=lines[1].split(" ")
+    return len(a)==k and all(re.fullmatch(r"[1-9]\d*",x) and 1<=int(x)<=10 for x in a)
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2676: 整数的个数\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02676/\n# License: not declared; no license is inferred.\nimport sys\nk = int(input())\nnumbers = list(map(int, input().split()))\n\n# 初始化计数器\ncount_1 = 0\ncount_5 = 0\ncount_10 = 0\n\n# 遍历列表，统计1、5和10出现的次数\nfor num in numbers:\n    if num == 1:\n        count_1 += 1\n    elif num == 5:\n        count_5 += 1\n    elif num == 10:\n        count_10 += 1\n\nprint(count_1)\nprint(count_5)\nprint(count_10)\n'
 NUMBER=2676

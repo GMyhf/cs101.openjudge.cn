@@ -53,7 +53,7 @@ def generate(n, seed):
         N=r.randint(2,20);return f'{N}\n'+'\n'.join(' '.join(str(r.randint(0,100)) for _ in range(i)) for i in range(1,N+1))+'\n'
     if n==3151:
         A,B=r.randint(2,30),r.randint(2,30);C=r.randint(1,max(A,B));return f'{A} {B} {C}\n'
-    if n==2733:return f'{r.randint(1,2999)}\n'
+    if n == 2733: return _gen_2733(r, seed)
     if n==2774:
         N=r.randint(2,30);K=r.randint(1,100);return f'{N} {K}\n'+'\n'.join(str(r.randint(1,10000)) for _ in range(N))+'\n'
     if n==2806:
@@ -161,6 +161,29 @@ def run(x):
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout
+import re as _re
+_INT=_re.compile(r'(0|-?[1-9][0-9]*)$')
+def _int(tok):
+    return int(tok) if _INT.match(tok) else None
+
+def valid(text):
+    """题面：输入只有一行，一个整数 a（0 < a < 3000）。"""
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if len(lines)!=1:return False
+    a=_int(lines[0])
+    return a is not None and 0<a<3000
+
+_SPECIAL_2733 = [1, 4, 100, 200, 400, 1600, 1700, 1800, 1900, 2000, 2004, 2100, 2400, 2800, 2900, 2996, 2999, 3, 1996, 2023]
+def _gen_2733(r, seed):
+    # 先覆盖整百、整四百与上下界，再混合随机 4 的倍数、100 的倍数与任意年份
+    if seed <= len(_SPECIAL_2733): return f"{_SPECIAL_2733[seed - 1]}\n"
+    k = seed % 3
+    if k == 0: a = 100 * r.randint(1, 29)
+    elif k == 1: a = 4 * r.randint(1, 749)
+    else: a = r.randint(1, 2999)
+    return f"{a}\n"
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()

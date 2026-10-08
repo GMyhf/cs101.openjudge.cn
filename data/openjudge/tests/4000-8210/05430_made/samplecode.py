@@ -1,4 +1,5 @@
 # Source: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md
+# 2026-10-08 本地修正：上面引用的原始代码在题面范围内有缺陷，已按题面改过，与原提交不再逐字一致（见 CHANGELOG）。
 '''
 表达式树是一种特殊的二叉树。对于你的问题，需要先将中缀表达式转换为后缀表达式
 （逆波兰式），然后根据后缀表达式建立表达式树，最后进行计算。
@@ -66,7 +67,7 @@ def build_tree(postfix):
 
 def get_val(expr_tree, var_vals):
     if expr_tree.value in '+-*/':
-        operator = {'+': op.add, '-': op.sub, '*': op.mul, '/': op.floordiv}
+        operator = {'+': op.add, '-': op.sub, '*': op.mul, '/': lambda x, y: abs(x) // abs(y) * (1 if (x >= 0) == (y > 0) else -1)}  # 题面：整除即舍弃小数部分（向零取整）
         return operator[expr_tree.value](get_val(expr_tree.left, var_vals), get_val(expr_tree.right, var_vals))
     else:
         return var_vals[expr_tree.value]

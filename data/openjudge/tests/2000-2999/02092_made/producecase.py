@@ -163,6 +163,129 @@ def generate(number, seed):
 REFERENCE="# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 2092: Grandpa is Famous\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02092/\n# License: not declared; no license is inferred.\nimport sys\nwhile True:\n    n, m = map(int, input().split())\n    if n == 0 and m == 0:\n        break\n\n    count = [0] * 10001\n    for _ in range(n):\n        for player in map(int, input().split()):\n            count[player] += 1\n\n    max_count = max(count)\n    second_max_count = max(x for x in count if x != max_count)\n\n    for player, player_count in enumerate(count):\n        if player_count == second_max_count:\n            print(player, end=' ')\n    print()\n"
 NUMBER=2092
 SAMPLE='4 5\n20 33 25 32 99\n32 86 99 25 10\n20 99 10 33 86\n19 33 74 99 32\n3 6\n2 34 67 36 79 93\n100 38 21 76 91 85\n32 23 85 31 88 1\n0 0\n'
+def valid(text):
+    """题面契约：多组数据，每组首行 N M（2<=N,M<=500），随后 N 行各 M 个互不相同的 1..10000 编号，
+    单空格分隔；以 "0 0" 结束。保证恰有一个最佳选手且至少有一个次佳选手。"""
+    if not text.endswith('\n') or '\r' in text:
+        return False
+    lines = text[:-1].split('\n')
+    i = 0
+    cases = 0
+    while True:
+        if i >= len(lines):
+            return False
+        head = lines[i].split(' ')
+        if len(head) != 2 or not all(t.isdigit() for t in head):
+            return False
+        n, m = map(int, head)
+        i += 1
+        if n == 0 and m == 0:
+            return i == len(lines) and cases >= 1
+        if not (2 <= n <= 500 and 2 <= m <= 500):
+            return False
+        if i + n > len(lines):
+            return False
+        counts = {}
+        for row in lines[i:i + n]:
+            toks = row.split(' ')
+            if len(toks) != m or not all(t.isdigit() and t[0] != '0' for t in toks):
+                return False
+            vals = list(map(int, toks))
+            if len(set(vals)) != m or not all(1 <= v <= 10000 for v in vals):
+                return False
+            for v in vals:
+                counts[v] = counts.get(v, 0) + 1
+        i += n
+        best = max(counts.values())
+        if sum(c == best for c in counts.values()) != 1 or len(counts) < 2:
+            return False
+        cases += 1
+
+
+def _case2092(r, n, m, pool, best=None, fixed=()):
+    """随机生成一组：best 每榜都出现（保证唯一最佳），其余从 pool 抽；fixed 里的编号尽量放进去。"""
+    pool = list(pool)
+    # 每个非最佳选手至少要缺席一榜，才可能「恰好一个最佳」：池子不够大就扩
+    while n * (len(pool) - m) < len(pool) - 1 + n and len(pool) < 10000:
+        pool.append(max(pool) + 1) if max(pool) < 10000 else pool.append(min(pool) - 1)
+    while True:
+        b = best if best is not None else r.choice(pool)
+        others = [p for p in pool if p != b]
+        rows = []
+        for k in range(n):
+            row = r.sample(others, m - 1)
+            if fixed and k % 3 == 0:
+                f = fixed[k // 3 % len(fixed)]
+                if f != b and f not in row:
+                    row[r.randrange(m - 1)] = f
+            row.append(b)
+            r.shuffle(row)
+            rows.append(row)
+        counts = {}
+        for row in rows:
+            for p in row:
+                counts[p] = counts.get(p, 0) + 1
+        # 其他人若也每榜都在（与最佳并列），在某一榜里把他换成出现最少的人
+        for _ in range(4 * n):
+            ties = sorted(p for p, c in counts.items() if c == n and p != b)
+            if not ties:
+                break
+            p = ties[0]; k = r.randrange(n); row = rows[k]
+            q = min((x for x in others if x not in row), key=lambda x: (counts.get(x, 0), x))
+            row[row.index(p)] = q
+            counts[p] -= 1; counts[q] = counts.get(q, 0) + 1
+        top = max(counts.values())
+        if sum(c == top for c in counts.values()) == 1:
+            return rows
+
+
+def _fmt2092(cases):
+    return "".join(f"{len(rows)} {len(rows[0])}\n" + "".join(" ".join(map(str, row)) + "\n" for row in rows)
+                   for rows in cases) + "0 0\n"
+
+
+def gen2092(seed):
+    r = random.Random(2092_000 + seed)
+    if seed == 1:      # 最小规模 N=M=2，编号取到两端 1 与 10000
+        return _fmt2092([[[1, 10000], [10000, 2]], [[5, 6], [6, 7]], [[10000, 1], [1, 9999]]])
+    if seed == 2:      # 次佳并列极多：除最佳外每人恰好出现一次（9900 人并列次佳）
+        ids = list(range(1, 10001)); r.shuffle(ids)
+        b = ids.pop(); rows = []
+        for k in range(100):
+            row = ids[k * 99:(k + 1) * 99] + [b]; r.shuffle(row); rows.append(row)
+        return _fmt2092([rows])
+    if seed == 3:      # 满规模 N=M=500，编号 1..999（控制文件 ≤1MB），含 1
+        return _fmt2092([_case2092(r, 500, 500, range(1, 1000), fixed=(1,))])
+    if seed == 4:      # N=500,M=300，编号覆盖到 10000
+        return _fmt2092([_case2092(r, 500, 300, range(1, 10001), best=10000)])
+    if seed == 5:      # N=300,M=500，编号 1..10000，次佳里放 10000
+        return _fmt2092([_case2092(r, 300, 500, range(1, 10001), fixed=(10000,))])
+    if seed == 6:      # 最佳编号为 1，次佳为 10000（越界、下标 0 的写法会出错）
+        rows = [[1, 10000] + r.sample(range(2, 10000), 3) for _ in range(9)] + [[1] + r.sample(range(2, 10000), 4)]
+        return _fmt2092([rows])
+    if seed == 7:      # N 小 M 大：最佳 10 次，次佳只有寥寥几次
+        rows = [_case2092(r, 10, 500, range(1, 10001))]
+        return _fmt2092(rows)
+    if seed == 8:      # 小池子：人人都出现很多次，次数差 1 的紧密竞争
+        return _fmt2092([_case2092(r, 50, 9, range(1, 11)) for _ in range(30)])
+    if seed <= 20:     # 多组中小规模混合
+        cases = []
+        for _ in range(r.randint(5, 40)):
+            n, m = r.randint(2, 30), r.randint(2, 30)
+            lo = r.choice([1, 1, 5000, 9900])
+            hi = min(10000, lo + r.choice([m + 1, 2 * m, 100, 10000]))
+            cases.append(_case2092(r, n, m, range(lo, hi + 1)))
+        return _fmt2092(cases)
+    if seed <= 30:     # 中等规模多组
+        cases = []
+        for _ in range(r.randint(2, 5)):
+            n, m = r.randint(50, 150), r.randint(50, 150)
+            cases.append(_case2092(r, n, m, range(1, r.choice([m + 2, 2 * m, 1000, 10001]))))
+        return _fmt2092(cases)
+    # 大规模单组/双组
+    n, m = r.randint(300, 500), r.randint(150, 300)
+    return _fmt2092([_case2092(r, n, m, range(1, r.choice([m + 3, 1000, 10001])))])
+
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
@@ -171,6 +294,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[gen2092(s) for s in range(1, 40)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

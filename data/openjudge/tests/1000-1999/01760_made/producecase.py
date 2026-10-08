@@ -161,9 +161,83 @@ def run(x):
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout
+NAME_CHARS = set("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#$%&'()-@^_`{}~")
+
+def valid(text):
+    """题面：首行 N(1<=N<=500)；随后恰 N 行互异路径，无空格，长度<=80，
+    以反斜杠分隔若干目录名，每个目录名 1..8 个字符，取自大写字母/数字/!#$%&'()-@^_`{}~。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if not lines[0].isdigit() or lines[0] != str(int(lines[0])):
+        return False
+    n = int(lines[0])
+    if not 1 <= n <= 500 or len(lines) != n + 1:
+        return False
+    paths = lines[1:]
+    if len(set(paths)) != n:
+        return False
+    for p in paths:
+        if not 1 <= len(p) <= 80:
+            return False
+        for name in p.split('\\'):
+            if not 1 <= len(name) <= 8 or not set(name) <= NAME_CHARS:
+                return False
+    return True
+
+def gen_case(seed):
+    r = random.Random(1760 * 1000 + seed)
+    allc = sorted(NAME_CHARS)
+    tricky = ["A", "A0", "A^", "A~", "A_", "A!", "AB", "AB`", "Z", "0", "~", "{}", "(", ")", "@", "WIN", "WINNT", "WIN~1"]
+    def rname(maxlen=8):
+        return "".join(r.choice(allc) for _ in range(r.randint(1, maxlen)))
+    if seed == 1:
+        return "1\nA\n"
+    if seed == 2:
+        p = "\\".join(rname(8).ljust(8, "~")[:8] for _ in range(9))
+        assert len(p) == 80
+        return "1\n" + p + "\n"
+    if seed == 3:
+        # 全部是顶层目录，含特殊字符，考察 ASCII 序
+        names = set(tricky)
+        while len(names) < 60: names.add(rname())
+        names = sorted(names); r.shuffle(names)
+        return f"{len(names)}\n" + "\n".join(names) + "\n"
+    if seed == 4:
+        # 一条链：每个前缀都单独列出，深度 40（"A\\A\\..." 长 79）
+        chain = ["A" if i % 2 else "B" for i in range(40)]
+        ps = ["\\".join(chain[:i]) for i in range(1, 41)]
+        r.shuffle(ps)
+        return f"{len(ps)}\n" + "\n".join(ps) + "\n"
+    if seed == 5:
+        # 卡“整串路径直接排序”的写法：A 的子树须排在 A0 之前
+        ps = ["A\\X", "A0", "A^", "A", "A\\X\\Y", "A!\\Q", "A~\\Q", "AB\\C", "AB`"]
+        r.shuffle(ps)
+        return f"{len(ps)}\n" + "\n".join(ps) + "\n"
+    big = seed >= 25
+    n = 500 if big else r.randint(2, 120)
+    pool_size = r.choice([3, 6, 12, 40]) if not big else r.choice([4, 8, 30, 200])
+    pool = set(tricky[:min(len(tricky), pool_size // 2)])
+    while len(pool) < pool_size: pool.add(rname())
+    pool = sorted(pool)
+    maxdepth = r.choice([3, 6, 12, 25]) if big else r.randint(1, 8)
+    # 可能的路径数不足时缩小 n（只算长度必不超 80 的深度），避免死循环
+    cap = sum(pool_size ** k for k in range(1, min(maxdepth, 80 // 9) + 1))
+    n = min(n, cap // 2 if cap > 4 else cap)
+    ps = set(); order = []
+    while len(order) < n:
+        dpt = r.randint(1, maxdepth)
+        parts = [r.choice(pool) for _ in range(dpt)]
+        p = "\\".join(parts)
+        while len(p) > 80:
+            parts.pop(); p = "\\".join(parts)
+        if p in ps: continue
+        ps.add(p); order.append(p)
+    return f"{n}\n" + "\n".join(order) + "\n"
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[gen_case(s) for s in range(1, 40)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

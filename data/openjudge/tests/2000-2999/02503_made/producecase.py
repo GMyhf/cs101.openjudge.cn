@@ -148,6 +148,98 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
+import re
+
+def valid(text):
+    """题面：至多 100000 条词典项（每行“英文词 空格 外文词”），一个空行，再是至多 100000 个外文词（每行一个）；
+    每个词是至多 10 个小写字母；外文词在词典中不重复。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if "" not in lines:
+        return False
+    k = lines.index("")
+    dict_lines, msg = lines[:k], lines[k + 1:]
+    if len(dict_lines) > 100000 or len(msg) > 100000:
+        return False
+    w = re.compile(r"[a-z]{1,10}")
+    seen = set()
+    for ln in dict_lines:
+        m = re.fullmatch(r"([a-z]{1,10}) ([a-z]{1,10})", ln)
+        if not m or m.group(2) in seen:
+            return False
+        seen.add(m.group(2))
+    return all(w.fullmatch(x) for x in msg)
+
+
+def g2503(seed, kind):
+    r = random.Random(2503_000 + seed)
+    # 带 _s 后缀的是同类缩小版（约 1/4 规模），控制 data/ 合计 ≤ 10MB；满规模各保留一组
+    sc = 4 if kind.endswith("_s") else 1
+    kind = kind[:-2] if kind.endswith("_s") else kind
+    L = "abcdefghijklmnopqrstuvwxyz"
+    def word(a, b, alpha=L):
+        return "".join(r.choice(alpha) for _ in range(r.randint(a, b)))
+    def uniq(n, a, b, alpha=L):
+        s = set()
+        while len(s) < n:
+            s.add(word(a, b, alpha))
+        out = sorted(s); r.shuffle(out); return out  # 先排序：字符串集合的迭代顺序随 PYTHONHASHSEED 变化
+    if kind == "small":
+        n = r.randint(1, 12)
+        foreign = uniq(n, 1, 10)
+        eng = [word(1, 10) for _ in range(n)]
+        pool = foreign + [word(1, 10) for _ in range(3)] + eng[:2]  # 英文词本身拿来查应得 eh
+        q = [r.choice(pool) for _ in range(r.randint(1, 15))]
+    elif kind == "edge":
+        # 长度 1 与 10 的词、只差一个字母的近似词、重复查询
+        foreign = ["a", "z", "abcdefghij", "abcdefghik", "zzzzzzzzzz", "ab"]
+        eng = ["x", "abcdefghij", "a", "q", "zzzzzzzzzz", "ba"]
+        q = ["a", "b", "abcdefghij", "abcdefghi", "abcdefghik", "zzzzzzzzzz", "zzzzzzzzz", "ab", "ba", "x", "a", "a"]
+        r.shuffle(q)
+    elif kind == "alleh":
+        n = r.randint(1, 2000)
+        foreign = uniq(n, 1, 10, "abcdefghijklm")
+        eng = [word(1, 10) for _ in range(n)]
+        q = [word(1, 10, "nopqrstuvwxyz") for _ in range(r.randint(1, 2000))]
+    elif kind == "mid":
+        n = r.randint(1000, 8000)
+        foreign = uniq(n, 1, 10)
+        eng = [word(1, 10) for _ in range(n)]
+        q = [r.choice(foreign) if r.random() < 0.7 else word(1, 10) for _ in range(r.randint(1000, 8000))]
+    elif kind == "bigdict":
+        # 满 100000 条词典，短词以控制文件大小
+        foreign = uniq(100000 // sc, 4, 4)
+        eng = [word(1, 2) for _ in range(100000 // sc)]
+        q = [r.choice(foreign) if r.random() < 0.8 else word(4, 4) for _ in range(40000 // sc)]
+    elif kind == "bigmsg":
+        # 满 100000 个待译词
+        foreign = uniq(40000 // sc, 4, 4)
+        eng = [word(1, 2) for _ in range(40000 // sc)]
+        q = [r.choice(foreign) if r.random() < 0.8 else word(1, 4) for _ in range(100000 // sc)]
+    elif kind == "both":
+        # 词典与消息同时满 100000：外文词取全部 1..3 字母词（a..m 单字母除外）再补 4 字母词，
+        # 英文词 1 个字母，查询以单字母为主，整组控制在 1e6 字节内
+        short = [w for w in (a + b + c for a in [""] + list(L) for b in [""] + list(L) for c in L) if not (len(w) == 1 and w > "m")]
+        short = sorted(set(short))
+        four = set()
+        while len(short) + len(four) < 100000:
+            four.add(word(4, 4))
+        foreign = short + sorted(four); r.shuffle(foreign)
+        four = sorted(four)
+        eng = [r.choice(L) for _ in range(100000)]
+        q = [r.choice(L) if r.random() < 0.75 else (r.choice(four) if r.random() < 0.5 else word(4, 4)) for _ in range(100000)]
+    elif kind == "long":
+        n = 30000 // sc
+        foreign = uniq(n, 9, 10)
+        eng = [word(9, 10) for _ in range(n)]
+        q = [r.choice(foreign) if r.random() < 0.6 else r.choice(foreign)[:-1] + r.choice(L) for _ in range(n)]
+    rows = [f"{e} {f}" for e, f in zip(eng, foreign)]
+    return "\n".join(rows) + "\n\n" + "\n".join(q) + "\n"
+
+
+PLAN2503 = ["edge"] + ["small"] * 14 + ["alleh"] * 3 + ["mid"] * 12 + ["bigdict"] + ["both"] + ["bigdict_s"] + ["bigmsg"] + ["bigmsg_s"] * 2 + ["long"] + ["long_s"] * 2
+
 REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02503/statistics/\n# Accepted submission: 51766135\n# Source: http://cs101.openjudge.cn/practice/solution/51766135/\n# License: not declared on the submission page; no license is inferred.\n\nd = {}\nwhile True:\n    inp = input().split()\n    if not inp:\n        break\n    d[inp[1]] = inp[0]\nwhile True:\n    try:\n        inp = input()\n        if inp not in d:\n            print('eh')\n        else:\n            print(d[inp])\n    except EOFError:\n        break\n"
 LANGUAGE='Python3'
 NUMBER=2503
@@ -159,7 +251,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [g2503(s,k) for s,k in enumerate(PLAN2503, start=1)])
+  assert all(valid(x) for x in cases)
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

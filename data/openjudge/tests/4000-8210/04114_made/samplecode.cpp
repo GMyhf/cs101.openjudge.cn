@@ -1,6 +1,7 @@
 // External reference: cs101.openjudge.cn practice/04114 statistics, Accepted solution 52510171.
 // Source: http://cs101.openjudge.cn/practice/solution/52510171/
 // License: no explicit license stated on the submission page; retained as an external platform reference.
+// Local patch (2026-10): 补上「所有端点重合 -> Yes!」的特判，其余逻辑未改。
 
 #include <iostream>
 #include <vector>
@@ -50,11 +51,13 @@ void solve() {
     }
 
     bool found = false;
+    bool distinct = false;  // 本地补丁：是否存在两个不重合的端点
     int m = pts.size();
     for (int i = 0; i < m && !found; ++i) {
         for (int j = i + 1; j < m && !found; ++j) {
             // 距离太近的点不能构成直线
             if (abs(pts[i].x - pts[j].x) < EPS && abs(pts[i].y - pts[j].y) < EPS) continue;
+            distinct = true;
 
             bool ok = true;
             for (int k = 0; k < n; ++k) {
@@ -66,6 +69,9 @@ void solve() {
             if (ok) found = true;
         }
     }
+
+    // 本地补丁：所有端点重合时投影都是同一点，答案为 Yes!（原 AC 解在 n>=3 时会输出 No!）
+    if (!distinct) found = true;
 
     if (found) cout << "Yes!" << endl;
     else cout << "No!" << endl;

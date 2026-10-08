@@ -4,80 +4,65 @@
 # Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md
 # Upstream problem: http://cs101.openjudge.cn/practice/02049/
 # License: not declared; no license is inferred.
+# 本地修订：原代码用普通 BFS（入队即标记访问）累计门数，求的是“步数最短路径上的门数”，
+# 不是最少门数；改为 0-1 BFS（不过门代价 0、过门代价 1）。
+# 2026-10-08 本地修正：上面引用的原始代码在题面范围内有缺陷，已按题面改过，与原提交不再逐字一致（见 CHANGELOG）。
 import sys
 from collections import deque
 
-N = 210
-Size = 999999
-INF = 1<<20
-mv = [(1,0),(0,-1),(0,1),(-1,0)]
-mapp = [[[0]*2 for _ in range(N)] for _ in range(N)]
-vis = [[0]*N for _ in range(N)]
-
-def init():
-    global result
-    result = 0
-    for i in range(N):
-        for j in range(N):
-            mapp[i][j] = [0, 0]
-            vis[i][j] = 0
-
-def BFS(x, y):
-    global result
-    q = deque()
-    q.append((x, y, 0))
-    vis[x][y] = 1
-    result = INF
-    while q:
-        t = q.popleft()
-        if t[0] == 0 or t[1] == 0 or t[0] > 198 or t[1] > 198:
-            result = min(result, t[2])
+def main():
+    data = sys.stdin.read().split()
+    p = 0
+    out = []
+    while True:
+        m, n = int(data[p]), int(data[p + 1]); p += 2
+        if m == -1 and n == -1:
+            break
+        # vert[x][y]: 竖直单位段 (x,y)-(x,y+1)；horz[x][y]: 水平单位段 (x,y)-(x+1,y)；0 空 1 墙 2 门
+        vert = [[0] * 201 for _ in range(201)]
+        horz = [[0] * 201 for _ in range(201)]
+        for _ in range(m):
+            x, y, d, t = map(int, data[p:p + 4]); p += 4
+            for k in range(t):
+                if d:
+                    vert[x][y + k] = 1
+                else:
+                    horz[x + k][y] = 1
+        for _ in range(n):
+            x, y, d = map(int, data[p:p + 3]); p += 3
+            if d:
+                vert[x][y] = 2
+            else:
+                horz[x][y] = 2
+        fx, fy = float(data[p]), float(data[p + 1]); p += 2
+        sx, sy = int(fx), int(fy)
+        # 格子 (i,j) 表示 [i,i+1]x[j,j+1]；i 或 j 为 0 或 >=199 的格子在所有墙之外，与 (0,0) 连通
+        if sx <= 0 or sy <= 0 or sx >= 199 or sy >= 199:
+            out.append(0)
             continue
-        for i in range(4):
-            f = [t[0] + mv[i][0], t[1] + mv[i][1]]
-            if i == 0 and not vis[f[0]][f[1]] and mapp[t[0]][t[1]][1] != 3:
-                f.append(t[2] + 1 if mapp[t[0]][t[1]][1] == 4 else t[2])
-                vis[f[0]][f[1]] = 1
-                q.append(tuple(f))
-            elif i == 1 and not vis[f[0]][f[1]] and mapp[f[0]][f[1]][0] != 3:
-                f.append(t[2] + 1 if mapp[f[0]][f[1]][0] == 4 else t[2])
-                vis[f[0]][f[1]] = 1
-                q.append(tuple(f))
-            elif i == 2 and not vis[f[0]][f[1]] and mapp[t[0]][t[1]][0] != 3:
-                f.append(t[2] + 1 if mapp[t[0]][t[1]][0] == 4 else t[2])
-                vis[f[0]][f[1]] = 1
-                q.append(tuple(f))
-            elif i == 3 and not vis[f[0]][f[1]] and mapp[f[0]][f[1]][1] != 3:
-                f.append(t[2] + 1 if mapp[f[0]][f[1]][1] == 4 else t[2])
-                vis[f[0]][f[1]] = 1
-                q.append(tuple(f))
+        INF = 1 << 30
+        dist = [[INF] * 200 for _ in range(200)]
+        dist[sx][sy] = 0
+        dq = deque([(sx, sy)])
+        ans = -1
+        while dq:
+            i, j = dq.popleft()
+            d0 = dist[i][j]
+            if i == 0 or j == 0 or i == 199 or j == 199:
+                ans = d0
+                break
+            for ni, nj, st in ((i + 1, j, vert[i + 1][j]), (i - 1, j, vert[i][j]),
+                               (i, j + 1, horz[i][j + 1]), (i, j - 1, horz[i][j])):
+                if st == 1:
+                    continue
+                c = 1 if st == 2 else 0
+                if d0 + c < dist[ni][nj]:
+                    dist[ni][nj] = d0 + c
+                    if c:
+                        dq.append((ni, nj))
+                    else:
+                        dq.appendleft((ni, nj))
+        out.append(ans)
+    print("\n".join(map(str, out)))
 
-while True:
-    m, n = map(int, input().split())
-    if m == -1 and n == -1:
-        break
-    init()
-    for _ in range(m):
-        x, y, d, t = map(int, input().split())
-        if d:
-            for num in range(t):
-                mapp[x-1][y+num][1] = 3
-        else:
-            for num in range(t):
-                mapp[x+num][y-1][0] = 3
-    for _ in range(n):
-        x, y, d = map(int, input().split())
-        if d:
-            mapp[x-1][y][1] = 4
-        else:
-            mapp[x][y-1][0] = 4
-    Nemo_x, Nemo_y = map(float, input().split())
-    xx, yy = int(Nemo_x + 0.0001), int(Nemo_y + 0.0001)
-    if n == 0 and m == 0:
-        print(0)
-        continue
-    if xx <= 0 or yy <= 0 or xx >= 199 or yy >= 199:
-        print(0)
-    else:
-        BFS(xx, yy)
-        print(result if result != INF else -1)
+main()

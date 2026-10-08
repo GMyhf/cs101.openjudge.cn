@@ -1,5 +1,56 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+import math as _math
+import re as _re
+
+_FLOAT1005 = _re.compile(r"-?\d+(\.\d+)?")
+
+def _far_from_boundary1005(x, y):
+    # 提示 1：点不会恰好落在半圆边界上。这里要求离边界足够远，浮点误差不影响答案
+    v = _math.pi * (x * x + y * y) / 100
+    k = round(v)
+    return k < 1 or abs(v - k) > 1e-6   # 第 0 年“边界”是原点本身，不算
+
+def valid(text):
+    """题面契约（POJ 1005）：首行正整数 N，其后恰 N 行，每行两个浮点数 X Y；
+    Y 非负，(0,0) 不会出现，点不在任何一年的半圆边界上。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not _re.fullmatch(r"[1-9]\d*", lines[0]):
+        return False
+    n = int(lines[0])
+    if len(lines) != n + 1:
+        return False
+    for ln in lines[1:]:
+        t = ln.split(" ")
+        if len(t) != 2 or not all(_FLOAT1005.fullmatch(z) for z in t):
+            return False
+        x, y = float(t[0]), float(t[1])
+        if t[1].startswith("-") or y < 0 or (x == 0 and y == 0):
+            return False
+        if not _far_from_boundary1005(x, y):
+            return False
+    return True
+
+def _fmt1005(v, d):
+    s = f"{v:.{d}f}"
+    return s[1:] if s.startswith("-") and float(s) == 0 else s   # 不写出 -0.000
+
+def gen1005(r, seed):
+    def pt(lo, hi, d=3):
+        while True:
+            x, y = _fmt1005(r.uniform(-hi, hi), d), _fmt1005(r.uniform(lo, hi), d)
+            if float(x) == 0 and float(y) == 0: continue
+            if _far_from_boundary1005(float(x), float(y)): return f"{x} {y}"
+    if seed == 1: rows = ["0.001 0.000"]                                   # 最小规模、极近原点
+    elif seed == 2: rows = ["0.0 5.0", "-5.0 0.0", "5.0 0.0", "0.0 0.1", "-0.1 0.0", "-25.0 0.0", "0.0 25.0"]  # 坐标轴上的点
+    elif seed == 3: rows = ["5.6 0.0", "5.7 0.0", "7.9 0.0", "8.0 0.0", "3.9 3.9", "4.0 4.0"]  # 跨过第 1、2 年边界附近
+    elif seed == 4: rows = ["1000.0 1000.0", "-3000.5 2000.25", "0.0 5000.0", "-9999.999 0.001"]  # 大坐标，年份上百万
+    elif seed >= 33: rows = [pt(0, 1000) for _ in range(r.randint(2000, 20000))]  # 大 N
+    else: rows = [pt(0, 100) for _ in range(r.randint(1, 8) if seed < 20 else r.randint(20, 300))]
+    return f"{len(rows)}\n" + "\n".join(rows) + "\n"
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -118,11 +169,7 @@ def generate(number, seed):
         cases=[f"{r.randint(1,10000)}\n"+" ".join(str(r.randint(1,10000)) for _ in range(5)) for _ in range(r.randint(1,4))];return f"{len(cases)}\n"+"\n".join(cases)+"\n"
     if number==1001:return "\n".join(f"{r.randint(1,999999)/10000:.4f} {r.randint(1,25)}" for _ in range(r.randint(1,6)))+"\n"
     if number==1004:return "\n".join(f"{r.randint(1,100000000)/100:.2f}" for _ in range(12))+"\n"
-    if number==1005:
-        rows=[]
-        for _ in range(r.randint(1,8)):
-            x,y=r.uniform(-100,100),r.uniform(0,100);rows.append(f"{x:.3f} {y:.3f}")
-        return f"{len(rows)}\n"+"\n".join(rows)+"\n"
+    if number==1005:return gen1005(r, seed)
     if number==1021:
         cases=[]
         for _ in range(r.randint(1,3)):

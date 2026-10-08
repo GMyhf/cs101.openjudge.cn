@@ -148,6 +148,141 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
+def _seg_inter(p1,p2,p3,p4):
+    def cr(o,a,b):return (a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0])
+    def on(p,q,r):return min(p[0],q[0])<=r[0]<=max(p[0],q[0]) and min(p[1],q[1])<=r[1]<=max(p[1],q[1])
+    d1=cr(p3,p4,p1);d2=cr(p3,p4,p2);d3=cr(p1,p2,p3);d4=cr(p1,p2,p4)
+    if ((d1>0 and d2<0) or (d1<0 and d2>0)) and ((d3>0 and d4<0) or (d3<0 and d4>0)):return True
+    if d1==0 and on(p3,p4,p1):return True
+    if d2==0 and on(p3,p4,p2):return True
+    if d3==0 and on(p1,p2,p3):return True
+    if d4==0 and on(p1,p2,p4):return True
+    return False
+
+def valid(text):
+    """题面契约：首行 N L（3<=N<=1000，1<=L<=1000），随后 N 行整点 Xi Yi（|Xi|,|Yi|<=10000），
+    顶点互不相同、按顺时针给出、边除顶点外不相交（简单多边形）。"""
+    import re
+    lines=text.split('\n')
+    if not text.endswith('\n'):return False
+    lines=lines[:-1]
+    def ints(s,k):
+        t=s.split()
+        if len(t)!=k or not all(re.fullmatch(r'-?\d+',x) for x in t):return None
+        return list(map(int,t))
+    if not lines:return False
+    h=ints(lines[0],2)
+    if not h:return False
+    N,L=h
+    if not(3<=N<=1000 and 1<=L<=1000) or len(lines)!=N+1:return False
+    P=[]
+    for s in lines[1:]:
+        v=ints(s,2)
+        if not v or not all(-10000<=c<=10000 for c in v):return False
+        P.append(tuple(v))
+    if len(set(P))!=N:return False
+    area=sum(P[i][0]*P[(i+1)%N][1]-P[(i+1)%N][0]*P[i][1] for i in range(N))
+    if area>=0:return False  # 顺时针 => 有向面积为负
+    E=[(P[i],P[(i+1)%N]) for i in range(N)]
+    box=[(min(a[0],b[0]),max(a[0],b[0]),min(a[1],b[1]),max(a[1],b[1])) for a,b in E]
+    for i in range(N):
+        a,b=E[i];c=E[(i+1)%N][1]
+        dx1,dy1=b[0]-a[0],b[1]-a[1];dx2,dy2=c[0]-b[0],c[1]-b[1]
+        if dx1*dy2-dy1*dx2==0 and dx1*dx2+dy1*dy2<0:return False  # 相邻边折返重叠
+    for i in range(N):
+        bi=box[i]
+        for j in range(i+2,N):
+            if i==0 and j==N-1:continue
+            bj=box[j]
+            if bi[1]<bj[0] or bj[1]<bi[0] or bi[3]<bj[2] or bj[3]<bi[2]:continue
+            if _seg_inter(E[i][0],E[i][1],E[j][0],E[j][1]):return False
+    return True
+
+def _wall(P,L):
+    import math
+    pts=sorted(set(P))
+    def cr(o,a,b):return (a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0])
+    lo=[];up=[]
+    for p in pts:
+        while len(lo)>1 and cr(lo[-2],lo[-1],p)<=0:lo.pop()
+        lo.append(p)
+    for p in reversed(pts):
+        while len(up)>1 and cr(up[-2],up[-1],p)<=0:up.pop()
+        up.append(p)
+    h=lo[:-1]+up[:-1]
+    return sum(math.dist(h[i],h[(i+1)%len(h)]) for i in range(len(h)))+2*math.pi*L
+
+def _star(r,N,R,cx,cy,rmin=1,convex=False):
+    import math
+    pts={}
+    tries=0
+    while len(pts)<N and tries<50*N:
+        tries+=1
+        a=r.uniform(0,2*math.pi);rad=R if convex else r.uniform(rmin,R)
+        x=round(cx+rad*math.cos(a));y=round(cy+rad*math.sin(a))
+        if not(-10000<=x<=10000 and -10000<=y<=10000) or (x,y)==(cx,cy):continue
+        ang=math.atan2(y-cy,x-cx)
+        if any(abs(ang-b)<1e-12 for b in ()):continue
+        pts.setdefault(ang,(x,y))
+    order=sorted(pts,reverse=True)  # 角度递减 => 顺时针
+    return [pts[k] for k in order]
+
+def _comb(r,teeth,W,H):
+    # 梳子形：底边 + teeth 个齿，顺时针
+    xs=sorted(r.sample(range(-W,W+1),2*teeth))
+    top=[]
+    for k in range(teeth):
+        x1,x2=xs[2*k],xs[2*k+1];hh=r.randint(1,H)
+        top+=[(x1,0),(x1,hh),(x2,hh),(x2,0)] if False else [(x1,hh),(x2,hh)]
+    pts=[(xs[0],-H)]
+    up=[]
+    for k in range(teeth):
+        x1,x2=xs[2*k],xs[2*k+1];hh=top[2*k][1]
+        if k==0:up+=[(x1,hh),(x2,hh)]
+        else:up+=[(x1,0),(x1,hh),(x2,hh)]
+        if k<teeth-1:up+=[(x2,0)]
+    return [(xs[0],-H)]+up+[(xs[-1],-H)]
+
+def gen1113(seed):
+    import math
+    r=random.Random(1113*1000+seed)
+    while True:
+        L=r.choice([1,1000,r.randint(1,1000)])
+        if seed==1:P=[(0,0),(0,1),(1,0)];L=1
+        elif seed==2:P=[(-10000,-10000),(10000,10000),(10000,-10000)];L=1000
+        elif seed==3:
+            P=[(-10000,-10000),(-10000,10000),(10000,10000),(10000,-10000)];L=1000
+        elif seed<=6:  # 近千点凸多边形（圆上整点）
+            P=_star(r,1000,10000 if seed==4 else r.randint(2000,10000),0,0,convex=True)
+            if len(P)>1000:P=P[:1000]
+        elif seed<=9:  # 带共线点的矩形边：考察共线处理
+            w,hh=r.randint(10,10000),r.randint(10,10000);x0,y0=r.randint(-10000,10000-w),r.randint(-10000,10000-hh)
+            k=r.randint(50,240)
+            left=sorted(set(r.randint(y0+1,y0+hh-1) for _ in range(k)))
+            topp=sorted(set(r.randint(x0+1,x0+w-1) for _ in range(k)))
+            right=sorted(set(r.randint(y0+1,y0+hh-1) for _ in range(k)),reverse=True)
+            bot=sorted(set(r.randint(x0+1,x0+w-1) for _ in range(k)),reverse=True)
+            P=[(x0,y0)]+[(x0,y) for y in left]+[(x0,y0+hh)]+[(x,y0+hh) for x in topp]+[(x0+w,y0+hh)]+[(x0+w,y) for y in right]+[(x0+w,y0)]+[(x,y0) for x in bot]
+            P=P[:1000] if len(P)<=1000 else None
+        elif seed<=13:  # 梳子形，大量凹点
+            t=r.randint(2,249) if seed<13 else 249
+            P=_comb(r,t,10000,10000)
+        elif seed>=36:  # 满规模星形
+            P=_star(r,1000,10000,r.randint(-50,50),r.randint(-50,50),rmin=r.choice([1,5000,9000]))
+        else:
+            N=r.choice([3,4,5,r.randint(3,50),r.randint(50,1000)])
+            R=r.choice([5,100,10000,r.randint(10,10000)])
+            cx=r.randint(-10000+R,10000-R);cy=r.randint(-10000+R,10000-R)
+            P=_star(r,N,R,cx,cy,rmin=1)
+        if not P or len(P)<3:continue
+        P=P[:1000]
+        if seed>3:
+            k=r.randrange(len(P));P=P[k:]+P[:k]
+        x=f'{len(P)} {L}\n'+''.join(f'{a} {b}\n' for a,b in P)
+        v=_wall(P,L)
+        if abs(v-math.floor(v)-0.5)<0.02:continue  # 避开四舍五入临界
+        if valid(x):return x
+
 REFERENCE="# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1113: Wall\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01113/\n# License: not declared; no license is inferred.\nimport math\nN,L=map(int,input().split())\npoints=[]\nfor _ in range(N):\n    points.append(tuple(map(int,input().split())))\ndef cross(o,a,b):\n\t# 矢量叉乘\n    return (a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0])\ndef distance(a,b):\n    return math.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2)\n# 对x坐标进行排序\npoints.sort()\n# 下凸边\nlower=[]\nfor p in points:\n    while len(lower)>1 and cross(lower[-2],lower[-1],p)<=0:\n        lower.pop()\n    lower.append(p)\n# 上凸边\nupper=[]\nfor p in reversed(points):\n    while len(upper)>1 and cross(upper[-2],upper[-1],p)<=0:\n        upper.pop()\n    upper.append(p)\nhull=lower[:-1]+upper[:-1]\nn=len(hull)\nl=0\nfor i in range(n):\n    j=(i+1)%n\n    l+=distance(hull[i],hull[j])\nl+=2*math.pi*L\nprint(f'{l:.0f}')\n"
 LANGUAGE='Python3'
 NUMBER=1113
@@ -159,7 +294,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [gen1113(s) for s in range(1, 40)])
   for i,x in enumerate(cases):
+   assert valid(x),i
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

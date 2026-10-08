@@ -1,5 +1,66 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def _fmt2253(cases):
+    """每个测试后跟一个空行（题面：There's a blank line following each test case），以 0 结束。"""
+    return "".join(f"{len(c)}\n" + "\n".join(f"{x} {y}" for x, y in c) + "\n\n" for c in cases) + "0\n"
+
+def _pts2253(r, n, mode="uniform"):
+    if mode == "cluster":
+        cs = [(r.randint(0, 1000), r.randint(0, 1000)) for _ in range(r.randint(2, 6))]
+        return [(min(1000, max(0, cx + r.randint(-60, 60))), min(1000, max(0, cy + r.randint(-60, 60))))
+                for cx, cy in (r.choice(cs) for _ in range(n))]
+    if mode == "small":
+        return [(r.randint(0, 6), r.randint(0, 6)) for _ in range(n)]  # 大量重合点
+    return [(r.randint(0, 1000), r.randint(0, 1000)) for _ in range(n)]
+
+def gen2253(r, seed):
+    # 参考解是 O(n^3) 的 Floyd：每组 n^3 之和控制在约 1e7（Python 约 3s）以内
+    if seed == 1: return _fmt2253([[(5, 5), (5, 5)], [(0, 0), (0, 0), (1000, 1000)]])          # 重合：0.000
+    if seed == 2: return _fmt2253([[(0, 0), (1000, 1000)], [(1000, 0), (0, 1000)], [(0, 0), (0, 1000)]])
+    if seed == 3:  # 1 与 2 之间一条等距直线：答案远小于直接距离
+        pts = [(0, 0), (995, 0)] + [(5 * i, 0) for i in range(1, 199)]
+        r.shuffle(pts[2:]); return _fmt2253([pts])
+    if seed == 4:  # 其他石头都很远：直接跳最优
+        return _fmt2253([[(500, 500), (503, 504)] + [(r.choice([0, 1000]), r.randint(0, 1000)) for _ in range(198)]])
+    if seed == 5:  # 很多小测试：考场景编号与空行
+        return _fmt2253([_pts2253(r, r.randint(2, 10), r.choice(["uniform", "small"])) for _ in range(60)])
+    if seed <= 10:
+        return _fmt2253([_pts2253(r, r.randint(2, 30), r.choice(["uniform", "cluster", "small"])) for _ in range(r.randint(1, 6))])
+    if seed <= 20:  # 单个 n=200 满规模
+        mode = ["uniform", "cluster", "uniform", "cluster", "small", "uniform", "cluster", "uniform", "cluster", "uniform"][seed - 11]
+        pts = _pts2253(r, 200, mode)
+        if seed % 3 == 0: pts[0], pts[1] = (0, 0), (1000, 1000)
+        return _fmt2253([pts])
+    if seed <= 30:  # 一个 n=200 加若干中小规模
+        cases = [_pts2253(r, 200, r.choice(["uniform", "cluster"]))]
+        cases += [_pts2253(r, r.randint(2, 60), r.choice(["uniform", "cluster", "small"])) for _ in range(r.randint(1, 8))]
+        r.shuffle(cases); return _fmt2253(cases)
+    # n 在 100..160 的两组
+    return _fmt2253([_pts2253(r, r.randint(100, 160), r.choice(["uniform", "cluster"])) for _ in range(2)])
+
+def valid(text):
+    """题面：若干测试；每个首行 n（2<=n<=200），随后 n 行 "xi yi"（0..1000）；每个测试后有一个空行；以 0 结束。"""
+    import re
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n"); k = 0; num = r"(0|[1-9]\d*)"
+    while True:
+        if k >= len(lines) or not re.fullmatch(num, lines[k]):
+            return False
+        n = int(lines[k]); k += 1
+        if n == 0:
+            return k == len(lines)
+        if not 2 <= n <= 200 or k + n >= len(lines):
+            return False
+        for line in lines[k:k + n]:
+            m = re.fullmatch(num + " " + num, line)
+            if not m or not all(0 <= int(v) <= 1000 for v in m.groups()):
+                return False
+        k += n
+        if lines[k] != "":
+            return False
+        k += 1
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -124,10 +185,7 @@ def generate(number, seed):
             n,m=r.randint(2,20),r.randint(1,20);cases.append(f"{n} {m}\n"+"\n".join(" ".join(str(r.randint(1,60)) for _ in range(m)) for _ in range(n)))
         return "\n".join(cases)+"\n0 0\n"
     if number == 2253:
-        cases=[]
-        for _ in range(r.randint(1,4)):
-            n=r.randint(2,30);cases.append(f"{n}\n"+"\n".join(f"{r.randint(0,1000)} {r.randint(0,1000)}" for _ in range(n)))
-        return "\n".join(cases)+"\n0\n"
+        return gen2253(r, seed)
     if number == 2337:
         cases=[]
         for _ in range(r.randint(1,5)):

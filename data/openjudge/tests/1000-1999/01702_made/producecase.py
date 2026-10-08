@@ -417,6 +417,35 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
+# ---- 题面契约与 1702 补充数据 ----
+WMAX = (3 ** 20 - 1) // 2
+def valid(text):
+    """T（1..20）后跟 T 行，每行一个整数 W，1 <= W <= (3^20-1)/2。"""
+    try:
+        if not text.endswith('\n') or '\r' in text: return False
+        lines = text[:-1].split('\n')
+        if not all(ln.isdigit() and ln == str(int(ln)) for ln in lines): return False
+        t = int(lines[0])
+        if not 1 <= t <= 20 or len(lines) != t + 1: return False
+        return all(1 <= int(w) <= WMAX for w in lines[1:])
+    except Exception:
+        return False
+
+def extra_cases():
+    """32..39 组（catalog 固定 40 组，替换原随机组）：边界（W=1、W=上限、3 的幂、(3^k±1)/2）与满 T=20。"""
+    r = random.Random(1702)
+    sets = [
+        [1],
+        [WMAX],
+        list(range(1, 21)),
+        [3 ** k for k in range(20)],
+        [(3 ** k - 1) // 2 for k in range(1, 21)],
+        [(3 ** k + 1) // 2 for k in range(1, 20)] + [WMAX - 1],
+        [r.randint(WMAX - 10 ** 6, WMAX) for _ in range(20)],
+        [r.randint(1, 1000) for _ in range(20)],
+    ]
+    return [f"{len(s)}\n" + "\n".join(map(str, s)) + "\n" for s in sets]
+
 REFERENCE="# External reference: http://cs101.openjudge.cn/practice/01702/statistics/\n# Accepted submission: 51708993\n# Source: http://cs101.openjudge.cn/practice/solution/51708993/\n# License: not declared on the submission page; no license is inferred.\n\ndef trans(x):\n    res = []\n    while x >= 3:\n        res.append(x%3)\n        x //= 3\n    res.append(x)\n    return res\nT = int(input())\nfor _ in range(T):\n    x = int(input())\n    expr = trans(x)+[0]\n    left, right = [], []\n    for i in range(len(expr)):\n        if expr[i] == 0:\n            continue\n        if expr[i] == 1:\n            right.append(3**i)\n        elif expr[i] == 2:\n            left.append(3**i)\n            expr[i+1] += 1\n        else:\n            expr[i+1] += 1\n    if not left:\n        print('empty', end = ' ')\n    else:\n        print(','.join(map(str, left)), end = ' ')\n    print(','.join(map(str, right)))\n"
 LANGUAGE='Python3'
 NUMBER=1702
@@ -428,7 +457,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 32)]+extra_cases()
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

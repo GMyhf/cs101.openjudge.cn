@@ -99,6 +99,25 @@ def generate(number, seed):
             n = r.randint(1, 10); values.append((n, r.randint(1, fence_counts(n))))
         return str(len(values)) + "\n" + "\n".join(f"{n} {c}" for n, c in values) + "\n"
     if number == 1160:
+        if seed >= 26:
+            if seed == 26: V, P = 300, 30; villages = sorted(r.sample(range(1, 10001), V))
+            elif seed == 27: V, P = 300, 1; villages = sorted(r.sample(range(1, 10001), V))
+            elif seed == 28: V, P = 1, 1; villages = [10000]
+            elif seed == 29: V, P = 30, 30; villages = sorted(r.sample(range(1, 10001), V))
+            elif seed == 30: V, P = 300, 30; villages = list(range(1, 301))
+            elif seed == 31: V, P = 300, 30; villages = list(range(9701, 10001))
+            elif seed == 32:
+                V, P = 300, 30; villages = sorted(r.sample(range(1, 121), 100) + r.sample(range(9881, 10001), 100) + r.sample(range(4000, 6000), 100))
+            elif seed == 33: V, P = 300, 29; villages = sorted(r.sample(range(1, 10001), V))
+            elif seed == 34: V, P = 2, 1; villages = [1, 10000]
+            elif seed == 35: V, P = 300, 2; villages = sorted(r.sample(range(1, 10001), V))
+            elif seed == 36:
+                V, P = 300, 30; villages = sorted({min(10000, 1 + i * i // 9) for i in range(300)})
+                while len(villages) < 300: villages = sorted(set(villages) | {r.randint(1, 10000)})
+            elif seed == 37: V, P = 31, 30; villages = sorted(r.sample(range(1, 10001), V))
+            elif seed == 38: V, P = r.randint(200, 299), r.randint(10, 30); villages = sorted(r.sample(range(1, 10001), V))
+            else: V, P = 300, 15; villages = sorted(r.sample(range(1, 10001), V))
+            return f"{V} {P}\n" + " ".join(map(str, villages)) + "\n"
         villages = sorted(r.sample(range(1, 10001), r.randint(1, 100)))
         return f"{len(villages)} {r.randint(1, min(30, len(villages)))}\n" + " ".join(map(str, villages)) + "\n"
     if number == 1944:
@@ -120,6 +139,18 @@ def generate(number, seed):
     raise KeyError(number)
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1160: Post Office\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01160/\n# License: not declared in source collection; no license is inferred.\nimport sys\n# https://blog.csdn.net/u011262722/article/details/9298011\n# uses dynamic programming to efficiently solve the problem of partitioning\n# an array into p subarrays with minimum cost.\n#\n# dp是前i个村庄建j个邮局，dis是在i和j村庄间建邮局的最小距离\n\'\'\'\n【题目大意】：用数轴描述一条高速公路，有V个村庄，每一个村庄坐落在数轴的某个点上，需要选择P个村庄在其中建立邮局，\n要求每个村庄到最近邮局的距离和最小。\n【题目分析】：经典DP\n1、考虑在V个村庄中只建立【一个】邮局的情况，显然可以知道，将邮局建立在中间的那个村庄即可。\n也就是在a到b间建立一个邮局，若使消耗最小，则应该将邮局建立在（a+b)/2这个村庄上。\n2、下面考虑建立【多个】邮局的问题，可以这样将该问题拆分为若干子问题，在前i个村庄中建立j个邮局的最短距离，\n是在前【k】个村庄中建立【j-1】个邮局的最短距离与 在【k+1】到第i个邮局建立【一个】邮局的最短距离的和。\n而建立一个邮局我们在上面已经求出。\n\n3、状态表示，由上面的讨论，可以开两个数组\ndp[i][j]:在前i个村庄中建立j个邮局的最小耗费\ndis[i][j]:在第i个村庄到第j个村庄中建立1个邮局的最小耗费\n那么就有转移方程：dp[i][j] = min(dp[i][j],dp[k][j-1]+dis[k+1][i])\nDP的边界状态即为dp[i][1] = dis[1][i]; 所要求的结果即为dp[village_num][post office_num];\n\n4、然后就说说求sum数组的优化问题，可以假定有6个村庄，村庄的坐标已知分别为p1,p2,p3,p4,p5,p6;\n那么，如果要求sum[1][4]的话邮局需要建立在2或者3处,放在2处的消耗为p4-p2+p3-p2+p2-p1=p4-p2+p3-p1\n放在3处的结果为p4-p3+p3-p2+p3-p1=p4+p3-p2-p1，可见，将邮局建在2处或3处是一样的。\n现在接着求sum[1][5],现在处于中点的村庄是3，那么1-4到3的距离和刚才已经求出了，即为sum[1][4],\n所以只需再加上5到3的距离即可。同样，求sum[1][6]的时候也可以用sum[1][5]加上6到中点的距离。\n所以有递推关系：sum[i][j] = sum[i][j-1] + p[j] -p[(i+j)/2]\n\n\'\'\'\nv, p = map(int, input().split())\nx = [0] + list(map(int, input().split()))\ndis = [[0] * (v + 1) for _ in range(v + 1)]\ndp = [[0] * (v + 1) for _ in range(v + 1)]\nfor i in range(1, v + 1):\n    for j in range(i + 1, v + 1):\n        dis[i][j] = dis[i][j - 1] + x[j] - x[(i + j) // 2]\nfor i in range(1, v + 1):\n    dp[i][i] = 0\n    dp[i][1] = dis[1][i]\nfor j in range(2, p + 1):\n    for i in range(j + 1, v + 1):\n        dp[i][j] = float("inf")\n        for k in range(j - 1, i):\n            dp[i][j] = min(dp[i][j], dp[k][j - 1] + dis[k + 1][i])\nprint(dp[v][p])\n'
+def valid(text):
+    """题面：第一行 V P（1<=V<=300，1<=P<=30，P<=V）；第二行 V 个严格递增的整数，1<=X<=10000。"""
+    import re
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if len(lines)!=2:return False
+    num=r'[1-9][0-9]*'
+    a=lines[0].split(' ');b=lines[1].split(' ')
+    if len(a)!=2 or not all(re.fullmatch(num,x) for x in a+b):return False
+    V,P=map(int,a);x=list(map(int,b))
+    if not(1<=V<=300 and 1<=P<=30 and P<=V and len(x)==V):return False
+    return all(1<=t<=10000 for t in x) and all(x[i]<x[i+1] for i in range(V-1))
 NUMBER=1160
 SAMPLE='10 5\n1 2 3 6 7 9 11 22 44 50\n'
 def run(x):

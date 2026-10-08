@@ -131,7 +131,7 @@ def generate(number, seed):
     if number==2251:
         R,C=3+(seed-1)%7,3+(seed-1)//7;grid=[["."]*C for _ in range(R)];grid[0][0]="S";grid[-1][-1]="E";return f"1 {R} {C}\n"+"\n".join("".join(x) for x in grid)+"\n0 0 0\n"
     if number==2663:return "\n".join(str(r.randint(0,30)) for _ in range(r.randint(1,10)))+"\n-1\n"
-    if number==2745:return "\n".join(f"{r.randint(1,10)} {r.randint(0,99999999)}" for _ in range(r.randint(1,5)))+"\n0 0\n"
+    if number == 2745: return _gen_2745(r, seed)
     if number==2977:return " ".join(str(r.randint(0,365)) for _ in range(4))+"\n"
     if number==2352:
         pts=sorted({(r.randint(0,100),r.randint(0,100)) for _ in range(30)},key=lambda p:(p[1],p[0]));return f"{len(pts)}\n"+"\n".join(f"{x} {y}" for x,y in pts)+"\n"
@@ -152,6 +152,33 @@ REFERENCE="# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.op
 LANGUAGE='Python3'
 NUMBER=2745
 SAMPLE='2 12345\n3 67890\n0 0\n'
+import re as _re
+_INT=_re.compile(r'(0|-?[1-9][0-9]*)$')
+def _int(tok):
+    return int(tok) if _INT.match(tok) else None
+
+def valid(text):
+    """题面：若干行“s n”（1<=s<=10，0<=n<=99999999），以一行“0 0”结束。"""
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if len(lines)<2 or lines[-1]!='0 0':return False
+    for l in lines[:-1]:
+        p=l.split(' ')
+        if len(p)!=2:return False
+        s=_int(p[0]);n=_int(p[1])
+        if s is None or n is None or not 1<=s<=10 or not 0<=n<=99999999:return False
+    return True
+
+def _gen_2745(r, seed):
+    rnd_n = lambda: r.randint(0, 10 ** r.randint(1, 8) - 1)
+    if seed == 1: rows = [(1, 0), (10, 0), (3, 0)]
+    elif seed == 2: rows = [(10, 12345678), (10, 90000000), (10, 99999999), (10, 10101010)]
+    elif seed == 3: rows = [(s, x) for s, x in zip(range(1, 11), [1, 8, 10, 7, 44, 100, 9, 1234, 5, 0])]
+    elif seed == 4: rows = [(1, d * 11111111) for d in range(10)]
+    elif seed == 5: rows = [(10, r.randint(10 ** 7, 10 ** 8 - 1)) for _ in range(50)]
+    else: rows = [(r.randint(1, 10), rnd_n()) for _ in range(r.randint(1, 10))]
+    return "".join(f"{s} {x}\n" for s, x in rows) + "0 0\n"
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]

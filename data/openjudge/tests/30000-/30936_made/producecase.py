@@ -3,7 +3,24 @@ REFERENCE='# External reference: /practice/30936/statistics/\n# Accepted submiss
 SAMPLE='7\n'
 GENERATOR_NAME='g30936'
 CPP=False
-def g30936(r): return f"{r.randint(1,1000)}\n"
+import re
+def valid(text):
+    """题面约束：一行一个整数 N（1<=N<=100000）。"""
+    if text.endswith('\n'):
+        text = text[:-1]
+    if not re.fullmatch(r'[1-9][0-9]*', text):
+        return False
+    return 1 <= int(text) <= 100000
+
+def build_cases():
+    r = random.Random(30936)
+    ns = [1, 2, 3, 4, 5, 6, 8, 9, 15, 16, 17, 31, 32, 33, 100, 1000, 1023, 1024, 1025,
+          4095, 4096, 65535, 65536, 65537, 99999, 100000, 50000, 77777]
+    while len(ns) < 39:
+        v = r.randint(10000, 100000)
+        if v not in ns and v != 7:
+            ns.append(v)
+    return [SAMPLE] + [f"{n}\n" for n in ns]
 
 from pathlib import Path
 import subprocess, sys, tempfile
@@ -20,6 +37,10 @@ def run(text):
         return x.stdout
 def main():
     data=Path('data'); data.mkdir(exist_ok=True)
-    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
-    for i,c in enumerate(cases): (data/f'{i}.in').write_text(c); (data/f'{i}.out').write_text(run(c))
+    cases=build_cases()
+    assert cases[0]==SAMPLE
+    assert len(set(cases))==len(cases), "存在重复测试组"
+    for i,c in enumerate(cases):
+        assert valid(c), f"第 {i} 组不满足题面约束"
+        (data/f'{i}.in').write_text(c); (data/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

@@ -1,4 +1,4 @@
-"""5907 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+"""5907 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 40 组数据。
 
 出处：build_001c
 生成器与循环取自 scripts/build_001c.py（批次 001c），保持同一形状；
@@ -34,7 +34,167 @@ def g5907(r):
         cases.append("\n".join(lines))
     return str(len(cases)) + "\n" + "\n".join(cases) + "\n"
 
+# 题面：t <= 100；每组 n m（1<=n<=100，m<=100），n 行 "X Y Z"（节点标识 0..n-1，-1 为空，根恒为 0），
+# m 行操作 "1 x y"（保证 x、y 不是祖先关系）或 "2 x"。
+def parse_tree(lines, n):
+    """返回 (son, parent) 或 None。"""
+    son = {}
+    for ln in lines:
+        toks = ln.split(" ")
+        if len(toks) != 3:
+            return None
+        try:
+            x, y, z = map(int, toks)
+        except ValueError:
+            return None
+        if any(str(v) != tok for v, tok in zip((x, y, z), toks)):
+            return None
+        if not 0 <= x < n or x in son or not all(-1 <= c < n for c in (y, z)):
+            return None
+        son[x] = [y, z]
+    parent = {}
+    for x, (y, z) in son.items():
+        for d, c in enumerate((y, z)):
+            if c == -1:
+                continue
+            if c == 0 or c in parent:
+                return None
+            parent[c] = (x, d)
+    if len(parent) != n - 1:
+        return None
+    seen = set(); stack = [0]
+    while stack:
+        u = stack.pop(); seen.add(u)
+        stack += [c for c in son[u] if c != -1]
+    return (son, parent) if len(seen) == n else None
+
+
+def is_ancestor(parent, a, b):
+    while True:
+        if a == b:
+            return True
+        if b not in parent:
+            return False
+        b = parent[b][0]
+
+
+def valid(text):
+    if not text.endswith("\n") or "\r" in text:
+        return False
+    lines = text[:-1].split("\n")
+    if not lines[0].isdigit() or str(int(lines[0])) != lines[0]:
+        return False
+    t = int(lines[0]); i = 1
+    if not 1 <= t <= 100:
+        return False
+    for _ in range(t):
+        if i >= len(lines):
+            return False
+        hd = lines[i].split(" ")
+        if len(hd) != 2 or not all(h.isdigit() and str(int(h)) == h for h in hd):
+            return False
+        n, m = map(int, hd); i += 1
+        if not (1 <= n <= 100 and 0 <= m <= 100) or i + n + m > len(lines):
+            return False
+        tr = parse_tree(lines[i:i + n], n)
+        if tr is None:
+            return False
+        son, parent = tr; i += n
+        for ln in lines[i:i + m]:
+            toks = ln.split(" ")
+            if not all(x.isdigit() and str(int(x)) == x for x in toks):
+                return False
+            v = list(map(int, toks))
+            if v[0] == 1 and len(v) == 3 and all(0 <= x < n for x in v[1:]):
+                a, b = v[1], v[2]
+                if is_ancestor(parent, a, b) or is_ancestor(parent, b, a):
+                    return False
+                fa, da = parent[a]; fb, db = parent[b]
+                son[fa][da] = b; son[fb][db] = a
+                parent[a], parent[b] = (fb, db), (fa, da)
+            elif v[0] == 2 and len(v) == 2 and 0 <= v[1] < n:
+                pass
+            else:
+                return False
+        i += m
+    return i == len(lines)
+
+
+def make_tree(r, n, shape):
+    """返回 children 列表（按标识），根为 0，其余标识随机打乱。"""
+    pos = [[-1, -1] for _ in range(n)]       # 先按位置 0..n-1 建树，位置 0 为根
+    for i in range(1, n):
+        if shape == "left":
+            pos[i - 1][0] = i
+        elif shape == "right":
+            pos[i - 1][1] = i
+        elif shape == "zig":
+            pos[i - 1][i % 2] = i
+        elif shape == "full":
+            pos[(i - 1) // 2][(i - 1) % 2] = i
+        else:
+            while True:
+                p = r.randrange(i) if shape == "rand" else r.randint(max(0, i - 3), i - 1)
+                free = [d for d in (0, 1) if pos[p][d] == -1]
+                if free:
+                    pos[p][r.choice(free)] = i
+                    break
+    label = [0] + r.sample(range(1, n), n - 1)
+    son = [None] * n
+    for i in range(n):
+        son[label[i]] = [label[c] if c != -1 else -1 for c in pos[i]]
+    return son
+
+
+def tree_group(r, n, m, shape, swap_p):
+    son = make_tree(r, n, shape)
+    parent = {}
+    for x in range(n):
+        for d, c in enumerate(son[x]):
+            if c != -1:
+                parent[c] = (x, d)
+    lines = [f"{n} {m}"]
+    order = list(range(n)); r.shuffle(order)
+    if r.random() < 0.5:
+        order = list(range(n))
+    lines += [f"{x} {son[x][0]} {son[x][1]}" for x in order]
+    for _ in range(m):
+        done = False
+        if n >= 3 and r.random() < swap_p:
+            for _ in range(50):
+                a, b = r.sample(range(1, n), 2)
+                if not is_ancestor(parent, a, b) and not is_ancestor(parent, b, a):
+                    fa, da = parent[a]; fb, db = parent[b]
+                    son[fa][da] = b; son[fb][db] = a
+                    parent[a], parent[b] = (fb, db), (fa, da)
+                    lines.append(f"1 {a} {b}"); done = True
+                    break
+        if not done:
+            lines.append(f"2 {r.choice([0, r.randrange(n)])}")
+    return "\n".join(lines)
+
+
+def g5907_hard(r, kind):
+    groups = []
+    if kind == "min":
+        groups = [tree_group(r, 1, 1, "rand", 0), tree_group(r, 1, 0, "rand", 0), tree_group(r, 2, 3, "rand", 0)]
+    elif kind == "max":
+        groups = [tree_group(r, 100, 100, r.choice(["rand", "full", "cat", "left", "zig"]), r.choice([0.3, 0.5, 0.7]))
+                  for _ in range(100)]
+    else:
+        for _ in range(r.randint(1, 30)):
+            n = r.choice([r.randint(1, 10), r.randint(1, 100), 100])
+            groups.append(tree_group(r, n, r.randint(0, 100), r.choice(["rand", "full", "cat", "left", "right", "zig"]),
+                                     r.choice([0.2, 0.5, 0.8])))
+    return str(len(groups)) + "\n" + "\n".join(groups) + "\n"
+
+
 def build_cases():
+    kinds = ["min", "max", "max", "max"] + ["mix"] * 16
+    return build_cases_base() + [g5907_hard(random.Random(NUMBER * 100 + i), k) for i, k in enumerate(kinds)]
+
+
+def build_cases_base():
     cases = [SAMPLE_IN]
     for i in range(1, 20):
         for attempt in range(100):

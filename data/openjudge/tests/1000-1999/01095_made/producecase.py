@@ -417,6 +417,36 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
+def valid(text):
+    """题面契约：每行一个整数 n，1<=n<=500000000，以单独一行 0 结束，其后无内容。"""
+    import re
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if not lines or lines[-1].strip()!='0' or len(lines)<2:return False
+    for s in lines[:-1]:
+        s=s.strip()
+        if not re.fullmatch(r'[1-9]\d*',s) or not 1<=int(s)<=500000000:return False
+    return True
+
+def gen1095(seed):
+    r=random.Random(1095*1000+seed)
+    cat=[1]
+    for i in range(40):cat.append(cat[-1]*(4*i+2)//(i+2))
+    bounds=[];acc=0
+    for c in cat[1:]:
+        acc+=c
+        if acc>500000000:break
+        bounds.append(acc)
+    if seed==1:vals=list(range(1,301))
+    elif seed==2:vals=[x+d for x in bounds for d in (-1,0,1,2) if 1<=x+d<=500000000]
+    elif seed==3:vals=[500000000,499999999,477638700,477638701,477638699,1,2,3,4]
+    elif seed>=35:vals=[r.randint(1,500000000) for _ in range(2000)]
+    else:
+        hi=[10**3,10**5,10**7,500000000][seed%4]
+        vals=[r.randint(1,hi) for _ in range(r.randint(5,60))]
+    vals=[v for v in vals if 1<=v<=500000000]
+    return '\n'.join(map(str,vals))+'\n0\n'
+
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01095/statistics/\n# Accepted submission: 52165931\n# Source: http://cs101.openjudge.cn/practice/solution/52165931/\n# License: not declared on the submission page; no license is inferred.\n\ncata=[1]\ns=500000000\ni=0\nwhile s>0:\n    cata.append(cata[i]*(4*i+2)//(i+2))\n    s-=cata[-1]\n    i+=1\ndef build(m,k):\n    if m==1:\n        return "X"\n    l=0\n    while k > cata[l] * cata[m-1-l]:\n        k -= cata[l] * cata[m-1-l]\n        l += 1\n    lk = (k - 1) // cata[m-1-l] + 1\n    rk =k-(lk-1)*(cata[m-1-l])\n    left = f"({build(l, lk)})" if l != 0 else ""\n    right = f"({build(m-1-l, rk)})" if (m-1-l) != 0 else ""\n    return left + "X" + right\n\nwhile True:\n    n=int(input())\n    x=n\n    if n==0:\n        break\n    else:\n        i=1\n        x=0\n        while x+cata[i]<n:\n            x+=cata[i]\n            i+=1\n        n-=x\n        print(build(i,n))\n'
 LANGUAGE='Python3'
 NUMBER=1095
@@ -428,7 +458,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[gen1095(s) for s in range(1, 40)]
   for i,x in enumerate(cases):
+   assert valid(x),i
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

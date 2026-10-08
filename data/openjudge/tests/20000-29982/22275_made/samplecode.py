@@ -11,4 +11,5 @@ def solve(text):
 
 if __name__ == '__main__':
     import sys
+    sys.setrecursionlimit(10000)  # 链状树深度可达 2000
     sys.stdout.write(solve(sys.stdin.read()))

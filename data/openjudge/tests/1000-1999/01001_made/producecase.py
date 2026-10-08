@@ -1,5 +1,58 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+import re as _re
+
+def valid(text):
+    """题面契约（POJ 1001）：若干行，每行 R 占第 1-6 列、n 占第 8-9 列；
+    0.0 < R < 99.999，0 < n <= 25。"""
+    if not text or not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if not lines:
+        return False
+    for ln in lines:
+        if len(ln) != 9 or ln[6] != " ":
+            return False
+        rs, ns = ln[:6], ln[7:9]
+        if not _re.fullmatch(r"\d*\.\d*", rs) or not _re.search(r"\d", rs):
+            return False
+        if not _re.fullmatch(r" \d|\d\d", ns) or ns[0] == "0":
+            return False
+        from decimal import Decimal
+        R = Decimal(rs)
+        n = int(ns)
+        if not (Decimal(0) < R < Decimal("99.999")) or not (0 < n <= 25):
+            return False
+    return True
+
+def _fmt1001(R, n):
+    # R 为 (整数位数, 整数部分, 小数串)，按 6 列宽、n 占 8-9 列写出
+    return f"{R} {n:2d}"
+
+def gen1001(r, seed):
+    def rand_R():
+        if r.random() < 0.5:
+            v = r.randint(1, 99999)          # d.dddd，0.0001 .. 9.9999
+            return f"{v // 10000}.{v % 10000:04d}"
+        v = r.randint(10000, 99998)          # dd.ddd，10.000 .. 99.998
+        return f"{v // 1000}.{v % 1000:03d}"
+    fixed = {
+        1: ["1.0000 25", "1.0000  1", "2.0000 25", "10.000 25", "99.000 25", "50.000  2", "9.0000 13"],
+        2: ["0.0001 25", "0.0010 25", "0.0100 25", "0.1000 25", "0.0001  1", "0.0002 24"],
+        3: ["1.5000 25", "0.5000 25", "12.500  3", "0.2500 10", "2.5000  2", "0.1250  8", "20.500  4"],
+        4: ["95.120  1", "0.1000  1", "99.998  1", "5.0000  1", "0.0500  1", "10.010  1"],
+        5: ["99.998 25", "99.997 25", "98.999 25", "9.9999 25", "0.9999 25", "99.990 25"],
+    }
+    if seed in fixed:
+        rows = fixed[seed]
+    else:
+        cnt = r.randint(1, 8) if seed < 20 else r.randint(30, 300)
+        rows = [_fmt1001(rand_R(), r.randint(1, 25)) for _ in range(cnt)]
+        if seed % 3 == 0:  # 混入整数结果、全小数结果
+            rows.insert(r.randrange(len(rows) + 1), f"{r.randint(1, 9)}.0000 {r.randint(1, 25):2d}")
+            rows.insert(r.randrange(len(rows) + 1), f"0.{r.randint(1, 9999):04d} {r.randint(1, 25):2d}")
+    return "\n".join(rows) + "\n"
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -116,7 +169,7 @@ def generate(number, seed):
         n=r.randint(1,8);m=r.randint(1,15);xs=sorted(r.sample(range(5,95),n));toys=[(r.randint(1,99),r.randint(1,9)) for _ in range(m)];return f"{n} {m} 0 10 100 0\n"+"\n".join(f"{x} {x}" for x in xs)+"\n"+"\n".join(f"{x} {y}" for x,y in toys)+"\n0\n"
     if number==3129:
         cases=[f"{r.randint(1,10000)}\n"+" ".join(str(r.randint(1,10000)) for _ in range(5)) for _ in range(r.randint(1,4))];return f"{len(cases)}\n"+"\n".join(cases)+"\n"
-    if number==1001:return "\n".join(f"{r.randint(1,999999)/10000:.4f} {r.randint(1,25)}" for _ in range(r.randint(1,6)))+"\n"
+    if number==1001:return gen1001(r, seed)
     if number==1004:return "\n".join(f"{r.randint(1,100000000)/100:.2f}" for _ in range(12))+"\n"
     if number==1005:
         rows=[]

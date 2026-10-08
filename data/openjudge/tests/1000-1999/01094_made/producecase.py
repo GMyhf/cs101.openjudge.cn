@@ -161,9 +161,80 @@ def run(x):
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout
+def valid(text):
+    """题面契约：多组，每组首行两个正整数 n m（2<=n<=26，m>=1 为关系数），随后 m 行形如 X<Y，
+    字母均在前 n 个大写字母内；以 0 0 结束，结束行后无其他内容。"""
+    import re
+    lines=text.split('\n')
+    if not text.endswith('\n'):return False
+    lines=lines[:-1]
+    i=0;inst=0
+    while True:
+        if i>=len(lines):return False
+        t=lines[i].split()
+        if len(t)!=2 or not all(re.fullmatch(r'\d+',x) for x in t):return False
+        n,m=map(int,t);i+=1
+        if n==0 and m==0:break
+        if not 2<=n<=26 or m<1:return False
+        for _ in range(m):
+            if i>=len(lines):return False
+            s=lines[i].strip();i+=1
+            if len(s)!=3 or s[1]!='<':return False
+            for c in (s[0],s[2]):
+                if not ('A'<=c<=chr(64+n)):return False
+        inst+=1
+    return i==len(lines) and inst>=1
+
+def _inst(r,n,kind):
+    if n==2 and kind=='undet':kind='sorted'   # n=2 且 m>=1 时不可能无法确定
+    L=[chr(65+i) for i in range(n)]
+    perm=L[:];r.shuffle(perm)
+    pos={c:i for i,c in enumerate(perm)}
+    if kind=='sorted':
+        # 相邻链 + 随机前向冗余边，打乱顺序；末尾可能追加矛盾边（应被忽略）
+        rel=[(perm[i],perm[i+1]) for i in range(n-1)]
+        for _ in range(r.randint(0,2*n)):
+            a,b=sorted(r.sample(range(n),2));rel.append((perm[a],perm[b]))
+        r.shuffle(rel)
+        if r.random()<.5:
+            a,b=sorted(r.sample(range(n),2));rel.append((perm[b],perm[a]))
+    elif kind=='incons':
+        rel=[]
+        for _ in range(r.randint(0,3*n)):
+            a,b=sorted(r.sample(range(n),2));rel.append((perm[a],perm[b]))
+        k=r.randint(2,n);cyc=r.sample(L,k)
+        cy=[(cyc[i],cyc[(i+1)%k]) for i in range(k)]
+        rel+=cy;r.shuffle(rel)
+        for _ in range(r.randint(0,n)):
+            a,b=r.sample(range(n),2);rel.append((L[a],L[b]))
+    else:  # undetermined：缺一条相邻边
+        miss=r.randrange(n-1);rel=[]
+        for i in range(n-1):
+            if i!=miss:rel.append((perm[i],perm[i+1]))
+        for _ in range(r.randint(0,2*n)):
+            a,b=sorted(r.sample(range(n),2))
+            if not(a==miss and b==miss+1):rel.append((perm[a],perm[b]))
+        r.shuffle(rel)
+        if r.random()<.3:rel=rel[:r.randint(1,len(rel))]
+    return f'{n} {len(rel)}\n'+''.join(f'{a}<{b}\n' for a,b in rel)
+
+def gen1094(seed):
+    r=random.Random(1094*1000+seed)
+    kinds=['sorted','incons','undet']
+    if seed<=3:   # 最小规模 n=2 的三类分支
+        parts=[_inst(r,2,k) for k in kinds]+['2 1\nA<B\n','2 1\nB<A\n','2 2\nA<B\nB<A\n']
+    elif seed<=6: # n=26 满字母
+        parts=[_inst(r,26,kinds[(seed+j)%3]) for j in range(6)]+['26 1\nA<Z\n']
+    elif seed>=36: # 大量实例
+        parts=[_inst(r,r.choice([2,26,r.randint(2,26)]),r.choice(kinds)) for _ in range(300)]
+    else:
+        parts=[_inst(r,r.randint(2,26),kinds[(seed+j)%3]) for j in range(r.randint(1,8))]
+        r.shuffle(parts)
+    return ''.join(parts)+'0 0\n'
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[gen1094(s) for s in range(1, 40)]):
+  assert valid(x),i
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

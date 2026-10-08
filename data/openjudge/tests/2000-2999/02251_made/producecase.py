@@ -1,5 +1,94 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def _fmt2251(dungeons):
+    """每层后恰好一个空行（题面：There's a single blank line after each level）。"""
+    parts=[]
+    for g in dungeons:
+        L,R,C=len(g),len(g[0]),len(g[0][0])
+        parts.append(f"{L} {R} {C}\n"+"".join("\n".join("".join(row) for row in lev)+"\n\n" for lev in g))
+    return "".join(parts)+"0 0 0\n"
+
+def _rand2251(r,L,R,C,p,trap=False):
+    if L*R*C<2:C=2  # 至少两格放 S、E
+    g=[[["#" if r.random()<p else "." for _ in range(C)] for _ in range(R)] for _ in range(L)]
+    cells=[(l,i,j) for l in range(L) for i in range(R) for j in range(C)]
+    a,b=r.sample(cells,2)
+    g[a[0]][a[1]][a[2]]="S";g[b[0]][b[1]][b[2]]="E"
+    if trap:  # 把 E 用石头封死
+        l,i,j=b
+        for dl,di,dj in ((1,0,0),(-1,0,0),(0,1,0),(0,-1,0),(0,0,1),(0,0,-1)):
+            x,y,z=l+dl,i+di,j+dj
+            if 0<=x<L and 0<=y<R and 0<=z<C and g[x][y][z]!="S":g[x][y][z]="#"
+    return g
+
+def _snake2251(L,R,C):
+    """偶数层是蛇形通道，奇数层全石头只留一个洞连接上下：最短路很长。"""
+    order=[]
+    for i in range(0,R,2):
+        cols=range(C) if (i//2)%2==0 else range(C-1,-1,-1)
+        order+=[(i,j) for j in cols]
+        if i+1<R:order.append((i+1,C-1 if (i//2)%2==0 else 0))
+    g=[[["#"]*C for _ in range(R)] for _ in range(L)]
+    pos=order[0];last=None
+    for l in range(L):
+        if l%2==0:
+            path=order if pos==order[0] else order[::-1]
+            for i,j in path:g[l][i][j]="."
+            pos=path[-1];last=(l,)+pos
+        else:
+            g[l][pos[0]][pos[1]]=".";last=(l,)+pos
+    g[0][order[0][0]][order[0][1]]="S";g[last[0]][last[1]][last[2]]="E"
+    return g
+
+def gen2251(r,seed):
+    if seed==1:return _fmt2251([[[list("SE")]]])                                   # 1x1x2：1 分钟
+    if seed==2:return _fmt2251([[[["E"]],[["S"]]]])                               # 2x1x1：上下相邻，1 分钟
+    if seed==3:
+        g=[[["."]*30 for _ in range(30)] for _ in range(30)];g[0][0][0]="S";g[29][29][29]="E";return _fmt2251([g])   # 87
+    if seed==4:
+        g=[[["."]*30 for _ in range(30)] for _ in range(30)];g[0][0][0]="S";g[15][15][15]="E"
+        for dl,di,dj in ((1,0,0),(-1,0,0),(0,1,0),(0,-1,0),(0,0,1),(0,0,-1)):g[15+dl][15+di][15+dj]="#"
+        return _fmt2251([g])                                                       # 全开但 E 被封：Trapped
+    if seed==5:return _fmt2251([_snake2251(30,30,30)])
+    if seed==6:return _fmt2251([_snake2251(29,30,29),_snake2251(30,29,30)])
+    if seed==7:return _fmt2251([_snake2251(1,30,30),_snake2251(30,1,1),_snake2251(1,1,30)])
+    if seed<=14:  # 多个小地牢，逃出/被困混合
+        return _fmt2251([_rand2251(r,r.randint(1,6),r.randint(1,6),r.randint(1,6),r.choice([.1,.3,.45,.6]),r.random()<.2) for _ in range(r.randint(2,12))])
+    if seed<=26:  # 满规模随机
+        p=[.05,.2,.3,.35,.4,.45,.5,.55,.3,.25,.35,.4][seed-15]
+        return _fmt2251([_rand2251(r,30,30,30,p,seed==26)])
+    if seed<=32:  # 多个中大规模
+        return _fmt2251([_rand2251(r,r.randint(10,30),r.randint(10,30),r.randint(10,30),r.uniform(.15,.5),r.random()<.15) for _ in range(r.randint(2,5))])
+    # 细长形状
+    shapes=[(1,30,30),(30,1,30),(30,30,1),(30,1,1),(1,1,30),(2,30,30),(30,2,2)]
+    L,R,C=shapes[seed-33]
+    return _fmt2251([_rand2251(r,L,R,C,.25),_rand2251(r,L,R,C,.1)])
+
+def valid(text):
+    """题面：若干地牢；每个以 "L R C" 开头（1..30），随后 L 块、每块 R 行 C 个字符（'#' '.' 'S' 'E'），
+    每层之后恰好一个空行；以 "0 0 0" 结束。另按描述要求每个地牢恰有一个 S、一个 E。"""
+    import re
+    if not text.endswith("\n"):
+        return False
+    lines=text[:-1].split("\n");k=0
+    while True:
+        if k>=len(lines):return False
+        m=re.fullmatch(r"(\d+) (\d+) (\d+)",lines[k]);k+=1
+        if not m:return False
+        L,R,C=map(int,m.groups())
+        if (L,R,C)==(0,0,0):return k==len(lines)
+        if not all(1<=v<=30 for v in (L,R,C)):return False
+        cnt={"S":0,"E":0}
+        for _ in range(L):
+            if k+R>=len(lines):return False
+            for row in lines[k:k+R]:
+                if len(row)!=C or set(row)-set("#.SE"):return False
+                cnt["S"]+=row.count("S");cnt["E"]+=row.count("E")
+            k+=R
+            if lines[k]!="":return False
+            k+=1
+        if cnt!={"S":1,"E":1}:return False
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -128,8 +217,7 @@ def generate(number, seed):
         for _ in range(r.randint(1,3)):
             w=h=r.randint(4,12);n=r.randint(1,min(12,w*h));p=r.sample([(x,y) for x in range(w) for y in range(h)],n);q=p[:] if r.random()<.5 else r.sample([(x,y) for x in range(w) for y in range(h)],n);cases.append(f"{w} {h} {n}\n"+" ".join(f"{x} {y}" for x,y in p)+"\n"+" ".join(f"{x} {y}" for x,y in q))
         return f"{len(cases)}\n"+"\n".join(cases)+"\n"
-    if number==2251:
-        R,C=3+(seed-1)%7,3+(seed-1)//7;grid=[["."]*C for _ in range(R)];grid[0][0]="S";grid[-1][-1]="E";return f"1 {R} {C}\n"+"\n".join("".join(x) for x in grid)+"\n0 0 0\n"
+    if number==2251:return gen2251(r,seed)
     if number==2663:return "\n".join(str(r.randint(0,30)) for _ in range(r.randint(1,10)))+"\n-1\n"
     if number==2745:return "\n".join(f"{r.randint(1,10)} {r.randint(0,99999999)}" for _ in range(r.randint(1,5)))+"\n0 0\n"
     if number==2977:return " ".join(str(r.randint(0,365)) for _ in range(4))+"\n"

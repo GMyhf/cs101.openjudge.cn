@@ -368,10 +368,25 @@ def generate(number, seed):
     if number == 2679:
         return f"{r.randint(1,10000)}\n"
     if number == 2696:
+        # div/mod 只用非负被除数、正除数：负数时 C 的截断与 Python 的向下取整结果不同，题面没规定取哪种
         ops = ["add", "sub", "mul", "div", "mod"]; rows = []
-        for _ in range(r.randint(1, 10)):
-            op = r.choice(ops); a, b = r.randint(-10000, 10000), r.randint(1, 10000)
-            rows.append(f"{a} {op} {b}")
+        def row(op, small=False):
+            hi = 20 if small else 10000
+            if op in ("div", "mod"):
+                return f"{r.randint(0, hi)} {op} {r.randint(1, hi)}"
+            return f"{r.randint(-hi, hi)} {op} {r.randint(-hi, hi)}"
+        if seed == 1:  # 最小规模
+            return "1\n7 mod 7\n"
+        if seed == 2:  # 边界：0、1、被除数小于除数、整除、最大值相乘
+            rows = ["0 add 0", "0 div 1", "0 mod 1", "5 div 7", "5 mod 7", "10000 div 1", "10000 mod 10000",
+                    "9999 div 10000", "10000 mul 10000", "-10000 mul 10000", "-10000 sub 10000", "10000 add 10000",
+                    "1 sub 1", "-1 add -1", "12 div 4", "12 mod 4", "0 mul -9999", "-5 sub -7"]
+        elif seed <= 4:  # 大组
+            rows = [row(r.choice(ops)) for _ in range(2000 if seed == 3 else 5000)]
+        else:
+            k = r.randint(1, 30); small = seed % 3 == 0
+            rows = [row(ops[i % 5] if i < 5 else r.choice(ops), small) for i in range(k)]
+            r.shuffle(rows)
         return f"{len(rows)}\n" + "\n".join(rows) + "\n"
     if number == 2713:
         n = r.randint(5, 20); top = r.randint(1, n-4); bottom = r.randint(top+2, n-2); left = r.randint(1, n-4); right = r.randint(left+2, n-2)
@@ -416,6 +431,21 @@ def generate(number, seed):
             chunks.append(f"{capacity}\n{count}\n" + " ".join(str(x) for pair in metals for x in pair))
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
+
+def valid(text):
+    """题面：第一行表达式个数 n，其后 n 行每行「整数 运算符 整数」，运算符为 mul/div/add/sub/mod；div/mod 除数不得为 0。"""
+    import re
+    if not text.endswith("\n"): return False
+    lines = text[:-1].split("\n")
+    if not re.fullmatch(r"[1-9]\d*", lines[0]): return False
+    n = int(lines[0])
+    if len(lines) != n + 1: return False
+    for ln in lines[1:]:
+        m = re.fullmatch(r"(-?\d+) (mul|div|add|sub|mod) (-?\d+)", ln)
+        if not m: return False
+        a, op, b = int(m.group(1)), m.group(2), int(m.group(3))
+        if op in ("div", "mod") and b == 0: return False
+    return True
 
 REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02696/statistics/\n# Accepted submission: 51484214\n# Source: http://cs101.openjudge.cn/practice/solution/51484214/\n# License: not declared on the submission page; no license is inferred.\n\ndict1={'mul':'*','div':'//','add':'+','sub':'-','mod':'%'}\nfor _ in range(int(input())):\n    a,x,b=input().split()\n    print(eval(a+dict1[x]+b))\n"
 LANGUAGE='Python3'

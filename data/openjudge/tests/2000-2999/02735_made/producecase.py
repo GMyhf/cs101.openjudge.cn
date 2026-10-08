@@ -50,8 +50,7 @@ def generate(number, seed):
         if seed % 2 == 0:
             board[0][0] = board[0][1] = 1
         return f"{n}\n" + "\n".join(" ".join(map(str, row)) for row in board) + "\n"
-    if number == 2735:
-        return f"{r.randint(1,65535):o}\n"
+    if number == 2735: return _gen_2735(r, seed)
     if number == 2576:
         n = r.randint(1, 24)
         return f"{n}\n" + "\n".join(str(r.randint(1, 450)) for _ in range(n)) + "\n"
@@ -421,6 +420,23 @@ REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02735/statis
 LANGUAGE='Python3'
 NUMBER=2735
 SAMPLE='11\n'
+import re as _re
+_INT=_re.compile(r'(0|-?[1-9][0-9]*)$')
+def _int(tok):
+    return int(tok) if _INT.match(tok) else None
+
+def valid(text):
+    """题面：一行，仅含一个八进制正整数 a，其十进制值在 (0, 65536) 内。"""
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if len(lines)!=1 or not _re.fullmatch(r'[1-7][0-7]*',lines[0]):return False
+    return 0<int(lines[0],8)<65536
+
+_SPECIAL_2735 = [1, 7, 8, 63, 64, 511, 512, 4095, 32767, 32768, 65535, 65528]
+def _gen_2735(r, seed):
+    if seed <= len(_SPECIAL_2735): return f"{_SPECIAL_2735[seed - 1]:o}\n"
+    return f"{r.randint(1, 65535):o}\n"
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]

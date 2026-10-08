@@ -16,6 +16,58 @@ REFERENCE_SOURCE = "def is_robot_making_loop(commands):\n    # 初始位置和�
 
 def g20472(r): return "".join(r.choice("GLR") for _ in range(r.randint(1,20)))+"\n"
 
+def valid(text):
+    """题面契约：一行非空字符串，只含 G、L、R。"""
+    if not text.endswith("\n") or text.count("\n") != 1:
+        return False
+    body = text[:-1]
+    return len(body) >= 1 and set(body) <= set("GLR")
+
+
+def _state(cmd):
+    x = y = 0
+    d = 0
+    for ch in cmd:
+        if ch == "G":
+            x, y = x + (0, 1, 0, -1)[d], y + (1, 0, -1, 0)[d]
+        elif ch == "L":
+            d = (d + 3) % 4
+        else:
+            d = (d + 1) % 4
+    return x, y, d
+
+
+def extra_cases():
+    """补充：只看朝向/只看回原点都会错的情形、无 G、单字符，以及长串。"""
+    out = ["G\n", "L\n", "R\n", "LLLL\n", "GLGLGLGL\n", "GRGRGRGRGG\n",
+           "GLLGLL\n", "GLRGRL\n"]
+    r = random.Random(NUMBER * 3 + 5)
+    # 长串：朝北且回原点(1)、朝北不在原点(0)、不朝北(1)
+    want = [(True, True), (True, False), (False, None), (True, False)]
+    for north, origin in want:
+        while True:
+            cmd = "".join(r.choice("GGLR") for _ in range(r.randint(50000, 100000)))
+            x, y, d = _state(cmd)
+            if north and d != 0:
+                continue
+            if not north and d == 0:
+                continue
+            if north and origin:
+                # 补走回原点：先转向，再走，最后转回北
+                fix = ""
+                if y:
+                    fix += ("LL" if y > 0 else "") + "G" * abs(y) + ("LL" if y > 0 else "")
+                if x:
+                    fix += ("L" if x > 0 else "R") + "G" * abs(x) + ("R" if x > 0 else "L")
+                cmd += fix
+                assert _state(cmd) == (0, 0, 0)
+            elif north and (x, y) == (0, 0):
+                continue
+            out.append(cmd + "\n")
+            break
+    return out
+
+
 def build_cases():
     cases = [SAMPLE_IN]
     for i in range(1, 20):
@@ -26,6 +78,11 @@ def build_cases():
                 break
         else:
             raise AssertionError("生成器多样性不足")
+    for value in extra_cases():
+        if value not in cases:
+            cases.append(value)
+    for value in cases:
+        assert valid(value), "生成的数据越出题面约束"
     return cases
 
 def solve_reference(content):

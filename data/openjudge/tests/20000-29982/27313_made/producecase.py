@@ -4,13 +4,60 @@ REFERENCE='# External reference: statistics page /practice/27313/\n# Accepted su
 SAMPLE='3\n1 2 0\n'
 EXTRA_CASE=None
 GENERATOR_NAME='g27313'
+def valid(text):
+    """题面：第一行 N (2<=N<=50)；第二行 N 个整数，是 0..N-1 的排列（无重复）。"""
+    lines = text.split('\n')
+    if len(lines) != 3 or lines[2] != '':
+        return False
+    if not lines[0].isdigit() or lines[0] != str(int(lines[0])):
+        return False
+    n = int(lines[0])
+    if not 2 <= n <= 50:
+        return False
+    toks = lines[1].split(' ')
+    if len(toks) != n or any(not t.isdigit() or t != str(int(t)) for t in toks):
+        return False
+    return sorted(map(int, toks)) == list(range(n))
+
+def apply_swaps(n, q):
+    a = list(range(n))
+    for i in q:
+        a[i], a[i + 1] = a[i + 1], a[i]
+    return a
+
+def fmt(p):
+    return f"{len(p)}\n{' '.join(map(str, p))}\n"
+
+def zigzag_case(n):
+    # 兔子顺序使相邻兔子先后关系交替（答案为欧拉锯齿数，最大的一类）
+    q = list(range(0, n - 1, 2)) + list(range(1, n - 1, 2))
+    return fmt(apply_swaps(n, q))
+
+# 固定特例：最小规模、题面样例 2、不可达（答案 0）、满规模各类答案
+SPECIAL_CASES = [
+    '2\n1 0\n',            # n=2 唯一可达排列，答案 1
+    '2\n0 1\n',            # n=2 恒等排列不可达，答案 0
+    '4\n2 0 3 1\n',        # 题面样例 2，答案 2
+    fmt(list(range(50))),   # n=50 恒等排列，答案 0
+    fmt(apply_swaps(50, list(range(49)))),           # 兔子 0..48 依次，答案 1
+    fmt(apply_swaps(50, list(range(48, -1, -1)))),   # 兔子 48..0 依次，答案 1
+    zigzag_case(50),
+    zigzag_case(49),
+]
+
 def g27313(r):
-    n = r.randint(3, 50)
-    if r.random() < .6:
-        p = list(range(1, n)) + [0]
-    else:
+    kind = r.random()
+    n = r.choice([r.randint(2, 50), r.randint(40, 50)])
+    q = list(range(n - 1)); r.shuffle(q)
+    p = apply_swaps(n, q)
+    if kind < 0.15:
+        # 任意排列（几乎都不可达）
         p = list(range(n)); r.shuffle(p)
-    return f"{n}\n{' '.join(map(str, p))}\n"
+    elif kind < 0.3 and n >= 3:
+        # 可达排列再随机交换两个位置，构造“差一点”的不可达情形
+        i, j = r.sample(range(n), 2)
+        p[i], p[j] = p[j], p[i]
+    return fmt(p)
 
 def run(text):
     with tempfile.TemporaryDirectory(prefix='producecase-') as d:
@@ -21,6 +68,11 @@ def run(text):
 def scale_case(): return EXTRA_CASE
 def main():
     d=Path('data'); d.mkdir(exist_ok=True)
-    extra=scale_case(); cases=[SAMPLE]+([extra] if extra else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+    extra=scale_case(); fixed=[SAMPLE]+([extra] if extra else [])+SPECIAL_CASES
+    cases=list(fixed); s=0
+    while len(cases)<40:
+        s+=1; c=globals()[GENERATOR_NAME](random.Random(s))
+        if c not in cases: cases.append(c)
+    assert len(cases)==40 and len(set(cases))==40 and all(valid(c) for c in cases)
     for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

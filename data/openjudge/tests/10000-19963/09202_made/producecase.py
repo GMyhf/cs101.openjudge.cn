@@ -63,6 +63,101 @@ def one_graph(r, want_cycle):
     return n, edges
 
 
+def valid(text):
+    """题面：T（1<=T<=5）组；每组 N M（1<=N<=100000，1<=M<=500000），
+    再 M 行各两个不相等的整数 x y（1..N）。按行严格核对。"""
+    lines = text.split("\n")
+    if not lines or lines[-1] != "":
+        return False
+    lines = lines[:-1]
+    pos = 0
+
+    def ints(k):
+        nonlocal pos
+        if pos >= len(lines):
+            return None
+        tok = lines[pos].split()
+        pos += 1
+        if len(tok) != k or not all(t.isdigit() for t in tok):
+            return None
+        return list(map(int, tok))
+
+    head = ints(1)
+    if head is None or not 1 <= head[0] <= 5:
+        return False
+    for _ in range(head[0]):
+        nm = ints(2)
+        if nm is None:
+            return False
+        n, m = nm
+        if not (1 <= n <= 100000 and 1 <= m <= 500000):
+            return False
+        for _ in range(m):
+            e = ints(2)
+            if e is None or e[0] == e[1] or not all(1 <= v <= n for v in e):
+                return False
+    return pos == len(lines)
+
+
+def block(n, edges):
+    return f"{n} {len(edges)}\n" + "".join(f"{u} {v}\n" for u, v in edges)
+
+
+def big_graph(r, n, kind, m):
+    """大图：kind 取 chain / chain_cycle / dag / dag_cycle。编号随机打乱，
+    m 受单组 .in ≤ 1MB 的限制（题面上限 M=500000 放不进 1MB）。"""
+    label = list(range(1, n + 1))
+    r.shuffle(label)
+    if kind.startswith("chain"):
+        edges = [(label[i], label[i + 1]) for i in range(m)]
+        if kind == "chain_cycle":
+            edges.append((label[m], label[0]))          # 长度 m+1 的大环
+    else:
+        edges = set()
+        while len(edges) < m:
+            a = r.randrange(n - 1)
+            b = min(n - 1, a + 1 + int(r.expovariate(1 / 30)))
+            edges.add((a, b))
+        edges = sorted(edges)
+        if kind == "dag_cycle":                         # 沿已有边走一段长路，再连回去
+            adj = {}
+            for a, b in edges:
+                adj.setdefault(a, []).append(b)
+            start = edges[r.randrange(len(edges) // 10)][0]
+            cur, steps = start, 0
+            while cur in adj and steps < 5000:
+                cur = r.choice(adj[cur])
+                steps += 1
+            edges.append((cur, start))
+        edges = [(label[a], label[b]) for a, b in edges]
+    r.shuffle(edges)
+    assert has_cycle(n, edges) == kind.endswith("cycle")
+    return edges
+
+
+def extra_cases():
+    """2026-10 审计补充：原数据 N<=25，递归 DFS 爆栈、O(N^2) 写法都卡不住；
+    也没有 N=2 这样的最小图、多连通块且环不在 1 号点所在块的情形。"""
+    r = random.Random(92020)
+    out = ["1\n2 1\n1 2\n", "1\n2 2\n1 2\n2 1\n", "1\n3 3\n1 2\n2 3\n3 1\n",
+           "1\n100000 1\n100000 1\n",
+           "2\n3 2\n2 1\n3 1\n3 3\n1 2\n1 3\n2 3\n"]
+    for kind, m in (("chain", 69999), ("chain_cycle", 69998), ("dag", 70000), ("dag_cycle", 70000)):
+        out.append("1\n" + block(100000, big_graph(r, 100000, kind, m)))
+    blocks = []
+    for kind in ("dag", "chain_cycle", "chain", "dag_cycle", "dag"):
+        blocks.append(block(20000, big_graph(r, 20000, kind, 14000 if kind.startswith("dag") else 13999)))
+    out.append("5\n" + "".join(blocks))
+    # 很多个互不相连的小链，只有编号最大的一块里有环
+    edges, k = [], 0
+    while k + 4 <= 60000:
+        edges += [(k + 1, k + 2), (k + 2, k + 3), (k + 3, k + 4)]
+        k += 4
+    edges.append((k, k - 3))
+    out.append("1\n" + block(100000, edges))
+    return out
+
+
 def build_cases():
     cases = [SAMPLE_IN]
     for index in range(1, 40):
@@ -77,7 +172,9 @@ def build_cases():
         content = f"{groups}\n" + "".join(blocks)
         if content not in cases:
             cases.append(content)
+    cases += [c for c in extra_cases() if c not in cases]
     assert len(set(cases)) >= 15, "去重后至少 15 组"
+    assert all(valid(c) for c in cases), "题面输入格式与取值范围"
     return cases
 
 

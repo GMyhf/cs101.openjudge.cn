@@ -13,7 +13,7 @@ def generate(n, seed):
     if n==2734:return f"{r.randint(1,65535)}\n"
     if n==2488:
         z=[(r.randint(1,6),r.randint(1,6)) for _ in range(r.randint(1,4))];return str(len(z))+'\n'+'\n'.join(f'{a} {b}' for a,b in z)+'\n'
-    if n==2810:return f"{r.randint(2,45)}\n"
+    if n==2810:return f"{n2810_values()[seed-1]}\n"
     if n==2299:
         a=[r.randint(0,10**9) for _ in range(r.randint(2,40))];return f"{len(a)}\n"+'\n'.join(map(str,a))+'\n0\n'
     if n==2775:return f"file{seed}\ndir{seed}\nfileA\n]\nfileZ\n*\n#\n"
@@ -156,6 +156,20 @@ def generate(n, seed):
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2810: 完美立方\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/02810/\n# License: not declared in source collection; no license is inferred.\nimport sys\n# AC时间: 65ms\nn = int(input())\ncube = {i**3: i for i in range(2, n+1)}\nreversed_cube = {v: k for k, v in cube.items()}\nans = []\nfor b in range(2, n):\n    for c in range(b, n):\n        for d in range(c, n):\n            if (a := reversed_cube[b]+reversed_cube[c]+reversed_cube[d]) in cube:\n                ans.append((cube[a], b, c, d))\nans.sort()\nfor s in ans:\n    print(f"Cube = {s[0]}, Triple = ({s[1]},{s[2]},{s[3]})")\n'
 NUMBER=2810
 SAMPLE='24\n'
+import re as _re
+def valid(text):
+    """题面：一个正整数 N (N<=100)。"""
+    m = _re.fullmatch(r'([1-9][0-9]*)\n', text)
+    return bool(m) and 1 <= int(m.group(1)) <= 100
+
+
+def n2810_values():
+    """39 个互不相同的 N（不含样例 24）：含最小值 1、无解的 2..5、首个解 6、上限 100 及附近。"""
+    special = [1, 2, 5, 6, 7, 100, 99, 98, 97, 50]
+    rest = sorted(set(range(1, 101)) - set(special) - {24})
+    return special + random.Random(2810).sample(rest, 39 - len(special))
+
+
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'m.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)

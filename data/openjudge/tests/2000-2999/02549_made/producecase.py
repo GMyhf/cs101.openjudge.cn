@@ -417,7 +417,92 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02549/statistics/\n# Accepted submission: 51482198\n# Source: http://cs101.openjudge.cn/practice/solution/51482198/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\n\ndef solve():\n    input_data = sys.stdin.read().strip().split()\n    idx = 0\n    results = []\n\n    while True:\n        n = int(input_data[idx]); idx += 1\n        if n == 0:\n            break\n\n        S = []\n        for _ in range(n):\n            S.append(int(input_data[idx])); idx += 1\n\n        S.sort()\n        found = False\n        ans = None\n\n        # 从大到小枚举d（作为答案）\n        for d_idx in range(n-1, -1, -1):\n            d = S[d_idx]\n            if found:\n                break\n\n            # 枚举c（作为减数）\n            for c_idx in range(n):\n                if c_idx == d_idx:\n                    continue\n                c = S[c_idx]\n                target = d - c\n\n                # 使用哈希表来寻找a+b=target\n                seen = set()\n                for a_idx in range(n):\n                    if a_idx == d_idx or a_idx == c_idx:\n                        continue\n                    a = S[a_idx]\n                    b = target - a\n\n                    # 检查b是否在集合中，并且b不是a,c,d\n                    if b in seen:\n                        # 还需要检查b是否在S中，并且b不是a,c,d\n                        # 由于S是排序的，我们可以用二分查找检查b是否存在\n                        # 但更简单的是：b已经在seen中，说明b是S中的某个元素\n                        # 我们只需要确保b不是a,c,d\n                        if (b != a and b != c and b != d and\n                            a != c and a != d):\n                            # 还需要确认b确实是S中的元素（不是巧合的数字）\n                            # 由于seen是从S中添加的，所以b一定是S中的元素\n                            ans = d\n                            found = True\n                            break\n                    seen.add(a)\n\n                if found:\n                    break\n\n        if found:\n            results.append(str(ans))\n        else:\n            results.append("no solution")\n\n    print("\\n".join(results))\n\nif __name__ == "__main__":\n    solve()\n'
+import re
+LO2549, HI2549 = -536870912, 536870911
+
+def valid(text):
+    """题面：若干个集合 S，每个先给一行 n（1 <= n <= 1000），再每行一个元素；元素是互不相同的整数，
+    范围 -536870912..536870911；最后一行是 0。"""
+    lines = text.split("\n")
+    if lines and lines[-1] == "":
+        lines.pop()
+    num = re.compile(r"-?(0|[1-9][0-9]*)")
+    pos = 0
+    sets = 0
+    while True:
+        if pos >= len(lines) or not re.fullmatch(r"0|[1-9][0-9]*", lines[pos]):
+            return False
+        n = int(lines[pos]); pos += 1
+        if n == 0:
+            break
+        if n > 1000 or pos + n > len(lines):
+            return False
+        vals = []
+        for ln in lines[pos:pos + n]:
+            if not num.fullmatch(ln) or ln == "-0":
+                return False
+            v = int(ln)
+            if not LO2549 <= v <= HI2549:
+                return False
+            vals.append(v)
+        if len(set(vals)) != n:
+            return False
+        pos += n
+        sets += 1
+    return pos == len(lines) and sets >= 1
+
+
+def g2549(seed, kind):
+    r = random.Random(2549_000 + seed)
+    sets = []
+    def distinct(n, lo, hi, base=()):
+        s = set(base)
+        while len(s) < n:
+            s.add(r.randint(lo, hi))
+        out = list(s); r.shuffle(out); return out
+    if kind == "edge":
+        sets = [[7], [1, 2], [1, 2, 3], [1, 2, 3, 6], [1, 2, 4, 6], [6, 1, 2, 3],
+                [0, 5, -5, 3],            # 3 = 3 + 5 + (-5) 要把 d 自己当加数，不合法；无解
+                [0, 1, -1, 10],           # 10 = 10 + 1 + (-1)、1 = 1 + 0 + ... 都要用到 d 本身；无解
+                [1, 2, 5, 100],           # 5 = 1 + 2 + 2 需要重复使用 2，不合法；无解
+                [-1, -2, -3, -6],         # 答案为负数 -6
+                [LO2549, HI2549, 0, -1, 1],  # 值域两端：0 = LO + HI + 1，答案 0
+                [HI2549, HI2549 - 3, 1, 2, 0, -1]]  # HI = (HI-3) + 1 + 2
+        r.shuffle(sets)
+    elif kind == "small":
+        for _ in range(r.randint(3, 15)):
+            n = r.randint(4, 40)
+            span = r.choice([20, 200, 10**6, HI2549])
+            sets.append(distinct(n, max(LO2549, -span), min(HI2549, span)))
+    elif kind == "bigrand":
+        sets.append(distinct(1000, LO2549, HI2549))
+    elif kind == "bignone":
+        # 全在 [2^28, 2^29) 或全在 [-2^29, -2^28]：任意三数之和都越出集合范围，必无解
+        if r.random() < .5:
+            sets.append(distinct(1000, 2**28, HI2549))
+        else:
+            sets.append(distinct(1000, LO2549, -2**28))
+    elif kind == "bigplant":
+        # 大数都凑不出来，只有一个中等元素恰为三数之和
+        big = distinct(990, 2**28, HI2549)
+        a, b, c = r.sample(range(-10**6, 10**6), 3)
+        extra = {a, b, c, a + b + c}
+        while len(extra) < 10:
+            extra.add(r.randint(-10**8, 10**8))
+        vals = list(set(big) | extra)
+        r.shuffle(vals)
+        sets.append(vals)
+    elif kind == "multi":
+        for _ in range(3):
+            n = r.randint(300, 1000)
+            sets.append(distinct(n, r.choice([LO2549, -10**4]), r.choice([HI2549, 10**4])))
+    return "".join(f"{len(s)}\n" + "".join(f"{v}\n" for v in s) for s in sets) + "0\n"
+
+
+PLAN2549 = ["edge"] + ["small"] * 6 + ["bigrand"] * 3 + ["bignone"] * 3 + ["bigplant"] * 4 + ["multi"] * 3
+
+# 原参考解（提交 51482198，与 samplecode.py 相同）是 O(n^3)，n=1000 时跑不动，换成下面的 O(n^2) 解；samplecode.py 在小组上交叉核对。
+REFERENCE='# 参考解：预处理所有数对和（同一和值最多留 3 对，因为同和数对两两不相交），再从大到小枚举 d、枚举 c，O(n^2)。\nimport sys\ndef best(S):\n    n = len(S)\n    S = sorted(S)\n    sums = {}\n    for i in range(n):\n        a = S[i]\n        for j in range(i + 1, n):\n            t = a + S[j]\n            lst = sums.get(t)\n            if lst is None:\n                sums[t] = [(i, j)]\n            elif len(lst) < 3:  # 同一和值的数对两两不相交，最多两对会和 c、d 冲突\n                lst.append((i, j))\n    for di in range(n - 1, -1, -1):\n        d = S[di]\n        for ci in range(n):\n            if ci == di:\n                continue\n            lst = sums.get(d - S[ci])\n            if lst:\n                for i, j in lst:\n                    if i != ci and i != di and j != ci and j != di:\n                        return d\n    return None\ndef main():\n    data = sys.stdin.read().split()\n    pos = 0\n    out = []\n    while True:\n        n = int(data[pos]); pos += 1\n        if n == 0:\n            break\n        S = [int(x) for x in data[pos:pos + n]]; pos += n\n        ans = best(S)\n        out.append("no solution" if ans is None else str(ans))\n    print("\\n".join(out))\nmain()\n'
 LANGUAGE='Python3'
 NUMBER=2549
 SAMPLE='5\n2\n3\n5\n7\n12\n5\n2\n16\n64\n256\n1024\n0\n'
@@ -428,7 +513,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 20)]+[g2549(s,k) for s,k in enumerate(PLAN2549, start=1)]
+  assert all(valid(x) for x in cases)
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

@@ -16,6 +16,47 @@ REFERENCE_SOURCE = "def closedIsland(grid):\n    rows, cols = len(grid), len(gri
 
 def g20456(r): return "\n".join(",".join(r.choice("01") for _ in range(10)) for _ in range(10))+"\n"
 
+def valid(text):
+    """题面契约：恰 10 行，每行 10 个 0/1，用逗号分隔（与样例一致）。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if len(lines) != 10:
+        return False
+    return all(len(t := line.split(",")) == 10 and all(x in ("0", "1") for x in t)
+               for line in lines)
+
+
+def _grid(rows):
+    return "\n".join(",".join(row) for row in rows) + "\n"
+
+
+def extra_cases():
+    """补充结构化边界：全水、全陆、单个大封闭岛、棋盘形最多岛、仅对角接边、蛇形接边。"""
+    out = []
+    out.append(_grid(["1" * 10] * 10))                       # 0
+    out.append(_grid(["0" * 10] * 10))                       # 0：整块陆地接边
+    out.append(_grid(["1" * 10] + ["1" + "0" * 8 + "1"] * 8 + ["1" * 10]))  # 1
+    rows = [["1"] * 10 for _ in range(10)]
+    for r in range(1, 9):
+        for c in range(1, 9):
+            if (r + c) % 2 == 0:
+                rows[r][c] = "0"
+    out.append(_grid(rows))                                  # 棋盘：32 个
+    rows = [["1"] * 10 for _ in range(10)]
+    for r, c in ((0, 0), (1, 1), (8, 8), (9, 9), (0, 9), (2, 7), (5, 5)):
+        rows[r][c] = "0"                                     # 只经对角接边的不算接边
+    rows[1][8] = "0"
+    out.append(_grid(rows))
+    rows = [["1"] * 10 for _ in range(10)]
+    for c in range(1, 9):
+        rows[1][c] = "0"; rows[3][c] = "0"; rows[5][c] = "0"; rows[7][c] = "0"
+    rows[2][8] = "0"; rows[4][1] = "0"; rows[6][8] = "0"
+    rows[8][1] = "0"; rows[9][1] = "0"                       # 蛇形长岛在末端接边：0
+    out.append(_grid(rows))
+    return out
+
+
 def build_cases():
     cases = [SAMPLE_IN]
     for i in range(1, 20):
@@ -26,6 +67,11 @@ def build_cases():
                 break
         else:
             raise AssertionError("生成器多样性不足")
+    for value in extra_cases():
+        assert value not in cases
+        cases.append(value)
+    for value in cases:
+        assert valid(value), "生成的数据越出题面约束"
     return cases
 
 def solve_reference(content):

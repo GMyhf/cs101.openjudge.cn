@@ -138,7 +138,22 @@ def generate(number, seed):
     if number==2599:
         n=r.randint(2,40);edges=[(i,r.randint(1,i-1)) for i in range(2,n+1)];return f"{n} {r.randint(1,n)}\n"+"\n".join(f"{a} {b}" for a,b in edges)+"\n"
     if number==2937:
-        n=r.randint(3,12);return f"{n}\n"+"\n".join(" ".join(str(r.randint(0,255)) for _ in range(n)) for _ in range(n))+"\n"
+        # N 覆盖 3（最小）到 100（上限）；在内部格子上按“比四邻最小值小 49/50/51/更多”埋点，
+        # 卡 < 与 <= 混淆；边缘格子也放极小值，卡把边缘也检测的写法。
+        if seed<=3: n=3
+        elif seed>=34: n=100
+        else: n=r.choice([r.randint(4,12),r.randint(13,60),r.randint(61,100)])
+        lo=r.choice([0,50,100,150]);g=[[r.randint(lo,255) for _ in range(n)] for _ in range(n)]
+        for _ in range(r.randint(1,max(1,n*n//6))):
+            i,j=r.randint(1,n-2),r.randint(1,n-2)
+            m=min(g[i-1][j],g[i+1][j],g[i][j-1],g[i][j+1])
+            d=r.choice([49,50,50,51,r.randint(52,255)])
+            if m-d>=0: g[i][j]=m-d
+        for _ in range(r.randint(0,n)):
+            if r.random()<0.5: i,j=r.choice([0,n-1]),r.randint(0,n-1)
+            else: i,j=r.randint(0,n-1),r.choice([0,n-1])
+            g[i][j]=r.randint(0,5)
+        return f"{n}\n"+"\n".join(" ".join(map(str,row)) for row in g)+"\n"
     if number==2943:
         n=r.randint(1,20);weights=r.sample(range(1,1001),n);return f"{n}\n"+"\n".join(f"{x} c{i}" for i,x in enumerate(weights))+"\n"
     if number==1007:
@@ -147,6 +162,19 @@ def generate(number, seed):
         n=r.randint(2,50);return f"{n}\n"+" ".join(f"{r.uniform(.5,2.5):.5f}" for _ in range(n))+"\n"
     raise KeyError(number)
 
+def valid(text):
+    """题面：第一行整数 N（100>=N>2）；下面 N 行，每行 N 个 0~255 之间的整数，用空格隔开。"""
+    if not text.endswith('\n') or '\r' in text: return False
+    L=text[:-1].split('\n')
+    if not L[0].isdigit() or L[0][0]=='0': return False
+    n=int(L[0])
+    if not 2<n<=100 or len(L)!=n+1: return False
+    for row in L[1:]:
+        t=row.split(' ')
+        if len(t)!=n: return False
+        for x in t:
+            if not x.isdigit() or (len(x)>1 and x[0]=='0') or int(x)>255: return False
+    return True
 NO_INPUT={3225, 2698}
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02937/statistics/\n# Accepted submission: 50584040\n# Source: http://cs101.openjudge.cn/practice/solution/50584040/\n# License: not declared on the submission page; no license is inferred.\n\nN = int(input())\nmat = []\nfor _ in range(N):\n    l = [int(x) for x in input().split()]\n    mat.append(l)\nres = 0\nfor i in range(1, N-1):\n    for j in range(1, N-1):\n        if mat[i][j] <= min(mat[i][j-1], mat[i][j+1], mat[i-1][j], mat[i+1][j])-50:\n            res += 1\nprint(res)\n'
 LANGUAGE='Python3'

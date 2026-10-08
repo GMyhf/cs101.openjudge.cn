@@ -417,10 +417,89 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
-REFERENCE="# External reference: http://cs101.openjudge.cn/practice/01050/statistics/\n# Accepted submission: 50936084\n# Source: http://cs101.openjudge.cn/practice/solution/50936084/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\ndata=iter(sys.stdin.read().strip().split())\nN=int(next(data))\nlist1=[[0]*N for _ in range(N)]\nfor i in range(N):\n    for j in range(N):\n        list1[i][j]=int(next(data))\nlist2=[[0]*N for _ in range(N)]\nlist2[0]=list1[0]\nfor i in range(1,N):\n    for j in range(N):\n        list2[i][j]=list2[i-1][j]+list1[i][j]\ns=-float('inf')\nfor i in range(N):\n    for j in range(i):\n        row=[list2[i][x]-list2[j][x] for x in range(N)]\n        dp=[row[0]]+[-float('inf')]*(N-1)\n        for k in range(1,N):\n            dp[k]=max(row[k],row[k]+dp[k-1])\n        s=max(s,max(dp))\nprint(s)\n"
+REFERENCE='# 参考解：原先引用的提交（50936084）只枚举上边界 j<i 的行段 j+1..i，漏掉了从第 0 行开始的子矩形，\n# N=1 时输出 -inf；旧生成器靠「第一行全负」把这个缺陷藏住了。这里换成 O(N^3) 的列压缩 + Kadane。\nimport sys\ndata = sys.stdin.buffer.read().split()\nn = int(data[0])\na = list(map(int, data[1:1 + n * n]))\nrows = [a[i * n:(i + 1) * n] for i in range(n)]\nbest = -10 ** 18\nfor top in range(n):\n    col = [0] * n\n    for bot in range(top, n):\n        col = [c + v for c, v in zip(col, rows[bot])]\n        cur = 0\n        m = -10 ** 18\n        for c in col:\n            cur = c if cur < 0 else cur + c\n            if cur > m:\n                m = cur\n        if m > best:\n            best = m\nprint(best)\n'
 LANGUAGE='Python3'
 NUMBER=1050
 SAMPLE='4\n0 -2 -7 0 9 2 -6 2\n-4 1 -4  1 -1\n\n8  0 -2\n'
+def valid(text):
+    """题面：首行单独一个正整数 N（N 最大 500），随后 N^2 个 [-127,127] 内的整数，以空白（空格、换行）分隔。"""
+    lines = text.split("\n")
+    first = lines[0].split()
+    if len(first) != 1 or not first[0].isdigit():
+        return False
+    n = int(first[0])
+    if not (1 <= n <= 500) or first[0] != str(n):
+        return False
+    toks = "\n".join(lines[1:]).split()
+    if len(toks) != n * n:
+        return False
+    for t in toks:
+        try:
+            v = int(t)
+        except ValueError:
+            return False
+        if str(v) != t or not (-127 <= v <= 127):
+            return False
+    return True
+
+def gen1050(seed):
+    """N 取到 400：参考解（纯 Python O(N^3)）在 N=500 约 12s，超过 Python 单组 20s 的一半，故规模组定在 400（约 5s）。"""
+    r = random.Random(1050_000 + seed)
+    def fmt(n, g, layout):
+        if layout == 0:
+            body = "\n".join(" ".join(map(str, row)) for row in g)
+        else:
+            flat = [v for row in g for v in row]; out = []; i = 0
+            while i < len(flat):
+                k = r.randint(1, 2 * n); out.append(" ".join(map(str, flat[i:i + k]))); i += k
+            body = "\n".join(out)
+        return f"{n}\n{body}\n"
+    def rand_grid(n, lo=-127, hi=127):
+        return [[r.randint(lo, hi) for _ in range(n)] for _ in range(n)]
+    def plant(n, bias):
+        # 背景偏负，种一块偏正的矩形，位置随机（含贴第 0 行、第 0 列、最后一行/列）
+        g = [[r.randint(-127, 127 - bias) for _ in range(n)] for _ in range(n)]
+        h, w = r.randint(1, n), r.randint(1, n)
+        y = r.choice([0, n - h, r.randint(0, n - h)]); x = r.choice([0, n - w, r.randint(0, n - w)])
+        for i in range(y, y + h):
+            for j in range(x, x + w):
+                g[i][j] = r.randint(-127 + bias, 127)
+        return g
+    fixed = {
+        1: (1, [[r.randint(1, 127)]]),
+        2: (1, [[-127]]),
+        3: (1, [[0]]),
+        4: (2, [[-5, -3], [-7, -1]]),
+        5: (3, [[127] * 3 for _ in range(3)]),
+        6: (2, [[127, -127], [-127, 127]]),
+        7: (3, [[5, -1, -1], [-1, -1, -1], [-1, -1, -1]]),   # 最优解只在第 0 行
+        8: (4, [[0] * 4 for _ in range(4)]),
+    }
+    if seed in fixed:
+        n, g = fixed[seed]
+    elif seed <= 16:
+        n = r.randint(2, 10); g = plant(n, r.randint(0, 120)) if seed % 2 else rand_grid(n)
+    elif seed <= 20:
+        n = r.randint(2, 12); g = rand_grid(n, -127, -1)       # 全负：答案是最大元素
+    elif seed <= 24:
+        n = r.randint(20, 60); g = plant(n, r.randint(10, 80))
+    elif seed <= 28:
+        n = r.randint(100, 200); g = plant(n, r.randint(5, 40)) if seed % 2 else rand_grid(n)
+    elif seed <= 31:
+        n = r.randint(280, 320); g = plant(n, r.randint(5, 30))
+    elif seed <= 35:
+        n = 400; g = plant(n, r.randint(3, 20)) if seed % 2 else rand_grid(n)
+    elif seed == 36:
+        n = 400; g = [[127] * n for _ in range(n)]           # 答案 20320000
+    elif seed == 37:
+        n = 400; g = rand_grid(n, -127, -1); g[0][0] = -1     # 全负，最大元素在左上角
+    elif seed == 38:
+        n = 400; g = rand_grid(n, -127, -60)
+        for j in range(n): g[0][j] = r.randint(50, 127)      # 最优解是整个第 0 行
+    else:
+        n = 400; g = rand_grid(n, -127, -1); g[n - 1][n - 1] = 127
+    return fmt(n, g, seed % 3 == 0)
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -428,7 +507,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[gen1050(s) for s in range(1, 40)]
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

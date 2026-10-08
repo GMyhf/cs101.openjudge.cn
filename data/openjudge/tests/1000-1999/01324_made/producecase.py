@@ -147,6 +147,116 @@ def generate(number, seed):
         n=r.randint(2,50);return f"{n}\n"+" ".join(f"{r.uniform(.5,2.5):.5f}" for _ in range(n))+"\n"
     raise KeyError(number)
 
+
+def valid(text):
+    """题面契约：多组，每组 n m L（1<=n,m<=20，2<=L<=8），L 个身体坐标（界内、相邻块四连通、互不重叠），
+    K 及 K 个石头坐标（界内，(1,1) 不是石头，也不压在身体上）；以 0 0 0 结束。"""
+    try:
+        t = [int(x) for x in text.split()]
+    except ValueError:
+        return False
+    i, cases = 0, 0
+    while True:
+        if i + 3 > len(t):
+            return False
+        n, m, L = t[i:i + 3]; i += 3
+        if (n, m, L) == (0, 0, 0):
+            return i == len(t) and cases >= 1
+        if not (1 <= n <= 20 and 1 <= m <= 20 and 2 <= L <= 8):
+            return False
+        if i + 2 * L + 1 > len(t):
+            return False
+        body = [(t[i + 2 * j], t[i + 2 * j + 1]) for j in range(L)]; i += 2 * L
+        if any(not (1 <= a <= n and 1 <= b <= m) for a, b in body) or len(set(body)) != L:
+            return False
+        if any(abs(a - c) + abs(b - d) != 1 for (a, b), (c, d) in zip(body, body[1:])):
+            return False
+        K = t[i]; i += 1
+        if K < 0 or i + 2 * K > len(t):
+            return False
+        stones = [(t[i + 2 * j], t[i + 2 * j + 1]) for j in range(K)]; i += 2 * K
+        if any(not (1 <= a <= n and 1 <= b <= m) or (a, b) == (1, 1) or (a, b) in body for a, b in stones):
+            return False
+        cases += 1
+
+
+def _snake_body(r, n, m, L, blocked=frozenset(), head=None):
+    """随机自回避路径作为身体；失败返回 None。"""
+    for _ in range(200):
+        h = head or (r.randint(1, n), r.randint(1, m))
+        if h in blocked: continue
+        body = [h]
+        while len(body) < L:
+            a, b = body[-1]
+            nb = [(a + da, b + db) for da, db in ((0, 1), (1, 0), (0, -1), (-1, 0))
+                  if 1 <= a + da <= n and 1 <= b + db <= m and (a + da, b + db) not in body
+                  and (a + da, b + db) not in blocked]
+            if not nb: break
+            body.append(r.choice(nb))
+        if len(body) == L:
+            return body
+    return None
+
+
+def _fmt1324(n, m, body, stones):
+    return (f"{n} {m} {len(body)}\n" + "".join(f"{a} {b}\n" for a, b in body) +
+            f"{len(stones)}\n" + "".join(f"{a} {b}\n" for a, b in stones) + "\n")
+
+
+def _rand1324(r, n, m, L, dens, head=None):
+    while True:
+        body = _snake_body(r, n, m, L, head=head)
+        if body is None:
+            continue
+        cells = [(a, b) for a in range(1, n + 1) for b in range(1, m + 1)
+                 if (a, b) != (1, 1) and (a, b) not in body]
+        stones = [c for c in cells if r.random() < dens]
+        r.shuffle(stones)
+        return _fmt1324(n, m, body, stones)
+
+
+def g1324_v2(seed):
+    r = random.Random(1324 * 1_000_003 + seed)
+    cs = []
+    if seed == 1:      # 手工边界：头已在出口(0)；头只能钻进尾巴所在格(-1)；1 行窄道；出口被围死
+        cs.append(_fmt1324(3, 3, [(1, 1), (1, 2)], []))
+        cs.append(_fmt1324(1, 2, [(1, 2), (1, 1)], []))
+        cs.append(_fmt1324(1, 20, [(1, 20 - j) for j in range(8)], []))
+        cs.append(_fmt1324(1, 20, [(1, 13 + j) for j in range(8)], []))
+        cs.append(_fmt1324(20, 1, [(13 + j, 1) for j in range(8)], [(5, 1)]))
+        cs.append(_fmt1324(5, 5, [(5, 5), (5, 4)], [(1, 2), (2, 1)]))
+        cs.append(_fmt1324(2, 2, [(2, 1), (2, 2), (1, 2)], []))
+        cs.append(_fmt1324(2, 2, [(2, 1), (2, 2), (1, 2), (1, 1)], []))
+    elif seed <= 20:   # 随机中小规模，多组
+        for _ in range(r.randint(2, 6)):
+            n, m = r.randint(1, 12), r.randint(1, 12)
+            if n * m < 3: n, m = 2, 3
+            L = r.randint(2, min(8, n * m - 1))
+            cs.append(_rand1324(r, n, m, L, r.choice([0, .1, .2, .3, .4])))
+    elif seed <= 30:   # 满规模 20x20，L 大，稀疏石头
+        for _ in range(1 if seed % 2 else 2):
+            cs.append(_rand1324(r, 20, 20, r.randint(6, 8), r.choice([0, .05, .15, .25])))
+    elif seed <= 34:   # 头在远角、需要掉头的迷宫：蛇头被自己身体挡在死胡同里
+        n = m = 20; L = 8
+        body = [(20, 20 - j) for j in range(L)] if seed % 2 else [(20 - j, 20) for j in range(L)]
+        stones = [(a, b) for a in range(1, 21) for b in range(1, 21)
+                  if (a, b) not in body and (a, b) != (1, 1) and r.random() < .12]
+        cs.append(_fmt1324(n, m, body, stones))
+    elif seed <= 36:   # 无解但要搜很多状态：出口被一条斜线石墙封死，蛇在大片区域里打转
+        n = m = 20; L = 8
+        d = 8 if seed == 35 else 5
+        wall = [(a, b) for a in range(1, 21) for b in range(1, 21) if a + b == d]
+        free = [(a, b) for a in range(1, 21) for b in range(1, 21) if a + b > d]
+        while True:
+            stones = wall + [c for c in free if r.random() < (.15 if seed == 35 else .06)]
+            body = _snake_body(r, n, m, L, blocked=frozenset(stones) | {(a, b) for a in range(1, 21) for b in range(1, 21) if a + b <= d})
+            if body is not None:
+                break
+        cs.append(_fmt1324(n, m, body, stones))
+    else:              # 满规模稀疏迷宫，答案较长
+        cs.append(_rand1324(r, 20, 20, 8, r.choice([.08, .12]), head=(20, r.randint(15, 20))))
+    return "".join(cs) + "0 0 0\n"
+
 NO_INPUT={3225, 2698}
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01324/statistics/\n# Accepted submission: 43827108\n# Source: http://cs101.openjudge.cn/practice/solution/43827108/\n# License: not declared on the submission page; no license is inferred.\n\n# https://www.cnblogs.com/wiklvrain/p/8179443.html\nfrom collections import deque\n\n# Constants for the maximum grid size\nmaxn = 21\n# Directions representing right, down, left, up\ndir = [(0, 1), (1, 0), (0, -1), (-1, 0)]\n\n\n# Function to judge if a move is valid\ndef judge(p, t, l):\n    a, b = p[0], p[1]\n    row, col = a + dir[t][0], b + dir[t][1]\n    if row == a and col == b:\n        return False\n    k = l - 1\n    while k:\n        q = p[2] & 3\n        p = (p[0], p[1], p[2] >> 2)\n        nx, ny = a + dir[q][0], b + dir[q][1]\n        if nx == row and ny == col:\n            return False\n        a, b = nx, ny\n        k -= 1\n    return True\n\n\n# BFS function to find the shortest path for the snake\ndef bfs(s, n, m, l, g):\n    q = deque()\n    vis = [[[0] * (1 << 14) for _ in range(maxn)] for _ in range(maxn)]\n\n    q.append(s)\n    vis[s[0]][s[1]][s[2]] = 1\n\n    while q:\n        p = q.popleft()\n        if p[0] == 1 and p[1] == 1:\n            return vis[p[0]][p[1]][p[2]] - 1\n        for i in range(4):\n            nx, ny = p[0] + dir[i][0], p[1] + dir[i][1]\n            st = (p[2] & ((1 << (2 * (l - 2))) - 1)) << 2\n            st |= (i + 2) % 4\n            if 1 <= nx <= n and 1 <= ny <= m and not vis[nx][ny][st] and not g[nx][ny] and judge(p, i, l):\n                vis[nx][ny][st] = vis[p[0]][p[1]][p[2]] + 1\n                q.append((nx, ny, st))\n    return -1\n\n\ndef main():\n    cas = 1\n    while True:\n        n, m, l = map(int, input().split())\n        if n == 0 and m == 0 and l == 0:\n            break\n\n        # Initialize the snake\n        ss = (0, 0, 0)\n        tmp1, tmp2 = 0, 0\n        for i in range(l):\n            a, b = map(int, input().split())\n            if i == 0:\n                ss = (a, b, 0)\n            else:\n                for j in range(4):\n                    nx = tmp1 + dir[j][0]\n                    ny = tmp2 + dir[j][1]\n                    if nx == a and ny == b:\n                        ss = (ss[0], ss[1], ss[2] | (j << (2 * (i - 1))))\n                        break\n            tmp1, tmp2 = a, b\n\n        # Read obstacles\n        k = int(input())\n        g = [[0] * maxn for _ in range(maxn)]\n        #for _ in range(k):\n        while k:\n            try:\n                a, b = map(int, input().split())\n            except ValueError:\n                continue\n            k -= 1\n\n            g[a][b] = 1\n\n        # Perform BFS\n        result = bfs(ss, n, m, l, g)\n        print(f"Case {cas}: {result}")\n        cas += 1\n        input()\n\n\nif __name__ == "__main__":\n    main()\n'
 LANGUAGE='Python3'
@@ -159,7 +269,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [g1324_v2(s) for s in range(1, 40)])
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

@@ -153,6 +153,68 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
+
+def _tree_ok(pre, ino):
+    # 前序/中序必须能还原出同一棵二叉树
+    if not pre:
+        return True
+    k = ino.find(pre[0])
+    if k < 0:
+        return False
+    return _tree_ok(pre[1:1+k], ino[:k]) and _tree_ok(pre[1+k:], ino[k+1:])
+
+def valid(text):
+    # 多组输入以 EOF 结束；每组一行两个只含大写字母、互不重复的串（前序、中序），且对应同一棵树
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if not lines or lines == ['']:
+        return False
+    for ln in lines:
+        t = ln.split(' ')
+        if len(t) != 2:
+            return False
+        a, b = t
+        if not a or not (a.isascii() and a.isalpha() and a.isupper()):
+            return False
+        if len(set(a)) != len(a) or sorted(a) != sorted(b):
+            return False
+        if not _tree_ok(a, b):
+            return False
+    return True
+
+def _extra():
+    # 追加的覆盖组：单结点、满 26 个字母、左链/右链/之字形、多组
+    r = random.Random(2255)
+    U = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    def rand_tree(vals):
+        if not vals: return '', ''
+        k = r.randrange(len(vals)); a, b = rand_tree(vals[:k]); c, d = rand_tree(vals[k+1:])
+        return vals[k]+a+c, a+vals[k]+d
+    def shaped(vals, mode):
+        # mode: 'L' 全左链, 'R' 全右链, 'Z' 之字
+        if not vals: return '', ''
+        root = vals[0]; rest = vals[1:]
+        if mode == 'L' or (mode == 'Z' and len(vals) % 2):
+            a, b = shaped(rest, mode); return root+a, b+root
+        a, b = shaped(rest, mode); return root+a, root+b
+    def perm(k):
+        return ''.join(r.sample(U, k))
+    cases = []
+    cases.append('Q Q\n')
+    cases.append('\n'.join(' '.join(shaped(perm(26), m)) for m in 'LRZ') + '\n')
+    cases.append(' '.join(shaped(perm(26), 'L')) + '\n')
+    cases.append(' '.join(shaped(perm(26), 'R')) + '\n')
+    for _ in range(4):
+        cases.append(' '.join(rand_tree(perm(26))) + '\n')
+    rows = []
+    for k in list(range(1, 27)) + [26] * 30:
+        rows.append(' '.join(rand_tree(perm(k))))
+    cases.append('\n'.join(rows) + '\n')
+    rows = [' '.join(rand_tree(perm(r.randint(1, 26)))) for _ in range(200)]
+    cases.append('\n'.join(rows) + '\n')
+    return cases
+
 REFERENCE="# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 2255: 重建二叉树\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024sp_routine/02255/\n# License: not declared in source collection; no license is inferred.\nimport sys\ndef build_tree(preorder, inorder):\n    if not preorder:\n        return ''\n\n    root = preorder[0]\n    root_index = inorder.index(root)\n\n    left_preorder = preorder[1:1 + root_index]\n    right_preorder = preorder[1 + root_index:]\n\n    left_inorder = inorder[:root_index]\n    right_inorder = inorder[root_index + 1:]\n\n    left_tree = build_tree(left_preorder, left_inorder)\n    right_tree = build_tree(right_preorder, right_inorder)\n\n    return left_tree + right_tree + root\n\nwhile True:\n    try:\n        preorder, inorder = input().split()\n        postorder = build_tree(preorder, inorder)\n        print(postorder)\n    except EOFError:\n        break\n"
 NUMBER=2255
 SAMPLE='DBACEGF ABCDEFG\nBCAD CBAD\n'
@@ -164,6 +226,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+_extra()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

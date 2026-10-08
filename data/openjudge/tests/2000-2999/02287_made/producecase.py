@@ -157,6 +157,59 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
+
+def valid(text):
+    # 至多 50 组；每组：一行正整数 n（n<=1000），一行 n 个田忌马速，一行 n 个齐王马速；最后一行单独的 0
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    if not lines or lines[-1] != '0':
+        return False
+    def ints(ln):
+        t = ln.split(' ')
+        for x in t:
+            y = x[1:] if x.startswith('-') else x
+            if not y.isdigit():
+                return None
+        return [int(x) for x in t]
+    i = 0; cases = 0
+    while i < len(lines) - 1:
+        if not lines[i].isdigit():
+            return False
+        n = int(lines[i])
+        if not (1 <= n <= 1000) or str(n) != lines[i] or i + 2 >= len(lines):
+            return False
+        a = ints(lines[i+1]); b = ints(lines[i+2])
+        if a is None or b is None or len(a) != n or len(b) != n:
+            return False
+        cases += 1; i += 3
+    return i == len(lines) - 1 and 1 <= cases <= 50
+
+def _extra():
+    # 追加的覆盖组：n=1 胜/负/平、全相等、大量并列、n=1000 满规模、50 组
+    r = random.Random(22870)
+    def case(a, b):
+        return f"{len(a)}\n" + ' '.join(map(str, a)) + "\n" + ' '.join(map(str, b)) + "\n"
+    out = []
+    out.append(case([5], [3]) + case([3], [5]) + case([4], [4]) + "0\n")
+    out.append(case([7]*1000, [7]*1000) + "0\n")
+    for lo, hi in ((1, 3), (1, 10), (1, 1000), (1, 10**6)):
+        out.append(''.join(case([r.randint(lo, hi) for _ in range(1000)], [r.randint(lo, hi) for _ in range(1000)]) for _ in range(3)) + "0\n")
+    # 田忌全面落后 / 全面领先 / 两边错位一格（贪心易错）
+    a = list(range(1, 1001)); out.append(case(a, [x+1 for x in a]) + case([x+1 for x in a], a) + case(a, a[::-1]) + "0\n")
+    rows = []
+    for k in range(50):
+        n = r.randint(1, 1000) if k % 5 else 1000
+        v = r.choice((2, 5, 50, 10**9))
+        rows.append(case([r.randint(1, v) for _ in range(n)], [r.randint(1, v) for _ in range(n)]))
+    out.append(''.join(rows) + "0\n")
+    rows = []
+    for k in range(50):
+        n = r.randint(1, 8); v = r.randint(1, 6)
+        rows.append(case([r.randint(1, v) for _ in range(n)], [r.randint(1, v) for _ in range(n)]))
+    out.append(''.join(rows) + "0\n")
+    return out
+
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2287: Tian Ji -- The Horse Racing\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/pctbook/02287/\n# License: not declared in source collection; no license is inferred.\nimport sys\nimport sys\n\n\ndef solve():\n    # 读取所有输入\n    input_data = sys.stdin.read().split()\n    it = iter(input_data)\n\n    while True:\n        n = int(next(it))\n        if n == 0:\n            break\n\n        tian = [int(next(it)) for _ in range(n)]\n        king = [int(next(it)) for _ in range(n)]\n\n        # 1. 排序\n        tian.sort()\n        king.sort()\n\n        # 2. 初始化双指针\n        # 田忌的头尾指针\n        t_slow, t_fast = 0, n - 1\n        # 齐王的头尾指针\n        k_slow, k_fast = 0, n - 1\n\n        money = 0\n\n        # 进行 N 轮比赛\n        for _ in range(n):\n            # 情况1: 田忌最快 > 齐王最快 -> 赢\n            if tian[t_fast] > king[k_fast]:\n                money += 200\n                t_fast -= 1\n                k_fast -= 1\n\n            # 情况2: 田忌最快 < 齐王最快 -> 输（用最慢消耗对方最快）\n            elif tian[t_fast] < king[k_fast]:\n                money -= 200\n                t_slow += 1\n                k_fast -= 1\n\n            # 情况3: 田忌最快 == 齐王最快 -> 比较慢马\n            else:\n                # 3.1 田忌最慢 > 齐王最慢 -> 赢（用慢马拿下一胜）\n                if tian[t_slow] > king[k_slow]:\n                    money += 200\n                    t_slow += 1\n                    k_slow += 1\n                # 3.2 其他情况 -> 用田忌最慢消耗齐王最快\n                else:\n                    # 这里需要判断一下胜负平\n                    if tian[t_slow] < king[k_fast]:\n                        money -= 200\n                    # 如果相等则不加不减（平局），例如全员速度一样的情况\n\n                    t_slow += 1\n                    k_fast -= 1\n\n        print(money)\n\n\nif __name__ == "__main__":\n    solve()\n'
 NUMBER=2287
 SAMPLE='3\n92 83 71\n95 87 74\n2\n20 20\n20 20\n2\n20 19\n22 18\n0\n'
@@ -168,6 +221,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+_extra()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

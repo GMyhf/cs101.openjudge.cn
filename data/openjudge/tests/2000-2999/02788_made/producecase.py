@@ -159,6 +159,35 @@ def generate(n, seed):
 
 REFERENCE="# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 2788: 二叉树（2）\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2025sp_routine/02788/\n# License: not declared in source collection; no license is inferred.\nimport sys\nimport sys\n\ndef count_subtree_nodes(m, n):\n    count = 0\n    left = m\n    right = m\n    # 每层的节点编号范围为 [left, right]\n    while left <= n:\n        count += min(n, right) - left + 1\n        left *= 2\n        right = right * 2 + 1\n    return count\n\ndef main():\n    input_stream = sys.stdin\n    for line in input_stream:\n        m, n = map(int, line.split())\n        if m == 0 and n == 0:\n            break\n        print(count_subtree_nodes(m, n))\n\nif __name__ == '__main__':\n    main()\n"
 NUMBER=2788
+def valid(text):
+    """题面：多行，每行两个整数 m n (1 <= m <= n <= 1000000000)；最后一行两个0表示结束。"""
+    if not text.endswith("\n"): return False
+    lines = text[:-1].split("\n")
+    if len(lines) < 2 or lines[-1] != "0 0": return False
+    for line in lines[:-1]:
+        t = line.split(" ")
+        if len(t) != 2 or not all(x.isdigit() and x[0] != "0" for x in t): return False
+        m, n = map(int, t)
+        if not 1 <= m <= n <= 1000000000: return False
+    return True
+def extra_cases():
+    """补充：m 取满值域（原数据 m<=1e5）、m=n、叶子、最后一层不满等边界，以及一组大量查询。"""
+    r = random.Random(2788)
+    N = 1000000000
+    edge = [(1, 1), (1, N), (N, N), (2, N), (3, N), (N // 2, N), (N // 2 + 1, N), (1, 2), (2, 2), (1, 3), (3, 12), (6, 12), (7, 12), (12, 12),
+            (1, 2**29), (1, 2**29 - 1), (2, 2**29), (3, 2**29), (536870911, N), (536870912, N), (268435455, N), (999999999, N)]
+    cases = ["\n".join(f"{m} {n}" for m, n in edge) + "\n0 0\n"]
+    for _ in range(3):
+        rows = []
+        for _ in range(r.randint(20, 40)):
+            n = r.randint(1, N); m = r.randint(1, n) if r.random() < .5 else max(1, n >> r.randint(0, 30)) + r.randint(-3, 3)
+            m = min(max(m, 1), n); rows.append(f"{m} {n}")
+        cases.append("\n".join(rows) + "\n0 0\n")
+    rows = []
+    for _ in range(20000):
+        n = r.randint(1, N); m = max(1, min(n, n >> r.randint(0, 30)) - r.randint(0, 2)); rows.append(f"{m} {n}")
+    cases.append("\n".join(rows) + "\n0 0\n")
+    return cases
 SAMPLE='3 12\n0 0\n'
 def run(x):
  with tempfile.TemporaryDirectory() as d:
@@ -168,6 +197,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

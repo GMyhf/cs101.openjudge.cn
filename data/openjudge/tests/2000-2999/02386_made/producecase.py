@@ -1,5 +1,41 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def valid(text):
+    """题面契约：第 1 行 N M（1<=N,M<=100）；随后恰 N 行，每行恰 M 个字符，只含 'W' 与 '.'，无空格。"""
+    try:
+        if not text.endswith("\n"):return False
+        lines=text[:-1].split("\n");t=lines[0].split(" ")
+        if len(t)!=2 or not all(x.isdigit() for x in t):return False
+        N,M=map(int,t)
+        if not (1<=N<=100 and 1<=M<=100) or len(lines)!=N+1:return False
+        return all(len(x)==M and set(x)<=set("W.") for x in lines[1:])
+    except Exception:
+        return False
+
+def gen2386(r,seed):
+    f=lambda g:f"{len(g)} {len(g[0])}\n"+"\n".join("".join(x) for x in g)+"\n"
+    rand=lambda N,M,p:[["W" if r.random()<p else "." for _ in range(M)] for _ in range(N)]
+    if seed==1:return f([["W"]])
+    if seed==2:return f([["."]])
+    if seed==3:return f([["W"]*100 for _ in range(100)])          # 全水，一个池塘（递归深 10000）
+    if seed==4:return f([["."]*100 for _ in range(100)])          # 全旱，0
+    if seed==5:return f([["W" if (i+j)%2==0 else "." for j in range(100)] for i in range(100)])  # 棋盘：只靠对角相连，1
+    if seed==6:return f([["W" if i%2==0 and j%2==0 else "." for j in range(100)] for i in range(100)])  # 孤点 2500 个
+    if seed==7:return f([["W" if i%2==0 else "." for j in range(100)] for i in range(100)])   # 50 条横带
+    if seed==8:                                                    # 蛇形单通道，DFS 深度最大
+        g=[["."]*100 for _ in range(100)]
+        for i in range(0,100,2):
+            for j in range(100):g[i][j]="W"
+            if i+1<100:g[i+1][99 if (i//2)%2==0 else 0]="W"
+        return f(g)
+    if seed==9:return f([["W" if r.random()<.5 else "."] for _ in range(100)])   # M=1
+    if seed==10:return f([["W" if r.random()<.5 else "." for _ in range(100)]])  # N=1
+    if seed==11:return f([["W" if (i+j)%2 else "." for j in range(100)] for i in range(99)])
+    if 12<=seed<=24:return f(rand(100,100,[.2,.3,.35,.4,.45,.5,.6,.7,.15,.25,.33,.38,.42][seed-12]))
+    if seed<=30:return f(rand(r.randint(90,100),r.randint(90,100),r.uniform(.2,.6)))
+    return f(rand(r.randint(1,12),r.randint(1,12),r.uniform(.2,.7)))
+
+
 def generate(n, seed):
     r=random.Random(seed)
     if n==2694:
@@ -41,8 +77,7 @@ def generate(n, seed):
         paths=[]
         for i in range(r.randint(2,20)):paths.append('\\'.join(f'D{r.randint(1,8)}' for _ in range(r.randint(1,5))))
         return str(len(paths))+'\n'+'\n'.join(paths)+'\n'
-    if n==2386:
-        a,b=r.randint(2,15),r.randint(2,15);return f'{a} {b}\n'+'\n'.join(''.join(r.choice('W..') for _ in range(b)) for _ in range(a))+'\n'
+    if n==2386:return gen2386(r,seed)
     if n==2456:
         N=r.randint(3,30);C=r.randint(2,N);x=sorted(r.sample(range(1,10000),N));return f'{N} {C}\n'+'\n'.join(map(str,x))+'\n'
     if n==2808:

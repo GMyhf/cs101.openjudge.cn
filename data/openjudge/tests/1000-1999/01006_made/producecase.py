@@ -1,5 +1,44 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+import re as _re
+
+def valid(text):
+    """题面契约（POJ 1006）：若干行，每行四个整数 p e i d，均非负且不超过 365；
+    以 p = e = i = d = -1 的一行结束。（“21252 天内必有三重高峰”由 CRT 自动成立。）"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if len(lines) < 2 or lines[-1] != "-1 -1 -1 -1":
+        return False
+    for ln in lines[:-1]:
+        t = ln.split(" ")
+        if len(t) != 4 or not all(_re.fullmatch(r"0|[1-9]\d*", z) for z in t):
+            return False
+        if not all(0 <= int(z) <= 365 for z in t):
+            return False
+    return True
+
+def gen1006(r, seed):
+    def on_peak(t):
+        # 构造 p, e, i（<= 365）使第 t 天恰是三重高峰
+        return [t % m + m * r.randint(0, (365 - t % m) // m) for m in (23, 28, 33)]
+    if seed == 1:
+        rows = [[0, 0, 0, 365], [365, 365, 365, 365], [365, 365, 365, 0], [0, 0, 0, 1],
+                [22, 27, 32, 0], [23, 28, 33, 0], [1, 1, 1, 0], [364, 364, 364, 365]]
+    elif seed == 2:   # 给定日期本身就是三重高峰，应给出 21252
+        rows = []
+        for _ in range(30):
+            d = r.randint(0, 365); rows.append(on_peak(d) + [d])
+    elif seed == 3:   # 三重高峰就在给定日期的下一天
+        rows = []
+        for _ in range(30):
+            d = r.randint(0, 364); rows.append(on_peak(d + 1) + [d])
+    elif seed >= 36:  # 多组数据（暴力逐日枚举 21252 天仍可在时限内）
+        rows = [[r.randint(0, 365) for _ in range(4)] for _ in range(1000)]
+    else:
+        rows = [[r.randint(0, 365) for _ in range(4)] for _ in range(r.randint(1, 5) if seed < 20 else r.randint(20, 200))]
+    return "\n".join(" ".join(map(str, x)) for x in rows) + "\n-1 -1 -1 -1\n"
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -67,7 +106,7 @@ def generate(number, seed):
             y,x=r.randrange(9),r.randrange(9);grid[y]=grid[y][:x]+"0"+grid[y][x+1:]
         return "1\n"+"\n".join(grid)+"\n"
     if number in NO_INPUT:return ""
-    if number==1006:return "\n".join(" ".join(str(r.randint(0,365)) for _ in range(4)) for _ in range(r.randint(1,5)))+"\n-1 -1 -1 -1\n"
+    if number==1006:return gen1006(r, seed)
     if number==2159:
         n=r.randint(2,100);a="".join(r.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(n));b="".join(r.sample(list(a),len(a))) if seed%2 else a[:-1]+("A" if a[-1]!="A" else "B");return a+"\n"+b+"\n"
     if number==1113:

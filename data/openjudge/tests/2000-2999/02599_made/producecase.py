@@ -136,7 +136,41 @@ def generate(number, seed):
     if number==2352:
         pts=sorted({(r.randint(0,100),r.randint(0,100)) for _ in range(30)},key=lambda p:(p[1],p[0]));return f"{len(pts)}\n"+"\n".join(f"{x} {y}" for x,y in pts)+"\n"
     if number==2599:
-        n=r.randint(2,40);edges=[(i,r.randint(1,i-1)) for i in range(2,n+1)];return f"{n} {r.randint(1,n)}\n"+"\n".join(f"{a} {b}" for a,b in edges)+"\n"
+        # 1-2：N=1/N=2；3-12：小树；13-22：N=1000 随机树；23-27：长链（递归深度 ~1000）；
+        # 28-33：度数顶到 20 的宽树；34-39：毛毛虫/中等规模
+        if seed==1:n=1
+        elif seed==2:n=2
+        elif seed<=12:n=r.randint(3,12)
+        elif seed<=33:n=1000 if seed%3 else r.randint(900,1000)
+        else:n=r.randint(100,1000)
+        deg=[0]*(n+1);edges=[]
+        def link(a,b):
+            deg[a]+=1;deg[b]+=1;edges.append((a,b))
+        if 23<=seed<=27:
+            for i in range(2,n+1):link(i-1,i)
+        elif 28<=seed<=33:
+            q=[1];nxt=2;h=0
+            while nxt<=n:
+                u=q[h];h+=1
+                for _ in range(20-deg[u]):
+                    if nxt>n:break
+                    link(u,nxt);q.append(nxt);nxt+=1
+        elif seed>=34:
+            spine=r.randint(1,n);
+            for i in range(2,spine+1):link(i-1,i)
+            for i in range(spine+1,n+1):
+                cand=[r.randint(1,spine) for _ in range(5)]+[r.randint(1,i-1)]
+                link(next((c for c in cand if deg[c]<20),next(c for c in range(1,i) if deg[c]<20)),i)
+        else:
+            for i in range(2,n+1):
+                while True:
+                    c=r.randint(max(1,i-r.choice([1,3,i])),i-1)
+                    if deg[c]<20:break
+                link(c,i)
+        perm=list(range(1,n+1));r.shuffle(perm);lab=[0]+perm
+        edges=[(lab[a],lab[b]) if r.random()<.5 else (lab[b],lab[a]) for a,b in edges];r.shuffle(edges)
+        k=r.randint(1,n) if seed%2 else lab[1]
+        return f"{n} {k}\n"+"".join(f"{a} {b}\n" for a,b in edges)
     if number==2937:
         n=r.randint(3,12);return f"{n}\n"+"\n".join(" ".join(str(r.randint(0,255)) for _ in range(n)) for _ in range(n))+"\n"
     if number==2943:
@@ -148,6 +182,35 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
+def valid(text):
+    """题面：首行 N K（N<=1000，1<=K<=N），随后 N-1 行无向边，构成一棵树（任两点恰一条路径），
+    每条边只出现一次，每个机场至多 20 条航线。"""
+    if not text.endswith("\n"):return False
+    lines=text[:-1].split("\n")
+    num=r"[1-9]\d*"
+    import re
+    m=re.fullmatch(f"({num}) ({num})",lines[0])
+    if not m:return False
+    n,k=int(m[1]),int(m[2])
+    if not(1<=n<=1000 and 1<=k<=n and len(lines)==n):return False
+    par=list(range(n+1));deg=[0]*(n+1);seen=set()
+    def find(x):
+        while par[x]!=x:par[x]=par[par[x]];x=par[x]
+        return x
+    for ln in lines[1:]:
+        m=re.fullmatch(f"({num}) ({num})",ln)
+        if not m:return False
+        a,b=int(m[1]),int(m[2])
+        if not(1<=a<=n and 1<=b<=n) or a==b:return False
+        e=(min(a,b),max(a,b))
+        if e in seen:return False
+        seen.add(e);deg[a]+=1;deg[b]+=1
+        if deg[a]>20 or deg[b]>20:return False
+        ra,rb=find(a),find(b)
+        if ra==rb:return False
+        par[ra]=rb
+    return True
+
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02599/statistics/\n# Accepted submission: 44797454\n# Source: http://cs101.openjudge.cn/practice/solution/44797454/\n# License: not declared on the submission page; no license is inferred.\n\n# -*- coding: utf-8 -*-\n"""\nCreated on Thu Apr 25 20:49:17 2024\n\n@author: Lenovo\n"""\n\nimport sys\nsys.setrecursionlimit(10<<8)\nans=0\ndef check(p):\n    global ans\n    vis.add(p)\n    for i in range(1,n+1):\n        if maze[p][i] and i not in vis:\n            if not check(i):\n                ans=i\n                return True\n    return False\n\nwhile True:\n    try:\n        n,k=map(int,input().split())\n        maze=[[0]*(n+1) for i in range(n+1)]\n        vis=set()\n        for i in range(n-1):\n            a,b=map(int,input().split())\n            maze[a][b]=maze[b][a]=1\n        if check(k):\n            print(f"First player wins flying to airport {ans}")\n        else:\n            print("First player loses")\n    except EOFError:\n        break\n'
 LANGUAGE='Python3'
 NUMBER=2599

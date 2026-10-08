@@ -37,6 +37,21 @@ def generate(number, seed):
         return "\n".join("".join(r.choice(chars) for _ in range(r.randint(1, 50)))
                          for _ in range(4)) + "\n"
     if number == 1163:
+        if seed >= 26:
+            n = {26: 100, 27: 100, 28: 100, 29: 2, 30: 100, 31: 99, 32: 100, 33: 100, 34: 2, 35: 100}.get(seed, r.randint(50, 100))
+            if seed == 27: rows = [[99] * i for i in range(1, n + 1)]
+            elif seed == 28: rows = [[0] * i for i in range(1, n + 1)]
+            elif seed == 29: rows = [[0], [0, 0]]
+            elif seed == 34: rows = [[99], [r.randint(0, 99), 99]]
+            elif seed == 30:  # 贪心陷阱：每层贪心较大的一侧会走进低谷
+                rows = [[r.randint(0, 9) for _ in range(i)] for i in range(1, n + 1)]
+                for i in range(1, n): rows[i][0] = 50; rows[i][-1] = 0
+                for i in range(2, n): rows[i][-1] = 99
+                rows[1] = [50, 0]
+            elif seed == 32: rows = [[99 if j == i - 1 else 0 for j in range(i)] for i in range(1, n + 1)]
+            elif seed == 33: rows = [[r.choice((0, 99)) for _ in range(i)] for i in range(1, n + 1)]
+            else: rows = [[r.randint(0, 99) for _ in range(i)] for i in range(1, n + 1)]
+            return f"{n}\n" + "\n".join(" ".join(map(str, row)) for row in rows) + "\n"
         n = r.randint(2, 18)
         return f"{n}\n" + "\n".join(" ".join(str(r.randint(0, 99)) for _ in range(i))
                                       for i in range(1, n + 1)) + "\n"
@@ -419,6 +434,18 @@ def generate(number, seed):
 
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01163/statistics/\n# Accepted submission: 51696004\n# Source: http://cs101.openjudge.cn/practice/solution/51696004/\n# License: not declared on the submission page; no license is inferred.\n\nN = int(input())\ndp = [int(input())]\nfor length in range(2, N+1):\n    n_dp = [int(x) for x in input().split()]\n    n_dp[0] += dp[0]\n    n_dp[-1] += dp[-1]\n    for i in range(1, length-1):\n        n_dp[i] += max(dp[i-1], dp[i])\n    dp = n_dp\nprint(max(dp))\n'
 LANGUAGE='Python3'
+def valid(text):
+    """题面：第一行 N（1<N<=100），其后 N 行第 i 行 i 个整数，取值 0..99。"""
+    import re
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if not re.fullmatch(r'[1-9][0-9]*',lines[0]):return False
+    N=int(lines[0])
+    if not(1<N<=100) or len(lines)!=N+1:return False
+    for i in range(1,N+1):
+        t=lines[i].split(' ')
+        if len(t)!=i or not all(re.fullmatch(r'0|[1-9][0-9]?',x) for x in t):return False
+    return True
 NUMBER=1163
 SAMPLE='5\n7\n3 8\n8 1 0\n2 7 4 4\n4 5 2 6 5\n'
 def main():

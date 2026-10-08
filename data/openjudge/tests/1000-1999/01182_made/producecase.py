@@ -36,6 +36,7 @@ def generate(n, seed):
     if n==1088:
         a,b=r.randint(2,12),r.randint(2,12);return f'{a} {b}\n'+'\n'.join(' '.join(str(r.randint(0,500)) for _ in range(b)) for _ in range(a))+'\n'
     if n==1182:
+        if seed>=26:return food_chain_case(r,seed)
         N=r.randint(3,50);k=r.randint(2,70);return f'{N} {k}\n'+'\n'.join(f'{r.randint(1,2)} {r.randint(1,N+3)} {r.randint(1,N+3)}' for _ in range(k))+'\n'
     if n==1760:
         paths=[]
@@ -153,6 +154,63 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
+def food_chain_case(r,seed):
+    """大规模/边界组。.in 需 <=1MB：N=50000 时 K 取 70000，K=100000 时 N<=999。
+    data/ 合计需 <=10MB：26/30/32/33/37 保留满规模，31/35/36/38/39 缩小 K。"""
+    def truthful(N,K,lie=0.0,out=0.0,selfeat=0.0,hi=None):
+        t=[r.randrange(3) for _ in range(N+1)];rows=[]
+        for _ in range(K):
+            u=r.random()
+            if u<out:
+                x,y=r.randint(1,hi or N+50),r.randint(1,hi or N+50)
+                if x<=N and y<=N:y=r.randint(N+1,N+50)
+                if r.random()<.5:x,y=y,x
+                rows.append((r.randint(1,2),x,y));continue
+            if u<out+selfeat:x=r.randint(1,N);rows.append((2,x,x));continue
+            x,y=r.randint(1,N),r.randint(1,N)
+            d=1 if t[x]==t[y] else (2 if (t[x]-t[y])%3==2 else None)
+            if d is None:x,y=y,x;d=2
+            if r.random()<lie:d=3-d if x!=y else 2
+            rows.append((d,x,y))
+        return N,rows
+    if seed==26:N,rows=truthful(50000,70000,lie=.2,out=.02,selfeat=.01)
+    elif seed==27:N=1;rows=[(r.randint(1,2),r.randint(1,2),r.randint(1,2)) for _ in range(100000)]
+    elif seed==28:N,rows=1,[]
+    elif seed==29:N,rows=50000,[]
+    elif seed==30:N=50000;rows=[(r.randint(1,2),r.randint(1,N),r.randint(1,N)) for _ in range(70000)]
+    elif seed==31:
+        N=50000;rows=[(1,i,i+1) for i in range(1,20000)]   # 控体积：同类链 2e4、总 K=3e4
+        rows+=[(r.randint(1,2),r.randint(1,N),r.randint(1,N)) for _ in range(30000-len(rows))]
+    elif seed==32:
+        N=50000;rows=[(2,i,i+1) for i in range(1,N)]
+        for _ in range(70000-len(rows)):
+            x=r.randint(1,N-6);k=r.randint(1,6);rows.append((r.randint(1,2),x,x+k))
+    elif seed==33:N,rows=truthful(999,100000,lie=.1,out=.05,selfeat=.02,hi=999)
+    elif seed==34:N=3;rows=[(r.randint(1,2),r.randint(1,4),r.randint(1,4)) for _ in range(100000)]
+    elif seed==35:N,rows=truthful(50000,30000)
+    elif seed==36:
+        N=500;rows=[]
+        for _ in range(50000):
+            k=r.randrange(4)
+            if k==0:rows.append((r.randint(1,2),r.randint(1,N),r.randint(N+1,999)))
+            elif k==1:rows.append((r.randint(1,2),r.randint(N+1,999),r.randint(1,N)))
+            else:rows.append((r.randint(1,2),r.randint(1,N),r.randint(1,N)))
+    elif seed==37:N,rows=truthful(999,100000,lie=.3,selfeat=.2)
+    elif seed==38:N,rows=truthful(50000,30000,lie=.01,out=.01)
+    else:N,rows=truthful(999,50000,lie=.05)
+    return f"{N} {len(rows)}\n"+"".join(f"{d} {x} {y}\n" for d,x,y in rows)
+def valid(text):
+    """题面：第一行 N K（1<=N<=50000，0<=K<=100000，单空格分隔）；其后 K 行，每行三个正整数 D X Y（单空格分隔），D∈{1,2}。
+    X、Y 只要求是正整数（允许大于 N，那是假话的一种）。"""
+    import re
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    m=re.fullmatch(r'([1-9][0-9]*) (0|[1-9][0-9]*)',lines[0])
+    if not m:return False
+    N,K=int(m.group(1)),int(m.group(2))
+    if not(1<=N<=50000 and 0<=K<=100000) or len(lines)!=K+1:return False
+    pat=re.compile(r'[12] [1-9][0-9]{0,9} [1-9][0-9]{0,9}')
+    return all(pat.fullmatch(x) for x in lines[1:])
 REFERENCE='# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 1182: 食物链\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024sp_routine/01182/\n# License: not declared in source collection; no license is inferred.\nimport sys\nclass DisjointSet:\n    def __init__(self, n):\n        #设[1,n] 区间表示同类，[n+1,2*n]表示x吃的动物，[2*n+1,3*n]表示吃x的动物。\n        self.parent = [i for i in range(3 * n + 1)] # 每个动物有三种可能的类型，用 3 * n 来表示每种类型的并查集\n        self.rank = [0] * (3 * n + 1)\n\n    def find(self, u):\n        if self.parent[u] != u:\n            self.parent[u] = self.find(self.parent[u])\n        return self.parent[u]\n\n    def union(self, u, v):\n        pu, pv = self.find(u), self.find(v)\n        if pu == pv:\n            return False\n        if self.rank[pu] > self.rank[pv]:\n            self.parent[pv] = pu\n        elif self.rank[pu] < self.rank[pv]:\n            self.parent[pu] = pv\n        else:\n            self.parent[pv] = pu\n            self.rank[pu] += 1\n        return True\n\n\ndef is_valid(n, k, statements):\n    dsu = DisjointSet(n)\n\n    def find_disjoint_set(x):\n        if x > n:\n            return False\n        return True\n\n    false_count = 0\n    for d, x, y in statements:\n        if not find_disjoint_set(x) or not find_disjoint_set(y):\n            false_count += 1\n            continue\n        if d == 1:  # X and Y are of the same type\n            if dsu.find(x) == dsu.find(y + n) or dsu.find(x) == dsu.find(y + 2 * n):\n                false_count += 1\n            else:\n                dsu.union(x, y)\n                dsu.union(x + n, y + n)\n                dsu.union(x + 2 * n, y + 2 * n)\n        else:  # X eats Y\n            if dsu.find(x) == dsu.find(y) or dsu.find(x + 2*n) == dsu.find(y):\n                false_count += 1\n            else: #[1,n] 区间表示同类，[n+1,2*n]表示x吃的动物，[2*n+1,3*n]表示吃x的动物\n                dsu.union(x + n, y)\n                dsu.union(x, y + 2 * n)\n                dsu.union(x + 2 * n, y + n)\n\n    return false_count\n\n\nif __name__ == "__main__":\n    N, K = map(int, input().split())\n    statements = []\n    for _ in range(K):\n        D, X, Y = map(int, input().split())\n        statements.append((D, X, Y))\n    result = is_valid(N, K, statements)\n    print(result)\n'
 NUMBER=1182
 SAMPLE='100 7\n1 101 1\n2 1 2\n2 2 3\n2 3 3\n1 1 3\n2 3 1\n1 5 5\n'
@@ -165,5 +223,6 @@ def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
  for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+  assert valid(x),i
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

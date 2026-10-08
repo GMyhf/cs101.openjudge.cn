@@ -5,6 +5,19 @@ GENERATOR_NAME='g29750'
 def g29750(r):
     n = r.randint(1, 11); return f"{n}\n" + " ".join(str(r.randint(0, 1)) for _ in range(n)) + "\n"
 
+
+def valid(text):
+    """题面契约：第一行正整数 n；第二行恰 n 个 0/1，单空格分隔。题面未给 n 的上限，只核格式。"""
+    import re
+    m = re.fullmatch(r'([1-9][0-9]*)\n([01]( [01])*)\n', text)
+    return bool(m) and len(m.group(2).split(' ')) == int(m.group(1))
+
+# 原随机组中第 14/32/39 组与前面重复，换成构造组（输出均 <= 2MB）
+EXTRA = {
+    14: "10\n" + " ".join(["1"] * 10) + "\n",          # 全黄金：3^10-1 步
+    32: "15\n" + " ".join(["0"] * 15) + "\n",          # 全普通：2^15-1 步
+    39: "12\n" + "1 0 1 0 0 0 0 0 0 0 0 1" + "\n",
+}
 from pathlib import Path
 import random, subprocess, sys, tempfile
 REFERENCE = REFERENCE
@@ -16,7 +29,10 @@ def solve(text):
         return result.stdout
 def main():
     data=Path('data'); data.mkdir(exist_ok=True)
-    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(seed)) for seed in range(1, 40)]
+    cases=[SAMPLE]+[EXTRA.get(seed) or globals()[GENERATOR_NAME](random.Random(seed)) for seed in range(1, 40)]
+    assert len(set(cases)) == len(cases)
+    for i, case in enumerate(cases):
+        assert valid(case), i
     for i, case in enumerate(cases):
         (data/f'{i}.in').write_text(case); (data/f'{i}.out').write_text(solve(case))
 if __name__=='__main__': main()

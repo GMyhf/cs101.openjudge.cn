@@ -151,6 +151,61 @@ NO_INPUT={3225, 2698}
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1193: 内存分配\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01193/\n# License: not declared; no license is inferred.\nimport sys\nimport heapq\nfrom collections import deque\nimport bisect\n\ndef solve():\n    # 使用 fast I/O 读取所有输入\n    input_data = sys.stdin.read().split()\n    if not input_data:\n        return\n\n    it = iter(input_data)\n    try:\n        N = int(next(it))\n    except StopIteration:\n        return\n\n    # running_tasks: 存储 [start_address, size, finish_time]，按 start_address 排序\n    running_tasks = []\n    # finish_heap: 存储所有任务的 finish_time，用于快速找到下一个释放内存的时间\n    finish_heap = []\n    # wait_queue: 存储等待进程的需求 (size, duration)\n    wait_queue = deque()\n\n    wait_count = 0\n    total_max_finish_time = 0\n\n    def find_gap(m):\n        """寻找长度为 m 的最小起始地址空闲片"""\n        if not running_tasks:\n            return 0 if N >= m else -1\n\n        # 1. 检查第一个任务之前的空间\n        if running_tasks[0][0] >= m:\n            return 0\n\n        # 2. 检查任务之间的间隙\n        for i in range(len(running_tasks) - 1):\n            gap_start = running_tasks[i][0] + running_tasks[i][1]\n            gap_end = running_tasks[i+1][0]\n            if gap_end - gap_start >= m:\n                return gap_start\n\n        # 3. 检查最后一个任务之后的空间\n        last_end = running_tasks[-1][0] + running_tasks[-1][1]\n        if N - last_end >= m:\n            return last_end\n\n        return -1\n\n    def allocate_task(pos, m, finish_t):\n        """将任务插入运行列表并更新结束时间堆"""\n        nonlocal total_max_finish_time\n        # 使用 bisect 保持 running_tasks 按起始地址有序\n        bisect.insort(running_tasks, [pos, m, finish_t])\n        heapq.heappush(finish_heap, finish_t)\n        if finish_t > total_max_finish_time:\n            total_max_finish_time = finish_t\n\n    def process_finishes(until_time):\n        """处理直到 until_time 为止的所有内存释放和等待队列激活"""\n        nonlocal running_tasks\n        while finish_heap and finish_heap[0] <= until_time:\n            t_f = heapq.heappop(finish_heap)\n\n            # 同时处理所有在 t_f 时刻结束的任务（可能释放出更大的连续空间）\n            finish_times_to_clear = {t_f}\n            while finish_heap and finish_heap[0] == t_f:\n                finish_times_to_clear.add(heapq.heappop(finish_heap))\n\n            # 释放内存\n            running_tasks = [t for t in running_tasks if t[2] not in finish_times_to_clear]\n\n            # 优先级最高：检查等待队列队头\n            while wait_queue:\n                m_q, p_q = wait_queue[0]\n                pos = find_gap(m_q)\n                if pos != -1:\n                    wait_queue.popleft()\n                    # 等待队列中的进程从内存释放的时刻 t_f 开始运行\n                    allocate_task(pos, m_q, t_f + p_q)\n                else:\n                    # 如果队头都放不下，根据规则，后面的不能先处理\n                    break\n\n    # 主循环：读取每个进程请求\n    while True:\n        try:\n            t_arrival = int(next(it))\n            m_size = int(next(it))\n            p_duration = int(next(it))\n        except StopIteration:\n            break\n\n        if t_arrival == 0 and m_size == 0 and p_duration == 0:\n            break\n\n        # 1. 在处理新到达请求前，先释放已经完成的任务并处理等待队列\n        process_finishes(t_arrival)\n\n        # 2. 尝试分配当前到达的任务\n        pos = find_gap(m_size)\n        if pos != -1:\n            allocate_task(pos, m_size, t_arrival + p_duration)\n        else:\n            # 放入等待队列\n            wait_queue.append((m_size, p_duration))\n            wait_count += 1\n\n    # 3. 输入结束后，处理完所有剩余任务\n    while finish_heap:\n        process_finishes(finish_heap[0])\n\n    # 输出结果\n    print(total_max_finish_time)\n    print(wait_count)\n\nif __name__ == "__main__":\n    solve()\n'
 LANGUAGE='Python3'
 NUMBER=1193
+def valid(text):
+    # 题面：首行 N；之后每行 T M P（M<=N），以 "0 0 0" 结束；按 T 非降序；
+    # 文件最多 10000 行；所有数据 < 10^9；同行相邻项以一个或多个空格分隔
+    if not text.endswith('\n'): return False
+    lines=text[:-1].split('\n')
+    if len(lines)>10000 or len(lines)<2: return False
+    def nums(l,k):
+        if l!=l.strip(' ') or '\t' in l: return None
+        t=l.split()
+        if len(t)!=k or not all(x.isdigit() for x in t): return None
+        return list(map(int,t))
+    h=nums(lines[0],1)
+    if not h or not 1<=h[0]<10**9: return False
+    N=h[0]
+    if nums(lines[-1],3)!=[0,0,0]: return False
+    last=0
+    for l in lines[1:-1]:
+        v=nums(l,3)
+        if v is None: return False
+        T,M,P=v
+        if not (1<=M<=N and 1<=P<10**9 and 0<=T<10**9 and T>=last): return False
+        if v==[0,0,0]: return False
+        last=T
+    return True
+def extra_1193():
+    # 补充大规模组：满 10000 行、数值接近 10^9、长等待队列、大量并发、同时刻到达/释放、多空格分隔
+    r=random.Random(1193_2024);out=[]
+    def mk(N,rows,sep=' '):
+        return f"{N}\n"+"\n".join(sep.join(map(str,x)) for x in rows)+"\n0 0 0\n"
+    K=9998
+    # 1) 小内存、长等待队列
+    t=1;rows=[]
+    for _ in range(K):t+=r.randint(0,3);rows.append((t,r.randint(1,100),r.randint(1,1000)))
+    out.append(mk(100,rows))
+    # 2) 大内存、大量并发进程（运行表很长）
+    t=1;rows=[]
+    for _ in range(K):t+=r.randint(0,50);rows.append((t,r.randint(1,200000),r.randint(2*10**4,10**5)))
+    out.append(mk(999_999_999,rows))
+    # 3) 数值接近上限：T 分散到 10^9 附近
+    ts=sorted(r.randint(1,999_999_999) for _ in range(K))
+    out.append(mk(10**6,[(x,r.randint(1,10**6),r.randint(1,999_999_999)) for x in ts]))
+    # 4) 全部同一时刻到达且独占内存：除第一个外全部进队，结束时刻超过 2^31
+    out.append(mk(999_999_999,[(1,999_999_999,r.randint(500_000,999_999)) for _ in range(K)]))
+    # 5) 释放与到达同刻频繁发生，多空格分隔
+    t=1;rows=[]
+    for _ in range(K):t+=r.choice([0,0,1,5]);rows.append((t,r.randint(1,50),r.choice([1,2,5,10])))
+    out.append(mk(60,rows,sep='   '))
+    # 6) 中等规模混合
+    t=1;rows=[]
+    for _ in range(5000):t+=r.randint(0,10);rows.append((t,r.randint(1,1000),r.randint(1,200)))
+    out.append(mk(1000,rows))
+    # 7) 最小规模
+    out.append("1\n1 1 1\n0 0 0\n")
+    out.append("5\n1 5 3\n1 5 3\n4 1 1\n0 0 0\n")
+    return out
 SAMPLE='10\n1 3 10\n2 4 3\n3 4 4\n4 1 4\n5 3 4\n0 0 0\n'
 def main():
  with tempfile.TemporaryDirectory() as d:
@@ -159,7 +214,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)])
+  cases=([SAMPLE] if SAMPLE or NUMBER in (2698,3225) else [])+([] if NUMBER in (2698,3225) else [generate(NUMBER,s) for s in range(1, 40)]+extra_1193())
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(q.stdout.rstrip()+'\n')
 if __name__=='__main__':main()

@@ -1,5 +1,79 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def valid(text):
+    """题面契约：第 1 行 N L（1<=N<=1000，1<=L<=1000000，L 为偶数）；第 2 行 A B（1<=A<=B<=1000）；
+    随后恰 N 行，每行 S E（0<=S<E<=L）。"""
+    try:
+        if not text.endswith("\n"):return False
+        lines=text[:-1].split("\n")
+        def ints(ln):
+            t=ln.split(" ")
+            if len(t)!=2 or not all(x.isdigit() for x in t):raise ValueError
+            return int(t[0]),int(t[1])
+        n,L=ints(lines[0]);a,b=ints(lines[1])
+        if not (1<=n<=1000 and 1<=L<=1000000 and L%2==0 and 1<=a<=b<=1000):return False
+        if len(lines)!=n+2:return False
+        for ln in lines[2:]:
+            s_,e=ints(ln)
+            if not 0<=s_<e<=L:return False
+        return True
+    except Exception:
+        return False
+
+def gen2373(r,seed):
+    def fmt(L,a,b,cows):
+        r.shuffle(cows);return f"{len(cows)} {L}\n{a} {b}\n"+"\n".join(f"{x} {y}" for x,y in cows)+"\n"
+    def planned(L,a,b,n,maxlen=None):
+        # 先切出一组合法喷头，再在各段内部放牛区间，保证有解
+        half=L//2;segs=[];pos=0
+        feas=lambda m:m==0 or (m+b-1)//b<=m//a
+        assert feas(half)
+        while pos<half:
+            rem=half-pos
+            while True:
+                rd=r.randint(a,min(b,rem))
+                if feas(rem-rd):break
+            segs.append((2*pos,2*(pos+rd)));pos+=rd
+        cows=[]
+        for _ in range(n):
+            x,y=r.choice(segs);
+            if maxlen:y=min(y,x+maxlen)
+            s_,e=sorted(r.sample(range(x,y+1),2));cows.append((s_,e))
+        return cows
+    def rnd(L,n,maxlen):
+        cows=[]
+        for _ in range(n):
+            ln=r.randint(1,min(maxlen,L));s_=r.randint(0,L-ln);cows.append((s_,s_+ln))
+        return cows
+    M=1000000
+    if seed==1:return fmt(2,1,1,[(0,2)])                     # 最小规模，答案 1
+    if seed==2:return fmt(2,2,5,[(0,1)])                     # 2A>L，-1
+    if seed==3:return fmt(2000,1000,1000,[(0,2000)])         # 一个喷头恰好覆盖全程
+    if seed==4:return fmt(2002,1000,1000,[(0,1)])            # L 不是 2A..2B 的和，-1
+    if seed==5:return fmt(M,1000,1000,planned(M,1000,1000,1000))   # 唯一划分，答案 500
+    if seed==6:return fmt(M,1,1,planned(M,1,1,1000))         # 半径固定为 1，答案 500000
+    if seed==7:return fmt(M,1,1000,planned(M,1,1000,1000))
+    if seed==8:return fmt(M,1,1000,planned(M,1,1000,1000,50))
+    if seed==9:return fmt(M,500,1000,planned(M,500,1000,1000))
+    if seed==10:return fmt(M,999,1000,planned(M,999,1000,1000))
+    if seed==11:return fmt(M,1,2,planned(M,1,2,1000))
+    if seed==12:return fmt(M,1,1000,rnd(M,1000,3000))        # 随机牛区间，可能 -1
+    if seed==13:return fmt(M,1,1000,rnd(M,1000,30))
+    if seed==14:return fmt(M,1,1000,[(0,M)]*1000)            # 整段被一头牛要求，-1
+    if seed==15:return fmt(M,1,1000,planned(M,1,1000,999)+[(1000,3001)])  # 一个超长区间，-1
+    if seed==16:return fmt(M,7,13,planned(M,7,13,1000))
+    if seed==17:return fmt(M,1,1000,rnd(M,1000,2000))
+    if seed==18:return fmt(M-2,333,777,planned(M-2,333,777,1000))
+    if seed<=30:
+        L=2*r.randint(1,40);a=r.randint(1,max(1,L//4));b=r.randint(a,min(1000,a+r.randint(0,8)))
+        n=r.randint(1,8)
+        return fmt(L,a,b,planned(L,a,b,n) if seed%2 and (L//2+b-1)//b<=L//2//a else rnd(L,n,r.randint(1,L)))
+    L=2*r.randint(500,50000);a=r.randint(1,100);b=r.randint(a,a+r.randint(0,900))
+    if seed%2:return fmt(L,a,b,rnd(L,r.randint(1,1000),r.randint(1,3*b)))
+    if (L//2+b-1)//b>L//2//a:a=1
+    return fmt(L,a,b,planned(L,a,b,r.randint(1,1000)))
+
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     letters = "abcdefghijklmnopqrstuvwxyz"
@@ -12,11 +86,7 @@ def generate(number, seed):
         a=[r.randint(1,40) for _ in range(r.randint(1,18))];return f"{len(a)}\n"+"\n".join(map(str,a))+"\n"
     if number==1837:
         c=r.randint(2,8);g=r.randint(2,8);p=sorted(r.sample(range(-15,16),c));w=sorted(r.sample(range(1,26),g));return f"{c} {g}\n"+" ".join(map(str,p))+"\n"+" ".join(map(str,w))+"\n"
-    if number==2373:
-        L=2*r.randint(8,35);a=r.randint(1,max(1,L//6));b=r.randint(a,min(L//2,a+8));rows=[]
-        for _ in range(r.randint(1,8)):
-            x,y=sorted(r.sample(range(L+1),2));rows.append((x,y))
-        return f"{len(rows)} {L}\n{a} {b}\n"+"\n".join(f"{x} {y}" for x,y in rows)+"\n"
+    if number==2373:return gen2373(r,seed)
     if number==1204:
         h,w=8+r.randrange(5),8+r.randrange(5);grid=[[r.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ") for _ in range(w)] for _ in range(h)];words=[]
         for y in range(min(6,h)):
@@ -148,7 +218,7 @@ def generate(number, seed):
     raise KeyError(number)
 
 NO_INPUT={3225, 2698}
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02373/statistics/\n# Accepted submission: 43079895\n# Source: http://cs101.openjudge.cn/practice/solution/43079895/\n# License: not declared on the submission page; no license is inferred.\n\n# -*- coding: utf-8 -*-\n"""\nCreated on Fri Oct 20 14:30:37 2023\n\n@author: Lenovo\n"""\n\nimport heapq\n\nn,l=map(int,input().split())\na,b=map(int,input().split())\ncow=[0]*(l+1)\nfor _ in range(n):\n    s,e=map(int,input().split())\n    for j in range(s+1,e):\n        cow[j]=1\nd=[-1]*(l+1)\na2=a*2\nb2=b*2\nheap=[]\nfor i in range(a2,l+1,2):\n    if i<=b2:\n        if cow[i]==0:\n            d[i]=1\n            if i<=b2+2-a2:\n                heapq.heappush(heap,(d[i],i))\n        continue\n    else:\n        if cow[i]==0:\n            while heap and heap[0][1]<i-b2:\n                heapq.heappop(heap)\n            if heap:\n                d[i]=heap[0][0]+1\n        if d[i-a2+2]>=0:\n            heapq.heappush(heap,(d[i-a2+2],i-a2+2))\nprint(d[l])\n'
+REFERENCE='# 参考解：差分标记牛区间内部 + 单调队列 DP，O(N+L)。\n# 原 AC 提交（43079895，见 samplecode.py）逐格标记牛区间，最坏 O(N*L)，大数据下过慢，改用本实现，原提交仍作交叉核对。\nimport sys\nfrom collections import deque\ndef main():\n    d=sys.stdin.buffer.read().split();n,L,a,b=int(d[0]),int(d[1]),int(d[2]),int(d[3])\n    diff=[0]*(L+2)\n    for i in range(n):\n        s_,e=int(d[4+2*i]),int(d[5+2*i]);diff[s_+1]+=1;diff[e]-=1\n    bad=[False]*(L+1);c=0\n    for i in range(L+1):c+=diff[i];bad[i]=c>0\n    INF=10**9;dp=[INF]*(L+1);dp[0]=0;q=deque()\n    for i in range(2*a,L+1,2):\n        j=i-2*a\n        if dp[j]<INF:\n            while q and dp[q[-1]]>=dp[j]:q.pop()\n            q.append(j)\n        while q and q[0]<i-2*b:q.popleft()\n        if not bad[i] and q:dp[i]=dp[q[0]]+1\n    print(dp[L] if dp[L]<INF else -1)\nmain()\n'
 LANGUAGE='Python3'
 NUMBER=2373
 SAMPLE='2 8\n1 2\n6 7\n3 6\n'

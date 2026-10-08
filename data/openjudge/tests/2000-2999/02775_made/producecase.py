@@ -16,7 +16,7 @@ def generate(n, seed):
     if n==2810:return f"{r.randint(2,45)}\n"
     if n==2299:
         a=[r.randint(0,10**9) for _ in range(r.randint(2,40))];return f"{len(a)}\n"+'\n'.join(map(str,a))+'\n0\n'
-    if n==2775:return f"file{seed}\ndir{seed}\nfileA\n]\nfileZ\n*\n#\n"
+    if n==2775:return gen2775(r)
     if n==2815:
         rows,cols=r.randint(2,7),r.randint(2,7);g=[[0]*cols for _ in range(rows)]
         for i in range(rows):
@@ -153,6 +153,72 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
+def valid(text):
+    """题面契约：若干组，每组若干行名字/']'，以 '*' 结尾，全部以 '#' 结尾；
+    目录名以 'd' 开头、文件名以 'f' 开头，无空格，长度 <=30；']' 结束一个目录（须先打开过，组末全部闭合）；
+    每个目录（含 ROOT）下子目录数+文件数 <= 30。"""
+    if not text.endswith('\n'): return False
+    lines = text[:-1].split('\n')
+    if len(lines) < 2 or lines[-1] != '#' or '#' in lines[:-1]: return False
+    sets = 0
+    stack = [0]
+    for s in lines[:-1]:
+        if s == '*':
+            if len(stack) != 1: return False
+            sets += 1; stack = [0]
+        elif s == ']':
+            if len(stack) == 1: return False
+            stack.pop()
+        else:
+            if not 1 <= len(s) <= 30 or s[0] not in 'df': return False
+            if any(not (33 <= ord(c) <= 126) or c in '*#]' for c in s): return False
+            stack[-1] += 1
+            if stack[-1] > 30: return False
+            if s[0] == 'd': stack.append(0)
+    return sets >= 1 and stack == [0]
+
+def gen2775(r, sets=None, max_depth=None):
+    """随机文件树：多组数据、多层嵌套、空目录、目录不按字母序出现、同目录下文件乱序；每个目录子项 <=30，名字长度 <=30。"""
+    alpha = 'abcdefghijklmnopqrstuvwxyz0123456789'
+    def name(kind, used):
+        while True:
+            body = ''.join(r.choice(alpha) for _ in range(r.randint(0, 8)))
+            if r.random() < .3: body += '.' + ''.join(r.choice('abcdefghijklmnopqrstuvwxyz') for _ in range(r.randint(1, 4)))
+            s = (kind + body)[:30]
+            if s not in used: used.add(s); return s
+    def tree(depth, budget):
+        used = set(); out = []
+        for _ in range(r.randint(0, min(30, budget[0]))):
+            if budget[0] <= 0: break
+            budget[0] -= 1
+            if depth < max_d and r.random() < .35:
+                out.append(name('d', used)); out += tree(depth + 1, budget); out.append(']')
+            else:
+                out.append(name('f', used))
+        return out
+    lines = []
+    for _ in range(sets or r.randint(1, 4)):
+        max_d = max_depth if max_depth is not None else r.randint(1, 6)
+        lines += tree(0, [r.randint(1, 60)]); lines.append('*')
+    return '\n'.join(lines + ['#']) + '\n'
+
+def extra_cases():
+    """补充覆盖：空组（只有 '*'）、单层深链、每个目录满 30 个子项、名字长度 30、多组数据。"""
+    r = random.Random(277500)
+    cases = ['*\n#\n', 'fz\nfa\nfm\n*\n#\n', 'dz\n]\nda\n]\ndm\n]\n*\n*\nfx\n*\n#\n']
+    chain = [f'd{i}' for i in range(40)] + ['f' + 'x' * 29] + [']'] * 40 + ['*', '#']
+    cases.append('\n'.join(chain) + '\n')
+    wide = []
+    for i in range(15):
+        wide.append(f'd{29 - i:02d}')
+        wide += sorted((f'f{j:02d}' + 'y' * (j % 20) for j in range(30)), key=lambda _: r.random())
+        wide.append(']')
+    wide += sorted((f'f{"q" * 20}{j:02d}' for j in range(15)), key=lambda _: r.random())
+    cases.append('\n'.join(wide + ['*', '#']) + '\n')
+    for k in range(6):
+        cases.append(gen2775(r, sets=r.randint(3, 8), max_depth=r.randint(4, 12)))
+    return cases
+
 REFERENCE="# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 2775: 文件结构“图”\n# Fenced code block index: 3\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024sp_routine/02775/\n# License: not declared in source collection; no license is inferred.\nimport sys\nclass Node:\n    def __init__(self,name):\n        self.name=name\n        self.dirs=[]\n        self.files=[]\n\ndef print_(root,m):\n    pre='|     '*m\n    print(pre+root.name)\n    for Dir in root.dirs:\n        print_(Dir,m+1)\n    for file in sorted(root.files):\n        print(pre+file)\n\ntests,test=[],[]\nwhile True:\n    s=input()\n    if s=='#':\n        break\n    elif s=='*':\n        tests.append(test)\n        test=[]\n    else:\n        test.append(s)\nfor n,test in enumerate(tests,1):\n    root=Node('ROOT')\n    stack=[root]\n    print(f'DATA SET {n}:')\n    for i in test:\n        if i[0]=='d':\n            Dir=Node(i)\n            stack[-1].dirs.append(Dir)\n            stack.append(Dir)\n        elif i[0]=='f':\n            stack[-1].files.append(i)\n        else:\n            stack.pop()\n    print_(root,0)\n    print()\n"
 NUMBER=2775
 SAMPLE='file1\nfile2\ndir3\ndir2\nfile1\nfile2\n]\n]\nfile4\ndir1\n]\nfile3\n*\nfile2\nfile1\n*\n#\n'
@@ -164,6 +230,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

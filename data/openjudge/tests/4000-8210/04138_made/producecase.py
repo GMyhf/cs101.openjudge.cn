@@ -26,6 +26,20 @@ def sieve(n):
     return flag
 
 
+def valid(text):
+    """题面：一行，一个不大于 10000 的正整数 S，且 S 是两个质数之和（「数据保证有解」）。"""
+    if not text.endswith("\n") or text.count("\n") != 1:
+        return False
+    t = text[:-1]
+    if not t.isdigit() or t[0] == "0":
+        return False
+    s = int(t)
+    if not 1 <= s <= LIMIT:
+        return False
+    prime = sieve(max(s, 2))
+    return any(prime[p] and prime[s - p] for p in range(2, s - 1))
+
+
 def solve_text(text):
     s = int(text.split()[0])
     prime = sieve(max(s, 2))
@@ -44,6 +58,7 @@ def build_cases():
     picks = sorted(set(picks))
     cases = [SAMPLE_IN] + [f"{s}\n" for s in picks if f"{s}\n" != SAMPLE_IN]
     assert all(int(c) in set(valid) for c in cases), "题面保证 S 是两个质数之和"
+    assert all(globals()["valid"](c) for c in cases)
     assert min(int(c) for c in cases) == 4, "最小的合法 S 是 4=2+2，要有数据"
     assert max(int(c) for c in cases) == valid[-1], "上界一带要有数据"
     assert any(int(c) % 2 for c in cases), "奇数 S(=2+p) 也要有数据"

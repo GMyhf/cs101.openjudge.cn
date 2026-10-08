@@ -101,10 +101,7 @@ def generate(number, seed):
     if number == 1160:
         villages = sorted(r.sample(range(1, 10001), r.randint(1, 100)))
         return f"{len(villages)} {r.randint(1, min(30, len(villages)))}\n" + " ".join(map(str, villages)) + "\n"
-    if number == 1944:
-        n = r.randint(2, 80); all_pairs = [(a, b) for a in range(1, n + 1) for b in range(a + 1, n + 1)]
-        pairs = r.sample(all_pairs, r.randint(1, min(200, len(all_pairs))))
-        return f"{n} {len(pairs)}\n" + "\n".join(f"{a} {b}" for a, b in pairs) + "\n"
+    if number == 1944: return gen1944(r, seed)
     if number == 2385:
         total, walks = r.randint(1, 200), r.randint(1, 30)
         return f"{total} {walks}\n" + "\n".join(str(r.randint(1, 2)) for _ in range(total)) + "\n"
@@ -118,6 +115,73 @@ def generate(number, seed):
         words = sorted(words); r.shuffle(words)
         return "\n".join(words) + "\n"
     raise KeyError(number)
+
+def valid(text):
+    """题面约束：首行 N P（1<=N<=1000，1<=P<=10000）；随后 P 行，每行两个 1..N 的谷仓编号，
+    表示需要通信的一对（两个不同谷仓）；“No pair is duplicated”——按无序对判重。"""
+    if not text.endswith("\n"):return False
+    lines=text[:-1].split("\n")
+    def ints(ln):
+        t=ln.split(" ")
+        if not all(x.isdigit() and str(int(x))==x for x in t):return None
+        return list(map(int,t))
+    h=ints(lines[0])
+    if not h or len(h)!=2:return False
+    n,p=h
+    if not(1<=n<=1000 and 1<=p<=10000) or len(lines)!=p+1:return False
+    seen=set()
+    for ln in lines[1:]:
+        v=ints(ln)
+        if not v or len(v)!=2:return False
+        a,b=v
+        if not(1<=a<=n and 1<=b<=n) or a==b:return False
+        k=(min(a,b),max(a,b))
+        if k in seen:return False
+        seen.add(k)
+    return True
+
+def gen1944(r, seed):
+    # 规模说明：N=1000 时内嵌参考解是 O(N*P)，P 取到 6000 左右（约 4s，Python 单组时限 10s 的一半以内）；
+    # P=10000 满规模放在 N≈150..200 的组里。
+    def arcs_pairs(n,P,k):
+        # 在环上取 k 段弧（可跨过 N-1 接口、可重叠），每对谷仓都落在同一段弧内
+        arcs=[(r.randint(1,n),r.randint(1,max(1,min(n-1,r.choice([n//(2*k)+1,n//k,n//2,n-1]))))) for _ in range(k)]
+        got=set();tries=0
+        while len(got)<P and tries<P*30:
+            tries+=1;st,ln=r.choice(arcs)
+            if ln<1:continue
+            i,j=r.sample(range(ln+1),2)
+            a=(st-1+i)%n+1;b=(st-1+j)%n+1
+            got.add((min(a,b),max(a,b)))
+        return list(got)
+    def rand_pairs(n,P):
+        got=set()
+        while len(got)<P:
+            a,b=r.sample(range(1,n+1),2);got.add((min(a,b),max(a,b)))
+        return list(got)
+    if seed==1:n,pairs=2,[(1,2)]
+    elif seed==2:n,pairs=3,[(1,3)]
+    elif seed==3:n,pairs=1000,[(1,1000)]
+    elif seed==4:n,pairs=1000,[(1,500)]
+    elif seed==5:n,pairs=1000,[(1,501),(250,750)]
+    elif seed<=16:
+        n=r.randint(4,12);P=r.randint(1,min(15,n*(n-1)//2))
+        pairs=arcs_pairs(n,P,r.randint(1,3)) if seed%3 else rand_pairs(n,P)
+    elif seed<=26:
+        n=r.randint(50,400);P=r.randint(100,min(3000,n*(n-1)//2))
+        pairs=arcs_pairs(n,P,r.randint(1,6))
+    elif seed<=32:
+        n=1000;pairs=arcs_pairs(n,r.randint(4500,6000),r.randint(2,8))
+    elif seed<=35:
+        n=r.randint(150,200);pairs=arcs_pairs(n,10000,r.randint(1,3))
+        if len(pairs)<10000:pairs=rand_pairs(n,10000)
+    elif seed<=37:
+        n=1000;pairs=rand_pairs(n,6000)
+    else:
+        n=r.randint(150,200);pairs=rand_pairs(n,10000)
+    r.shuffle(pairs)
+    pairs=[(b,a) if r.random()<.5 else (a,b) for a,b in pairs]
+    return f"{n} {len(pairs)}\n"+"\n".join(f"{a} {b}" for a,b in pairs)+"\n"
 
 REFERENCE="# Source collection: /home/rocky/git/2024spring-cs201/2024spring_dsa_problems.md\n# Heading: 1944: Fiber Communications\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2024spring-cs201/blob/main/2024spring_dsa_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01944/\n# License: not declared in source collection; no license is inferred.\nimport sys\n# https://www.cnblogs.com/lightspeedsmallson/p/4785834.html\nN, P = map(int, input().split())\nnode_one = []\n\nfor i in range(P):\n    Q1, Q2 = map(int, input().split())\n    node_one.append({'start': min(Q1, Q2), 'end': max(Q1, Q2)})\n\nnode_one.sort(key=lambda x: (x['start'], x['end']))\n\nINF = float('inf')\nans = INF\n\nfor i in range(1, N + 1):\n    to = [0] * (N + 1)\n\n    for j in range(P):\n        if node_one[j]['end'] >= i + 1 and node_one[j]['start'] <= i:\n            to[1] = max(to[1], node_one[j]['start'])\n            to[node_one[j]['end']] = N + 1\n        else:\n            to[node_one[j]['start']] = max(to[node_one[j]['start']], node_one[j]['end'])\n\n    duandian = 0\n    result = 0\n\n    for j in range(1, N + 1):\n        if to[j] == 0:\n            continue\n\n        if to[j] > duandian:\n            if j >= duandian:\n                result += (to[j] - j)\n            else:\n                result += (to[j] - duandian)\n\n            duandian = to[j]\n\n    ans = min(ans, result)\n\nprint(ans)\n"
 NUMBER=1944

@@ -20,6 +20,55 @@ def g20626(r):
         l=r.randrange(len(a)); q.append(f"{l} {r.randint(l,len(a)-1)}")
     return " ".join(map(str,a))+"\n"+"\n".join(q)+"\n"
 
+def valid(text):
+    """题面契约：第一行是空格分隔的正整数数列 V（非空）；随后恰 10000 行，每行 "L R"，0<=L<=R<len(V)。
+    注：题面样例只给 4 行查询，第 0 组按题面"10000 次查询"用 "0 0" 补齐，输出前 4 行即样例输出。"""
+    if not text.endswith("\n"):
+        return False
+    lines = text[:-1].split("\n")
+    if len(lines) != 10001:
+        return False
+    v = lines[0].split(" ")
+    if not v or not all(t.isdigit() and t[0] != "0" for t in v):
+        return False
+    n = len(v)
+    for line in lines[1:]:
+        t = line.split(" ")
+        if len(t) != 2 or not all(x.isdigit() and (x == "0" or x[0] != "0") for x in t):
+            return False
+        lo, hi = int(t[0]), int(t[1])
+        if not 0 <= lo <= hi < n:
+            return False
+    return True
+
+
+def extra_cases():
+    """补充：n=1、n=2，以及 n=5e4 的大数列（卡每次查询 O(R-L) 的暴力；值到 2^30）。"""
+    r = random.Random(NUMBER * 19 + 3)
+    out = []
+
+    def make(a, wide):
+        q = []
+        n = len(a)
+        for _ in range(10000):
+            if wide:
+                lo = r.randrange(0, max(1, n // 10))
+                hi = r.randrange(n - max(1, n // 10), n)
+                lo = min(lo, hi)
+            else:
+                lo = r.randrange(n)
+                hi = r.randint(lo, n - 1)
+            q.append(f"{lo} {hi}")
+        return " ".join(map(str, a)) + "\n" + "\n".join(q) + "\n"
+
+    out.append(make([r.randint(1, 10 ** 9)], False))
+    out.append(make([r.randint(1, 10 ** 9) for _ in range(2)], False))
+    out.append(make([r.randint(1, 10 ** 9) for _ in range(50000)], True))
+    out.append(make([r.randint(1, 2 ** 30) for _ in range(50000)], True))
+    out.append(make([r.randint(1, 10 ** 9) for _ in range(50000)], False))
+    return out
+
+
 def build_cases():
     cases = [SAMPLE_IN]
     for i in range(1, 20):
@@ -30,6 +79,11 @@ def build_cases():
                 break
         else:
             raise AssertionError("生成器多样性不足")
+    for value in extra_cases():
+        if value not in cases:
+            cases.append(value)
+    for value in cases:
+        assert valid(value), "生成的数据越出题面约束"
     return cases
 
 def solve_reference(content):

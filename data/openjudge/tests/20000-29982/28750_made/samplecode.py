@@ -2,6 +2,8 @@
 # Accepted submission: 51077576
 # Source: http://cs101.openjudge.cn/practice/solution/51077576/
 # License: not declared on the submission page; no license is inferred.
+# 本地修正：原提交求 4 次倾斜后的置换时固定按 d,d+1,d+2,d+3 方向倾斜，
+# 逆时针一支（q=3）应按 d,d+q,d+2q,d+3q；原写法会把 1 3 / ca. / .ac 判成 yes。
 
 import sys
 from math import gcd
@@ -45,7 +47,7 @@ try:
        ng.append(w)
       if not ok:T(tg,d);d=(d+q)%4;continue
       sm=[r[:]for r in ng]
-      for _ in range(4):T(sm,(d+_)%4)
+      for _ in range(4):T(sm,(d+_*q)%4)
       rs,ms=[],[]
       for r in range(Y):
        for c in range(X):

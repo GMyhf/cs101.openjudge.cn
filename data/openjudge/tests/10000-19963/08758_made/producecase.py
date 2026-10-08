@@ -14,6 +14,21 @@ SAMPLE_IN = '137\n'
 SAMPLE_OUT = '2(2(2)+2+2(0))+2(2+2(0))+2(0)\n'
 REFERENCE_SOURCE = "def power_of_two_representation(n):\n    # 函数用于找到小于或等于n的最大2的幂次\n    def find_max_power(n):\n        power = 0\n        while (1 << power) <= n:\n            power += 1\n        return power - 1\n\n    # 函数用于将幂次表示为2的幂次方的表示\n    def represent_power(power):\n        if power == 1:\n            return '2'\n        elif power == 0:\n            return '2(0)'\n        else:\n            return '2(' + power_of_two_representation(power) + ')'\n\n    # 特殊情况：如果n是0，直接返回空字符串\n    if n == 0:\n        return ''\n\n    result = ''\n    while n > 0:\n        max_power = find_max_power(n)\n        # 如果结果字符串不为空，添加加号\n        if result:\n            result += '+'\n        # 把最大幂次转换为2的幂次方的表示\n        result += represent_power(max_power)\n        # 减去已经表示的数，继续寻找余数的表示\n        n -= 1 << max_power\n\n    return result\n\nprint(power_of_two_representation(int(input())))\n"
 
+def valid(text):
+    """题面：一行一个正整数 n（n≤20000）。"""
+    lines = text.split("\n")
+    if len(lines) != 2 or lines[1] != "":
+        return False
+    tok = lines[0].strip()
+    if not tok.isdigit() or (len(tok) > 1 and tok[0] == "0"):
+        return False
+    return 1 <= int(tok) <= 20000
+
+
+# 2026-10 审计补充：边界与特殊形状（1、2 的幂、全 1 位、上限、题面第二例 1315）
+EDGE_VALUES = [1, 2, 3, 4, 7, 1315, 1024, 16383, 16384, 19999, 20000]
+
+
 def g8758(r):
     return str(r.randint(1, 20000)) + "\n"
 
@@ -27,6 +42,11 @@ def build_cases():
                 break
         else:
             raise AssertionError("生成器多样性不足")
+    for v in EDGE_VALUES:
+        value = f"{v}\n"
+        if value not in cases:
+            cases.append(value)
+    assert all(valid(c) for c in cases), "题面：1<=n<=20000"
     return cases
 
 def solve_reference(content):

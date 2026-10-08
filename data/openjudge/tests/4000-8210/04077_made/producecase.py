@@ -20,6 +20,18 @@ SAMPLE_OUT = '5\n'
 BRUTE_SOURCE = 'def count_sequences(n):\n    def dfs(push_num, stack, popped):\n        nonlocal count\n        # 如果已经弹出了 n 个数，说明这个出栈序列是合法的\n        if popped == n:\n            count += 1\n            return\n        # 尝试进栈：如果还有数字没进栈\n        if push_num <= n:\n            stack.append(push_num)\n            dfs(push_num + 1, stack, popped)\n            stack.pop()\n        # 尝试出栈：如果栈不空\n        if stack:\n            top = stack.pop()\n            dfs(push_num, stack, popped + 1)\n            stack.append(top)\n\n    count = 0\n    dfs(1, [], 0)\n    return count\n\n# 读取输入\nn = int(input())\nprint(count_sequences(n))\n'
 REFERENCE_SOURCE = 'import math\nn = int(input())\nprint(math.comb(2 * n, n) // (n + 1))\n'
 
+def valid(text):
+    """题面：输入就一个数 n，1<=n<=15。"""
+    toks = text.split()
+    if len(toks) != 1 or len(text.strip().split("\n")) != 1:
+        return False
+    try:
+        n = int(toks[0])
+    except ValueError:
+        return False
+    return 1 <= n <= 15
+
+
 def _run(source, content, limit=180):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8", delete=False) as fh:
         fh.write(source)
@@ -52,6 +64,7 @@ def main():
             f"闭式与题解暴力在 n={n} 不一致"
     cases = [SAMPLE_IN] + [f"{n}\n" for n in range(1, 16) if f"{n}\n" != SAMPLE_IN]
     assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
+    assert all(valid(c) for c in cases), "有组越出题面约束"
     assert len(set(cases)) == 15, "题面 1<=n<=15 共 15 个取值，应全覆盖"
     assert "1\n" in cases and "15\n" in cases, "上下界都要有数据"
     assert _run(REFERENCE_SOURCE, SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"

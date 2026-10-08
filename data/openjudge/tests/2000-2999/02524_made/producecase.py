@@ -153,6 +153,91 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
+import re
+
+def valid(text):
+    """题面：多组数据，每组首行 n m（0 < n <= 50000，0 <= m <= n(n-1)/2），其后 m 行每行两个学生编号 i j（1..n）；
+    以一行 0 0 结束。"""
+    lines = text.split("\n")
+    if lines and lines[-1] == "":
+        lines.pop()
+    pos = 0
+    cases = 0
+    while True:
+        if pos >= len(lines):
+            return False
+        mm = re.fullmatch(r"(0|[1-9][0-9]*) (0|[1-9][0-9]*)", lines[pos])
+        if not mm:
+            return False
+        n, m = int(mm.group(1)), int(mm.group(2))
+        pos += 1
+        if n == 0 and m == 0:
+            break
+        if not (1 <= n <= 50000 and 0 <= m <= n * (n - 1) // 2):
+            return False
+        if pos + m > len(lines):
+            return False
+        for ln in lines[pos:pos + m]:
+            e = re.fullmatch(r"([1-9][0-9]*) ([1-9][0-9]*)", ln)
+            if not e or not (1 <= int(e.group(1)) <= n and 1 <= int(e.group(2)) <= n):
+                return False
+        pos += m
+        cases += 1
+    return pos == len(lines) and cases >= 1
+
+
+def g2524(seed, kind):
+    r = random.Random(2524_000 + seed)
+    blocks = []
+    def rand_edges(n, m):
+        return [(r.randint(1, n), r.randint(1, n)) for _ in range(m)]
+    def forest(n, comps):
+        """把 1..n 随机划分成 comps 个连通块，每块给一棵随机树，边序打乱。"""
+        perm = list(range(1, n + 1)); r.shuffle(perm)
+        cuts = sorted(r.sample(range(1, n), comps - 1)) if comps > 1 else []
+        es = []
+        for a, b in zip([0] + cuts, cuts + [n]):
+            grp = perm[a:b]
+            for k in range(1, len(grp)):
+                u, v = grp[k], grp[r.randrange(k)]
+                es.append((u, v) if r.random() < .5 else (v, u))
+        r.shuffle(es)
+        return es
+    if kind == "edge":
+        blocks = [(1, []), (2, [(1, 2)]), (2, []), (3, [(1, 1), (2, 2), (3, 3)]), (2, [(2, 1)]), (3, [(1, 2), (2, 1), (1, 2)]),
+                  (5, [(1, 2), (2, 3), (3, 4), (4, 5), (5, 1), (1, 3), (2, 4), (3, 5), (4, 1), (5, 2)])]
+    elif kind == "mid":
+        for _ in range(r.randint(2, 6)):
+            n = r.randint(100, 3000)
+            comps = r.randint(1, n)
+            es = forest(n, comps)
+            es += rand_edges(n, r.randint(0, n // 20))  # 少量额外边，未必在块内，但仍是合法询问
+            r.shuffle(es)
+            blocks.append((n, es))
+    elif kind == "bigrand":
+        n = 50000
+        blocks.append((n, rand_edges(n, r.choice([30000, 50000, 70000]))))
+    elif kind == "bigforest":
+        n = 50000
+        comps = [1, 2, 17, 1000, 25000][(seed - 13) % 5]  # 五组 bigforest（seed 13..17）各取一种块数，保证有满规模全连通
+        blocks.append((n, forest(n, comps)))
+    elif kind == "bigzero":
+        blocks = [(50000, []), (1, []), (50000, [(50000, 1)])]
+    elif kind == "multi":
+        # 多组数据连续出现，忘记重置并查集会错
+        for _ in range(r.randint(20, 60)):
+            n = r.randint(1, 400)
+            comps = r.randint(1, n)
+            blocks.append((n, forest(n, comps)))
+    out = []
+    for n, es in blocks:
+        out.append(f"{n} {len(es)}")
+        out += [f"{a} {b}" for a, b in es]
+    return "\n".join(out) + "\n0 0\n"
+
+
+PLAN2524 = ["edge"] + ["mid"] * 8 + ["bigrand"] * 3 + ["bigforest"] * 5 + ["bigzero"] + ["multi"] * 3
+
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2524: 宗教信仰\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2025sp_routine/02524/\n# License: not declared in source collection; no license is inferred.\nimport sys\ndef init_set(n):\n    return list(range(n))\n\ndef get_father(x, father):\n    if father[x] != x:\n        father[x] = get_father(father[x], father)\n    return father[x]\n\ndef join(x, y, father):\n    fx = get_father(x, father)\n    fy = get_father(y, father)\n    if fx == fy:\n        return\n    father[fx] = fy\n\ndef is_same(x, y, father):\n    return get_father(x, father) == get_father(y, father)\n\ndef main():\n    case_num = 0\n    while True:\n        n, m = map(int, input().split())\n        if n == 0 and m == 0:\n            break\n        count = 0\n        father = init_set(n)\n        for _ in range(m):\n            s1, s2 = map(int, input().split())\n            join(s1 - 1, s2 - 1, father)\n        for i in range(n):\n            if father[i] == i:\n                count += 1\n        case_num += 1\n        print(f"Case {case_num}: {count}")\n\nif __name__ == "__main__":\n    main()\n'
 NUMBER=2524
 SAMPLE='10 9\n1 2\n1 3\n1 4\n1 5\n1 6\n1 7\n1 8\n1 9\n1 10\n10 4\n2 3\n4 5\n4 8\n5 8\n0 0\n'
@@ -164,6 +249,8 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ cases=[SAMPLE]+[generate(NUMBER,s) for s in range(1, 19)]+[g2524(s,k) for s,k in enumerate(PLAN2524, start=1)]
+ assert all(valid(x) for x in cases)
+ for i,x in enumerate(cases):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

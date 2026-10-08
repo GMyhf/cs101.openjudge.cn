@@ -421,6 +421,41 @@ REFERENCE="# External reference: http://cs101.openjudge.cn/practice/01080/statis
 LANGUAGE='Python3'
 NUMBER=1080
 SAMPLE='2\n7 AGTGATG\n5 GTTAG\n7 AGCTATT\n9 AGCTTTAAA\n'
+def valid(text):
+    """题面契约：首行 T；每组两行，每行「长度 基因串」，长度 1..100 且与串长一致，串只含 A C G T。题面未给 T 的上界。"""
+    lines = text.split('\n')
+    if lines and lines[-1] == '':
+        lines.pop()
+    try:
+        if not lines or not lines[0].isdigit():
+            return False
+        t = int(lines[0])
+        if t < 1 or len(lines) != 1 + 2 * t:
+            return False
+        for line in lines[1:]:
+            toks = line.split(' ')
+            if len(toks) != 2 or not toks[0].isdigit():
+                return False
+            n, g = int(toks[0]), toks[1]
+            if not 1 <= n <= 100 or len(g) != n or set(g) - set('ACGT'):
+                return False
+        return True
+    except Exception:
+        return False
+
+def extra_cases():
+    """补充覆盖：长度 100 满规模、长度 1、两串相同、全不匹配、长短悬殊、较多组数。"""
+    r = random.Random(1080_2026)
+    rnd = lambda n: "".join(r.choice("ACGT") for _ in range(n))
+    fmt = lambda pairs: f"{len(pairs)}\n" + "".join(f"{len(a)} {a}\n{len(b)} {b}\n" for a, b in pairs)
+    same = rnd(100)
+    return [
+        fmt([(rnd(100), rnd(100)) for _ in range(10)]),
+        fmt([("A", "A"), ("A", "T"), ("C", "G"), ("T" * 100, "C" * 100), ("G" * 100, "G"),
+             ("A", rnd(100)), (same, same), ("ACGT" * 25, "TGCA" * 25), (rnd(100), rnd(1)), ("C" * 100, "C" * 100)]),
+        fmt([(rnd(r.randint(1, 100)), rnd(r.randint(1, 100))) for _ in range(50)]),
+        fmt([(rnd(100), rnd(100))]),
+    ]
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -428,7 +463,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()
+  assert all(valid(x) for x in cases)
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

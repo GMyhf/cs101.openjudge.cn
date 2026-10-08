@@ -3,9 +3,69 @@ REFERENCE='# External reference: /practice/30932/statistics/\n# Accepted submiss
 SAMPLE='1 3 2 5 3 null 9\n'
 GENERATOR_NAME='g30932'
 CPP=False
-def g30932(r):
-    n=r.randint(1,31); vals=[str(r.randint(-100,100)) if i==0 or r.random()<.8 else "null" for i in range(n)]
-    return " ".join(vals)+"\n"
+import re
+_INT = re.compile(r'(0|-?[1-9][0-9]*)$')
+def valid(text):
+    """题面约束：一行层序序列（按完全二叉树形态补 null），第一个元素不是 null；
+    节点数 1<=n<=10000（这里按 token 总数计，更严）；节点值 -10^9<=val<=10^9。
+    结构性：完全二叉树编号下，非空结点的父结点（(i-1)//2）必须非空。"""
+    if text.endswith('\n'):
+        text = text[:-1]
+    if '\n' in text:
+        return False
+    tok = text.split()
+    if not (1 <= len(tok) <= 10000) or tok[0] == 'null':
+        return False
+    for i, t in enumerate(tok):
+        if t == 'null':
+            continue
+        if not _INT.match(t) or not (-10**9 <= int(t) <= 10**9):
+            return False
+        if i > 0 and tok[(i - 1) // 2] == 'null':
+            return False
+    return True
+
+def _tree(r, ntok, p, lo, hi):
+    a = [str(r.randint(lo, hi))]
+    for i in range(1, ntok):
+        a.append(str(r.randint(lo, hi)) if a[(i - 1) // 2] != 'null' and r.random() < p else 'null')
+    while a[-1] == 'null':
+        a.pop()
+    return ' '.join(a) + '\n'
+
+def _spine(r, depth, right):
+    idx = {0}; i = 0
+    for _ in range(depth):
+        i = 2 * i + (2 if right else 1); idx.add(i)
+    return ' '.join(str(r.randint(-10**9, 10**9)) if k in idx else 'null' for k in range(i + 1)) + '\n'
+
+def build_cases():
+    r = random.Random(30932)
+    cases = [SAMPLE]
+    cases += ['5\n', '-1000000000\n', '1000000000 -1000000000 1000000000\n', '1 null 2\n',
+              '-5 -3 -7 null -1 -2\n', '1 null 2 null null 3 4\n', '0 -1 -1 -2 null null -3\n',
+              '7 null 3 null null null 9\n']
+    for k in range(20):
+        lo, hi = [(-100, 100), (-10**9, 10**9), (-50, -1), (-10**9, -10**9 + 5)][k % 4]
+        cases.append(_tree(r, r.randint(2, 40), r.choice([0.6, 0.75, 0.9]), lo, hi))
+    cases.append(_tree(r, 1000, 0.85, -1000, 1000))
+    cases.append(_tree(r, 1000, 0.7, -10**9, -1))
+    cases.append(_spine(r, 12, False))           # 左链，8191 个 token
+    cases.append(_spine(r, 12, True))            # 右链
+    cases.append(_tree(r, 10000, 1.0, -10**9, 10**9))   # 满 13 层 + 第 14 层部分
+    cases.append(_tree(r, 10000, 0.97, -10**9, 10**9))
+    cases.append(_tree(r, 10000, 0.9, -10**9, -1))      # 全为负数：最大值初始化为 0 会错
+    cases.append(' '.join(['-1000000000'] * 8191) + '\n')
+    cases.append(_tree(r, 8191, 1.0, 0, 9))
+    # 每层最大值都放在该层最后一个位置
+    a = []
+    for d in range(13):
+        w = 1 << d
+        a += [str(r.randint(-10**9, 0)) for _ in range(w - 1)] + [str(10**9 - d)]
+    cases.append(' '.join(a) + '\n')
+    # 每层最大值都在左边、右半层大量 null
+    cases.append(_tree(r, 10000, 0.8, -10**9, 10**9))
+    return cases
 
 from pathlib import Path
 import subprocess, sys, tempfile
@@ -22,6 +82,10 @@ def run(text):
         return x.stdout
 def main():
     data=Path('data'); data.mkdir(exist_ok=True)
-    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
-    for i,c in enumerate(cases): (data/f'{i}.in').write_text(c); (data/f'{i}.out').write_text(run(c))
+    cases=build_cases()
+    assert cases[0]==SAMPLE
+    assert len(set(cases))==len(cases), "存在重复测试组"
+    for i,c in enumerate(cases):
+        assert valid(c), f"第 {i} 组不满足题面约束"
+        (data/f'{i}.in').write_text(c); (data/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

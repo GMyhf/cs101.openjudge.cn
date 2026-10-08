@@ -2,25 +2,13 @@
 # Accepted submission: 52201327
 # Source: http://cs101.openjudge.cn/practice/solution/52201327/
 # License: not declared on the submission page; no license is inferred.
+# 2026-10-08 本地重写：上面引用的原始代码在题面范围内有缺陷，下面已换成按题面重写的实现，不再是原提交（原因见下方注释与 CHANGELOG）。
+# 原样例解（AC 提交 52201327，http://cs101.openjudge.cn/practice/solution/52201327/）在 x>y 时
+# 会漏掉交换（如 x=3,y=1），在本仓数据上答案错误；这里改为直接交换后求边缘和。
 
-# External reference: statistics page /practice/20731/
-# Accepted submission: 52201327
-# Source: http://cs101.openjudge.cn/practice/solution/52201327/
-# License: not declared on the submission page; no license is inferred.
-
-m,n=map(int,input().split())
-matrix=[]
-for i in range(m):
-    matrix.append(list(map(int,input().split())))
-x,y=map(int,input().split())
-x,y=x-1,y-1
-if (x==0 and y==m-1) or (x!=0 and y!=m-1):
-    ans=sum(matrix[0])+sum(matrix[m-1])
-    for i in range(1,m-1):
-        ans+=matrix[i][0]+matrix[i][n-1]
-else:
-    matrix[x],matrix[y]=matrix[y],matrix[x]
-    ans=sum(matrix[0])+sum(matrix[m-1])
-    for i in range(1,m-1):
-        ans+=matrix[i][0]+matrix[i][n-1]
-print(ans)
+m, n = map(int, input().split())
+a = [list(map(int, input().split())) for _ in range(m)]
+x, y = map(int, input().split())
+a[x - 1], a[y - 1] = a[y - 1], a[x - 1]
+print(sum(a[i][j] for i in range(m) for j in range(n)
+          if i == 0 or i == m - 1 or j == 0 or j == n - 1))

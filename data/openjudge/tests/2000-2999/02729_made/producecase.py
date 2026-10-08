@@ -421,6 +421,19 @@ REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02729/statis
 LANGUAGE='Python3'
 NUMBER=2729
 SAMPLE='3\n'
+import re as _re
+_INT=_re.compile(r'(0|-?[1-9][0-9]*)$')
+def _int(tok):
+    return int(tok) if _INT.match(tok) else None
+
+def valid(text):
+    """题面：只有一行，整数 n（n<=12）；阶乘题按 0<=n<=12 理解。"""
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if len(lines)!=1:return False
+    n=_int(lines[0])
+    return n is not None and 0<=n<=12
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]

@@ -141,12 +141,46 @@ def generate(number, seed):
         n=r.randint(3,12);return f"{n}\n"+"\n".join(" ".join(str(r.randint(0,255)) for _ in range(n)) for _ in range(n))+"\n"
     if number==2943:
         # 题面：N只小白鼠(1 < N < 100)，重量是不大于 1000 的正整数且各不相同。
-        n=r.randint(2,99);weights=r.sample(range(1,1001),n);return f"{n}\n"+"\n".join(f"{x} c{i}" for i,x in enumerate(weights))+"\n"
+        # 覆盖：N=2/N=99 两端、重量取到 1 与 1000、帽子颜色大量重复（卡按颜色建字典）、
+        # 颜色长度到 10、输入已按升序/降序给出。
+        palette=["red","blue","green","yellow","black","white","purple","orange","pink","grey","lightgreen","darkorange","x","ab"]
+        if seed==1:n=2
+        elif seed in (2,3,4,5):n=99
+        elif seed<=8:n=r.randint(2,5)
+        else:n=r.randint(2,99)
+        weights=r.sample(range(1,1001),n)
+        if seed==3:weights=sorted(weights)
+        if seed==4:weights=sorted(weights,reverse=True)
+        if seed==5:weights=list(range(1000,1000-n,-1));r.shuffle(weights)
+        if seed in (2,6):weights[0]=1 if 1 not in weights else weights[0]
+        if seed in (2,7):
+            if 1000 not in weights:weights[-1]=1000
+        if seed%3==0:colors=[r.choice(palette[:3]) for _ in range(n)]
+        elif seed%3==1:colors=[r.choice(palette) for _ in range(n)]
+        else:colors=[r.choice(palette) if r.random()<.5 else "".join(r.choice("abcdefghijklmnopqrstuvwxyz") for _ in range(r.randint(1,10))) for _ in range(n)]
+        return f"{n}\n"+"\n".join(f"{x} {c}" for x,c in zip(weights,colors))+"\n"
     if number==1007:
         n,m=r.randint(1,30),r.randint(1,30);return f"{n} {m}\n"+"\n".join("".join(r.choice("ACGT") for _ in range(n)) for _ in range(m))+"\n"
     if number==1836:
         n=r.randint(2,50);return f"{n}\n"+" ".join(f"{r.uniform(.5,2.5):.5f}" for _ in range(n))+"\n"
     raise KeyError(number)
+
+def valid(text):
+    """题面 02943：首行 N（1<N<100）；随后恰 N 行「重量 颜色」，重量为不大于 1000 的正整数且互不相同，颜色为长度不超过 10 的字符串。"""
+    import re
+    if not text.endswith("\n"):return False
+    lines=text[:-1].split("\n")
+    if not lines or not re.fullmatch(r"[1-9]\d*",lines[0]):return False
+    n=int(lines[0])
+    if not 1<n<100 or len(lines)!=n+1:return False
+    seen=set()
+    for line in lines[1:]:
+        m=re.fullmatch(r"([1-9]\d*) (\S{1,10})",line)
+        if not m:return False
+        w=int(m.group(1))
+        if w>1000 or w in seen:return False
+        seen.add(w)
+    return True
 
 NO_INPUT={3225, 2698}
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02943/statistics/\n# Accepted submission: 52332033\n# Source: http://cs101.openjudge.cn/practice/solution/52332033/\n# License: not declared on the submission page; no license is inferred.\n\nn=int(input())\nlis=[]\nfor i in range(n):\n    x,y=input().split()\n    x=int(x)\n    lis.append([x,y])\nlis.sort()\nfor i in range(n-1,-1,-1):\n    print(lis[i][1])\n'

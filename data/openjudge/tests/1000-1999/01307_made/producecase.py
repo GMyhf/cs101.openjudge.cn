@@ -417,6 +417,137 @@ def generate(number, seed):
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
 
+
+def _maze_open(r, c, w, y, x, dy, dx):
+    """(y,x) 0 起；判断从 (y,x) 向 (dy,dx) 能否走。外围墙不看输入。"""
+    ny, nx = y + dy, x + dx
+    if not (0 <= ny < r and 0 <= nx < c):
+        return False
+    if dx == 1: return not (w[y][x] & 1)
+    if dx == -1: return not (w[y][nx] & 1)
+    if dy == 1: return not (w[y][x] & 2)
+    return not (w[ny][x] & 2)
+
+
+def valid(text):
+    """题面契约：若干迷宫，每个先 6 个整数 h w sr sc gr gc（h,w<=12，位置在界内），
+    再 h*w 个 0..3 的墙值（行主序），起点到终点必有通路；最后以六个 0 结尾。"""
+    try:
+        toks = [int(t) for t in text.split()]
+    except ValueError:
+        return False
+    i, mazes = 0, 0
+    while True:
+        if i + 6 > len(toks):
+            return False
+        h, w, sr, sc, gr, gc = toks[i:i + 6]; i += 6
+        if (h, w, sr, sc, gr, gc) == (0, 0, 0, 0, 0, 0):
+            return i == len(toks) and mazes >= 1
+        if not (1 <= h <= 12 and 1 <= w <= 12 and 1 <= sr <= h and 1 <= gr <= h
+                and 1 <= sc <= w and 1 <= gc <= w):
+            return False
+        if i + h * w > len(toks):
+            return False
+        cells = toks[i:i + h * w]; i += h * w
+        if any(v < 0 or v > 3 for v in cells):
+            return False
+        g = [cells[k * w:(k + 1) * w] for k in range(h)]
+        seen = {(sr - 1, sc - 1)}; st = [(sr - 1, sc - 1)]
+        while st:
+            y, x = st.pop()
+            for dy, dx in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+                if _maze_open(h, w, g, y, x, dy, dx) and (y + dy, x + dx) not in seen:
+                    seen.add((y + dy, x + dx)); st.append((y + dy, x + dx))
+        if (gr - 1, gc - 1) not in seen:
+            return False
+        mazes += 1
+
+
+def _perfect_maze(r, h, w):
+    """随机 DFS 生成树迷宫：返回墙值矩阵（外围位为 0）。"""
+    g = [[3] * w for _ in range(h)]
+    seen = {(0, 0)}; st = [(r.randrange(h), r.randrange(w))]; seen = {st[0]}
+    while st:
+        y, x = st[-1]
+        nb = [(y + dy, x + dx) for dy, dx in ((0, 1), (0, -1), (1, 0), (-1, 0))
+              if 0 <= y + dy < h and 0 <= x + dx < w and (y + dy, x + dx) not in seen]
+        if not nb:
+            st.pop(); continue
+        ny, nx = r.choice(nb)
+        if ny == y: g[y][min(x, nx)] &= ~1
+        else: g[min(y, ny)][x] &= ~2
+        seen.add((ny, nx)); st.append((ny, nx))
+    return g
+
+
+def _snake_maze(h, w):
+    """蛇形单通路，路径覆盖全部格子（序号可到 144）。"""
+    g = [[3] * w for _ in range(h)]
+    for y in range(h):
+        for x in range(w - 1):
+            g[y][x] &= ~1
+        if y < h - 1:
+            x = w - 1 if y % 2 == 0 else 0
+            g[y][x] &= ~2
+    end = (h - 1, 0 if h % 2 == 0 else w - 1)
+    return g, (0, 0), end
+
+
+def _fmt_maze(h, w, s, t, g):
+    for y in range(h):          # 外围位按题面不给出
+        g[y][w - 1] &= ~1
+    for x in range(w):
+        g[h - 1][x] &= ~2
+    return (f"{h} {w} {s[0]+1} {s[1]+1} {t[0]+1} {t[1]+1}\n" +
+            "\n".join(" ".join(map(str, row)) for row in g) + "\n\n")
+
+
+def _one_maze(r, kind, h, w, flip=None):
+    if kind == "snake":
+        g, s, t = _snake_maze(h, w)
+        if (r.random() < .5) if flip is None else flip: s, t = t, s
+        return _fmt_maze(h, w, s, t, g)
+    g = _perfect_maze(r, h, w)
+    if kind == "loops":       # 在树上再拆掉一些墙，制造环
+        for _ in range(r.randint(1, h * w // 3 + 1)):
+            y, x = r.randrange(h), r.randrange(w)
+            g[y][x] &= ~r.choice((1, 2))
+    elif kind == "random":    # 随机墙，再保证连通性由 valid 筛
+        while True:
+            g = [[r.randint(0, 3) for _ in range(w)] for _ in range(h)]
+            s = (r.randrange(h), r.randrange(w)); t = (r.randrange(h), r.randrange(w))
+            txt = _fmt_maze(h, w, s, t, [row[:] for row in g])
+            if valid(txt + "0 0 0 0 0 0\n"):
+                return txt
+    cells = [(y, x) for y in range(h) for x in range(w)]
+    if h * w >= 2:
+        s, t = r.sample(cells, 2)
+    else:
+        s = t = cells[0]
+    if kind == "corner":
+        s, t = (0, 0), (h - 1, w - 1)
+        if r.random() < .5: s, t = t, s
+    return _fmt_maze(h, w, s, t, g)
+
+
+def gen1307(seed):
+    r = random.Random(1307 * 1_000_003 + seed)
+    if seed == 1:      # 最小：1x1，起点即终点；再加 1xN、Nx1
+        mazes = ["1 1 1 1 1 1\n0\n\n", _one_maze(r, "tree", 1, 12), _one_maze(r, "tree", 12, 1)]
+    elif seed <= 4:    # 满规模蛇形，路径长 144
+        mazes = [_one_maze(r, "snake", 12, 12, flip=(seed == 3))]
+        if seed == 4: mazes.append(_one_maze(r, "snake", r.randint(9, 12), r.randint(9, 12)))
+    elif seed <= 16:   # 满规模树迷宫，随机起终点
+        mazes = [_one_maze(r, "tree" if seed % 3 else "corner", 12, 12) for _ in range(1 + seed % 3)]
+    elif seed <= 26:   # 有环迷宫
+        mazes = [_one_maze(r, "loops", r.randint(6, 12), r.randint(6, 12)) for _ in range(r.randint(1, 3))]
+    elif seed <= 32:   # 随机墙（含不可达区域）
+        mazes = [_one_maze(r, "random", r.randint(2, 12), r.randint(2, 12)) for _ in range(r.randint(1, 3))]
+    else:              # 多组混合小规模
+        mazes = [_one_maze(r, r.choice(("tree", "loops", "random", "corner")),
+                           r.randint(1, 12), r.randint(1, 12)) for _ in range(r.randint(3, 8))]
+    return "".join(mazes) + "0 0 0 0 0 0\n"
+
 REFERENCE="# External reference: http://cs101.openjudge.cn/practice/01307/statistics/\n# Accepted submission: 43699892\n# Source: http://cs101.openjudge.cn/practice/solution/43699892/\n# License: not declared on the submission page; no license is inferred.\n\nh=1\nwhile 1:\n    while 1:\n        k=input()\n        if k:break\n    r,c,a,b,e,f=map(int,k.split())\n    if r==0:\n        break\n    print('Maze %d'%h);h+=1;print()\n    while 1:\n        k=input()\n        if k:break\n    wall=[list(map(int,k.split()))]+[list(map(int,input().split())) for _ in range(r-1)]\n    input()\n    l=[[0]*c for _ in range(r)]\n    l[a-1][b-1]=1\n    cur=(a,b)\n    while 1:\n        if cur==(e,f):\n            break\n        ff=0\n        for direction in [(0,-1),(-1,0),(0,1),(1,0),]:\n            x,y=direction\n            if not (1<=cur[0]+x<=r and 1<=cur[1]+y<=c):\n                continue\n            if (x,y)==(-1,0) and wall[cur[0]-2][cur[1]-1] in {2,3}:\n                continue\n            if (x,y)==(0,1) and wall[cur[0]-1][cur[1]-1] in {1,3}:\n                continue\n            if (x,y)==(1,0) and wall[cur[0]-1][cur[1]-1] in {2,3}:\n                continue\n            if (x,y)==(0,-1) and wall[cur[0]-1][cur[1]-2] in {1,3}:\n                continue\n            if l[cur[0]+x-1][cur[1]+y-1]!=-1:\n                if l[cur[0]+x-1][cur[1]+y-1]==0:\n                    ff=1\n                    l[cur[0]+x-1][cur[1]+y-1]=l[cur[0]-1][cur[1]-1]+1\n                    cur=(cur[0]+x,cur[1]+y)\n                    break\n        if ff==0:\n            for direction in [(-1,0),(0,1),(1,0),(0,-1)]:\n                x,y=direction\n                if not (1<=cur[0]+x<=r and 1<=cur[1]+y<=c):\n                    continue\n                if (x,y)==(-1,0) and wall[cur[0]-2][cur[1]-1] in {2,3}:\n                    continue\n                if (x,y)==(0,1) and wall[cur[0]-1][cur[1]-1] in {1,3}:\n                    continue\n                if (x,y)==(1,0) and wall[cur[0]-1][cur[1]-1] in {2,3}:\n                    continue\n                if (x,y)==(0,-1) and wall[cur[0]-1][cur[1]-2] in {1,3}:\n                    continue\n                t=l[cur[0]+x-1][cur[1]+y-1]\n                if t!=-1 and t==l[cur[0]-1][cur[1]-1]-1:\n                    l[cur[0]-1][cur[1]-1]=-1\n                    cur=(cur[0]+x,cur[1]+y)\n                    break\n    res=['']*(2*r+1)\n    res[0]='+---'*c+'+'\n    res[-1]=res[0]\n    for i in range(r):\n        t=2*i+1\n        res[t]='|'\n        for j in range(c):\n            if l[i][j]==-1:res[t]+='???'\n            elif l[i][j]==0:res[t]+=' '*3\n            else:res[t]+=' '*(3-len(str(l[i][j])))+str(l[i][j])\n            if wall[i][j] in {1,3} or j==c-1:res[t]+='|'\n            else:res[t]+=' '\n    for i in range(1,r):\n        t=2*i\n        res[t]='+'\n        for j in range(c):\n            if wall[i-1][j] in {2,3}:\n                res[t]+='---'\n            else:\n                res[t]+='   '\n            res[t]+='+'\n    for u in res:\n        print(u)\n    print('\\n')\n"
 LANGUAGE='Python3'
 NUMBER=1307
@@ -428,7 +559,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[gen1307(s) for s in range(1, 40)]
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

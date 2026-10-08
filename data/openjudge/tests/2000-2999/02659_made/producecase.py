@@ -85,9 +85,36 @@ def generate(number, seed):
         values = [r.randint(0, 10000) for _ in range(r.randint(1, 200))]
         return f"{len(values)}\n" + " ".join(map(str, values)) + "\n"
     if number == 2659:
-        rows, cols, count = r.randint(1, 30), r.randint(1, 30), r.randint(1, 30)
-        bombs = [(r.randint(1, rows), r.randint(1, cols), r.randrange(1, 100, 2), r.randint(0, 1))
-                 for _ in range(count)]
+        # 先藏好碉堡，再按真实位置给出每颗炸弹的 T，保证回答前后一致（题面：Susko 如实回答）。
+        # 1-2：最小规模；3-12：小中规模；13-30：A=B=K=100 满规模；31-39：边界/特殊分布
+        if seed <= 2:
+            rows, cols, count = 1, seed, seed
+        elif seed <= 12:
+            rows, cols, count = r.randint(1, 30), r.randint(1, 30), r.randint(1, 30)
+        elif seed <= 30:
+            rows, cols, count = 100, 100, 100
+            if seed % 4 == 0:
+                rows, cols = r.randint(1, 100), r.randint(1, 100)
+        else:
+            rows, cols, count = r.choice([(100, 1, 100), (1, 100, 100), (100, 100, 1), (100, 100, 100), (r.randint(50, 100), r.randint(50, 100), r.randint(50, 100))])
+        x, y = r.randint(1, rows), r.randint(1, cols)
+        mode = seed % 5
+        bombs = []
+        for _ in range(count):
+            if mode == 0:     # 大炸弹为主：答案常是一大片
+                p = r.randrange(51, 100, 2)
+            elif mode == 1:   # 小炸弹为主：大多是 T=0
+                p = r.randrange(1, 12, 2)
+            else:
+                p = r.randrange(1, 100, 2)
+            if mode in (2, 3) and r.random() < .6:  # 落在碉堡附近，逼出 T=1 并收窄范围
+                h = p // 2
+                R = min(rows, max(1, x + r.randint(-h - 1, h + 1)))
+                S = min(cols, max(1, y + r.randint(-h - 1, h + 1)))
+            else:
+                R, S = r.randint(1, rows), r.randint(1, cols)
+            t = int(abs(x - R) <= p // 2 and abs(y - S) <= p // 2)
+            bombs.append((R, S, p, t))
         return f"{rows} {cols} {count}\n" + "\n".join("%d %d %d %d" % b for b in bombs) + "\n"
     if number == 2946:
         value, count = r.randint(-100, 100), r.randint(1, 30); operations = []
@@ -118,6 +145,27 @@ def generate(number, seed):
         words = sorted(words); r.shuffle(words)
         return "\n".join(words) + "\n"
     raise KeyError(number)
+
+def valid(text):
+    """题面：首行 A B K（1<=A,B,K<=100），随后 K 行 R S P T：1<=R<=A，1<=S<=B，1<=P<=99 且为奇数，
+    T 为 0/1。碉堡确实放在某一格、Susko 如实回答，故至少有一格与全部回答一致。"""
+    import re
+    if not text.endswith("\n"):return False
+    lines=text[:-1].split("\n")
+    num=r"(0|[1-9]\d*)"
+    m=re.fullmatch(f"{num} {num} {num}",lines[0])
+    if not m:return False
+    A,B,K=map(int,m.groups())
+    if not(1<=A<=100 and 1<=B<=100 and 1<=K<=100 and len(lines)==K+1):return False
+    bs=[]
+    for ln in lines[1:]:
+        m=re.fullmatch(f"{num} {num} {num} {num}",ln)
+        if not m:return False
+        R,S,P,T=map(int,m.groups())
+        if not(1<=R<=A and 1<=S<=B and 1<=P<=99 and P%2==1 and T in(0,1)):return False
+        bs.append((R,S,P//2,T))
+    return any(all((abs(x-R)<=h and abs(y-S)<=h)==(T==1) for R,S,h,T in bs)
+               for x in range(1,A+1) for y in range(1,B+1))
 
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2659: Bomb Game\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02659/\n# License: not declared in source collection; no license is inferred.\nimport sys\ndef max_count(matrix):\n    maximum = max(max(row) for row in matrix)\n    count = sum(row.count(maximum) for row in matrix)\n    return count\n\ndef calculate_possible_positions(A, B, K, bombs):\n    positions = [[0] * B for _ in range(A)]\n\n    for (R, S, P, T) in bombs:\n        for i in range(max(0, R - (P - 1) // 2), min(A, R + (P + 1) // 2)):\n            for j in range(max(0, S - (P - 1) // 2), min(B, S + (P + 1) // 2)):\n                if T == 1 :\n                    positions[i][j] += 1\n\n                elif T == 0:\n                    positions[i][j] -= 1\n\n    #for row in positions:\n    #    print(row)\n    return max_count(positions)\n\nA, B, K = map(int, input().split())\nbombs = []\nfor _ in range(K):\n    R, S, P, T = map(int, input().split())\n    bombs.append((R - 1, S - 1, P, T))\n\nresult = calculate_possible_positions(A, B, K, bombs)\nprint(result)\n'
 NUMBER=2659

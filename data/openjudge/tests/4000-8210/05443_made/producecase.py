@@ -1,4 +1,4 @@
-"""5443 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 20 组数据。
+"""5443 测试数据生成器：固定种子，重跑可逐字节复现 data/ 下的 31 组数据（第 20 组起为边界组与 P=29/Q=49/R=19 的满规模组）。
 
 出处：build_001b
 生成器与循环取自 scripts/build_001b.py（批次 001b），保持同一形状；
@@ -47,8 +47,108 @@ def g5443(r):
     return (f"{p}\n" + "\n".join(names) + f"\n{len(roads)}\n" + "\n".join(roads) +
             f"\n{len(queries)}\n" + "\n".join(f"{names[a]} {names[b]}" for a, b in queries) + "\n")
 
+def valid(text):
+    """题面：P（P<30）后跟 P 行地点名（长度不超过 20）；Q（Q<50）后跟 Q 行「地点 地点 距离」；
+    R（R<20）后跟 R 行「地点 地点」。地点名互异、道路与查询只用已列出的地点、距离为整数（取正整数）。"""
+    lines = text.split("\n")
+    if lines[-1] != "":
+        return False
+    lines = lines[:-1]; pos = 0
+
+    def count(limit):
+        nonlocal pos
+        if pos >= len(lines) or not lines[pos].isdigit() or not int(lines[pos]) < limit:
+            return None
+        pos += 1
+        return int(lines[pos - 1])
+
+    p = count(30)
+    if not p or pos + p > len(lines):
+        return False
+    names = lines[pos:pos + p]; pos += p
+    if len(set(names)) != p or not all(1 <= len(x) <= 20 and x.isprintable() and " " not in x for x in names):
+        return False
+    known = set(names)
+    q = count(50)
+    if q is None or pos + q > len(lines):
+        return False
+    seen = set()
+    for line in lines[pos:pos + q]:
+        parts = line.split(" ")
+        if len(parts) != 3 or parts[0] not in known or parts[1] not in known or parts[0] == parts[1]:
+            return False
+        if not parts[2].isdigit() or int(parts[2]) < 1 or frozenset(parts[:2]) in seen:
+            return False
+        seen.add(frozenset(parts[:2]))
+    pos += q
+    r = count(20)
+    if r is None or pos + r != len(lines):
+        return False
+    return all(len(line.split(" ")) == 2 and all(x in known for x in line.split(" ")) for line in lines[pos:])
+
+
+def _unique_paths(text):
+    """出题方自加的要求：每个查询可达且最短路唯一（输出是走法本身，必须确定）。"""
+    import heapq
+    tok = text.split(); p = int(tok[0]); names = tok[1:1 + p]; idx = {x: i for i, x in enumerate(names)}
+    q = int(tok[1 + p]); at = 2 + p; adj = [[] for _ in range(p)]
+    for _ in range(q):
+        u, v, w = idx[tok[at]], idx[tok[at + 1]], int(tok[at + 2]); at += 3
+        adj[u].append((v, w)); adj[v].append((u, w))
+    r = int(tok[at]); at += 1
+    for _ in range(r):
+        s, t = idx[tok[at]], idx[tok[at + 1]]; at += 2
+        dist = [None] * p; ways = [0] * p; dist[s] = 0; ways[s] = 1; heap = [(0, s)]
+        while heap:
+            d, u = heapq.heappop(heap)
+            if d > dist[u]: continue
+            for v, w in adj[u]:
+                if dist[v] is None or d + w < dist[v]:
+                    dist[v] = d + w; ways[v] = ways[u]; heapq.heappush(heap, (dist[v], v))
+                elif d + w == dist[v]:
+                    ways[v] += ways[u]
+        if ways[t] != 1:
+            return False
+    return True
+
+
+def g5443_big(r, p, q, rq, name_len, wmax=999):
+    """随机生成树打底（不再总是链），补边到 q 条；地点名长度可到 20；查询含起终点相同的情形。"""
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    while True:
+        names = set()
+        while len(names) < p:
+            names.add("".join(r.choice(alphabet) for _ in range(r.randint(1, name_len))))
+        names = sorted(names); r.shuffle(names)
+        edges = {}
+        for i in range(1, p):
+            j = r.randrange(i)
+            edges[(j, i)] = r.randint(1, wmax)
+        pairs = [(i, j) for i in range(p) for j in range(i + 1, p) if (i, j) not in edges]
+        r.shuffle(pairs)
+        for e in pairs[:max(0, q - len(edges))]:
+            edges[e] = r.randint(1, wmax)
+        roads = [(a, b, w) if r.random() < .5 else (b, a, w) for (a, b), w in edges.items()]
+        r.shuffle(roads)
+        queries = [(r.randrange(p), r.randrange(p)) for _ in range(rq)]
+        queries[0] = (queries[0][0], queries[0][0])
+        text = (f"{p}\n" + "".join(x + "\n" for x in names) + f"{len(roads)}\n" +
+                "".join(f"{names[a]} {names[b]} {w}\n" for a, b, w in roads) +
+                f"{len(queries)}\n" + "".join(f"{names[a]} {names[b]}\n" for a, b in queries))
+        if _unique_paths(text):
+            return text
+
+
 def build_cases():
-    return [SAMPLE_IN] + [g5443(random.Random(NUMBER + i)) for i in range(1, 20)]
+    cases = [SAMPLE_IN] + [g5443(random.Random(NUMBER + i)) for i in range(1, 20)]
+    r = random.Random(544300)
+    cases.append("1\nOnlyOne\n0\n1\nOnlyOne OnlyOne\n")                      # 最小规模
+    cases.append("2\nA\nB\n1\nB A 7\n2\nA B\nB A\n")                         # 道路两个方向都要走
+    for p, q, rq, nl in ((29, 49, 19, 20), (29, 28, 19, 20), (29, 49, 19, 3), (29, 40, 19, 20),
+                         (20, 49, 19, 20), (10, 45, 19, 8), (29, 35, 19, 12), (29, 49, 19, 20)):
+        cases.append(g5443_big(r, p, q, rq, nl))
+    cases.append(g5443_big(r, 29, 49, 19, 20, wmax=9))   # 小权值，靠唯一性筛选
+    return cases
 
 def solve_reference(content):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
@@ -63,6 +163,9 @@ def main():
     cases = build_cases()
     assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
     assert solve_reference(SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
+    assert all(valid(c) for c in cases), "有数据越出题面约束"
+    assert all(_unique_paths(c) for c in cases), "有查询的最短路不唯一或不可达"
+    assert len(set(cases)) == len(cases), "有重复组"
     root = Path(__file__).parent / "data"
     root.mkdir(exist_ok=True)
     for index, content in enumerate(cases):

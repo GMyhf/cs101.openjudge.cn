@@ -3,6 +3,9 @@ from pathlib import Path
 REFERENCE="import copy\n\n# 原始列表\nlst = [[1, 2, 3], 'abc', [1, 3], 4]\n\n# 1.赋值\nassign = lst\n# 2.浅拷贝\nshallow = copy.copy(lst)\n# 3.深拷贝\ndeep = copy.deepcopy(lst)\n\n# 按题目执行修改\nlst[0].append(4)\nlst[1] = 'def'\nlst.append(5)\n\n# 依次输出三行\nprint(assign)\nprint(shallow)\nprint(deep)"
 SAMPLE="[[1, 2, 3], 'abc', [1, 3], 4]\n"
 GENERATOR_NAME='g25274'
+def valid(text):
+    """题面「输入」段只给出固定的一行 [[1, 2, 3], 'abc', [1, 3], 4]（样例输入写作“无”），只核这一行。"""
+    return text == "[[1, 2, 3], 'abc', [1, 3], 4]\n"
 def g25274(r): return "[[1, 2, 3], 'abc', [1, 3], 4]\n"
 
 def run(text):

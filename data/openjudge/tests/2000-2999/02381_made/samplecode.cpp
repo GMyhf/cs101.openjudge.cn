@@ -30,7 +30,7 @@ bitset<16000001> bs;
 
 int main()
 {
-	int a, c, m, r;
+	long long a, c, m, r; // 原提交用 int，a*R 可达 2^32-1 会溢出，改 long long
 	cin >> a >> c >> m >> r;
 	bs[r] = true;
 	r = (a * r + c) % m;

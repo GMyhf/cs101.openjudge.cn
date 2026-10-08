@@ -151,6 +151,20 @@ def generate(number, seed):
 
 REFERENCE="# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1190: 生日蛋糕\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01190/\n# License: not declared; no license is inferred.\nimport sys\nimport math\nN=int(input())\nM=int(input())\n# 对M==1特判\nif M==1:\n    S=float('inf')\n    R=1\n    while R**2<=N:\n        if N%(R**2)==0:\n            S=min(S,R**2+2*R*(N//(R**2)))\n        R+=1\n    print(S)\n    exit()\nS=float('inf')\nflag=False\nRstack=[]\nhstack=[]\ndef minV(i):\n    return (i*(i+1)//2)**2\ndef maxV(R,h,i):\n    return R**2*h*i-(R**2+2*R*h)*i*(i+1)//2+(2*R+h)*i*(i+1)*(2*i+1)//6-(i*(i+1)//2)**2\ndef check(R,h,i,n):\n    return N-n-maxV(R,h,i)<=R**2*h<=N-n-minV(i)\ndef dfs(i,n,s):\n    global S\n    if s>=S:\n        return\n    # 底层蛋糕\n    if i==M-1:\n        if N<minV(i): # 无解\n            return\n        Rmin=i+1\n        Rmax=int(math.sqrt((N-minV(i))/(i+1)))\n        for R in range(Rmax,Rmin-1,-1):\n            hmin=i+1\n            hmax=int((N-minV(i))/R**2)\n            for h in range(hmax,hmin-1,-1):\n                if check(R,h,i,n):\n                    Rstack.append(R)\n                    hstack.append(h)\n                    dfs(i-1,R**2*h,R**2+2*R*h)\n                    Rstack.pop()\n                    hstack.pop()\n        return\n    # 最顶层蛋糕要特判，刚好用完剩余体积\n    if i==0:\n        Rmin=math.ceil(math.sqrt((N-n)/(hstack[-1]-1)))\n        Rmax=Rstack[-1]-1\n        for R in range(Rmax,Rmin-1,-1):\n            if (N-n)%(R**2)==0:\n                h=(N-n)//(R**2)\n                global flag\n                flag=True\n                S=min(S,s+2*R*h)\n        return\n    Rmin=i+1\n    Rmax=min(Rstack[-1]-1,int(math.sqrt((N-n-minV(i))/(i+1))))\n    for R in range(Rmax,Rmin-1,-1):\n        hmin=i+1\n        hmax=min(hstack[-1]-1,int((N-n-minV(i))/(R**2)))\n        for h in range(hmax,hmin-1,-1):\n            if check(R,h,i,n):\n                Rstack.append(R)\n                hstack.append(h)\n                dfs(i-1,n+R**2*h,s+2*R*h)\n                Rstack.pop()\n                hstack.pop()\ndfs(M-1,0,0)\nprint(S) if flag else print(0)\n"
 NUMBER=1190
+def valid(text):
+    # 题面：两行，第一行 N（N<=10000），第二行 M（M<=20）；所有数据皆为正整数
+    if not text.endswith('\n'): return False
+    lines=text[:-1].split('\n')
+    if len(lines)!=2 or not all(l.isdigit() for l in lines): return False
+    n,m=map(int,lines)
+    return 1<=n<=10000 and 1<=m<=20
+def extra_1190():
+    # 补充：N 取满 10000、M 覆盖到 20（含无解），以及最小规模
+    r=random.Random(1190_2024)
+    fixed=[(10000,1),(10000,3),(10000,5),(10000,8),(10000,10),(10000,13),(10000,14),(10000,20),
+           (1,1),(1,2),(9999,1),(8281,13),(8280,13),(9973,1),(9998,2),(7056,7)]
+    rnd=[(r.randint(5000,10000),r.randint(1,20)) for _ in range(10)]
+    return [f"{n}\n{m}\n" for n,m in fixed+rnd]
 SAMPLE='100\n2\n'
 def run(x):
  with tempfile.TemporaryDirectory() as d:
@@ -160,6 +174,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_1190()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

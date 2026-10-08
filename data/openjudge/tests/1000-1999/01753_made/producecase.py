@@ -157,9 +157,54 @@ def run(x):
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout.rstrip()+'\n'
+def valid(text):
+    """题面：4 行，每行 4 个字符，只含 'w' 或 'b'。"""
+    if not text.endswith('\n'):
+        return False
+    lines = text[:-1].split('\n')
+    return len(lines) == 4 and all(len(l) == 4 and set(l) <= set('bw') for l in lines)
+
+def _press(state, k):
+    y, x = divmod(k, 4)
+    for b, a in ((y, x), (y-1, x), (y+1, x), (y, x-1), (y, x+1)):
+        if 0 <= a < 4 and 0 <= b < 4:
+            state ^= 1 << (b*4 + a)
+    return state
+
+def cases():
+    """覆盖：全 w/全 b（答 0）、答案 1..最大步数的每一档（多次）、以及若干 Impossible。"""
+    from itertools import combinations
+    best = {}
+    for mask in range(1 << 16):
+        st = 0; cnt = bin(mask).count('1')
+        for k in range(16):
+            if mask >> k & 1: st = _press(st, k)
+        for t in (st, st ^ 0xFFFF):
+            if t not in best or best[t] > cnt: best[t] = cnt
+    r = random.Random(1753)
+    show = lambda st: "\n".join("".join('b' if st >> (i*4+j) & 1 else 'w' for j in range(4)) for i in range(4)) + "\n"
+    bylevel = {}
+    for st, c in sorted(best.items()):
+        bylevel.setdefault(c, []).append(st)
+    imp = [st for st in range(1 << 16) if st not in best]
+    out = [show(0), show(0xFFFF)]
+    levels = sorted(c for c in bylevel if c > 0)
+    used = {0, 0xFFFF, int("".join('1' if ch == 'b' else '0' for ch in SAMPLE.replace('\n', ''))[::-1], 2)}
+    i = 0
+    while len(out) < 30:
+        lv = levels[i % len(levels)]; i += 1
+        st = r.choice(bylevel[lv])
+        if st in used: continue
+        used.add(st); out.append(show(st))
+    while len(out) < 39:
+        st = r.choice(imp)
+        if st in used: continue
+        used.add(st); out.append(show(st))
+    return out
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

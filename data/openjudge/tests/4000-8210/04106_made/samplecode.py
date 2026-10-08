@@ -61,7 +61,13 @@ def r4105(a):
   o.append(str(ans) if ans is not None else"oop!")
  print("\n".join(o))
 def r4106(a):
- print("\n".join(next(c for c in s if s.count(c)==2) for s in a[1:1+int(a[0])]))
+ # 先整串计数再顺序扫一遍，O(L)；原先逐字符 s.count 是 O(L^2)，长串答案靠后时超时
+ o=[]
+ for s in a[1:1+int(a[0])]:
+  cnt={}
+  for c in s:cnt[c]=cnt.get(c,0)+1
+  o.append(next(c for c in s if cnt[c]==2))
+ print("\n".join(o))
 def r4108(a):
  ns=a[1:1+a[0]];f=[1,1,1]
  for n in range(3,max(ns,default=2)+1):f.append(f[-1]+f[n-3])

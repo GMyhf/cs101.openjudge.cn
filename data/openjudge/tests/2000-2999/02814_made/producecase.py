@@ -157,9 +157,24 @@ def run(x):
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout.rstrip()+'\n'
+def valid(text):
+    """题面契约：恰 9 个整数，取值 0..3（0=12点、1=3点、2=6点、3=9点），
+    相邻整数用单个空格分隔（样例为 3 行各 3 个，也接受同一行 9 个）。"""
+    if not text.endswith('\n') or '\r' in text: return False
+    toks = []
+    for ln in text[:-1].split('\n'):
+        p = ln.split(' ')
+        if not all(t in ('0', '1', '2', '3') for t in p): return False
+        toks += p
+    return len(toks) == 9
+
+# 替换最后 4 组随机数据的边界组（catalog 按文件逐组登记，组数保持 40）：全部已在 12 点（答案为空序列）、全 3、全 1、全 2
+EXTRA = ['0 0 0\n0 0 0\n0 0 0\n', '3 3 3\n3 3 3\n3 3 3\n', '1 1 1\n1 1 1\n1 1 1\n', '2 2 2\n2 2 2\n2 2 2\n']
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 36)]+EXTRA):
+  assert valid(x),i
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

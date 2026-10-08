@@ -1,5 +1,21 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+
+def valid(text):
+    """题面：第 1 行 N (1<=N<=10000)，第 2 行 M (1<=M<=100)，第 3 行 1..N 的一个排列。"""
+    import re
+    lines=text.split("\n")
+    if len(lines)!=4 or lines[3]!="":
+        return False
+    if not re.fullmatch(r"[1-9][0-9]*",lines[0]) or not re.fullmatch(r"[1-9][0-9]*",lines[1]):
+        return False
+    N,M=int(lines[0]),int(lines[1])
+    if not (1<=N<=10000 and 1<=M<=100):
+        return False
+    t=lines[2].split(" ")
+    if len(t)!=N or not all(re.fullmatch(r"[1-9][0-9]*",x) for x in t):
+        return False
+    return sorted(map(int,t))==list(range(1,N+1))
 def generate(n, seed):
     r=random.Random(seed)
     if n==2694:
@@ -126,7 +142,45 @@ def generate(n, seed):
         return f'{K}\n{N}\n{len(edges)}\n'+'\n'.join(' '.join(map(str,e)) for e in edges)+'\n'
     if n==2706:return f"{1000+seed}\n"
     if n==2996:
-        N=r.randint(2,80);p=list(range(1,N+1));r.shuffle(p);return f'{N}\n{r.randint(1,min(30,N))}\n'+' '.join(map(str,p))+'\n'
+        # 题面没说越过最后一个排列（N..1）时怎么办，数据保证往后 M 个排列都存在（N=1 除外，此时答案恒为 1）。
+        import math
+        def remaining(p):
+            # p 之后还有多少个排列（超过 100 就提前返回）
+            N=len(p);suf=[0]*(N+1)
+            for i in range(N-1,-1,-1):suf[i]=max(suf[i+1],p[i])
+            cnt=0
+            for i in range(N):
+                if N-1-i>=6:
+                    if suf[i+1]>p[i]:return 1000  # 后面有更大的数，乘上 >=6! 必然超过 100
+                else:
+                    cnt+=sum(1 for x in p[i+1:] if x>p[i])*math.factorial(N-1-i)
+            return cnt
+        sizes=[1,2,3,3,4,5,6,8,10,50,100,1000,5000,9999,10000,10000,10000]
+        N=sizes[seed-1] if seed<=len(sizes) else r.choice([10000,10000,r.randint(2,10000)])
+        for attempt in range(60):
+            M=r.choice([1,2,99,100,r.randint(1,100)]) if seed>3 else (1 if seed<3 else 5)
+            kind=seed%5 if attempt<50 else 0;p=list(range(1,N+1))  # 反复造不出就退回恒等排列
+            if kind==1:r.shuffle(p)
+            elif kind==2:
+                # 随机前缀 + 递减尾巴：M 步内要向前进位
+                t=min(N,r.randint(3,6));head=p[:];r.shuffle(head);p=head[:N-t]+sorted(head[N-t:],reverse=True)
+                if t<N and N-t>=2 and p[N-t-1]>max(p[N-t:]):p[N-t-1],p[N-t-2]=p[N-t-2],p[N-t-1]
+            elif kind==3:
+                # 几乎是最后一个排列：整体递减，只有末尾 t 个打乱
+                t=min(N,r.randint(5,7));p=p[::-1];tail=p[N-t:];r.shuffle(tail);p=p[:N-t]+tail
+            elif kind==4:
+                # 前缀随机，末尾 k 个排成降序后再交换一对，接近递减
+                r.shuffle(p);k=min(N,r.randint(4,8));tail=sorted(p[N-k:],reverse=True)
+                i,j=r.sample(range(k),2) if k>=2 else (0,0);tail[i],tail[j]=tail[j],tail[i];p=p[:N-k]+tail
+            elif seed>len(sizes):
+                # kind==0 的大组：随机排列，末尾 2~4 个递减
+                r.shuffle(p);t=r.randint(2,4);p=p[:N-t]+sorted(p[N-t:],reverse=True)
+            # 其余 kind==0：恒等排列
+            if N==1:break
+            rem=remaining(p)
+            if rem>=1:
+                M=min(M,rem);break
+        return f'{N}\n{M}\n'+' '.join(map(str,p))+'\n'
     if n==3254:return '\n'.join(f'{r.randint(2,100)} {r.randint(1,100)} {r.randint(1,100)}' for _ in range(r.randint(1,5)))+'\n0 0 0\n'
     if n==2502:
         hx,hy,sx,sy=[r.randint(0,10000) for _ in range(4)];return f'{hx} {hy} {sx} {sy}\n{r.randint(0,10000)} {r.randint(0,10000)} {r.randint(0,10000)} {r.randint(0,10000)} -1 -1\n'

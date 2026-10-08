@@ -149,7 +149,7 @@ def generate(number, seed):
     if number == 1753:return "\n".join("".join(r.choice("bw") for _ in range(4)) for _ in range(4))+"\n"
     raise KeyError(number)
 
-REFERENCE="# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1056: IMMEDIATE DECODABILITY\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01056/\n# License: not declared; no license is inferred.\nimport sys\nm=0\nwhile True:\n    try:\n        a=input()\n    except EOFError:\n        break\n    m+=1\n    list1=[]\n    while a!='9':\n        list1.append(a)\n        a=input()\n    dict1={}\n    flag1=True\n    flag2=True\n    def dfs(dict1,a,i):\n        global flag1,flag2\n        if not flag1:\n            return\n        if '-1' in dict1:\n            flag1=False\n            return\n        if i==len(a):\n            dict1['-1']=-1\n            return\n        if a[i] not in dict1:\n            dict1[a[i]]={}\n            flag2=False\n        dfs(dict1[a[i]],a,i+1)\n    for a in list1:\n        flag2=True\n        dfs(dict1,a,0)\n        if not flag1:\n            break\n    if flag1:\n        print(f'Set {m} is immediately decodable')\n    else:\n        print(f'Set {m} is not immediately decodable')\n"
+REFERENCE='# 参考解：原先引用的 2020fall 代码只在插入时检查「已有编码是当前编码的前缀」，\n# 当前编码是已有编码的前缀（如先 01 后 0）时照样判可解码；旧生成器把每组排好序，正好藏住了这个缺陷。\n# 这里改成两两比较前缀（每组至多 8 个编码）。\nimport sys\ngroup = []\nk = 0\nfor t in sys.stdin.read().split():\n    if t == "9":\n        k += 1\n        bad = any(i != j and group[j].startswith(group[i])\n                  for i in range(len(group)) for j in range(len(group)))\n        print(f"Set {k} is {\'not \' if bad else \'\'}immediately decodable")\n        group = []\n    else:\n        group.append(t)\n'
 NUMBER=1056
 SAMPLE='01\n10\n0010\n0000\n9\n01\n10\n010\n0000\n9\n'
 def run(x):
@@ -157,9 +157,80 @@ def run(x):
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
   if q.returncode:raise SystemExit(q.stderr)
   return q.stdout.rstrip()+'\n'
+def valid(text):
+    """题面：若干组，每组 2..8 个互不相同的二进制编码（每个 1..10 位），每组后跟单独一行 9。"""
+    if not text.endswith("9\n"):
+        return False
+    lines = text[:-1].split("\n")
+    group = []
+    groups = 0
+    for s in lines:
+        if s == "9":
+            if not (2 <= len(group) <= 8) or len(set(group)) != len(group):
+                return False
+            groups += 1
+            group = []
+        elif 1 <= len(s) <= 10 and set(s) <= {"0", "1"}:
+            group.append(s)
+        else:
+            return False
+    return groups >= 1 and not group
+
+def gen1056(seed):
+    r = random.Random(1056_000 + seed)
+    def rb(lo, hi):
+        return "".join(r.choice("01") for _ in range(r.randint(lo, hi)))
+    def prefix_free(k):
+        # 从根开始随机分裂叶子，得到 k 个互不为前缀的编码（长度 ≤ 10）
+        leaves = [""]
+        while len(leaves) < k:
+            cand = [x for x in leaves if len(x) < 10]
+            x = r.choice(cand); leaves.remove(x)
+            leaves += [x + "0", x + "1"]
+        if r.random() < 0.5 and len(leaves) > 2:   # 丢掉部分叶子仍然无前缀
+            leaves = r.sample(leaves, r.randint(2, len(leaves)))
+        return [x if x else "0" for x in leaves]
+    def one_group():
+        k = r.randint(2, 8); t = r.random()
+        if t < 0.4:
+            codes = prefix_free(k)
+        elif t < 0.7:
+            # 先拿一个无前缀集合，再把某个编码的真前缀或延长塞进去，并打乱顺序
+            codes = prefix_free(max(2, k - 1))
+            c = r.choice(codes)
+            if len(c) > 1 and r.random() < 0.5:
+                extra = c[:r.randint(1, len(c) - 1)]
+            elif len(c) < 10:
+                extra = c + rb(1, 10 - len(c))
+            else:
+                extra = c[:-1]
+            if extra not in codes:
+                codes.append(extra)
+        else:
+            codes = set()
+            while len(codes) < k:
+                codes.add(rb(1, 10))
+            codes = sorted(codes)          # 集合遍历顺序受哈希随机化影响，先排序再打乱
+        codes = codes[:8]
+        r.shuffle(codes)
+        return codes
+    if seed == 1:
+        groups = [["0", "1"], ["01", "0"], ["0", "01"], ["1111111111", "111111111"]]
+    elif seed == 2:
+        groups = [["0000000000", "1"], ["0", "10", "110", "1110", "11110", "111110", "1111110", "1111111"]]
+    elif seed == 3:
+        groups = [["10", "01", "1"], ["1", "0"]]
+    elif seed <= 15:
+        groups = [one_group() for _ in range(r.randint(1, 10))]
+    elif seed <= 30:
+        groups = [one_group() for _ in range(r.randint(50, 500))]
+    else:
+        groups = [one_group() for _ in range(r.randint(3000, 8000))]
+    return "".join("\n".join(g) + "\n9\n" for g in groups)
+
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[gen1056(s) for s in range(1, 40)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

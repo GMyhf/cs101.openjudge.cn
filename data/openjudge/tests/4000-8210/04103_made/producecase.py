@@ -18,6 +18,13 @@ SAMPLE_OUT = '7\n'
 BRUTE_SOURCE = 'n = int(input())\nstep = [[1, 0], [-1, 0], [0, 1]]\nnum = 1\n\n\ndef dfs(x, y, m, visited):\n    global num\n    if m == 0:\n        return\n    visited.append([x, y])\n    num -= 1\n    for j in range(3):\n        if [x+step[j][0], y+step[j][1]] not in visited:\n            num += 1\n            lista = []\n            lista += visited\n            dfs(x+step[j][0], y+step[j][1], m-1, lista)\n\n\ndfs(0, 0, n, [])\nprint(num)\n'
 REFERENCE_SOURCE = 'n = int(input())\na, b = 1, 3            # f(0)=1, f(1)=3, f(k)=2*f(k-1)+f(k-2)\nfor _ in range(max(0, n - 1)):\n    a, b = b, 2 * b + a\nprint(b if n >= 1 else a)\n'
 
+def valid(text):
+    """题面契约：一行一个整数 n（n<=20；题面未写下界，步数取非负）。"""
+    import re
+    m = re.fullmatch(r"(0|[1-9][0-9]*)\n", text)
+    return bool(m) and int(m.group(1)) <= 20
+
+
 def _run(source, content, limit=180):
     with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8", delete=False) as fh:
         fh.write(source)
@@ -51,6 +58,7 @@ def main():
     assert cases[0] == SAMPLE_IN, "第 0 组必须是题面样例"
     assert len(set(cases)) == 20, "题面 n<=20 应覆盖 1..20 全部取值"
     assert "1\n" in cases and "20\n" in cases, "上下界都要有数据"
+    assert all(valid(c) for c in cases), "有数据不满足题面约束"
     assert _run(REFERENCE_SOURCE, SAMPLE_IN).split() == SAMPLE_OUT.split(), "参考解法跑不出样例输出"
     _emit(cases, lambda c: _run(REFERENCE_SOURCE, c))
 

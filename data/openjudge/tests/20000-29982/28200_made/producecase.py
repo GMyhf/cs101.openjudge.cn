@@ -1,20 +1,74 @@
-import random, subprocess, sys, tempfile
+"""28200 超大二叉树 测试数据生成器。
+
+题面：2 <= N <= 10^6，1 <= D <= 2*10^6；输入一行两个整数 N D。
+树上最大距离为 2N-2，D 大部分取在 [1, 2N-2] 内，只留少量 D > 2N-2（答案 0）的组。
+第 0 组为样例 1，第 1 组为样例 2；含 N=10^6 满规模组。
+"""
+import random
+import re
+import subprocess
+import sys
 from pathlib import Path
-REFERENCE='# External reference: statistics page /practice/28200/\n# Accepted submission: 52734593\n# Source: http://cs101.openjudge.cn/practice/solution/52734593/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\n\ninput = sys.stdin.read\ndata = input().split()\n\nN = int(data[0])\nD = int(data[1])\nMOD = 998244353\n\nif D == 0:\n    print(0)\n    sys.exit(0)\n\n# Precompute powers of 2\nMAXN = max(N, D) + 5\npw = [1] * (MAXN + 1)\nfor i in range(1, MAXN + 1):\n    pw[i] = (pw[i-1] * 2) % MOD\n\n# ans[i+1] = sum for left path length 0 to i\nans = [0] * (D + 2)\nfor i in range(D + 1):\n    j = D - i\n    l = pw[max(0, i - 1)]\n    r = pw[max(0, j - 1)]\n    ans[i + 1] = (ans[i] + 2 * l * r % MOD) % MOD\n\nres = 0\nfor dep in range(1, N + 1):  # depth from 1 to N (root depth 0, but we skip root? wait)\n    # In code: for(int i=1;i<=n;i++)  i is depth?\n    l = max(0, dep + D - N)\n    r = min(D, N - dep)\n    if l > r:\n        continue\n    # res = number for one node at this depth\n    temp = (ans[min(D, N - dep) + 1] - ans[max(0, dep + D - N)] + MOD) % MOD\n    # multiply by number of nodes at this depth: 2^{dep-1}\n    res = (res + pw[dep - 1] * temp % MOD) % MOD\n\nprint(res)'
-SAMPLE='3 2\n'
-EXTRA_CASE='200000 400000\n'
-GENERATOR_NAME='g28200'
-def g28200(r): return f"{r.randint(2, 10000)} {r.randint(1, 20000)}\n"
+
+HERE = Path(__file__).resolve().parent
+SEED = 28200
+
+
+def valid(text):
+    if not re.fullmatch(r"[0-9]+ [0-9]+\n", text):
+        return False
+    n, d = map(int, text.split())
+    return 2 <= n <= 10**6 and 1 <= d <= 2 * 10**6 and str(n) + " " + str(d) + "\n" == text
+
+
+def build_cases():
+    r = random.Random(SEED)
+    pairs = [
+        (3, 2),             # 样例 1
+        (14142, 17320),     # 样例 2
+        (10**6, 10**6),     # 满规模
+        (10**6, 1999998),   # 满规模，D 恰为最大距离
+        (999983, 2 * 10**6),  # 接近满规模且 D 取上限（D > 2N-2，答案 0）
+        (10**6, 1),
+        (2, 1), (2, 2), (2, 3),
+        (3, 4), (5, 7), (10, 18),
+        (20, 30), (31, 60),
+        (2, 2 * 10**6),
+    ]
+    # 中等规模：卡 O(N*D) 写法
+    for _ in range(4):
+        n = r.randint(20000, 200000)
+        pairs.append((n, r.randint(1, 2 * n - 2)))
+    for _ in range(6):
+        n = r.randint(2, 3000)
+        pairs.append((n, r.randint(1, 2 * n - 2)))
+    for _ in range(3):
+        n = r.randint(300000, 999999)
+        pairs.append((n, r.randint(n // 2, min(2 * 10**6, 2 * n - 2))))
+    seen, out = set(), []
+    for p in pairs:
+        if p not in seen:
+            seen.add(p)
+            out.append(f"{p[0]} {p[1]}\n")
+    return out
+
 
 def run(text):
-    with tempfile.TemporaryDirectory(prefix='producecase-') as d:
-        p=Path(d)/'main.py'; p.write_text(REFERENCE)
-        x=subprocess.run([sys.executable,str(p)],input=text,text=True,capture_output=True,timeout=90)
-        if x.returncode: raise SystemExit(x.stderr)
-        return x.stdout
-def scale_case(): return EXTRA_CASE
+    x = subprocess.run([sys.executable, str(HERE / "samplecode.py")], input=text,
+                       text=True, capture_output=True, timeout=120)
+    if x.returncode:
+        raise SystemExit(x.stderr)
+    return x.stdout
+
+
 def main():
-    d=Path('data'); d.mkdir(exist_ok=True)
-    extra=scale_case(); cases=[SAMPLE]+([extra] if extra else [])+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
-    for i,c in enumerate(cases): (d/f'{i}.in').write_text(c); (d/f'{i}.out').write_text(run(c))
-if __name__=='__main__': main()
+    d = HERE / "data"
+    d.mkdir(exist_ok=True)
+    for i, c in enumerate(build_cases()):
+        assert valid(c), i
+        (d / f"{i}.in").write_text(c)
+        (d / f"{i}.out").write_text(run(c))
+
+
+if __name__ == "__main__":
+    main()

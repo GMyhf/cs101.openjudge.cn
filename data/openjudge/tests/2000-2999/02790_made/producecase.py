@@ -420,6 +420,52 @@ def generate(number, seed):
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02790/statistics/\n# Accepted submission: 51486638\n# Source: http://cs101.openjudge.cn/practice/solution/51486638/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\n\nsys.setrecursionlimit(1 << 30)\n\nk = int(input())\nfor _ in range(k):\n    n = int(input())\n    a = []\n    for i in range(n):\n        a.append(input())\n    ha, la, hb, lb = map(int, input().split())\n    if a[ha][la] == "#" or a[hb][lb] == "#":\n        print("NO")\n        continue\n\n    vis = [[False] * n for __ in range(n)]\n\n    def dfs(x, y):\n        vis[x][y] = True\n        if x == hb and y == lb:\n            return True\n        d = [(1, 0), (0, 1), (-1, 0), (0, -1)]\n        for dx, dy in d:\n            if 0 <= x + dx < n and 0 <= y + dy < n:\n                if a[x + dx][y + dy] == "." and not vis[x + dx][y + dy]:\n                    if dfs(x + dx, y + dy):\n                        return True\n\n    print("YES" if dfs(ha, la) else "NO")\n'
 LANGUAGE='Python3'
 NUMBER=2790
+def valid(text):
+    """题面：第1行组数k；每组：n (1<=n<=100)，n行每行n个 . 或 #，再一行 ha la hb lb（从0计数，落在迷宫内）。"""
+    if not text.endswith("\n"): return False
+    lines = text[:-1].split("\n")
+    def num(x):
+        return x.isdigit() and (x == "0" or x[0] != "0")
+    if not lines or not num(lines[0]): return False
+    k = int(lines[0]); pos = 1
+    if k < 1: return False
+    for _ in range(k):
+        if pos >= len(lines) or not num(lines[pos]): return False
+        n = int(lines[pos]); pos += 1
+        if not 1 <= n <= 100 or pos + n >= len(lines): return False
+        for row in lines[pos:pos + n]:
+            if len(row) != n or set(row) - set(".#"): return False
+        pos += n
+        t = lines[pos].split(" "); pos += 1
+        if len(t) != 4 or not all(num(x) and int(x) < n for x in t): return False
+    return pos == len(lines)
+def extra_cases():
+    """补充：n=1、起点/终点为 # 的 NO、A=B、n=100 的长蛇形通路（深递归）与满规模随机组。"""
+    r = random.Random(2790)
+    def fmt(blocks):
+        return f"{len(blocks)}\n" + "\n".join(f"{len(g)}\n" + "\n".join(g) + f"\n{a} {b} {c} {d}" for g, (a, b, c, d) in blocks) + "\n"
+    def snake(n, cut=False):
+        g = [["#"] * n for _ in range(n)]
+        for y in range(0, n, 2):
+            for x in range(n): g[y][x] = "."
+            if y + 1 < n: g[y + 1][n - 1 if (y // 2) % 2 == 0 else 0] = "."
+        if cut: g[51] = ["#"] * n
+        return ["".join(row) for row in g]
+    def rnd(n, p):
+        return ["".join("#" if r.random() < p else "." for _ in range(n)) for _ in range(n)]
+    cases = []
+    cases.append(fmt([(["."], (0, 0, 0, 0)), (["#"], (0, 0, 0, 0)), (["..", ".."], (0, 0, 1, 1)), (["#.", ".."], (0, 0, 1, 1)), ([".#", ".#"], (0, 0, 1, 1)), ([".#", ".."], (1, 1, 1, 1))]))
+    full = ["." * 100] * 100
+    g = [list(row) for row in full]; g[0][0] = "#"; startblk = ["".join(x) for x in g]
+    g = [list(row) for row in full]; g[99][99] = "#"; endblk = ["".join(x) for x in g]
+    cases.append(fmt([(full, (0, 0, 99, 99)), (startblk, (0, 0, 99, 99)), (endblk, (0, 0, 99, 99)), (full, (50, 50, 50, 50))]))
+    sn = snake(100); cases.append(fmt([(sn, (0, 0, 98, 99 if (98 // 2) % 2 == 0 else 0)), (sn, (0, 0, 98, 0)), (snake(100, True), (0, 0, 99, 0)), (snake(99), (0, 0, 98, 98))]))
+    for p in (0.3, 0.4, 0.45):
+        blocks = []
+        for _ in range(10):
+            gg = rnd(100, p); a, b, c, d = (r.randrange(100) for _ in range(4)); blocks.append((gg, (a, b, c, d)))
+        cases.append(fmt(blocks))
+    return cases
 SAMPLE='2\n3\n.##\n..#\n#..\n0 0 2 2\n5\n.....\n###.#\n..#..\n###..\n...#.\n0 0 4 0\n'
 def main():
  with tempfile.TemporaryDirectory() as d:
@@ -428,7 +474,7 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()
   for i,x in enumerate(cases):
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

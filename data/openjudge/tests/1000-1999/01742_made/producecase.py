@@ -149,6 +149,74 @@ def generate(number, seed):
     if number == 1753:return "\n".join("".join(r.choice("bw") for _ in range(4)) for _ in range(4))+"\n"
     raise KeyError(number)
 
+# ---- 题面契约与 1742 专用生成器 ----
+def valid(text):
+    """若干组，每组两行：“n m”（1<=n<=100，m<=100000，取 m>=1），下一行 2n 个整数 A1..An C1..Cn
+    （1<=Ai<=100000，1<=Ci<=1000）；最后一行为 “0 0”，其后无内容。"""
+    try:
+        if not text.endswith('\n') or '\r' in text: return False
+        lines = text[:-1].split('\n')
+        if any(ln != ln.strip() or '  ' in ln or not ln for ln in lines): return False
+        if lines[-1] != '0 0' or len(lines) % 2 != 1 or len(lines) < 3: return False
+        for i in range(0, len(lines) - 1, 2):
+            hd = lines[i].split()
+            if len(hd) != 2: return False
+            n, m = map(int, hd)
+            if not (1 <= n <= 100 and 1 <= m <= 100000): return False
+            v = list(map(int, lines[i + 1].split()))
+            if len(v) != 2 * n: return False
+            if not all(1 <= a <= 100000 for a in v[:n]) or not all(1 <= c <= 1000 for c in v[n:]): return False
+        return True
+    except Exception:
+        return False
+
+def _dp_count(n, m, a, c):
+    """独立解：经典 used[] 计数的多重背包可达性，O(n*m)。"""
+    ok = bytearray(m + 1); ok[0] = 1
+    for ai, ci in zip(a, c):
+        if ai > m: continue
+        used = [0] * (m + 1)
+        for s in range(ai, m + 1):
+            if not ok[s] and ok[s - ai] and used[s - ai] < ci:
+                ok[s] = 1; used[s] = used[s - ai] + 1
+    return sum(ok) - 1
+
+def _solve_text(text):
+    lines = text[:-1].split('\n'); out = []
+    for i in range(0, len(lines) - 1, 2):
+        n, m = map(int, lines[i].split()); v = list(map(int, lines[i + 1].split()))
+        out.append(str(_dp_count(n, m, v[:n], v[n:])))
+    return "\n".join(out) + "\n"
+
+def _case(r, n, m, amax, cmax, kind='rand'):
+    if kind == 'dup':
+        base = [r.randint(1, amax) for _ in range(max(1, n // 5))]
+        a = [r.choice(base) for _ in range(n)]
+    elif kind == 'big':
+        a = [r.randint(max(1, amax // 2), amax) for _ in range(n)]
+    elif kind == 'gcd':   # 所有面值同一公因数：答案约 m/g，卡只输出常量或把可达数当 m 的写法
+        g = r.randint(2, 9); a = [g * r.randint(1, max(1, amax // g)) for _ in range(n)]
+    else:
+        a = [r.randint(1, amax) for _ in range(n)]
+    c = [r.randint(1, cmax) for _ in range(n)]
+    return f"{n} {m}\n" + " ".join(map(str, a + c))
+
+def gen_file(seed):
+    r = random.Random(1742 * 1_000_003 + seed)
+    if seed == 1:
+        cs = ["1 1\n1 1", "1 1\n2 1", "1 100000\n100000 1000", "2 3\n1 1 1 1"]
+    elif seed <= 12:
+        cs = [_case(r, r.randint(1, 8), r.randint(1, 60), r.randint(1, 30), r.randint(1, 6), r.choice(['rand', 'dup', 'gcd']))
+              for _ in range(r.randint(1, 30))]
+    elif seed <= 22:
+        cs = [_case(r, r.randint(1, 100), r.randint(1, 20000), r.randint(1, 5000), r.randint(1, 1000), r.choice(['rand', 'dup', 'big', 'gcd']))
+              for _ in range(r.randint(1, 8))]
+    elif seed <= 30:   # 满规模：n=100、m=100000，C 也取大，卡 O(n*m*C) 的朴素多重背包
+        cs = [_case(r, 100, 100000, r.choice([100, 1000, 100000]), 1000, r.choice(['rand', 'dup', 'big', 'gcd'])) for _ in range(r.randint(1, 3))]
+    else:              # 满规模、多组
+        cs = [_case(r, 100, 100000, r.choice([50, 3000, 100000]), r.choice([1, 1000]), r.choice(['rand', 'dup', 'big', 'gcd'])) for _ in range(4)]
+    return "\n".join(cs) + "\n0 0\n"
+
 REFERENCE="# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 1742: Coins\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/01742/\n# License: not declared; no license is inferred.\nimport sys\n# 23n2300010763，数院胡睿诚\n'''\n多重背包问题 (二进制优化)\n多重背包问题通常可转化成01背包问题求解。但若将每种物品的数量拆分成多个1的话，时间复杂度会很高，\n从而导致TLE。所以，需要利用二进制优化思想。即:一个正整数n，可以被分解成1,2,4,...,2^(k-1),\nn-2^k+1的形式。其中，k是满足n-2^k+1>0的最大整数。\n例如，假设给定价值为2，数量为10的物品，依据二进制优化思想可将10分解为1+2+4+3，则原来价值为2,\n数量为10的物品可等效转化为价值分别为1*2，2*2，4*2，3*2，即价值分别为2，4，8，6，数量均为1的物品。\n\ndef sum_2(x):\n    s = 0\n    while x > 0:\n        s += (x & 1)\n        x = x >> 1\n    return s\n\n'''\nimport math\n\nwhile True:\n    n, m = map(int, input().split())\n    if n == 0 and m == 0:\n        break\n    ls = list(map(int, input().split()))\n    w = (1 << (m + 1)) - 1  # e.g., m=10, w=2047\n    result = 1\n    for i in range(n):\n        number = ls[i + n] + 1  # e.g., number = 10\n        limit = int(math.log(number, 2))  # limit = 3\n        rest = number - (1 << limit)  # rest = 3\n        # 处理 2 的幂次方部分\n        for j in range(limit):\n            shift = ls[i] * (1 << j)\n            result = (result | (result << shift)) & w\n\n        # 处理剩余部分\n        if rest > 0:\n            result = (result | (result << (ls[i] * rest))) & w\n    # print(sum_2(result) - 1)\n    print(bin(result).count('1') - 1)\n"
 NUMBER=1742
 SAMPLE='3 10\n1 2 4 2 1 1\n2 5\n1 4 2 1\n0 0\n'
@@ -160,6 +228,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[gen_file(s) for s in range(1, 40)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

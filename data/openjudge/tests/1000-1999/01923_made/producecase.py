@@ -313,9 +313,7 @@ def generate(number, seed):
             points = r.sample([(x, y) for x in range(1, 101) for y in range(1, 101)], r.randint(1, 20))
             chunks.append(str(len(points)) + "\n" + "\n".join(f"{i} {x} {y}" for i, (x, y) in enumerate(points, 1)))
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
-    if number == 1923:
-        rows = [f"{r.randint(1,100)} {r.randint(0,10000)}" for _ in range(r.randint(1, 8))]
-        return "\n".join(rows) + "\n0 0\n"
+    if number == 1923: return gen1923(r, seed)
     if number == 2157:
         chunks = []
         for index in range(r.randint(1, 4)):
@@ -416,6 +414,53 @@ def generate(number, seed):
             chunks.append(f"{capacity}\n{count}\n" + " ".join(str(x) for pair in metals for x in pair))
         return f"{len(chunks)}\n" + "\n".join(chunks) + "\n"
     raise KeyError(number)
+
+def valid(text):
+    """题面约束：若干行，每行两个整数 N M（1<=N<=100，0<=M<=10000），以一个空格分隔；
+    最后一行为 "0 0"（结束标记，不处理），其后无内容。"""
+    if not text.endswith("\n"):return False
+    lines=text[:-1].split("\n")
+    if lines[-1]!="0 0" or len(lines)<2:return False
+    for ln in lines[:-1]:
+        t=ln.split(" ")
+        if len(t)!=2 or not all(x.isdigit() and str(int(x))==x for x in t):return False
+        n,m=map(int,t)
+        if not(1<=n<=100 and 0<=m<=10000):return False
+    return True
+
+def _possible1923():
+    # 独立 oracle：P[n] 的第 m 位表示 n 条线能否恰好 m 个交点（按平行组划分递推）
+    P=[1]
+    for n in range(1,101):
+        b=0
+        for i in range(1,n+1):b|=P[n-i]<<(i*(n-i))
+        P.append(b)
+    return P
+
+def gen1923(r, seed):
+    if seed == 1:
+        rows=[(1,0),(1,1),(2,0),(2,1),(2,2),(3,2),(3,3),(1,10000),(100,0),(100,1),(100,98),(100,99),
+              (100,4949),(100,4950),(100,4951),(100,10000),(99,4851),(99,4852),(45,990),(46,1035),(17,101)]
+    elif seed <= 14:
+        rows=[]
+        for _ in range(r.randint(5,30)):
+            n=r.randint(1,12);rows.append((n,r.randint(0,n*(n-1)//2+2)))
+    elif seed <= 30:
+        rows=[]
+        for _ in range(r.randint(150,300)):
+            n=r.randint(1,100);mx=n*(n-1)//2;u=r.random()
+            if u<.4:m=r.randint(0,min(10000,3*n))
+            elif u<.8:m=r.randint(0,mx)
+            elif u<.9:m=r.randint(max(0,mx-3*n),mx)
+            else:m=r.randint(0,10000)
+            rows.append((n,m))
+    else:
+        rows=[]
+        for _ in range(r.randint(1000,1300)):
+            n=r.randint(80,100);mx=n*(n-1)//2
+            m=r.randint(0,1600) if r.random()<.7 else r.randint(0,mx)
+            rows.append((n,m))
+    return "\n".join(f"{a} {b}" for a,b in rows)+"\n0 0\n"
 
 REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01923/statistics/\n# Accepted submission: 44796928\n# Source: http://cs101.openjudge.cn/practice/solution/44796928/\n# License: not declared on the submission page; no license is inferred.\n\n# -*- coding: utf-8 -*-\n"""\nCreated on Thu Apr 25 20:37:03 2024\n\n@author: Lenovo\n"""\n\ndef dfs(n,m):\n    if m<0 or n*(n+1)<(m<<1):\n        return 0\n    elif m==0:\n        return 1\n    elif dp[n][m]!=-1:\n        return dp[n][m]\n    for i in range(1,n+1):\n        dp[n][m]=dfs(n-i,m-i*(n-i))\n        if dp[n][m]:\n            return 1\n    return 0\n\ncase=1\nwhile True:\n    n,m=map(int,input().split())\n    if m==0 and n==0:\n        break\n    dp=[[-1]*(m+1) for i in range(n+1)]\n    if dfs(n,m):\n        print(f"Case {case}: {n} lines with exactly {m} crossings can cut the plane into {n+m+1} pieces at most.")\n    else:\n        print(f"Case {case}: {n} lines cannot make exactly {m} crossings.")\n    case+=1\n'
 LANGUAGE='Python3'

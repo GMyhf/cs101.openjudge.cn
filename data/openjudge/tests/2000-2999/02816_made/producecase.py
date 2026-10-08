@@ -421,6 +421,70 @@ REFERENCE='# External reference: http://cs101.openjudge.cn/practice/02816/statis
 LANGUAGE='Python3'
 NUMBER=2816
 SAMPLE='6 9\n....#.\n.....#\n......\n......\n......\n......\n......\n#@...#\n.#..#.\n0 0\n'
+import re as _re
+_NAT = _re.compile(r'(0|[1-9][0-9]*)\Z')
+def valid(text):
+    """题面契约：多个数据集合，每个以 "W H" 开头（W、H 都不超过 20，取 1..20），
+    接着 H 行、每行恰 W 个字符，只含 '.'、'#'、'@'，且 '@' 在每个数据集合中恰出现一次；
+    以一行 "0 0" 结束，其后不再有内容。"""
+    if not text.endswith('\n') or '\r' in text: return False
+    lines = text[:-1].split('\n'); i = 0; sets = 0
+    while True:
+        if i >= len(lines): return False
+        p = lines[i].split(' ')
+        if len(p) != 2 or not all(_NAT.match(t) for t in p): return False
+        W, H = map(int, p); i += 1
+        if W == 0 and H == 0: break
+        if not (1 <= W <= 20 and 1 <= H <= 20): return False
+        rows = lines[i:i + H]; i += H
+        if len(rows) != H or any(len(row) != W or set(row) - set('.#@') for row in rows): return False
+        if sum(row.count('@') for row in rows) != 1: return False
+        sets += 1
+    return i == len(lines) and sets >= 1
+
+def _ds(grid):
+    return f"{len(grid[0])} {len(grid)}\n" + "\n".join("".join(row) for row in grid)
+
+def _rand(r, w, h, p):
+    g = [["." if r.random() < p else "#" for _ in range(w)] for _ in range(h)]
+    g[r.randrange(h)][r.randrange(w)] = "@"
+    return g
+
+def _snake(w, h):
+    g = [["." if y % 2 == 0 else "#" for _ in range(w)] for y in range(h)]
+    for y in range(1, h, 2): g[y][w - 1 if y % 4 == 1 else 0] = "."
+    g[0][0] = "@"
+    return g
+
+def _file(sets):
+    return "\n".join(_ds(g) for g in sets) + "\n0 0\n"
+
+def cases():
+    r = random.Random(2816_2026)
+    out = []
+    out.append(_file([[["@"]]]))                                   # 1x1
+    out.append(_file([[["."] * 20 for _ in range(19)] + [["."] * 19 + ["@"]]]))  # 20x20 全黑 -> 400
+    out.append(_file([[list("###"), list("#@#"), list("###")]]))   # 被红砖围住 -> 1
+    out.append(_file([[["."] * 7 + ["@"] + ["."] * 12]]))           # W=20, H=1
+    out.append(_file([[["."]] * 5 + [["@"]] + [["."]] * 14]))  # W=1, H=20
+    out.append(_file([_snake(20, 20), _snake(19, 20), _snake(20, 19)]))  # 蛇形长走廊
+    # @ 在角上、边上；整行红砖隔断
+    g = [["."] * 20 for _ in range(20)]
+    for x in range(20): g[10][x] = "#"
+    g[19][19] = "@"
+    out.append(_file([g, _rand(r, 20, 20, .5), _rand(r, 2, 20, .8), _rand(r, 20, 2, .8)]))
+    # W != H，读反行列会越界或错
+    out.append(_file([_rand(r, 20, 3, .75), _rand(r, 3, 20, .75), _rand(r, 17, 5, .7), _rand(r, 5, 17, .7)]))
+    # 多组随机：组数、尺寸、密度各异
+    for k in range(31):
+        sets = []
+        for _ in range(r.randint(1, 12) if k < 25 else r.randint(40, 60)):
+            w, h = r.randint(1, 20), r.randint(1, 20)
+            if k % 3 == 0: w, h = r.randint(15, 20), r.randint(15, 20)
+            sets.append(_rand(r, w, h, r.choice((.3, .55, .6, .7, .8, .95))))
+        out.append(_file(sets))
+    return out
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]
@@ -428,7 +492,8 @@ def main():
    exe=d/'s';subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=Path('data');out.mkdir(exist_ok=True)
   for p in out.glob('*'):p.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,s) for s in range(1, 40)]
-  for i,x in enumerate(cases):
+  cases_=([SAMPLE] if SAMPLE else [])+cases()
+  for i,x in enumerate(cases_):
+   assert valid(x),i
    q=subprocess.run(cmd,input=x,text=True,capture_output=True,timeout=120,check=True);clean='\n'.join(line.rstrip() for line in q.stdout.rstrip().splitlines())+'\n';(out/f'{i}.in').write_text(x);(out/f'{i}.out').write_text(clean)
 if __name__=='__main__':main()

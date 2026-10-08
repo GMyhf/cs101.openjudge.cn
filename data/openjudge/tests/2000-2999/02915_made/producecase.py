@@ -81,9 +81,37 @@ def generate(number, seed):
     if number == 2796:
         return " ".join(str(r.randint(1, 99)) for _ in range(6)) + "\n"
     if number == 2915:
-        lines = [f"text {seed}" + (" " + "x" * count if count else "")
-                 for count in [r.randint(0, 18) for _ in range(r.randint(2, 10))]]
-        return f"{len(lines)}\n" + "\n".join(lines) + "\n"
+        # 多组数据；部分组中途出现 "stop" 提前结束该组；串长 1~99（题面：少于一百个字符）。
+        # 同组内等长的串内容完全相同，避免稳定/不稳定排序造成答案歧义。
+        letters = "abcdefghijklmnopqrstuvwxyz"
+        body = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ,.!?'-"
+        def mkstr(L):
+            if L == 1: return r.choice(letters)
+            t = [r.choice(body) for _ in range(L)]
+            t[0] = r.choice(letters); t[-1] = r.choice(letters)
+            x = "".join(t)
+            return x if x != "stop" else "stoq"
+        if seed <= 3: groups_n, nmax = 1, seed
+        elif seed >= 37: groups_n, nmax = 60, 99
+        else: groups_n, nmax = r.randint(2, 12), r.choice([5, 10, 30, 99])
+        out = []
+        for g in range(groups_n):
+            n = nmax if seed <= 3 or seed >= 37 else r.randint(1, nmax)
+            lens = r.sample(range(1, 100), n if seed <= 3 else r.randint(max(1, n - 2), n))
+            pool = {}
+            rows = []
+            for L in lens:
+                if L not in pool:
+                    pool[L] = "stops" if (L == 5 and r.random() < 0.5) else mkstr(L)
+                rows.append(pool[L])
+            # 少量重复串（与已有串完全相同）
+            for _ in range(n - len(rows)): rows.append(r.choice(rows))
+            mode = r.random() if seed > 3 else 1.0
+            if mode < 0.35 and n >= 1:
+                k = r.randint(0, n - 1)        # 第 k 个位置读到 stop，后面的不再输入
+                rows = rows[:k] + ["stop"]
+            out.append(f"{n}\n" + "\n".join(rows))
+        return "\n".join(out) + "\n"
     if number == 1050:
         n = r.randint(2, 10)
         rows = [[-r.randint(1, 20) for _ in range(n)]]
@@ -418,6 +446,22 @@ def generate(number, seed):
     raise KeyError(number)
 
 REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02915/statistics/\n# Accepted submission: 52675051\n# Source: http://cs101.openjudge.cn/practice/solution/52675051/\n# License: not declared on the submission page; no license is inferred.\n\nwhile True:\n    try:\n        n = int(input())\n    except Exception:\n        break\n    strings = []\n    for _ in range(n):\n        s = input()\n        if s == 'stop':\n            break\n        strings.append(s)\n    strings.sort(key = lambda x: len(x))\n    for s in strings:\n        print(s)\n"
+def valid(text):
+    """题面：多组数据；每组先给字符串个数，再逐行给字符串（每个少于一百个字符）；
+    读到 "stop" 则该组提前结束（stop 不计入输出）。"""
+    if not text.endswith('\n') or '\r' in text: return False
+    L = text[:-1].split('\n'); i = 0; groups = 0
+    while i < len(L):
+        h = L[i]; i += 1
+        if not h.isdigit() or (len(h) > 1 and h[0] == '0') or int(h) < 1: return False
+        n = int(h)
+        for _ in range(n):
+            if i >= len(L): return False
+            x = L[i]; i += 1
+            if len(x) >= 100: return False
+            if x == 'stop': break
+        groups += 1
+    return groups >= 1
 LANGUAGE='Python3'
 NUMBER=2915
 SAMPLE='5\nsky is grey\ncold\nvery cold\nstop\n3\nit is good enough to be proud of\ngood\nit is quite good\n'

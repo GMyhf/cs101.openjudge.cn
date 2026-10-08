@@ -1,5 +1,38 @@
 import random,subprocess,sys,tempfile
 from pathlib import Path
+def valid(text):
+    """题面契约：第 1 行 N（1<=N<10000，N 为奇数）；随后恰 N 行，每行一个整数（题面未给值域，只核整数格式）。"""
+    try:
+        if not text.endswith("\n"):return False
+        lines=text[:-1].split("\n")
+        if not lines[0].isdigit():return False
+        n=int(lines[0])
+        if not (1<=n<10000 and n%2==1) or len(lines)!=n+1:return False
+        for x in lines[1:]:
+            y=x[1:] if x.startswith("-") else x
+            if not y.isdigit():return False
+        return True
+    except Exception:
+        return False
+
+def gen2388(r,seed):
+    # 题面没给值域，取值控制在 32 位有符号整数内
+    f=lambda a:f"{len(a)}\n"+"\n".join(map(str,a))+"\n"
+    if seed==1:return f([7])
+    if seed==2:return f([-2147483648])
+    if seed==3:return f([3,1,2])
+    if seed==4:return f(list(range(1,10000)))                 # 已升序
+    if seed==5:return f(list(range(9999,0,-1)))               # 降序
+    if seed==6:return f([5]*9999)                             # 全相同
+    if seed==7:return f([0]*4999+[1]*5000)                    # 大量重复，中位数 1
+    if seed==8:return f([2147483647]*5000+[-2147483648]*4999) # 极值
+    if seed==9:a=[r.randint(1,1000000) for _ in range(9999)];return f(a)
+    if 10<=seed<=16:a=[r.randint(-10**9,10**9) for _ in range(9999)];return f(a)
+    if 17<=seed<=20:a=[r.randint(-5,5) for _ in range(r.choice([9997,9999,9995]))];return f(a)
+    if 21<=seed<=26:n=2*r.randint(500,4999)+1;return f([r.randint(-10**6,10**6) for _ in range(n)])
+    n=2*r.randint(0,15)+1;return f([r.randint(-10000,10000) for _ in range(n)])
+
+
 def generate(number, seed):
     r = random.Random(number * 1_000_003 + seed)
     if number == 2236:
@@ -10,9 +43,7 @@ def generate(number, seed):
         ops += [f"S {r.randint(1,n)} {r.randint(1,n)}" for _ in range(r.randint(3, 9))]
         r.shuffle(ops)
         return f"{n} {d}\n" + "\n".join(f"{x} {y}" for x, y in points) + "\n" + "\n".join(ops) + "\n"
-    if number == 2388:
-        n = 2 * r.randint(0, 15) + 1
-        return f"{n}\n" + "\n".join(str(r.randint(-10000, 10000)) for _ in range(n)) + "\n"
+    if number == 2388:return gen2388(r,seed)
     if number == 2994:
         n = r.randint(1, 30); values = [r.randint(1, 10000) for _ in range(n)]
         return f"{n}\n" + " ".join(map(str, values)) + "\n"

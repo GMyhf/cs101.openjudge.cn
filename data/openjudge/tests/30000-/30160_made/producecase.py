@@ -1,18 +1,104 @@
 import random
-REFERENCE="# External reference: /practice/30160/statistics/\n# Accepted submission: 50848044\n# Source: http://cs101.openjudge.cn/practice/solution/50848044/\n# License: not declared on the submission page; no license is inferred.\n\nimport itertools\nimport sys\nfrom functools import reduce\nfrom operator import and_, or_\n\n\ndef generate_all(arr, length):\n    sep = len(arr) + 1\n    blank = length - sum(arr) - len(arr) + 1\n    elem = [(1 << i) - 1 for i in arr]\n    comb = itertools.combinations_with_replacement(range(sep), blank)\n    entire = []\n    for i in comb:\n        this = 0\n        cursor = 0\n        counter = [0] * sep\n        for s in i:\n            counter[s] += 1\n        for j in range(len(arr)):\n            cursor += counter[j]\n            if j > 0: cursor += 1\n            this |= elem[j] << cursor\n            cursor += arr[j]\n        entire.append(this)\n    return entire\n\n\ndef find_must(entire):\n    must_filled = reduce(and_, entire)  # 1 if must filled\n    must_empty = reduce(or_, entire)  # 0 if must empty\n    return must_filled, must_empty\n\ndef meet_condition(psb: int, must_filled: int, must_empty: int):\n    return not ((~psb & must_filled) | (psb & ~must_empty))\n\n\nclass Nonogram:\n    def __init__(self, rows_cond, cols_cond):\n        self.rows_cond = rows_cond\n        self.cols_cond = cols_cond\n        self.height, self.width = len(rows_cond), len(cols_cond)\n        self.size = self.height * self.width\n        self.mask = (1 << self.size) - 1\n        self.board_filled = 0\n        self.board_empty = self.mask\n\n        self.rows = [generate_all(i, self.width) for i in rows_cond]\n        self.cols = [generate_all(i, self.height) for i in cols_cond]\n\n        self.row_cache = [None] * self.height\n        self.col_cache = [None] * self.width\n\n    def get_row(self, r: int):\n        if self.row_cache[r] is None:\n            self.row_cache[r] = ((self.board_filled >> (r * self.width)) & ((1 << self.width) - 1),\n                (self.board_empty >> (r * self.width)) & ((1 << self.width) - 1))\n        return self.row_cache[r]\n\n    def get_col(self, c: int):\n        if self.col_cache[c] is None:\n            must_filled = must_empty = 0\n            for r in range(self.height):\n                must_filled |= ((self.board_filled >> (r * self.width + c)) & 1) << r\n                must_empty |= ((self.board_empty >> (r * self.width + c)) & 1) << r\n                self.col_cache[c] = (must_filled, must_empty)\n        return self.col_cache[c]\n\n    def set_row(self, r: int, filled: int, empty: int):\n        self.row_cache[r] = None\n        self.board_filled &= ~(((1 << self.width) - 1) << (r * self.width))\n        self.board_empty &= ~(((1 << self.width) - 1) << (r * self.width))\n        self.board_filled |= filled << (r * self.width)\n        self.board_empty |= empty << (r * self.width)\n\n    def set_col(self, c: int, filled: int, empty: int):\n        self.col_cache[c] = None\n        for r in range(self.height):\n            self.board_filled &= ~(1 << (r * self.width + c))\n            self.board_empty &= ~(1 << (r * self.width + c))\n            self.board_filled |= ((filled >> r) & 1) << (r * self.width + c)\n            self.board_empty |= ((empty >> r) & 1) << (r * self.width + c)\n\n    def solve(self):\n        while self.board_filled != self.board_empty:\n            for i, entire in enumerate(self.rows):\n                cond_entire = [psb for psb in entire if meet_condition(psb, *self.get_row(i))]\n                self.rows[i] = [psb for psb in entire if meet_condition(psb, *self.get_row(i))]\n                self.set_row(i, *find_must(cond_entire))\n            for i, entire in enumerate(self.cols):\n                cond_entire = [psb for psb in entire if meet_condition(psb, *self.get_col(i))]\n                self.cols[i] = cond_entire\n                self.set_col(i, *find_must(cond_entire))\n\n\ndef main():\n    r, c = map(int, input().split())\n    rows_cond = [list(map(int, input().split()))[1:] for _ in range(r)]\n    cols_cond = [list(map(int, input().split()))[1:] for _ in range(c)]\n    board = Nonogram(rows_cond, cols_cond)\n    board.solve()\n    filled = board.board_filled\n    for i in range(board.size):\n        sys.stdout.write(str(filled & 1))\n        filled >>= 1\n        if (i + 1) % board.width == 0:\n            sys.stdout.write('\\n')\n\n\nif __name__ == '__main__':\n    main()"
+# 原参考解（提交 50848044）只做行列推理，遇到唯一解但需要试填的盘面会死循环；
+# 换成「行列推理 + 分支搜索」的完整解法，下面 valid() 也用它核唯一解。
+REFERENCE="import sys\n\ndef cands(clue, n):\n    # 长度 n 的行里满足提示 clue 的所有填法（bit j 表示第 j 格涂黑）\n    res = []\n    def rec(k, start, mask):\n        if k == len(clue):\n            res.append(mask); return\n        need = sum(clue[k:]) + len(clue) - k - 1\n        for s in range(start, n - need + 1):\n            rec(k + 1, s + clue[k] + 1, mask | (((1 << clue[k]) - 1) << s))\n    rec(0, 0, 0)\n    return res\n\ndef search(rows, cols, R, C, limit, found):\n    rows = [list(x) for x in rows]; cols = [list(x) for x in cols]\n    changed = True\n    while changed:\n        changed = False\n        for i in range(R):\n            if not rows[i]: return\n            a = -1; o = 0\n            for m in rows[i]: a &= m; o |= m\n            for j in range(C):\n                if a >> j & 1:\n                    nl = [m for m in cols[j] if m >> i & 1]\n                elif not (o >> j & 1):\n                    nl = [m for m in cols[j] if not (m >> i & 1)]\n                else: continue\n                if len(nl) != len(cols[j]): cols[j] = nl; changed = True\n                if not nl: return\n        for j in range(C):\n            a = -1; o = 0\n            for m in cols[j]: a &= m; o |= m\n            for i in range(R):\n                if a >> i & 1:\n                    nl = [m for m in rows[i] if m >> j & 1]\n                elif not (o >> i & 1):\n                    nl = [m for m in rows[i] if not (m >> j & 1)]\n                else: continue\n                if len(nl) != len(rows[i]): rows[i] = nl; changed = True\n                if not nl: return\n    best = -1\n    for i in range(R):\n        if len(rows[i]) > 1 and (best < 0 or len(rows[i]) < len(rows[best])): best = i\n    if best < 0:\n        found.append([m for m in (x[0] for x in rows)]); return\n    for m in rows[best]:\n        nr = rows[:]; nr[best] = [m]\n        search(nr, cols, R, C, limit, found)\n        if len(found) >= limit: return\n\ndef solve_all(R, C, rc, cc, limit=2):\n    rows = [cands(x, C) for x in rc]; cols = [cands(x, R) for x in cc]\n    found = []\n    search(rows, cols, R, C, limit, found)\n    return found\n\ndef main():\n    data = sys.stdin.read().split(); p = 0\n    R, C = int(data[0]), int(data[1]); p = 2\n    rc = []; cc = []\n    for _ in range(R):\n        k = int(data[p]); rc.append([int(x) for x in data[p+1:p+1+k]]); p += 1 + k\n    for _ in range(C):\n        k = int(data[p]); cc.append([int(x) for x in data[p+1:p+1+k]]); p += 1 + k\n    sol = solve_all(R, C, rc, cc, 1)[0]\n    sys.stdout.write(''.join(''.join('1' if m >> j & 1 else '0' for j in range(C)) + '\\n' for m in sol))\n\nif __name__ == '__main__':\n    main()\n"
 SAMPLE='5 5\n1 3\n1 2\n1 1\n2 2 1\n1 4\n1 2\n1 2\n2 1 1\n2 2 2\n1 3\n'
 GENERATOR_NAME='g30160'
 CPP=False
-def g30160(r):
-    h, w = r.randint(1, 8), r.randint(1, 8); board = [[False for _ in range(w)] for _ in range(h)]
-    def clue(line):
-        out=[]; run=0
-        for x in line + [False]:
-            if x: run += 1
-            elif run: out.append(run); run=0
-        return out
-    rows = [clue(x) for x in board]; cols = [clue([board[i][j] for i in range(h)]) for j in range(w)]
-    return f"{h} {w}\n" + "\n".join(f"{len(x)} {' '.join(map(str,x))}" for x in rows+cols) + "\n"
+_NS = {}
+exec(REFERENCE.replace("if __name__ == '__main__':", "if False:"), _NS)
+
+def clue(line):
+    out=[]; run=0
+    for x in list(line) + [0]:
+        if x: run += 1
+        elif run: out.append(run); run=0
+    return out
+
+def valid(text):
+    # 题面：第一行 R C（R,C<=10）；接着 R 行行提示、C 行列提示，每行首个数为提示个数 k，后跟 k 个正整数；保证唯一解
+    if not text.endswith('\n'): return False
+    lines = text[:-1].split('\n')
+    try:
+        head = [int(x) for x in lines[0].split(' ')]
+        if len(head) != 2: return False
+        R, C = head
+        if not (1 <= R <= 10 and 1 <= C <= 10) or len(lines) != 1 + R + C: return False
+        clues = []
+        for idx, ln in enumerate(lines[1:]):
+            t = [int(x) for x in ln.split(' ')]
+            k = t[0]
+            if k < 0 or len(t) != 1 + k or any(x < 1 for x in t[1:]): return False
+            n = C if idx < R else R
+            if k and sum(t[1:]) + k - 1 > n: return False
+            clues.append(t[1:])
+    except ValueError: return False
+    return len(_NS['solve_all'](R, C, clues[:R], clues[R:], 2)) == 1
+
+def board_case(b):
+    R, C = len(b), len(b[0])
+    rows = [clue(x) for x in b]; cols = [clue([b[i][j] for i in range(R)]) for j in range(C)]
+    return f"{R} {C}\n" + "\n".join(" ".join(map(str, [len(x)] + x)) for x in rows + cols) + "\n"
+
+def line_solvable(text):
+    # 只靠行列推理（不分支）能否解出：原参考解只能处理这一类
+    d = [int(x) for x in text.split()]; R, C = d[0], d[1]; p = 2; cl = []
+    for _ in range(R + C): k = d[p]; cl.append(d[p+1:p+1+k]); p += 1 + k
+    rows = [_NS['cands'](x, C) for x in cl[:R]]; cols = [_NS['cands'](x, R) for x in cl[R:]]
+    found = []
+    s = _NS['search']
+    # 把分支禁掉：只推理一次，看是否每行只剩一种
+    import types
+    rows2 = [list(x) for x in rows]; cols2 = [list(x) for x in cols]
+    changed = True
+    while changed:
+        changed = False
+        for i in range(R):
+            a=-1; o=0
+            for m in rows2[i]: a&=m; o|=m
+            for j in range(C):
+                if a>>j&1: nl=[m for m in cols2[j] if m>>i&1]
+                elif not (o>>j&1): nl=[m for m in cols2[j] if not (m>>i&1)]
+                else: continue
+                if len(nl)!=len(cols2[j]): cols2[j]=nl; changed=True
+        for j in range(C):
+            a=-1; o=0
+            for m in cols2[j]: a&=m; o|=m
+            for i in range(R):
+                if a>>i&1: nl=[m for m in rows2[i] if m>>j&1]
+                elif not (o>>i&1): nl=[m for m in rows2[i] if not (m>>j&1)]
+                else: continue
+                if len(nl)!=len(rows2[i]): rows2[i]=nl; changed=True
+    return all(len(x) == 1 for x in rows2)
+
+def unique_board(r, R, C, p, need_search=None):
+    while True:
+        b = [[1 if r.random() < p else 0 for _ in range(C)] for _ in range(R)]
+        t = board_case(b)
+        if not valid(t): continue
+        if need_search is not None and line_solvable(t) == need_search: continue
+        return t
+
+def all_cases():
+    r = random.Random(30160)
+    out = [SAMPLE]
+    out.append(board_case([[0]])); out.append(board_case([[1]]))
+    out.append(board_case([[1] * 10 for _ in range(10)]))
+    out.append(board_case([[0] * 10 for _ in range(10)]))
+    out.append(board_case([[1, 0, 1, 1, 0, 1, 1, 1, 0, 1]]))          # 1 x 10
+    out.append(board_case([[x] for x in [1, 1, 0, 1, 0, 0, 1, 1, 1, 1]]))  # 10 x 1
+    out.append(board_case([[1 if (i == j or i + j == 9) else 0 for j in range(10)] for i in range(10)][:1] + [[1]*10]))
+    for (R, C, p) in [(1, 7, .5), (7, 1, .5), (2, 3, .5), (3, 2, .6), (4, 4, .6), (5, 5, .5), (6, 8, .6),
+                      (8, 6, .7), (9, 10, .6), (10, 9, .7), (10, 10, .6), (10, 10, .7), (10, 10, .5),
+                      (10, 10, .3), (10, 10, .8), (3, 10, .5), (10, 3, .5)]:
+        out.append(unique_board(r, R, C, p))
+    for _ in range(12):
+        out.append(unique_board(r, 10, 10, r.choice([.5, .6, .7]), need_search=False))
+    for _ in range(5):                # 唯一解但光靠推理解不出、必须试填
+        out.append(unique_board(r, 10, 10, r.choice([.5, .6]), need_search=True))
+    for _ in range(4):
+        out.append(unique_board(r, r.randint(1, 10), r.randint(1, 10), r.random()))
+    return out
 
 from pathlib import Path
 import subprocess, sys, tempfile
@@ -29,6 +115,7 @@ def run(text):
         return x.stdout
 def main():
     data=Path('data'); data.mkdir(exist_ok=True)
-    cases=[SAMPLE]+[globals()[GENERATOR_NAME](random.Random(s)) for s in range(1, 40)]
+    cases=all_cases()
+    assert all(valid(c) for c in cases) and len(set(cases))==len(cases)
     for i,c in enumerate(cases): (data/f'{i}.in').write_text(c); (data/f'{i}.out').write_text(run(c))
 if __name__=='__main__': main()

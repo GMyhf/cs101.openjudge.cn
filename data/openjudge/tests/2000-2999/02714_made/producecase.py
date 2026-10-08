@@ -380,9 +380,7 @@ def generate(number, seed):
             for x in range(left, right + 1):
                 if y in (top, bottom) or x in (left, right): grid[y][x] = 0
         return f"{n}\n" + "\n".join(" ".join(map(str, row)) for row in grid) + "\n"
-    if number == 2714:
-        ages = [r.randint(15, 25) for _ in range(r.randint(1, 100))]
-        return f"{len(ages)}\n" + "\n".join(map(str, ages)) + "\n"
+    if number == 2714: return _gen_2714(r, seed)
     if number == 2744:
         chunks = []
         for _ in range(r.randint(1, 5)):
@@ -421,6 +419,32 @@ REFERENCE="# External reference: http://cs101.openjudge.cn/practice/02714/statis
 LANGUAGE='Python3'
 NUMBER=2714
 SAMPLE='2\n18\n17\n'
+import re as _re
+_INT=_re.compile(r'(0|-?[1-9][0-9]*)$')
+def _int(tok):
+    return int(tok) if _INT.match(tok) else None
+
+def valid(text):
+    """题面：第一行 n（1<=n<=100），其后 n 行每行一个年龄整数，取值 15 到 25。"""
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    n=_int(lines[0])
+    if n is None or not 1<=n<=100 or len(lines)!=n+1:return False
+    for l in lines[1:]:
+        a=_int(l)
+        if a is None or not 15<=a<=25:return False
+    return True
+
+def _gen_2714(r, seed):
+    # 覆盖 n=1、n=100、全取上下界，其余随机
+    if seed == 1: ages = [r.randint(15, 25)]
+    elif seed == 2: ages = [25] * 100
+    elif seed == 3: ages = [15] * 100
+    elif seed == 4: ages = [15]
+    elif seed <= 8: ages = [r.randint(15, 25) for _ in range(100)]
+    else: ages = [r.randint(15, 25) for _ in range(r.randint(1, 100))]
+    return f"{len(ages)}\n" + "\n".join(map(str, ages)) + "\n"
+
 def main():
  with tempfile.TemporaryDirectory() as d:
   d=Path(d);src=d/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE);cmd=[sys.executable,'-I',str(src)]

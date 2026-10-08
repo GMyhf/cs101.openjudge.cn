@@ -98,7 +98,9 @@ def generate(number, seed):
     if number==2141:
         key=list(letters);r.shuffle(key);msg="".join(r.choice(letters+letters.upper()+" ") for _ in range(r.randint(1,80)));return "".join(key)+"\n"+msg+"\n"
     if number==1164:
-        h,w=1+(seed-1)%8,2+(seed-1)//8;return f"{h}\n{w}\n"+"\n".join(" ".join(["15"]*w) for _ in range(h))+"\n"
+        if seed<=4:
+            h,w=1+(seed-1)%8,2+(seed-1)//8;return f"{h}\n{w}\n"+"\n".join(" ".join(["15"]*w) for _ in range(h))+"\n"
+        return castle_case(r,seed)
     if number==1166:return "\n".join(" ".join(str(r.randrange(4)) for _ in range(3)) for _ in range(3))+"\n"
     if number==1193:
         N=r.randint(5,100);rows=[];t=0
@@ -147,8 +149,97 @@ def generate(number, seed):
         n=r.randint(2,50);return f"{n}\n"+" ".join(f"{r.uniform(.5,2.5):.5f}" for _ in range(n))+"\n"
     raise KeyError(number)
 
+def castle_rooms(m,n,V,H):
+    """V[i][j]: (i,j) 与 (i,j+1) 之间有墙；H[i][j]: (i,j) 与 (i+1,j) 之间有墙。返回房间数。"""
+    seen=[[False]*n for _ in range(m)];cnt=0
+    for i in range(m):
+        for j in range(n):
+            if seen[i][j]:continue
+            cnt+=1;seen[i][j]=True;st=[(i,j)]
+            while st:
+                x,y=st.pop()
+                for nx,ny,ok in ((x,y+1,y+1<n and not V[x][y]),(x,y-1,y>0 and not V[x][y-1]),(x+1,y,x+1<m and not H[x][y]),(x-1,y,x>0 and not H[x-1][y])):
+                    if ok and not seen[nx][ny]:seen[nx][ny]=True;st.append((nx,ny))
+    return cnt
+def castle_text(m,n,V,H):
+    rows=[]
+    for i in range(m):
+        row=[]
+        for j in range(n):
+            p=(1 if j==0 or V[i][j-1] else 0)+(2 if i==0 or H[i-1][j] else 0)+(4 if j==n-1 or V[i][j] else 0)+(8 if i==m-1 or H[i][j] else 0)
+            row.append(str(p))
+        rows.append(" ".join(row))
+    return f"{m}\n{n}\n"+"\n".join(rows)+"\n"
+def castle_case(r,seed):
+    sizes={5:(50,50),6:(50,50),7:(50,50),8:(50,50),9:(50,50),10:(50,50),11:(50,50),12:(50,50),13:(1,50),14:(50,1),15:(2,1),16:(1,3),
+           17:(50,50),18:(50,50),19:(49,50),20:(50,37),21:(10,10),22:(3,3),23:(50,50),24:(50,50),25:(25,50)}
+    m,n=sizes.get(seed,(r.randint(2,50),r.randint(2,50)))
+    kind=["prob","maze","split","voronoi","hole","prob","maze","voronoi"][seed%8] if m*n>2 else "split"
+    if seed in (5,23):kind="hole"
+    if seed in (6,24):kind="maze"
+    if seed in (7,):kind="split"
+    while True:
+        V=[[False]*(n-1) for _ in range(m)];H=[[False]*n for _ in range(m-1)]
+        if kind=="prob":
+            q=r.choice((0.05,0.15,0.3,0.5,0.8))
+            for i in range(m):
+                for j in range(n-1):V[i][j]=r.random()<q
+            for i in range(m-1):
+                for j in range(n):H[i][j]=r.random()<q
+        elif kind in ("maze","hole"):
+            if kind=="maze":
+                for i in range(m):V[i]=[True]*(n-1)
+                for i in range(m-1):H[i]=[True]*n
+                seen=[[False]*n for _ in range(m)];st=[(r.randrange(m),r.randrange(n))];seen[st[0][0]][st[0][1]]=True
+                while st:
+                    x,y=st[-1];nb=[(a,b) for a,b in ((x+1,y),(x-1,y),(x,y+1),(x,y-1)) if 0<=a<m and 0<=b<n and not seen[a][b]]
+                    if not nb:st.pop();continue
+                    a,b=r.choice(nb);seen[a][b]=True;st.append((a,b))
+                    if a==x:V[x][min(y,b)]=False
+                    else:H[min(x,a)][y]=False
+            x,y=r.randrange(m),r.randrange(n)
+            if y<n-1:V[x][y]=True
+            if y>0:V[x][y-1]=True
+            if x<m-1:H[x][y]=True
+            if x>0:H[x-1][y]=True
+        elif kind=="split":
+            if n>1 and (m==1 or r.random()<.5):
+                c=r.randrange(n-1)
+                for i in range(m):V[i][c]=True
+            else:
+                c=r.randrange(m-1);H[c]=[True]*n
+        else:
+            k=r.randint(2,min(40,m*n));pts=r.sample([(i,j) for i in range(m) for j in range(n)],k)
+            lab=[[min(range(k),key=lambda t:(abs(pts[t][0]-i)+abs(pts[t][1]-j),t)) for j in range(n)] for i in range(m)]
+            for i in range(m):
+                for j in range(n-1):V[i][j]=lab[i][j]!=lab[i][j+1] or r.random()<.03
+            for i in range(m-1):
+                for j in range(n):H[i][j]=lab[i][j]!=lab[i+1][j] or r.random()<.03
+        if castle_rooms(m,n,V,H)>=2:return castle_text(m,n,V,H)
+def valid(text):
+    """题面：先给南北向模块数 m、东西向模块数 n（m,n<=50，样例中各占一行），其后 m 行每行 n 个 0..15 的整数；
+    内墙两侧都要标出（东墙与右邻西墙一致、南墙与下邻北墙一致），外围有墙（城堡封闭），且至少有两个房间。"""
+    import re
+    if not text.endswith('\n'):return False
+    lines=text[:-1].split('\n')
+    if len(lines)<3 or not re.fullmatch(r'[1-9][0-9]*',lines[0]) or not re.fullmatch(r'[1-9][0-9]*',lines[1]):return False
+    m,n=int(lines[0]),int(lines[1])
+    if not(1<=m<=50 and 1<=n<=50) or len(lines)!=m+2:return False
+    g=[]
+    for i in range(m):
+        t=lines[i+2].split(' ')
+        if len(t)!=n or not all(re.fullmatch(r'0|[1-9][0-9]?',x) and int(x)<=15 for x in t):return False
+        g.append(list(map(int,t)))
+    for i in range(m):
+        for j in range(n):
+            p=g[i][j]
+            if j==0 and not p&1 or i==0 and not p&2 or j==n-1 and not p&4 or i==m-1 and not p&8:return False
+            if j<n-1 and bool(p&4)!=bool(g[i][j+1]&1):return False
+            if i<m-1 and bool(p&8)!=bool(g[i+1][j]&2):return False
+    V=[[bool(g[i][j]&4) for j in range(n-1)] for i in range(m)];H=[[bool(g[i][j]&8) for j in range(n)] for i in range(m-1)]
+    return castle_rooms(m,n,V,H)>=2
 NO_INPUT={3225, 2698}
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01164/statistics/\n# Accepted submission: 51696044\n# Source: http://cs101.openjudge.cn/practice/solution/51696044/\n# License: not declared on the submission page; no license is inferred.\n\ndire = [(0, -1), (-1, 0), (0, 1), (1, 0)]\ndef dfs(visited, x, y):\n    global num\n    visited[x][y] = True\n    for i in range(4):\n        if cond[x][y] >> i & 1:\n            continue\n        nx, ny = x+dire[i][0], y+dire[i][1]\n        if not visited[nx][ny]:\n            num += 1\n            dfs(visited, nx, ny)\n    return num\nm = int(input())\nn = int(input())\ncond = [[int(x) for x in input().split()] for _ in range(m)]\nvisited = [[False]*n for _ in range(m)]\nres, cnt = 0, 0\nfor i in range(m):\n    for j in range(n):\n        if not visited[i][j]:\n            cnt += 1\n            num = 1\n            space = dfs(visited, i, j)\n            res = max(res, space)\nprint(cnt)\nprint(res)\n'
+REFERENCE='# External reference: http://cs101.openjudge.cn/practice/01164/statistics/\n# Accepted submission: 51696044\n# Source: http://cs101.openjudge.cn/practice/solution/51696044/\n# License: not declared on the submission page; no license is inferred.\n\nimport sys\nsys.setrecursionlimit(20000)\ndire = [(0, -1), (-1, 0), (0, 1), (1, 0)]\ndef dfs(visited, x, y):\n    global num\n    visited[x][y] = True\n    for i in range(4):\n        if cond[x][y] >> i & 1:\n            continue\n        nx, ny = x+dire[i][0], y+dire[i][1]\n        if not visited[nx][ny]:\n            num += 1\n            dfs(visited, nx, ny)\n    return num\nm = int(input())\nn = int(input())\ncond = [[int(x) for x in input().split()] for _ in range(m)]\nvisited = [[False]*n for _ in range(m)]\nres, cnt = 0, 0\nfor i in range(m):\n    for j in range(n):\n        if not visited[i][j]:\n            cnt += 1\n            num = 1\n            space = dfs(visited, i, j)\n            res = max(res, space)\nprint(cnt)\nprint(res)\n'
 LANGUAGE='Python3'
 NUMBER=1164
 SAMPLE='4\n7\n11 6 11 6 3 10 6\n7 9 6 13 5 15 5\n1 10 12 7 13 7 5\n13 11 10 8 10 12 13\n'

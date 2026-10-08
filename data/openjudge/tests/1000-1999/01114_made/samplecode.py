@@ -2,6 +2,7 @@
 # Accepted submission: 52288305
 # Source: http://cs101.openjudge.cn/practice/solution/52288305/
 # License: not declared on the submission page; no license is inferred.
+# 2026-10-08 本地修正：上面引用的原始代码在题面范围内有缺陷，已按题面改过，与原提交不再逐字一致（见 CHANGELOG）。
 
 from collections import defaultdict
 def f(thing):
@@ -41,7 +42,15 @@ def f(thing):
                 stack += temp*num
             continue
         else:
-            stack.append(char)
+            # 修正：无倍数的括号组要就地消去这一对括号，否则外层倍数会误停在内层 '('
+            if char == ')' and not (idx+1 < n and thing[idx+1].isdigit()):
+                temp = []
+                while stack[-1] != '(':
+                    temp.append(stack.pop())
+                stack.pop()
+                stack += temp[::-1]
+            else:
+                stack.append(char)
         idx += 1
     for ele in stack:
         if ele not in '()':

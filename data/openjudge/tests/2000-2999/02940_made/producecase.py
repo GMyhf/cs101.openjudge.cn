@@ -17,7 +17,11 @@ def generate(number, seed):
     if number == 2814: return " ".join(str(r.randrange(4)) for _ in range(9)) + "\n"
     if number == 2910:
         chars = letters + letters.upper() + "0123456789*?-_"; return "".join(r.choice(chars) for _ in range(r.randint(1, 100))) + "\n"
-    if number == 2940: return f"{r.randint(1,9)} {r.randint(1,9)}\n"
+    if number == 2940:
+        # 值域只有 81 种 (a, n)，除样例 (2, 5) 外全部枚举，覆盖 n=9 的最大值 1111111101 与 n=1 等边界
+        pairs = [(a, n) for a in range(1, 10) for n in range(1, 10) if (a, n) != (2, 5)]
+        a, n = pairs[seed - 1]
+        return f"{a} {n}\n"
     if number == 1178:
         squares = [f"{chr(65+x)}{y+1}" for y in range(8) for x in range(8)]
         return "".join(r.sample(squares, r.randint(2, 12))) + "\n"
@@ -152,6 +156,11 @@ def generate(number, seed):
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2940: 求和\n# Fenced code block index: 2\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/practice/02940/\n# License: not declared; no license is inferred.\nimport sys\n# 读取输入的 a 和 n\na, n = map(int, input().split())\n\n# 初始化总和为 0\nSn = 0\n# 初始化当前项的值\ncurrent_num = 0\n\n# 循环 n 次来计算每一项的值并累加到总和中\nfor i in range(n):\n    # 计算当前项的值\n    current_num = current_num * 10 + a\n    # 将当前项的值累加到总和中\n    Sn += current_num\n\n# 输出总和\nprint(Sn)\n'
 NUMBER=2940
 SAMPLE='2  5\n'
+def valid(text):
+    """题面：一行，两个整数 a、n（1 <= a, n <= 9），以空格分隔（样例里是两个空格，故允许连续空格）。"""
+    import re
+    m = re.fullmatch(r'([1-9]) +([1-9])\n', text)
+    return m is not None
 def run(x):
  with tempfile.TemporaryDirectory() as d:
   p=Path(d)/'s.py';p.write_text(REFERENCE);q=subprocess.run([sys.executable,'-I',str(p)],input=x,text=True,capture_output=True,timeout=120)
@@ -160,6 +169,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 81)]):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()

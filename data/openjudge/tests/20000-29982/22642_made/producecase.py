@@ -5,20 +5,32 @@ SAMPLE_IN = '3\n'
 SAMPLE_OUT = '((()))\n(()())\n(())()\n()(())\n()()()\n'
 def generate_case(r): return str(r.randint(1, 10)) + "\n"
 
-assert SAMPLE_IN == '3\n'
-with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
-    handle.write(REFERENCE_SOURCE); handle.flush()
-    root = Path(__file__).parent / "data"
-    seen = [SAMPLE_IN]
-    for index in range(10):
-        if index == 0:
-            content = SAMPLE_IN
-        else:
-            for attempt in range(100):
-                content = generate_case(random.Random(22642 + index + attempt * 1000))
-                if content not in seen: break
-            else: raise AssertionError('insufficient diversity')
-        seen.append(content)
-        result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
-        (root / f"{index}.in").write_text(content, encoding="utf-8")
-        (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+def valid(text):
+    # 题面：输入只有一行 N（1 ≤ N ≤ 10）
+    if not text.endswith("\n") or text.count("\n") != 1:
+        return False
+    t = text[:-1]
+    return t.isdigit() and t.isascii() and t[0] != "0" and 1 <= int(t) <= 10
+
+def main():
+    assert SAMPLE_IN == '3\n'
+    with tempfile.NamedTemporaryFile("w", suffix=".py", encoding="utf-8") as handle:
+        handle.write(REFERENCE_SOURCE); handle.flush()
+        root = Path(__file__).parent / "data"
+        seen = [SAMPLE_IN]
+        for index in range(10):
+            if index == 0:
+                content = SAMPLE_IN
+            else:
+                for attempt in range(100):
+                    content = generate_case(random.Random(22642 + index + attempt * 1000))
+                    if content not in seen: break
+                else: raise AssertionError('insufficient diversity')
+            assert valid(content)
+            seen.append(content)
+            result = subprocess.run(["python3", handle.name], input=content, text=True, capture_output=True, timeout=10, check=True)
+            (root / f"{index}.in").write_text(content, encoding="utf-8")
+            (root / f"{index}.out").write_text(result.stdout, encoding="utf-8")
+
+if __name__ == "__main__":
+    main()

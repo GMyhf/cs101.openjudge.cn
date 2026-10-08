@@ -153,6 +153,41 @@ def generate(n, seed):
         q=[r.randint(5,100) for _ in range(r.randint(1,10))];return str(len(q))+'\n'+'\n'.join(map(str,q))+'\n'
     raise KeyError(n)
 
+def valid(text):
+    """题面契约：第一行 N (1<N<=100)；接下来 N 行，第 i 行 i 个整数，取值 0..100。"""
+    import re
+    if not text.endswith('\n'): return False
+    lines = text[:-1].split('\n')
+    INT = re.compile(r'0|[1-9][0-9]*')
+    if not lines or not INT.fullmatch(lines[0]): return False
+    n = int(lines[0])
+    if not 1 < n <= 100 or len(lines) != n + 1: return False
+    for i in range(1, n + 1):
+        toks = lines[i].split(' ')
+        if len(toks) != i or not all(INT.fullmatch(t) and int(t) <= 100 for t in toks): return False
+    return True
+
+def extra_cases():
+    """补充覆盖：N=2 最小规模、N=100 满规模随机、全 0、全 100、贪心（每步走大的一侧）会错的构造、小值域大量平局。"""
+    r = random.Random(276000)
+    def fmt(rows): return f'{len(rows)}\n' + '\n'.join(' '.join(map(str, x)) for x in rows) + '\n'
+    cases = [fmt([[0], [0, 0]]), fmt([[100], [3, 99]])]
+    for _ in range(3):
+        cases.append(fmt([[r.randint(0, 100) for _ in range(i)] for i in range(1, 101)]))
+    cases.append(fmt([[0] * i for i in range(1, 101)]))
+    cases.append(fmt([[100] * i for i in range(1, 101)]))
+    # 贪心陷阱：第二层左侧稍大，但右侧通往一条全 100 的深链
+    rows = [[r.randint(0, 3) for _ in range(i)] for i in range(1, 101)]
+    rows[1] = [10, 9]
+    for i in range(2, 100): rows[i][i] = 100
+    cases.append(fmt(rows))
+    rows = [[r.randint(0, 100) if r.random() < .1 else r.randint(0, 2) for _ in range(i)] for i in range(1, 101)]
+    cases.append(fmt(rows))
+    for _ in range(4):
+        n = r.randint(2, 12)
+        cases.append(fmt([[r.randint(0, 2) for _ in range(i)] for i in range(1, n + 1)]))
+    return cases
+
 REFERENCE='# Source collection: /home/rocky/git/2020fall-cs101/2020fall_cs101.openjudge.cn_problems.md\n# Heading: 2760: 数字三角形\n# Fenced code block index: 3\n# Source URL: https://github.com/GMyhf/2020fall-cs101/blob/main/2020fall_cs101.openjudge.cn_problems.md\n# Upstream problem: http://cs101.openjudge.cn/2024fallroutine/02760/\n# License: not declared in source collection; no license is inferred.\nimport sys\nn = int(input())\ntri = []   # triangle\n\nfor i in range(n):\n    tri.append(list(map(int, input().split()))+[0 for j in range(n-i-1)])\n\nfor i in range(n-2,-1,-1):\n    for j in range(i+1):\n        tri[i][j] += max(tri[i+1][j], tri[i+1][j+1])\n\nprint(tri[0][0])\n'
 NUMBER=2760
 SAMPLE='5\n7\n3 8\n8 1 0\n2 7 4 4\n4 5 2 6 5\n'
@@ -164,6 +199,6 @@ def run(x):
 def main():
  d=Path('data');d.mkdir(exist_ok=True)
  for p in d.glob('*'):p.unlink()
- for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]):
+ for i,x in enumerate([SAMPLE]+[generate(NUMBER,s) for s in range(1, 40)]+extra_cases()):
   (d/f'{i}.in').write_text(x);(d/f'{i}.out').write_text(run(x))
 if __name__=='__main__':main()
