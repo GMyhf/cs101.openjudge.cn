@@ -11,8 +11,8 @@
 - 本站渲染：题面、两张表、「运行样例」取到 `31 19`，都钉在 `test_practice_31378_is_mirrored_and_runs_its_sample`。
 - **`.env` 事故差点发生**：人把平台账号 `.env` 放在了 cs101 仓库根目录，而仓库公开、`.gitignore` 没有 `.env`。
   已挪到 `../oj-problem-tools/.env`（工具的 `find_dotenv` 从它自己的代码目录往上找，放 cs101 里本来也读不到），
-  权限 600，cs101 的 `.gitignore` 补上 `.env`。人填的 `OJ_EMAIL` 是 5 个字符、没有 `@`，像是用户名，要换成登录邮箱；
-  未做真实登录测试。
+  权限 600，cs101 的 `.gitignore` 补上 `.env`。人填的 `OJ_EMAIL` 是用户名，**这是对的**：
+  我当时只看字段名 `email` 就让人换成邮箱，人实测邮箱提示「用户不存在」，用户名才能登（登录页标的是「账号」）。已改回。
 
 ### 2026-10-09 · Claude · 1000000 用 oj-problem-tools 发到 cs101.openjudge.cn
 
