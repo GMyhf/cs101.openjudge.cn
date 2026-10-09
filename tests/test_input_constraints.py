@@ -614,6 +614,21 @@ def check_31298(text):
     return None
 
 
+# ---------------------------------------------------- 2026-10-09 私有题库 1000000
+
+def check_1000000(text):
+    # 「第一行是模式串 p，第二行是主串 t，均只含大写英文字母，1 <= |p| <= |t| <= 100000」
+    lines = text.splitlines()
+    if len(lines) != 2:
+        return f"应为 2 行，实际 {len(lines)} 行"
+    p, t = lines
+    if not re.fullmatch(r"[A-Z]+", p) or not re.fullmatch(r"[A-Z]+", t):
+        return "p 或 t 不是非空大写字母串"
+    if not 1 <= len(p) <= len(t) <= 100000:
+        return f"|p|={len(p)} |t|={len(t)} 越出题面 1 <= |p| <= |t| <= 100000"
+    return None
+
+
 VALIDATORS = {
     ("practice", "01958"): check_01958,
     ("codeforces", "25A"): check_25a,
@@ -649,6 +664,7 @@ VALIDATORS = {
     ("practice", "31296"): check_31296,
     ("practice", "31297"): check_31297,
     ("practice", "31298"): check_31298,
+    ("private", "1000000"): check_1000000,
 }
 
 

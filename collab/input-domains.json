@@ -1,7 +1,7 @@
 {
   "note": "题面对输入的原话（逐字）与数据实际极值并排记账。由 scripts/build_input_domains.py 生成，tools/full_sweep.py 第 15 条盯着。引文没有数值范围（quote_has_bound=false）不是缺陷，是「这段题面本来就没写上界」，记下来是为了让它可见。",
   "updated": "2026-09-20",
-  "count": 1217,
+  "count": 1218,
   "without_bound": 402,
   "entries": {
     "tests/1000-1999/01001_made": {
@@ -16943,6 +16943,19 @@
       },
       "case_count": 21,
       "data_digest": "a3d728c851b9102c87df96b69ae87a1bb8cc4b7e4bbe2f342363d3a17e531aaf"
+    },
+    "tests/private/1000000_made": {
+      "book": "private",
+      "id": "1000000",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行是模式串 p，第二行是主串 t，均只含大写英文字母，1 <= |p| <= |t| <= 100000。",
+      "quote_has_bound": true,
+      "quote_max_number": 100000,
+      "generated_extremes": {
+        "integer_tokens": 0
+      },
+      "case_count": 21,
+      "data_digest": "a2450d3f522888fca4692920ed901009857044246f25ad6ae9bddbfd5f74ddd2"
     }
   }
 }

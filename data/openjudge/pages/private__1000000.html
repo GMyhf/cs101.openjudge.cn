@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>1000000: KMP 字符比较次数（nextval）</title></head>
+<body><div id="pageTitle"><h2>1000000: KMP 字符比较次数（nextval）</h2></div>
+<dl class="problem-params">
+<dt>总时间限制: </dt><dd>1000ms</dd>
+<dt>内存限制: </dt><dd>65536kB</dd>
+</dl>
+<dl class="problem-content">
+<dt>描述</dt><dd><p>用 KMP 算法在主串 t 中查找模式串 p 第一次出现的位置，失配时按<strong>优化后的 next 数组（nextval）</strong>回退。请统计到第一次匹配成功为止，一共做了多少次字符比较。</p>
+<p>下标都从 0 开始，m = |p|。</p>
+<p><strong>next 数组</strong>：next[0] = -1；j ≥ 1 时 next[j] 是 p[0..j-1] 的最长相等真前缀与真后缀的长度。</p>
+<p><strong>nextval 数组</strong>：nextval[0] = -1；j ≥ 1 时，若 p[j] == p[next[j]]，则 nextval[j] = nextval[next[j]]，否则 nextval[j] = next[j]。</p>
+<p><strong>匹配过程</strong>（只有 t[i] 与 p[j] 的比较计数，j == -1 时的后移不计数）：</p>
+<pre>i = j = cnt = 0
+while i &lt; |t| and j &lt; m:
+    if j == -1:
+        i += 1; j = 0; continue
+    cnt += 1
+    if t[i] == p[j]:
+        i += 1; j += 1
+    else:
+        j = nextval[j]</pre>
+<p>循环结束时若 j == m，则匹配成功，起始位置为 i - m；否则主串里没有 p。</p></dd>
+<dt>输入</dt><dd><p>第一行是模式串 p，第二行是主串 t，均只含大写英文字母，1 &lt;= |p| &lt;= |t| &lt;= 100000。</p></dd>
+<dt>输出</dt><dd><p>一行两个整数，用空格隔开：按上面的过程做的字符比较次数 cnt；第一次匹配成功的起始下标，若 t 中没有 p 则输出 -1。</p></dd>
+<dt>样例输入</dt><dd><pre>BAAABBBAA
+BAAABBBCDDDCCHHHHBBBAAABBBAADD</pre></dd>
+<dt>样例输出</dt><dd><pre>31 19</pre></dd>
+<dt>提示</dt><dd><p>样例的 next 与 nextval：</p>
+<table border="1" cellpadding="4">
+<tr><th>index</th><td>0</td><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+<tr><th>pattern</th><td>B</td><td>A</td><td>A</td><td>A</td><td>B</td><td>B</td><td>B</td><td>A</td><td>A</td></tr>
+<tr><th>next</th><td>-1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>1</td><td>2</td></tr>
+<tr><th>nextval</th><td>-1</td><td>0</td><td>0</td><td>0</td><td>-1</td><td>1</td><td>1</td><td>0</td><td>0</td></tr>
+</table>
+<p>比较过程：</p>
+<table border="1" cellpadding="4">
+<tr><th>步骤</th><th>比较内容</th><th>结果</th><th>本步次数</th><th>累计</th></tr>
+<tr><td>①</td><td>T[0..6] 对 p[0..6]</td><td>7 个都相等</td><td>7</td><td>7</td></tr>
+<tr><td>②</td><td>T[7]=C 对 p[7]=A</td><td>≠，j ← nextval[7]=0</td><td>1</td><td>8</td></tr>
+<tr><td>③</td><td>T[7]=C 对 p[0]=B</td><td>≠，j ← -1，i 后移</td><td>1</td><td>9</td></tr>
+<tr><td>④</td><td>T[8..16]（D D D C C H H H H）逐个对 p[0]=B</td><td>都不相等</td><td>9</td><td>18</td></tr>
+<tr><td>⑤</td><td>T[17]=B 对 p[0]=B</td><td>=</td><td>1</td><td>19</td></tr>
+<tr><td>⑥</td><td>T[18]=B 对 p[1]=A</td><td>≠，j ← nextval[1]=0</td><td>1</td><td>20</td></tr>
+<tr><td>⑦</td><td>T[18]=B 对 p[0]=B</td><td>=</td><td>1</td><td>21</td></tr>
+<tr><td>⑧</td><td>T[19]=B 对 p[1]=A</td><td>≠，j ← 0</td><td>1</td><td>22</td></tr>
+<tr><td>⑨</td><td>T[19]=B 对 p[0]=B</td><td>=</td><td>1</td><td>23</td></tr>
+<tr><td>⑩</td><td>T[20..27] 对 p[1..8]</td><td>8 个都相等，匹配成功</td><td>8</td><td>31</td></tr>
+</table>
+<p>匹配成功的位置是主串下标 19。若改用普通 next 数组，第②步失配后 j 退到 next[7]=1，要多比较一次 C 和 p[1]=A 才退到 0，总共 32 次；nextval 跳过了这次一定失败的比较。</p></dd>
+</dl>
+</body></html>

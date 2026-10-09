@@ -416,6 +416,65 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
 """)
         self.assertEqual((mutant["status"], mutant["case"]), ("Wrong Answer", 2), mutant)
 
+    def test_private_book_is_visible_only_to_gmyhf(self):
+        """私有题库（2026-10-09 人拍板：只有 GMyhf 看得到）。
+
+        看不到的人在每条路上都得到「没有这东西」：目录、首页、题库页、题面、
+        提交记录、运行样例、提交。漏一条就等于公开 —— 所以逐条钉。
+        """
+        PRIVATE_SOURCE = (ROOT / "data/openjudge/tests/private/1000000_made/samplecode.py"
+                          ).read_text(encoding="utf-8")
+        admin = self._admin_cookie()
+        student = self.register_and_login("private_peek", "Peek-pass-123")
+        for viewer in (None, student):
+            for path in ("/private/1000000/", "/private/1000000/submit/", "/book/private/",
+                         "/book/private/status/", "/api/books/private/",
+                         "/api/books/private/user/GMyhf/", "/api/books/private/solution/1/"):
+                status, _, _ = request(self.port, "GET", path, cookie=viewer)
+                self.assertEqual(status, 404, (viewer, path))
+            for query in ("/api/catalog", "/api/catalog?summary=1"):
+                payload = json.loads(request(self.port, "GET", query, cookie=viewer)[2])
+                self.assertNotIn("private", payload["book_meta"], (viewer, query))
+                self.assertFalse([p for p in payload["problems"] if p["book"] == "private"],
+                                 (viewer, query))
+        for path in ("/api/run", "/api/submit"):
+            status, _, _ = request(self.port, "POST", path, {
+                "book": "private", "problem": "1000000", "language": "python",
+                "source": PRIVATE_SOURCE, "stdin": ""}, cookie=student)
+            self.assertEqual(status, 404, path)
+
+        # GMyhf 看得到、交得上
+        status, _, body = request(self.port, "GET", "/private/1000000/", cookie=admin)
+        self.assertEqual(status, 200)
+        self.assertIn("KMP 字符比较次数（nextval）", body.decode("utf-8"))
+        status, _, body = request(self.port, "GET", "/api/books/private/", cookie=admin)
+        self.assertEqual(status, 200)
+        self.assertEqual([p["id"] for p in json.loads(body)["problems"]], ["1000000"])
+        full = json.loads(request(self.port, "GET", "/api/catalog", cookie=admin)[2])
+        self.assertEqual(full["book_meta"]["private"], {"name": "私有题库", "count": 1})
+        self.assertEqual([p["id"] for p in full["problems"] if p["book"] == "private"], ["1000000"])
+        # 「收录 N 题」只算公开题：私有题不该让所有人看到的总数变
+        anonymous = json.loads(request(self.port, "GET", "/api/catalog")[2])
+        def key(item):
+            match = re.search(r"(\d+)$", item["id"])
+            return int(match.group(1)) if match else (item["book"], item["id"])
+        self.assertEqual(len({key(p) for p in anonymous["problems"]}), anonymous["unique_total"])
+        self.assertEqual(full["unique_total"], anonymous["unique_total"])
+        summary = json.loads(request(self.port, "GET", "/api/catalog?summary=1", cookie=admin)[2])
+        self.assertEqual(summary["total"], anonymous["unique_total"])
+        status, _, body = request(self.port, "POST", "/api/submit", {
+            "book": "private", "problem": "1000000", "language": "python",
+            "source": PRIVATE_SOURCE}, cookie=admin)
+        self.assertEqual(json.loads(body)["status"], "Accepted", body)
+
+        # GMyhf 交过之后，别人按题库、按用户都翻不到这条记录
+        for query in ("/api/submissions?book=private", "/api/submissions?user=GMyhf&limit=500"):
+            rows = json.loads(request(self.port, "GET", query, cookie=student)[2])["submissions"]
+            self.assertFalse([r for r in rows if r["book"] == "private"], query)
+        rows = json.loads(request(self.port, "GET", "/api/submissions?book=private",
+                                  cookie=admin)[2])["submissions"]
+        self.assertEqual([(r["problem"], r["result"]) for r in rows][:1], [("1000000", "Accepted")])
+
     def test_codeforces_markdown_import_keeps_standard_and_excluded_sets_separate(self):
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
         entries = {item["id"]: item for item in catalog["problems"]

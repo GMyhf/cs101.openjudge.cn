@@ -470,7 +470,13 @@ BOOK_META = {
     "25dsapre": {"name": "数算 2025Spring预习题", "count": 35},
     "2024fallroutine": {"name": "数算 2024Fall每日选作", "count": 93},
     "2024sp_routine": {"name": "数算 2024Spring每日选作", "count": 154},
+    "private": {"name": "私有题库", "count": 1},
 }
+# 私有题库 → 能看到它的用户（人拍板 2026-10-09：只给 GMyhf）。题号从 1000000 起，
+# 和 OpenJudge 全局题号（目前最大 3 万出头）不会撞，limits.json 按题号取限时也就不串。
+# 看不到的人：目录、首页、题库页、题面、提交记录、运行样例、提交一律当它不存在（404），
+# 不是 403 —— 403 等于告诉人「这里有东西」。闸门在 `book_visible`，别在各路由里另写一份。
+PRIVATE_BOOKS = {"private": ("GMyhf",)}
 SMTP_ENV_FILE = ROOT / "data" / ".smtp.env"
 # 校外学生收邮件用，回退值也必须是公网能开的地址，不能是校内 IP
 DEFAULT_PUBLIC_URL = "https://jensen.zhengmao.ltd"
@@ -780,6 +786,22 @@ def catalog_title(item):
     return title
 
 
+def book_visible(book, user):
+    allowed = PRIVATE_BOOKS.get(book)
+    return allowed is None or any(same_username(user or "", name) for name in allowed)
+
+
+def visible_catalog(payload, user):
+    """把 catalog 响应里当前用户看不到的私有题库剔掉（题目行与 book_meta 都剔）。"""
+    hidden = {book for book in PRIVATE_BOOKS if not book_visible(book, user)}
+    if not hidden:
+        return payload
+    return {**payload,
+            "problems": [item for item in payload["problems"] if item.get("book") not in hidden],
+            "book_meta": {book: meta for book, meta in payload["book_meta"].items()
+                          if book not in hidden}}
+
+
 def catalog_raw():
     """Read the catalog once per file version instead of once per request."""
     global CATALOG_RAW_CACHE, CATALOG_RAW_VERSION, CATALOG_FULL_CACHE
@@ -812,8 +834,9 @@ def catalog_full_payload():
         def problem_key(item):
             match = re.search(r"(\d+)$", item.get("id", ""))
             return int(match.group(1)) if match else (item.get("book", ""), item.get("id", ""))
-        all_keys = {problem_key(item) for item in problems}
-        tested_keys = {problem_key(item) for item in problems if (item.get("test_count") or 0) > 0}
+        public = [item for item in problems if item.get("book") not in PRIVATE_BOOKS]
+        all_keys = {problem_key(item) for item in public}
+        tested_keys = {problem_key(item) for item in public if (item.get("test_count") or 0) > 0}
         CATALOG_FULL_CACHE = {
             **raw,
             "problems": [{**{k: v for k, v in item.items() if k not in CATALOG_INTERNAL_FIELDS},
@@ -855,8 +878,9 @@ def catalog_summary_payload():
         match = re.search(r"(\d+)$", item.get("id", ""))
         return int(match.group(1)) if match else (item.get("book", ""), item.get("id", ""))
 
-    all_keys = {problem_key(item) for item in problems}
-    tested_keys = {problem_key(item) for item in problems if (item.get("test_count") or 0) > 0}
+    public = [item for item in problems if item.get("book") not in PRIVATE_BOOKS]
+    all_keys = {problem_key(item) for item in public}
+    tested_keys = {problem_key(item) for item in public if (item.get("test_count") or 0) > 0}
     return {
         "total": len(all_keys),
         "tested_count": len(tested_keys),
@@ -1613,7 +1637,13 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             if not self.authorized():
                 self.send_response(302); self.send_header("Location", "/auth/login/"); self.end_headers(); return
             self.send_html(self.profile_settings_page()); return
-        submit_page = re.fullmatch(r"/(codeforces|pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/([^/]+)/submit/", path)
+        # 私有题库的总闸：/<题库>/…、/book/<题库>/…、/api/books/<题库>/… 三种前缀一并拦下。
+        # 必须在这里 return：没被路由接住的路径会落到上游代理（见 favicon 那段注释）。
+        private_prefix = re.match(r"/(?:book/|api/books/)?([^/]+)/", decoded_path)
+        if (private_prefix and private_prefix.group(1) in PRIVATE_BOOKS
+                and not book_visible(private_prefix.group(1), self.current_user())):
+            self.send_json({"error": "Not found"}, 404); return
+        submit_page = re.fullmatch(r"/(codeforces|pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice|private)/([^/]+)/submit/", path)
         if submit_page:
             book, problem_id = submit_page.groups()
             page = MIRROR / "pages" / f"{book}__{problem_id}.html"
@@ -1638,7 +1668,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             page = MIRROR / "books" / f"{local_book.group(1)}__{page_number}.html"
             if page.is_file():
                 self.send_html(self.local_page(page)); return
-        local_problem = re.fullmatch(r"/(codeforces|pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice)/([^/]+)/", path)
+        local_problem = re.fullmatch(r"/(codeforces|pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice|private)/([^/]+)/", path)
         if local_problem:
             book, problem = local_problem.groups()
             page = MIRROR / "pages" / f"{book}__{problem}.html"
@@ -1702,6 +1732,10 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                     filters.append("lower(user) = lower(?)"); values.append(user)
                 elif query_user:
                     filters.append("lower(user) = lower(?)"); values.append(query_user)
+                hidden = [book for book in PRIVATE_BOOKS if not book_visible(book, user)]
+                if hidden:
+                    filters.append("book not in (" + ",".join("?" * len(hidden)) + ")")
+                    values.extend(hidden)
                 where = (" where " + " and ".join(filters)) if filters else ""
                 rows = db.execute("select id, user, problem, result, created, book, language, detail, source from submissions"
                                   + where + " order by id desc limit ?", (*values, limit)).fetchall()
@@ -1763,9 +1797,10 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             if page.is_file():
                 self.send_html(page.read_text(encoding="utf-8")); return
         if path == "/api/catalog":
+            viewer = self.current_user()
             if parse_qs(parsed.query).get("summary") == ["1"]:
-                self.send_json(catalog_summary_payload()); return
-            self.send_json(catalog_full_payload()); return
+                self.send_json(visible_catalog(catalog_summary_payload(), viewer)); return
+            self.send_json(visible_catalog(catalog_full_payload(), viewer)); return
         book_api = re.fullmatch(r"/api/books/([^/]+)/", path)
         if book_api and book_api.group(1) in BOOK_META:
             query = parse_qs(parsed.query)
@@ -2099,7 +2134,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             if retry_after:
                 self.send_json({"status": "Rate Limited", "retry_after": retry_after,
                                 "message": f"运行样例太频繁了，请 {retry_after} 秒后再试。"}, 429); return
-            if not problem_exists(book, problem):
+            if not problem_exists(book, problem) or not book_visible(book, self.current_user()):
                 self.send_json({"status": "Problem Not Found", "message": "本地题库中没有这道题。"}, 404); return
             with judging_slot(self.current_user() or ADMIN_USER) as got_slot:
                 if not got_slot:
@@ -2165,6 +2200,8 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
         if path in {"/api/submit", "/api/submit/"} and self.authorized():
             book, problem = data.get("book", ""), data.get("problem", "")
             language = data.get("language", "python")
+            if not book_visible(book, self.current_user()):
+                self.send_json({"status": "Problem Not Found", "message": "本地题库中没有这道题。"}, 404); return
             retry_after = quota_retry_after("submit", self.current_user() or ADMIN_USER)
             if retry_after:
                 self.send_json({"status": "Rate Limited", "retry_after": retry_after,
