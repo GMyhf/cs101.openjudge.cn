@@ -10,7 +10,8 @@
 「本站判对、平台判错」的两套数据。答案用 `tests/test_private_1000000.py` 里那份独立 oracle
 （暴力求 border / Z 函数），与 `solution.py`（即本站参考实现）算法不同，框架的对拍才有意义。
 
-自动更新平台题面：人先在平台建好占位题，再把下面两行的注释去掉、填上题号。
+平台上是 http://cs101.openjudge.cn/practice/31378/（2026-10-09 人用 inject.js 发布）。
+要让工具直接改平台题面，把下面两行的注释去掉（需要工具目录下的 .env，只由人写）。
 """
 import shutil
 import sys
@@ -33,7 +34,7 @@ class KmpNextval(OjProblem[str, str]):
     case_range = range(producecase.TOTAL)
     interpreter = shutil.which("python3.8") or sys.executable
     # group_slug = "cs101"
-    # problem_id = 0
+    # problem_id = 31378
 
     def generate(self, index: int, random: Random) -> str:
         if index < len(producecase.SAMPLES):

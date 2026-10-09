@@ -4,7 +4,8 @@
 
 人要求把私有题 1000000 发到平台，用 FuYnAloft/oj-problem-tools。工具克隆在 `../oj-problem-tools`，
 题目目录 `tools/oj-problems/kmp_nextval/`（输入调本站生成器、答案用 tests 里的 oracle，`cases/` 与本站逐字节相同，
-Python 3.8 对拍 21/21）。人在浏览器编辑页运行 inject.js、上传数据，题已出好（平台题号人没告诉我，这里没记）。
+Python 3.8 对拍 21/21）。人在浏览器编辑页运行 inject.js、上传数据，题已出好：平台 **practice/31378**（全局题号 31378，1000ms / 65536kB，人已交过 Accepted）。
+本站私有 1000000 与平台 31378 是同一道题；本站 practice 镜像里还没有 31378，要不要按「新增一道题」收进来、收了以后私有版留不留，等人定。
 完整流程与踩过的坑（服务器无剪贴板、Chrome 的 `allow pasting`、Safari 开发者菜单、脚本不自动保存）
 写进 `docs/管理员手册.md`「把题发到 cs101.openjudge.cn 平台」。
 
