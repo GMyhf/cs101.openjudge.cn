@@ -1,5 +1,13 @@
 # HANDOFF · 交接日志
 
+### 2026-10-09 · Claude · 1000000 用 oj-problem-tools 发到 cs101.openjudge.cn
+
+人要求把私有题 1000000 发到平台，用 FuYnAloft/oj-problem-tools。工具克隆在 `../oj-problem-tools`，
+题目目录 `tools/oj-problems/kmp_nextval/`（输入调本站生成器、答案用 tests 里的 oracle，`cases/` 与本站逐字节相同，
+Python 3.8 对拍 21/21）。人在浏览器编辑页运行 inject.js、上传数据，题已出好（平台题号人没告诉我，这里没记）。
+完整流程与踩过的坑（服务器无剪贴板、Chrome 的 `allow pasting`、Safari 开发者菜单、脚本不自动保存）
+写进 `docs/管理员手册.md`「把题发到 cs101.openjudge.cn 平台」。
+
 ### 2026-10-09 · Claude · 私有题库 `private` 与第一题 1000000（T-049）
 
 人要一个只有 GMyhf 看得到的私有题库，题号从 1000000 起，第一题由一段「KMP 用 nextval 模拟字符比较次数」的讲解改编。
