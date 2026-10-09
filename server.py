@@ -462,7 +462,7 @@ MIRRORED_IMAGE_PATTERN = (
 )
 BOOK_META = {
     "codeforces": {"name": "Codeforces 题库", "count": 164},
-    "practice": {"name": "题库（包括计概、数算题目）", "count": 996},
+    "practice": {"name": "题库（包括计概、数算题目）", "count": 997},
     "pctbook": {"name": "计算思维算法实践", "count": 215},
     "routine": {"name": "数算 2025Spring每日选作", "count": 203},
     "2025sp_routine": {"name": "数算 2025Spring每日选作", "count": 73},

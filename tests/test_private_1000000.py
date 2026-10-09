@@ -13,6 +13,9 @@ from judge import judge
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data/openjudge/tests/private/1000000_made/data"
+# 2026-10-09 发到平台成为 practice/31378，平台上传的就是上面那份数据；本站 practice 镜像收录时
+# 用同一个随机种子重建，两份必须逐字节相同，否则本站和平台就是两套数据。
+PUBLIC = ROOT / "data/openjudge/tests/30000-/31378_made/data"
 
 
 def brute_next(p):
@@ -81,8 +84,17 @@ class Problem1000000Tests(unittest.TestCase):
                       for path in DATA.glob("*.in"))
         self.assertGreaterEqual(differs, 10)
 
+    def test_platform_copy_31378_has_the_same_bytes(self):
+        private = {path.name: path.read_bytes() for path in DATA.iterdir()}
+        public = {path.name: path.read_bytes() for path in PUBLIC.iterdir()}
+        self.assertEqual(len(private), 42)
+        self.assertEqual(public, private)
+        self.assertEqual((PUBLIC.parent / "samplecode.py").read_text(encoding="utf-8").split('"""', 2)[2],
+                         REFERENCE.split('"""', 2)[2])
+
     def test_reference_accepted_and_typical_mistakes_rejected(self):
         self.assertEqual(judge("private", "1000000", "python", REFERENCE)["status"], "Accepted")
+        self.assertEqual(judge("practice", "31378", "python", REFERENCE)["status"], "Accepted")
         # 实测（2026-10-09）：next 挂 14/21、多计 -1 挂 16/21、从 1 数挂 11/21
         mistakes = {
             # 用普通 next，不做 nextval 优化
@@ -97,7 +109,9 @@ class Problem1000000Tests(unittest.TestCase):
         }
         for name, source in mistakes.items():
             self.assertNotEqual(source, REFERENCE, name)
-            self.assertNotEqual(judge("private", "1000000", "python", source)["status"], "Accepted", name)
+            for book, problem in (("private", "1000000"), ("practice", "31378")):
+                self.assertNotEqual(judge(book, problem, "python", source)["status"], "Accepted",
+                                    (name, book))
 
 
 if __name__ == "__main__":

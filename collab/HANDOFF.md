@@ -1,5 +1,19 @@
 # HANDOFF · 交接日志
 
+### 2026-10-09 · Claude · 收录 31378（私有 1000000 的平台公开版，T-050）
+
+人拍板「收进来，私有版也保留」。照「新增一道题」走：
+
+- 抓 `practice/31378`（OJ Inject 页）；`books/practice__11.html` 末尾按字节补 8 行（`git diff` 恰 8 行 `+`）。
+- **数据必须与平台一致**：平台上传的是 1000000 的 `cases/`，所以 `tests/30000-/31378_made/producecase.py`
+  另设 `SEED_NUMBER = 1000000` 重建，21 组与私有版逐字节相同。两份目录要改一起改，
+  `test_platform_copy_31378_has_the_same_bytes` 盯着；判别力用例对两题各跑一遍错解。
+- 本站渲染：题面、两张表、「运行样例」取到 `31 19`，都钉在 `test_practice_31378_is_mirrored_and_runs_its_sample`。
+- **`.env` 事故差点发生**：人把平台账号 `.env` 放在了 cs101 仓库根目录，而仓库公开、`.gitignore` 没有 `.env`。
+  已挪到 `../oj-problem-tools/.env`（工具的 `find_dotenv` 从它自己的代码目录往上找，放 cs101 里本来也读不到），
+  权限 600，cs101 的 `.gitignore` 补上 `.env`。人填的 `OJ_EMAIL` 是 5 个字符、没有 `@`，像是用户名，要换成登录邮箱；
+  未做真实登录测试。
+
 ### 2026-10-09 · Claude · 1000000 用 oj-problem-tools 发到 cs101.openjudge.cn
 
 人要求把私有题 1000000 发到平台，用 FuYnAloft/oj-problem-tools。工具克隆在 `../oj-problem-tools`，

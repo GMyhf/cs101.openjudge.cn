@@ -665,6 +665,7 @@ VALIDATORS = {
     ("practice", "31297"): check_31297,
     ("practice", "31298"): check_31298,
     ("private", "1000000"): check_1000000,
+    ("practice", "31378"): check_1000000,      # 平台版，题面与私有版逐字相同
 }
 
 

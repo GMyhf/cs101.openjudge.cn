@@ -387,7 +387,7 @@ class ServerApiTests(unittest.TestCase):
         self.assertEqual(status, 200)
         meta = json.loads(body)["book_meta"]
         self.assertEqual(meta["practice"]["name"], "题库（包括计概、数算题目）")
-        self.assertEqual(meta["practice"]["count"], 996)
+        self.assertEqual(meta["practice"]["count"], 997)
         self.assertEqual(meta["pctbook"]["name"], "计算思维算法实践")
 
     def test_codeforces_4a_is_a_local_judgeable_problem(self):
@@ -415,6 +415,28 @@ print(\"YES\" if w > 2 and w % 2 == 0 else \"NO\")
 print(\"YES\" if w % 2 == 0 else \"NO\")
 """)
         self.assertEqual((mutant["status"], mutant["case"]), ("Wrong Answer", 2), mutant)
+
+    def test_practice_31378_is_mirrored_and_runs_its_sample(self):
+        """31378 是私有题 1000000 发到平台后的公开版（2026-10-09）。
+
+        题面是 oj-problem-tools 产的 OJ Inject 页：正文压在 gzip 里，这类页面出过两次
+        「运行样例」拿不到样例的事（零宽空格、markdown-body 嵌套 div），所以把样例也钉住。
+        """
+        status, _, body = request(self.port, "GET", "/practice/31378/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8", errors="replace")
+        self.assertIn("31378:KMP 字符比较次数（nextval）", text)
+        self.assertIn("nextval[j] = nextval[next[j]]", text)
+        samples = json.loads(re.search(r"const SAMPLES = (\{.*?\});\n", text).group(1))
+        self.assertEqual(samples["cases"],
+                         [{"input": "BAAABBBAA\nBAAABBBCDDDCCHHHHBBBAAABBBAADD", "output": "31 19"}])
+        mirrored = (ROOT / "data/openjudge/pages/practice__31378.html").read_text(encoding="utf-8")
+        self.assertRegex(mirrored, r"全局题号\s*</dt>\s*<dd>\s*31378")
+
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
+        disk = [item for item in catalog["problems"] if item.get("global_number") == 31378]
+        self.assertEqual([(item["book"], item["id"], item["test_count"]) for item in disk],
+                         [("practice", "31378", 21)])
 
     def test_private_book_is_visible_only_to_gmyhf(self):
         """私有题库（2026-10-09 人拍板：只有 GMyhf 看得到）。
