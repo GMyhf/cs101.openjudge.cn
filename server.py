@@ -787,6 +787,8 @@ def catalog_title(item):
 
 
 def book_visible(book, user):
+    if not isinstance(book, str):
+        return False
     allowed = PRIVATE_BOOKS.get(book)
     return allowed is None or any(same_username(user or "", name) for name in allowed)
 
@@ -2134,7 +2136,7 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             if retry_after:
                 self.send_json({"status": "Rate Limited", "retry_after": retry_after,
                                 "message": f"运行样例太频繁了，请 {retry_after} 秒后再试。"}, 429); return
-            if not problem_exists(book, problem) or not book_visible(book, self.current_user()):
+            if not book_visible(book, self.current_user()) or not problem_exists(book, problem):
                 self.send_json({"status": "Problem Not Found", "message": "本地题库中没有这道题。"}, 404); return
             with judging_slot(self.current_user() or ADMIN_USER) as got_slot:
                 if not got_slot:

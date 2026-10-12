@@ -93,6 +93,45 @@ def oracle_1b(text):
     return "".join(out)
 
 
+def reachable_2254f(start):
+    """Enumerate the literal XOR operation, without the multiset invariant."""
+    start = tuple(start)
+    seen = {start}
+    pending = collections.deque([start])
+    while pending:
+        row = pending.popleft()
+        for index, pivot in enumerate(row):
+            changed = tuple(value if j == index else value ^ pivot
+                            for j, value in enumerate(row))
+            if changed not in seen:
+                seen.add(changed)
+                pending.append(changed)
+    return seen
+
+
+def signature_2254f(row):
+    # For even n, one operation swaps slots i and n of this extended vector.
+    # Star transpositions generate all permutations, including duplicate values.
+    total = 0
+    for value in row:
+        total ^= value
+    return collections.Counter([total] + [value ^ total for value in row])
+
+
+@oracle("2254F")
+def oracle_2254f(text):
+    values = iter(ints(text))
+    answers = []
+    for _ in range(next(values)):
+        n = next(values)
+        left = [next(values) for _ in range(n)]
+        right = [next(values) for _ in range(n)]
+        possible = (tuple(right) in reachable_2254f(left) if n <= 6 else
+                    signature_2254f(left) == signature_2254f(right))
+        answers.append("YES" if possible else "NO")
+    return "\n".join(answers) + "\n"
+
+
 @oracle("50A")
 def oracle_50a(text):
     m, n = ints(text)

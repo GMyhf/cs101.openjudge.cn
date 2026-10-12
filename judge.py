@@ -908,7 +908,7 @@ def run_checker(checker, input_data, output_data, answer_data):
     return None, (result.stderr.decode(errors="replace")[-2000:] or f"checker 退出码 {result.returncode}")
 
 
-def _pump(source_fd, sink_fd, state, key, transcript, tag):
+def _pump(source_fd, sink_fd, state, key, transcript, tag, on_eof=None):
     """把一端的输出原样搬到另一端。sink 断开后继续读干净，免得上游写满管道卡住。"""
     sink_open = sink_fd is not None
     while True:
@@ -931,6 +931,8 @@ def _pump(source_fd, sink_fd, state, key, transcript, tag):
                     view = view[os.write(sink_fd, view):]
             except OSError:
                 sink_open = False
+    if on_eof is not None:
+        on_eof()
     if sink_fd is not None:
         try:
             os.close(sink_fd)
@@ -981,8 +983,13 @@ def run_interactive(command, interactor, input_data, answer_data, cwd, cpu_secon
         for stream in (student.stdin, student.stdout, student.stderr,
                        judge_proc.stdin, judge_proc.stdout, judge_proc.stderr):
             stream.close()
+        def student_eof():
+            # Record before forwarding EOF: the interactor may immediately exit
+            # in response, before the polling loop observes either process.
+            state["student_eof_before_jury_exit"] = judge_proc.poll() is None
+
         threads = [
-            threading.Thread(target=_pump, args=(s_out, j_in, state, "student_bytes", transcript, ">"), daemon=True),
+            threading.Thread(target=_pump, args=(s_out, j_in, state, "student_bytes", transcript, ">", student_eof), daemon=True),
             threading.Thread(target=_pump, args=(j_out, s_in, state, "jury_bytes", transcript, "<"), daemon=True),
             threading.Thread(target=_drain, args=(s_err, student_err), daemon=True),
             threading.Thread(target=_drain, args=(j_err, jury_err), daemon=True),
@@ -1053,7 +1060,7 @@ def run_interactive(command, interactor, input_data, answer_data, cwd, cpu_secon
         return {**row, "outcome": "tle", "message": "单组测试超过 CPU 限制。"}
     if state["output_exceeded"]:
         return {**row, "outcome": "ole", "message": "交互中输出超过 16 MiB。"}
-    if student_first and student_rc != 0 and student_rc != -signal.SIGPIPE:
+    if (student_first or state.get("student_eof_before_jury_exit")) and student_rc != 0 and student_rc != -signal.SIGPIPE:
         # 程序先自己崩了，interactor 只看到「提前 EOF」；报 RE 比报 WA 有用。
         # 反过来 interactor 先判了 WA、程序随后读到 EOF 才崩的，仍是 WA。
         return {**row, "outcome": "re", "message": row["stderr"] or f"退出码 {student_rc}"}

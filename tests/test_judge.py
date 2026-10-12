@@ -766,6 +766,20 @@ while True:
         self.assertEqual(stuck["status"], "Time Limit Exceeded")
         self.assertIn("flush", stuck["message"])
 
+    def test_interactive_exit_order_survives_delayed_polling(self):
+        wait4 = judge_module.os.wait4
+
+        def delayed_wait4(pid, options):
+            if options == os.WNOHANG:
+                time.sleep(0.05)
+            return wait4(pid, options)
+
+        with mock.patch.object(judge_module.os, "wait4", delayed_wait4):
+            crash = judge(BOOK, "GUESS", "python", "input()\nraise SystemExit(3)\n")
+            self.assertEqual(crash["status"], "Runtime Error", crash)
+            wrong = judge(BOOK, "GUESS", "python", "input()\nprint('! -1', flush=True)\ninput()\n")
+            self.assertEqual(wrong["status"], "Wrong Answer", wrong)
+
     def test_interactive_student_process_keeps_the_sandbox_contract(self):
         seen = []
         real_popen = judge_module.subprocess.Popen

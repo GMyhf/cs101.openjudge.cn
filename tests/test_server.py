@@ -438,6 +438,17 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertEqual([(item["book"], item["id"], item["test_count"]) for item in disk],
                          [("practice", "31378", 21)])
 
+    def test_non_string_book_is_rejected_without_closing_the_connection(self):
+        cookie = self._admin_cookie()
+        for book in ([], {}, None, 123):
+            for path in ("/api/run", "/api/submit"):
+                with self.subTest(book=book, path=path):
+                    status, _, body = request(self.port, "POST", path, {
+                        "book": book, "problem": "1000000", "language": "python",
+                        "source": "print(1)"}, cookie=cookie)
+                    self.assertEqual(status, 404)
+                    self.assertEqual(json.loads(body)["status"], "Problem Not Found")
+
     def test_private_book_is_visible_only_to_gmyhf(self):
         """私有题库（2026-10-09 人拍板：只有 GMyhf 看得到）。
 
@@ -503,7 +514,8 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
                    if item.get("source") == "codeforces"}
         # 158 道来自课程题解导入；另 6 道（116A 546A 617A 734A 791A 977A）是 2026-09-13
         # 按「800 分经典入门题」清单补的，走单题流水线，不在导入源里
-        self.assertEqual(len(entries), 164)
+        # 2254F was added after the original import.
+        self.assertEqual(len(entries), 165)
         self.assertTrue({"1A", "2228D", "4A"}.issubset(entries))
         self.assertFalse({"2095A", "2214A"} & set(entries))
         self.assertEqual(entries["4A"]["test_count"], 21)
@@ -666,15 +678,17 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertTrue({"2227A"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"2227C"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"2218F"}.issubset({item["id"] for item in generated}))
-        self.assertTrue(all(item["test_count"] == 21 for item in generated))
+        self.assertTrue(all(item["test_count"] == (22 if item["id"] == "230B" else 21)
+                            for item in generated))
         self.assertTrue(all(len({(ROOT / "data/openjudge" / case["input"]).read_bytes()
-                                 for case in item["test_cases"]}) == 21 for item in generated))
+                                 for case in item["test_cases"]}) == item["test_count"] for item in generated))
         rebuilt = [item for item in entries if item.get("data_status") == "rebuilt_tests"]
         self.assertEqual({item["id"] for item in rebuilt},
                          {"270A", "456A", "698A", "903C", "1374B", "1374C", "1475A", "1742A", "1764C", "1829D", "1883D", "1970E1", "2140B", "2208C", "2227B",
-                          "116A", "546A", "617A", "734A", "791A", "977A",
+                          "116A", "546A", "617A", "734A", "791A", "977A", "2254F",
                           *REBUILT_2026_09_17_CODEFORCES, *SPECIAL_JUDGE_CODEFORCES})
-        self.assertTrue(all(item["test_count"] == (2 if item["id"] == "2201G" else 21) for item in rebuilt))
+        self.assertTrue(all(item["test_count"] == {"2201G": 2, "2254F": 40}.get(item["id"], 21)
+                            for item in rebuilt))
         for problem_id, field in SPECIAL_JUDGE_CODEFORCES.items():
             item = next(row for row in rebuilt if row["id"] == problem_id)
             self.assertEqual(item[field], f"tests/codeforces/{problem_id}_made/{field}.py")
@@ -868,7 +882,7 @@ print("\\n".join(answers))
                    if item.get("global_number") == 1978]
         self.assertEqual({(item["book"], item["id"]) for item in entries},
                          {("practice", "02977"), ("pctbook", "M02977")})
-        self.assertEqual({item["test_count"] for item in entries}, {21})
+        self.assertEqual({item["test_count"] for item in entries}, {40})
         # 「同一全局题号的两个别名指向同一份数据」这条性质在 catalog.json 上，
         # 不在接口上 —— 接口刻意不再透出 `test_cases`（见下面那条用例）。
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
@@ -889,7 +903,7 @@ print("\\n".join(answers))
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
         disk = [item for item in catalog["problems"] if item.get("global_number") == 1936]
         self.assertEqual([(item["book"], item["id"], item["test_count"]) for item in disk],
-                         [("practice", "02934", 21)])
+                         [("practice", "02934", 40)])
 
         # 数据存在 ≠ 数据判得动。题面写「若有多个最大则只考虑第一个」，
         # 而「插在最后一个最大字符后面」是这题最常见的错法 —— 生成数据里必须真有
@@ -912,7 +926,7 @@ print("\\n".join(answers))
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
         disk = [item for item in catalog["problems"] if item.get("global_number") == 832]
         self.assertEqual([(item["book"], item["id"], item["test_count"]) for item in disk],
-                         [("practice", "01830", 21)])
+                         [("practice", "01830", 40)])
 
         # 第 0 组是**唯一一组有外部答案**的数据。2026-09-11 那版正是漏了跟题面对照这一步：
         # 参考实现没把「操作一个开关会翻转它自己」那条对角线放进方程，样例第一组从 4
@@ -995,9 +1009,9 @@ print("\\n".join(answers))
         # 一次都没出现这一行，漏写这个分支的解法照样 21/21。
         made = ROOT / "data/openjudge/tests/1000-1999/01002_made/data"
         outputs = {int(p.stem): p.read_text(encoding="utf-8") for p in made.glob("*.out")}
-        self.assertEqual(len(outputs), 21)
+        self.assertEqual(len(outputs), 45)
         none = sorted(i for i, text in outputs.items() if text == "No duplicates.\n")
-        self.assertEqual(none, [5, 10, 15, 20])
+        self.assertTrue({5, 10, 15, 20}.issubset(none))
         self.assertEqual((made / "5.in").read_text(encoding="utf-8").split("\n")[0], "1")
 
         # 第 20 组：没跳过 Q 的 (ord-65)//3+2 映射把 S/V/Y 算成 8/9/10，会凭空造出重复。
@@ -1018,7 +1032,7 @@ print("\\n".join(answers))
         catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text(encoding="utf-8"))
         disk = [item for item in catalog["problems"] if item.get("global_number") == 924]
         self.assertEqual(sorted((item["book"], item["id"], item["test_count"]) for item in disk),
-                         [("pctbook", "M01922", 21), ("practice", "01922", 21)])
+                         [("pctbook", "M01922", 40), ("practice", "01922", 40)])
 
         made = ROOT / "data/openjudge/tests/1000-1999/01922_made/data"
         self.assertEqual((made / "0.out").read_text(encoding="utf-8"), "780\n771\n")
@@ -1157,7 +1171,7 @@ print("\\n".join(answers))
             mirrored = (ROOT / f"data/openjudge/pages/practice__{problem_id}.html").read_text(
                 encoding="utf-8")
             self.assertRegex(mirrored, rf"全局题号\s*</dt>\s*<dd>\s*{problem_id}")
-            self.assertEqual(rows[problem_id]["test_count"], 21)
+            self.assertEqual(rows[problem_id]["test_count"], 40)
             data = ROOT / f"data/openjudge/tests/30000-/{problem_id}_made/data"
             found_modes = {int(path.read_text(encoding="utf-8").split()[0])
                            for path in data.glob("*.in")}
@@ -1309,12 +1323,12 @@ print("\\n".join(answers))
         rows = [item for item in catalog["problems"] if item["book"] == "practice" and item["id"] == "31180"]
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]["global_number"], 31180)
-        self.assertEqual(rows[0]["test_count"], 21)
+        self.assertEqual(rows[0]["test_count"], 40)
         page = (ROOT / "data/openjudge/pages/practice__31180.html").read_text(encoding="utf-8")
         self.assertIn("31180:学生数据统计分析", page)
         self.assertRegex(page, r"全局题号\s*</dt>\s*<dd>\s*31180")
         made = ROOT / "data/openjudge/tests/30000-/31180_made/data"
-        self.assertEqual(len(list(made.glob("*.in"))), 21)
+        self.assertEqual(len(list(made.glob("*.in"))), 40)
         self.assertEqual((made / "0.out").read_text(encoding="utf-8"),
                          "David 288\nQ1 2 165.5\nQ2 1 180.0\nQ3 1 165.2\nQ4 1 178.4\n1\nAlice 90 85 95 270\n")
         headers = {tuple(path.read_text(encoding="utf-8").splitlines()[1].split()) for path in made.glob("*.in")}
@@ -1341,7 +1355,7 @@ print("\\n".join(answers))
             {(item["book"], item["id"], item["test_count"])
              for item in payload["problems"]
              if item["id"] in {"M29917", "29917"}},
-            {("pctbook", "M29917", 22), ("practice", "29917", 22)},
+            {("pctbook", "M29917", 41), ("practice", "29917", 41)},
         )
         self.assertLess(int(headers["Content-Length"]), 500_000)
 

@@ -307,6 +307,7 @@ def page_html(data):
                 ("Output", render_blocks(field("formatO")))]
     content = "\n".join(f"<dt>{name}</dt><dd>{body}</dd>" for name, body in sections if body)
     note = render_blocks(field("hint"))
+    note_section = f"\n<dt>Note</dt><dd>{note}</dd>" if note else ""
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><title>Codeforces {escape(data['id'])}: {escape(title)}</title></head>
 <body><div id="pageTitle"><h2>{escape(title)}</h2></div>
@@ -316,7 +317,7 @@ def page_html(data):
 </dl>
 <dl class="problem-content">
 {content}
-{sample_rows(data['samples'])}{f'\n<dt>Note</dt><dd>{note}</dd>' if note else ''}
+{sample_rows(data['samples'])}{note_section}
 </dl>
 </body></html>
 """
