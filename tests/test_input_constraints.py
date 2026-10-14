@@ -629,6 +629,22 @@ def check_1000000(text):
     return None
 
 
+def check_1000001(text):
+    lines = text.splitlines()
+    if len(lines) != 2:
+        return f"应为 2 行，实际 {len(lines)} 行"
+    try:
+        n = int(lines[0])
+        values = numbers(lines[1])
+    except ValueError:
+        return "n 或元素不是整数"
+    if not 1 <= n <= 100 or len(values) != n:
+        return f"n={n} 或元素个数 {len(values)} 越出题面约束"
+    if len(set(values)) != n or any(abs(value) > 10 ** 9 for value in values):
+        return "元素必须互不相同且绝对值不超过 10^9"
+    return None
+
+
 VALIDATORS = {
     ("practice", "01958"): check_01958,
     ("codeforces", "25A"): check_25a,
@@ -665,6 +681,7 @@ VALIDATORS = {
     ("practice", "31297"): check_31297,
     ("practice", "31298"): check_31298,
     ("private", "1000000"): check_1000000,
+    ("private", "1000001"): check_1000001,
     ("practice", "31378"): check_1000000,      # 平台版，题面与私有版逐字相同
 }
 

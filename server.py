@@ -470,7 +470,7 @@ BOOK_META = {
     "25dsapre": {"name": "数算 2025Spring预习题", "count": 35},
     "2024fallroutine": {"name": "数算 2024Fall每日选作", "count": 93},
     "2024sp_routine": {"name": "数算 2024Spring每日选作", "count": 154},
-    "private": {"name": "私有题库", "count": 1},
+    "private": {"name": "私有题库", "count": 2},
 }
 # 私有题库 → 能看到它的用户（人拍板 2026-10-09：只给 GMyhf）。题号从 1000000 起，
 # 和 OpenJudge 全局题号（目前最大 3 万出头）不会撞，limits.json 按题号取限时也就不串。
