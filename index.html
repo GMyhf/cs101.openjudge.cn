@@ -27,7 +27,12 @@ __THEME_HEAD__
     .toolbar input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-soft) }
     .search-note { margin: -6px 0 14px; color: var(--muted); font-size: 13px }
 
+    .recent { margin: 20px 0 24px; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--green-soft) }
+    .recent-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 12px }
+    .recent-head h2 { margin: 0; font-size: 18px }
+    .recent-head p { margin: 0; color: var(--muted); font-size: 12px }
     .catalog-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px }
+    .recent .catalog-grid { gap: 10px }
     .book-block { min-width: 0 }
     .book-title { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 8px; padding-bottom: 7px; border-bottom: 2px solid var(--line); font-size: 16px }
     .book-title a { color: inherit; text-decoration: none }
@@ -84,6 +89,13 @@ __THEME_HEAD__
       </div>
       <a class="solution-link" href="https://fuynaloft.github.io/sol101/" target="_blank" rel="noopener" onclick="window.open(this.href,'sol101-explanations','noopener,width=1280,height=900');return false;">题解 ↗</a>
     </div>
+    <section id="recent" class="recent" aria-labelledby="recent-heading" hidden>
+      <div class="recent-head">
+        <h2 id="recent-heading">最近新增</h2>
+        <p>按本站收录顺序，展示最近 6 道可判题题目</p>
+      </div>
+      <div id="recent-list" class="catalog-grid"></div>
+    </section>
     <div class="toolbar"><input id="search" type="search" placeholder="搜索题号或标题" autocomplete="off" aria-label="搜索题号或标题"></div>
     <p class="search-note" id="search-note" hidden></p>
     <div id="list" class="catalog-grid"></div>
@@ -93,7 +105,8 @@ __THEME_HEAD__
   <script>
     // 顶栏的主题按钮、账号菜单在 /static/shell.js，这里只管首页自己的目录与在线人数。
     const list = document.querySelector('#list'), empty = document.querySelector('#empty'),
-          search = document.querySelector('#search'), searchNote = document.querySelector('#search-note');
+          search = document.querySelector('#search'), searchNote = document.querySelector('#search-note'),
+          recent = document.querySelector('#recent'), recentList = document.querySelector('#recent-list');
     let problems = [], bookMeta = {};
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -102,6 +115,9 @@ __THEME_HEAD__
       document.querySelector('#total-count').textContent = (data.total || 0).toLocaleString('en-US');
       problems = data.problems || [];
       bookMeta = data.book_meta || {};
+      // 目录按收录顺序追加；在随机抽题之前保留最近新增的题目。
+      const latest = [...problems].reverse().slice(0, 6);
+      recentList.innerHTML = latest.map(p => problemCard(p, bookMeta[p.book]?.name || p.book)).join('');
       shuffle(problems);
       render();
     }).catch(() => { empty.hidden = false; empty.textContent = '题库暂时不可用'; });
@@ -113,6 +129,10 @@ __THEME_HEAD__
       }
     }
     function titleOf(p) { return (p.title || '').replace(new RegExp('^' + p.id + '\\s*[:：]\\s*', 'i'), '') || p.id; }
+    function problemCard(p, bookName = '') {
+      const source = bookName ? `<span class="problem-meta">${esc(bookName)}</span>` : '';
+      return `<a class="problem" href="${esc(p.path)}"><span class="pid">${esc(p.id)}</span><span class="problem-main"><span class="problem-title">${esc(titleOf(p))}</span>${source}<span class="problem-meta">${esc(p.test_count)} 组测试数据</span></span><span class="arrow" aria-hidden="true">›</span></a>`;
+    }
 
     const featuredBooks = ['pctbook', 'practice'];
     const rank = book => featuredBooks.indexOf(book) < 0 ? 99 : featuredBooks.indexOf(book);
@@ -122,6 +142,7 @@ __THEME_HEAD__
 
     function render() {
       const q = search.value.trim().toLowerCase();
+      recent.hidden = !!q || !recentList.innerHTML;
       const limit = q ? PER_BOOK_SEARCHING : PER_BOOK;
       const groups = new Map();
       let matched = 0;
@@ -138,7 +159,7 @@ __THEME_HEAD__
         const meta = bookMeta[book] || {};
         const featured = featuredBooks.includes(book) ? ' featured' : '';
         const href = `/book/${encodeURIComponent(book)}/`;
-        const rows = g.items.map(p => `<a class="problem" href="${esc(p.path)}"><span class="pid">${esc(p.id)}</span><span class="problem-main"><span class="problem-title">${esc(titleOf(p))}</span><span class="problem-meta">${p.test_count} 组测试数据</span></span><span class="arrow" aria-hidden="true">›</span></a>`).join('');
+        const rows = g.items.map(p => problemCard(p)).join('');
         const more = q && g.total > g.items.length ? `<a class="more" href="${href}">还有 ${g.total - g.items.length} 道匹配，去题库里看 ›</a>` : '';
         return `<section class="book-block${featured}"><h3 class="book-title"><a href="${href}">${esc(meta.name || book)}</a><span>${meta.count || 0} 题</span></h3><div class="list">${rows}${more}</div></section>`;
       }).join('');
