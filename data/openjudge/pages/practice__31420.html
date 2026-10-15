@@ -1,0 +1,209 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>OpenJudge - 31420:一盏灯，照亮整间房？</title>
+
+<link href="http://static.openjudge.cn/styles/global.css?1586031922.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/styles.css?1470100812.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/group.css?1634019818.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/contest.css?1467854438.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="http://static.openjudge.cn/styles/favicon.ico?1467854438.ico" rel="shortcut icon" type="image/x-icon" />
+<!--[if IE]>
+   <script type="text/javascript" src="http://static.openjudge.cn/scripts/html5.js?1467854438.js"></script>
+<![endif]-->
+<!--[if lt IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie6-deprecated.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 7]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie7.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<!--[if IE 8]>
+	<link type="text/css" href="http://static.openjudge.cn/styles/ie8.css?1467854438.css" rel="stylesheet" />
+<![endif]-->
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery-1.4.3.min.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/jquery.form.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/base-nc.js?1467854438.js"></script>
+<script type="text/javascript" src="http://static.openjudge.cn/scripts/api.js?1467854438.js"></script>
+<script type="text/javascript">
+    //<![CDATA[
+var web_root = '/',
+	static_root = 'http://static.openjudge.cn/',
+	script_root = 'http://static.openjudge.cn/scripts',
+	style_root = 'http://static.openjudge.cn/styles';
+    //]]>
+</script>    <script>
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?cba6845c6d8176f123f81538e1796b8a";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+<body>
+	<div id="headerTop">
+  <div class="wrapper">
+    <h1 class="logo"><a href="http://openjudge.cn/" title="首页" rel="home">OpenJudge</a></h1>
+    <ul id="userToolbar">
+            <li><a class="link" href="/auth/login/">登入</a></li>
+      <li><a class="link" href="/register/">注册</a></li>
+          </ul>
+    <div class="practice-search">
+		 <form class="search-form" action="/search/" method="get">
+	        <input name="q" type="text" value="题目ID, 标题, 描述" onclick="this.select()">
+	        <button type="submit"></button>
+	     </form>	
+	</div>
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="header">
+  <div class="wrapper">
+  	<div id="groupSmallLog">
+  		<a href="http://cs101.openjudge.cn/"><img class="group-logo" src="http://static.openjudge.cn/images/default_logo_small.png" alt="CS101" width="50" height="50" /></a>    </div>
+	<div class="contest-title-tab">
+		 <h2><a href="http://cs101.openjudge.cn/" title="首页" rel="home">CS101</a></h2>
+		 <span>/</span>
+		 <h2>题库（包括计概、数算题目）</h2>
+			</div>
+    <ul id="mainNav">
+        <li  class="current"><a href="/practice/" class="first">题目</a></li>
+            <li ><a href="/practice/ranking/">排名</a></li>
+                    <li ><a href="/practice/status/">状态</a></li>
+	    			        <li class="last"><a href="/practice/clarify/" class="last">提问</a></li>
+        </ul>	 
+    <div style="clear:both;"></div>
+  </div>
+</div>
+	
+	<div id="pagebody">
+		<div class="wrapper">
+			<script type="text/javascript">
+$(function(e){
+  var b={1:"很水",2:"简单",3:"普通",4:"较难",5:"变态"},
+      g=$("#rate"),
+      c=$("#stars img"),
+      d=function(f){
+        var h=0||g.val();
+        c.each(function(k){
+          var i=this.src.replace(/\w*\.gif$/,((k<f)?"sth":((k<h)?"st":"nst"))+".gif");
+          this.src=i;
+        });
+        if(f)
+          $("#rate_description").text(b[f]);
+        else
+          $("#rate_description").text(h!=0?b[h]:"");
+      };
+      c.hover(function(){d(this.id.charAt(4));},function(){d();});
+      if(g.attr("value")){
+        c.click(function(){
+          var f=this.id.charAt(4);
+          g.val(f);
+          d(f);
+          //$('#form_diffculity_rating').submit();
+          $( "#dialog-form" ).dialog( "open" );
+			g();
+        });
+      }
+      d();
+  });
+$(document).ready(
+		function(){
+			$('#problem-tags').hide();
+			$('#tag-display').toggle(function() {
+											$('#problem-tags').show();
+											this.value = '隐藏标签';
+										}, function(){
+											$('#problem-tags').hide();
+											this.value = '显示标签';
+										}
+									);
+			});
+</script>
+
+<div id="pageTitle"><h2>31420:一盏灯，照亮整间房？</h2></div>
+<div id="topMenu">
+	<ul>
+		<li class="current-show"><a href="/practice/31420/">查看</a></li>
+		<li ><a href="/practice/31420/submit/">提交</a></li>
+				<li ><a href="/practice/31420/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/31420/">提问</a></li>
+			
+	</ul>
+</div><div class="problem-page col-9">
+	<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>60000ms</dd>
+			<dt>单个测试点时间限制: </dt>
+		<dd>8000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>262144kB</dd>
+	</dl>
+	<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><p>题目描述加载中。如果持续看到此说明，请确认浏览器没有禁用 JavaScript，并查看是否有加载错误。</p>
+<p>本题使用 <a href="https://github.com/FuYnAloft/oj-inject">OJ Inject（FuYnAloft/oj-inject）</a> 构建。</p>
+<p>无需浏览器也可从本页 HTML 提取题面和源码：查找 type="application/x-oj-inject-data" 的四个 script 数据节点，按 data-part="0" 至 "3" 排序拼接文本，再依次进行 Base64 解码、gzip 解压和 UTF-8 解码，即得到 HTML 题面。查找 type="application/x-oj-inject-source" 的 script 数据节点，对文本做同样的解码，即得到 Markdown 原文（或 HTML 原文，data-format 表示源码格式）。</p>
+<p>也可以从上方的仓库下载 public/extract.mjs，用 Node.js 执行：<code>node extract.mjs page.html recovered</code>，输出 recovered.html 和 recovered.md（或 recovered.source.html）。适用于服务器返回的页面源码，以及保留数据节点的渲染后 HTML。</p></dd>
+				
+				
+				<dt>输入</dt>
+		<dd><script type="application/x-oj-inject-data" data-version="2" data-part="0">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</script></dd>
+		<dt>输出</dt>
+		<dd><script type="application/x-oj-inject-data" data-version="2" data-part="1"></script></dd>
+		<dt>样例输入</dt>
+		<dd><pre><script type="application/x-oj-inject-data" data-version="2" data-part="2"></script></pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre><script type="application/x-oj-inject-data" data-version="2" data-part="3"></script></pre></dd>
+				<dt>提示</dt>
+		<dd><script type="application/x-oj-inject-source" data-version="2" data-format="markdown">H4sIAAAAAAAAE41YTU8bSRq+969oCZ+sJWsbNsqstIfZ82hOcxlptclqxAHtJpE2OSRzaow/wXZ7AOPvGDs2JoC7nYGYdrfb/WOot6r6xF9YvVXtxkDYzKEt3K56632f53k/ihWVWBpr6mzLvJkVWHpIbINWLv3qJc15N7OOoqyurirK282XGz9svtx8+1f1aSwWi6krKq1O/OqlXy9DbnIzK0CxQtwiseyXb661pPJy4+Xr/74PtiSeJuLr6+qKCpk0jGoP9/z777hH+eVfbzZ+uj3pWSwWk8evrKhU17k3VhTiHtGaSSwNykUw+pBJs/SQ1krcmHOjC1buZlagpQHkxsTOEEvzu1OWn1JjhzVSxHFgp3sza0SjoJ8S12MHJ18Nn1inNOf51UvWSFFTJ5ZGrFM+3ONl91pLRqOKwr263IZmbQPsYz65gH4H+kMMTDeJM2DpIYxT6Inj0JTOvRZrpKA1pofTay3JUhOuFXBxOs9sD/RTvu3S3z3WvGS2R2ZHdG+EsVSP6EWFffK4l4VeHT5uXWtJaB7RUR/3mlNil8DtsZ0J9Iu0nUSPhesC3wsMcsuETJHYxs2sQKYd0E2+7cKoBq2TwHh6CLkxbhw5fLgnqKC534hzDuNMgIOhQeGQWDaxC8y5hOmF3+4RS4AqwIF+g8+n4Pbw2OmEuC3I2sQZEGuX2cdgNG5mDUVZVUNYuWuAsy+pJNYpsYo8e0rsPmuk8LBiZdmi3AWFNN09D99DJu1vn4C+A+kJn09ZpYCer6rU1P12D3p1f9uF6QXvFhCidpkeZbkbwCKRBP1UokFrJh1jVDR3yM4OkYJGSlpjWybvnfFhBoMXrtLfu7SVJ+4+GyL7LDkNGacHc+YaCKx0OJOWqqMpnbhF5iIFMoplh+E4ST+0iFMK5CRWQm4sjRBrRDtllGlyihxVLmm7y2yPGl+gncX8sUvhcf72Cc0dSuPE2sHjxp+50SeWzc0BS06R+n6H986k1gXX0Shxj8L0oDXzZtZgTh2MRhDwgjNJu2QOTef69HBEayaUj6WeAi4XoRLXCxHh5kC+l5KRySO9eZh2QZKtrKh8vg/pAT2awUxXFPkNCmkon0G/wZwU/bLLzQqtjGlRBkNN/d5r5Oj8nFga7xbk1iCsyiWtjNXIq8jNrMC7J6xvy9NlgKHOWCPldycsOaWVMWrR6fLJhZBzJKKsq//4z4b6SnyuJbA04luFllD5tD1A8yrvYp5TU1/yoL/kwbvnmxEV9gpq5P3zzVtv2Pm5GtmMqMQ6lQ4gBULHD9xYjcf++Z1w4t3zzT+9f74p/saXwh2JG/Ha3NxaJGJeo618EFghH436XRtL+l7O79pg69EoSiBrhzlF210+nz6WU8Q6YE3LTzrSIrGKfrYI5ZzcTuZtet7l3gdaGnCvTuymXCaLBVaZlgblkuRlYaEkWbuNvmlx7wOUS7hrXsW6KktPOYdFDGW1qCF3C4j0IRqFciGo5FJUh1niTIglqqxA455qQtbJdBf2Cmh+kuZeVo1IpiOBTMHd56YD6QFrpNTIq7/FItgcQxrlaczZp+2OQKrotzR+vAX9FCtnEA4hTaHeQPFZe6F4WeAfihqti4Vyc0CqrCSP5eI30y40qr74eePNi+XqRKtH3LBhnGFbJj2YQ+sE9k/9LOra33bDPvK4wR9fC3sKN6/oxQm2Q/EDSro/hLEOmfoCAXp0Rea7WJfkXxLAOEL94sWLtxvv3ipPlZgaU2LqupIQT0L5i3hiyrPgl4QSF09cSYgnoayJJ6bE0Mpd61n7jvWfN94oP76+t2z40c/uiGVSl0iIoCLsYeoPKri9sILxustSE0kGZKd8uCdoyBCnGHSL/BxyYyjnfC0Z1n1JFfbsdJ4fZ1jz8B6gsvff50k4hb154ZQYl8JhgFgjbBALX/z61bWWxCI0H8pWSGYNYu9hCm8ZtNCVOpXr76hF5AkUbOh0ll2+69SC67sEJpYhXg9oiguK4o/RkrhPy1c4EWtkmCEVdPSRHga5j+148TVokaIpLU9+2CUfT4pHIL8b3tqyq/GEiC8unlsJLkS6Jp5VfCk/cPlq4v9viytr4okpCfGsxnFT/OvArf0xPa/d1XPY6MVASc0DPt+W0/PNrAH6Kc49S2VFQgblAq1O7ugjnHEPPhO75PdqrGlAeosbFt3ZCSvI8piCZdApstSEGVUcHnVTNs1vqj10WcrYHrKDDrEz4M7oqM86TdacYylfXDlkpZKZJ1soP96in5PfFrO4g5RZ31YU1rykpQH90CDW/M7MNp0Qq8hKYzA+SDvEssPZDBtM9Yh9uoJ+A9uWVve1vGiCTV/DAY+edOluR6a+nKoQ4NyYz+fiEhLcQOQYT1un4KX9sxqtiCarYL4en9BiD7kcFqnW5lemuOsQqwTpCZgOzc/5trvMlLR4p/igmSTu1rbl1UcO02BOl0Olehmbj50hjkamOQli0A8l33LauDdmsPQwnDMwI8u/hVMGXn3aGsIgBg3ilPiXK5xYv4zFshxaEG11edpFGXn1YN6vp7j3m5yI5UQL+gXN75L5UCAkqy6M29hFRYCibcafqEGXFWO23+49vAtAr473wyUAZA+XEpIY0HaXOMK/fDGE+Z5zYUGWJRQv2IkntzcWCUaoVxy2vLTfdeQxWMvcffkTbQ9w1rGKmH0CyAAbOY2LW40s6DIH8KS1J4tm3tKYk8PbT/4TsXYl5vJKgVEeNHj2QuY5S05vbzayUtoHOO/I2UPEjabXn6i3iu13oHXibxWhlIFyStKJNz4vy052sRNpZToa0M9ZqjnE61Jhl2u3k9HDzBL/iYDcGXg1YmeEqv/IyEimu4h1uUCPrmRvkN7c3i9oe0DtsqIkYomnP32/+uuv7zHGUkdqOBFLrHGjy4wqPU5yw/6etjrEGnFtm5sVdn7+7M/f+b0azkBiuWy6sFeA5pzls8zRyawGhcNrLfk/Meo7hGgRAAA=</script><script>(function J_(){let e=document.currentScript?.closest(`dl.problem-content`);if(!e)return;let t=e.style.visibility;e.style.visibility=`hidden`,(document.readyState===`loading`?new Promise(e=>document.addEventListener(`DOMContentLoaded`,e,{once:!0})):Promise.resolve()).then(async()=>{try{let t=[...e.querySelectorAll(`script[type="application/x-oj-inject-data"]`)];if(t.sort((e,t)=>Number(e.dataset.part)-Number(t.dataset.part)),t.length!==4||t.some((e,t)=>e.dataset.part!==String(t)||e.dataset.version!==`2`))throw Error(`题面数据缺失或版本不支持`);let n=e.querySelector(`script[type="application/x-oj-inject-source"]`);if(!n||n.dataset.version!==`2`)throw Error(`源码数据缺失`);let r=Uint8Array.from(atob(t.map(e=>e.textContent).join(``)),e=>e.charCodeAt(0)),i=await new Response(new Blob([r]).stream().pipeThrough(new DecompressionStream(`gzip`))).text();e.innerHTML=i,e.append(...t,n)}catch(t){let n=document.createElement(`dd`);n.textContent=`OJ Inject 加载失败：`+t.message,e.append(n)}finally{e.style.visibility=t}})})();</script></dd>
+						</dl>
+	<ul class="bottomMenu">
+		<li class="current-show"><a href="/practice/31420/">查看</a></li>
+		<li ><a href="/practice/31420/submit/">提交</a></li>
+				<li ><a href="/practice/31420/statistics/">统计</a></li>
+			
+		<li ><a href="/practice/clarify/31420/">提问</a></li>
+			</ul>
+</div>
+
+<div class="problem-statistics col-3">
+       		<dl>
+		<dt>全局题号</dt>
+		<dd>31420</dd>
+					<dt>添加于</dt>
+			<dd>2026-10-15</dd>
+				<dt>提交次数</dt>
+		<dd>11</dd>
+		<dt>尝试人数</dt>
+	    <dd>6</dd>
+	    <dt>通过人数</dt>
+	    <dd>5</dd>
+	</dl>
+		
+		
+					
+	</div>
+		</div>
+	</div>
+	<div id="footer">
+	<div class="wrapper">
+		<ul class="oj-info">
+			<li>&copy;2002-2022 POJ <a href="http://www.beian.miit.gov.cn">京ICP备20010980号-1</a></li>
+		</ul>
+		<ul class="debug-info">
+									<li>
+				<a style="color:red" href="javascript:void(0);" onclick="api.switchLanguage('en_US');">English</a></li>
+						<li><a href="http://openjudge.cn/help.html" rel="nofollow">帮助</a></li>
+			<li><a href="http://openjudge.cn/about.html" rel="nofollow">关于</a></li>
+		</ul>
+		<div style="clear:both;"></div>
+	</div>
+</div>
+	
+	</body>
+</html>
