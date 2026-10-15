@@ -114,7 +114,7 @@ __THEME_HEAD__
     }
     function titleOf(p) { return (p.title || '').replace(new RegExp('^' + p.id + '\\s*[:：]\\s*', 'i'), '') || p.id; }
 
-    const featuredBooks = ['pctbook', 'practice', 'dsapre'];
+    const featuredBooks = ['pctbook', 'practice'];
     const rank = book => featuredBooks.indexOf(book) < 0 ? 99 : featuredBooks.indexOf(book);
     // 平时每个题库随机挑 5 道；搜索时放宽到 20 道 —— 原来搜索也只给 5 道，
     // 第 6 道起的匹配结果根本看不到，也没有任何提示。

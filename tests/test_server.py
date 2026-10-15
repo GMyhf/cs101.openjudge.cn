@@ -449,6 +449,51 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
                     self.assertEqual(status, 404)
                     self.assertEqual(json.loads(body)["status"], "Problem Not Found")
 
+    def test_offline_books_are_hidden_and_unavailable_to_all_users(self):
+        offline = {"25dsapre", "dsapre"}
+        raw = json.loads((ROOT / "data/openjudge/catalog.json").read_text())
+        public = [p for p in raw["problems"] if p["book"] not in offline | {"private"}]
+        def key(item):
+            match = re.search(r"(\d+)$", item["id"])
+            return int(match.group(1)) if match else (item["book"], item["id"])
+        total = len({key(p) for p in public})
+        tested = len({key(p) for p in public if p.get("test_count", 0) > 0})
+        admin = self._admin_cookie()
+        student = self.register_and_login("offline_viewer", "Offline-pass-123")
+        for viewer in (None, student, admin):
+            for query in ("/api/catalog", "/api/catalog?summary=1"):
+                status, _, body = request(self.port, "GET", query, cookie=viewer)
+                self.assertEqual(status, 200)
+                payload = json.loads(body)
+                self.assertTrue(offline.isdisjoint(payload["book_meta"]))
+                self.assertFalse(any(p["book"] in offline for p in payload["problems"]))
+                if "summary" in query:
+                    self.assertEqual(payload["total"], total)
+                    self.assertEqual(payload["tested_count"], tested)
+                else:
+                    self.assertEqual(payload["unique_total"], total)
+                    self.assertEqual(payload["unique_tested_count"], tested)
+            for book in offline:
+                problem = next(p["id"] for p in raw["problems"] if p["book"] == book)
+                for path in (f"/{book}", f"/{book}/", f"/{book}/{problem}/",
+                             f"/{book}/{problem}/submit/", f"/{book}/{problem}/statistics/",
+                             f"/book/{book}", f"/book/{book}/", f"/book/{book}/ranking/",
+                             f"/book/{book}/status/", f"/book/{book}/user/GMyhf/",
+                             f"/book/{book}/solution/1/", f"/api/books/{book}/",
+                             f"/api/books/{book}/user/GMyhf/", f"/api/books/{book}/solution/1/",
+                             f"/book/%{ord(book[0]):02x}{book[1:]}/"):
+                    with self.subTest(viewer=viewer is not None, path=path):
+                        self.assertEqual(request(self.port, "GET", path, cookie=viewer)[0], 404)
+                if viewer:
+                    for path in ("/api/run", "/api/submit"):
+                        status, _, body = request(self.port, "POST", path, {
+                            "book": book, "problem": problem, "language": "python",
+                            "source": "print(1)", "stdin": ""}, cookie=viewer)
+                        self.assertEqual(status, 404, path)
+                        self.assertEqual(json.loads(body)["status"], "Problem Not Found")
+        self.assertEqual(request(self.port, "GET", "/api/books/practice/")[0], 200)
+        self.assertEqual(request(self.port, "GET", "/book/pctbook/")[0], 200)
+
     def test_private_book_is_visible_only_to_gmyhf(self):
         """私有题库（2026-10-09 人拍板：只有 GMyhf 看得到）。
 

@@ -477,6 +477,8 @@ BOOK_META = {
 # 看不到的人：目录、首页、题库页、题面、提交记录、运行样例、提交一律当它不存在（404），
 # 不是 403 —— 403 等于告诉人「这里有东西」。闸门在 `book_visible`，别在各路由里另写一份。
 PRIVATE_BOOKS = {"private": ("GMyhf",)}
+# 下线题库保留镜像数据与历史提交，但不再展示、访问或接受判题。
+OFFLINE_BOOKS = frozenset({"25dsapre", "dsapre"})
 SMTP_ENV_FILE = ROOT / "data" / ".smtp.env"
 # 校外学生收邮件用，回退值也必须是公网能开的地址，不能是校内 IP
 DEFAULT_PUBLIC_URL = "https://jensen.zhengmao.ltd"
@@ -787,15 +789,15 @@ def catalog_title(item):
 
 
 def book_visible(book, user):
-    if not isinstance(book, str):
+    if not isinstance(book, str) or book in OFFLINE_BOOKS:
         return False
     allowed = PRIVATE_BOOKS.get(book)
     return allowed is None or any(same_username(user or "", name) for name in allowed)
 
 
 def visible_catalog(payload, user):
-    """把 catalog 响应里当前用户看不到的私有题库剔掉（题目行与 book_meta 都剔）。"""
-    hidden = {book for book in PRIVATE_BOOKS if not book_visible(book, user)}
+    """从目录中剔除下线题库与当前用户不可见的私有题库。"""
+    hidden = OFFLINE_BOOKS | {book for book in PRIVATE_BOOKS if not book_visible(book, user)}
     if not hidden:
         return payload
     return {**payload,
@@ -832,7 +834,8 @@ def catalog_full_payload():
     global CATALOG_FULL_CACHE
     if CATALOG_FULL_CACHE is None:
         raw = catalog_raw()
-        problems = raw.get("problems", [])
+        problems = [item for item in raw.get("problems", [])
+                    if item.get("book") not in OFFLINE_BOOKS]
         def problem_key(item):
             match = re.search(r"(\d+)$", item.get("id", ""))
             return int(match.group(1)) if match else (item.get("book", ""), item.get("id", ""))
@@ -841,6 +844,7 @@ def catalog_full_payload():
         tested_keys = {problem_key(item) for item in public if (item.get("test_count") or 0) > 0}
         CATALOG_FULL_CACHE = {
             **raw,
+            "count": len(problems),
             "problems": [{**{k: v for k, v in item.items() if k not in CATALOG_INTERNAL_FIELDS},
                           "title": catalog_title(item)} for item in problems],
             "unique_total": len(all_keys),
@@ -875,7 +879,8 @@ def catalog_full_payload():
 def catalog_summary_payload():
     """Return only the fields needed by the fast homepage catalog."""
     raw = catalog_raw()
-    problems = raw.get("problems", [])
+    problems = [item for item in raw.get("problems", [])
+                if item.get("book") not in OFFLINE_BOOKS]
     def problem_key(item):
         match = re.search(r"(\d+)$", item.get("id", ""))
         return int(match.group(1)) if match else (item.get("book", ""), item.get("id", ""))
@@ -1639,11 +1644,10 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             if not self.authorized():
                 self.send_response(302); self.send_header("Location", "/auth/login/"); self.end_headers(); return
             self.send_html(self.profile_settings_page()); return
-        # 私有题库的总闸：/<题库>/…、/book/<题库>/…、/api/books/<题库>/… 三种前缀一并拦下。
+        # 下线与私有题库的总闸：三种前缀一并拦下，避免兜底代理继续展示上游题库。
         # 必须在这里 return：没被路由接住的路径会落到上游代理（见 favicon 那段注释）。
-        private_prefix = re.match(r"/(?:book/|api/books/)?([^/]+)/", decoded_path)
-        if (private_prefix and private_prefix.group(1) in PRIVATE_BOOKS
-                and not book_visible(private_prefix.group(1), self.current_user())):
+        book_prefix = re.match(r"/(?:book/|api/books/)?([^/]+)(?:/|$)", decoded_path)
+        if book_prefix and not book_visible(book_prefix.group(1), self.current_user()):
             self.send_json({"error": "Not found"}, 404); return
         submit_page = re.fullmatch(r"/(codeforces|pctbook|2025sp_routine|25dsapre|2024fallroutine|2024sp_routine|dsapre|routine|practice|private)/([^/]+)/submit/", path)
         if submit_page:
