@@ -464,12 +464,12 @@ BOOK_META = {
     "codeforces": {"name": "Codeforces 题库", "count": 164},
     "practice": {"name": "题库（包括计概、数算题目）", "count": 997},
     "pctbook": {"name": "计算思维算法实践", "count": 215},
-    "routine": {"name": "数算 2025Spring每日选作", "count": 203},
-    "2025sp_routine": {"name": "数算 2025Spring每日选作", "count": 73},
-    "dsapre": {"name": "数算预习题", "count": 101},
-    "25dsapre": {"name": "数算 2025Spring预习题", "count": 35},
-    "2024fallroutine": {"name": "数算 2024Fall每日选作", "count": 93},
-    "2024sp_routine": {"name": "数算 2024Spring每日选作", "count": 154},
+    "routine": {"name": "计概2023fall每日选做", "count": 203},
+    "2025sp_routine": {"name": "数算2025spring每日选做", "count": 73},
+    "dsapre": {"name": "数算2024pre每日选做", "count": 101},
+    "25dsapre": {"name": "数算2025pre每日选做", "count": 35},
+    "2024fallroutine": {"name": "计概2024fall每日选做", "count": 93},
+    "2024sp_routine": {"name": "数算2024spring每日选做", "count": 154},
     "private": {"name": "私有题库", "count": 2},
 }
 # 私有题库 → 能看到它的用户（人拍板 2026-10-09：只给 GMyhf）。题号从 1000000 起，
