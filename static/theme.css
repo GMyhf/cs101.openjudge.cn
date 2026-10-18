@@ -138,12 +138,12 @@ a { color: inherit }
 .mark {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
-  background: var(--ink);
-  color: var(--bg);
-  font-size: 14px;
+  background: var(--accent);
+  color: var(--panel);
+  font-size: 15px;
 }
 
 .topnav {
@@ -258,6 +258,10 @@ a { color: inherit }
     border-radius: 0 0 4px 4px;
   }
   .account-trigger { max-width: 7em }
+}
+
+@media (max-width: 400px) {
+  .mark { width: 30px; height: 30px; font-size: 13px }
 }
 
 /* ---- 面板：力扣式圆角卡片 ---------------------------------------------- */

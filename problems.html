@@ -3,6 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 __THEME_HEAD__
+<script src="/static/catalog-books.js"></script>
 <title>题库目录 · CS101 本机判题</title>
 <style>
   * { box-sizing: border-box; }
@@ -63,14 +64,14 @@ const requestedBook = new URLSearchParams(location.search).get('book') || '';
 fetch('/api/catalog', { credentials: 'same-origin' })
   .then(r => r.json())
   .then(data => {
-    all = data.problems || [];
+    all = (data.problems || []).filter(p => catalogBooks.isVisible(p.book));
     bookMeta = data.book_meta || {};
     dataUniqueTotal = data.unique_total || 0;
     dataUniqueTested = data.unique_tested_count || 0;
-    for (const b of [...new Set(all.map(p => p.book))].sort()) {
+    for (const b of [...new Set(all.map(p => p.book))].sort((a, b) => catalogBooks.compare(a, b))) {
       els.book.insertAdjacentHTML('beforeend', `<option value="${b}">${(bookMeta[b] || {}).name || b}</option>`);
     }
-    if ([...els.book.options].some(option => option.value === requestedBook)) {
+    if (requestedBook && [...els.book.options].some(option => option.value === requestedBook)) {
       els.book.value = requestedBook;
       els.only.checked = false;
       document.querySelector('#pageTitle').textContent = (bookMeta[requestedBook] || {}).name || requestedBook;
