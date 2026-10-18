@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+__THEME_HEAD__
+  <title>最近新增 · CS101 题库</title>
+  <style>
+    .shell { width: 100%; max-width: 1000px; margin: auto; padding: 0 24px }
+    .top { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line) }
+    .content { padding-top: 28px; padding-bottom: 60px }
+    .back { color: var(--accent); font-size: 13px; text-decoration: none }
+    .back:hover { text-decoration: underline }
+    h1 { margin: 14px 0 8px; font-size: 22px }
+    .intro { margin: 0 0 22px; color: var(--muted); font-size: 13px }
+    .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px }
+    .filters button { padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--muted); font: inherit; font-size: 14px; cursor: pointer }
+    .filters button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 650 }
+    .count { margin: 0 0 12px; color: var(--muted); font-size: 13px }
+    .list { padding: 0 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel) }
+    .problem { display: flex; align-items: center; gap: 14px; min-height: 56px; padding: 12px 4px; text-decoration: none }
+    .problem + .problem { border-top: 1px solid var(--line) }
+    .problem:hover { color: var(--accent) }
+    .pid { flex-shrink: 0; width: 66px; color: var(--accent); font: 600 13px var(--font-mono) }
+    .problem-main { flex: 1; min-width: 0 }
+    .problem-title { display: block; overflow-wrap: anywhere; font-size: 14px; font-weight: 550 }
+    .added { flex-shrink: 0; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums }
+    .arrow { color: var(--muted) }
+    .empty { padding: 36px 16px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); text-align: center }
+    @media (max-width: 640px) {
+      .shell { padding-left: 16px; padding-right: 16px }
+      .top { min-height: 64px; gap: 8px }
+      .top .brand { gap: 6px; font-size: 14px }
+      .top .topnav { gap: 8px }
+      .list { padding: 0 12px }
+      .problem { gap: 10px }
+      .pid { width: 56px; font-size: 12px }
+      .added { font-size: 11px }
+    }
+  </style>
+</head>
+<body>
+  <header class="top shell">
+    <a class="brand" href="/"><span class="mark">CS</span><span>CS101 题库</span></a>
+    <nav class="topnav">
+      <span class="online" id="online" hidden></span>
+      <a href="/problems/">题库目录</a>
+      <a href="/history/">提交记录</a>
+      <a href="/help/">说明</a>
+      <button id="theme" type="button" class="ghost theme-toggle">深色</button>
+      __ACCOUNT_MENU__
+    </nav>
+  </header>
+  <main class="content shell">
+    <a class="back" href="/">← 返回首页</a>
+    <h1>最近新增</h1>
+    <p class="intro">按本站首次收录日期排序，展示可直接判题的题目。</p>
+    <div class="filters" role="group" aria-label="新增时间范围">
+      <button type="button" data-range="10" aria-pressed="false">最近 10 天</button>
+      <button type="button" data-range="30" aria-pressed="true">最近 30 天</button>
+      <button type="button" data-range="3m" aria-pressed="false">最近 3 个月</button>
+      <button type="button" data-range="all" aria-pressed="false">全部</button>
+    </div>
+    <p id="count" class="count" aria-live="polite">正在加载…</p>
+    <div id="list" class="list" hidden></div>
+    <div id="empty" class="empty" hidden>这个时间范围内暂无新增题目。</div>
+  </main>
+  <script src="/static/recent.js" defer></script>
+</body>
+</html>

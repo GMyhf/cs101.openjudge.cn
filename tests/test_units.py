@@ -129,7 +129,7 @@ class HandbookBuildTests(unittest.TestCase):
                       "请跑 `python3 tools/build_handbook.py` 并提交产物")
 
 
-PAGES = ("index.html", "problems.html", "book.html", "history.html", "admin.html",
+PAGES = ("index.html", "recent.html", "problems.html", "book.html", "history.html", "admin.html",
          "submit.html")
 THEME_CSS = ROOT / "static" / "theme.css"
 
@@ -310,6 +310,9 @@ class PageStructureTests(unittest.TestCase):
             text = (ROOT / name).read_text(encoding="utf-8")
             styles = "\n".join(STYLE_BLOCK.findall(text))
             markup = text.replace(styles, "")
+            # 外部脚本也会生成页面元素（例如最近新增列表）。
+            for asset in re.findall(r'<script\b[^>]*\bsrc="(/static/[^"?]+\.js)"', text):
+                markup += (ROOT / asset.lstrip("/")).read_text(encoding="utf-8")
             dead = []
             for cls in sorted(set(CLASS_SELECTOR.findall(CSS_COMMENT.sub("", styles)))):
                 if cls in markup:

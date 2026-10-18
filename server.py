@@ -461,16 +461,16 @@ MIRRORED_IMAGE_PATTERN = (
     if MIRRORED_IMAGE_URLS else None
 )
 BOOK_META = {
-    "codeforces": {"name": "Codeforces 题库", "count": 164},
-    "practice": {"name": "题库（包括计概、数算题目）", "count": 997},
-    "pctbook": {"name": "计算思维算法实践", "count": 215},
-    "routine": {"name": "计概2023fall每日选做", "count": 203},
-    "2025sp_routine": {"name": "数算2025spring每日选做", "count": 73},
-    "dsapre": {"name": "数算2024pre每日选做", "count": 101},
-    "25dsapre": {"name": "数算2025pre每日选做", "count": 35},
-    "2024fallroutine": {"name": "计概2024fall每日选做", "count": 93},
-    "2024sp_routine": {"name": "数算2024spring每日选做", "count": 154},
-    "private": {"name": "私有题库", "count": 2},
+    "codeforces": {"name": "Codeforces 题库"},
+    "practice": {"name": "题库（包括计概、数算题目）"},
+    "pctbook": {"name": "计算思维算法实践"},
+    "routine": {"name": "计概2023fall每日选做"},
+    "2025sp_routine": {"name": "数算2025spring每日选做"},
+    "dsapre": {"name": "数算2024pre每日选做"},
+    "25dsapre": {"name": "数算2025pre每日选做"},
+    "2024fallroutine": {"name": "计概2024fall每日选做"},
+    "2024sp_routine": {"name": "数算2024spring每日选做"},
+    "private": {"name": "私有题库"},
 }
 # 私有题库 → 能看到它的用户（人拍板 2026-10-09：只给 GMyhf）。题号从 1000000 起，
 # 和 OpenJudge 全局题号（目前最大 3 万出头）不会撞，limits.json 按题号取限时也就不串。
@@ -829,6 +829,16 @@ def catalog_raw():
 CATALOG_INTERNAL_FIELDS = ("test_cases", "checker", "interactor", "code_prefix")
 
 
+def catalog_book_meta(problems):
+    """题库数量按本地目录统计，随新增题目更新。"""
+    counts = {}
+    for item in problems:
+        book = item.get("book", "")
+        counts[book] = counts.get(book, 0) + 1
+    return {book: {**meta, "count": counts.get(book, 0)}
+            for book, meta in BOOK_META.items()}
+
+
 def catalog_full_payload():
     """Build the complete directory response only once per catalog version."""
     global CATALOG_FULL_CACHE
@@ -849,7 +859,7 @@ def catalog_full_payload():
                           "title": catalog_title(item)} for item in problems],
             "unique_total": len(all_keys),
             "unique_tested_count": len(tested_keys),
-            "book_meta": BOOK_META,
+            "book_meta": catalog_book_meta(problems),
         }
     with connect_db() as db:
         local_stats = {
@@ -879,6 +889,8 @@ def catalog_full_payload():
 def catalog_summary_payload():
     """Return only the fields needed by the fast homepage catalog."""
     raw = catalog_raw()
+    dates_path = MIRROR / "added_dates.json"
+    added_dates = json.loads(dates_path.read_text(encoding="utf-8")) if dates_path.is_file() else {}
     problems = [item for item in raw.get("problems", [])
                 if item.get("book") not in OFFLINE_BOOKS]
     def problem_key(item):
@@ -891,6 +903,7 @@ def catalog_summary_payload():
     return {
         "total": len(all_keys),
         "tested_count": len(tested_keys),
+        "today": datetime.now().strftime("%Y-%m-%d"),
         "problems": [
             {
                 "book": item.get("book", ""),
@@ -898,10 +911,12 @@ def catalog_summary_payload():
                 "path": item.get("path", ""),
                 "test_count": item.get("test_count", 0),
                 "title": catalog_title(item),
+                "added_at": item.get("added_at") or added_dates.get(
+                    f"{item.get('book', '')}/{item.get('id', '')}", ""),
             }
             for item in problems if (item.get("test_count") or 0) > 0
         ],
-        "book_meta": BOOK_META,
+        "book_meta": catalog_book_meta(problems),
     }
 
 
@@ -1798,6 +1813,8 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
                 self.send_json({"error": "Not found", "message": "分享链接不存在。"}, 404); return
             self.send_json({"id": row[0], "author": nicknames.get(row[1].casefold(), row[1]),
                             "language": row[2], "source": row[3], "stdin": row[4], "created": row[5]}); return
+        if path in ("/recent", "/recent/"):
+            self.send_html((ROOT / "recent.html").read_text(encoding="utf-8")); return
         if path in ("/problems", "/problems/"):
             page = ROOT / "problems.html"
             if page.is_file():

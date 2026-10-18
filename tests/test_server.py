@@ -382,12 +382,44 @@ class ServerApiTests(unittest.TestCase):
         self.assertIn("题库目录", text)
         self.assertIn("/api/catalog", text)          # 目录页的数据来源
 
+    def test_recent_page_is_served_with_filters_and_theme(self):
+        status, _, body = request(self.port, "GET", "/recent/?range=10")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8")
+        self.assertIn("最近 10 天", text)
+        self.assertIn("最近 30 天", text)
+        self.assertIn("最近 3 个月", text)
+        self.assertIn("/static/recent.js", text)
+        self.assertIn("/static/theme.css", text)
+        self.assertNotIn("__THEME_HEAD__", text)
+
+    def test_birthday_gift_book_entries_reuse_canonical_test_data(self):
+        rows = json.loads((ROOT / "data/openjudge/catalog.json").read_text())["problems"]
+        canonical = next(p for p in rows if (p["book"], p["id"]) == ("practice", "04107"))
+        source = (ROOT / "data/openjudge/tests/4000-8210/04107_made/samplecode.py").read_text()
+        for book, problem in (("pctbook", "E04107"), ("routine", "04107")):
+            with self.subTest(book=book):
+                row = next(p for p in rows if (p["book"], p["id"]) == (book, problem))
+                self.assertEqual(row["test_cases"], canonical["test_cases"])
+                self.assertEqual(row["global_number"], canonical["global_number"])
+                status, _, body = request(self.port, "GET", f"/{book}/{problem}/")
+                self.assertEqual(status, 200)
+                self.assertIn("19岁生日礼物".encode(), body)
+                result = judge(book, problem, "python", source)
+                self.assertEqual((result["status"], result["cases"]),
+                                 ("Accepted", len(canonical["test_cases"])))
+
     def test_catalog_exposes_display_book_names(self):
         status, _, body = request(self.port, "GET", "/api/catalog")
         self.assertEqual(status, 200)
         meta = json.loads(body)["book_meta"]
         self.assertEqual(meta["practice"]["name"], "题库（包括计概、数算题目）")
-        self.assertEqual(meta["practice"]["count"], 997)
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text())
+        self.assertEqual(meta["practice"]["count"], sum(
+            item["book"] == "practice" for item in catalog["problems"]))
+        status, _, summary = request(self.port, "GET", "/api/catalog?summary=1")
+        self.assertEqual(status, 200)
+        self.assertEqual(json.loads(summary)["book_meta"], meta)
         self.assertEqual(meta["pctbook"]["name"], "计算思维算法实践")
 
     def test_codeforces_4a_is_a_local_judgeable_problem(self):
@@ -399,8 +431,10 @@ class ServerApiTests(unittest.TestCase):
 
         status, _, body = request(self.port, "GET", "/api/catalog")
         payload = json.loads(body)
+        catalog = json.loads((ROOT / "data/openjudge/catalog.json").read_text())
         self.assertEqual(payload["book_meta"]["codeforces"],
-                         {"name": "Codeforces 题库", "count": 164})
+                         {"name": "Codeforces 题库", "count": sum(
+                             item["book"] == "codeforces" for item in catalog["problems"])})
         row = next(item for item in payload["problems"]
                    if (item["book"], item["id"]) == ("codeforces", "4A"))
         self.assertEqual((row["title"], row["test_count"]), ("A. Watermelon", 21))

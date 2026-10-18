@@ -95,6 +95,12 @@ python3 scripts/mirror_openjudge_images.py --check
 python3 scripts/index_tests.py
 ```
 
+首页“最近新增”展示 5 道可判题题目，“查看全部”进入 `/recent/`，可按最近 10 天、
+30 天、3 个自然月或全部筛选。日期指本站首次收录日期；历史日期由
+`python3 scripts/backfill_added_dates.py` 从 Git 目录历史回填到
+`data/openjudge/added_dates.json`，后续抓取和索引会保留或登记 `added_at`。
+没有可靠日期的题目只在“全部”中展示，更新测试数据不会改变收录日期。
+
 测试数据按题库和题号放置，存在测试目录的题目即可进入判题队列：
 
 ```text

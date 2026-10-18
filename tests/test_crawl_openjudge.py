@@ -26,6 +26,7 @@ class TargetedRefreshTests(unittest.TestCase):
                     "path": "/routine/27150/",
                     "tests": True,
                     "test_count": 21,
+                    "added_at": "2026-07-29",
                 }],
             }
             (data / "catalog.json").write_text(json.dumps(catalog), encoding="utf-8")
@@ -36,17 +37,20 @@ class TargetedRefreshTests(unittest.TestCase):
             }
             with patch.object(crawl_openjudge, "DATA", data), \
                     patch.object(crawl_openjudge, "fetch", side_effect=pages.__getitem__), \
+                    patch.object(crawl_openjudge.time, "strftime", return_value="2026-10-18"), \
                     patch.object(crawl_openjudge, "mirror_all") as mirror_all:
                 crawl_openjudge.refresh_problems(["routine/27150", "practice/27150"])
 
             refreshed = json.loads((data / "catalog.json").read_text(encoding="utf-8"))
             self.assertEqual(refreshed["count"], 2)
             self.assertEqual(refreshed["problems"][0]["test_count"], 21)
+            self.assertEqual(refreshed["problems"][0]["added_at"], "2026-07-29")
             self.assertEqual(refreshed["problems"][1], {
                 "book": "practice",
                 "id": "27150",
                 "path": "/practice/27150/",
                 "tests": False,
+                "added_at": "2026-10-18",
             })
             self.assertEqual((data / "pages" / "routine__27150.html").read_text(), "<html>corrected routine</html>")
             self.assertEqual((data / "pages" / "practice__27150.html").read_text(), "<html>new practice</html>")

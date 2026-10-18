@@ -76,7 +76,8 @@ def refresh_problems(specs):
         html = fetch(path)
         (DATA / "pages" / f"{book}__{problem_id}.html").write_text(html, encoding="utf-8")
         if (book, problem_id) not in known:
-            item = {"book": book, "id": problem_id, "path": path, "tests": False}
+            item = {"book": book, "id": problem_id, "path": path, "tests": False,
+                    "added_at": time.strftime("%Y-%m-%d")}
             problems.append(item)
             known[(book, problem_id)] = item
         print(f"refreshed {book}/{problem_id}", flush=True)
@@ -102,6 +103,14 @@ def main(argv=None):
     if args.problem:
         refresh_problems(args.problem)
         return
+    previous_path = DATA / "catalog.json"
+    previous = json.loads(previous_path.read_text(encoding="utf-8")) if previous_path.is_file() else {}
+    dates_path = DATA / "added_dates.json"
+    added_dates = json.loads(dates_path.read_text(encoding="utf-8")) if dates_path.is_file() else {}
+    for item in previous.get("problems", []):
+        key = f"{item['book']}/{item['id']}"
+        if item.get("added_at"):
+            added_dates[key] = item["added_at"]
     catalog = []
     for book in BOOKS:
         seen = set(); page = 1
@@ -118,7 +127,8 @@ def main(argv=None):
                 if (book, problem_id) in EXCLUDED_ENTRIES:
                     print(f"  跳过 {book}/{problem_id}：{EXCLUDED_ENTRIES[(book, problem_id)]}", flush=True)
                     continue
-                catalog.append({"book": book, "id": problem_id, "path": href, "tests": False})
+                catalog.append({"book": book, "id": problem_id, "path": href, "tests": False,
+                                "added_at": added_dates.get(f"{book}/{problem_id}", time.strftime("%Y-%m-%d"))})
             print(f"{book}: page {page}, +{len(fresh)}, total {len(seen)}", flush=True)
             page += 1
         if not seen: raise RuntimeError(f"No problems found for {book}")

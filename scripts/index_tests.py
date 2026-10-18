@@ -2,6 +2,7 @@
 """Index OpenJudge .in/.out pairs according to global problem numbers."""
 import json
 import re
+from datetime import date
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -230,6 +231,10 @@ def book_stats():
 def main():
     catalog_path = MIRROR / "catalog.json"
     catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    dates_path = MIRROR / "added_dates.json"
+    added_dates = json.loads(dates_path.read_text(encoding="utf-8")) if dates_path.is_file() else {}
+    for item in catalog["problems"]:
+        item.setdefault("added_at", added_dates.get(f"{item['book']}/{item['id']}", date.today().isoformat()))
     per_entry_global, practice_global = catalog_global_numbers(catalog)
     directory_global = test_directory_global_numbers(per_entry_global, practice_global)
     made_by_global_number = {}
