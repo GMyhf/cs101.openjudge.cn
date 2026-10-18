@@ -547,10 +547,10 @@ def submit_page_template():
 EDITOR_LANGUAGES = ("python", "pypy3", "cpp", "c", "csharp", "fsharp", "vbnet", "swift", "objc")
 
 
-def editor_language_options():
+def editor_language_options(allowed=None):
     """语言下拉框。显示的是本机探测到的真实版本号。"""
     return "".join(f'<option value="{key}">{escape(language_version(key))}</option>'
-                   for key in EDITOR_LANGUAGES)
+                   for key in EDITOR_LANGUAGES if allowed is None or key in allowed)
 
 
 def playground_result(result, language):
@@ -1550,11 +1550,15 @@ class Handler(BaseHTTPRequestHandler):
 
     def submission_page(self, page, book, problem):
         title, params_html, content_html, _ = self.problem_parts(page, book, problem)
-        language_options = editor_language_options()
+        item = next((r for r in catalog_raw().get("problems", [])
+                     if r.get("book") == book and r.get("id") == problem), {})
+        allowed = item.get("code_languages", ["python"]) if item.get("code_prefix") else None
+        language_options = editor_language_options(allowed)
         return (submit_page_template().replace("__BOOK__", escape(book))
                 .replace("__BOOK_NAME__", escape(BOOK_META.get(book, {}).get("name", book)))
                 .replace("__PROBLEM__", escape(problem))
                 .replace("__LANGUAGE_OPTIONS__", language_options)
+                .replace("__FUNCTION_HINT_HIDDEN__", "" if item.get("code_suffix") else "hidden")
                 .replace("__STATEMENT_TITLE__", escape(title))
                 .replace("__STATEMENT_PARAMS__", params_html)
                 .replace("__SAMPLE_JSON__", json.dumps(self.sample_payload(page, book, problem), ensure_ascii=False)

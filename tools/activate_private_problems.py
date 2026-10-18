@@ -12,10 +12,13 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import sys
 
 ROOT = Path(__file__).resolve().parent.parent
 MIRROR = ROOT / "data" / "openjudge"
 CATALOG = MIRROR / "catalog.json"
+sys.path.insert(0, str(ROOT / "scripts"))
+from index_tests import JUDGE_HOOK_FILES  # noqa: E402
 
 
 def cases_for(book: str, problem_id: str):
@@ -55,10 +58,11 @@ def main():
         row.update({"path": f"/{options.book}/{problem_id}/", "source": "private",
                     "tests": True, "test_count": len(cases), "test_cases": cases})
         # 与 scripts/index_tests.py 的 JUDGE_HOOK_FILES 同一口径
-        for field, name in (("checker", "checker.py"), ("interactor", "interactor.py"),
-                            ("code_prefix", "preset_code.py")):
+        for field, name in JUDGE_HOOK_FILES.items():
             if (root / name).is_file():
-                row[field] = str((root / name).relative_to(MIRROR))
+                row[field] = (json.loads((root / name).read_text(encoding="utf-8"))
+                              if field in {"code_languages", "sample_cases"}
+                              else str((root / name).relative_to(MIRROR)))
             else:
                 row.pop(field, None)
     catalog["count"] = len(catalog["problems"])

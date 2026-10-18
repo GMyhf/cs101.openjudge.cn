@@ -16,6 +16,7 @@ import sys  # noqa: E402
 if str(ROOT / "scripts") not in sys.path:
     sys.path.insert(0, str(ROOT / "scripts"))
 from cf_statement_flags import allows_any_case  # noqa: E402
+from index_tests import JUDGE_HOOK_FILES  # noqa: E402
 
 
 def cases_for(problem_id: str):
@@ -55,9 +56,11 @@ def main():
                     "data_status": "rebuilt_tests"})
         root = MIRROR / "tests" / "codeforces" / f"{problem_id}_made"
         # 与 scripts/index_tests.py 的 JUDGE_HOOK_FILES 同一口径
-        for field, name in (("checker", "checker.py"), ("interactor", "interactor.py")):
+        for field, name in JUDGE_HOOK_FILES.items():
             if (root / name).is_file():
-                row[field] = str((root / name).relative_to(MIRROR))
+                row[field] = (json.loads((root / name).read_text(encoding="utf-8"))
+                              if field in {"code_languages", "sample_cases"}
+                              else str((root / name).relative_to(MIRROR)))
             else:
                 row.pop(field, None)
         if problem_id in FLOAT_REBUILDS:

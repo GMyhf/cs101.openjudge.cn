@@ -102,6 +102,7 @@ __THEME_HEAD__
  .submission-source code{font:inherit}
  .source-copy{position:absolute;top:8px;right:8px;width:28px;height:28px;padding:0;border:1px solid var(--line);border-radius:4px;background:var(--panel);color:var(--muted);cursor:pointer}
  .source-copy::before,.source-copy::after{content:'';position:absolute;width:9px;height:11px;border:1.5px solid currentColor;border-radius:1px}
+ .function-hint{margin:0;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--accent-soft);color:var(--ink);font-size:13px;flex:none}
  .source-copy::before{top:7px;left:9px}.source-copy::after{top:5px;left:7px;background:var(--panel)}
  .source-copy:hover,.source-copy:focus-visible,.source-copy.copied{border-color:var(--accent);color:var(--accent)}
  .source-copy-tip{position:absolute;top:42px;right:8px;z-index:1;padding:4px 7px;border-radius:4px;background:var(--ink);color:var(--bg);font:12px var(--font-ui);white-space:nowrap;opacity:0;transform:translateY(-3px);pointer-events:none;transition:opacity .12s,transform .12s}
@@ -178,6 +179,7 @@ __THEME_HEAD__
           <button id="resetCode" class="ghost" type="button" title="清空代码">清空</button>
         </span>
       </div>
+      <p class="function-hint" __FUNCTION_HINT_HIDDEN__>本题只需提交题面约定的函数实现，平台负责读入数据、调用函数和输出结果。</p>
       <div class="editor">
         <div class="gutter" id="gutter">1</div>
         <div class="codewrap">
