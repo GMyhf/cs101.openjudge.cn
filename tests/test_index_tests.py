@@ -96,9 +96,12 @@ class ArchiveExclusionTests(unittest.TestCase):
         self.assertTrue(all("12555_made/" in path for path in cases[3:]))
         inputs = [(ROOT / "data/openjudge" / path).read_bytes() for path in cases]
         self.assertEqual(len(inputs), len(set(inputs)), "与原数据逐字节相同的 _made 组应跳过")
+        exemptions = json.loads((ROOT / "collab/tests-below-20.json").read_text())["entries"]
+        approved = {entry["key"]: entry["test_count"] for entry in exemptions}
         short = [number for number, rows in by_global.items()
                  if rows and any("_GMyhf/" in row["input"] for row in rows)
-                 and len(rows) < index_tests.MIN_CASES]
+                 and len(rows) < index_tests.MIN_CASES
+                 and approved.get(f"openjudge:{number}") != len(rows)]
         self.assertEqual(short, [])
 
     def test_problem_pages_supply_global_identity(self):

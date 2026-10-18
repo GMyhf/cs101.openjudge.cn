@@ -46,7 +46,9 @@ def exclude_special_judge_cases(by_global_number):
 
 # 逐题判题钩子：放在数据目录根上的文件名 → catalog 字段（路径相对 MIRROR）。
 # checker.py = 答案不唯一时的特判；interactor.py = 交互题；preset_code.py = 平台拼在学生代码前的预设代码。
-JUDGE_HOOK_FILES = {"checker": "checker.py", "interactor": "interactor.py", "code_prefix": "preset_code.py"}
+JUDGE_HOOK_FILES = {"checker": "checker.py", "interactor": "interactor.py",
+                    "code_prefix": "preset_code.py", "code_suffix": "preset_suffix.py",
+                    "code_languages": "preset_languages.json", "sample_cases": "samples.json"}
 
 
 def judge_hooks(cases):
@@ -63,7 +65,9 @@ def judge_hooks(cases):
         if len(found) > 1:
             raise ValueError(f"{field}: 同一题的多个数据目录都有 {name}：{found}")
         if found:
-            hooks[field] = str(found[0].relative_to(MIRROR))
+            hooks[field] = (json.loads(found[0].read_text(encoding="utf-8"))
+                            if field in {"code_languages", "sample_cases"}
+                            else str(found[0].relative_to(MIRROR)))
     return hooks
 
 
@@ -234,7 +238,8 @@ def main():
     dates_path = MIRROR / "added_dates.json"
     added_dates = json.loads(dates_path.read_text(encoding="utf-8")) if dates_path.is_file() else {}
     for item in catalog["problems"]:
-        item.setdefault("added_at", added_dates.get(f"{item['book']}/{item['id']}", date.today().isoformat()))
+        if not item.get("added_at") and f"{item['book']}/{item['id']}" not in added_dates:
+            item["added_at"] = date.today().isoformat()
     per_entry_global, practice_global = catalog_global_numbers(catalog)
     directory_global = test_directory_global_numbers(per_entry_global, practice_global)
     made_by_global_number = {}

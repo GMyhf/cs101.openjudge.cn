@@ -612,6 +612,8 @@ def init_db():
         for column in ("book text", "language text", "detail text", "source text"):
             if column.split()[0] not in existing:
                 db.execute(f"alter table submissions add column {column}")
+        # 上游将「宿舍熄灯」从 31419 更正为 31270，保留原提交编号及成绩。
+        db.execute("update submissions set problem = '31270' where book = 'practice' and problem = '31419'")
         user_columns = {row[1] for row in db.execute("pragma table_info(users)")}
         for column in ("email text", "nickname text", "active integer default 1", "activation_token_hash text", "activation_expires integer", "reset_token_hash text", "reset_expires integer"):
             if column.split()[0] not in user_columns:
@@ -826,7 +828,7 @@ def catalog_raw():
 # accepted_count/attempt_count。判题取数据走 `catalog_raw()`，不经这个响应。
 # 顺带也不再把 `_made/` 与归档目录的内部布局透给任何访客。
 # checker / interactor / code_prefix 同理是数据目录里的文件路径，只给判题器用。
-CATALOG_INTERNAL_FIELDS = ("test_cases", "checker", "interactor", "code_prefix")
+CATALOG_INTERNAL_FIELDS = ("test_cases", "checker", "interactor", "code_prefix", "code_suffix")
 
 
 def catalog_book_meta(problems):
@@ -1538,10 +1540,12 @@ class Handler(BaseHTTPRequestHandler):
         elif item.get("checker"):
             payload["judge_mode"] = "checker"
         elif item.get("code_prefix") and item.get("test_cases"):
-            case = item["test_cases"][0]
-            text = lambda key: (MIRROR / case[key]).read_text(encoding="utf-8", errors="replace")
-            payload = {"input": text("input"), "output": text("output"),
-                       "cases": [{"input": text("input"), "output": text("output")}], "judge_mode": "preset_code"}
+            cases = item.get("sample_cases")
+            if not cases:
+                case = item["test_cases"][0]
+                text = lambda key: (MIRROR / case[key]).read_text(encoding="utf-8", errors="replace")
+                cases = [{"input": text("input"), "output": text("output")}]
+            payload = {**cases[0], "cases": cases, "judge_mode": "preset_code"}
         return payload
 
     def submission_page(self, page, book, problem):
@@ -1627,6 +1631,13 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
         decoded_path = unquote(path)
         if any(part == ".." for part in decoded_path.split("/")):
             self.send_json({"error": "Not found"}, 404); return
+        if path in ("/practice/31419/", "/practice/31419/submit/"):
+            target = path.replace("/31419/", "/31270/")
+            if parsed.query:
+                target += "?" + parsed.query
+            self.send_response(301)
+            self.send_header("Location", target)
+            self.end_headers(); return
         if path == "/auth/login/":
             requested = parse_qs(parsed.query).get("next", [""])[0]
             self.send_html(self.account_page(next_path=safe_return_path(requested))); return

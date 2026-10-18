@@ -56,6 +56,12 @@ class TargetedRefreshTests(unittest.TestCase):
             self.assertEqual((data / "pages" / "practice__27150.html").read_text(), "<html>new practice</html>")
             mirror_all.assert_called_once_with()
 
+    def test_old_dormitory_id_cannot_be_reimported(self):
+        with patch.object(crawl_openjudge, "fetch") as fetch:
+            with self.assertRaisesRegex(ValueError, "practice/31419"):
+                crawl_openjudge.refresh_problems(["practice/31419"])
+            fetch.assert_not_called()
+
     def test_rejects_invalid_problem_spec(self):
         with self.assertRaisesRegex(ValueError, "expected BOOK/ID"):
             crawl_openjudge.parse_problem_spec("unknown/27150")

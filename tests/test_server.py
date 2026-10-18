@@ -2836,6 +2836,32 @@ process.exit(richExpected.every(value => richOut.includes(value))
         self.assertTrue(payload["output"].strip(), "样例输出不该是空的")
         self.assertNotIn("<pre>", payload["input"])     # 标签要剥干净
 
+    def test_renumbered_dormitory_links_redirect_to_31270(self):
+        for suffix in ("", "submit/"):
+            with self.subTest(suffix=suffix):
+                status, headers, _ = request(self.port, "GET", "/practice/31419/" + suffix + "?from=old")
+                self.assertEqual(status, 301)
+                self.assertEqual(headers["Location"], "/practice/31270/" + suffix + "?from=old")
+                status, _, body = request(self.port, "GET", headers["Location"])
+                self.assertEqual(status, 200)
+                self.assertIn("31270:宿舍熄灯", body.decode())
+
+    def test_two_sum_31428_exposes_only_public_samples(self):
+        status, _, body = request(self.port, "GET", "/practice/31428/submit/")
+        self.assertEqual(status, 200)
+        text = body.decode("utf-8")
+        payload = json.loads(re.search(r"const SAMPLES = (\{.*?\});", text).group(1))
+        expected = json.loads((ROOT / "data/openjudge/tests/30000-/31428_GMyhf/samples.json").read_text())
+        self.assertEqual(payload["cases"], expected)
+        self.assertEqual(payload["judge_mode"], "preset_code")
+        self.assertLess(len(json.dumps(payload)), 1024)
+        status, _, body = request(self.port, "GET", "/api/catalog")
+        self.assertEqual(status, 200)
+        item = next(row for row in json.loads(body)["problems"]
+                    if row["book"] == "practice" and row["id"] == "31428")
+        self.assertTrue({"code_prefix", "code_suffix", "test_cases"}.isdisjoint(item))
+        self.assertEqual(item["test_count"], 1)
+
     def test_special_judge_and_interactive_problems_are_judged_on_the_real_catalog(self):
         """2026-09-17：答案不唯一的题走 checker、交互题走 interactor、29986 走预设代码。"""
         def samples(path):

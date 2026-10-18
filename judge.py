@@ -856,15 +856,19 @@ def catalog_item(book, problem_id):
 
 
 def apply_code_prefix(item, language, source):
-    """「预设代码」题（如 29986）：平台把交互库拼在学生代码前面。返回 (source, failure)。"""
+    """拼接题目预设的前后置代码；编译与运行仍走原有沙箱。"""
     prefix = (item or {}).get("code_prefix")
     if not prefix:
         return source, None
-    if language not in CODE_PREFIX_LANGUAGES:
+    if language not in (item or {}).get("code_languages", CODE_PREFIX_LANGUAGES):
         return None, {"status": "Language Unavailable",
-                      "message": "这道题的预设代码是 Python，只能用 Python 3 提交。"}
+                      "message": "这道题不支持所选语言，请使用题面模板中的语言。"}
     text = (MIRROR / prefix).read_text(encoding="utf-8")
-    return text.rstrip("\n") + "\n" + source, None
+    wrapped = text.rstrip("\n") + "\n" + source
+    suffix = (item or {}).get("code_suffix")
+    if suffix:
+        wrapped += "\n" + (MIRROR / suffix).read_text(encoding="utf-8")
+    return wrapped, None
 
 
 def unshift_prefix_lines(item, result):
@@ -877,6 +881,7 @@ def unshift_prefix_lines(item, result):
         line = int(match.group(2)) - offset
         return f"{match.group(1)}{line}" if line > 0 else f"{match.group(1)}{match.group(2)}（预设代码）"
     result["message"] = re.sub(r'(main\.py"?, line )(\d+)', shift, result["message"])
+    result["message"] = re.sub(r'(main\.cpp:)(\d+)', shift, result["message"])
     if isinstance(result.get("stderr"), str):
         result["stderr"] = re.sub(r'(main\.py"?, line )(\d+)', shift, result["stderr"])
     return result
