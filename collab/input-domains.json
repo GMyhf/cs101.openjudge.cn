@@ -1,8 +1,8 @@
 {
   "note": "题面对输入的原话（逐字）与数据实际极值并排记账。由 scripts/build_input_domains.py 生成，tools/full_sweep.py 第 15 条盯着。引文没有数值范围（quote_has_bound=false）不是缺陷，是「这段题面本来就没写上界」，记下来是为了让它可见。",
   "updated": "2026-09-20",
-  "count": 1220,
-  "without_bound": 404,
+  "count": 1226,
+  "without_bound": 408,
   "entries": {
     "tests/1000-1999/01001_made": {
       "book": "practice",
@@ -11743,6 +11743,20 @@
       "case_count": 40,
       "data_digest": "a0c6fe7cffe17b31f121ad2c21f0fe328dcab08d0ce170a11e8f6a98a61c7fc3"
     },
+    "tests/30000-/31270_GMyhf": {
+      "book": "practice",
+      "id": "31270",
+      "source": "mirror_page",
+      "statement_quote": "输入",
+      "quote_has_bound": false,
+      "quote_max_number": null,
+      "generated_extremes": {
+        "max_int": 3,
+        "min_int": 1
+      },
+      "case_count": 2,
+      "data_digest": "d2ff292df5ff167d148db519546e077955c70a6dfbd8e4a778913b0b7606d728"
+    },
     "tests/30000-/31293_made": {
       "book": "practice",
       "id": "31293",
@@ -11839,6 +11853,62 @@
       },
       "case_count": 21,
       "data_digest": "a2450d3f522888fca4692920ed901009857044246f25ad6ae9bddbfd5f74ddd2"
+    },
+    "tests/30000-/31418_made": {
+      "book": "practice",
+      "id": "31418",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行是整数 n （ 1 ≤ n ≤ 100 ）。第二行是 n 个互不相同的整数，绝对值不超过 10 9 。",
+      "quote_has_bound": true,
+      "quote_max_number": 100,
+      "generated_extremes": {
+        "max_int": 631234607,
+        "min_int": -362381533
+      },
+      "case_count": 21,
+      "data_digest": "f871a75c8449873bfc65f08f98062d5a43d42d60a59994712eb0f9e12a72eb57"
+    },
+    "tests/30000-/31420_GMyhf": {
+      "book": "practice",
+      "id": "31420",
+      "source": "mirror_page",
+      "statement_quote": "输入",
+      "quote_has_bound": false,
+      "quote_max_number": null,
+      "generated_extremes": {
+        "max_int": 700544017,
+        "min_int": -700977653
+      },
+      "case_count": 62,
+      "data_digest": "a35e140e742513bdf693bcda4833c9f864288f634611dc8ea392f1080d2fe997"
+    },
+    "tests/30000-/31421_GMyhf": {
+      "book": "practice",
+      "id": "31421",
+      "source": "mirror_page",
+      "statement_quote": "输入",
+      "quote_has_bound": false,
+      "quote_max_number": null,
+      "generated_extremes": {
+        "max_int": 16,
+        "min_int": 1
+      },
+      "case_count": 15,
+      "data_digest": "357239a7fe2f473b55979ecd0676466619fd49b70e77b90ebcea2404c641d81a"
+    },
+    "tests/30000-/31422_GMyhf": {
+      "book": "practice",
+      "id": "31422",
+      "source": "mirror_page",
+      "statement_quote": "输入",
+      "quote_has_bound": false,
+      "quote_max_number": null,
+      "generated_extremes": {
+        "max_int": 100000,
+        "min_int": 1
+      },
+      "case_count": 30,
+      "data_digest": "22fe2bc3c33d444ae0f8b807573c2672eedc3673386fc42cff451c0f3ef73464"
     },
     "tests/30000-/31428_GMyhf": {
       "book": "practice",
@@ -16983,19 +17053,20 @@
       },
       "case_count": 21,
       "data_digest": "a2450d3f522888fca4692920ed901009857044246f25ad6ae9bddbfd5f74ddd2"
-    }
-  },
-  "tests/private/1000001_made": {
-    "book": "private",
-    "id": "1000001",
-    "source": "private_page",
-    "statement_quote": "第一行是整数 n（1 ≤ n ≤ 100）。第二行是 n 个互不相同的整数，绝对值不超过 10^9。",
-    "quote_has_bound": true,
-    "quote_max_number": 1000000000,
-    "generated_extremes": {
-      "integer_tokens": 21
     },
-    "case_count": 21,
-    "data_digest": "9fe5f073549a836552c6649bb08b9c03871393a91a2270593aa8625f9086da57"
+    "tests/private/1000001_made": {
+      "book": "private",
+      "id": "1000001",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行是整数 n （ 1 ≤ n ≤ 100 ）。第二行是 n 个互不相同的整数，绝对值不超过 10 9 。",
+      "quote_has_bound": true,
+      "quote_max_number": 100,
+      "generated_extremes": {
+        "max_int": 631234607,
+        "min_int": -362381533
+      },
+      "case_count": 21,
+      "data_digest": "f871a75c8449873bfc65f08f98062d5a43d42d60a59994712eb0f9e12a72eb57"
+    }
   }
 }

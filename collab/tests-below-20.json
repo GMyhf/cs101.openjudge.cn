@@ -1,8 +1,17 @@
 {
   "min_cases": 20,
-  "description": "每题至少 20 组测试数据。这里登记的是做不到的题及原因；tools/full_sweep.py 第 12 条（check_short_data_is_recorded）会拦下没登记的短数据和已经补够却没删的条目。OpenJudge 按全局题号登记，外部题库按「来源:题号」。",
-  "updated": "2026-10-18",
+  "description": "每题通常至少 20 组测试数据。课题组自出题直接收录平台原始数据，不足 20 组时登记例外，无需为满足组数补造数据；其他不足组数的题也须写明原因。tools/full_sweep.py 第 12 条（check_short_data_is_recorded）会拦下没登记的短数据和已经补够却没删的条目。OpenJudge 按全局题号登记，外部题库按「来源:题号」。",
+  "updated": "2026-10-19",
   "entries": [
+    {
+      "key": "openjudge:31270",
+      "problems": [
+        "practice/31270"
+      ],
+      "test_count": 2,
+      "category": "official_reused_data",
+      "reason": "课题组自出题《宿舍熄灯》，直接收录平台提供的 2 组原始测试数据，存放于 tests/30000-/31270_GMyhf/data/。用户于 2026-10-19 明确允许原始数据少于标准时登记例外；保留原始输入输出，不为满足 20 组补造数据。"
+    },
     {
       "key": "openjudge:12065",
       "problems": [
