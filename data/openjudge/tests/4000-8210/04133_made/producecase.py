@@ -338,6 +338,17 @@ REFERENCE='# External reference: http://cs101.openjudge.cn/practice/04133/statis
 LANGUAGE='Python3'
 NUMBER=4133
 SAMPLE='1\n2\n4 4 10\n6 6 20\n'
+# User-provided boundary regression (2026-10-19): the optimum touches x=1024.
+# All five cases imported at the user's request (2026-10-19) from
+# ~/Code/20071224-POJTestData/4000-8210/4133; preserve original contents.
+RAW_CASES = {
+    'raw1': ('4\n4\n0 0 3\n0 5 4\n1024 1024 4\n1024 1019 4\n', '20 8\n'),
+    'poj0': ('1\r\n2\r\n4 4 10\r\n6 6 20', '1 30'),
+    'poj1': ('50\r\n5\r\n1 1 10\r\n100 100 20\r\n300 800 70\r\n800 10 30\r\n800 100 30', '10201 70'),
+    'poj2': ('4\r\n4\r\n0 0 3\r\n0 5 4\r\n1024 1024 4\r\n1024 1019 4', '20 8'),
+    'poj3': ('2\r\n4\r\n0 0 1\r\n0 1024 2\r\n1024 0 3\r\n1024 1024 3', '18 3'),
+    'poj4': ('1\r\n1\r\n512 512 10', '9 10'),
+}
 def _build():
  with _tempfile.TemporaryDirectory() as folder:
   folder=_Path(folder);src=folder/('s.py' if LANGUAGE=='Python3' else 's.cpp');src.write_text(REFERENCE)
@@ -351,4 +362,8 @@ def _build():
    result=_subprocess.run(cmd,input=case,text=True,capture_output=True,timeout=120,check=True)
    answer='\n'.join(line.rstrip() for line in result.stdout.rstrip().splitlines())+'\n'
    (out/f'{index}.in').write_text(case);(out/f'{index}.out').write_text(answer)
+  for name,(case,expected) in RAW_CASES.items():
+   result=_subprocess.run(cmd,input=case,text=True,capture_output=True,timeout=120,check=True)
+   assert result.stdout.strip()==expected.strip(), (name,result.stdout,expected)
+   (out/f'{name}.in').write_text(case);(out/f'{name}.out').write_text(expected)
 if __name__=='__main__':_build()
