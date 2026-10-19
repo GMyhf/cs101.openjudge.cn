@@ -718,7 +718,7 @@ run.addEventListener('click', async () => {
         if (v.message) sampleGot.textContent += "\n--- 交互器 ---\n" + v.message;
         sampleVerdict.innerHTML = badge(v.verdict);
       } else if (data.checker) {
-        // 答案不唯一：由逐题 checker 判；自定义输入没有参考答案时不判
+        // 答案不唯一：由后端判题器判定；无法校验时返回未判定
         const c = data.checker;
         if (c.message) sampleGot.textContent += "\n--- 判题器 ---\n" + c.message;
         sampleVerdict.innerHTML = c.ok === null ? '<span class="badge b-other">未判定</span>'

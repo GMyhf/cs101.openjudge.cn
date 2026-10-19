@@ -282,6 +282,40 @@ class ProblemLookupCacheTests(unittest.TestCase):
         self.assertTrue(judge_module.special_output_matches("matrix_beauty", b"1\n1 2\n", "2\n0 1\n"))
         self.assertFalse(judge_module.special_output_matches("matrix_beauty", b"1\n1 2\n", "2\n0 0\n"))
 
+    def test_matrix_beauty_sample_accepts_a_different_optimal_matrix(self):
+        source = """from collections import deque
+t = int(input())
+for _ in range(t):
+    n, m = map(int, input().split())
+    q = deque(range(m))
+    if m == 1:
+        for _ in range(n + 1):
+            print(0)
+    elif n >= m:
+        print(m)
+        for _ in range(n - m + 2):
+            print(*q)
+        for _ in range(m - 2):
+            q.append(q.popleft())
+            print(*q)
+    else:
+        print(n + 1)
+        for _ in range(n):
+            q.append(q.popleft())
+            print(*q)
+"""
+        item = {"special_checker": "matrix_beauty"}
+        with mock.patch.object(judge_module, "catalog_item", return_value=item):
+            for stdin in ("4\n4 3\n1 16\n6 6\n2 1\n", "3\n1 1\n1 200000\n5 7\n"):
+                result = judge_module.run_sample("codeforces", "1868A", "python", source, stdin)
+                self.assertEqual(result["status"], "OK", result)
+                self.assertTrue(result["checker"]["ok"], result)
+            for output in ("2\n0 0", "1\n0 1", "3\n0 1 2\n0 1 2", "2\n-1 1", "2\n0 1\n99"):
+                stdin = "1\n2 3\n" if output.startswith("3") else "1\n1 2\n"
+                result = judge_module.run_sample("codeforces", "1868A", "python",
+                                                 f"print({output!r})", stdin)
+                self.assertFalse(result["checker"]["ok"], result)
+
     def test_maximize_min_checker(self):
         self.assertTrue(judge_module.special_output_matches("maximize_min", b"2\n-2\n3\n", "0\n3\n"))
         self.assertFalse(judge_module.special_output_matches("maximize_min", b"1\n3\n", "2\n"))

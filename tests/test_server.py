@@ -2881,6 +2881,7 @@ process.exit(richExpected.every(value => richOut.includes(value))
         hidden = (ROOT / "data/openjudge/tests/codeforces/2209C_made/data/0.in").read_text(encoding="utf-8")
         self.assertEqual(interactive["input"], hidden)
         self.assertEqual(samples("/practice/03151/submit/")["judge_mode"], "checker")
+        self.assertEqual(samples("/codeforces/1868A/submit/")["judge_mode"], "checker")
 
         # 判题器内部路径不下发
         status, _, body = request(self.port, "GET", "/api/catalog")

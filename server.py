@@ -1537,7 +1537,7 @@ class Handler(BaseHTTPRequestHandler):
             hidden = (MIRROR / item["test_cases"][0]["input"]).read_text(encoding="utf-8", errors="replace")
             payload = {"input": hidden, "output": "", "cases": [{"input": hidden, "output": ""}]}
             payload["judge_mode"] = "interactive"
-        elif item.get("checker"):
+        elif item.get("checker") or item.get("special_checker"):
             payload["judge_mode"] = "checker"
         elif item.get("code_prefix") and item.get("test_cases"):
             cases = item.get("sample_cases")

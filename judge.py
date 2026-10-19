@@ -312,7 +312,7 @@ def run_sample(book, problem_id, language, source, stdin):
 
 
 def _run_sample(item, book, problem_id, language, source, stdin):
-    """跑一次用户给的输入，只回显输出，不比对、不入库。
+    """跑一次用户给的输入，特判题返回校验结果，不入库。
 
     沙箱一条没放宽：命令来自同一个 prepare_program，执行走同一个 _run，
     因此 RLIMIT_CPU / RLIMIT_FSIZE / RLIMIT_AS、env 白名单、python3 -I
@@ -369,6 +369,10 @@ def _run_sample(item, book, problem_id, language, source, stdin):
                 ok, message = run_checker(item["checker"], payload, result.stdout,
                                           (MIRROR / case["output"]).read_bytes())
                 row["checker"] = {"ok": ok, "message": message if ok is not None else "判题器出错，请联系管理员。"}
+        elif item and item.get("special_checker"):
+            ok = special_output_matches(item["special_checker"], payload,
+                                        result.stdout.decode(errors="replace"))
+            row["checker"] = {"ok": ok, "message": ""}
         return row
 
 
@@ -593,10 +597,10 @@ def _special_output_matches_core(kind, input_data, actual):
             return False
     if kind == "matrix_beauty":
         try:
-            from itertools import product, permutations
             tokens = list(map(int, input_data.decode().split()))
             output = list(map(int, actual.split()))
             def mex(values):
+                values = set(values)
                 value = 0
                 while value in values: value += 1
                 return value
@@ -606,9 +610,11 @@ def _special_output_matches_core(kind, input_data, actual):
                 if cursor + 1 + n * m > len(output): return False
                 beauty, flat = output[cursor], output[cursor+1:cursor+1+n*m]; cursor += 1+n*m
                 rows = [flat[row*m:(row+1)*m] for row in range(n)]
-                if any(sorted(row) != list(range(m)) for row in rows): return False
+                if any(len(set(row)) != m or any(x < 0 or x >= m for x in row) for row in rows): return False
                 actual_beauty = mex([mex([rows[row][col] for row in range(n)]) for col in range(m)])
-                best = max(mex([mex([candidate[row][col] for row in range(n)]) for col in range(m)]) for candidate in product(list(permutations(range(m))), repeat=n))
+                # 列 MEX 至多 n，外层 MEX 至多 m；循环移位可达到此上界。
+                # m=1 时每列包含 0，故美丽值只能为 0。
+                best = 0 if m == 1 else min(n + 1, m)
                 if beauty != actual_beauty or beauty != best: return False
             return cursor == len(output)
         except (UnicodeDecodeError, ValueError, IndexError):
