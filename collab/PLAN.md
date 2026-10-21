@@ -69,6 +69,8 @@
 | T-048 | **新增 6 道题 31293–31298**（人给题目链接，未附 AC 代码） | Done | Claude → Codex | 参考实现为仓库交接件（自写）；每题 40 组，前 1–2 组是题面样例且构建时逐字比对；`valid()` + `tests/test_input_constraints.py` 照题面各一条契约；算法不同的 oracle（31293 DP 先对暴力自证、31294 帕累托状态集、31296 二分配对数、31297 线性筛 + Miller-Rabin、31298 逐人堆模拟）逐组核 `.out` 全部一致，典型错解 11 种每种都挂（5–34 组）— 顺带修 `server.local_page`/`sample_io` 截取 OJ Inject `markdown-body` 的非贪婪正则（嵌套 div 时题面被截空） — 已知局限：`collab/input-domains.json` 的引文对 OJ Inject 题面只能取到「输入」二字（31201 同样），逐题契约在测试里 — **Codex 2026-10-12 平台真提交复验完成：Python3 6/6 Accepted；提交编号、源码哈希与耗时见 `t048-platform-review.json`** |
 | T-050 | **收录平台 31378（= 私有 1000000 的公开版），私有版保留**（人拍板） | Done | Claude | 抓题面、第 11 页按字节补 8 行、`31378_made` 用种子 1000000 重建与私有版逐字节相同、输入契约与镜像回归用例（含 OJ Inject 样例）各一条；practice 计数 997 — 平台人已交过 Accepted |
 | T-049 | **私有题库 `private`（只有 GMyhf 看得到）+ 第一题 1000000**（人拍板，给了题目讲解） | Done | Claude | `server.PRIVATE_BOOKS` 一处定谁可见；`do_GET` 按前缀总闸 + catalog / submissions / run / submit 四处出口过滤，看不到一律 404；回归用例逐条变异自检过 — 1000000：nextval 版 KMP 比较次数与位置，21 组，独立 oracle 逐组核，三种典型错解挂 11–16 组 — 平台上无此题，不需要 Codex 复验 |
+| T-051 | **P1117 简化版：第一个 AA 型子串，加入私有题库 1000002** | Done | Codex | T≤10、n≤2000、0 起始下标，无解 -1；用户 firstSquare 方法实际判题 21/21 AC，9840 串穷举对拍、4 错解 WA、字节复现通过；证据 `private-1000002-review.json`。此前全库扫描被 04133/raw1.in 阻断，文件名已由 T-052 修正 |
+| T-052 | **修正 04133 测试数据非数字文件名并恢复全库扫描** | Done | Codex | poj0..poj4→40..44、raw1→45；生成器、双索引、输入范围与复核计数同步，92 个文件重建字节不变；补全 1000002 输入契约。全库扫描 1227 份数据、862 条报告、967 个目录输入校验全部干净；证据 `04133-numeric-filenames-review.json` |
 
 ### 状态看板补充记录
 

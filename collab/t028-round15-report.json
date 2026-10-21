@@ -824,17 +824,17 @@
       "constraint_counterexample": "51\n1\n0 0 1",
       "self_audit": {
         "distinct_cases": {
-          "total": 40,
-          "distinct": 40,
+          "total": 46,
+          "distinct": 46,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
           "frequency": 1,
-          "total": 40,
+          "total": 46,
           "status": "rejected",
           "exemption": null,
-          "share": 0.025
+          "share": 0.021739130434782608
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -843,7 +843,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 40,
+          "cases": 46,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -885,6 +885,11 @@
       "generated_extremes": {
         "max_int": 9991,
         "min_int": 0
+      },
+      "supplemental_cases_review": {
+        "date": "2026-10-22",
+        "note": "Six previously imported cases renamed numerically: poj0..poj4 -> 40..44, raw1 -> 45. All 46 cases regenerated; all 92 files retain original bytes. Audit counts recomputed for the complete current dataset.",
+        "evidence": "collab/04133-numeric-filenames-review.json"
       }
     },
     {

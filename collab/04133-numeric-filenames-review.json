@@ -1,0 +1,85 @@
+{
+  "renames": {
+    "poj0.in": {
+      "new": "40.in",
+      "sha256": "1d28e493a5d7a335f33e8671fe60acd69cb0457638e9df056399205ba749cce0"
+    },
+    "poj0.out": {
+      "new": "40.out",
+      "sha256": "1eeee2bd61436e4f430eb5e6d828e2c1e3144e4b359389b8b9aca57409aeb46d"
+    },
+    "poj1.in": {
+      "new": "41.in",
+      "sha256": "602fe2dea622500bbfc5aac4ad7af3e964f0b6d1aeb09296a98832b572058fb2"
+    },
+    "poj1.out": {
+      "new": "41.out",
+      "sha256": "5001f40644bd3e46de4c30bc2cba3dc2b60c7ee50e5878f3f82854f2ae696206"
+    },
+    "poj2.in": {
+      "new": "42.in",
+      "sha256": "2b4c88e0cbcbe590a4cf464d3ad82126f8e3a7b3731bf274232b7649ae98ef6c"
+    },
+    "poj2.out": {
+      "new": "42.out",
+      "sha256": "c62901f97487a865d8ca6e64390fa532429165a68336ea2caeebbb828291a757"
+    },
+    "poj3.in": {
+      "new": "43.in",
+      "sha256": "32b428832bd60f46f5397fb838962264b83e96bfc9bcd626b6afc6ad7371564c"
+    },
+    "poj3.out": {
+      "new": "43.out",
+      "sha256": "a6d3e0a5801da68d4610856c8ea85d9b193c426b8a4e41241100079fdfea4be5"
+    },
+    "poj4.in": {
+      "new": "44.in",
+      "sha256": "45fb80ae179c5132da8d473bcafe97c43d14bfa00c95dc83e7cef94503137ba4"
+    },
+    "poj4.out": {
+      "new": "44.out",
+      "sha256": "9fccad38dfbb77c1d0c173be4568cb0650b85568181e9193499922697956f33e"
+    },
+    "raw1.in": {
+      "new": "45.in",
+      "sha256": "ad495db53d81effde0ed894221dac122cf5ee5bef462e56c45920a4b21b4e580"
+    },
+    "raw1.out": {
+      "new": "45.out",
+      "sha256": "cfbd2e324623126c51dd8de99084a8ba72f7b07320e7fbef40aca036d1b7b8b6"
+    }
+  },
+  "generator_reproduces_original_bytes": true,
+  "cases": 46,
+  "all_made_input_filenames_numeric": true,
+  "full_sweep": {
+    "command": "python3 -u tools/full_sweep.py --list",
+    "exit_code": 0,
+    "active_directories": 1227,
+    "report_entries": 862,
+    "validated_directories": 967,
+    "output": [
+      "  [干净] 报告里 self_audit.failed 非空",
+      "  [干净] 退化约束（非空占位+空反例，或整轮共用同一判据）",
+      "  [干净] 输出超过判题器 2MB 上限",
+      "  [干净] 浮点输出里的循环小数（token 精确比对会误杀）",
+      "  [干净] 标记式样例输出的首行安全前提（已扫描 356 题）",
+      "  [干净] 第 0 组与题面样例输出的锚定（已锚定 1455 题）",
+      "  [干净] T-028 报告缺「合并后真判」的实测或未通过",
+      "  [干净] 多解题却生成了精确比对数据",
+      "  [干净] T-028 报告未记录 oracle 用了哪些存档目录（round8 起）",
+      "  [干净] T-028 priority 有缺口却没有记录",
+      "  [干净] 报告自检数字与 data/ 重算不符（必须是实测值）",
+      "  [干净] T-028 报告未把题面范围与生成极值钉在一起（round20 起）",
+      "  [干净] 少于 20 组测试数据却没有登记原因",
+      "  [干净] 生成器的 valid() 在自己的数据上不成立（967 个目录）",
+      "  [干净] 输入契约覆盖率棘轮（collab/valid-contracts.json）",
+      "  [干净] 全库输入范围记账（1227 份在判数据，引文无数值范围 408 条）",
+      "全库横扫：1227 份在判数据，862 条报告记录，干净"
+    ]
+  },
+  "private_1000002_input_contract": {
+    "valid_cases": 21,
+    "invalid_probes_rejected": 8
+  }
+}

@@ -355,15 +355,17 @@ def _build():
   cmd=[_sys.executable,'-I',str(src)]
   if LANGUAGE!='Python3':
    exe=folder/'s';_subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
-  out=_Path('data');out.mkdir(exist_ok=True)
+  out=_Path(__file__).resolve().parent/'data';out.mkdir(exist_ok=True)
   for path in out.glob('*'):path.unlink()
   cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,seed) for seed in range(1, 40)]
   for index,case in enumerate(cases):
    result=_subprocess.run(cmd,input=case,text=True,capture_output=True,timeout=120,check=True)
    answer='\n'.join(line.rstrip() for line in result.stdout.rstrip().splitlines())+'\n'
    (out/f'{index}.in').write_text(case);(out/f'{index}.out').write_text(answer)
-  for name,(case,expected) in RAW_CASES.items():
+  # Keep source labels for provenance; data filenames continue as 40..45.
+  for index,name in enumerate(sorted(RAW_CASES), start=len(cases)):
+   case,expected=RAW_CASES[name]
    result=_subprocess.run(cmd,input=case,text=True,capture_output=True,timeout=120,check=True)
    assert result.stdout.strip()==expected.strip(), (name,result.stdout,expected)
-   (out/f'{name}.in').write_text(case);(out/f'{name}.out').write_text(expected)
+   (out/f'{index}.in').write_text(case);(out/f'{index}.out').write_text(expected)
 if __name__=='__main__':_build()

@@ -1,0 +1,37 @@
+{
+  "reference_judge": {
+    "status": "Accepted",
+    "cases": 21,
+    "time_ms": 134,
+    "memory_kb": 64000
+  },
+  "mutations": {
+    "return_first_length": "Wrong Answer",
+    "one_based": "Wrong Answer",
+    "only_adjacent": "Wrong Answer",
+    "missing_last_position": "Wrong Answer"
+  },
+  "exhaustive_abc_lengths_1_to_8": 9840,
+  "squarefree_2000_answer": -1,
+  "deterministic_regeneration": true,
+  "case_files": 21,
+  "server_regression": {
+    "tests": 128,
+    "status": "OK",
+    "seconds": 39.515
+  },
+  "repository_gate": {
+    "tests": 386,
+    "initial_failure": "Private catalog test expected 2 problems; updated to 3 and server tests passed.",
+    "full_sweep_blocker": "Pre-existing tests/4000-8210/04133_made/data/raw1.in causes int(p.stem) ValueError.",
+    "syntax_and_pending_rework": "passed",
+    "server_first_rerun": "Unrelated 2209C interactive wrong-answer test returned Runtime Error; second run passed.",
+    "full_sweep_blocker_resolution": {
+      "date": "2026-10-22",
+      "task": "T-052",
+      "evidence": "collab/04133-numeric-filenames-review.json",
+      "note": "Six non-numeric data pairs renamed 40..45; generator and both indices updated, original bytes preserved.",
+      "full_sweep_status": "passed: 1227 active directories, 862 report entries, 967 input validators"
+    }
+  }
+}

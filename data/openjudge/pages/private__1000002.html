@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>1000002: 第一个 AA 型子串</title></head>
+<body><div id="pageTitle"><h2>1000002: 第一个 AA 型子串</h2></div>
+<dl class="problem-params">
+<dt>总时间限制: </dt><dd>2000ms</dd>
+<dt>内存限制: </dt><dd>65536kB</dd>
+</dl>
+<dl class="problem-content">
+<dt>描述</dt><dd><p>给定一个仅由英文小写字母组成的字符串 S，请找出其中最早出现的 AA 型子串。</p>
+<p>如果一个子串可以表示为两个完全相同的非空字符串 A 连在一起，就称它为 AA 型子串。例如，<code>aa</code>、<code>abab</code> 和 <code>abcabc</code> 都是 AA 型子串。</p>
+<p>输出所有 AA 型子串中最小的起始下标。下标从 <strong>0</strong> 开始；如果不存在这样的子串，输出 <code>-1</code>。只需输出起始下标，不需要输出子串或它的长度。</p></dd>
+<dt>输入</dt><dd><p>第一行是整数 T，表示数据组数（1 ≤ T ≤ 10）。接下来 T 行，每行一个字符串 S，满足 1 ≤ |S| ≤ 2000，且仅包含英文小写字母。</p></dd>
+<dt>输出</dt><dd><p>输出 T 行，每行一个整数，表示对应字符串中第一个 AA 型子串的起始下标；不存在时输出 -1。</p></dd>
+<dt>样例输入</dt><dd><pre>6
+abcabcaa
+dabcabc
+abc
+aa
+a
+abcc</pre></dd>
+<dt>样例输出</dt><dd><pre>0
+1
+-1
+0
+-1
+2</pre></dd>
+<dt>提示</dt><dd><p>第一组中，<code>aa</code> 的起始下标是 6，而 <code>abcabc</code> 的起始下标是 0，所以答案是 0。第二组中，<code>abcabc</code> 从下标 1 开始。第三组和第五组没有 AA 型子串。</p>
+<p>本题由 [NOI2016]《优秀的拆分》（P1117）简化改编：只查找一个 AA 型子串的最早位置。数据范围允许 O(n²) 时间的算法通过。</p></dd>
+</dl></body></html>
