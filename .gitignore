@@ -1,4 +1,7 @@
 __pycache__/
+# macOS 垃圾文件与本地 CLI 权限配置（.qoder 里是本机工具白名单），不入库。
+.DS_Store
+.qoder/
 data/*.db
 # WAL 模式下库旁边会多出这两个文件。`data/*.db` 匹配不到它们，
 # 而 `-wal` 里就躺着尚未合并回主库的提交记录（含口令哈希那张表的写入）。
@@ -18,6 +21,9 @@ data/openjudge/tests/**
 # 于是在 `_made` 目录里跑一次 `producecase.py` 就会有 .pyc 等着被 `git add -A` 收走。
 data/openjudge/tests/*/*_made/__pycache__/
 data/openjudge/tests/*/*_GMyhf/__pycache__/
+# 同理，`_made`/`_GMyhf` 里的 .DS_Store 也被上面的 `!…/**` 翻回来了，要再压回去。
+data/openjudge/tests/*/*_made/.DS_Store
+data/openjudge/tests/*/*_GMyhf/.DS_Store
 data/openjudge/__MACOSX/
 collab/review-input.md
 # 手工起服务时的日志（systemd 部署走 journal，不产生这个文件）。
