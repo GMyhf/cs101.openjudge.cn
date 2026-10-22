@@ -1,0 +1,43 @@
+{
+  "source_url": "http://cs101.openjudge.cn/practice/31454/",
+  "private_problem": "private/1000002",
+  "official_sample_matches": true,
+  "data_files": 42,
+  "public_private_byte_identical": true,
+  "reference_judge": {
+    "status": "Accepted",
+    "cases": 21,
+    "time_ms": 133,
+    "memory_kb": 63704
+  },
+  "limits": {
+    "total_ms": 2000,
+    "case_ms": 1000,
+    "memory_kb": 65536
+  },
+  "anonymous_catalog_visible": true,
+  "private_version_preserved_and_hidden": true,
+  "previous_catalog_entries_preserved": true,
+  "deterministic_generator_matches_private": true,
+  "repository_verification": {
+    "command": "python3 tools/handoff.py --verify",
+    "tests_run": 386,
+    "test_seconds": 201.517,
+    "initial_failures": 1,
+    "failure": "Unrelated test_interactive_verdicts returned Runtime Error/EOF instead of Wrong Answer for excessive queries.",
+    "targeted_rerun": {
+      "command": "python3 -m unittest discover -s tests -p test_judge.py -k test_interactive_verdicts",
+      "tests": 1,
+      "seconds": 8.42,
+      "status": "OK"
+    },
+    "full_sweep": "passed",
+    "syntax_and_pending_rework": "passed",
+    "precommit_rerun": {
+      "date": "2026-10-22",
+      "command": "python3 tools/handoff.py --verify",
+      "exit_code": 0,
+      "status": "passed outside sandbox; unit tests, Python/JS syntax, pending rework and full sweep all passed"
+    }
+  }
+}

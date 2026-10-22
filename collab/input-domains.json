@@ -1,7 +1,7 @@
 {
   "note": "题面对输入的原话（逐字）与数据实际极值并排记账。由 scripts/build_input_domains.py 生成，tools/full_sweep.py 第 15 条盯着。引文没有数值范围（quote_has_bound=false）不是缺陷，是「这段题面本来就没写上界」，记下来是为了让它可见。",
   "updated": "2026-09-20",
-  "count": 1227,
+  "count": 1228,
   "without_bound": 408,
   "entries": {
     "tests/1000-1999/01001_made": {
@@ -11923,6 +11923,20 @@
       },
       "case_count": 1,
       "data_digest": "5939850629272034862f6ec8d5b7601b6016d9fcdc5a5196736c93eab1e8c509"
+    },
+    "tests/30000-/31454_made": {
+      "book": "practice",
+      "id": "31454",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行是整数 T，表示数据组数（1 ≤ T ≤ 10）。接下来 T 行，每行一个字符串 S，满足 1 ≤ |S| ≤ 2000，且仅包含英文小写字母。",
+      "quote_has_bound": true,
+      "quote_max_number": 2000,
+      "generated_extremes": {
+        "max_int": 10,
+        "min_int": 2
+      },
+      "case_count": 21,
+      "data_digest": "f04b0fa49c52a3be3ba44a88753f005563aa65e94bdec4838156388e3fa31527"
     },
     "tests/4000-8210/03704_made": {
       "book": "2024sp_routine",
