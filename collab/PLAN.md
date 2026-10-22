@@ -71,6 +71,7 @@
 | T-049 | **私有题库 `private`（只有 GMyhf 看得到）+ 第一题 1000000**（人拍板，给了题目讲解） | Done | Claude | `server.PRIVATE_BOOKS` 一处定谁可见；`do_GET` 按前缀总闸 + catalog / submissions / run / submit 四处出口过滤，看不到一律 404；回归用例逐条变异自检过 — 1000000：nextval 版 KMP 比较次数与位置，21 组，独立 oracle 逐组核，三种典型错解挂 11–16 组 — 平台上无此题，不需要 Codex 复验 |
 | T-051 | **P1117 简化版：第一个 AA 型子串，加入私有题库 1000002** | Done | Codex | T≤10、n≤2000、0 起始下标，无解 -1；用户 firstSquare 方法实际判题 21/21 AC，9840 串穷举对拍、4 错解 WA、字节复现通过；证据 `private-1000002-review.json`。此前全库扫描被 04133/raw1.in 阻断，文件名已由 T-052 修正 |
 | T-052 | **修正 04133 测试数据非数字文件名并恢复全库扫描** | Done | Codex | poj0..poj4→40..44、raw1→45；生成器、双索引、输入范围与复核计数同步，92 个文件重建字节不变；补全 1000002 输入契约。全库扫描 1227 份数据、862 条报告、967 个目录输入校验全部干净；证据 `04133-numeric-filenames-review.json` |
+| T-053 | **macOS 开发机闸门全红：内核不支持 RLIMIT_AS，降级方案待人拍板** | Backlog | 待认领 | 草案见下方「T-053 macOS 降级方案草案」。根因已定位并实测：darwin 上 RLIMIT_AS 与 RLIMIT_RSS 同为常量 5，setrlimit 恒返回 EINVAL，`_limits` 在 preexec_fn 抛异常 → 62 个判题用例 + full_sweep 全挂；CI（ubuntu）与部署机（Linux）不受影响。涉红线 1（放宽资源限制），**必须人拍板后才动 `judge.py`** |
 
 ### 状态看板补充记录
 
@@ -78,6 +79,40 @@
 > token 精确判题，不回退全 NO 的 `_made`。索引层按全局题号屏蔽 `_GMyhf` / `_made` /
 > legacy，两个题库别名均为零测试；审计记 `requires_special_judge`。最终物化 158 目录 /
 > 3290 组，`full_sweep` 转绿，保持 Review 等 Claude 销账。
+
+## T-053 macOS 降级方案草案（2026-10-22 起草，待人拍板）
+
+**现象**：macOS 开发机上 `python3 tools/handoff.py --verify` 全红 —— unittest 386 个中
+62 个 error，`tools/full_sweep.py` 崩溃；py_compile、check_pending_rework、node --check
+全绿。工作区零改动，不是代码回归。
+
+**根因（已实测定位）**：
+
+- darwin 上 `resource.RLIMIT_AS == resource.RLIMIT_RSS == 5`（同一常量）。
+- ctypes 直接调 `setrlimit(5, …)`，内核恒返回 `EINVAL` —— **macOS 内核根本不接受
+  这条限制**，与 Python 版本无关（本机 3.9/3.12/3.13/3.14 全部复现）。
+- `judge.py:_limits` 无条件设置 `RLIMIT_AS`，在 `preexec_fn` 里抛异常 → 所有走
+  `_run` 的判题失败；服务端 submit 路径随之崩溃（测试里表现为 `RemoteDisconnected`）。
+- 顺带实测：`RLIMIT_DATA`（常量 2）在 macOS 上同样 EINVAL，**不存在等价的
+  堆内存限额替代项**；`RLIMIT_CPU` / `RLIMIT_FSIZE` / `RLIMIT_STACK` 正常。
+- Linux（CI ubuntu-latest、部署机）一切正常，线上安全姿态不受影响。
+
+**候选方案**：
+
+- **A. darwin 下跳过 RLIMIT_AS（推荐）**：`_limits` 按 `sys.platform` 分支，
+  darwin 只设 CPU/FSIZE。配套必须做：① `tests/test_judge.py` 里验证「内存限额
+  生效」的用例在 darwin 下改判据或 skip（判据是「这台机器能不能做这件事」）；
+  ② README 与 CONTRIBUTING 声明支持平台：macOS 仅作开发、判题结果可能与线上
+  不一致（MLE 判不出），发版验证仍以 Linux 为准。代价：mac 上学生代码内存
+  失控无人拦 —— 可接受，因为 mac 不是对外服务机。
+- **B. 不改代码，mac 开发者去 Linux 容器/VM 跑闸门**：零代码风险，但「干净克隆
+  闸门必绿」这条纪律在 mac 上事实上失效，新人贡献者第一步就卡住。
+- **C. 换等价机制**：**已排除** —— RLIMIT_DATA 同样被内核拒绝，sandbox-exec
+  早已废弃，macOS 没有可用的进程级内存硬限额。
+
+**为什么必须人拍板**：方案 A 触碰红线 1（沙箱资源限制），且首次在代码里引入
+平台分支；「macOS 是开发机、判题结论以 Linux 为准」这条定位也要人确认。
+拍板前 `judge.py` 一行不动。
 
 ## T-004 进展记录
 
