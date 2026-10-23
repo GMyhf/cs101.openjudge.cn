@@ -1,17 +1,8 @@
 {
   "min_cases": 20,
   "description": "每题通常至少 20 组测试数据。课题组自出题直接收录平台原始数据，不足 20 组时登记例外，无需为满足组数补造数据；其他不足组数的题也须写明原因。tools/full_sweep.py 第 12 条（check_short_data_is_recorded）会拦下没登记的短数据和已经补够却没删的条目。OpenJudge 按全局题号登记，外部题库按「来源:题号」。",
-  "updated": "2026-10-19",
+  "updated": "2026-10-23",
   "entries": [
-    {
-      "key": "openjudge:31270",
-      "problems": [
-        "practice/31270"
-      ],
-      "test_count": 2,
-      "category": "official_reused_data",
-      "reason": "课题组自出题《宿舍熄灯》，直接收录平台提供的 2 组原始测试数据，存放于 tests/30000-/31270_GMyhf/data/。用户于 2026-10-19 明确允许原始数据少于标准时登记例外；保留原始输入输出，不为满足 20 组补造数据。"
-    },
     {
       "key": "openjudge:12065",
       "problems": [
@@ -24,14 +15,13 @@
       "reason": "无输入、答案唯一（题面「输入 -」，输出方程的根精确到 9 位小数）：合法输入只有一个，1 组即穷举。constant_output_probe 早已按 exemption 记录。"
     },
     {
-      "key": "openjudge:2226",
+      "key": "openjudge:1681",
       "problems": [
-        "pctbook/E03225",
-        "practice/03225"
+        "practice/02679"
       ],
-      "test_count": 1,
-      "category": "no_input",
-      "reason": "题面「输入 无」：按格式输出全部满足条件的整数组，合法输入只有一个，1 组即穷举。"
+      "test_count": 8,
+      "category": "small_input_domain",
+      "reason": "题面 1 < k < 10，合法输入只有 k=2..9 八个，8 组已穷举整个输入域（见 02679_made/producecase.py 顶部说明）。"
     },
     {
       "key": "openjudge:1700",
@@ -43,23 +33,14 @@
       "reason": "题面「无输入」：输出全部八皇后解，合法输入只有一个，1 组即穷举。"
     },
     {
-      "key": "openjudge:1681",
+      "key": "openjudge:2226",
       "problems": [
-        "practice/02679"
+        "pctbook/E03225",
+        "practice/03225"
       ],
-      "test_count": 8,
-      "category": "small_input_domain",
-      "reason": "题面 1 < k < 10，合法输入只有 k=2..9 八个，8 组已穷举整个输入域（见 02679_made/producecase.py 顶部说明）。"
-    },
-    {
-      "key": "openjudge:3190",
-      "problems": [
-        "2024sp_routine/04077",
-        "practice/04077"
-      ],
-      "test_count": 15,
-      "category": "small_input_domain",
-      "reason": "题面 1≤n≤15，合法输入只有 15 个，15 组已穷举整个输入域（见 04077_made/producecase.py 顶部说明）。"
+      "test_count": 1,
+      "category": "no_input",
+      "reason": "题面「输入 无」：按格式输出全部满足条件的整数组，合法输入只有一个，1 组即穷举。"
     },
     {
       "key": "openjudge:22642",
@@ -70,35 +51,6 @@
       "test_count": 10,
       "category": "small_input_domain",
       "reason": "题面 1 ≤ N ≤ 10，合法输入只有 10 个，10 组已穷举整个输入域。"
-    },
-    {
-      "key": "openjudge:26573",
-      "problems": [
-        "2024sp_routine/26573",
-        "dsapre/26573",
-        "practice/26573"
-      ],
-      "test_count": 9,
-      "category": "small_input_domain",
-      "reason": "输入只有一个 n，题面没给范围；输出长 3^n，n≥14 时超过本站 2MB 输出上限，可判的输入至多 n=0..13 共 14 个，凑不到 20。现有 n=0..8 共 9 组；n=9..13 题面无依据，未外推。"
-    },
-    {
-      "key": "openjudge:31033",
-      "problems": [
-        "practice/00000"
-      ],
-      "test_count": 0,
-      "category": "output_exceeds_judge_limit",
-      "reason": "输入固定为 3000000 行，正确输出约 20MB，超过判题器 RLIMIT_FSIZE=2MB；且合法输入只有一个。"
-    },
-    {
-      "key": "codeforces:2201G",
-      "problems": [
-        "codeforces/2201G"
-      ],
-      "test_count": 2,
-      "category": "small_input_domain",
-      "reason": "题面「n∈{5,1001}」「There are only two input files for this problem」：合法输入只有 2 个，2 组即穷举。答案不唯一，由 checker.py 判（诱导子图是长度 ≥⌊n²/e⌋ 的单个环）。"
     },
     {
       "key": "openjudge:24755",
@@ -119,13 +71,33 @@
       "reason": "输入只有一个 1..9 的数字，合法输入共 9 种，9 组即穷举；2026-10-08 去掉了与之重复的 13 组旧数据。"
     },
     {
-      "key": "openjudge:31428",
+      "key": "openjudge:26573",
       "problems": [
-        "practice/31428"
+        "2024sp_routine/26573",
+        "dsapre/26573",
+        "practice/26573"
       ],
-      "test_count": 1,
-      "category": "official_batched_cases",
-      "reason": "课题组自出题，用户明确授权直接复用官方测试数据。后台提供 1 对原始文件，内含 100 个独立的唯一解样例，以 0 0 结束；保留原文件及 SHA-256，不拆分或生成额外数据。"
+      "test_count": 9,
+      "category": "small_input_domain",
+      "reason": "输入只有一个 n，题面没给范围；输出长 3^n，n≥14 时超过本站 2MB 输出上限，可判的输入至多 n=0..13 共 14 个，凑不到 20。现有 n=0..8 共 9 组；n=9..13 题面无依据，未外推。"
+    },
+    {
+      "key": "openjudge:30216",
+      "problems": [
+        "practice/30216"
+      ],
+      "test_count": 11,
+      "category": "platform_original",
+      "reason": "平台原始数据（GMyhf 后台 /admin/download 抓取）只有 11 组；按 openjudge:31270 先例（2026-10-19 用户拍板）保留原始组数，不为凑 20 组补造数据。"
+    },
+    {
+      "key": "openjudge:31033",
+      "problems": [
+        "practice/00000"
+      ],
+      "test_count": 0,
+      "category": "output_exceeds_judge_limit",
+      "reason": "输入固定为 3000000 行，正确输出约 20MB，超过判题器 RLIMIT_FSIZE=2MB；且合法输入只有一个。"
     },
     {
       "key": "openjudge:31421",
@@ -135,6 +107,34 @@
       "test_count": 15,
       "category": "official_reused_data",
       "reason": "课题组自出题，直接复用 cs101.openjudge.cn 对应题目的 15 组官方测试数据，并非重新生成的数据。用户于 2026-10-18 明确允许少于 20 组时登记例外，保留现有官方数据，不为满足组数补造数据。现有 15 组已逐组核验输入约束和穷举答案。"
+    },
+    {
+      "key": "openjudge:31428",
+      "problems": [
+        "practice/31428"
+      ],
+      "test_count": 1,
+      "category": "official_batched_cases",
+      "reason": "课题组自出题，用户明确授权直接复用官方测试数据。后台提供 1 对原始文件，内含 100 个独立的唯一解样例，以 0 0 结束；保留原文件及 SHA-256，不拆分或生成额外数据。"
+    },
+    {
+      "key": "openjudge:3190",
+      "problems": [
+        "2024sp_routine/04077",
+        "practice/04077"
+      ],
+      "test_count": 15,
+      "category": "small_input_domain",
+      "reason": "题面 1≤n≤15，合法输入只有 15 个，15 组已穷举整个输入域（见 04077_made/producecase.py 顶部说明）。"
+    },
+    {
+      "key": "codeforces:2201G",
+      "problems": [
+        "codeforces/2201G"
+      ],
+      "test_count": 2,
+      "category": "small_input_domain",
+      "reason": "题面「n∈{5,1001}」「There are only two input files for this problem」：合法输入只有 2 个，2 组即穷举。答案不唯一，由 checker.py 判（诱导子图是长度 ≥⌊n²/e⌋ 的单个环）。"
     }
   ]
 }

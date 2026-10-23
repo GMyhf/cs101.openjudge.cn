@@ -36,15 +36,29 @@ class GMyhfDataArtifactTests(unittest.TestCase):
                                     .read_text(encoding="utf-8"))
         cls.catalog = json.loads((audit_gmyhf_data.OPENJUDGE / "catalog.json")
                                  .read_text(encoding="utf-8"))["problems"]
+        # 2026-10-23 后台下载物化（scripts/materialize_gmyhf_downloads.py）是
+        # archive 审核之外的第二条 _GMyhf 来源，判题活目录是两者的并集。
+        download = json.loads((ROOT / "collab/gmyhf-download-materialize.json")
+                              .read_text(encoding="utf-8"))
+        cls.download_materialized = {
+            int(row["global_number"]):
+                f"data/openjudge/tests/{row['bucket']}/{row['local_id']}_GMyhf"
+            for row in download["materialized"]}
 
     def test_audit_decisions_match_active_catalog(self):
         materialized = {int(row["global_number"]) for row in self.audit["entries"]
                         if row.get("materialized_dir")}
+        self.assertEqual(158, len(materialized))
+        self.assertEqual(209, len(self.download_materialized))
         problems = {int(row["global_number"]) for row in self.audit["entries"]
                     if row["status"] == "original_problem"}
-        self.assertEqual(158, len(materialized))
+        # 27631/28050 的 archive 原数据仍判 original_problem，但后台下载的平台
+        # 当前数据已过全部闸门判据并物化 —— 活目录按并集算。
         self.assertEqual({18159, 27631, 27699, 28050, 28190, 28203, 30172,
                           30179, 30550, 30720, 30908, 30921, 30937}, problems)
+        active = materialized | set(self.download_materialized)
+        self.assertEqual({27631, 28050}, problems & active)
+        problems -= active
         for item in self.catalog:
             # This audit is about OpenJudge global-number materialization.
             # Imported sources deliberately have no compatible global number.
@@ -52,7 +66,7 @@ class GMyhfDataArtifactTests(unittest.TestCase):
                 continue
             number = int(item["global_number"])
             paths = [case["input"] for case in item.get("test_cases", [])]
-            if number in materialized:
+            if number in active:
                 # 原数据在前；不足 20 组时后面接同题 `_made`（index_tests.merge_short_gmyhf）
                 original = [path for path in paths if "_GMyhf/" in path]
                 self.assertTrue(original and paths[:len(original)] == original, number)
@@ -65,10 +79,12 @@ class GMyhfDataArtifactTests(unittest.TestCase):
 
     def test_materialized_files_match_recorded_hashes(self):
         checked = 0
-        for row in self.audit["entries"]:
-            if not row.get("materialized_dir"):
-                continue
-            directory = ROOT / row["materialized_dir"]
+        directories = {row["materialized_dir"] for row in self.audit["entries"]
+                       if row.get("materialized_dir")}
+        directories |= set(self.download_materialized.values())
+        self.assertEqual(210, len(directories))
+        for materialized_dir in sorted(directories):
+            directory = ROOT / materialized_dir
             provenance = json.loads((directory / "SOURCE.json").read_text(encoding="utf-8"))
             for item in provenance["files"]:
                 input_path = directory / "data" / f"{item['case']}.in"
@@ -76,7 +92,7 @@ class GMyhfDataArtifactTests(unittest.TestCase):
                 self.assertEqual(item["input_sha256"], audit_gmyhf_data.sha256(input_path))
                 self.assertEqual(item["output_sha256"], audit_gmyhf_data.sha256(output_path))
                 checked += 1
-        self.assertEqual(3290, checked)
+        self.assertEqual(3829, checked)
 
     def test_partial_copies_record_every_excluded_pair(self):
         partial = {int(row["global_number"]): row for row in self.audit["entries"]

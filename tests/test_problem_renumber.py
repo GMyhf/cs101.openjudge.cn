@@ -34,7 +34,9 @@ class DormitoryRenumberTests(unittest.TestCase):
         self.assertIsNone(judge.catalog_item('practice', '31419'))
         row = judge.catalog_item('practice', '31270')
         self.assertEqual(row['global_number'], 31270)
-        self.assertEqual(row['test_count'], 2)
+        # 2026-10-23 后台下载（fetch_gmyhf_testdata.py）发现平台原始数据已从 2 组
+        # 扩充到 37 组，_GMyhf 已同步为平台当前数据。
+        self.assertEqual(row['test_count'], 37)
         self.assertIn('31270:', server.catalog_title(row))
         self.assertIn('宿舍熄灯', server.catalog_title(row))
         for case in row['test_cases']:
