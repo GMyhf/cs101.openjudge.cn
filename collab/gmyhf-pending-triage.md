@@ -62,3 +62,8 @@
 上述十题现已完成题面与后台只读回读、200对独立答案核对及当前判题器本地复判，均通过。
 用户补充明确授权后，10题现有参考源码在平台Python3档全部Accepted；仍未接入，须保留原_made契约与覆盖。
 详细结论与复核边界见[gmyhf-pending-batch1-review.md](gmyhf-pending-batch1-review.md)。
+
+## 第2批续核记录
+
+本批10题、206对，10题复核通过，0题保留疑点，尚未激活数据。
+详见[gmyhf-pending-batch2-review.md](gmyhf-pending-batch2-review.md)；全量进度见[gmyhf-pending-progress.json](gmyhf-pending-progress.json)。
