@@ -1,0 +1,390 @@
+{
+  "global_number": 20091,
+  "reason": "平台原始答案由浮点除法生成，丢失大整数精度；维护者授权同步修正平台与本地，保留 // 精确整数解。",
+  "verified_at": "2026-10-23T09:44:51.798243+00:00",
+  "oracle": "math.comb(n, n // 2)，逐项与 factorial 的 // 结果核对",
+  "datasets": [
+    {
+      "case": 0,
+      "filename": "1.out",
+      "answers": 100,
+      "changed_answers": 43,
+      "before_sha256": "8d5c589ade9c6e280261057fa827bc8188e4161d43f200e05ed6604a8b18dbd7",
+      "after_sha256": "aa1479ead0b8490adbba0500c6cee993aa823d10e23c585fbd045582621c2b51",
+      "bytes": 1669
+    },
+    {
+      "case": 1,
+      "filename": "2.out",
+      "answers": 300,
+      "changed_answers": 300,
+      "before_sha256": "bf05fb08aa59a6d0f6d6498e50c2ecc4217494c5d912e4a86b48516e8b278e1f",
+      "after_sha256": "4054f15fde7fd1af4b679ef8ee756fbd27b94c61b68b20e048869954c89298b6",
+      "bytes": 67767
+    }
+  ],
+  "input_cases": 400,
+  "changed_answers": 343,
+  "platform_files": [
+    {
+      "filename": "1.out",
+      "before_sha256": "8d5c589ade9c6e280261057fa827bc8188e4161d43f200e05ed6604a8b18dbd7",
+      "after_sha256": "aa1479ead0b8490adbba0500c6cee993aa823d10e23c585fbd045582621c2b51",
+      "bytes": 1669
+    },
+    {
+      "filename": "2.out",
+      "before_sha256": "bf05fb08aa59a6d0f6d6498e50c2ecc4217494c5d912e4a86b48516e8b278e1f",
+      "after_sha256": "4054f15fde7fd1af4b679ef8ee756fbd27b94c61b68b20e048869954c89298b6",
+      "bytes": 67767
+    },
+    {
+      "filename": "sample code.py",
+      "before_sha256": "c144af0e819917e3856aa5caae93a217dc21f69c75b6fffb6f353dbf199e963a",
+      "after_sha256": "526b2122d58454a79bbedb4eca63c17ec0df6e7a8916d99adade83edb9bb1fab",
+      "bytes": 252
+    }
+  ],
+  "platform_download_verified": true,
+  "platform_inputs_and_document_unchanged": true,
+  "reference": "data/openjudge/tests/20000-29982/20091_made/samplecode.py",
+  "reference_sha256": "d1feb7df28a1a7cd31988a19842db4860547e865718d28213c834806cea1f53b",
+  "local_judge": {
+    "status": "Accepted",
+    "cases": 48,
+    "time_ms": 720,
+    "memory_kb": 12240,
+    "timing_audit": {
+      "status": "passed",
+      "required_max_ratio": 0.75,
+      "max_case": {
+        "case": 42,
+        "time_ms": 62,
+        "case_limit_ms": 10000,
+        "ratio": 0.0062
+      },
+      "cases": [
+        {
+          "case": 1,
+          "time_ms": 15,
+          "case_limit_ms": 10000,
+          "ratio": 0.0015
+        },
+        {
+          "case": 2,
+          "time_ms": 36,
+          "case_limit_ms": 10000,
+          "ratio": 0.0036
+        },
+        {
+          "case": 3,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 4,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 5,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 6,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 7,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 8,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 9,
+          "time_ms": 14,
+          "case_limit_ms": 10000,
+          "ratio": 0.0014
+        },
+        {
+          "case": 10,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 11,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 12,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 13,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 14,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 15,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 16,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 17,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 18,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 19,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 20,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 21,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 22,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 23,
+          "time_ms": 14,
+          "case_limit_ms": 10000,
+          "ratio": 0.0014
+        },
+        {
+          "case": 24,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 25,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 26,
+          "time_ms": 14,
+          "case_limit_ms": 10000,
+          "ratio": 0.0014
+        },
+        {
+          "case": 27,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 28,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 29,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 30,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 31,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 32,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 33,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 34,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 35,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 36,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 37,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 38,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 39,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 40,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 41,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 42,
+          "time_ms": 62,
+          "case_limit_ms": 10000,
+          "ratio": 0.0062
+        },
+        {
+          "case": 43,
+          "time_ms": 36,
+          "case_limit_ms": 10000,
+          "ratio": 0.0036
+        },
+        {
+          "case": 44,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 45,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 46,
+          "time_ms": 12,
+          "case_limit_ms": 10000,
+          "ratio": 0.0012
+        },
+        {
+          "case": 47,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        },
+        {
+          "case": 48,
+          "time_ms": 13,
+          "case_limit_ms": 10000,
+          "ratio": 0.0013
+        }
+      ]
+    }
+  },
+  "local_float_rejection": {
+    "status": "Wrong Answer",
+    "case": 1
+  },
+  "regression_test": "tests/test_20091_exact_answers.py",
+  "mutation_checks": {
+    "reference_division_changed_to_float": "failed_as_expected",
+    "output_restored_to_old_float_answers": "failed_as_expected"
+  },
+  "platform_submissions": [
+    {
+      "kind": "exact_integer",
+      "language": "Python3",
+      "solution_id": "53576768",
+      "verdict": "Accepted",
+      "verification": "状态栏 result-* 元素；忽略展示源码中的 Accepted 注释",
+      "url": "http://cs101.openjudge.cn/practice/solution/53576768/"
+    },
+    {
+      "kind": "old_float",
+      "language": "Python3",
+      "solution_id": "53576769",
+      "verdict": "Wrong Answer",
+      "verification": "状态栏 result-* 元素；忽略展示源码中的 Accepted 注释",
+      "url": "http://cs101.openjudge.cn/practice/solution/53576769/"
+    }
+  ],
+  "gate": {
+    "command": "python3 tools/handoff.py --verify",
+    "exit_code": 0,
+    "verified_at": "2026-10-23T09:56:46.766471+00:00"
+  }
+}

@@ -13,8 +13,8 @@
       "input_bytes": 301,
       "input_sha256": "0fa1fdff6290e869953350cf7b9a5aefb980812741aa7f1ae3b892841045ddf8",
       "original_output": "1.out",
-      "output_bytes": 1668,
-      "output_sha256": "8d5c589ade9c6e280261057fa827bc8188e4161d43f200e05ed6604a8b18dbd7"
+      "output_bytes": 1669,
+      "output_sha256": "aa1479ead0b8490adbba0500c6cee993aa823d10e23c585fbd045582621c2b51"
     },
     {
       "case": 1,
@@ -22,8 +22,13 @@
       "input_bytes": 1203,
       "input_sha256": "103c6b626a837b4b8d6f796786319c077c6d2febda488ff5e7f578d97caea36a",
       "original_output": "2.out",
-      "output_bytes": 67766,
-      "output_sha256": "bf05fb08aa59a6d0f6d6498e50c2ecc4217494c5d912e4a86b48516e8b278e1f"
+      "output_bytes": 67767,
+      "output_sha256": "4054f15fde7fd1af4b679ef8ee756fbd27b94c61b68b20e048869954c89298b6"
     }
-  ]
+  ],
+  "answer_correction": {
+    "reason": "平台原答案经浮点除法取整，改用精确整数组合数；维护者明确授权同步修正平台与本地。",
+    "oracle": "math.comb(n, n // 2)，与参考解法 factorial 的 // 独立核对",
+    "report": "collab/20091-exact-answer-fix.json"
+  }
 }
