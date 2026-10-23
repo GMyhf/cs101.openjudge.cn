@@ -6,7 +6,7 @@
 | --- | --- | --- | --- |
 | 1 | 19964、19966 | 3 | 平台与本地回读一致，16组合法输入复判Accepted；[完整回执](gmyhf-answer-repairs-batch1.json) |
 | 2 | 30205 | 11 | 平台与本地回读一致，11组复判Accepted；[完整回执](gmyhf-answer-repairs-batch2.json) |
-| 3 | 30827、30828 | 51 | 待修复 |
+| 3 | 30827、30828 | 51 | 平台与本地回读一致，100组复判Accepted；[完整回执](gmyhf-answer-repairs-batch3.json) |
 | 4 | 20124、20126、23665 | 22 | 待修复 |
 
 原始`data/openjudge/tests/admin_download/`快照保持不变；修正后的完整本地集与自写参考在被忽略的`data/openjudge/tests/admin_repaired/<题号>/`。入库回执记录原件和目标SHA256，全部参考源码已在原审核JSON中入库。运行`python3 scripts/repair_gmyhf_pending_answers.py --batch 1`可重放本地修正、独立复判并只读检查平台；添加`--apply`才上传。默认备份目录为`/tmp/gmyhf-pending-answer-repairs`，包含原件，凭据仅复用环境变量，不落盘。
@@ -16,3 +16,5 @@
 同步保护的6个单元测试使用自产夹具，不依赖下载数据；只读开关、题面漂移、输入哈希三种错误变异均检出，见[变异回执](gmyhf-answer-repair-mutations.json)。
 
 30205按当前目标函数修正全局最优配置计数，整数二项式递推保留`//`精确除法；不是把模后的组合数再做整除。原题面样例与目标仍有冲突，本轮不改样例或hint，不声称整题已可接入。独立上界、充分性证明及11380组小域穷举见第14批审核证据。
+
+30827只在标记为补给站的格点补能，六份修正与第15批独立全状态BFS结果哈希一致。30828保留undo本身可被undo撤销的题面规则，自造反例`push 1 → undo → undo → max`结果为1；45份旧答案使用了不记录undo的不同规则，现已按题面回填。两题100组合法输入复判通过。
