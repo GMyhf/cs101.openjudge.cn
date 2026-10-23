@@ -57,14 +57,21 @@ def review(output):
         print(index, "/", len(rows), row["global_number"], result["status"], flush=True)
 
 
-def contracts(output):
+def contract_driver(number):
+    """先查原文；只有空行无语义的题才兼容生成器对末尾换行的限制。"""
     sys.path.insert(0, str(ROOT / "tools"))
     from full_sweep import VALID_DRIVER
-    # 统一 CRLF 并忽略文件末尾空行，仅作筛查。16531 的空答题行有意义，需人工复核。
-    driver = VALID_DRIVER.replace(
-        "verdict = valid(text) if len(parameters) == 1 else valid(key, text)",
-        'text = text.rstrip("\\n") + "\\n"\n        '
-        'verdict = valid(text) if len(parameters) == 1 else valid(key, text)')
+    if number == 16531:
+        return VALID_DRIVER
+    return VALID_DRIVER.replace(
+        'verdict = valid(text) if len(parameters) == 1 else valid(key, text)',
+        'verdict = valid(text) if len(parameters) == 1 else valid(key, text)\n'
+        '        if verdict is not True:\n'
+        '            text = text.rstrip("\\n") + "\\n"\n'
+        '            verdict = valid(text) if len(parameters) == 1 else valid(key, text)')
+
+
+def contracts(output):
     rows = json.loads((ROOT / "collab/gmyhf-download-materialize.json").read_text())["materialized"]
     results = []
     for item in rows:
@@ -75,12 +82,19 @@ def contracts(output):
         if not module.exists() or not re.search(r"^def valid\(", module.read_text(), re.M):
             row["status"] = "missing"
         elif item["global_number"] == 31069:
-            # 此题原 valid() 展开 A×B；单独用字符频数算长度，见验收报告。
-            row["status"] = "needs_linear_validator"
+            # 独立检查使用频数计算长度和离线扫描，不展开 A×B。
+            from check_gmyhf_remaining import forbidden
+            invalid = []
+            for path in sorted(data.glob('*.in'), key=lambda p: int(p.stem)):
+                try:
+                    forbidden(path.read_text(encoding='utf-8'))
+                except ValueError as exc:
+                    invalid.append(f'{path.name}: {exc}')
+            row.update(status='checked_independent', invalid=invalid)
         else:
             with tempfile.TemporaryDirectory(prefix="gmyhf-contract-acceptance-") as work:
                 try:
-                    result = subprocess.run([sys.executable, "-c", driver, str(module), str(data),
+                    result = subprocess.run([sys.executable, "-c", contract_driver(item['global_number']), str(module), str(data),
                                              item["local_id"]], cwd=work, text=True,
                                             capture_output=True, timeout=30)
                 except subprocess.TimeoutExpired:
