@@ -814,6 +814,26 @@ while True:
             wrong = judge(BOOK, "GUESS", "python", "input()\nprint('! -1', flush=True)\ninput()\n")
             self.assertEqual(wrong["status"], "Wrong Answer", wrong)
 
+    def test_interactive_jury_eof_before_exit_does_not_blame_the_student(self):
+        # 交互器必须等学生stdout的EOF才退出；因此学生崩溃时poll仍显示交互器存活。
+        # 学生的EOFError却是交互器先关闭输出造成的，不能据此把WA/Judge Error改成RE。
+        for exit_code, expected in ((42, "wrong"), (3, "judge_error"), (0, "re")):
+            with self.subTest(exit_code=exit_code), tempfile.TemporaryDirectory() as tmp:
+                work = Path(tmp)
+                (work / "student.py").write_text("print('! -1', flush=True)\ninput()\n")
+                (work / "interactor.py").write_text(
+                    "import os, sys\nsys.stdin.readline()\n"
+                    "os.close(1)\nsys.stdin.read()\n"
+                    f"os._exit({exit_code})\n")
+                with mock.patch.object(judge_module, "MIRROR", work):
+                    result = judge_module.run_interactive(
+                        [judge_module._trusted_python(), "-I", str(work / "student.py")],
+                        "interactor.py", b"", b"", work, 1,
+                        768 * 1024 * 1024, 2 * 1024 * 1024)
+                self.assertEqual(expected, result["outcome"], result)
+                self.assertEqual(1, result["student_returncode"], result)
+                self.assertIn("EOFError", result["stderr"])
+
     def test_interactive_student_process_keeps_the_sandbox_contract(self):
         seen = []
         real_popen = judge_module.subprocess.Popen

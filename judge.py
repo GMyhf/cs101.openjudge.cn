@@ -994,14 +994,17 @@ def run_interactive(command, interactor, input_data, answer_data, cwd, cpu_secon
         for stream in (student.stdin, student.stdout, student.stderr,
                        judge_proc.stdin, judge_proc.stdout, judge_proc.stderr):
             stream.close()
-        def student_eof():
-            # Record before forwarding EOF: the interactor may immediately exit
-            # in response, before the polling loop observes either process.
-            state["student_eof_before_jury_exit"] = judge_proc.poll() is None
+        eof_lock = threading.Lock()
+
+        def record_eof(side):
+            # 在转发EOF（关闭对端stdin）之前记录；读到EOF引起的退出必定在此之后。
+            # poll只能看到进程是否已回收，无法区分自己崩溃与被对端EOF带出的崩溃。
+            with eof_lock:
+                state.setdefault("first_eof", side)
 
         threads = [
-            threading.Thread(target=_pump, args=(s_out, j_in, state, "student_bytes", transcript, ">", student_eof), daemon=True),
-            threading.Thread(target=_pump, args=(j_out, s_in, state, "jury_bytes", transcript, "<"), daemon=True),
+            threading.Thread(target=_pump, args=(s_out, j_in, state, "student_bytes", transcript, ">", lambda: record_eof("student")), daemon=True),
+            threading.Thread(target=_pump, args=(j_out, s_in, state, "jury_bytes", transcript, "<", lambda: record_eof("jury")), daemon=True),
             threading.Thread(target=_drain, args=(s_err, student_err), daemon=True),
             threading.Thread(target=_drain, args=(j_err, jury_err), daemon=True),
         ]
@@ -1012,17 +1015,13 @@ def run_interactive(command, interactor, input_data, answer_data, cwd, cpu_secon
         student_usage = None
         killed_student = timed_out = False
         grace_until = None
-        student_first = None                    # 谁先退出决定 RE 与 WA 谁优先
         while True:
             if student.returncode is None:
                 pid, status, usage = os.wait4(student.pid, os.WNOHANG)
                 if pid:
                     student.returncode = os.waitstatus_to_exitcode(status)
                     student_usage = usage
-                    if student_first is None:
-                        student_first = judge_proc.poll() is None
-            if judge_proc.poll() is not None and student_first is None:
-                student_first = False
+            judge_proc.poll()
             now = time.perf_counter()
             if student.returncode is not None and judge_proc.returncode is not None:
                 break
@@ -1071,7 +1070,7 @@ def run_interactive(command, interactor, input_data, answer_data, cwd, cpu_secon
         return {**row, "outcome": "tle", "message": "单组测试超过 CPU 限制。"}
     if state["output_exceeded"]:
         return {**row, "outcome": "ole", "message": "交互中输出超过 16 MiB。"}
-    if (student_first or state.get("student_eof_before_jury_exit")) and student_rc != 0 and student_rc != -signal.SIGPIPE:
+    if state.get("first_eof") == "student" and student_rc != 0 and student_rc != -signal.SIGPIPE:
         # 程序先自己崩了，interactor 只看到「提前 EOF」；报 RE 比报 WA 有用。
         # 反过来 interactor 先判了 WA、程序随后读到 EOF 才崩的，仍是 WA。
         return {**row, "outcome": "re", "message": row["stderr"] or f"退出码 {student_rc}"}

@@ -1,0 +1,83 @@
+{
+  "baseline": "d85b7b6f3ffd2cdb3f95989f694c50328951ffee",
+  "checked_at": "2026-10-23T15:02:11.113628+00:00",
+  "problem": "交互器已关闭stdout但仍等学生EOF才退出时，学生被EOF带出异常；旧poll判定误归因为学生自身崩溃。",
+  "fix": "双向_pump在转发EOF之前通过锁记录首个EOF，不再用进程poll顺序推断因果；学生先崩仍为RE，交互器WA或错误先导致学生EOF则保留交互器结论，交互器成功不掩盖学生异常。",
+  "sources": {
+    "judge.py": "3877bc76e9ba14d6a53193a7308544997a98832b27d6dd6e84442f8e5235dd9a",
+    "tests/test_judge.py": "e64c93289563c5783ff1d2992e6b715ea4a2c232a9bfdbfb5c403226f81bebd3"
+  },
+  "deterministic_reproduction": {
+    "command": "python3 -m unittest tests.test_judge.SpecialJudgeTests.test_interactive_jury_eof_before_exit_does_not_blame_the_student",
+    "before_exit_code": 1,
+    "before_failures": 2,
+    "cases": {
+      "jury42_studentEOF": "wrong",
+      "jury3_studentEOF": "judge_error",
+      "jury0_studentEOF": "re"
+    },
+    "before_log_sha256": "394a9118a01a25c941375f324458bad2b143c9a0005dd385d029103bc7ffd178"
+  },
+  "regression": {
+    "command": "python3 -m unittest tests.test_judge",
+    "tests": 65,
+    "exit_code": 0,
+    "log": ".....................................................judge error: t001/BADCHECK case 1: checker 退出码 3\n............\n----------------------------------------------------------------------\nRan 65 tests in 34.861s\n\nOK\n"
+  },
+  "stress": {
+    "test_methods": [
+      "test_interactive_jury_eof_before_exit_does_not_blame_the_student",
+      "test_interactive_exit_order_survives_delayed_polling"
+    ],
+    "iterations_per_method": 50,
+    "tests": 100,
+    "exit_code": 0,
+    "log": "....................................................................................................\n----------------------------------------------------------------------\nRan 100 tests in 9.717s\n\nOK\n"
+  },
+  "mutations": [
+    {
+      "mutation": "漏记交互器EOF",
+      "test": "tests.test_judge.SpecialJudgeTests.test_interactive_jury_eof_before_exit_does_not_blame_the_student",
+      "killed": true
+    },
+    {
+      "mutation": "漏记学生EOF",
+      "test": "tests.test_judge.SpecialJudgeTests.test_interactive_exit_order_survives_delayed_polling",
+      "killed": true
+    },
+    {
+      "mutation": "不再优先识别学生自身崩溃",
+      "test": "tests.test_judge.SpecialJudgeTests.test_interactive_exit_order_survives_delayed_polling",
+      "killed": true
+    },
+    {
+      "mutation": "交互器成功掩盖学生崩溃",
+      "test": "tests.test_judge.SpecialJudgeTests.test_interactive_jury_eof_before_exit_does_not_blame_the_student",
+      "killed": true
+    }
+  ],
+  "sandbox": {
+    "protected_function_asts_unchanged": {
+      "_limits": true,
+      "_run": true,
+      "prepare_program": true,
+      "_pump": true
+    },
+    "popen_calls_unchanged": true,
+    "limits": "CPU、2MiB文件、768MiB内存、env白名单、python3 -I和临时目录隔离全部保留；现有交互沙箱回归通过。"
+  },
+  "gate": {
+    "status": "passed",
+    "command": "python3 tools/handoff.py --verify",
+    "exit_code": 0,
+    "verified_at": "2026-10-23T15:11:31.610971+00:00",
+    "log_sha256": "fdc7447fbf1a92b4e59cc16e6c7ecfca3ed2ac8c4a48b69b0822498afe9050a1",
+    "output": "$ python3 -m unittest <441 files>\n✅ ok\n$ python3 -m py_compile <441 files>\n✅ ok\n$ python3 tools/check_pending_rework.py\n✅ ok\n$ python3 tools/full_sweep.py\n✅ ok\n$ node --check static/catalog-books.js\n✅ ok\n$ node --check static/code-editor.js\n✅ ok\n$ node --check static/recent.js\n✅ ok\n$ node --check static/shell.js\n✅ ok\n"
+  },
+  "baseline_ci": {
+    "head_sha": "d85b7b6f3ffd2cdb3f95989f694c50328951ffee",
+    "run_id": 39973130280,
+    "conclusion": "success",
+    "url": "https://github.com/GMyhf/cs101.openjudge.cn/actions/runs/39973130280"
+  }
+}
