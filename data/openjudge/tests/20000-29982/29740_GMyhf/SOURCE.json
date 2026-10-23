@@ -316,11 +316,16 @@
     {
       "case": 34,
       "original_input": "035.in",
-      "input_bytes": 327,
-      "input_sha256": "e5af784da6f105c5d51270707db1ca8ab068a19e56b4cddbcecd9305d5cd6072",
+      "input_bytes": 40,
+      "input_sha256": "9af2922848f9b9863ac24177ed1958ef3702a215d538c2427a75fc0eeb8eadc6",
       "original_output": "035.out",
       "output_bytes": 6,
-      "output_sha256": "f32e5543d52695fc22963557c3cfe9b6961e01399d3fedfe081acae0abca5fb7"
+      "output_sha256": "f32e5543d52695fc22963557c3cfe9b6961e01399d3fedfe081acae0abca5fb7",
+      "correction": {
+        "reason": "合并重复有向边并累加权重，更新边数，保留网络计算语义",
+        "before_input_sha256": "e5af784da6f105c5d51270707db1ca8ab068a19e56b4cddbcecd9305d5cd6072",
+        "before_output_sha256": "f32e5543d52695fc22963557c3cfe9b6961e01399d3fedfe081acae0abca5fb7"
+      }
     },
     {
       "case": 35,
@@ -844,5 +849,6 @@
       "output_bytes": 31,
       "output_sha256": "d67c2d51b67db37a639b534776b4109524cc8664cb81a3ab1f3dc85974b5d28a"
     }
-  ]
+  ],
+  "correction_ledger": "collab/gmyhf-input-repairs.json"
 }

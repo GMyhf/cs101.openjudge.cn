@@ -28,11 +28,16 @@
     {
       "case": 2,
       "original_input": "2.in",
-      "input_bytes": 9,
-      "input_sha256": "123850b506f1084ce1017c5a1ae128d7c80ea89f922ba6f53ba1bdea538ce9b8",
+      "input_bytes": 8,
+      "input_sha256": "1fcc492f9ef68b1cb0bb952423c6526d3254b25255326c6f91f74339d1933fcf",
       "original_output": "2.out",
       "output_bytes": 2,
-      "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+      "correction": {
+        "reason": "移除最后一行受限节点之后的重复行",
+        "before_input_sha256": "123850b506f1084ce1017c5a1ae128d7c80ea89f922ba6f53ba1bdea538ce9b8",
+        "before_output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      }
     },
     {
       "case": 3,
@@ -124,5 +129,6 @@
       "output_bytes": 3,
       "output_sha256": "5378796307535df3ec8d8b15a2e2dc5641419c3d3060cfe32238c0fa973f7aa3"
     }
-  ]
+  ],
+  "correction_ledger": "collab/gmyhf-input-repairs.json"
 }

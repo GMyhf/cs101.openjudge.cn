@@ -92,10 +92,15 @@
       "case": 9,
       "original_input": "9.in",
       "input_bytes": 439,
-      "input_sha256": "b21d0511c38b00fcf9956505c11864c65021b601ff759ecf8fd963bf6f940a03",
+      "input_sha256": "cc887731569abe594b9cf6cb4eac52a34835e1268dc06a3bdfb48e955ec05605",
       "original_output": "9.out",
       "output_bytes": 4,
-      "output_sha256": "872c612230a8234cd219e15ddb0ba94e345d5ed9d8c205d283b0bffcd4d6ec2a"
+      "output_sha256": "872c612230a8234cd219e15ddb0ba94e345d5ed9d8c205d283b0bffcd4d6ec2a",
+      "correction": {
+        "reason": "把修改次数设为字符串长度，覆盖最大合法修改次数",
+        "before_input_sha256": "b21d0511c38b00fcf9956505c11864c65021b601ff759ecf8fd963bf6f940a03",
+        "before_output_sha256": "872c612230a8234cd219e15ddb0ba94e345d5ed9d8c205d283b0bffcd4d6ec2a"
+      }
     },
     {
       "case": 10,
@@ -286,5 +291,6 @@
       "output_bytes": 2,
       "output_sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d"
     }
-  ]
+  ],
+  "correction_ledger": "collab/gmyhf-input-repairs.json"
 }

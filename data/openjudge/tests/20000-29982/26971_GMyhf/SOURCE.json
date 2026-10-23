@@ -226,11 +226,17 @@
     {
       "case": 24,
       "original_input": "sample5.in",
-      "input_bytes": 6438,
-      "input_sha256": "21c4952986487c79878ca84e5677f8b341b259144b22ec2276e0b6947375e22d",
+      "input_bytes": 3895,
+      "input_sha256": "737cd07a50c488f7f1912d733055b33151cd5b215e8bcc31db8ea67973717b74",
       "original_output": "sample5.out",
-      "output_bytes": 4,
-      "output_sha256": "9552186d84ad5c6e459ce386f5ba884aa4219a0c763bc285da9edb9b03180f93"
+      "output_bytes": 5,
+      "output_sha256": "1620c8a0a17a932482cfca336488ec13f1b2ee15ac5e4cf59d8c1701eed0a9df",
+      "correction": {
+        "reason": "按去重后的评分排名压缩，严格保留相邻评分大小与相等关系",
+        "before_input_sha256": "21c4952986487c79878ca84e5677f8b341b259144b22ec2276e0b6947375e22d",
+        "before_output_sha256": "9552186d84ad5c6e459ce386f5ba884aa4219a0c763bc285da9edb9b03180f93"
+      }
     }
-  ]
+  ],
+  "correction_ledger": "collab/gmyhf-input-repairs.json"
 }

@@ -14,6 +14,8 @@
 
 落盘即替换：已有 `_GMyhf` 整目录换成平台当前数据，内容漂移记入报告
 （exact / line_endings_only / content_changed / new）。
+已审核的 93 对输入修正由 gmyhf_input_repairs 按清单重放；输入或答案出现
+未审核的变化时，在删除该题旧目录前报错。详见 collab/gmyhf-input-repairs.md。
 """
 from __future__ import annotations
 
@@ -31,6 +33,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 import full_sweep                                  # noqa: E402
 from audit_gmyhf_data import RUNTIME_MARGIN_REJECTIONS  # noqa: E402
 from index_tests import SPECIAL_JUDGE_GLOBAL_NUMBERS    # noqa: E402
+from gmyhf_input_repairs import load_repairs, repair_pair  # noqa: E402
 
 OPENJUDGE = ROOT / "data" / "openjudge"
 TESTS = OPENJUDGE / "tests"
@@ -111,6 +114,7 @@ def main():
     local_ids = local_id_map()
     ledger = json.loads((ROOT / "collab" / "valid-contracts.json").read_text(encoding="utf-8"))
     contract_dirs = set(ledger["dirs"])
+    input_repairs = load_repairs()
 
     report = {"policy": __doc__.strip().splitlines()[0],
               "download_manifest": str((DL / "manifest.json").relative_to(ROOT)),
@@ -180,17 +184,23 @@ def main():
             skip(number, "no_paired_cases")
             continue
 
+        # 在删除旧目录前校验全部修正，远端同名文件发生其他变化时保留现有数据并报错。
+        prepared = {}
+        for stem in stems:
+            prepared[stem] = repair_pair(
+                number, inputs[stem]["filename"],
+                (DL / num_s / inputs[stem]["filename"]).read_bytes(),
+                (DL / num_s / outputs[stem]["filename"]).read_bytes(), input_repairs)
         destination = TESTS / bucket / f"{local}_GMyhf"
         drift = "new"
         if destination.is_dir():
             old = norm_hashes(destination)
-            new = {hashlib.sha256((DL / num_s / f["filename"]).read_bytes()
-                                  .replace(b"\r\n", b"\n")).hexdigest()
-                   for stem in stems for f in (inputs[stem], outputs[stem])}
+            new = {hashlib.sha256(payload.replace(b"\r\n", b"\n")).hexdigest()
+                   for stem in stems for payload in prepared[stem][:2]}
             raw_old = {hashlib.sha256(p.read_bytes()).hexdigest()
                        for p in destination.rglob("*") if p.suffix in (".in", ".out")}
-            raw_new = {hashlib.sha256((DL / num_s / f["filename"]).read_bytes()).hexdigest()
-                       for stem in stems for f in (inputs[stem], outputs[stem])}
+            raw_new = {hashlib.sha256(payload).hexdigest()
+                       for stem in stems for payload in prepared[stem][:2]}
             drift = ("exact" if raw_old == raw_new
                      else "line_endings_only" if old == new else "content_changed")
             shutil.rmtree(destination)
@@ -199,13 +209,17 @@ def main():
         records = []
         for index, stem in enumerate(stems):
             record = {"case": index}
-            for kind, entry in (("input", inputs[stem]), ("output", outputs[stem])):
-                payload = (DL / num_s / entry["filename"]).read_bytes()
+            fixed_input, fixed_output, correction = prepared[stem]
+            for kind, entry, payload in (("input", inputs[stem], fixed_input),
+                                         ("output", outputs[stem], fixed_output)):
                 target = data / f"{index}.{'in' if kind == 'input' else 'out'}"
                 target.write_bytes(payload)
                 record[f"original_{kind}"] = entry["filename"]
                 record[f"{kind}_bytes"] = len(payload)
                 record[f"{kind}_sha256"] = hashlib.sha256(payload).hexdigest()
+            if correction is not None:
+                record["correction"] = {key: correction[key] for key in
+                                        ("reason", "before_input_sha256", "before_output_sha256")}
             records.append(record)
         provenance = {
             "owner": "GMyhf",
@@ -218,6 +232,9 @@ def main():
             "fetched_at": manifest["fetched_at"],
             "files": records,
         }
+        corrected_pairs = sum("correction" in record for record in records)
+        if corrected_pairs:
+            provenance["correction_ledger"] = "collab/gmyhf-input-repairs.json"
         if unpaired:
             provenance["unpaired_files_dropped"] = unpaired
         (destination / "SOURCE.json").write_text(
@@ -230,6 +247,8 @@ def main():
             "unpaired_dropped": len(unpaired),
             "contract_preserved_via_merge": f"tests/{bucket}/{local}_made" in contract_dirs,
         })
+        if corrected_pairs:
+            report["materialized"][-1]["corrected_pairs"] = corrected_pairs
 
     summary = {}
     for reason, rows in skipped.items():

@@ -46,20 +46,30 @@
     {
       "case": 4,
       "original_input": "5.in",
-      "input_bytes": 88,
-      "input_sha256": "a5115a19b86b704ba6c1d82e7592bfda20bdca44b5e8a0750ebb0b9d1ba31cce",
+      "input_bytes": 91,
+      "input_sha256": "524a1ba91a1222ac7c2e0c437bcd91cb38f76ab8d447bc0b6180b6c5733bd917",
       "original_output": "5.out",
-      "output_bytes": 4,
-      "output_sha256": "2cb6318b9f4550a828e3567463a256327bc37dc992c988810cf4a4a8ed8ce5d9"
+      "output_bytes": 5,
+      "output_sha256": "a86559be54a61efb3d36d0b0510b2151087ef4f27257613697784d28b7ac6d3a",
+      "correction": {
+        "reason": "补齐无向图缺失的反向邻接，保留边与环结构",
+        "before_input_sha256": "a5115a19b86b704ba6c1d82e7592bfda20bdca44b5e8a0750ebb0b9d1ba31cce",
+        "before_output_sha256": "2cb6318b9f4550a828e3567463a256327bc37dc992c988810cf4a4a8ed8ce5d9"
+      }
     },
     {
       "case": 5,
       "original_input": "6.in",
-      "input_bytes": 88,
-      "input_sha256": "af17520dc48e16e8749723f09cdd66d3d63cba8fb57205610027d9aa54bf11f4",
+      "input_bytes": 91,
+      "input_sha256": "07515c0ad246160cab9ed53da962cdae1e3ded81176c96e7488075ceb8c0297f",
       "original_output": "6.out",
-      "output_bytes": 3,
-      "output_sha256": "74c4743b0b7b6b8f9f42af0da9346f6b46333228970e9d5e76b1861a19da68d1"
+      "output_bytes": 4,
+      "output_sha256": "36c4af347e06cfe6d7b43f201017a7d9ad5b88b6999fe4d374086e4928d96088",
+      "correction": {
+        "reason": "补齐无向图缺失的反向邻接，保留边与环结构",
+        "before_input_sha256": "af17520dc48e16e8749723f09cdd66d3d63cba8fb57205610027d9aa54bf11f4",
+        "before_output_sha256": "74c4743b0b7b6b8f9f42af0da9346f6b46333228970e9d5e76b1861a19da68d1"
+      }
     },
     {
       "case": 6,
@@ -97,5 +107,6 @@
       "output_bytes": 4,
       "output_sha256": "2cb6318b9f4550a828e3567463a256327bc37dc992c988810cf4a4a8ed8ce5d9"
     }
-  ]
+  ],
+  "correction_ledger": "collab/gmyhf-input-repairs.json"
 }

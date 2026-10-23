@@ -11,10 +11,15 @@
       "case": 0,
       "original_input": "2.in",
       "input_bytes": 10,
-      "input_sha256": "02bfbb85ecfba2af2b10666975b823977df19167dcc946edfe22dd22feb8f547",
+      "input_sha256": "0be2ad7435fd88ddcce418aa053f6e472d9f792fc972f4211202bdba076bb4c7",
       "original_output": "2.out",
       "output_bytes": 9,
-      "output_sha256": "efc2a522d1bd2ac5211b9e6b6ccffc9ebaecf1a26446b107667176346e5f796a"
+      "output_sha256": "dbf49ee47089a80aa52cdee996311cf2aa9e70c5725925da0f83a35d14e2efb1",
+      "correction": {
+        "reason": "用 2^29 替代越界的 2^30，保留大整数二次幂案例",
+        "before_input_sha256": "02bfbb85ecfba2af2b10666975b823977df19167dcc946edfe22dd22feb8f547",
+        "before_output_sha256": "efc2a522d1bd2ac5211b9e6b6ccffc9ebaecf1a26446b107667176346e5f796a"
+      }
     },
     {
       "case": 1,
@@ -178,5 +183,6 @@
       "output_bytes": 1,
       "output_sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
     }
-  ]
+  ],
+  "correction_ledger": "collab/gmyhf-input-repairs.json"
 }

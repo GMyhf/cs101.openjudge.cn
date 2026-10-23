@@ -82,11 +82,17 @@
     {
       "case": 8,
       "original_input": "9.in",
-      "input_bytes": 210001,
-      "input_sha256": "79e7770d0e4293740068a3ddac5c76a65010c671b4b70b942d50ec5492b4a84a",
+      "input_bytes": 21,
+      "input_sha256": "29c89e780745b6a50b05ff5988a601edd62c4f143777313517510cabce81358a",
       "original_output": "9.out",
       "output_bytes": 2,
-      "output_sha256": "f0b5c2c2211c8d67ed15e75e656c7862d086e9245420892a7de62cd9ec582a06"
+      "output_sha256": "f0b5c2c2211c8d67ed15e75e656c7862d086e9245420892a7de62cd9ec582a06",
+      "correction": {
+        "reason": "恢复被重复拼接 10500 次的原始预算与七类计数",
+        "before_input_sha256": "79e7770d0e4293740068a3ddac5c76a65010c671b4b70b942d50ec5492b4a84a",
+        "before_output_sha256": "f0b5c2c2211c8d67ed15e75e656c7862d086e9245420892a7de62cd9ec582a06"
+      }
     }
-  ]
+  ],
+  "correction_ledger": "collab/gmyhf-input-repairs.json"
 }

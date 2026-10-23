@@ -208,11 +208,16 @@
     {
       "case": 22,
       "original_input": "sample3.in",
-      "input_bytes": 153,
-      "input_sha256": "eef5a9d64d1e3ad02c32fcdc1331e451560b7ee38ae29fa9e7db20669315e143",
+      "input_bytes": 20,
+      "input_sha256": "b057d453e1140d9cec54770d08842364d1307898a32f90295749a2b14b254ba8",
       "original_output": "sample3.out",
       "output_bytes": 2,
-      "output_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+      "output_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+      "correction": {
+        "reason": "恢复被重复黏连的 1..9 序列，去掉额外输入",
+        "before_input_sha256": "eef5a9d64d1e3ad02c32fcdc1331e451560b7ee38ae29fa9e7db20669315e143",
+        "before_output_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3"
+      }
     },
     {
       "case": 23,
@@ -241,5 +246,6 @@
       "output_bytes": 2,
       "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
     }
-  ]
+  ],
+  "correction_ledger": "collab/gmyhf-input-repairs.json"
 }

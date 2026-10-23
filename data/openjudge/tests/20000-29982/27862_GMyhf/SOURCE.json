@@ -37,11 +37,16 @@
     {
       "case": 3,
       "original_input": "sample3.in",
-      "input_bytes": 63,
-      "input_sha256": "b960868cc83b6176b3946fc0c128711942e737a862feefd102b8c950ee9f62a3",
+      "input_bytes": 66,
+      "input_sha256": "12be7e8886e219c91a4616baffba6d7468c2925df66e6d506497d5a82ec6fba0",
       "original_output": "sample3.out",
       "output_bytes": 4,
-      "output_sha256": "7ccdd490f6b3380bf5ef76529f8a33c3d0d324062b190d63706eaa7ffd0ce85a"
+      "output_sha256": "7ccdd490f6b3380bf5ef76529f8a33c3d0d324062b190d63706eaa7ffd0ce85a",
+      "correction": {
+        "reason": "增加一个分支节点，把三叉节点改为二叉结构，保留全部叶子收益",
+        "before_input_sha256": "b960868cc83b6176b3946fc0c128711942e737a862feefd102b8c950ee9f62a3",
+        "before_output_sha256": "7ccdd490f6b3380bf5ef76529f8a33c3d0d324062b190d63706eaa7ffd0ce85a"
+      }
     },
     {
       "case": 4,
@@ -52,5 +57,6 @@
       "output_bytes": 4,
       "output_sha256": "3f11ad6bbc7ecca0b2416b713dee77f1a635c00aaeaa946e14cde1c2bfae56d5"
     }
-  ]
+  ],
+  "correction_ledger": "collab/gmyhf-input-repairs.json"
 }

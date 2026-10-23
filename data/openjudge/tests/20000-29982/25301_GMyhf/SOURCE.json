@@ -91,11 +91,16 @@
     {
       "case": 9,
       "original_input": "9.in",
-      "input_bytes": 1407,
-      "input_sha256": "b506aa24607e0410cc6d1ec71f8291be54d5a1786fecb4d89a75f04705cafba0",
+      "input_bytes": 1392,
+      "input_sha256": "5886494b488c167a2b11529c3a8dee0059968a2b791407fb69170c94495d9cea",
       "original_output": "9.out",
       "output_bytes": 355,
-      "output_sha256": "216fc036dd793b69612ce8171e51ab6f2475b0b1be3a533e9db9c406fb28372c"
+      "output_sha256": "216fc036dd793b69612ce8171e51ab6f2475b0b1be3a533e9db9c406fb28372c",
+      "correction": {
+        "reason": "保留前 99 个学生并同步人数，覆盖最大合法规模",
+        "before_input_sha256": "b506aa24607e0410cc6d1ec71f8291be54d5a1786fecb4d89a75f04705cafba0",
+        "before_output_sha256": "216fc036dd793b69612ce8171e51ab6f2475b0b1be3a533e9db9c406fb28372c"
+      }
     },
     {
       "case": 10,
@@ -106,5 +111,6 @@
       "output_bytes": 53,
       "output_sha256": "f36b6d43a2022c9035d64d81da523dc6c6bc0964b4a44a2db98e31ff7491954e"
     }
-  ]
+  ],
+  "correction_ledger": "collab/gmyhf-input-repairs.json"
 }
