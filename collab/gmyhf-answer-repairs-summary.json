@@ -1,0 +1,107 @@
+{
+  "scope": "T-059：四批修复8题87份明确错误的答案；保留非法输入、题面歧义与接入边界。",
+  "repair_complete": true,
+  "problem_count": 8,
+  "corrected_answers": 87,
+  "verified_legal_pairs": 153,
+  "platform_files_verified": 329,
+  "full_gates_passed": 4,
+  "batch_reports": [
+    {
+      "batch": 1,
+      "path": "collab/gmyhf-answer-repairs-batch1.json",
+      "sha256": "6480480bd129bd2ebd46a833cff54a9428ab080a5fd5d0ffe2e2451f0ec2dd45",
+      "answer_files": 3,
+      "gate_exit_code": 0
+    },
+    {
+      "batch": 2,
+      "path": "collab/gmyhf-answer-repairs-batch2.json",
+      "sha256": "84e8057b4479eb8283a262ffe037dcad1301557b4713d011736ff2e8aa6ec191",
+      "answer_files": 11,
+      "gate_exit_code": 0
+    },
+    {
+      "batch": 3,
+      "path": "collab/gmyhf-answer-repairs-batch3.json",
+      "sha256": "daa7ffa35d6836ca449c7ae9025c2fe5a044ae9ffd2753ae6213002fd64dd128",
+      "answer_files": 51,
+      "gate_exit_code": 0
+    },
+    {
+      "batch": 4,
+      "path": "collab/gmyhf-answer-repairs-batch4.json",
+      "sha256": "ef6683dec4e4f60f806b2134016565d4b28a90e611d3d89dccfe96507047e524",
+      "answer_files": 22,
+      "gate_exit_code": 0
+    }
+  ],
+  "problems": [
+    {
+      "global_number": 19964,
+      "corrected_answers": 1,
+      "verified_legal_pairs": 4,
+      "unresolved_inputs": [
+        "10.in",
+        "11.in",
+        "12.in",
+        "4.in",
+        "6.in",
+        "7.in",
+        "8.in",
+        "9.in"
+      ],
+      "local_dataset": "data/openjudge/tests/admin_repaired/19964"
+    },
+    {
+      "global_number": 19966,
+      "corrected_answers": 2,
+      "verified_legal_pairs": 12,
+      "unresolved_inputs": [],
+      "local_dataset": "data/openjudge/tests/admin_repaired/19966"
+    },
+    {
+      "global_number": 30205,
+      "corrected_answers": 11,
+      "verified_legal_pairs": 11,
+      "unresolved_inputs": [],
+      "local_dataset": "data/openjudge/tests/admin_repaired/30205"
+    },
+    {
+      "global_number": 30827,
+      "corrected_answers": 6,
+      "verified_legal_pairs": 50,
+      "unresolved_inputs": [],
+      "local_dataset": "data/openjudge/tests/admin_repaired/30827"
+    },
+    {
+      "global_number": 30828,
+      "corrected_answers": 45,
+      "verified_legal_pairs": 50,
+      "unresolved_inputs": [],
+      "local_dataset": "data/openjudge/tests/admin_repaired/30828"
+    },
+    {
+      "global_number": 20124,
+      "corrected_answers": 1,
+      "verified_legal_pairs": 3,
+      "unresolved_inputs": [],
+      "local_dataset": "data/openjudge/tests/admin_repaired/20124"
+    },
+    {
+      "global_number": 20126,
+      "corrected_answers": 1,
+      "verified_legal_pairs": 3,
+      "unresolved_inputs": [],
+      "local_dataset": "data/openjudge/tests/admin_repaired/20126"
+    },
+    {
+      "global_number": 23665,
+      "corrected_answers": 20,
+      "verified_legal_pairs": 20,
+      "unresolved_inputs": [],
+      "local_dataset": "data/openjudge/tests/admin_repaired/23665"
+    }
+  ],
+  "procedure_source": "\"\"\"四批答案回填收口；只检查哈希和已完成回执，不访问平台、不修改数据。\"\"\"\nimport hashlib,json\nfrom pathlib import Path\nroot=Path.cwd()\ndef sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()\nreports=[];problems=[];uploads=[];checked=0;legal=0\nfor batch in range(1,5):\n path=root/f'collab/gmyhf-answer-repairs-batch{batch}.json';r=json.loads(path.read_text())\n assert r['applied'] and r['validation']['exit_code']==0 and len(r['uploads'])==r['answer_files']\n reports.append({'batch':batch,'path':str(path.relative_to(root)),'sha256':sha(path),'answer_files':r['answer_files'],'gate_exit_code':0})\n for g in r['problems']:\n  assert g['local']['status']=='Accepted' and g['form_unchanged'] and g['file_list_unchanged']\n  assert g['local']['cases']==g['verified_legal_pairs'] and g['local']['timing_audit']['status']=='passed'\n  assert sha(root/g['evidence'])==g['evidence_sha256']\n  changes={c['output']:c['after_sha256'] for c in g['changes']}\n  for name,old in g['before_files'].items():\n   assert g['final_files'][name]==changes.get(name,old)\n   if name.endswith(('.in','.out')):assert sha(root/g['local_dataset']/'data'/name)==g['final_files'][name]\n  for c in g['changes']:assert c['input_sha256']==g['before_files'][c['input']]\n  problems.append({'global_number':g['global_number'],'corrected_answers':len(g['changes']),'verified_legal_pairs':g['verified_legal_pairs'],'unresolved_inputs':g['unresolved_inputs'],'local_dataset':g['local_dataset']})\n  checked+=len(g['final_files']);legal+=g['verified_legal_pairs']\n uploads.extend((u['global_number'],u['filename']) for u in r['uploads'])\nassert len(problems)==8 and len({g['global_number'] for g in problems})==8\nassert len(uploads)==len(set(uploads))==87 and legal==153\nresult={'scope':'T-059：四批修复8题87份明确错误的答案；保留非法输入、题面歧义与接入边界。','repair_complete':True,'problem_count':8,'corrected_answers':87,'verified_legal_pairs':legal,'platform_files_verified':checked,'full_gates_passed':4,'batch_reports':reports,'problems':problems,'procedure_source':Path(__file__).read_text()}\n(root/'collab/gmyhf-answer-repairs-summary.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\\n')\nprint('收口通过：8题87份答案，153组合法输入，全部',checked,'个后台文件与本地核验一致，4次完整闸门成功')\n"
+}
