@@ -80,7 +80,7 @@ T-055/T-056已分别提交推送为`a6843e06a`、`7c54a2c29`；用户授权继�
 | T-055 | 修复交互器先关闭输出引发的WA误判RE | Review | Codex | 用户2026-10-23授权；EOF转发前双向记序，不改资源限制、环境或隔离；65项判题回归、100次重复、4项变异及完整闸门通过；见 `interactive-eof-review.json` |
 | T-056 | 按排除原因梳理359题未接入后台数据 | Done | Codex | 用户2026-10-23授权只读梳理；完整清单与候选见 `gmyhf-pending-triage.json`，不绕过输入契约或沙箱限制 |
 | T-057 | 复核首批10题未接入课题组数据 | Done | Codex | 200对输入契约与独立答案一致，19样例、2817组小域检查、10项变异通过；400文件后台回读一致，10题本地AC且逐点余量通过；用户明确授权后平台Python3提交10/10 Accepted；未接入，须保留_made契约，见 `gmyhf-pending-batch1-review.json` |
-| T-058 | 按批复核全部剩余课题组数据并逐批提交推送 | In progress | Codex | 用户2026-10-24授权持续执行；359题中已复核通过60题、留疑点62题、待审237题；第8批见 `gmyhf-pending-batch8-review.json`，总账 `gmyhf-pending-progress.json`；不自动接入 |
+| T-058 | 按批复核全部剩余课题组数据并逐批提交推送 | In progress | Codex | 用户2026-10-24授权持续执行；359题中已复核通过60题、留疑点82题、待审217题；第9批见 `gmyhf-pending-batch9-review.json`，总账 `gmyhf-pending-progress.json`；不自动接入 |
 
 ### 状态看板补充记录
 
