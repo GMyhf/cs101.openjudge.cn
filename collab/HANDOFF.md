@@ -6611,3 +6611,9 @@ samplecode 对每组复算全对 ｜ 单组最慢 <4s（判题 CPU 上限）｜ 
 本地 C++ 判题 21/21 Accepted（133ms）。完整闸门实际 `Ran 386 tests in 201.517s / FAILED (failures=1)`，仅既有 `test_interactive_verdicts` 过量询问分支出现 EOF/Runtime Error 与预期 Wrong Answer 的竞态；独立重跑 `Ran 1 test in 8.420s / OK`。全库扫描、Python/JS 语法和欠账检查均通过。未向上游提交参考程序，未改交互判题逻辑。证据 `collab/practice-31454-review.json`。
 
 提交前复验（2026-10-22）：`python3 tools/handoff.py --verify` 在沙箱外完整运行退出码 0，单元测试、Python/JS 语法、欠账检查及全库扫描全部通过。沙箱内首轮因套接字与 NuGet 网络权限受限失败，外部完整重跑已排除环境限制。
+
+## 2026-10-24 · Codex · T-059 第1批答案修复
+
+19964修正5.out，19966修正5.out和10.out；全部50个后台文件（含2个附件）前后回读，输入、题面配置及附件未变。修正后的16组合法输入在原judge限制下复判Accepted；19964另8组人数越界仍保留，不算本次修复完成。原始下载快照不变，本地修正集在忽略目录admin_repaired，通过入库脚本与审核参考可重放。六个自产夹具测试通过，三种变异均检出。详见`gmyhf-answer-repairs.md`和第1批JSON回执。
+
+T-059第1批提交前完整闸门退出码0：unittest、py_compile、待返工检查、full_sweep及JS语法全部通过。

@@ -1,0 +1,21 @@
+{
+  "test_module": "tests/test_gmyhf_answer_repairs.py",
+  "procedure": "import io,json,unittest\nfrom pathlib import Path\nimport tests.test_gmyhf_answer_repairs as test\nm=test.repair\nsource=Path(m.__file__).read_text()\nmutants=[('跳过只读开关', 'if not apply:', 'if False:', 'test_plan_does_not_upload_or_claim_completion'),('忽略题面漂移', \"require(observed == entry['checks']['statement']['field_sha256'],\", 'require(True,', 'test_changed_statement_stops_before_upload'),('关闭全部哈希保护', 'if not condition:', 'if False:', 'test_changed_input_stops_before_upload')]\nresults=[]\nfor name,old,new,method in mutants:\n assert source.count(old)==1\n exec(compile(source.replace(old,new),m.__file__,'exec'),m.__dict__)\n result=unittest.TextTestRunner(stream=io.StringIO()).run(unittest.TestSuite([test.AnswerRepairTests(method)]))\n assert not result.wasSuccessful(),name\n results.append({'mutation':name,'test':method,'detected':True})\nexec(compile(source,m.__file__,'exec'),m.__dict__)\nPath('/tmp/gmyhf-answer-repair-mutations.json').write_text(json.dumps(results,ensure_ascii=False,indent=2)+'\\n')\nprint('3种变异全部被检出')\n",
+  "results": [
+    {
+      "mutation": "跳过只读开关",
+      "test": "test_plan_does_not_upload_or_claim_completion",
+      "detected": true
+    },
+    {
+      "mutation": "忽略题面漂移",
+      "test": "test_changed_statement_stops_before_upload",
+      "detected": true
+    },
+    {
+      "mutation": "关闭全部哈希保护",
+      "test": "test_changed_input_stops_before_upload",
+      "detected": true
+    }
+  ]
+}

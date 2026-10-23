@@ -1,0 +1,339 @@
+{
+  "batch": 1,
+  "baseline": "bfe49c6149204962fe55e0336e30a5536eb2bbc8",
+  "procedure_sha256": "6c004fd4b9aaf57fa9c8c984bc5978811944b65be2c23f771e913aff909fa14e",
+  "applied": true,
+  "policy": "只回填审核为错误的答案；原始快照不变，修正数据在admin_repaired；逐文件写前核对、写后回读，所有输入附件及题面配置保持；不自动接入题库。",
+  "answer_files": 3,
+  "problems": [
+    {
+      "global_number": 19964,
+      "evidence": "collab/gmyhf-pending-batch16-review.json",
+      "evidence_sha256": "4ec0d145708f5cd4705c1e16b28f5cb9bcd3480db1a7a90a72077db2246b8ec1",
+      "reference_sha256": "8532ba3d08492b9dc70facf18863f592da0c0b4ab009ff81b9fa9b81a1fc193c",
+      "changes": [
+        {
+          "input": "5.in",
+          "output": "5.out",
+          "input_sha256": "f73c320560c6c7fac2c050163877e126fe5c88c959b0a762910a96059655c3ad",
+          "before_sha256": "615bdd17c2556f82f384392ea8557f8cc88b03501c759e23093ab0b2a9b5cd48",
+          "after_sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+          "bytes": 2
+        }
+      ],
+      "local_dataset": "data/openjudge/tests/admin_repaired/19964",
+      "local": {
+        "status": "Accepted",
+        "cases": 4,
+        "time_ms": 134,
+        "memory_kb": 21024,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 3,
+            "time_ms": 35,
+            "case_limit_ms": 4000,
+            "ratio": 0.0088
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 31,
+              "case_limit_ms": 4000,
+              "ratio": 0.0077
+            },
+            {
+              "case": 2,
+              "time_ms": 32,
+              "case_limit_ms": 4000,
+              "ratio": 0.008
+            },
+            {
+              "case": 3,
+              "time_ms": 35,
+              "case_limit_ms": 4000,
+              "ratio": 0.0088
+            },
+            {
+              "case": 4,
+              "time_ms": 34,
+              "case_limit_ms": 4000,
+              "ratio": 0.0085
+            }
+          ]
+        }
+      },
+      "verified_legal_pairs": 4,
+      "unresolved_inputs": [
+        "10.in",
+        "11.in",
+        "12.in",
+        "4.in",
+        "6.in",
+        "7.in",
+        "8.in",
+        "9.in"
+      ],
+      "form_sha256": "11d0bc0928cf43fec263a9a449a0dfc5a8d3d0d7b060f9e24a6e210ab83d7c04",
+      "before_files": {
+        "1.in": "c5620dd173e33795c08934ab0df16edcb43f885b2441d8a4b04fe5177dabdbc6",
+        "1.out": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "10.in": "1ac5dd8c1cdc1e2aa5f4d701a342e7a2cfb22d2aad6d3230ccf48104f8e538b7",
+        "10.out": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+        "11.in": "7b11ac72292ba78fdbba596ccec5022373ca79fa8fd0dc2546ca629ab22f5b21",
+        "11.out": "e29c9c180c6279b0b02abd6a1801c7c04082cf486ec027aa13515e4f3884bb6b",
+        "12.in": "070ff344191328df93502317545b0d27dbe93a32040707f3f5d027f99019e2bd",
+        "12.out": "8241649609f88ccd2a0a5b233a07a538ec313ff6adf695aa44a969dbca39f67d",
+        "2.in": "5264685be6191cf5a099e223022bf7da84f07ebab280ccc71b4b37d4f0f2e143",
+        "2.out": "1bad6b8cf97131fceab8543e81f7757195fbb1d36b376ee994ad1cf17699c464",
+        "3.in": "3819dac33f864d4a71145d8cc5f4208ed2447b858b5c65bbdaa8b86d7d28439a",
+        "3.out": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+        "4.in": "162fb5e6175ea39a230209e4d7292ad29852efd05aeed1bd2959d7e0ca471c08",
+        "4.out": "c171d4ec282b23db89a99880cd624e9ba2940c1d894783602edab5d7481dc1ea",
+        "5.in": "f73c320560c6c7fac2c050163877e126fe5c88c959b0a762910a96059655c3ad",
+        "5.out": "615bdd17c2556f82f384392ea8557f8cc88b03501c759e23093ab0b2a9b5cd48",
+        "6.in": "0341a3ee7d4e3be1c8936b7756b440851569ac1cc83cf3a883f07179a0286634",
+        "6.out": "9400f1b21cb527d7fa3d3eabba93557a18ebe7a2ca4e471cfe5e4c5b4ca7f767",
+        "7.in": "a0b6e0c57f49527090ac1fa687735c1c98a7addd3c034ab1bba7bcde9279a5ef",
+        "7.out": "4523540f1504cd17100c4835e85b7eefd49911580f8efff0599a8f283be6b9e3",
+        "8.in": "bb0c9bd1a15bf3c0061672e05ec87efa4bba9dd3de3dde703d037fdae5fdad6a",
+        "8.out": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b",
+        "9.in": "2148f36af5410ddd464cec13245f9d7f2fb2165b41338c9bd11c7a112f892e29",
+        "9.out": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+        "魔王和勇士.txt": "10ba56a2ae867c808260552ebac130f9b227bcfe64b5e5c0e972c5116a6b5cf5"
+      },
+      "final_files": {
+        "1.in": "c5620dd173e33795c08934ab0df16edcb43f885b2441d8a4b04fe5177dabdbc6",
+        "1.out": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "10.in": "1ac5dd8c1cdc1e2aa5f4d701a342e7a2cfb22d2aad6d3230ccf48104f8e538b7",
+        "10.out": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+        "11.in": "7b11ac72292ba78fdbba596ccec5022373ca79fa8fd0dc2546ca629ab22f5b21",
+        "11.out": "e29c9c180c6279b0b02abd6a1801c7c04082cf486ec027aa13515e4f3884bb6b",
+        "12.in": "070ff344191328df93502317545b0d27dbe93a32040707f3f5d027f99019e2bd",
+        "12.out": "8241649609f88ccd2a0a5b233a07a538ec313ff6adf695aa44a969dbca39f67d",
+        "2.in": "5264685be6191cf5a099e223022bf7da84f07ebab280ccc71b4b37d4f0f2e143",
+        "2.out": "1bad6b8cf97131fceab8543e81f7757195fbb1d36b376ee994ad1cf17699c464",
+        "3.in": "3819dac33f864d4a71145d8cc5f4208ed2447b858b5c65bbdaa8b86d7d28439a",
+        "3.out": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+        "4.in": "162fb5e6175ea39a230209e4d7292ad29852efd05aeed1bd2959d7e0ca471c08",
+        "4.out": "c171d4ec282b23db89a99880cd624e9ba2940c1d894783602edab5d7481dc1ea",
+        "5.in": "f73c320560c6c7fac2c050163877e126fe5c88c959b0a762910a96059655c3ad",
+        "5.out": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+        "6.in": "0341a3ee7d4e3be1c8936b7756b440851569ac1cc83cf3a883f07179a0286634",
+        "6.out": "9400f1b21cb527d7fa3d3eabba93557a18ebe7a2ca4e471cfe5e4c5b4ca7f767",
+        "7.in": "a0b6e0c57f49527090ac1fa687735c1c98a7addd3c034ab1bba7bcde9279a5ef",
+        "7.out": "4523540f1504cd17100c4835e85b7eefd49911580f8efff0599a8f283be6b9e3",
+        "8.in": "bb0c9bd1a15bf3c0061672e05ec87efa4bba9dd3de3dde703d037fdae5fdad6a",
+        "8.out": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b",
+        "9.in": "2148f36af5410ddd464cec13245f9d7f2fb2165b41338c9bd11c7a112f892e29",
+        "9.out": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+        "魔王和勇士.txt": "10ba56a2ae867c808260552ebac130f9b227bcfe64b5e5c0e972c5116a6b5cf5"
+      },
+      "form_unchanged": true,
+      "file_list_unchanged": true
+    },
+    {
+      "global_number": 19966,
+      "evidence": "collab/gmyhf-pending-batch16-review.json",
+      "evidence_sha256": "4ec0d145708f5cd4705c1e16b28f5cb9bcd3480db1a7a90a72077db2246b8ec1",
+      "reference_sha256": "4062057c7b2881115dc679ceb7b0c704711b910c8c2cdd5a74f84f05256e37aa",
+      "changes": [
+        {
+          "input": "10.in",
+          "output": "10.out",
+          "input_sha256": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+          "before_sha256": "aaa1b68d8a028eeae6300772c8bd726b259735c896538680ce9e62e9f6d89c1d",
+          "after_sha256": "db9fd7bf3f74b55edde5af762dacbb47e90b5ba8994289e648395caec9241ed7",
+          "bytes": 5
+        },
+        {
+          "input": "5.in",
+          "output": "5.out",
+          "input_sha256": "e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb",
+          "before_sha256": "9c1ac48b9a6b519464185a0c5df1b2426f364103036bd29b629b65e87aec5390",
+          "after_sha256": "92e89bebb1b299e96944a5a5fd5dde5ce4aef7ad22576f5e8fdf2828d1d6759b",
+          "bytes": 7
+        }
+      ],
+      "local_dataset": "data/openjudge/tests/admin_repaired/19966",
+      "local": {
+        "status": "Accepted",
+        "cases": 12,
+        "time_ms": 366,
+        "memory_kb": 22268,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 1,
+            "time_ms": 31,
+            "case_limit_ms": 4000,
+            "ratio": 0.0077
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 31,
+              "case_limit_ms": 4000,
+              "ratio": 0.0077
+            },
+            {
+              "case": 2,
+              "time_ms": 30,
+              "case_limit_ms": 4000,
+              "ratio": 0.0075
+            },
+            {
+              "case": 3,
+              "time_ms": 31,
+              "case_limit_ms": 4000,
+              "ratio": 0.0077
+            },
+            {
+              "case": 4,
+              "time_ms": 30,
+              "case_limit_ms": 4000,
+              "ratio": 0.0075
+            },
+            {
+              "case": 5,
+              "time_ms": 31,
+              "case_limit_ms": 4000,
+              "ratio": 0.0077
+            },
+            {
+              "case": 6,
+              "time_ms": 30,
+              "case_limit_ms": 4000,
+              "ratio": 0.0075
+            },
+            {
+              "case": 7,
+              "time_ms": 30,
+              "case_limit_ms": 4000,
+              "ratio": 0.0075
+            },
+            {
+              "case": 8,
+              "time_ms": 30,
+              "case_limit_ms": 4000,
+              "ratio": 0.0075
+            },
+            {
+              "case": 9,
+              "time_ms": 30,
+              "case_limit_ms": 4000,
+              "ratio": 0.0075
+            },
+            {
+              "case": 10,
+              "time_ms": 31,
+              "case_limit_ms": 4000,
+              "ratio": 0.0077
+            },
+            {
+              "case": 11,
+              "time_ms": 31,
+              "case_limit_ms": 4000,
+              "ratio": 0.0077
+            },
+            {
+              "case": 12,
+              "time_ms": 30,
+              "case_limit_ms": 4000,
+              "ratio": 0.0075
+            }
+          ]
+        }
+      },
+      "verified_legal_pairs": 12,
+      "unresolved_inputs": [],
+      "form_sha256": "c2133d15e2bc6d3b50374dccbac7135aafefae9a42183ef8c8936974e27afbdd",
+      "before_files": {
+        "1.in": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+        "1.out": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+        "10.in": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+        "10.out": "aaa1b68d8a028eeae6300772c8bd726b259735c896538680ce9e62e9f6d89c1d",
+        "11.in": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9",
+        "11.out": "69cfe66b17bcc88ec829e9500d4255a5c92faf45fc4b35b1963f85fc83896e64",
+        "12.in": "4523540f1504cd17100c4835e85b7eefd49911580f8efff0599a8f283be6b9e3",
+        "12.out": "89e27eeaea20dfc549affaa558db3e015ee24167f6d844e74cb0fa55cb986b41",
+        "2.in": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+        "2.out": "4523540f1504cd17100c4835e85b7eefd49911580f8efff0599a8f283be6b9e3",
+        "3.in": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+        "3.out": "3d914f9348c9cc0ff8a79716700b9fcd4d2f3e711608004eb8f138bcba7f14d9",
+        "4.in": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b",
+        "4.out": "9c1ac48b9a6b519464185a0c5df1b2426f364103036bd29b629b65e87aec5390",
+        "5.in": "e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb",
+        "5.out": "9c1ac48b9a6b519464185a0c5df1b2426f364103036bd29b629b65e87aec5390",
+        "6.in": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+        "6.out": "cb7f423e8c37a17b68993b6b88e83de15f7a0f1ed8e6a03145018f696ae0947e",
+        "7.in": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+        "7.out": "cbe8185d766c12f3cd3e05c20a277e812de9f10b6a9efd43c686b6fce07bf8d7",
+        "8.in": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
+        "8.out": "25a5b17b32ecc7035873440bf39e24a81de5bf8422934629c174a96a483521c3",
+        "9.in": "3fdba35f04dc8c462986c992bcf875546257113072a909c162f7e470e581e278",
+        "9.out": "e97ee85f2dabbad208632e1d291e4e923ccf73bf6187785566e415de10410633",
+        "迷路的佐罗.txt": "85459ea0a31b51fcaa27e3992cacfd813cda367ab05988a8b6a9bc028683abda"
+      },
+      "final_files": {
+        "1.in": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+        "1.out": "7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+        "10.in": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+        "10.out": "db9fd7bf3f74b55edde5af762dacbb47e90b5ba8994289e648395caec9241ed7",
+        "11.in": "b17ef6d19c7a5b1ee83b907c595526dcb1eb06db8227d650d5dda0a9f4ce8cd9",
+        "11.out": "69cfe66b17bcc88ec829e9500d4255a5c92faf45fc4b35b1963f85fc83896e64",
+        "12.in": "4523540f1504cd17100c4835e85b7eefd49911580f8efff0599a8f283be6b9e3",
+        "12.out": "89e27eeaea20dfc549affaa558db3e015ee24167f6d844e74cb0fa55cb986b41",
+        "2.in": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+        "2.out": "4523540f1504cd17100c4835e85b7eefd49911580f8efff0599a8f283be6b9e3",
+        "3.in": "4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+        "3.out": "3d914f9348c9cc0ff8a79716700b9fcd4d2f3e711608004eb8f138bcba7f14d9",
+        "4.in": "f5ca38f748a1d6eaf726b8a42fb575c3c71f1864a8143301782de13da2d9202b",
+        "4.out": "9c1ac48b9a6b519464185a0c5df1b2426f364103036bd29b629b65e87aec5390",
+        "5.in": "e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb",
+        "5.out": "92e89bebb1b299e96944a5a5fd5dde5ce4aef7ad22576f5e8fdf2828d1d6759b",
+        "6.in": "4a44dc15364204a80fe80e9039455cc1608281820fe2b24f1e5233ade6af1dd5",
+        "6.out": "cb7f423e8c37a17b68993b6b88e83de15f7a0f1ed8e6a03145018f696ae0947e",
+        "7.in": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+        "7.out": "cbe8185d766c12f3cd3e05c20a277e812de9f10b6a9efd43c686b6fce07bf8d7",
+        "8.in": "6b51d431df5d7f141cbececcf79edf3dd861c3b4069f0b11661a3eefacbba918",
+        "8.out": "25a5b17b32ecc7035873440bf39e24a81de5bf8422934629c174a96a483521c3",
+        "9.in": "3fdba35f04dc8c462986c992bcf875546257113072a909c162f7e470e581e278",
+        "9.out": "e97ee85f2dabbad208632e1d291e4e923ccf73bf6187785566e415de10410633",
+        "迷路的佐罗.txt": "85459ea0a31b51fcaa27e3992cacfd813cda367ab05988a8b6a9bc028683abda"
+      },
+      "form_unchanged": true,
+      "file_list_unchanged": true
+    }
+  ],
+  "uploads": [
+    {
+      "global_number": 19964,
+      "filename": "5.out",
+      "sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+      "verified": true
+    },
+    {
+      "global_number": 19966,
+      "filename": "10.out",
+      "sha256": "db9fd7bf3f74b55edde5af762dacbb47e90b5ba8994289e648395caec9241ed7",
+      "verified": true
+    },
+    {
+      "global_number": 19966,
+      "filename": "5.out",
+      "sha256": "92e89bebb1b299e96944a5a5fd5dde5ce4aef7ad22576f5e8fdf2828d1d6759b",
+      "verified": true
+    }
+  ],
+  "verified_at": "2026-10-23T23:10:27.833482+00:00",
+  "validation": {
+    "command": "python3 tools/handoff.py --verify",
+    "exit_code": 0,
+    "log_sha256": "4dc4cc5a3715f060d29e86d3b84ad3c5429d9c46e0382b2577df3ae0fb7c0c82",
+    "sync_protection_tests": 6,
+    "mutations_detected": 3
+  }
+}
