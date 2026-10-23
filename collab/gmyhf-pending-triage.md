@@ -92,3 +92,8 @@
 
 本批11题、249对，0题复核通过，11题保留疑点，尚未激活数据。
 详见[gmyhf-pending-batch7-review.md](gmyhf-pending-batch7-review.md)；全量进度见[gmyhf-pending-progress.json](gmyhf-pending-progress.json)。
+
+## 第8批续核记录
+
+本批11题、156对，0题复核通过，11题保留疑点，尚未激活数据。
+详见[gmyhf-pending-batch8-review.md](gmyhf-pending-batch8-review.md)；全量进度见[gmyhf-pending-progress.json](gmyhf-pending-progress.json)。
