@@ -49,7 +49,7 @@ LABELS = {
     4097: "2..99 unique alphabetic stations precede 1..99 valid direction queries",
     12555: "1..300000 finite decimal sample values follow the declared sample count",
     12557: "exactly two dot-separated numeric version strings contain no spaces",
-    18104: "two nonempty rows each contain at most 100 positive weights in 1..100",
+    18104: "two nonempty rows each contain at most 100 nonnegative weights in 0..100",
     18105: "the single nonempty row contains nonnegative integer citation counts",
     18107: "1..50 ordered integer intervals follow the declared case count",
     27072: "the input is one integer n in 1..100000",
@@ -61,7 +61,7 @@ INVALID = {
     4069: "1\n5 1\n1 6 2 3\n", 4070: "8\n0\n", 4073: "1\n\n0\n",
     4096: "ABCE\n", 4098: "1\n2\n1 1 1\n2 0 2\n",
     27623: "1 2\n0 1\n", 4095: "1\nStation2\n", 4097: "2\nA\nA\n1\nA A\n",
-    12555: "2\n1\n", 12557: "1.a\n2.0\n", 18104: "0\n1\n",
+    12555: "2\n1\n", 12557: "1.a\n2.0\n", 18104: "-1\n1\n",
     18105: "1 -1 2\n", 18107: "1\n5 4\n", 27072: "100001\n",
     4094: "1 100\n0 0\n",
 }
@@ -299,7 +299,7 @@ def valid(number: int, text: str) -> bool:
             return len(lines) == 2 and 1 <= n <= 300000 and len(values) == n and all(value == value and abs(value) != float("inf") for value in values)
         if number == 12557: return len(lines) == 2 and all(re.fullmatch(r"\d+(?:\.\d+)*", line) for line in lines)
         if number == 18104:
-            return len(lines) == 2 and all(1 <= len(row.split()) <= 100 and all(1 <= int(x) <= 100 for x in row.split()) for row in lines)
+            return len(lines) == 2 and all(1 <= len(row.split()) <= 100 and all(0 <= int(x) <= 100 for x in row.split()) for row in lines)
         if number == 18105: return len(lines) == 1 and bool(tokens) and all(re.fullmatch(r"\d+", x) for x in tokens)
         if number == 18107:
             t = int(lines[0]); rows = [list(map(int, row.split())) for row in lines[1:]]

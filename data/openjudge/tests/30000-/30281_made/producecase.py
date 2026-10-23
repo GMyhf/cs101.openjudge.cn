@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Problem-specific generators and input contracts for T-028 phase-2 round 23."""
 from __future__ import annotations
+from decimal import Decimal, InvalidOperation
 
 import random
 import re
@@ -105,7 +106,9 @@ def _route_cost(costs, points, order):
     def leg(p, q):
         dx, dy = abs(p[0] - q[0]), abs(p[1] - q[1])
         a, b, c = costs
-        return min(dx, dy) * c + max(dx - dy, 0) * a + max(dy - dx, 0) * b
+        axis = a if dx >= dy else b
+        pairs, odd = divmod(abs(dx-dy), 2)
+        return min(dx, dy)*c + pairs*min(2*axis, 2*c) + odd*axis
     route = [(0, 0)] + [points[i] for i in order] + [(100, 100)]
     return sum(leg(route[i], route[i + 1]) for i in range(4))
 
@@ -142,7 +145,7 @@ def generate(number, seed):
         return f"{n} {m}\n" + " ".join(str(r.randrange(m)) for _ in range(n)) + "\n"
     if number == 30281:
         while True:
-            costs = tuple(r.randint(1, 100) / 10 for _ in range(3))
+            costs = tuple(Decimal(r.randint(1, 100)) / 10 for _ in range(3))
             points = [tuple(r.randint(-99, 99) for _ in range(2)) for _ in range(3)]
             reduced = (min(costs[0], costs[1] + costs[2]), min(costs[1], costs[0] + costs[2]),
                        min(costs[2], costs[0] + costs[1]))
@@ -229,12 +232,9 @@ def valid(number, text):
             n,m=map(int,lines[0].split()); values=list(map(int,lines[1].split()))
             return len(lines)==2 and 1<=n<=50 and 1<=m<=20 and len(values)==n and all(0<=x<m for x in values)
         if number == 30281:
-            costs=list(map(float,lines[0].split())); rows=[row.split() for row in lines[1:]]
-            if not (len(lines)==4 and len(costs)==3 and all(.1<=x<=10 for x in costs) and len(rows)==3 and len({row[0] for row in rows})==3 and all(len(row)==3 and 1<=len(row[0])<=20 and -100<int(row[1])<100 and -100<int(row[2])<100 for row in rows)): return False
-            points=[(int(row[1]),int(row[2])) for row in rows]
-            reduced=(min(costs[0],costs[1]+costs[2]),min(costs[1],costs[0]+costs[2]),min(costs[2],costs[0]+costs[1]))
-            values=[_route_cost(reduced,points,order) for order in ((0,1,2),(0,2,1),(1,0,2),(1,2,0),(2,0,1),(2,1,0))]
-            return values.count(min(values))==1
+            costs=list(map(Decimal,lines[0].split())); rows=[row.split() for row in lines[1:]]
+            if not (len(lines)==4 and len(costs)==3 and all(Decimal('.1')<=x<=10 for x in costs) and len(rows)==3 and len({row[0] for row in rows})==3 and all(len(row)==3 and 1<=len(row[0])<=20 and -100<int(row[1])<100 and -100<int(row[2])<100 for row in rows)): return False
+            return True  # 并列最优按输入编号字典序输出，不限制输入唯一。
         if number == 30313:
             n,m=map(int,lines[0].split()); edges=[tuple(map(int,row.split())) for row in lines[1:]]
             return 1<=n<=100000 and 0<=m<=min(200000,n*(n-1)//2) and len(edges)==m and len({(u,v) for u,v,w in edges})==m and all(1<=u<v<=n and 1<=w<=10**9 for u,v,w in edges)
@@ -274,7 +274,7 @@ def valid(number, text):
             fixed=[clue==[1,cols] for clue in clues[:rows]]
             if any(clue not in ([0],[1,cols]) for clue in clues[:rows]): return False
             return all(clue[1:]==_runs(fixed) for clue in clues[rows:])
-    except (ValueError, IndexError, TypeError):
+    except (ValueError, IndexError, TypeError, InvalidOperation):
         return False
     return False
 
@@ -282,7 +282,7 @@ def valid(number, text):
 
 import subprocess as _subprocess, sys as _sys, tempfile as _tempfile
 from pathlib import Path as _Path
-REFERENCE="# External reference: http://cs101.openjudge.cn/practice/30281/statistics/\n# Accepted submission: 51424826\n# Source: http://cs101.openjudge.cn/practice/solution/51424826/\n# License: not declared on the submission page; no license is inferred.\n\ndef min_cost(dx, dy):\n    min_delta = min(dx, dy)\n    rem_delta = abs(dx-dy)\n    cost = min_delta * c\n    if dx > dy:\n        cost += rem_delta * a\n    else:\n        cost += rem_delta * b\n    return cost\na, b, c = map(float, input().split())\na, b, c = min(a, b+c), min(b, a+c), min(c, a+b)\npos = []\nname = []\nfor _ in range(3):\n    s, x, y = input().split()\n    pos.append((int(x), int(y)))\n    name.append(s)\nmatrix = [[0]*5 for _ in range(5)]\nmatrix[0][1] = matrix[1][0] = min_cost(abs(pos[0][0]), abs(pos[0][1]))\nmatrix[0][2] = matrix[2][0] = min_cost(abs(pos[1][0]), abs(pos[1][1]))\nmatrix[0][3] = matrix[3][0] = min_cost(abs(pos[2][0]), abs(pos[2][1]))\nmatrix[1][2] = matrix[2][1] = min_cost(abs(pos[0][0]-pos[1][0]), abs(pos[0][1]-pos[1][1]))\nmatrix[1][3] = matrix[3][1] = min_cost(abs(pos[0][0]-pos[2][0]), abs(pos[0][1]-pos[2][1]))\nmatrix[3][2] = matrix[2][3] = min_cost(abs(pos[1][0]-pos[2][0]), abs(pos[1][1]-pos[2][1]))\nmatrix[4][1] = matrix[1][4] = min_cost(100-pos[0][0], 100-pos[0][1])\nmatrix[4][2] = matrix[2][4] = min_cost(100-pos[1][0], 100-pos[1][1])\nmatrix[4][3] = matrix[3][4] = min_cost(100-pos[2][0], 100-pos[2][1])\nroute = [(1, 2, 3), (1, 3, 2), (2, 1, 3), (2, 3, 1), (3, 1, 2), (3, 2, 1)]\nd = {}\nfor i, j, k in route:\n    d[(i, j, k)] = matrix[0][i]+matrix[i][j]+matrix[j][k]+matrix[k][4]\ncost = min(d.values())\nfor key in d:\n    if d[key] == cost:\n        print(name[key[0]-1], name[key[1]-1], name[key[2]-1])\n        break\nprint(f'{cost:.2f}')\n"
+REFERENCE="# External reference: http://cs101.openjudge.cn/practice/30281/statistics/\n# Accepted submission: 51424826\n# Source: http://cs101.openjudge.cn/practice/solution/51424826/\n# License: not declared on the submission page; no license is inferred.\n\n# 本地修正：反向斜走可以更便宜；Decimal保证并列判断精确。\nfrom decimal import Decimal\n\ndef min_cost(dx, dy):\n    axis = a if dx >= dy else b\n    low, high = min(dx, dy), max(dx, dy)\n    pairs, odd = divmod(high-low, 2)\n    return low*c + pairs*min(2*axis, 2*c) + odd*axis\na, b, c = map(Decimal, input().split())\na, b, c = min(a, b+c), min(b, a+c), min(c, a+b)\npos = []\nname = []\nfor _ in range(3):\n    s, x, y = input().split()\n    pos.append((int(x), int(y)))\n    name.append(s)\nmatrix = [[0]*5 for _ in range(5)]\nmatrix[0][1] = matrix[1][0] = min_cost(abs(pos[0][0]), abs(pos[0][1]))\nmatrix[0][2] = matrix[2][0] = min_cost(abs(pos[1][0]), abs(pos[1][1]))\nmatrix[0][3] = matrix[3][0] = min_cost(abs(pos[2][0]), abs(pos[2][1]))\nmatrix[1][2] = matrix[2][1] = min_cost(abs(pos[0][0]-pos[1][0]), abs(pos[0][1]-pos[1][1]))\nmatrix[1][3] = matrix[3][1] = min_cost(abs(pos[0][0]-pos[2][0]), abs(pos[0][1]-pos[2][1]))\nmatrix[3][2] = matrix[2][3] = min_cost(abs(pos[1][0]-pos[2][0]), abs(pos[1][1]-pos[2][1]))\nmatrix[4][1] = matrix[1][4] = min_cost(100-pos[0][0], 100-pos[0][1])\nmatrix[4][2] = matrix[2][4] = min_cost(100-pos[1][0], 100-pos[1][1])\nmatrix[4][3] = matrix[3][4] = min_cost(100-pos[2][0], 100-pos[2][1])\nroute = [(1, 2, 3), (1, 3, 2), (2, 1, 3), (2, 3, 1), (3, 1, 2), (3, 2, 1)]\nd = {}\nfor i, j, k in route:\n    d[(i, j, k)] = matrix[0][i]+matrix[i][j]+matrix[j][k]+matrix[k][4]\ncost = min(d.values())\nfor key in d:\n    if d[key] == cost:\n        print(name[key[0]-1], name[key[1]-1], name[key[2]-1])\n        break\nprint(f'{cost:.2f}')\n"
 LANGUAGE='Python3'
 NUMBER=30281
 SAMPLE='1.0 1.0 1.4\nAdamantium 92 40\ninfinity_gauntlet -74 -25\ndecade_armor 95 72\n'

@@ -49,7 +49,7 @@ class GMyhfDataArtifactTests(unittest.TestCase):
         materialized = {int(row["global_number"]) for row in self.audit["entries"]
                         if row.get("materialized_dir")}
         self.assertEqual(158, len(materialized))
-        self.assertEqual(209, len(self.download_materialized))
+        self.assertEqual(210, len(self.download_materialized))
         problems = {int(row["global_number"]) for row in self.audit["entries"]
                     if row["status"] == "original_problem"}
         # 27631/28050 的 archive 原数据仍判 original_problem，但后台下载的平台

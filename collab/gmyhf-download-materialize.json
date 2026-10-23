@@ -1550,6 +1550,17 @@
       "contract_preserved_via_merge": false
     },
     {
+      "global_number": 28912,
+      "title": "绝对值函数最值",
+      "local_id": "28912",
+      "bucket": "20000-29982",
+      "cases": 20,
+      "drift": "content_changed",
+      "bytes": 404996,
+      "correction_report": "collab/gmyhf-followup-repairs.json",
+      "corrected_pairs": 0
+    },
+    {
       "global_number": 28914,
       "local_id": "28914",
       "bucket": "20000-29982",
@@ -1777,10 +1788,11 @@
       "bucket": "30000-",
       "title": "简单的四则运算和函数求值",
       "cases": 11,
-      "bytes": 2563,
+      "bytes": 2491,
       "drift": "content_changed",
       "unpaired_dropped": 0,
-      "contract_preserved_via_merge": true
+      "contract_preserved_via_merge": true,
+      "corrected_pairs": 1
     },
     {
       "global_number": 30163,
@@ -1898,11 +1910,11 @@
       "bucket": "30000-",
       "title": "穿越者和三个零件",
       "cases": 21,
-      "bytes": 2239,
+      "bytes": 2237,
       "drift": "exact",
       "unpaired_dropped": 0,
       "contract_preserved_via_merge": false,
-      "corrected_pairs": 6
+      "corrected_pairs": 16
     },
     {
       "global_number": 30283,
@@ -3584,10 +3596,6 @@
     ],
     "manual_exclusion": [
       {
-        "global_number": 28912,
-        "detail": "平台当前数据使已验证参考解法 WA（case 2），待维护者复核"
-      },
-      {
         "global_number": 31428,
         "detail": "手工配置的函数题（preset/samples/verify），非纯数据目录"
       },
@@ -3598,7 +3606,7 @@
     ]
   },
   "summary": {
-    "materialized": 209,
+    "materialized": 210,
     "contract_protected": 102,
     "output_over_2MiB": 7,
     "not_in_catalog": 232,
@@ -3606,6 +3614,8 @@
     "special_judge": 2,
     "no_download_links": 14,
     "runtime_margin": 4,
-    "manual_exclusion": 3
-  }
+    "manual_exclusion": 2
+  },
+  "followup_report": "collab/gmyhf-followup-repairs.json",
+  "current_materialized_count": 210
 }

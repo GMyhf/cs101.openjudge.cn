@@ -14,7 +14,7 @@
 
 落盘即替换：已有 `_GMyhf` 整目录换成平台当前数据，内容漂移记入报告
 （exact / line_endings_only / content_changed / new）。
-已审核的 93 对输入修正由 gmyhf_input_repairs 按清单重放；输入或答案出现
+已审核的93对输入修正及继续验收的11对修正由gmyhf_input_repairs合并清单重放；输入或答案出现
 未审核的变化时，在删除该题旧目录前报错。详见 collab/gmyhf-input-repairs.md。
 """
 from __future__ import annotations
@@ -47,11 +47,10 @@ BUCKET_RANGES = ((4000, 8210, "4000-8210"), (10000, 19963, "10000-19963"),
 # 活目录换走、valid() 契约悄悄失效 —— 不动它。
 # 31428：手工配置的函数题（preset_code/preset_suffix/samples.json/verify.py），
 # 目录里全是判题钩子，不是可替换的纯数据。
-# 28912：2026-10-23 复判发现平台当前数据使已验证参考解法在 case 2 判 WA
-# （数据整体重生成，非行尾差异），接进来会静默改变学生判题结果 —— 待维护者复核。
+# 28912：继续验收确认平台当前20组正确，旧参考解错误地访问非整数折点；
+# 修复参考解并独立复核后解除排除，见 collab/gmyhf-followup-repairs.json。
 MANUAL_EXCLUSIONS = {31454: "2026-10-22 人拍板 31454_made 复用私有题校验链，不覆盖",
-                     31428: "手工配置的函数题（preset/samples/verify），非纯数据目录",
-                     28912: "平台当前数据使已验证参考解法 WA（case 2），待维护者复核"}
+                     31428: "手工配置的函数题（preset/samples/verify），非纯数据目录"}
 
 
 def bucket_of(number):
@@ -220,6 +219,8 @@ def main():
             if correction is not None:
                 record["correction"] = {key: correction[key] for key in
                                         ("reason", "before_input_sha256", "before_output_sha256")}
+                record["correction"]["ledger"] = correction.get(
+                    "ledger", "collab/gmyhf-input-repairs.json")
             records.append(record)
         provenance = {
             "owner": "GMyhf",
@@ -234,7 +235,11 @@ def main():
         }
         corrected_pairs = sum("correction" in record for record in records)
         if corrected_pairs:
-            provenance["correction_ledger"] = "collab/gmyhf-input-repairs.json"
+            ledgers = sorted({record["correction"]["ledger"] for record in records
+                              if "correction" in record})
+            provenance["correction_ledgers"] = ledgers
+            provenance["correction_ledger"] = ("collab/gmyhf-input-repairs.json"
+                if "collab/gmyhf-input-repairs.json" in ledgers else ledgers[0])
         if unpaired:
             provenance["unpaired_files_dropped"] = unpaired
         (destination / "SOURCE.json").write_text(

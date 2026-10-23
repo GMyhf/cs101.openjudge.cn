@@ -164,7 +164,14 @@ def repair_input(number, payload):
 
 def load_repairs():
     data = json.loads(LEDGER.read_text(encoding="utf-8"))
-    return {(row["global_number"], row["original_input"]): row for row in data["entries"]}
+    rows = list(data["entries"])
+    followup = ROOT / "collab/gmyhf-followup-repairs.json"
+    if followup.is_file():
+        rows.extend(json.loads(followup.read_text(encoding="utf-8"))["entries"])
+    repairs = {(row["global_number"], row["original_input"]): row for row in rows}
+    if len(repairs) != len(rows):
+        raise ValueError("修正清单中有重复的题号和原文件名")
+    return repairs
 
 
 def repair_pair(number, filename, input_data, output_data, repairs):
@@ -178,7 +185,8 @@ def repair_pair(number, filename, input_data, output_data, repairs):
     before = entry["before_input_sha256"], entry["before_output_sha256"]
     if current != before:
         raise ValueError(f"{number}/{filename} 已变化，须重新审核后更新修正清单")
-    fixed_input = repair_input(number, input_data)
+    fixed_input = (entry["corrected_input"].encode("utf-8") if "corrected_input" in entry
+                   else repair_input(number, input_data))
     fixed_output = entry["corrected_output"].encode("utf-8")
     if (sha(fixed_input), sha(fixed_output)) != after:
         raise ValueError(f"{number}/{filename} 修正规则或答案与审核哈希不符")

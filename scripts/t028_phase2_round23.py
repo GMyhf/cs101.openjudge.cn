@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Problem-specific generators and input contracts for T-028 phase-2 round 23."""
 from __future__ import annotations
+from decimal import Decimal, InvalidOperation
 
 import random
 import re
@@ -105,7 +106,9 @@ def _route_cost(costs, points, order):
     def leg(p, q):
         dx, dy = abs(p[0] - q[0]), abs(p[1] - q[1])
         a, b, c = costs
-        return min(dx, dy) * c + max(dx - dy, 0) * a + max(dy - dx, 0) * b
+        axis = a if dx >= dy else b
+        pairs, odd = divmod(abs(dx-dy), 2)
+        return min(dx, dy)*c + pairs*min(2*axis, 2*c) + odd*axis
     route = [(0, 0)] + [points[i] for i in order] + [(100, 100)]
     return sum(leg(route[i], route[i + 1]) for i in range(4))
 
@@ -142,7 +145,7 @@ def generate(number, seed):
         return f"{n} {m}\n" + " ".join(str(r.randrange(m)) for _ in range(n)) + "\n"
     if number == 30281:
         while True:
-            costs = tuple(r.randint(1, 100) / 10 for _ in range(3))
+            costs = tuple(Decimal(r.randint(1, 100)) / 10 for _ in range(3))
             points = [tuple(r.randint(-99, 99) for _ in range(2)) for _ in range(3)]
             reduced = (min(costs[0], costs[1] + costs[2]), min(costs[1], costs[0] + costs[2]),
                        min(costs[2], costs[0] + costs[1]))
@@ -229,12 +232,9 @@ def valid(number, text):
             n,m=map(int,lines[0].split()); values=list(map(int,lines[1].split()))
             return len(lines)==2 and 1<=n<=50 and 1<=m<=20 and len(values)==n and all(0<=x<m for x in values)
         if number == 30281:
-            costs=list(map(float,lines[0].split())); rows=[row.split() for row in lines[1:]]
-            if not (len(lines)==4 and len(costs)==3 and all(.1<=x<=10 for x in costs) and len(rows)==3 and len({row[0] for row in rows})==3 and all(len(row)==3 and 1<=len(row[0])<=20 and -100<int(row[1])<100 and -100<int(row[2])<100 for row in rows)): return False
-            points=[(int(row[1]),int(row[2])) for row in rows]
-            reduced=(min(costs[0],costs[1]+costs[2]),min(costs[1],costs[0]+costs[2]),min(costs[2],costs[0]+costs[1]))
-            values=[_route_cost(reduced,points,order) for order in ((0,1,2),(0,2,1),(1,0,2),(1,2,0),(2,0,1),(2,1,0))]
-            return values.count(min(values))==1
+            costs=list(map(Decimal,lines[0].split())); rows=[row.split() for row in lines[1:]]
+            if not (len(lines)==4 and len(costs)==3 and all(Decimal('.1')<=x<=10 for x in costs) and len(rows)==3 and len({row[0] for row in rows})==3 and all(len(row)==3 and 1<=len(row[0])<=20 and -100<int(row[1])<100 and -100<int(row[2])<100 for row in rows)): return False
+            return True  # 并列最优按输入编号字典序输出，不限制输入唯一。
         if number == 30313:
             n,m=map(int,lines[0].split()); edges=[tuple(map(int,row.split())) for row in lines[1:]]
             return 1<=n<=100000 and 0<=m<=min(200000,n*(n-1)//2) and len(edges)==m and len({(u,v) for u,v,w in edges})==m and all(1<=u<v<=n and 1<=w<=10**9 for u,v,w in edges)
@@ -274,7 +274,7 @@ def valid(number, text):
             fixed=[clue==[1,cols] for clue in clues[:rows]]
             if any(clue not in ([0],[1,cols]) for clue in clues[:rows]): return False
             return all(clue[1:]==_runs(fixed) for clue in clues[rows:])
-    except (ValueError, IndexError, TypeError):
+    except (ValueError, IndexError, TypeError, InvalidOperation):
         return False
     return False
 

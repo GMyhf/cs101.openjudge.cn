@@ -3,16 +3,15 @@
 # Source: http://cs101.openjudge.cn/practice/solution/51424826/
 # License: not declared on the submission page; no license is inferred.
 
+# 本地修正：反向斜走可以更便宜；Decimal保证并列判断精确。
+from decimal import Decimal
+
 def min_cost(dx, dy):
-    min_delta = min(dx, dy)
-    rem_delta = abs(dx-dy)
-    cost = min_delta * c
-    if dx > dy:
-        cost += rem_delta * a
-    else:
-        cost += rem_delta * b
-    return cost
-a, b, c = map(float, input().split())
+    axis = a if dx >= dy else b
+    low, high = min(dx, dy), max(dx, dy)
+    pairs, odd = divmod(high-low, 2)
+    return low*c + pairs*min(2*axis, 2*c) + odd*axis
+a, b, c = map(Decimal, input().split())
 a, b, c = min(a, b+c), min(b, a+c), min(c, a+b)
 pos = []
 name = []

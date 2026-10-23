@@ -91,11 +91,17 @@
     {
       "case": 9,
       "original_input": "9.in",
-      "input_bytes": 279,
-      "input_sha256": "9d3483fa4d3de5b68b005b91e453d6279d49493a9c943a13f583ce97eea8f0a6",
+      "input_bytes": 207,
+      "input_sha256": "9655233fc136d40e6773be87dfd84c94cc2daf6131d75d3d4bf3f76d4c7c14ae",
       "original_output": "9.out",
       "output_bytes": 15,
-      "output_sha256": "0302226eff91e573d12412215957c47bb675dc285796445503af17a46b12f639"
+      "output_sha256": "0302226eff91e573d12412215957c47bb675dc285796445503af17a46b12f639",
+      "correction": {
+        "reason": "去除题面禁止的等号，保留纯数学格式错误",
+        "before_input_sha256": "9d3483fa4d3de5b68b005b91e453d6279d49493a9c943a13f583ce97eea8f0a6",
+        "before_output_sha256": "0302226eff91e573d12412215957c47bb675dc285796445503af17a46b12f639",
+        "ledger": "collab/gmyhf-followup-repairs.json"
+      }
     },
     {
       "case": 10,
@@ -106,5 +112,9 @@
       "output_bytes": 15,
       "output_sha256": "0302226eff91e573d12412215957c47bb675dc285796445503af17a46b12f639"
     }
-  ]
+  ],
+  "correction_ledgers": [
+    "collab/gmyhf-followup-repairs.json"
+  ],
+  "correction_ledger": "collab/gmyhf-followup-repairs.json"
 }
