@@ -82,6 +82,50 @@ def repair_input(number, payload):
         if len(distances) == n - 1:
             return payload
         return (f'{n} {m}\n' + ' '.join(map(str, distances[:n-1])) + '\n').encode()
+    if number == 21471:
+        values = list(map(int, text.split()))
+        n = values[0]
+        assert n >= 1 and len(values) == 1 + n * n
+        if n <= 20:
+            return payload
+        rows = [values[1+i*n:1+i*n+20] for i in range(20)]
+        return ('20\n' + '\n'.join(' '.join(map(str,row)) for row in rows) + '\n').encode()
+    if number == 25563:
+        values = list(map(int, text.split()))
+        n, m = values[:2]
+        scores = values[2:]
+        assert 1 < n < 50000 and 1 <= m <= n and len(scores) == n
+        assert all(1 <= x < 1000 for x in scores)
+        if min(scores) > 1:
+            return payload
+        return (f'{n} {m}\n' + ' '.join(str(max(x,2)) for x in scores) + '\n').encode()
+    if number == 25577:
+        tokens = text.split()
+        if len(tokens) == 1:
+            assert int(tokens[0]) >= 0
+            return payload
+        # 混入了其他题输入，替换为自产的高精度锚点，不猜测原文件含义。
+        return b'10000\n'
+    if number == 27946:
+        lines = text.splitlines()
+        values = list(map(int,lines[0].split()))
+        index, distance = map(int,' '.join(lines[1:]).split())
+        assert 2 <= len(values) <= 100000 and 1 <= index <= len(values) and 0 <= distance <= 1000
+        if all(-1000 <= x <= 1000 for x in values):
+            return payload
+        # 范围出自hint的Constraints，同属当前题面；参数保持。
+        values = [min(1000,max(-1000,x)) for x in values]
+        return (' '.join(map(str,values)) + f'\n{index}\n{distance}\n').encode()
+    if number == 30177:
+        values = list(map(int,text.split()))
+        m,k = values[:2]
+        coins = values[2:2+m]
+        assert 1 <= m <= 10 and 1 <= k <= 10 and len(set(coins)) == m
+        assert len(coins) == m and coins[0] == 1 and all(1 <= x <= 100 for x in coins)
+        if len(values) == 2+m:
+            return payload
+        # 单组输入只保留声明的m个面值，移除串接在末尾的额外内容。
+        return (f'{m} {k}\n' + ' '.join(map(str,coins)) + '\n').encode()
     return payload
 
 

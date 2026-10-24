@@ -184,6 +184,70 @@ class ReviewRulesTests(unittest.TestCase):
                 self.assertEqual(str(expected),solve(f'5 {m}\n'+' '.join(map(str,gaps))))
 
 
+    def test_third_batch_bounds_preserve_rows_and_parameters(self):
+        matrix = [[100*i+j for j in range(21)] for i in range(21)]
+        given = '21\n'+'\n'.join(' '.join(map(str,row)) for row in matrix)
+        fixed = list(map(int,rules.repair_input(21471,given.encode()).split()))
+        self.assertEqual([20]+[v for row in matrix[:20] for v in row[:20]],fixed)
+        self.assertEqual(b'3 2\n2 3 2\n',rules.repair_input(25563,b'3 2\n1 3 2'))
+        replacement = rules.repair_input(25577,b'3 2\n1 3 2').strip()
+        self.assertTrue(replacement.isdigit())
+        self.assertGreaterEqual(int(replacement),0)
+        self.assertEqual(b'-1000 3 1000\n2\n1\n',rules.repair_input(27946,b'-2000 3 5000\n2\n1'))
+        self.assertEqual(b'3 4\n1 3 5\n',rules.repair_input(30177,b'3 4\n1 3 5\n2 3\n1 2'))
+        for n,value in ((21471,b'1\n7'),(25563,b'2 1\n2 3'),(25577,b'0'),
+                        (27946,b'-1000 1000\n1\n0'),(30177,b'1 1\n1')):
+            self.assertEqual(value,rules.repair_input(n,value))
+
+    def test_attention_against_expanded_four_index_formula(self):
+        solve = self.reference(21471,9,'attention')
+        rng = random.Random(64)
+        for n in range(1,6):
+            for _ in range(10):
+                a = [[rng.randrange(-4,5) for _ in range(n)] for _ in range(n)]
+                expected = [[sum(a[i][r]*a[s][r]*a[s][j] for r in range(n) for s in range(n))
+                             for j in range(n)] for i in range(n)]
+                text = str(n)+'\n'+'\n'.join(' '.join(map(str,row)) for row in a)
+                self.assertEqual([v for row in expected for v in row],list(map(int,solve(text).split())))
+
+    def test_teams_against_every_contiguous_partition(self):
+        solve = self.reference(25563,11,'teams')
+        for a in itertools.product(range(2,5),repeat=5):
+            for m in range(1,6):
+                expected = min(max(sum(a[l:r]) for l,r in zip((0,)+cuts,cuts+(5,)))
+                               for cuts in itertools.combinations(range(1,5),m-1))
+                self.assertEqual(str(expected),solve(f'5 {m}\n'+' '.join(map(str,a))))
+
+    def test_fibonacci_against_linear_exact_integer_recurrence(self):
+        solve = self.reference(25577,11,'fibonacci')
+        a,b = 0,1
+        for n in range(10001):
+            if n < 100 or n == 10000:
+                self.assertEqual(str(a),solve(str(n)))
+            a,b = b,a+b
+
+    def test_close_duplicates_against_all_index_pairs(self):
+        solve = self.reference(27946,13,'close_duplicates')
+        rng = random.Random(65)
+        for _ in range(300):
+            a = [rng.randrange(-2000,2001) for _ in range(12)]
+            k,d = rng.randrange(1,13),rng.randrange(1001)
+            expected = any(j-i <= k and abs(a[i]-a[j]) <= d for i in range(12) for j in range(i+1,12))
+            self.assertEqual('true' if expected else 'false',solve(' '.join(map(str,a))+f'\n{k}\n{d}'))
+
+    def test_tickets_against_explicit_reachable_sums(self):
+        solve = self.reference(30177,14,'tickets')
+        for tail_size in range(4):
+            for tail in itertools.combinations(range(2,9),tail_size):
+                coins = (1,)+tail
+                for k in range(1,5):
+                    reachable = {0}
+                    for _ in range(k):
+                        reachable |= {x+c for x in reachable for c in coins}
+                    first_missing = next(x for x in range(1,k*max(coins)+2) if x not in reachable)
+                    self.assertEqual(str(first_missing-1),solve(f'{len(coins)} {k}\n'+' '.join(map(str,coins))))
+
+
 
 class ReviewUploadTests(unittest.TestCase):
     def setUp(self):
