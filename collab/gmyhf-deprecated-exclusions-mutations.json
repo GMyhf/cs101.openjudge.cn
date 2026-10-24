@@ -1,0 +1,55 @@
+{
+  "task": "T-060",
+  "batch": 26,
+  "deprecated_problems": [
+    19945,
+    20139
+  ],
+  "mutation_count": 6,
+  "mutations": [
+    {
+      "mutation": "撤销19945固定排除",
+      "test": "tests.test_gmyhf_deprecated_exclusions.DeprecatedExclusionTests.test_future_mapping_cannot_reactivate_deprecated_problems",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "1909be60554095399440c4dabd74daece5691cde405f5a0f05f7f208d157b1f6"
+    },
+    {
+      "mutation": "撤销20139固定排除",
+      "test": "tests.test_gmyhf_deprecated_exclusions.DeprecatedExclusionTests.test_future_mapping_cannot_reactivate_deprecated_problems",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "8fea2e8032fd07613a217ae618eceffe56cfd74ebbd3003302e5d4d7a219fc72"
+    },
+    {
+      "mutation": "跳过整个排除判断",
+      "test": "tests.test_gmyhf_deprecated_exclusions.DeprecatedExclusionTests.test_future_mapping_cannot_reactivate_deprecated_problems",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "2d5f0ebb326a04c1d3dda76de266768595853be7f1c743a7c655ae244ccfbc0e"
+    },
+    {
+      "mutation": "记录排除后仍处理",
+      "test": "tests.test_gmyhf_deprecated_exclusions.DeprecatedExclusionTests.test_future_mapping_cannot_reactivate_deprecated_problems",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "be0e8dfd94983138b259526cbdd118e009aa501fff8d293953237f8e5864d8dd"
+    },
+    {
+      "mutation": "第一题后中断漏处理第二题",
+      "test": "tests.test_gmyhf_deprecated_exclusions.DeprecatedExclusionTests.test_future_mapping_cannot_reactivate_deprecated_problems",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "d64ee4dfb309d6aaa9f1191d8f511ea2db95feb3564b2b34ea7091a714d9e5ef"
+    },
+    {
+      "mutation": "意外启用废弃题目录",
+      "test": "tests.test_gmyhf_deprecated_exclusions.DeprecatedExclusionTests.test_actual_catalog_keeps_both_deprecated_problems_inactive",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "b1c81fcdc2e988c1a2ab423b6807e5c770d9f05c1979c83cc52291307c0b3771"
+    }
+  ],
+  "source_sha256": "df8e6b36434e8da297153c04a9b3d5642cbfc78e21fc0332b0f55e832e6f8b34",
+  "tests_sha256": "12717c07ca6977f157d41a5119c38eb91df1f85481c49bf17f906e2b917d3d1a"
+}

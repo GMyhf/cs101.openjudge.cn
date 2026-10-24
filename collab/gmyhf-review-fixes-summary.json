@@ -4596,9 +4596,7 @@
     ]
   },
   "remaining_holds": {
-    "author_semantics": [
-      19945
-    ],
+    "author_semantics": [],
     "special_judge_protocol": [
       27952,
       28341
@@ -4611,6 +4609,10 @@
     "public_catalog_mapping_and_existing_validator_exclusions": "保留原接入排除，不属于已修复输入/答案的计数。",
     "remote_special_judge": [
       31381
+    ],
+    "deprecated_excluded": [
+      19945,
+      20139
     ]
   },
   "next_candidates_not_exhaustive": [],
@@ -4636,6 +4638,10 @@
       "separate_readback_files": 52
     },
     "procedure_source": "\"\"\"原二十批汇总追加后续复核裁定；保留历史报告与修复累计数。\"\"\"\nimport hashlib,json\nfrom pathlib import Path\nroot=Path.cwd();path=root/'collab/gmyhf-review-fixes-summary.json'\nproofpath=root/'collab/gmyhf-30497-contract-recheck.json';proof=json.loads(proofpath.read_text())\nassert proof['platform_writes']==0 and proof['download_pairs']==25 and proof['made_pairs']==40\nassert len(proof['readback_files'])==52 and proof['admin_form_unchanged'] and proof['original_test_files_unchanged']\nassert all(not row['strict_valid'] and row['valid_after_final_lf'] and row['hint_permitted_answer'] for row in proof['checks'])\nassert proof['local_judge']['status']=='Accepted'\nfor name,digest in proof['sources_sha256'].items():assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest,name\nreport=json.loads(path.read_text());changed=0\nfor row in report['original_report_dispositions']['items']:\n if row['global_number']==30497:\n  row['resolution']='第25批只读复核：提示明确允许undecidable，旧答案不符为误报；缺末尾LF不违反输入语义，既有valid和接入排除保留'\n  row['followup_proof']='collab/gmyhf-30497-contract-recheck.json';changed+=1\nreport['remaining_holds']['author_semantics']=[n for n in report['remaining_holds']['author_semantics'] if n not in (20139,30497)]\nreport['remaining_holds']['special_judge_protocol']=[n for n in report['remaining_holds']['special_judge_protocol'] if n!=31381]\nreport['remaining_holds']['remote_special_judge']=[31381]\nsource=Path(__file__).read_text()\nreport['post_review_updates']={'scope':'后续裁定覆盖当前remaining_holds和30497去向；原20批累计数及历史生成过程保留',\n '20139':{'decision':'用户明确废弃题保持排除','proof':'collab/gmyhf-review-fixes-batch24-proof.json'},\n '31381':{'decision':'第23批用户授权本地逐题SPJ绑定启用，远端SPJ未改','proof':'collab/gmyhf-31381-activation.json'},\n '30497':{'decision':'漏读提示的误报已收口；不改输入/答案/既有valid/绑定','proof':str(proofpath.relative_to(root)),'proof_sha256':hashlib.sha256(proofpath.read_bytes()).hexdigest(),'original_dispositions_corrected':changed,'separate_readonly_pairs':25,'separate_readback_files':52},\n 'procedure_source':source,'procedure_sha256':hashlib.sha256(source.encode()).hexdigest()}\npath.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\\n')\nprint('30497历史误报去向更新',changed,'项；待题意确认',report['remaining_holds']['author_semantics'])\n",
-    "procedure_sha256": "f59152f8599fdb19c7784a30dc47a931cecb9ab32fa62f03105516a37dde6759"
+    "procedure_sha256": "f59152f8599fdb19c7784a30dc47a931cecb9ab32fa62f03105516a37dde6759",
+    "19945": {
+      "decision": "用户明确废弃题保持排除，不再等待K或最小收益题意澄清",
+      "proof": "collab/gmyhf-deprecated-exclusions.json"
+    }
   }
 }
