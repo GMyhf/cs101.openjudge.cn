@@ -1,8 +1,8 @@
 {
   "note": "题面对输入的原话（逐字）与数据实际极值并排记账。由 scripts/build_input_domains.py 生成，tools/full_sweep.py 第 15 条盯着。引文没有数值范围（quote_has_bound=false）不是缺陷，是「这段题面本来就没写上界」，记下来是为了让它可见。",
   "updated": "2026-09-20",
-  "count": 1276,
-  "without_bound": 423,
+  "count": 1282,
+  "without_bound": 426,
   "entries": {
     "tests/1000-1999/01001_made": {
       "book": "practice",
@@ -8179,6 +8179,20 @@
       "case_count": 22,
       "data_digest": "166b805ab2af187f6010ffa1c10d4311cd42a397dce7ac00fa3992f309d912f9"
     },
+    "tests/20000-29982/27207_made": {
+      "book": "practice",
+      "id": "27207",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行一个整数n (1 <= n <= 10000)，表示需要制备的铑纳米管的数量。 其后每组数据有(2k+1)行，第一行一个整数 k (1 <= k <= 100)，表示配方数。 其后2k行，每两行是一种铑纳米管，编号从0到n-1。 第一行两个整数：t( 0 <= t <= 10000)，表示摩尔制备用时；x (0 <= x <=1 0000)，表示前体摩尔数，x=0时表示制备该铑纳米管不需要前体。 第二行x个整数，表示前体的编号。x=0时输入一个空行。",
+      "quote_has_bound": true,
+      "quote_max_number": 10000,
+      "generated_extremes": {
+        "max_int": 10000,
+        "min_int": 0
+      },
+      "case_count": 21,
+      "data_digest": "eb02293304add105ff4565fa7cf09aa26fabd8b22e8515190f669ed930ef4793"
+    },
     "tests/20000-29982/27217_made": {
       "book": "2025sp_routine",
       "id": "27217",
@@ -9959,6 +9973,20 @@
       "case_count": 40,
       "data_digest": "6e7c3616da79a9ca63784ec2e6e8cd919650eeeb54dba2f44c694386a8032f9e"
     },
+    "tests/20000-29982/29337_made": {
+      "book": "practice",
+      "id": "29337",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行为非负整数数组 nums ，其中每一个数用空格分隔。 第二行为整数 target 。",
+      "quote_has_bound": false,
+      "quote_max_number": null,
+      "generated_extremes": {
+        "max_int": 1000,
+        "min_int": -1000
+      },
+      "case_count": 21,
+      "data_digest": "41788aaf571878b77754370df1d13f86daf3622abd7a658c4422d66f8665436b"
+    },
     "tests/20000-29982/29340_made": {
       "book": "practice",
       "id": "29340",
@@ -10306,6 +10334,34 @@
       },
       "case_count": 20,
       "data_digest": "64b2e5688339a572c7c4e91d258f559f9fc4cd13bbd6120bff44eed4161ba16e"
+    },
+    "tests/20000-29982/29893_made": {
+      "book": "practice",
+      "id": "29893",
+      "source": "mirror_page",
+      "statement_quote": "输入 ## 输入格式 输入只有一行四个整数，分别表示始发站上车人数 $a$，车站数 $n$，终点站下车人数 $m$ 和所求的站点编号 $x$。",
+      "quote_has_bound": false,
+      "quote_max_number": null,
+      "generated_extremes": {
+        "max_int": 4181,
+        "min_int": 1
+      },
+      "case_count": 21,
+      "data_digest": "999502422d64c56d2f87e2a0a4732dc0e7ef94fa9fa8bd74f0000dc2c0fc8f33"
+    },
+    "tests/20000-29982/29894_made": {
+      "book": "practice",
+      "id": "29894",
+      "source": "mirror_page",
+      "statement_quote": "输入 ## 输入格式 输入只有一行四个整数，分别表示始发站上车人数 $a$，车站数 $n$，终点站下车人数 $m$ 和所求的站点编号 $x$。",
+      "quote_has_bound": false,
+      "quote_max_number": null,
+      "generated_extremes": {
+        "max_int": 4181,
+        "min_int": 1
+      },
+      "case_count": 21,
+      "data_digest": "0a6f58ae56eff5af460abd12ba693c3e03cc42c226f2380f0128d7fd6efc2b15"
     },
     "tests/20000-29982/29895_made": {
       "book": "pctbook",
@@ -12300,6 +12356,20 @@
       "case_count": 40,
       "data_digest": "df6d9e9315be8213b76ce63bebb1a777a9f06444782e29b8a2990c2bfd56ad16"
     },
+    "tests/30000-/31178_made": {
+      "book": "practice",
+      "id": "31178",
+      "source": "mirror_page",
+      "statement_quote": "输入 输入一行非空字符串 s，长度满足 1 ≤ |s| ≤ 100。",
+      "quote_has_bound": true,
+      "quote_max_number": 100,
+      "generated_extremes": {
+        "max_int": 900,
+        "min_int": 0
+      },
+      "case_count": 21,
+      "data_digest": "63c2ad3611fdc151689a09e3f68adefe0f5a2f772d0772278efbbe163af04b03"
+    },
     "tests/30000-/31180_made": {
       "book": "practice",
       "id": "31180",
@@ -12369,6 +12439,20 @@
       },
       "case_count": 40,
       "data_digest": "a10345d6ac0726ae2a38eaaa666fd762a61518b3ef5f8ec19d32b7f9848c677a"
+    },
+    "tests/30000-/31200_made": {
+      "book": "practice",
+      "id": "31200",
+      "source": "mirror_page",
+      "statement_quote": "输入 输入一行，包含两个正整数 a、b（100 ≤ a ≤ b ≤ 999）。",
+      "quote_has_bound": true,
+      "quote_max_number": 999,
+      "generated_extremes": {
+        "max_int": 999,
+        "min_int": 100
+      },
+      "case_count": 21,
+      "data_digest": "8d5fca7422d1a5ac825a8dbcf13de33a8bd154655e38921e4e489225c5f80661"
     },
     "tests/30000-/31201_made": {
       "book": "practice",

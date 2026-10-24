@@ -4631,14 +4631,7 @@
       31031,
       31032
     ],
-    "new_made_without_local_catalog": [
-      27207,
-      29337,
-      29893,
-      29894,
-      31178,
-      31200
-    ]
+    "new_made_without_local_catalog": []
   },
   "next_candidates_not_exhaustive": [],
   "preserved_exclusions": "未放宽valid、时限余量、2MiB输出或SPJ要求；无公开映射和无下载题仍保留原排除。",
@@ -4745,6 +4738,13 @@
       },
       "limits": "本批不新增公开题库/课程绑定，不改限额；6题本地数据暂未启用，5性能题答案超过2MiB继续排除。",
       "procedure_source": "import hashlib,json\nfrom pathlib import Path\nroot=Path.cwd();p=root/'collab/gmyhf-review-fixes-summary.json';d=json.loads(p.read_text())\nproof=root/'collab/gmyhf-missing-data-completion.json';r=json.loads(proof.read_text());s=r['summary']\nassert s['problems_with_new_data']==11 and s['total_new_pairs']==131 and s['total_new_files']==262\nassert s['remaining_without_downloads']==[28979,31195,31248]\nd['remaining_holds']['unavailable_downloads']=3\nd['remaining_holds']['without_downloads_remaining_ids']=s['remaining_without_downloads']\nd['remaining_holds']['new_benchmark_output_over_2MiB']=list(range(31028,31033))\nd['remaining_holds']['new_made_without_local_catalog']=[27207,29337,29893,29894,31178,31200]\nd['post_review_updates']['missing_data_added']={\n 'decision':'按用户要求为11题补齐平台数据；6题126组自产数据入库，5性能题各1组完整300万行平台数据。当前无下载题剩3个固定排除项。',\n 'proof':str(proof.relative_to(root)),'proof_sha256':hashlib.sha256(proof.read_bytes()).hexdigest(),'summary':s,\n 'limits':'本批不新增公开题库/课程绑定，不改限额；6题本地数据暂未启用，5性能题答案超过2MiB继续排除。',\n 'procedure_source':Path(__file__).read_text()}\np.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n')\n"
+    },
+    "normal_local_activation": {
+      "decision": "第32批用户授权六题绑定本地practice，每题21组；Python/C++各126组AC，12份错解WA；性能题31028–31032继续排除。",
+      "proof": "collab/gmyhf-normal-local-activation.json",
+      "proof_sha256": "4e7951f5705c15c19c0ffc18e3f79afbee434d5c6c98e4a47b6e0ebb7e6d7608",
+      "platform_writes": 0,
+      "note": "第31批暂未启用的记录保留为历史，本条覆盖当前启用状态。"
     }
   }
 }

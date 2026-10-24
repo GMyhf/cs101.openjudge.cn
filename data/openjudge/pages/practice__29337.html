@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>29337:目标和</title></head><body>
+<div id="pageTitle"><h2>29337:目标和</h2></div>
+<dl class="problem-params"><dt>总时间限制:</dt><dd>1000ms</dd><dt>单个测试点时间限制:</dt><dd>1000ms</dd><dt>内存限制:</dt><dd>65536kB</dd></dl>
+<dl class="problem-content">
+<dt>描述</dt><dd><p class="md-end-block md-p md-focus"><span class="md-plain md-expand">给你一个非负整数数组 </span><span class="md-pair-s" spellcheck="false"><code>nums</code></span><span class="md-plain"> 和一个整数 </span><span class="md-pair-s" spellcheck="false"><code>target</code></span><span class="md-plain"> 。</span></p>
+<p class="md-end-block md-p"><span class="md-plain">向数组中的每个整数前添加 </span><span class="md-pair-s" spellcheck="false"><code>'+'</code></span><span class="md-plain"> 或 </span><span class="md-pair-s" spellcheck="false"><code>'-'</code></span><span class="md-plain"> ，然后串联起所有整数，可以构造一个 </span><span class="md-pair-s "><strong><span class="md-plain">表达式</span></strong></span><span class="md-plain"> ：</span></p>
+<ul class="ul-list" data-mark="-">
+<li class="md-list-item">
+<p class="md-end-block md-p"><span class="md-plain">例如，</span><span class="md-pair-s" spellcheck="false"><code>nums = [2, 1]</code></span><span class="md-plain"> ，可以在 </span><span class="md-pair-s" spellcheck="false"><code>2</code></span><span class="md-plain"> 之前添加 </span><span class="md-pair-s" spellcheck="false"><code>'+'</code></span><span class="md-plain"> ，在 </span><span class="md-pair-s" spellcheck="false"><code>1</code></span><span class="md-plain"> 之前添加 </span><span class="md-pair-s" spellcheck="false"><code>'-'</code></span><span class="md-plain"> ，然后串联起来得到表达式 </span><span class="md-pair-s" spellcheck="false"><code>"+2-1"</code></span><span class="md-plain"> 。</span></p>
+</li>
+</ul>
+<p class="md-end-block md-p"><span class="md-plain">求可以通过上述方法构造的、运算结果等于 </span><span class="md-pair-s" spellcheck="false"><code>target</code></span><span class="md-plain"> 的不同 </span><span class="md-pair-s "><strong><span class="md-plain">表达式</span></strong></span><span class="md-plain"> 的数目。</span></p>
+<p class="md-end-block md-p">&nbsp;</p>
+<ul class="ul-list" data-mark="-">
+<li class="md-list-item">
+<p class="md-end-block md-p"><span class="md-pair-s" spellcheck="false"><code>1 &lt;= nums.length &lt;= 20</code></span></p>
+</li>
+<li class="md-list-item">
+<p class="md-end-block md-p"><span class="md-pair-s" spellcheck="false"><code>0 &lt;= nums[i] &lt;= 1000</code></span></p>
+</li>
+<li class="md-list-item">
+<p class="md-end-block md-p"><span class="md-pair-s" spellcheck="false"><code>0 &lt;= sum(nums[i]) &lt;= 1000</code></span></p>
+</li>
+<li class="md-list-item md-focus-container">
+<p class="md-end-block md-p md-focus"><span class="md-pair-s md-expand" spellcheck="false"><code>-1000 &lt;= target &lt;= 1000</code></span></p>
+</li>
+</ul></dd>
+<dt>输入</dt><dd>第一行为非负整数数组 nums ，其中每一个数用空格分隔。<br><br>第二行为整数 target 。</dd>
+<dt>输出</dt><dd>一个整数，表示不同 表达式 的数目。</dd>
+<dt>样例输入</dt><dd><pre>1 1 1 1 1
+3
+</pre></dd>
+<dt>样例输出</dt><dd><pre>5
+</pre></dd>
+<dt>提示</dt><dd>dp, 回溯；另一组样例：输入两行 1 和 1，输出 1。</dd>
+</dl>
+<div class="problem-statistics"><dl><dt>全局题号</dt><dd>29337</dd></dl></div>
+<p>来源：OpenJudge 全局题号 29337，课程组授权题面；Inject 题面已解码为静态文字，样例按实际输入输出整理。</p>
+</body></html>

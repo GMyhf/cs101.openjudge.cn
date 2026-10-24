@@ -1,0 +1,53 @@
+{
+  "mutation_count": 9,
+  "results": [
+    {
+      "mutation": "global_number错绑",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "tests标记停用",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "漏掉测试点",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "数据路径串题",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "题面全局号错绑",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "样例被改坏",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "目录链接丢失",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "单点限额放宽",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "超限性能题误启用",
+      "detected": true,
+      "exit_code": 1
+    }
+  ],
+  "all_original_bytes_restored": true,
+  "restored_tests_exit_code": 0,
+  "procedure_source": "import json,subprocess,sys,hashlib\nfrom pathlib import Path\nR=Path.cwd();catalog=R/'data/openjudge/catalog.json';page=R/'data/openjudge/pages/practice__31178.html';book=R/'data/openjudge/books/practice__11.html';limits=R/'data/openjudge/limits.json'\nbackups={p:p.read_bytes() for p in (catalog,page,book,limits)};rows=[]\ndef run(name,path,edit):\n try:\n  path.write_bytes(edit(backups[path]));p=subprocess.run([sys.executable,'-m','unittest','tests.test_gmyhf_normal_activation'],capture_output=True,text=True)\n  assert p.returncode!=0,(name,p.stdout,p.stderr);rows.append({'mutation':name,'detected':True,'exit_code':p.returncode})\n finally:path.write_bytes(backups[path])\ndef cat_edit(fn):\n def edit(raw):\n  data=json.loads(raw);item=next(r for r in data['problems'] if r['book']=='practice' and r['id']=='31178');fn(data,item);return json.dumps(data,ensure_ascii=False).encode()\n return edit\nrun('global_number错绑',catalog,cat_edit(lambda d,r:r.update(global_number=31200)))\nrun('tests标记停用',catalog,cat_edit(lambda d,r:r.update(tests=False)))\nrun('漏掉测试点',catalog,cat_edit(lambda d,r:r['test_cases'].pop()))\nrun('数据路径串题',catalog,cat_edit(lambda d,r:r['test_cases'][0].update(input='tests/30000-/31200_made/data/0.in')))\nrun('题面全局号错绑',page,lambda b:b.replace(b'<dd>31178</dd>',b'<dd>31200</dd>'))\nrun('样例被改坏',page,lambda b:b.replace(b'Hello, OJ Inject!',b'Wrong sample'))\nrun('目录链接丢失',book,lambda b:b.replace(b'/practice/31178/',b'/practice/31179/'))\ndef badlimit(raw):\n d=json.loads(raw);d['limits']['31178']['case_ms']=1000;return json.dumps(d).encode()\nrun('单点限额放宽',limits,badlimit)\nrun('超限性能题误启用',catalog,cat_edit(lambda d,r:d['problems'].append({'book':'practice','id':'probe','global_number':31028,'tests':True,'test_cases':[{'input':'bad','output':'bad'}]})))\nassert all(p.read_bytes()==b for p,b in backups.items())\np=subprocess.run([sys.executable,'-m','unittest','tests.test_gmyhf_normal_activation'],capture_output=True,text=True);assert p.returncode==0,p.stderr\nreport={'mutation_count':len(rows),'results':rows,'all_original_bytes_restored':True,'restored_tests_exit_code':p.returncode,'procedure_source':Path(__file__).read_text()}\n(R/'collab/gmyhf-normal-local-activation-mutations.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\\n');print('9种变异检出，原文件已恢复')\n"
+}
