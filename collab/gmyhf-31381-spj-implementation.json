@@ -1,0 +1,128 @@
+{
+  "scope": "31381本地逐题SPJ实现；原后台一组数据只读绑定、六个自产程序走既有判题沙箱。未替换OpenJudge远端SPJ，未新增题库映射。",
+  "checked_at": "2026-10-24T05:10:55.880840+00:00",
+  "checker_path": "data/openjudge/tests/30000-/31381_made/checker.py",
+  "checker_sha256": "5ff5cb4c3d09ac1f237b4231b1e4cc8681abe5fcf8b996093b07b3b44c82c388",
+  "test_path": "tests/test_31381_checker.py",
+  "test_sha256": "10952e46977477c4eeb0b21ef1edbbd73c823881a0cb12783de6117c2b519c11",
+  "prior_platform_evidence": "collab/gmyhf-course-spj-recheck.json",
+  "prior_platform_evidence_sha256": "34b0851ee8a656f661373220e226d5ca0bc565067225acc9469eba8fced867a9",
+  "readback_files": {
+    "0.in": "5912c11d5726b75004b9b138b9c87d75d68a9c05f9d5e74a2ff1ecec42dcc927",
+    "0.out": "7e01e73c9453cd1797c71bc04e90d29dad106856df4a98420d0ee2884080fb1e"
+  },
+  "form_sha256": "d995c68c05f9bf811396645e0100528b8ab30872239a307e40952ed453877fdd",
+  "local_judge_results": [
+    {
+      "probe": "identity",
+      "source": "import sys\ns = sys.stdin.read().rstrip('\\r\\n')\nprint(s)\n",
+      "source_sha256": "c40816f6bf367d8495f1f8243ec4e39e7556caf79623348cd8604d696da14cd8",
+      "expected": "Accepted",
+      "observed": {
+        "status": "Accepted",
+        "cases": 1,
+        "time_ms": 14,
+        "memory_kb": 19668
+      }
+    },
+    {
+      "probe": "reverse",
+      "source": "import sys\ns = sys.stdin.read().rstrip('\\r\\n')\nprint(s[::-1])\n",
+      "source_sha256": "712b25c72388393eed2d6506f9c8245a9951b2564e7cf7dc4600458806657020",
+      "expected": "Accepted",
+      "observed": {
+        "status": "Accepted",
+        "cases": 1,
+        "time_ms": 12,
+        "memory_kb": 19668
+      }
+    },
+    {
+      "probe": "sorted",
+      "source": "import sys\ns = sys.stdin.read().rstrip('\\r\\n')\nprint(''.join(sorted(s)))\n",
+      "source_sha256": "fa3086e48ca18a370b5331e4fd02bc1240edda8ce63a089557ec3fa14ce53bd9",
+      "expected": "Accepted",
+      "observed": {
+        "status": "Accepted",
+        "cases": 1,
+        "time_ms": 12,
+        "memory_kb": 19668
+      }
+    },
+    {
+      "probe": "append_invalid",
+      "source": "import sys\ns = sys.stdin.read().rstrip('\\r\\n')\nprint(s + '~')\n",
+      "source_sha256": "a119dfa263ecfe454bd0e175d6436d789af65cf5ac5307de1fffc08e18ed97b8",
+      "expected": "Wrong Answer",
+      "observed": {
+        "status": "Wrong Answer",
+        "case": 1,
+        "time_ms": 12,
+        "memory_kb": 19668,
+        "expected_tokens": 1,
+        "actual_tokens": 1,
+        "message": "输出字符及其出现次数必须与输入一致",
+        "actual_output": {
+          "text": "aunycfgiawygfbewuoychmicewhbncfowieufhmneoiufn~\n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 48
+        }
+      }
+    },
+    {
+      "probe": "replace_invalid",
+      "source": "import sys\ns = sys.stdin.read().rstrip('\\r\\n')\nprint(chr(ord(s[0]) ^ 1) + s[1:] if s else '~')\n",
+      "source_sha256": "08bceccb250da5451a93b4f51340cfc933438a547447a1c63335677857f00208",
+      "expected": "Wrong Answer",
+      "observed": {
+        "status": "Wrong Answer",
+        "case": 1,
+        "time_ms": 12,
+        "memory_kb": 19672,
+        "expected_tokens": 1,
+        "actual_tokens": 1,
+        "message": "输出字符及其出现次数必须与输入一致",
+        "actual_output": {
+          "text": "`unycfgiawygfbewuoychmicewhbncfowieufhmneoiufn\n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 47
+        }
+      }
+    },
+    {
+      "probe": "drop_invalid",
+      "source": "import sys\ns = sys.stdin.read().rstrip('\\r\\n')\nprint(s[1:] if s else '~')\n",
+      "source_sha256": "4f7c5e2b3121df0af39f2e26c0ed7a9ede44c9f38afad76a2e43da9bf7905b07",
+      "expected": "Wrong Answer",
+      "observed": {
+        "status": "Wrong Answer",
+        "case": 1,
+        "time_ms": 12,
+        "memory_kb": 19852,
+        "expected_tokens": 1,
+        "actual_tokens": 1,
+        "message": "输出字符及其出现次数必须与输入一致",
+        "actual_output": {
+          "text": "unycfgiawygfbewuoychmicewhbncfowieufhmneoiufn\n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 46
+        }
+      }
+    }
+  ],
+  "local_accepted": 3,
+  "local_wrong_answer": 3,
+  "test_data_writes": 0,
+  "statement_writes": 0,
+  "configuration_writes": 0,
+  "submission_writes": 0,
+  "catalog_changed": false,
+  "remote_spj_replaced": false,
+  "mutation_evidence": "collab/gmyhf-31381-spj-mutations.json",
+  "mutation_evidence_sha256": "99e512d97934843981c4b1511fe1634b29d63dc88ccd49d904fc1c4541efc31f",
+  "procedure_source": "\"\"\"只读绑定31381后台数据，使用本地逐题checker复判六个自产程序。\"\"\"\nimport hashlib\nimport json\nfrom datetime import datetime, timezone\nfrom pathlib import Path\nimport shutil\nimport sys\nimport tempfile\nfrom unittest.mock import patch\n\nROOT=Path.cwd();sys.path.insert(0,str(ROOT));sys.path.insert(0,str(ROOT/'scripts'))\nimport judge\nimport audit_gmyhf_course_spj as audit\ncommon=audit.common\nsha=lambda raw:hashlib.sha256(raw).hexdigest()\nchecker=ROOT/'data/openjudge/tests/30000-/31381_made/checker.py'\nevidence=ROOT/'collab/gmyhf-course-spj-recheck.json';prior=json.loads(evidence.read_text())\nsession=common.platform.oj_submit.Session().login()\nurl=common.platform.oj_submit.HOST+'/admin/problems/edit/?id=31381'\nbefore=session._get(url)\nassert common.form_sha(before)==prior['form_sha256']\nassert common.listed_files(before,31381)==sorted(prior['readback_files'])\npayloads={name:common.platform.download(session,31381,name) for name in prior['readback_files']}\nassert {name:sha(raw) for name,raw in payloads.items()}==prior['readback_files']\nresults=[]\nwith tempfile.TemporaryDirectory(prefix='cs101-31381-spj-') as temp:\n    mirror=Path(temp);directory=mirror/'tests/31381_made';directory.mkdir(parents=True)\n    shutil.copyfile(checker,directory/'checker.py')\n    for name,raw in payloads.items():(directory/name).write_bytes(raw)\n    item={'book':'t31381','id':'31381','checker':'tests/31381_made/checker.py','test_cases':[{'input':'tests/31381_made/0.in','output':'tests/31381_made/0.out'}]}\n    with patch.object(judge,'MIRROR',mirror),patch.object(judge,'catalog_item',return_value=item):\n        for name,source in audit.probe_sources().items():\n            wanted='Wrong Answer' if name.endswith('_invalid') else 'Accepted'\n            result=judge.judge('t31381','31381','python',source)\n            assert result['status']==wanted,(name,result)\n            results.append({'probe':name,'source':source,'source_sha256':sha(source.encode()),'expected':wanted,'observed':result})\n            print(name,result['status'],flush=True)\nafter=session._get(url)\nassert common.form_sha(after)==common.form_sha(before)\nassert common.listed_files(after,31381)==sorted(payloads)\nfor name,raw in payloads.items():assert sha(common.platform.download(session,31381,name))==sha(raw)\nsource=Path(__file__).read_text()\nreport={'scope':'31381本地逐题SPJ实现；原后台一组数据只读绑定、六个自产程序走既有判题沙箱。未替换OpenJudge远端SPJ，未新增题库映射。','checked_at':datetime.now(timezone.utc).isoformat(),'checker_path':str(checker.relative_to(ROOT)),'checker_sha256':sha(checker.read_bytes()),'test_path':'tests/test_31381_checker.py','test_sha256':sha((ROOT/'tests/test_31381_checker.py').read_bytes()),'prior_platform_evidence':str(evidence.relative_to(ROOT)),'prior_platform_evidence_sha256':sha(evidence.read_bytes()),'readback_files':{name:sha(raw) for name,raw in payloads.items()},'form_sha256':common.form_sha(before),'local_judge_results':results,'local_accepted':3,'local_wrong_answer':3,'test_data_writes':0,'statement_writes':0,'configuration_writes':0,'submission_writes':0,'catalog_changed':False,'remote_spj_replaced':False,'mutation_evidence':'collab/gmyhf-31381-spj-mutations.json','mutation_evidence_sha256':sha((ROOT/'collab/gmyhf-31381-spj-mutations.json').read_bytes()),'procedure_source':source,'procedure_sha256':sha(source.encode())}\ncommon.save(ROOT/'collab/gmyhf-31381-spj-implementation.json',report)\nprint('后台两文件前后哈希一致，本地六探针结果正确，平台零写入',flush=True)\n",
+  "procedure_sha256": "178219e48588e51dc6b44fc79fb3f814cedd56154edd5ba742971a72d9ee9c57"
+}

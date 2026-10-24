@@ -1,0 +1,57 @@
+{
+  "results": [
+    {
+      "mutation": "只比较集合而非字符重数",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错误忽略输入首尾空格",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错误忽略输出首尾空格",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错误容忍额外空行",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错误替换学生非法UTF8",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "遗漏输出长度保护",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "把非法输入误判学生WA",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错误按参考答案而非输入判断",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "遗漏多行拒绝",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "遗漏临时题库限时缓存隔离",
+      "detected": true,
+      "exit_code": 1
+    }
+  ],
+  "checker_sha256": "5ff5cb4c3d09ac1f237b4231b1e4cc8681abe5fcf8b996093b07b3b44c82c388",
+  "procedure_source": "\"\"\"逐次改坏31381 SPJ，运行独立回归，最后恢复源码。\"\"\"\nimport hashlib\nimport json\nimport os\nfrom pathlib import Path\nimport subprocess\n\npath = Path('data/openjudge/tests/30000-/31381_made/checker.py')\noriginal = path.read_text()\ncases = [\n    ('只比较集合而非字符重数', 'Counter(given) == Counter(actual)', 'set(given) == set(actual)'),\n    ('错误忽略输入首尾空格', 'Counter(given)', 'Counter(given.strip())'),\n    ('错误忽略输出首尾空格', 'Counter(actual)', 'Counter(actual.strip())'),\n    ('错误容忍额外空行', \"text = text[:-1]\", \"text = text.rstrip('\\\\n')\"),\n    ('错误替换学生非法UTF8', \"raw.decode('utf-8')\", \"raw.decode('utf-8', errors='replace')\"),\n    ('遗漏输出长度保护', 'if len(raw) > MAX_OUTPUT_BYTES:', 'if False:'),\n    ('把非法输入误判学生WA', \"print('判题输入格式有误')\\n        return 3\", \"print('判题输入格式有误')\\n        return 42\"),\n    ('错误按参考答案而非输入判断', 'if not matches(given, actual):', \"if not matches(Path(sys.argv[3]).read_text(), actual):\"),\n    ('遗漏多行拒绝', \"if '\\\\n' in text or '\\\\r' in text:\", 'if False:'),\n]\nresults = []\ntry:\n    for name, before, after in cases:\n        assert original.count(before) == 1, name\n        path.write_text(original.replace(before, after))\n        result = subprocess.run(['/usr/bin/python3.11', '-B', '-m', 'unittest', 'tests.test_31381_checker'], capture_output=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE='1'), timeout=30)\n        assert result.returncode != 0, name\n        results.append({'mutation': name, 'detected': True, 'exit_code': result.returncode})\n        path.write_text(original)\nfinally:\n    path.write_text(original)\ntest_path = Path('tests/test_31381_checker.py')\ntest_original = test_path.read_text()\ntry:\n    broken = test_original.replace(\", patch.object(judge, 'LIMITS_CACHE', {})\", '')\n    assert broken != test_original\n    test_path.write_text(broken)\n    result = subprocess.run(['/usr/bin/python3.11', '-B', '-m', 'unittest', 'tests.test_31381_checker'], capture_output=True, env=dict(os.environ, PYTHONDONTWRITEBYTECODE='1'), timeout=30)\n    assert result.returncode != 0\n    results.append({'mutation': '遗漏临时题库限时缓存隔离', 'detected': True, 'exit_code': result.returncode})\nfinally:\n    test_path.write_text(test_original)\nsource = Path(__file__).read_text()\nPath('collab/gmyhf-31381-spj-mutations.json').write_text(json.dumps({'results': results, 'checker_sha256': hashlib.sha256(original.encode()).hexdigest(), 'procedure_source': source, 'procedure_sha256': hashlib.sha256(source.encode()).hexdigest()}, ensure_ascii=False, indent=2)+'\\n')\nprint(len(results), '种实际变异检出，源码恢复')\n",
+  "procedure_sha256": "cdde27c9fa93392846078e2eeb67921295b2e0f5a34beedfefd6c19d3eaeb179"
+}
