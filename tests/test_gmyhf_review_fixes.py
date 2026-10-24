@@ -16,6 +16,32 @@ import repair_gmyhf_review_findings as repair
 
 
 class ReviewRulesTests(unittest.TestCase):
+    def test_stock_repair_preserves_each_price_difference(self):
+        before = b'4\n0 8 2 5\n4 7 0 9\n'
+        self.assertEqual(b'4\n1 9 3 6\n5 8 1 10\n', rules.repair_input(25579, before))
+        self.assertEqual(b'3\n1 4 2\n2 5 9\n',
+                         rules.repair_input(25579, b'3\n0 3 1\n2 5 9\n'))
+        legal = b'3  2 3 4  9 7 1'
+        self.assertEqual(legal, rules.repair_input(25579, legal))
+        for bad in (b'2 1 2 3 4', b'3 0 1 2 3 4', b'3 -1 2 3 4 5 6'):
+            with self.assertRaises(AssertionError):
+                rules.repair_input(25579, bad)
+
+    def test_stock_reference_against_all_transactions(self):
+        solve = self.reference(25579, 11, 'stocks')
+        rng = random.Random(606)
+        for n in range(3, 8):
+            for _ in range(30):
+                rows = [[rng.randrange(6) for _ in range(n)] for _ in range(2)]
+                trades = [(buy, sell, row[sell]-row[buy]) for row in rows
+                          for buy in range(n) for sell in range(buy, n)]
+                expected = max([0] + [p for b,s,p in trades] +
+                               [p+q for b,s,p in trades for c,d,q in trades if s <= c])
+                before = (' '.join(map(str, [n]+rows[0]+rows[1]))).encode()
+                after = rules.repair_input(25579, before)
+                self.assertEqual(str(expected), solve(before.decode()))
+                self.assertEqual(str(expected), solve(after.decode()))
+
     def reference(self, number, batch, name):
         path = repair.ROOT / f'collab/gmyhf-pending-batch{batch}-review.json'
         entry = next(e for e in json.loads(path.read_text())['entries'] if e['global_number'] == number)

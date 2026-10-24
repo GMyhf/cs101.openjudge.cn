@@ -1,0 +1,37 @@
+{
+  "batch": 6,
+  "results": [
+    {
+      "mutation": "保留零股价",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "逐点截断破坏价差",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "连合法股票一起平移",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放过负股价",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放过两天输入",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "两次交易收益相减",
+      "detected": true,
+      "failures": 1
+    }
+  ],
+  "procedure_source": "import hashlib,json,os,subprocess\nfrom pathlib import Path\nroot=Path.cwd();path=root/'scripts/gmyhf_review_fixes.py';original=path.read_text()\nvariants=[('保留零股价','x + (min(row) == 0)','x'),('逐点截断破坏价差','x + (min(row) == 0)','max(1,x)'),('连合法股票一起平移','x + (min(row) == 0)','x + 1'),('放过负股价','assert all(x >= 0 for row in rows for x in row)','assert True'),('放过两天输入','assert 3 <= n <= 100 and len(values) == 1 + 2 * n','assert 2 <= n <= 100 and len(values) == 1 + 2 * n')]\nresults=[]\nenv=dict(os.environ,PYTHONDONTWRITEBYTECODE='1')\ntry:\n for name,old,new in variants:\n  assert original.count(old)==1\n  path.write_text(original.replace(old,new))\n  p=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest','tests.test_gmyhf_review_fixes.ReviewRulesTests.test_stock_repair_preserves_each_price_difference'],capture_output=True,env=env)\n  assert p.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':p.returncode})\nfinally:path.write_text(original)\n# 对已有自写参考做实质变异，用同一独立枚举测试检出。\nimport sys,unittest,io\nsys.path.insert(0,str(root));from tests.test_gmyhf_review_fixes import ReviewRulesTests\nsource=json.loads((root/'collab/gmyhf-pending-batch11-review.json').read_text())['entries']\nsource=next(e['authored_reference']['source'] for e in source if e['global_number']==25579)\nsource=source.split('import sys\\nsys.stdout.write')[0].replace('a + b for (a, b)', 'a - b for (a, b)')\nns={};exec(source,ns)\nfrom unittest.mock import patch\nwith patch.object(ReviewRulesTests,'reference',return_value=ns['stocks']):\n result=unittest.TextTestRunner(stream=io.StringIO()).run(ReviewRulesTests('test_stock_reference_against_all_transactions'))\n assert not result.wasSuccessful()\nresults.append({'mutation':'两次交易收益相减','detected':True,'failures':len(result.failures)})\nprocedure=Path(__file__).read_text()\nreport={'batch':6,'results':results,'procedure_source':procedure,'procedure_sha256':hashlib.sha256(procedure.encode()).hexdigest()}\n(root/'collab/gmyhf-review-fixes-batch6-mutations.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\\n')\nprint('6 种变异全部检出，已恢复原始源码')\n",
+  "procedure_sha256": "74f7bcf68098886bfd8aaa225dfa4b5d28b8ad09f93d0beb5c70f23a311837b9"
+}

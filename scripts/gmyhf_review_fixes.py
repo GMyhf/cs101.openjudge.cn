@@ -1,10 +1,21 @@
-"""审核后输入修复规则；只裁剪越界部分，答案由已审核的整数参考重算。"""
+"""审核后确定性派生合法输入；保留原件，答案由已审核的整数参考重算。"""
 import ast
 import json
 
 
 def repair_input(number, payload):
     text = payload.decode()
+    if number == 25579:
+        values = list(map(int, text.split()))
+        n = values[0]
+        assert 3 <= n <= 100 and len(values) == 1 + 2 * n
+        rows = [values[1:1+n], values[1+n:]]
+        assert all(x >= 0 for row in rows for x in row)
+        if all(min(row) > 0 for row in rows):
+            return payload
+        # 每支含零股价的股票整体加一，保留该股票所有买卖价差及最优收益。
+        rows = [[x + (min(row) == 0) for x in row] for row in rows]
+        return (str(n) + '\n' + '\n'.join(' '.join(map(str, row)) for row in rows) + '\n').encode()
     if number == 19964:
         values = list(map(int, text.split()))
         n = values[0]
