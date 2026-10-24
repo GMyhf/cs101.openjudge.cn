@@ -1,0 +1,103 @@
+{
+  "task": "T-060",
+  "batch": 25,
+  "count": 12,
+  "mutations": [
+    {
+      "mutation": "漏读提示",
+      "source": "scripts/audit_gmyhf_30497.py",
+      "test": "tests.test_30497_review.Review30497Tests.test_hint_must_explicitly_permit_the_constant_response",
+      "exit_code": 1,
+      "detected": true,
+      "mutated_sha256": "79d815704f3c553d8c06e03021bd8ffef83398c3cf6e7a2b83a908977d1fa35e"
+    },
+    {
+      "mutation": "错读输出字段",
+      "source": "scripts/audit_gmyhf_30497.py",
+      "test": "tests.test_30497_review.Review30497Tests.test_hint_must_explicitly_permit_the_constant_response",
+      "exit_code": 1,
+      "detected": true,
+      "mutated_sha256": "34359931ac7368d6a41506edff936289d93c36f82e9d0d9a5ba103c6b1143b8e"
+    },
+    {
+      "mutation": "数学小于号被当标签删除",
+      "source": "scripts/audit_gmyhf_30497.py",
+      "test": "tests.test_30497_review.Review30497Tests.test_hint_must_explicitly_permit_the_constant_response",
+      "exit_code": 1,
+      "detected": true,
+      "mutated_sha256": "c28362200ceef7c44f5a0d96b1a182f25b8899fdc921242cffff2ac985f18300"
+    },
+    {
+      "mutation": "放宽N上界",
+      "source": "scripts/audit_gmyhf_30497.py",
+      "test": "tests.test_30497_review.Review30497Tests.test_domain_accepts_eof_but_checks_rows_and_bounds",
+      "exit_code": 1,
+      "detected": true,
+      "mutated_sha256": "50615a6531ff2ce6cb5cb12c0fd31402d3e8119758e3f1bceed1b1342af61b93"
+    },
+    {
+      "mutation": "不核行数",
+      "source": "scripts/audit_gmyhf_30497.py",
+      "test": "tests.test_30497_review.Review30497Tests.test_domain_accepts_eof_but_checks_rows_and_bounds",
+      "exit_code": 1,
+      "detected": true,
+      "mutated_sha256": "7ba1c317cc098d33ea1ec66eb6f21dbccf8b33258efe1bc6a14c0dd8f1b918d1"
+    },
+    {
+      "mutation": "瓷砖只给三个颜色",
+      "source": "scripts/audit_gmyhf_30497.py",
+      "test": "tests.test_30497_review.Review30497Tests.test_domain_accepts_eof_but_checks_rows_and_bounds",
+      "exit_code": 1,
+      "detected": true,
+      "mutated_sha256": "3c0e073fe4272fe0854593a7de32dc5dc7decf2ecc11748c0928ea4e715febd8"
+    },
+    {
+      "mutation": "放宽颜色上界",
+      "source": "scripts/audit_gmyhf_30497.py",
+      "test": "tests.test_30497_review.Review30497Tests.test_domain_accepts_eof_but_checks_rows_and_bounds",
+      "exit_code": 1,
+      "detected": true,
+      "mutated_sha256": "02c5acdbb49661d12f4b79c670dd987c3b2c6b7c8d3d0325479f9fde89a29b16"
+    },
+    {
+      "mutation": "把末尾LF当题面硬约束",
+      "source": "scripts/audit_gmyhf_30497.py",
+      "test": "tests.test_30497_review.Review30497Tests.test_domain_accepts_eof_but_checks_rows_and_bounds",
+      "exit_code": 1,
+      "detected": true,
+      "mutated_sha256": "fb0b2411cfba6f740f159d011c777bad583214f34c560f27dbc986a63c4434ef"
+    },
+    {
+      "mutation": "任意金标都通过",
+      "source": "scripts/audit_gmyhf_30497.py",
+      "test": "tests.test_30497_review.Review30497Tests.test_pair_requires_permitted_gold_and_valid_input",
+      "exit_code": 1,
+      "detected": true,
+      "mutated_sha256": "e17b5d66b3d9fcd4d387a631f817370372bd24663381824bef9ec6114d6d623f"
+    },
+    {
+      "mutation": "不核输入范围",
+      "source": "scripts/audit_gmyhf_30497.py",
+      "test": "tests.test_30497_review.Review30497Tests.test_pair_requires_permitted_gold_and_valid_input",
+      "exit_code": 1,
+      "detected": true,
+      "mutated_sha256": "b012ab1bfcf1691aeb7afd5bd1493018ebd2a7136928dbf9b0e7b264a50425c3"
+    },
+    {
+      "mutation": "把固定回答改为YES",
+      "source": "data/openjudge/tests/30000-/30497_made/samplecode.py",
+      "test": "tests.test_30497_review.Review30497Tests.test_current_page_made_data_and_actual_judge",
+      "exit_code": 1,
+      "detected": true,
+      "mutated_sha256": "6c8a2ee363d60499993141e14c11b38b161d40bffecf01d13f7ae9e2f7de4038"
+    },
+    {
+      "mutation": "自产金标误改为YES",
+      "source": "data/openjudge/tests/30000-/30497_made/data/0.out",
+      "test": "tests.test_30497_review.Review30497Tests.test_current_page_made_data_and_actual_judge",
+      "exit_code": 1,
+      "detected": true,
+      "mutated_sha256": "a115e91c2e84c3078fa06914eff28d07590ddfaa47a55fb4f31dd7c5b3566194"
+    }
+  ]
+}
