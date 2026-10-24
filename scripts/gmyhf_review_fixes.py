@@ -19,6 +19,53 @@ def validate_missing_deque_input(payload):
 
 def repair_input(number, payload):
     text = payload.decode()
+    if number == 19962:
+        values = list(map(int, text.split())); n = values[0]; coordinates = values[1:]
+        # 上界在描述末尾的数据范围中，不能只读取“输入”字段。
+        assert 1 <= n <= 100000 and len(coordinates) == n and min(coordinates) >= 1
+        if max(coordinates) <= 100000:
+            return payload
+        result = payload; spans = list(re.finditer(rb'\S+',payload))
+        for i in reversed(range(n)):
+            if coordinates[i] > 100000:
+                span = spans[i+1]; result = result[:span.start()] + b'100000' + result[span.end():]
+        return result
+    if number == 30172:
+        lines = text.splitlines(); n = int(lines[0]); start, end = lines[1].split()
+        assert n >= 2 and start != end and len(lines) == n+1
+        rows = []
+        for line in lines[2:]:
+            words = line.split(); count = int(words[1])
+            assert 0 <= count <= 10 and len(words) == 2+2*count
+            rows.append((words[0],[(words[2+2*i],int(words[3+2*i])) for i in range(count)]))
+        sources = [u for u,_ in rows]
+        names = set(sources)|{end}
+        assert len(names) == n and len(set(sources)) == n-1 and start in names and end not in sources
+        assert all(re.fullmatch('[a-z_]+',name) for name in names)
+        assert all(v in names for _,edges in rows for v,_ in edges)
+        if n <= 1000 and all(v != start for _,edges in rows for v,_ in edges):
+            return payload
+        # 保留起终点及原顺序前998个其他源节点，不为清除环而重写合法关系。
+        kept = {start,end}
+        for u in sources:
+            if len(kept) == 1000:
+                break
+            kept.add(u)
+        fixed = []
+        for u,edges in rows:
+            if u not in kept:
+                continue
+            edges = [(v,w) for v,w in edges if v in kept and v != start]
+            fixed.append(f'{u} {len(edges)}'+''.join(f' {v} {w}' for v,w in edges))
+        assert len(fixed) == len(kept)-1
+        return (str(len(kept))+'\n'+start+' '+end+'\n'+'\n'.join(fixed)+'\n').encode()
+    if number == 27699:
+        values = list(map(int, text.split())); n,k = values[:2]; permutation = values[2:]
+        assert 2 <= n <= 500000 and k >= 1 and len(permutation) == n and set(permutation) == set(range(1,n+1))
+        if k < n:
+            return payload
+        span = list(re.finditer(rb'\S+',payload))[1]
+        return payload[:span.start()] + str(n-1).encode() + payload[span.end():]
     if number == 23554:
         values = list(map(int, text.split())); n = values[0]; seen = values[1:]
         assert 1 <= n <= 200 and seen and all(1 <= x <= 10000 for x in seen)

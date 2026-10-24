@@ -1,0 +1,403 @@
+{
+  "original_evidence": "collab/gmyhf-pending-batch8-review.json",
+  "original_evidence_sha256": "f32179ba25bb87b53478334f84b3a067c17e8ca9d526164606669638553a4569",
+  "public_page_sha256": "a5e103504c80aa8f8d74b4ad79c8c373c8d10036d702d36712566469a5d331df",
+  "comparison_modes": {
+    "description": "raw",
+    "input": "raw",
+    "output": "raw",
+    "hint": "br_as_newline",
+    "sampleInput": "raw",
+    "sampleOutput": "raw"
+  },
+  "scope": "独立审核自产函数按原源码哈希提取；公开题面六字段与后台一致（pre包装、行尾、边缘空白、NBSP与空格和已标明的br换行），绑定当前后台原字段哈希。",
+  "platform_writes": 0,
+  "procedure_source": "\"\"\"从已入库独立审核提取自写参考，并只读绑定原公开题面与后台六字段。\"\"\"\nimport ast,copy,html,json,re,sys\nfrom pathlib import Path\nsys.path.insert(0,str(Path.cwd()/'scripts'));import repair_gmyhf_pending_answers as c\nmapping={27699:(8,'wide_swap')}\nkeys={'描述':'description','输入':'input','输出':'output','提示':'hint','样例输入':'sampleInput','样例输出':'sampleOutput'}\nsession=c.platform.oj_submit.Session().login()\nfor n,(batch,function) in mapping.items():\n original=Path(f'collab/gmyhf-pending-batch{batch}-review.json');data=json.loads(original.read_text());old=next(e for e in data['entries'] if e['global_number']==n)['authored_reference'];assert c.sha(old['source'].encode())==old['sha256'];proc=old;tree=ast.parse(proc['source'])\n entry=copy.deepcopy(next(e for e in data['entries'] if e['global_number']==n));public_page=Path(entry['page']).read_bytes();assert c.sha(public_page)==entry['page_sha256']\n section=re.search(r'<dl class=\"problem-content\">(.*?)</dl>',public_page.decode(),re.S)[1];public={k:'' for k in keys.values()}\n for label,value in re.findall(r'<dt>(.*?)</dt>\\s*<dd>(.*?)</dd>',section,re.S):\n  if label not in keys:continue\n  public[keys[label]]=value[5:-6] if value.startswith('<pre>') and value.endswith('</pre>') else value\n fields=c.platform.parse_form(session._get(c.platform.oj_submit.HOST+f'/admin/problems/edit/?id={n}'))\n def canonical(s):return html.unescape(s).replace('\\xa0',' ').replace('\\r\\n','\\n').strip()\n modes={}\n for key in public:\n  a,b=canonical(public[key]),canonical(fields[key]);mode='raw'\n  if a!=b:\n   a=re.sub(r'<br\\s*/?>','\\n',a);b=re.sub(r'<br\\s*/?>','\\n',b);mode='br_as_newline'\n  if a!=b:\n   import difflib\n   print(n,key,'diff',repr('\\n'.join(difflib.unified_diff(a.splitlines(),b.splitlines()))[:1600]),flush=True)\n  assert a==b,(n,key)\n  modes[key]=mode\n node=next(v for v in tree.body if isinstance(v,ast.FunctionDef) and v.name==function);body=ast.get_source_segment(proc['source'],node)\n source=Path('/tmp/gmyhf_wide_swap_reference.cpp').read_text()\n entry['authored_reference']={'source':source,'sha256':c.sha(source.encode()),'language':'cpp','origin':'原独立审核自产Python函数的自写C++翻译，未取用平台附件；小域穷举与原函数对拍另有证明。','original_python_source':old['source'],'original_python_sha256':old['sha256'],'function_sha256':c.sha(body.encode())}\n entry['checks']['statement']['field_sha256']={k:c.sha(html.unescape(fields[k]).encode()) for k in public}\n s=Path(__file__).read_text();c.save(Path(f'/tmp/gmyhf-{n}-authored-admin-review.json'),{'original_evidence':str(original),'original_evidence_sha256':c.sha(original.read_bytes()),'public_page_sha256':c.sha(public_page),'comparison_modes':modes,'scope':'独立审核自产函数按原源码哈希提取；公开题面六字段与后台一致（pre包装、行尾、边缘空白、NBSP与空格和已标明的br换行），绑定当前后台原字段哈希。','platform_writes':0,'procedure_source':s,'procedure_sha256':c.sha(s.encode()),'entries':[entry]})\n print(n,'自写参考溯源及后台题面绑定通过',flush=True)\n",
+  "procedure_sha256": "719fdf37e774297eb7ebb0c09268e2573b0466f639500569971376fb97c955c6",
+  "entries": [
+    {
+      "global_number": 27699,
+      "title": "Wide Swap",
+      "reference": "/tmp/gmyhf-authored-27699.py",
+      "reference_sha256": "7c3d6fc9702cefaf4aa854c04467480366a164a8c88db434e25bb91a8e4594c7",
+      "validator": "/tmp/gmyhf_batch8_oracles.py",
+      "validator_sha256": "cb132c1c4938bb8edd1f3f21c609e98183b3b2ab7a7cebfe7f5be50ebf915ebc",
+      "page": "data/openjudge/pages/practice__27699.html",
+      "page_sha256": "a5e103504c80aa8f8d74b4ad79c8c373c8d10036d702d36712566469a5d331df",
+      "checks": {
+        "statement": {
+          "changed_fields": [],
+          "available": true,
+          "checked_at": "2026-10-23T18:44:27.831244+00:00",
+          "field_sha256": {
+            "description": "c5adb3ba535988da478eb3532042cb6e40adee0c20f77f6819099fe5db2fe530",
+            "input": "5753d01aa5b51b9109fe72613c72b6443dca7e83aa73765b0e87439f24e3cd20",
+            "output": "d04364fe3dc5cc98aeab59198acd4f23152fad3187750d505c8c959b72282271",
+            "hint": "8f08f395ab1586586473bdf4f8b49c5c7dac6ed2ee4b9b952f3eb4e4c3fdb396",
+            "sampleInput": "6978aef0362dc0ad6fd9331b4269c5c62f3c9cbeaae057e9a6ea0276c0f32d53",
+            "sampleOutput": "00fc9f3815b53683ac1fb797226dfcd14bc7d008be64c6cc75e201ce4d597c68"
+          }
+        },
+        "readback": {
+          "files": [
+            {
+              "filename": "0.in",
+              "sha256": "bf71a25385acb63658b823472084229af1fc6e10862cea0fc8184a9d1d5619ee",
+              "matches": true
+            },
+            {
+              "filename": "0.out",
+              "sha256": "8543d6ef9fdf33fb9c92332123913c7d362aa8b367cefd7ebaace703326d37c6",
+              "matches": true
+            },
+            {
+              "filename": "1.in",
+              "sha256": "b1351cdeecd962c15a6834eff43b25358bed7122127594fc46074b18349c714a",
+              "matches": true
+            },
+            {
+              "filename": "1.out",
+              "sha256": "f15665a9b2001db53536883c32bdb40f1f5d115861bcd997ec0334c9e191bb84",
+              "matches": true
+            },
+            {
+              "filename": "13.in",
+              "sha256": "6986c22dba5b9eca74e4f9f9cc563b3e034f4832487aa598dc793c0ba27c0eff",
+              "matches": true
+            },
+            {
+              "filename": "13.out",
+              "sha256": "01805c57d3198ba6524a13ca16662bf30695902f4b46b5b6d7b478ec28c474c7",
+              "matches": true
+            },
+            {
+              "filename": "19.in",
+              "sha256": "30646b8b0f76e0deb6117c8c58b207f1f91011c02809cfd59c6a75e06703cfbd",
+              "matches": true
+            },
+            {
+              "filename": "19.out",
+              "sha256": "326bd28f117ee9a719ae856cf9958c1ad6be9750e7cf1ad4925908c2c6842a42",
+              "matches": true
+            },
+            {
+              "filename": "2.in",
+              "sha256": "dd6a26adc835f66b999e3eea41f254ff2961b02b450dab934540ed001cf6ec17",
+              "matches": true
+            },
+            {
+              "filename": "2.out",
+              "sha256": "424356313251edef0ce9a009d4047309213b62167f0534ba36f24d34c234c272",
+              "matches": true
+            },
+            {
+              "filename": "8.in",
+              "sha256": "89531ce93e0462faf3a9711e83861113c2debf689d393240d9f182830d6ff415",
+              "matches": true
+            },
+            {
+              "filename": "8.out",
+              "sha256": "21c8a4acdb53cc20913dfa1c067df8ded1a26da50afcba6f2a0089ad8d08eb07",
+              "matches": true
+            },
+            {
+              "filename": "sample1.in",
+              "sha256": "942e998f8399bf401f1d1df214049ad2a4eeffe1cc31588a68c8be723986be26",
+              "matches": true
+            },
+            {
+              "filename": "sample1.out",
+              "sha256": "fae8582bea097120806a9968f0144744e0cb14339c733742458cf227a99214ed",
+              "matches": true
+            },
+            {
+              "filename": "sample2.in",
+              "sha256": "47211a9b4718abc365ee089be4d37198d6d0c178b9ea76774a044f0a3093bf33",
+              "matches": true
+            },
+            {
+              "filename": "sample2.out",
+              "sha256": "f6b49467f595b1a44e442c198b3df4d221e88efcaabc26254f8e0ad4f79b6242",
+              "matches": true
+            },
+            {
+              "filename": "sample3.in",
+              "sha256": "2c623ed62a27e2edc5691d4a24c64087187d3e9ace421ff3fb39802851c2f59a",
+              "matches": true
+            },
+            {
+              "filename": "sample3.out",
+              "sha256": "3830bbad969d75ff43479f96a83cad4540998faa882db95d9eafe9e6c1a91029",
+              "matches": true
+            },
+            {
+              "filename": "sample5.in",
+              "sha256": "5705a1614c8aa9a95a0af140d4e3b9cb54e5e37324d5ad8ec694176f28b18b8a",
+              "matches": true
+            },
+            {
+              "filename": "sample5.out",
+              "sha256": "7cafd0f0fecfd045d3e3a54a9b04f7afe7c0f98c15d135d21f30d54be41b005d",
+              "matches": true
+            }
+          ],
+          "checked_at": "2026-10-23T18:44:31.219867+00:00"
+        },
+        "contract": {
+          "cases": 10,
+          "rejected": [
+            "0.in",
+            "13.in",
+            "19.in",
+            "2.in",
+            "8.in"
+          ],
+          "definition": "原分类未提供_made参考和valid；按独立复算器extra_contract核题面约束，不声称通过既有valid。",
+          "checks": [
+            {
+              "input": "0.in",
+              "issues": [
+                "不是合法N,K及排列"
+              ]
+            },
+            {
+              "input": "1.in",
+              "issues": []
+            },
+            {
+              "input": "13.in",
+              "issues": [
+                "不是合法N,K及排列"
+              ]
+            },
+            {
+              "input": "19.in",
+              "issues": [
+                "不是合法N,K及排列"
+              ]
+            },
+            {
+              "input": "2.in",
+              "issues": [
+                "不是合法N,K及排列"
+              ]
+            },
+            {
+              "input": "8.in",
+              "issues": [
+                "不是合法N,K及排列"
+              ]
+            },
+            {
+              "input": "sample1.in",
+              "issues": []
+            },
+            {
+              "input": "sample2.in",
+              "issues": []
+            },
+            {
+              "input": "sample3.in",
+              "issues": []
+            },
+            {
+              "input": "sample5.in",
+              "issues": []
+            }
+          ]
+        },
+        "extra_contract": {
+          "definition": "按解码题面补足原valid未覆盖的语义范围；实现见独立复算器extra_contract",
+          "files": [
+            {
+              "input": "0.in",
+              "issues": [
+                "不是合法N,K及排列"
+              ]
+            },
+            {
+              "input": "1.in",
+              "issues": []
+            },
+            {
+              "input": "13.in",
+              "issues": [
+                "不是合法N,K及排列"
+              ]
+            },
+            {
+              "input": "19.in",
+              "issues": [
+                "不是合法N,K及排列"
+              ]
+            },
+            {
+              "input": "2.in",
+              "issues": [
+                "不是合法N,K及排列"
+              ]
+            },
+            {
+              "input": "8.in",
+              "issues": [
+                "不是合法N,K及排列"
+              ]
+            },
+            {
+              "input": "sample1.in",
+              "issues": []
+            },
+            {
+              "input": "sample2.in",
+              "issues": []
+            },
+            {
+              "input": "sample3.in",
+              "issues": []
+            },
+            {
+              "input": "sample5.in",
+              "issues": []
+            }
+          ]
+        },
+        "answers": {
+          "method": "逆排列不可交换次序的DAG，以最大位置汇点逆向编号",
+          "official_samples": 3,
+          "files": [
+            {
+              "input": "0.in",
+              "output": "0.out",
+              "input_sha256": "bf71a25385acb63658b823472084229af1fc6e10862cea0fc8184a9d1d5619ee",
+              "output_sha256": "8543d6ef9fdf33fb9c92332123913c7d362aa8b367cefd7ebaace703326d37c6",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "1.in",
+              "output": "1.out",
+              "input_sha256": "b1351cdeecd962c15a6834eff43b25358bed7122127594fc46074b18349c714a",
+              "output_sha256": "f15665a9b2001db53536883c32bdb40f1f5d115861bcd997ec0334c9e191bb84",
+              "matches": true,
+              "oracle_ms": 11769
+            },
+            {
+              "input": "13.in",
+              "output": "13.out",
+              "input_sha256": "6986c22dba5b9eca74e4f9f9cc563b3e034f4832487aa598dc793c0ba27c0eff",
+              "output_sha256": "01805c57d3198ba6524a13ca16662bf30695902f4b46b5b6d7b478ec28c474c7",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "19.in",
+              "output": "19.out",
+              "input_sha256": "30646b8b0f76e0deb6117c8c58b207f1f91011c02809cfd59c6a75e06703cfbd",
+              "output_sha256": "326bd28f117ee9a719ae856cf9958c1ad6be9750e7cf1ad4925908c2c6842a42",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "2.in",
+              "output": "2.out",
+              "input_sha256": "dd6a26adc835f66b999e3eea41f254ff2961b02b450dab934540ed001cf6ec17",
+              "output_sha256": "424356313251edef0ce9a009d4047309213b62167f0534ba36f24d34c234c272",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "8.in",
+              "output": "8.out",
+              "input_sha256": "89531ce93e0462faf3a9711e83861113c2debf689d393240d9f182830d6ff415",
+              "output_sha256": "21c8a4acdb53cc20913dfa1c067df8ded1a26da50afcba6f2a0089ad8d08eb07",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "sample1.in",
+              "output": "sample1.out",
+              "input_sha256": "942e998f8399bf401f1d1df214049ad2a4eeffe1cc31588a68c8be723986be26",
+              "output_sha256": "fae8582bea097120806a9968f0144744e0cb14339c733742458cf227a99214ed",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "sample2.in",
+              "output": "sample2.out",
+              "input_sha256": "47211a9b4718abc365ee089be4d37198d6d0c178b9ea76774a044f0a3093bf33",
+              "output_sha256": "f6b49467f595b1a44e442c198b3df4d221e88efcaabc26254f8e0ad4f79b6242",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "sample3.in",
+              "output": "sample3.out",
+              "input_sha256": "2c623ed62a27e2edc5691d4a24c64087187d3e9ace421ff3fb39802851c2f59a",
+              "output_sha256": "3830bbad969d75ff43479f96a83cad4540998faa882db95d9eafe9e6c1a91029",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "sample5.in",
+              "output": "sample5.out",
+              "input_sha256": "5705a1614c8aa9a95a0af140d4e3b9cb54e5e37324d5ad8ec694176f28b18b8a",
+              "output_sha256": "7cafd0f0fecfd045d3e3a54a9b04f7afe7c0f98c15d135d21f30d54be41b005d",
+              "matches": true,
+              "oracle_ms": 0
+            }
+          ]
+        },
+        "local": {
+          "status": "Time Limit Exceeded",
+          "case": 2,
+          "time_ms": 11808,
+          "memory_kb": 144792,
+          "message": "单组测试超过 CPU 限制。"
+        },
+        "platform": {
+          "final": "Presentation Error",
+          "attempts": [
+            {
+              "language": "Python3",
+              "solution_id": "53582477",
+              "url": "http://cs101.openjudge.cn/practice/solution/53582477/",
+              "verdict": "Presentation Error",
+              "ms": 2337
+            }
+          ],
+          "checked_at": "2026-10-23T18:45:01.521074+00:00"
+        },
+        "admission_boundary": {
+          "original_reason": "output_over_2MiB",
+          "preserve_exclusion": true,
+          "reason": "原题号绑定或资源排除未改；答案核对通过不能自动激活"
+        }
+      },
+      "authored_reference": {
+        "source": "// 原独立审核自写线段树参考的C++翻译，未使用平台附件源码。\n#include <algorithm>\n#include <iostream>\n#include <queue>\n#include <utility>\n#include <vector>\nusing namespace std;\nvector<int> solve_wide(int n,int k,vector<int> a) {\n    int size=1; while(size<n) size*=2;\n    vector<pair<int,int>> tree(2*size,{0,-1});\n    for(int i=0;i<n;i++) tree[size+i]={a[i],i};\n    for(int i=size-1;i;i--) tree[i]=max(tree[2*i],tree[2*i+1]);\n    auto query=[&](int left,int right) {\n        left=max(0,left)+size; right=min(n,right)+size;\n        pair<int,int> best={0,-1};\n        while(left<right) {\n            if(left&1) best=max(best,tree[left++]);\n            if(right&1) best=max(best,tree[--right]);\n            left/=2;right/=2;\n        }\n        return best;\n    };\n    auto available=[&](int i) {return a[i] && query(i-k+1,i+k).first==a[i];};\n    priority_queue<int> heap;\n    for(int i=0;i<n;i++) if(available(i)) heap.push(i);\n    vector<int> answer(n);int label=n;\n    while(!heap.empty()) {\n        int i=heap.top();heap.pop();if(!a[i]) continue;\n        answer[i]=label--;a[i]=0;\n        int at=size+i;tree[at]={0,-1};\n        while(at>1) {at/=2;tree[at]=max(tree[2*at],tree[2*at+1]);}\n        for(auto range:vector<pair<int,int>>{{i-k+1,i},{i+1,i+k}}) {\n            auto best=query(range.first,range.second);\n            if(best.first && available(best.second)) heap.push(best.second);\n        }\n    }\n    if(label!=0) throw 1;\n    return answer;\n}\nint main() {\n    ios::sync_with_stdio(false);cin.tie(nullptr);\n    int n,k;if(!(cin>>n>>k))return 1;\n    vector<int>a(n);for(int &x:a)cin>>x;\n    auto answer=solve_wide(n,k,a);\n    for(int i=0;i<n;i++)cout<<(i?\" \":\"\")<<answer[i];\n    cout<<'\\n';\n}\n",
+        "sha256": "245f338cc3fd037601c88777033d2f070c0c1c0279e491ad784110174a01edcc",
+        "language": "cpp",
+        "origin": "原独立审核自产Python函数的自写C++翻译，未取用平台附件；小域穷举与原函数对拍另有证明。",
+        "original_python_source": "import math, heapq, random, itertools, re, html\nfrom pathlib import Path\nfrom collections import deque, Counter\nfrom decimal import Decimal, localcontext, ROUND_HALF_EVEN\nfrom fractions import Fraction\n\ndef wide_swap(s):\n    v = list(map(int, s.split()))\n    (n, k) = v[:2]\n    a = v[2:]\n    size = 1 << n.bit_length()\n    tree = [(0, -1)] * (size * 2)\n    for (i, x) in enumerate(a):\n        tree[size + i] = (x, i)\n    for i in range(size - 1, 0, -1):\n        tree[i] = max(tree[2 * i], tree[2 * i + 1])\n\n    def query(l, r):\n        l = max(0, l) + size\n        r = min(n, r) + size\n        best = (0, -1)\n        while l < r:\n            if l & 1:\n                best = max(best, tree[l])\n                l += 1\n            if r & 1:\n                r -= 1\n                best = max(best, tree[r])\n            l //= 2\n            r //= 2\n        return best\n\n    def available(i):\n        return a[i] and query(i - k + 1, i + k)[0] == a[i]\n    heap = [-i for i in range(n) if available(i)]\n    heapq.heapify(heap)\n    answer = [0] * n\n    label = n\n    while heap:\n        i = -heapq.heappop(heap)\n        if not a[i]:\n            continue\n        answer[i] = label\n        label -= 1\n        a[i] = 0\n        at = size + i\n        tree[at] = (0, -1)\n        while at > 1:\n            at //= 2\n            tree[at] = max(tree[at * 2], tree[at * 2 + 1])\n        for (l, r) in [(i - k + 1, i), (i + 1, i + k)]:\n            (value, j) = query(l, r)\n            if value and available(j):\n                heapq.heappush(heap, -j)\n    assert label == 0\n    return ' '.join(map(str, answer))\nimport sys\nsys.stdout.write(wide_swap(sys.stdin.read()) + '\\n')\n",
+        "original_python_sha256": "7c3d6fc9702cefaf4aa854c04467480366a164a8c88db434e25bb91a8e4594c7",
+        "function_sha256": "4ac9443d662589b50ae7205d03151be38f1b128228d0d789f4aa64658afbfb85"
+      },
+      "platform_attempts": [
+        {
+          "language": "Python3",
+          "solution_id": "53582477",
+          "url": "http://cs101.openjudge.cn/practice/solution/53582477/",
+          "verdict": "Presentation Error",
+          "ms": 2337
+        }
+      ],
+      "passed": false,
+      "complete": true
+    }
+  ]
+}

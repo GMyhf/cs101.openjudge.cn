@@ -1,0 +1,106 @@
+{
+  "batch": 20,
+  "results": [
+    {
+      "mutation": "坐标裁至错误上界",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错误放过100001坐标",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "图裁剪上界错一",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "未移除指向起点的边",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "起终点保留集漏终点",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "K改成N仍越界",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放过重复排列",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "误把未验证大对计为Accepted",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放过修复范围漂移",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "离线校核忽略错误答案",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "离线校核忽略执行失败",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "遗漏描述段坐标上界",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "矩阵错误拒绝尾部空行",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "堆值错误要求正整数",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "聊天错误拒绝尾部空行",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "线段查询漏一格",
+      "detected": true,
+      "failures": 0,
+      "errors": 1
+    },
+    {
+      "mutation": "优先选择最小位置",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "同分路径错误取最大字典序",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "用最小坐标错误替代中位点",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    }
+  ],
+  "procedure_source": "import ast,hashlib,io,json,os,subprocess,sys,unittest\nfrom pathlib import Path\nfrom unittest.mock import patch\ncases=[\n ('scripts/gmyhf_review_fixes.py','坐标裁至错误上界',\"+ b'100000' + result[span.end():]\",\"+ b'99999' + result[span.end():]\",'tests.test_gmyhf_graph_and_swap.GraphAndSwapTests.test_parcel_repairs_only_coordinate_above_description_bound'),\n ('scripts/gmyhf_review_fixes.py','错误放过100001坐标','if max(coordinates) <= 100000:','if max(coordinates) <= 100001:','tests.test_gmyhf_graph_and_swap.GraphAndSwapTests.test_parcel_repairs_only_coordinate_above_description_bound'),\n ('scripts/gmyhf_review_fixes.py','图裁剪上界错一','if len(kept) == 1000:','if len(kept) == 1001:','tests.test_gmyhf_graph_and_swap.GraphAndSwapTests.test_graph_crop_keeps_late_end_and_at_most_thousand_nodes'),\n ('scripts/gmyhf_review_fixes.py','未移除指向起点的边','if v in kept and v != start]','if v in kept]','tests.test_gmyhf_graph_and_swap.GraphAndSwapTests.test_graph_keeps_end_and_original_edge_order_without_incoming_start'),\n ('scripts/gmyhf_review_fixes.py','起终点保留集漏终点','kept = {start,end}','kept = {start}','tests.test_gmyhf_graph_and_swap.GraphAndSwapTests.test_graph_crop_keeps_late_end_and_at_most_thousand_nodes'),\n ('scripts/gmyhf_review_fixes.py','K改成N仍越界','str(n-1).encode()','str(n).encode()','tests.test_gmyhf_graph_and_swap.GraphAndSwapTests.test_swap_changes_only_invalid_k_and_rejects_bad_permutations'),\n ('scripts/gmyhf_review_fixes.py','放过重复排列','and set(permutation) == set(range(1,n+1))','and True','tests.test_gmyhf_graph_and_swap.GraphAndSwapTests.test_swap_changes_only_invalid_k_and_rejects_bad_permutations'),\n ('scripts/repair_gmyhf_review_findings.py','误把未验证大对计为Accepted','    return selected','    return cases','tests.test_gmyhf_graph_and_swap.GraphAndSwapTests.test_wide_sandbox_scope_does_not_count_preserved_large_pairs'),\n ('scripts/repair_gmyhf_review_findings.py','放过修复范围漂移','len(changed_names) == len(selected) == 5','True','tests.test_gmyhf_graph_and_swap.GraphAndSwapTests.test_wide_sandbox_scope_does_not_count_preserved_large_pairs'),\n ('scripts/repair_gmyhf_review_findings.py','离线校核忽略错误答案','result.stdout.split() == answer.split()','True','tests.test_gmyhf_graph_and_swap.GraphAndSwapTests.test_wide_trusted_recheck_rejects_bad_answers_without_claiming_acceptance'),\n ('scripts/repair_gmyhf_review_findings.py','离线校核忽略执行失败','result.returncode == 0 and result.stdout.split() == answer.split()','result.stdout.split() == answer.split()','tests.test_gmyhf_graph_and_swap.GraphAndSwapTests.test_wide_trusted_recheck_rejects_bad_answers_without_claiming_acceptance'),\n ('tests/test_gmyhf_contract_recheck.py','遗漏描述段坐标上界','1<=n<=100000 and len(data)==n and all(1<=v<=100000 for v in data)','n>=1 and len(data)==n','tests.test_gmyhf_contract_recheck.ContractRecheckTests.test_coordinate_bounds_are_in_description'),\n ('tests/test_gmyhf_contract_recheck.py','矩阵错误拒绝尾部空行','1<=n<=100 and len(data)==n*n','not payload.endswith(b\"\\\\n\\\\n\") and 1<=n<=100 and len(data)==n*n','tests.test_gmyhf_contract_recheck.ContractRecheckTests.test_matrix_trailing_blank_line_is_whitespace'),\n ('tests/test_gmyhf_contract_recheck.py','堆值错误要求正整数','len(set(data))==n','len(set(data))==n and all(v>0 for v in data)','tests.test_gmyhf_contract_recheck.ContractRecheckTests.test_heap_labels_are_distinct_integers_including_zero'),\n ('tests/test_gmyhf_contract_recheck.py','聊天错误拒绝尾部空行','1<=n<=500000 and len(data)==n','not payload.endswith(b\"\\\\n\\\\n\") and 1<=n<=500000 and len(data)==n','tests.test_gmyhf_contract_recheck.ContractRecheckTests.test_chat_blank_lines_do_not_change_count_or_range')]\nresults=[]\nfor path,name,old,new,test in cases:\n p=Path(path);original=p.read_text()\n try:\n  assert original.count(old)==1,(name,original.count(old));p.write_text(original.replace(old,new))\n  run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest',test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'));assert run.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':run.returncode})\n finally:p.write_text(original)\nsys.path.insert(0,str(Path.cwd()));from tests import test_gmyhf_graph_and_swap as tests\noriginal=tests.wide_cpp_source()\nfor name,old,new in [('线段查询漏一格','query(i-k+1,i+k)','query(i-k+1,i+k-1)'),('优先选择最小位置','priority_queue<int> heap;','priority_queue<int,vector<int>,greater<int>> heap;')]:\n assert original.count(old)==1\n with patch.object(tests,'wide_cpp_source',return_value=original.replace(old,new)):\n  run=unittest.TextTestRunner(stream=io.StringIO()).run(tests.GraphAndSwapTests('test_cpp_swap_matches_all_reachable_permutations'));assert not run.wasSuccessful(),name\n results.append({'mutation':name,'detected':True,'failures':len(run.failures),'errors':len(run.errors)})\nproof=json.loads(Path('collab/gmyhf-30172-authored-admin-review.json').read_text())['entries'][0]['authored_reference'];source=proof['source'];old='min(v for value,v in choices if value==score)';assert source.count(old)==1;tree=ast.parse(source.replace(old,'max(v for value,v in choices if value==score)'));tree.body=[v for v in tree.body if isinstance(v,(ast.Import,ast.ImportFrom,ast.FunctionDef))];ns={};exec(compile(tree,'<自产参考变异>','exec'),ns)\nwith patch.object(tests,'reference',return_value=ns[proof['function']]):\n run=unittest.TextTestRunner(stream=io.StringIO()).run(tests.GraphAndSwapTests('test_story_reference_matches_all_small_dag_paths_and_cycle_rules'));assert not run.wasSuccessful()\nresults.append({'mutation':'同分路径错误取最大字典序','detected':True,'failures':len(run.failures),'errors':len(run.errors)})\nproof=json.loads(Path('collab/gmyhf-19962-authored-admin-review.json').read_text())['entries'][0]['authored_reference'];source=proof['source'];assert source.count('len(a)//2+1')==1;tree=ast.parse(source.replace('len(a)//2+1','1'));tree.body=[v for v in tree.body if isinstance(v,(ast.Import,ast.ImportFrom,ast.FunctionDef))];ns={};exec(compile(tree,'<自产参考变异>','exec'),ns)\nwith patch.object(tests,'reference',return_value=ns[proof['function']]):\n run=unittest.TextTestRunner(stream=io.StringIO()).run(tests.GraphAndSwapTests('test_parcel_reference_matches_all_candidate_locations'));assert not run.wasSuccessful()\nresults.append({'mutation':'用最小坐标错误替代中位点','detected':True,'failures':len(run.failures),'errors':len(run.errors)})\ns=Path(__file__).read_text();Path('collab/gmyhf-review-fixes-batch20-mutations.json').write_text(json.dumps({'batch':20,'results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n');print(len(results),'种变异检出并恢复源码')\n",
+  "procedure_sha256": "29ef992cdad61669c2a2b1222c7f0bea2d57ff0493fc330c666a1535f56f7a2c"
+}

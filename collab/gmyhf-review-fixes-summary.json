@@ -1,14 +1,14 @@
 {
-  "scope": "T-060十九批指定问题的修复收口；不是所有历史疑点已消除或已接入题库的声明。",
+  "scope": "T-060二十批指定问题的修复收口；不是所有历史疑点已消除或已接入题库的声明。",
   "totals": {
-    "problems": 58,
-    "repaired_inputs": 383,
-    "repaired_answers": 322,
+    "problems": 61,
+    "repaired_inputs": 397,
+    "repaired_answers": 336,
     "changed_statement_fields": 18,
-    "accepted_legal_pairs": 1192,
+    "accepted_legal_pairs": 1243,
     "recomputed_samples": 20,
-    "readback_files": 3165,
-    "detected_mutations": 212
+    "readback_files": 3278,
+    "detected_mutations": 231
   },
   "reports": [
     {
@@ -97,6 +97,11 @@
       "sha256": "2187ed82067c9348fd999a432389ed4d1e719c01a0a9e05cc62b2615403ad1e8"
     },
     {
+      "phase": 20,
+      "path": "collab/gmyhf-review-fixes-batch20.json",
+      "sha256": "419cc6ed35bcd6925e829f0e511d231a16f03342f0e5078ab88029ce3515f900"
+    },
+    {
       "phase": 4,
       "path": "collab/gmyhf-sample-repairs.json",
       "sha256": "8b474801c35191cc1dfd5a96e3a4c25937d3159195f7d3c7c0eea5fca34ec0e8"
@@ -136,6 +141,13 @@
       "report": "collab/gmyhf-review-fixes-batch18.json",
       "scope": "本批输入/答案修复及全量回读已完成",
       "changes": 20
+    },
+    {
+      "global_number": 19962,
+      "phase": 20,
+      "report": "collab/gmyhf-review-fixes-batch20.json",
+      "scope": "本批输入/答案修复及全量回读已完成",
+      "changes": 2
     },
     {
       "global_number": 19964,
@@ -291,6 +303,13 @@
       "report": "collab/gmyhf-review-fixes-batch19.json",
       "scope": "本批输入/答案修复及全量回读已完成",
       "changes": 6
+    },
+    {
+      "global_number": 27699,
+      "phase": 20,
+      "report": "collab/gmyhf-review-fixes-batch20.json",
+      "scope": "本批输入/答案修复及全量回读已完成",
+      "changes": 10
     },
     {
       "global_number": 27934,
@@ -489,6 +508,13 @@
       "changed_fields": [
         "input"
       ]
+    },
+    {
+      "global_number": 30172,
+      "phase": 20,
+      "report": "collab/gmyhf-review-fixes-batch20.json",
+      "scope": "本批输入/答案修复及全量回读已完成",
+      "changes": 16
     },
     {
       "global_number": 30176,
@@ -703,6 +729,11 @@
       "path": "collab/gmyhf-review-fixes-batch19-mutations.json",
       "sha256": "0fce0e36395f96472b6ae704a427636d851fa1161501a8968608d785cdcc11f8",
       "detected": 17
+    },
+    {
+      "path": "collab/gmyhf-review-fixes-batch20-mutations.json",
+      "sha256": "dba695d12da57899fce256f9b8bec6953089be8956bdac4e7d9aa59e865e9d12",
+      "detected": 19
     }
   ],
   "additional_finding": {
@@ -827,16 +858,3738 @@
     "sha256": "eab331f6eb434dced136e353c8d0dafd8beec9a0430798e21b00dcf8e9370a22",
     "actual_independent_pairs": 131
   },
-  "next_candidates_not_exhaustive": [
-    19962,
-    25570,
-    27699,
-    28013,
-    30172,
-    30497,
-    30930
-  ],
+  "reference_validation20": {
+    "path": "collab/gmyhf-review-fixes-batch20-proof.json",
+    "sha256": "fd8d01770776d345fb098646d296fcb4720b478ac5c9dc0f355e952e60c0b14e",
+    "actual_independent_pairs": 51,
+    "small_swap_cases": 4166,
+    "wide_sandbox_pairs": 5,
+    "wide_preserved_pairs_without_sandbox_acceptance": 5
+  },
+  "extra_contract_recheck": {
+    "path": "collab/gmyhf-extra-contracts-recheck.json",
+    "sha256": "1fb9b457fa7fdd69e0b40a8bc905d6bb8fb107ab6e72aadf4aa310773a7d746b",
+    "problems": 3,
+    "input_contracts": 90,
+    "readback_files": 181,
+    "platform_writes": 0,
+    "counted_separately_from_repaired_problems": true
+  },
+  "original_report_dispositions": {
+    "scope": "仅对原16批已报告的答案不符、extra_contract及规范化后拒绝核对去向；并非重新证明所有算法或解除所有接入排除。",
+    "reports": [
+      {
+        "path": "collab/gmyhf-pending-batch1-review.json",
+        "sha256": "1d3d253137dd652d0694b1f1b88676f06541468faef458cf50e41f1d368d96e0"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch2-review.json",
+        "sha256": "3462c10e6ef88e0ccde1d5aa5c5b96dd07c5069c49d02e5235b53918b05fda66"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch3-review.json",
+        "sha256": "cb09542355a9d5811c0728e2641438dd8622dfc915eb8d1ca38060944174e869"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch4-review.json",
+        "sha256": "d0d27b956d04cb5d8678e86297f8c2169ef623879a561f404c9e2113132e45df"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch5-review.json",
+        "sha256": "bec50be3d30c8f8d6d1e9fdcf0e32d744a562d6e9ee6d49a7b916549c151b191"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch6-review.json",
+        "sha256": "4f54de42c5d22cfb6d17fefd20d739242457d6c2128e4bbbdcf21845a7a70083"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch7-review.json",
+        "sha256": "4624ed641b4d490f1f272792d6d23ca3f97f077f45bfbaa9a50a9df17a4a5e50"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch8-review.json",
+        "sha256": "f32179ba25bb87b53478334f84b3a067c17e8ca9d526164606669638553a4569"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch9-review.json",
+        "sha256": "1c13707c8291ef2e11e77d8c9558530404c91f580313d35f424a28a384db90db"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch10-review.json",
+        "sha256": "115ff239b388d2378b8c5b9f57ecda5f3602dd0e691bbee2524fcfc05f894464"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch11-review.json",
+        "sha256": "3a05d16a838fbde5c70dd73404f7cbe1db03b543b22b784b900d2a1f89a5828a"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch12-review.json",
+        "sha256": "f0c3ccdac3a4e300479a80c7dd6b722bdc7f4240a6be81ec5888daae1e8856e0"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch13-review.json",
+        "sha256": "732f5eed1a178ad87072c26d9c1b9826c144c4b6dd6f4a44813e0c2d2ec3d8e3"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch14-review.json",
+        "sha256": "55ab571e26f83251d814a0d674c37114f1b9ccc35367c7b67e734a918d28e59c"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch15-review.json",
+        "sha256": "daf49d623f2cfd66dab22327561eca3ed9a39cc1688447754716677c2780cec1"
+      },
+      {
+        "path": "collab/gmyhf-pending-batch16-review.json",
+        "sha256": "4ec0d145708f5cd4705c1e16b28f5cb9bcd3480db1a7a90a72077db2246b8ec1"
+      }
+    ],
+    "previous_answer_repair_reports": [
+      {
+        "path": "collab/gmyhf-answer-repairs-batch1.json",
+        "sha256": "6480480bd129bd2ebd46a833cff54a9428ab080a5fd5d0ffe2e2451f0ec2dd45"
+      },
+      {
+        "path": "collab/gmyhf-answer-repairs-batch2.json",
+        "sha256": "84e8057b4479eb8283a262ffe037dcad1301557b4713d011736ff2e8aa6ec191"
+      },
+      {
+        "path": "collab/gmyhf-answer-repairs-batch3.json",
+        "sha256": "daa7ffa35d6836ca449c7ae9025c2fe5a044ae9ffd2753ae6213002fd64dd128"
+      },
+      {
+        "path": "collab/gmyhf-answer-repairs-batch4.json",
+        "sha256": "ef6683dec4e4f60f806b2134016565d4b28a90e611d3d89dccfe96507047e524"
+      }
+    ],
+    "items": [
+      {
+        "global_number": 18076,
+        "input": "18.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "1.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "10.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "11.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "12.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "13.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "14.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "15.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "16.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "17.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "18.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "19.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "2.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "20.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "3.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "4.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "5.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "6.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "7.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "8.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18076,
+        "input": "9.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "1.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "10.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "11.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "12.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "13.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "14.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "15.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "16.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "17.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "18.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "19.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "2.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "20.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "3.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "4.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "5.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "6.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "7.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "8.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 18209,
+        "input": "9.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19962,
+        "input": "20.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20004,
+        "input": "16.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20004,
+        "input": "20.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "10.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "11.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "12.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "13.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "14.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "15.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "16.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "17.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "18.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "19.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "2.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "20.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "3.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "4.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "5.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "6.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "7.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "8.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20103,
+        "input": "9.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21727,
+        "input": "D10.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21727,
+        "input": "D11.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21727,
+        "input": "D12.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21727,
+        "input": "D13.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21727,
+        "input": "D16.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21727,
+        "input": "D17.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21727,
+        "input": "D3.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21727,
+        "input": "D4.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21727,
+        "input": "D7.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21727,
+        "input": "D8.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "1.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "10.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "11.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "12.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "13.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "14.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "15.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "16.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "17.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "18.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "19.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "2.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "20.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "3.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "4.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "5.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "6.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "7.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "8.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21728,
+        "input": "9.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 23554,
+        "input": "20.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25570,
+        "input": "1.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "只读题面契约复核通过，保留既有valid及接入排除"
+      },
+      {
+        "global_number": 25570,
+        "input": "3.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "只读题面契约复核通过，保留既有valid及接入排除"
+      },
+      {
+        "global_number": 25570,
+        "input": "4.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "只读题面契约复核通过，保留既有valid及接入排除"
+      },
+      {
+        "global_number": 25570,
+        "input": "6.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "只读题面契约复核通过，保留既有valid及接入排除"
+      },
+      {
+        "global_number": 25580,
+        "input": "14.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25580,
+        "input": "15.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25580,
+        "input": "16.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25580,
+        "input": "17.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25580,
+        "input": "18.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25580,
+        "input": "19.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27307,
+        "input": "3.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27307,
+        "input": "4.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27307,
+        "input": "5.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28013,
+        "input": "10.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "只读题面契约复核通过，保留既有valid及接入排除"
+      },
+      {
+        "global_number": 28013,
+        "input": "13.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "只读题面契约复核通过，保留既有valid及接入排除"
+      },
+      {
+        "global_number": 28013,
+        "input": "4.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "只读题面契约复核通过，保留既有valid及接入排除"
+      },
+      {
+        "global_number": 28013,
+        "input": "5.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "只读题面契约复核通过，保留既有valid及接入排除"
+      },
+      {
+        "global_number": 30172,
+        "input": "13.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30172,
+        "input": "14.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30172,
+        "input": "15.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30172,
+        "input": "16.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30172,
+        "input": "17.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30172,
+        "input": "18.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30172,
+        "input": "19.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30172,
+        "input": "25.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30222,
+        "input": "46.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30222,
+        "input": "47.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30222,
+        "input": "48.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30222,
+        "input": "49.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30222,
+        "input": "50.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30222,
+        "input": "46.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30222,
+        "input": "47.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30222,
+        "input": "48.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30222,
+        "input": "49.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30222,
+        "input": "50.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30930,
+        "input": "test01.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "只读题面契约复核通过，保留既有valid及接入排除"
+      },
+      {
+        "global_number": 31193,
+        "input": "10.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "11.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "12.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "13.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "14.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "15.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "16.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "17.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "18.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "19.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "2.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "20.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "3.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "5.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "6.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "7.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "8.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31193,
+        "input": "9.in",
+        "kind": "规范化后仍拒绝",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19965,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19965,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19965,
+        "input": "6.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19965,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19965,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19974,
+        "input": "1.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19974,
+        "input": "2.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19984,
+        "input": "4.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27699,
+        "input": "0.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27699,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27699,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27699,
+        "input": "2.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27699,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30497,
+        "input": "0.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "1.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "10.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "11.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "12.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "13.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "14.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "15.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "16.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "17.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "18.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "19.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "2.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "20.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "21.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "22.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "23.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "24.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "3.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "4.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "5.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "6.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "7.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "8.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 30497,
+        "input": "9.in",
+        "kind": "原报告答案不符",
+        "resolution": "30497保留题意未核定，不擅造YES/NO"
+      },
+      {
+        "global_number": 21471,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "20.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "21.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "22.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "23.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "24.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "25.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "26.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "27.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "28.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "29.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "30.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "31.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "32.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "33.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "34.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "35.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "36.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 21471,
+        "input": "37.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "0.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "1.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "14.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "2.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "3.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "4.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "5.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "6.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31239,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 31241,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 20124,
+        "input": "2.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 20126,
+        "input": "2.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 21729,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "1.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "10.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "11.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "12.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "13.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "14.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "15.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "16.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "17.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "18.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "19.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "2.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "20.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "3.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "4.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "5.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "6.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "7.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "8.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 23665,
+        "input": "9.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "0.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "14.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "18.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "2.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "3.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "4.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "5.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "6.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25563,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25577,
+        "input": "20.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25579,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25579,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25579,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25579,
+        "input": "14.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25579,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25579,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25579,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25579,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25579,
+        "input": "2.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25579,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25579,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25579,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "0.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "1.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "14.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "18.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "3.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "5.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "6.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 25685,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27945,
+        "input": "21.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27946,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27946,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27946,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27946,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27946,
+        "input": "14.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27946,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27946,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27946,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27946,
+        "input": "18.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27946,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27952,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27952,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27952,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27952,
+        "input": "18.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27952,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27952,
+        "input": "20.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27952,
+        "input": "5.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 27952,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28014,
+        "input": "1.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28016,
+        "input": "3.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28016,
+        "input": "4.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28016,
+        "input": "5.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28016,
+        "input": "6.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28016,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28016,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "14.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "18.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "20.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "4.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "5.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "6.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28187,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "14.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "18.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "20.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28188,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28189,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28189,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28189,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28189,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28189,
+        "input": "14.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28189,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28189,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28189,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28189,
+        "input": "18.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28189,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28189,
+        "input": "5.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28189,
+        "input": "6.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28189,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28191,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28191,
+        "input": "18.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28191,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28191,
+        "input": "20.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28277,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28339,
+        "input": "20.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28341,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28680,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28680,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28680,
+        "input": "20.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28680,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28680,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "1.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "14.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "18.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "2.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "20.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "3.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "4.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "5.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "6.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28682,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "1.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "14.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "18.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "2.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "3.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "4.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "5.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 28696,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "1.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "14.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "18.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "2.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "20.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "21.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "24.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "25.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "26.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "27.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "28.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "29.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "3.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "30.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "31.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "32.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "35.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "36.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "37.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "38.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "4.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "5.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "6.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29329,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29663,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "1.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "14.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "18.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "2.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "20.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "3.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "4.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "5.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "6.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 29905,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "1.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "13.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "14.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "15.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "16.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "17.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "18.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "19.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "2.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "20.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "21.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "22.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "23.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "24.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "25.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "26.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "27.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "28.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "29.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "3.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "30.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "31.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "32.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "33.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "34.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "35.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "36.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "37.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "38.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "39.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "4.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "40.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "42.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "44.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "46.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "48.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "5.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "50.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "6.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30125,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30177,
+        "input": "0.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30205,
+        "input": "1.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30205,
+        "input": "10.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30205,
+        "input": "11.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30205,
+        "input": "2.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30205,
+        "input": "3.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30205,
+        "input": "4.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30205,
+        "input": "5.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30205,
+        "input": "6.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30205,
+        "input": "7.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30205,
+        "input": "8.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30205,
+        "input": "9.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30825,
+        "input": "2.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30825,
+        "input": "3.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30827,
+        "input": "1.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30827,
+        "input": "15.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30827,
+        "input": "18.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30827,
+        "input": "32.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30827,
+        "input": "41.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30827,
+        "input": "5.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "10.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "11.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "12.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "13.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "14.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "15.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "16.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "17.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "18.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "19.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "20.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "21.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "22.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "23.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "24.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "25.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "26.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "27.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "28.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "29.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "30.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "31.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "32.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "33.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "34.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "35.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "36.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "37.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "38.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "39.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "40.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "41.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "42.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "43.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "44.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "45.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "46.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "47.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "48.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "49.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "5.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "50.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "7.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "8.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 30828,
+        "input": "9.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 19964,
+        "input": "5.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19964,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19964,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19964,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19964,
+        "input": "4.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19964,
+        "input": "6.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19964,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19964,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19964,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19966,
+        "input": "10.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 19966,
+        "input": "5.in",
+        "kind": "原报告答案不符",
+        "resolution": "T-059已修复"
+      },
+      {
+        "global_number": 19968,
+        "input": "10.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19968,
+        "input": "11.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19968,
+        "input": "12.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19968,
+        "input": "6.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19968,
+        "input": "7.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19968,
+        "input": "8.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 19968,
+        "input": "9.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30236,
+        "input": "51.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30920,
+        "input": "test01.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      },
+      {
+        "global_number": 30920,
+        "input": "test80.in",
+        "kind": "额外输入契约",
+        "resolution": "T-060修复"
+      }
+    ]
+  },
+  "remaining_holds": {
+    "author_semantics": [
+      19945,
+      20139,
+      30497
+    ],
+    "special_judge_protocol": [
+      27952,
+      28341,
+      31381
+    ],
+    "resource_limits_examples": [
+      27699,
+      31033
+    ],
+    "unavailable_downloads": 14,
+    "public_catalog_mapping_and_existing_validator_exclusions": "保留原接入排除，不属于已修复输入/答案的计数。"
+  },
+  "next_candidates_not_exhaustive": [],
   "preserved_exclusions": "未放宽valid、时限余量、2MiB输出或SPJ要求；无公开映射和无下载题仍保留原排除。",
-  "procedure_sha256": "0677f55820a1bdef5b26d07906c8547beaee247e71e7c6db681071c19d1cf337",
-  "procedure_source": "\"\"\"只读汇总十九批历史源码、回执与本地字节；跨题面批的数据文件去重计数。\"\"\"\nimport hashlib,json,subprocess\nfrom pathlib import Path\nROOT=Path.cwd()\ndef sha(b):return hashlib.sha256(b).hexdigest()\ndef read(path):return json.loads((ROOT/path).read_text())\ndef code(path,commit=None):return subprocess.check_output(['git','show',f'{commit}:{path}']) if commit else (ROOT/path).read_bytes()\nreports=[];problems=[];files={};input_count=answer_count=pair_count=sample_count=field_count=0\ncommits={1:'2a8bc7d21',2:'79fe0c992',3:'27aabcd3e',5:'ae51f71fa',6:'56772cd62',7:'7a184e698',9:'9621ffe4d',10:'607eb3892',11:'e865edce2',12:'d897af220',13:'b11d6fc5f',14:'fe0b2d0ee',15:'988d21a2f',16:'4557973c9',17:'7fc83e92b',18:'621b372cc'}\nfor batch in (1,2,3,5,6,7,9,10,11,12,13,14,15,16,17,18,19):\n path=f'collab/gmyhf-review-fixes-batch{batch}.json';report=read(path);assert report['applied']\n for key,source in [('procedure_sha256','scripts/repair_gmyhf_missing_pair.py' if batch==14 else 'scripts/repair_gmyhf_review_findings.py'),('rules_sha256','scripts/gmyhf_review_fixes.py'),('common_sha256','scripts/repair_gmyhf_pending_answers.py')]:\n  assert sha(code(source,commits.get(batch)))==report[key],(batch,key)\n reports.append({'phase':batch,'path':path,'sha256':sha((ROOT/path).read_bytes())})\n for group in report['problems']:\n  n=group['global_number'];assert group['local']['status']=='Accepted' and group['local']['timing_audit']['status']=='passed'\n  assert (group['form_unchanged'] and group['file_list_unchanged']) or (group.get('only_expected_files_added') and group['configuration_unchanged'] and set(group['final_files'])-set(group['before_files'])=={'3.in'})\n  assert sha((ROOT/group['evidence']).read_bytes())==group['evidence_sha256']\n  directory=ROOT/group['local_dataset']\n  assert sha((directory/group.get('reference_file','reference.py')).read_bytes())==group['reference_sha256']==sha(group['reference_source'].encode())\n  if 'semantic_checker' in group:\n   checker=group['semantic_checker']\n   assert sha(code('scripts/gmyhf_semantic_checkers.py',commits.get(batch)))==checker['rules_sha256']\n   assert sha(checker['source'].encode())==checker['sha256']==sha((ROOT/'data/openjudge'/checker['path']).read_bytes())\n  expected=dict(group['before_files'])\n  for change in group['changes']:\n   assert expected.get(change['filename'])==change['before_sha256'];expected[change['filename']]=change['after_sha256']\n   input_count+=change['filename'].endswith('.in');answer_count+=change['filename'].endswith('.out')\n  assert expected==group['final_files']\n  for name,digest in expected.items():\n   assert (n,name) not in files;files[n,name]=digest\n   if name.endswith(('.in','.out')):assert sha((directory/'data'/name).read_bytes())==digest\n  pair_count+=group['verified_legal_pairs']\n  problems.append({'global_number':n,'phase':batch,'report':path,'scope':'本批输入/答案修复及全量回读已完成','changes':len(group['changes'])})\nfor phase,path,commit in [(4,'collab/gmyhf-sample-repairs.json','05e8ffb4a'),(8,'collab/gmyhf-statement-repairs-batch8.json','1aba30da1'),(9,'collab/gmyhf-statement-repairs-batch9.json','9621ffe4d'),(10,'collab/gmyhf-statement-repairs-batch10.json','607eb3892'),(15,'collab/gmyhf-statement-repairs-batch15.json','988d21a2f')]:\n report=read(path);assert report['applied']\n assert report['procedure_sha256']==sha(code('scripts/repair_gmyhf_sample_findings.py',commit))\n if 'recipes_sha256' in report:assert report['recipes_sha256']==sha(code('scripts/gmyhf_statement_fixes.py',commit))\n if 'reference_rules_sha256' in report:assert report['reference_rules_sha256']==sha(code('scripts/gmyhf_review_fixes.py',commit))\n reports.append({'phase':phase,'path':path,'sha256':sha((ROOT/path).read_bytes())})\n for group in report['problems']:\n  n=group['global_number'];assert group['before_files']==group['final_files'] and group['local_matches'] and group['only_allowed_fields_changed']\n  assert sha((ROOT/group['evidence']).read_bytes())==group['evidence_sha256']\n  local=ROOT/group['local_statement'];fields=read(str(local.relative_to(ROOT))+'/fields.json')\n  normalized={k:v.replace('\\r\\n','\\n') for k,v in fields.items()}\n  assert sha(json.dumps(normalized,ensure_ascii=False,sort_keys=True).encode())==group['after_form_sha256']\n  assert sha((local/'reference.py').read_bytes())==group['reference_sha256']\n  prior={25685:'collab/gmyhf-review-fixes-batch7.json',28277:'collab/gmyhf-review-fixes-batch9.json',28680:'collab/gmyhf-review-fixes-batch9.json',21729:'collab/gmyhf-review-fixes-batch10.json',29663:'collab/gmyhf-review-fixes-batch15.json'}.get(n)\n  if prior:\n   assert sha((ROOT/prior).read_bytes())==group['prior_repair_sha256']\n   previous=next(g for g in read(prior)['problems'] if g['global_number']==n)\n   assert group['final_files']==previous['final_files']\n  for name,digest in group['final_files'].items():\n   if (n,name) in files:assert files[n,name]==digest and prior\n   files[n,name]=digest\n  sample_count+=len(group['samples']);field_count+=len(group['changed_fields'])\n  problems.append({'global_number':n,'phase':phase,'report':path,'scope':'本批题面/样例修复及全量回读已完成','changed_fields':sorted(group['changed_fields'])})\nproof=read('collab/gmyhf-31241-small-proof.json');assert proof['all_matched'] and proof['cases']==388\nassert proof['reference_sha256']==next(g for g in read('collab/gmyhf-review-fixes-batch12.json')['problems'] if g['global_number']==31241)['reference_sha256']\nproof13=read('collab/gmyhf-31239-small-proof.json');assert proof13['all_matched'] and proof13['cases']==654\nassert proof13['reference_sha256']==next(g for g in read('collab/gmyhf-review-fixes-batch13.json')['problems'] if g['global_number']==31239)['reference_sha256']\ncertificate=read('collab/gmyhf-30549-certificate-recheck.json');assert certificate['certificate_pairs']==101 and len(certificate['readback_files'])==202 and certificate['platform_writes']==0\nassert all(r['independent_valid'] for r in certificate['checks']+certificate['samples'])\npadding=read('collab/gmyhf-29663-padding-proof.json');assert padding['all_matched'] and padding['small_cases']==1806 and len(padding['data_pairs'])==20\nassert padding['reference_sha256']==read('collab/gmyhf-review-fixes-batch15.json')['problems'][0]['reference_sha256']\nassert padding['independent_simulator_sha256']==sha((ROOT/'tests/test_gmyhf_padded_tree.py').read_bytes())\nfor row in padding['data_pairs']:\n group=read('collab/gmyhf-review-fixes-batch15.json')['problems'][0]\n assert row['matches'] and group['final_files'][row['input']]==row['input_sha256'] and group['final_files'][row['input'][:-3]+'.out']==row['answer_sha256']\ncourse=read('collab/gmyhf-30686-course-display-recheck.json')\nassert course['platform_writes']==0 and course['global_number_verified'] and course['problem_content_verified'] and course['single_html_parse_samples_match_admin'] and course['visible_sample_output_matches'] and course['admin_form_unchanged']\nassert course['reference_answers']==['true','true','false'] and course['previous_recheck_sha256']==sha((ROOT/course['previous_recheck']).read_bytes())\nproof18=read('collab/gmyhf-review-fixes-batch18-proof.json');assert proof18['all_matched'] and proof18['actual_independent_pairs']==80\nassert proof18['tests_sha256']==sha((ROOT/'tests/test_gmyhf_early_semantics.py').read_bytes())\nassert proof18['rules_sha256']==read('collab/gmyhf-review-fixes-batch18.json')['rules_sha256']\nproof19=read('collab/gmyhf-review-fixes-batch19-proof.json');assert proof19['all_matched'] and proof19['actual_independent_pairs']==131\nassert proof19['tests_sha256']==sha((ROOT/'tests/test_gmyhf_early_structure.py').read_bytes())\nassert proof19['rules_sha256']==read('collab/gmyhf-review-fixes-batch19.json')['rules_sha256']\nstep_findings=[]\ngroup=next(g for g in read('collab/gmyhf-review-fixes-batch5.json')['problems'] if g['global_number']==28682)\nfor row in next(e for e in read(group['evidence'])['entries'] if e['global_number']==28682)['checks']['answers']['files']:\n before=(ROOT/f'data/openjudge/tests/admin_download/28682/{row[\"input\"]}').read_bytes()\n tokens=before.split();n,m=map(int,tokens[:2]);steps=[int(tokens[3+2*n+2*i]) for i in range(m)]\n if n in steps:\n  after=(ROOT/group['local_dataset']/'data'/row['input']).read_bytes();fixed=after.split()\n  assert sha(before)==row['input_sha256'] and sha(after)==group['final_files'][row['input']]\n  assert all(1<=int(fixed[3+2*n+2*i])<n for i in range(m))\n  step_findings.append({'input':row['input'],'before_sha256':sha(before),'after_sha256':sha(after),'original_steps_equal_n':steps.count(n),'corrected_steps_strictly_less_than_n':True})\nassert len(step_findings)==10\nmutations=[]\nfor path in ['collab/gmyhf-review-fixes-mutations.json','collab/gmyhf-review-fixes-batch2-mutations.json','collab/gmyhf-review-fixes-batch3-mutations.json','collab/gmyhf-sample-repairs-mutations.json','collab/gmyhf-review-fixes-batch5-mutations.json','collab/gmyhf-review-fixes-batch6-mutations.json','collab/gmyhf-review-fixes-batch7-mutations.json','collab/gmyhf-statement-repairs-batch8-mutations.json','collab/gmyhf-review-fixes-batch9-mutations.json','collab/gmyhf-review-fixes-batch10-mutations.json','collab/gmyhf-review-fixes-batch11-mutations.json','collab/gmyhf-review-fixes-batch12-mutations.json','collab/gmyhf-review-fixes-batch13-mutations.json','collab/gmyhf-30549-recheck-mutations.json','collab/gmyhf-review-fixes-batch14-mutations.json','collab/gmyhf-review-fixes-batch15-mutations.json','collab/gmyhf-review-fixes-batch16-mutations.json','collab/gmyhf-review-fixes-batch17-mutations.json','collab/gmyhf-30686-course-display-mutations.json','collab/gmyhf-review-fixes-batch18-mutations.json','collab/gmyhf-review-fixes-batch19-mutations.json']:\n report=read(path);assert all(row['detected'] for row in report['results'])\n mutations.append({'path':path,'sha256':sha((ROOT/path).read_bytes()),'detected':len(report['results'])})\nassert len({g['global_number'] for g in problems})==58\nresult={'scope':'T-060十九批指定问题的修复收口；不是所有历史疑点已消除或已接入题库的声明。',\n 'totals':{'problems':len({g['global_number'] for g in problems}),'repaired_inputs':input_count,'repaired_answers':answer_count,'changed_statement_fields':field_count,'accepted_legal_pairs':pair_count,'recomputed_samples':sample_count,'readback_files':len(files),'detected_mutations':sum(m['detected'] for m in mutations)},\n 'reports':reports,'problems':sorted(problems,key=lambda g:(g['global_number'],g['phase'])),'mutations':mutations,\n 'additional_finding':{'global_number':28682,'rule':'1≤s_i<n；原第13批未单列10份s_i=n，现改为n−1。','files':step_findings},\n 'reference_validation':{'path':'collab/gmyhf-31241-small-proof.json','sha256':sha((ROOT/'collab/gmyhf-31241-small-proof.json').read_bytes()),'cases':388},\n 'reference_validation13':{'path':'collab/gmyhf-31239-small-proof.json','sha256':sha((ROOT/'collab/gmyhf-31239-small-proof.json').read_bytes()),'cases':654},\n 'certificate_recheck':{'path':'collab/gmyhf-30549-certificate-recheck.json','sha256':sha((ROOT/'collab/gmyhf-30549-certificate-recheck.json').read_bytes()),'pairs':101,'samples':2,'readback_files':202,'platform_writes':0,'counted_separately_from_repaired_problems':True},\n 'padding_recheck':{'path':'collab/gmyhf-29663-padding-proof.json','sha256':sha((ROOT/'collab/gmyhf-29663-padding-proof.json').read_bytes()),'small_cases':1806,'data_pairs':20},\n 'display_recheck':{'path':'collab/gmyhf-30686-display-recheck.json','sha256':sha((ROOT/'collab/gmyhf-30686-display-recheck.json').read_bytes()),'platform_writes':0},\n 'course_display_recheck':{'path':'collab/gmyhf-30686-course-display-recheck.json','sha256':sha((ROOT/'collab/gmyhf-30686-course-display-recheck.json').read_bytes()),'problem_content_verified':True,'platform_writes':0},\n 'reference_validation18':{'path':'collab/gmyhf-review-fixes-batch18-proof.json','sha256':sha((ROOT/'collab/gmyhf-review-fixes-batch18-proof.json').read_bytes()),'actual_independent_pairs':80},\n 'reference_validation19':{'path':'collab/gmyhf-review-fixes-batch19-proof.json','sha256':sha((ROOT/'collab/gmyhf-review-fixes-batch19-proof.json').read_bytes()),'actual_independent_pairs':131},\n 'next_candidates_not_exhaustive':[19962,25570,27699,28013,30172,30497,30930],\n 'preserved_exclusions':'未放宽valid、时限余量、2MiB输出或SPJ要求；无公开映射和无下载题仍保留原排除。',\n 'procedure_sha256':sha(Path(__file__).read_bytes()),'procedure_source':Path(__file__).read_text()}\n(ROOT/'collab/gmyhf-review-fixes-summary.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\\n')\nprint(json.dumps(result['totals'],ensure_ascii=False))\n"
+  "procedure_sha256": "5408e8009e459c34a0ed50cbc2f530974bfd2fe0ea56c06ac7773d41de16666d",
+  "procedure_source": "\"\"\"只读汇总二十批历史源码、回执与本地字节；跨题面批的数据文件去重计数。\"\"\"\nimport hashlib,json,subprocess\nfrom pathlib import Path\nROOT=Path.cwd()\ndef sha(b):return hashlib.sha256(b).hexdigest()\ndef read(path):return json.loads((ROOT/path).read_text())\ndef code(path,commit=None):return subprocess.check_output(['git','show',f'{commit}:{path}']) if commit else (ROOT/path).read_bytes()\nreports=[];problems=[];files={};input_count=answer_count=pair_count=sample_count=field_count=0\ncommits={1:'2a8bc7d21',2:'79fe0c992',3:'27aabcd3e',5:'ae51f71fa',6:'56772cd62',7:'7a184e698',9:'9621ffe4d',10:'607eb3892',11:'e865edce2',12:'d897af220',13:'b11d6fc5f',14:'fe0b2d0ee',15:'988d21a2f',16:'4557973c9',17:'7fc83e92b',18:'621b372cc',19:'ba80864ba'}\nfor batch in (1,2,3,5,6,7,9,10,11,12,13,14,15,16,17,18,19,20):\n path=f'collab/gmyhf-review-fixes-batch{batch}.json';report=read(path);assert report['applied']\n for key,source in [('procedure_sha256','scripts/repair_gmyhf_missing_pair.py' if batch==14 else 'scripts/repair_gmyhf_review_findings.py'),('rules_sha256','scripts/gmyhf_review_fixes.py'),('common_sha256','scripts/repair_gmyhf_pending_answers.py')]:\n  assert sha(code(source,commits.get(batch)))==report[key],(batch,key)\n reports.append({'phase':batch,'path':path,'sha256':sha((ROOT/path).read_bytes())})\n for group in report['problems']:\n  n=group['global_number'];assert group['local']['status']=='Accepted' and group['local']['timing_audit']['status']=='passed'\n  assert (group['form_unchanged'] and group['file_list_unchanged']) or (group.get('only_expected_files_added') and group['configuration_unchanged'] and set(group['final_files'])-set(group['before_files'])=={'3.in'})\n  assert sha((ROOT/group['evidence']).read_bytes())==group['evidence_sha256']\n  directory=ROOT/group['local_dataset']\n  assert sha((directory/group.get('reference_file','reference.py')).read_bytes())==group['reference_sha256']==sha(group['reference_source'].encode())\n  if 'semantic_checker' in group:\n   checker=group['semantic_checker']\n   assert sha(code('scripts/gmyhf_semantic_checkers.py',commits.get(batch)))==checker['rules_sha256']\n   assert sha(checker['source'].encode())==checker['sha256']==sha((ROOT/'data/openjudge'/checker['path']).read_bytes())\n  expected=dict(group['before_files'])\n  for change in group['changes']:\n   assert expected.get(change['filename'])==change['before_sha256'];expected[change['filename']]=change['after_sha256']\n   input_count+=change['filename'].endswith('.in');answer_count+=change['filename'].endswith('.out')\n  assert expected==group['final_files']\n  for name,digest in expected.items():\n   assert (n,name) not in files;files[n,name]=digest\n   if name.endswith(('.in','.out')):assert sha((directory/'data'/name).read_bytes())==digest\n  pair_count+=group['verified_legal_pairs']\n  problems.append({'global_number':n,'phase':batch,'report':path,'scope':'本批输入/答案修复及全量回读已完成','changes':len(group['changes'])})\nfor phase,path,commit in [(4,'collab/gmyhf-sample-repairs.json','05e8ffb4a'),(8,'collab/gmyhf-statement-repairs-batch8.json','1aba30da1'),(9,'collab/gmyhf-statement-repairs-batch9.json','9621ffe4d'),(10,'collab/gmyhf-statement-repairs-batch10.json','607eb3892'),(15,'collab/gmyhf-statement-repairs-batch15.json','988d21a2f')]:\n report=read(path);assert report['applied']\n assert report['procedure_sha256']==sha(code('scripts/repair_gmyhf_sample_findings.py',commit))\n if 'recipes_sha256' in report:assert report['recipes_sha256']==sha(code('scripts/gmyhf_statement_fixes.py',commit))\n if 'reference_rules_sha256' in report:assert report['reference_rules_sha256']==sha(code('scripts/gmyhf_review_fixes.py',commit))\n reports.append({'phase':phase,'path':path,'sha256':sha((ROOT/path).read_bytes())})\n for group in report['problems']:\n  n=group['global_number'];assert group['before_files']==group['final_files'] and group['local_matches'] and group['only_allowed_fields_changed']\n  assert sha((ROOT/group['evidence']).read_bytes())==group['evidence_sha256']\n  local=ROOT/group['local_statement'];fields=read(str(local.relative_to(ROOT))+'/fields.json')\n  normalized={k:v.replace('\\r\\n','\\n') for k,v in fields.items()}\n  assert sha(json.dumps(normalized,ensure_ascii=False,sort_keys=True).encode())==group['after_form_sha256']\n  assert sha((local/'reference.py').read_bytes())==group['reference_sha256']\n  prior={25685:'collab/gmyhf-review-fixes-batch7.json',28277:'collab/gmyhf-review-fixes-batch9.json',28680:'collab/gmyhf-review-fixes-batch9.json',21729:'collab/gmyhf-review-fixes-batch10.json',29663:'collab/gmyhf-review-fixes-batch15.json'}.get(n)\n  if prior:\n   assert sha((ROOT/prior).read_bytes())==group['prior_repair_sha256']\n   previous=next(g for g in read(prior)['problems'] if g['global_number']==n)\n   assert group['final_files']==previous['final_files']\n  for name,digest in group['final_files'].items():\n   if (n,name) in files:assert files[n,name]==digest and prior\n   files[n,name]=digest\n  sample_count+=len(group['samples']);field_count+=len(group['changed_fields'])\n  problems.append({'global_number':n,'phase':phase,'report':path,'scope':'本批题面/样例修复及全量回读已完成','changed_fields':sorted(group['changed_fields'])})\nproof=read('collab/gmyhf-31241-small-proof.json');assert proof['all_matched'] and proof['cases']==388\nassert proof['reference_sha256']==next(g for g in read('collab/gmyhf-review-fixes-batch12.json')['problems'] if g['global_number']==31241)['reference_sha256']\nproof13=read('collab/gmyhf-31239-small-proof.json');assert proof13['all_matched'] and proof13['cases']==654\nassert proof13['reference_sha256']==next(g for g in read('collab/gmyhf-review-fixes-batch13.json')['problems'] if g['global_number']==31239)['reference_sha256']\ncertificate=read('collab/gmyhf-30549-certificate-recheck.json');assert certificate['certificate_pairs']==101 and len(certificate['readback_files'])==202 and certificate['platform_writes']==0\nassert all(r['independent_valid'] for r in certificate['checks']+certificate['samples'])\npadding=read('collab/gmyhf-29663-padding-proof.json');assert padding['all_matched'] and padding['small_cases']==1806 and len(padding['data_pairs'])==20\nassert padding['reference_sha256']==read('collab/gmyhf-review-fixes-batch15.json')['problems'][0]['reference_sha256']\nassert padding['independent_simulator_sha256']==sha((ROOT/'tests/test_gmyhf_padded_tree.py').read_bytes())\nfor row in padding['data_pairs']:\n group=read('collab/gmyhf-review-fixes-batch15.json')['problems'][0]\n assert row['matches'] and group['final_files'][row['input']]==row['input_sha256'] and group['final_files'][row['input'][:-3]+'.out']==row['answer_sha256']\ncourse=read('collab/gmyhf-30686-course-display-recheck.json')\nassert course['platform_writes']==0 and course['global_number_verified'] and course['problem_content_verified'] and course['single_html_parse_samples_match_admin'] and course['visible_sample_output_matches'] and course['admin_form_unchanged']\nassert course['reference_answers']==['true','true','false'] and course['previous_recheck_sha256']==sha((ROOT/course['previous_recheck']).read_bytes())\nproof18=read('collab/gmyhf-review-fixes-batch18-proof.json');assert proof18['all_matched'] and proof18['actual_independent_pairs']==80\nassert proof18['tests_sha256']==sha((ROOT/'tests/test_gmyhf_early_semantics.py').read_bytes())\nassert proof18['rules_sha256']==read('collab/gmyhf-review-fixes-batch18.json')['rules_sha256']\nproof19=read('collab/gmyhf-review-fixes-batch19-proof.json');assert proof19['all_matched'] and proof19['actual_independent_pairs']==131\nassert proof19['tests_sha256']==sha((ROOT/'tests/test_gmyhf_early_structure.py').read_bytes())\nassert proof19['rules_sha256']==read('collab/gmyhf-review-fixes-batch19.json')['rules_sha256']\nproof20=read('collab/gmyhf-review-fixes-batch20-proof.json');assert proof20['all_matched'] and proof20['actual_independent_pairs']==51 and proof20['small_swap_cases']==4166\nassert proof20['tests_sha256']==sha((ROOT/'tests/test_gmyhf_graph_and_swap.py').read_bytes())\nassert proof20['rules_sha256']==read('collab/gmyhf-review-fixes-batch20.json')['rules_sha256']\nwide=next(g for g in read('collab/gmyhf-review-fixes-batch20.json')['problems'] if g['global_number']==27699)\nassert wide['verified_legal_pairs']==5 and len(wide['preserved_pairs_without_sandbox_acceptance'])==5 and len(wide['trusted_reference_rechecks'])==10\nassert wide['reference_sha256']==proof20['cpp_reference_sha256']\nfor row in wide['trusted_reference_rechecks']:\n assert row['tokens_match'] and row['input_sha256']==wide['final_files'][row['input']] and row['answer_sha256']==wide['final_files'][row['input'][:-3]+'.out']\nextra=read('collab/gmyhf-extra-contracts-recheck.json');assert extra['platform_writes']==0 and extra['tests_sha256']==sha((ROOT/'tests/test_gmyhf_contract_recheck.py').read_bytes())\nassert {g['global_number'] for g in extra['problems']}=={25570,28013,30930}\nassert all(g['platform_writes']==0 and g['public_statement_matches_admin'] and g['preserve_existing_validator_and_exclusion'] and all(r['statement_contract_passed'] for r in g['checks']) for g in extra['problems'])\nstep_findings=[]\ngroup=next(g for g in read('collab/gmyhf-review-fixes-batch5.json')['problems'] if g['global_number']==28682)\nfor row in next(e for e in read(group['evidence'])['entries'] if e['global_number']==28682)['checks']['answers']['files']:\n before=(ROOT/f'data/openjudge/tests/admin_download/28682/{row[\"input\"]}').read_bytes()\n tokens=before.split();n,m=map(int,tokens[:2]);steps=[int(tokens[3+2*n+2*i]) for i in range(m)]\n if n in steps:\n  after=(ROOT/group['local_dataset']/'data'/row['input']).read_bytes();fixed=after.split()\n  assert sha(before)==row['input_sha256'] and sha(after)==group['final_files'][row['input']]\n  assert all(1<=int(fixed[3+2*n+2*i])<n for i in range(m))\n  step_findings.append({'input':row['input'],'before_sha256':sha(before),'after_sha256':sha(after),'original_steps_equal_n':steps.count(n),'corrected_steps_strictly_less_than_n':True})\nassert len(step_findings)==10\nmutations=[]\nfor path in ['collab/gmyhf-review-fixes-mutations.json','collab/gmyhf-review-fixes-batch2-mutations.json','collab/gmyhf-review-fixes-batch3-mutations.json','collab/gmyhf-sample-repairs-mutations.json','collab/gmyhf-review-fixes-batch5-mutations.json','collab/gmyhf-review-fixes-batch6-mutations.json','collab/gmyhf-review-fixes-batch7-mutations.json','collab/gmyhf-statement-repairs-batch8-mutations.json','collab/gmyhf-review-fixes-batch9-mutations.json','collab/gmyhf-review-fixes-batch10-mutations.json','collab/gmyhf-review-fixes-batch11-mutations.json','collab/gmyhf-review-fixes-batch12-mutations.json','collab/gmyhf-review-fixes-batch13-mutations.json','collab/gmyhf-30549-recheck-mutations.json','collab/gmyhf-review-fixes-batch14-mutations.json','collab/gmyhf-review-fixes-batch15-mutations.json','collab/gmyhf-review-fixes-batch16-mutations.json','collab/gmyhf-review-fixes-batch17-mutations.json','collab/gmyhf-30686-course-display-mutations.json','collab/gmyhf-review-fixes-batch18-mutations.json','collab/gmyhf-review-fixes-batch19-mutations.json','collab/gmyhf-review-fixes-batch20-mutations.json']:\n report=read(path);assert all(row['detected'] for row in report['results'])\n mutations.append({'path':path,'sha256':sha((ROOT/path).read_bytes()),'detected':len(report['results'])})\nassert len({g['global_number'] for g in problems})==61\n# 对原16批已报告的问题逐项核对去向，不将资源/SPJ排除误写为数据错误。\nrepaired={g['global_number'] for g in problems};previous_answers=set();previous_reports=[]\nfor phase in range(1,5):\n path=f'collab/gmyhf-answer-repairs-batch{phase}.json';old=read(path);assert old['applied']\n previous_answers.update(g['global_number'] for g in old['problems']);previous_reports.append({'path':path,'sha256':sha((ROOT/path).read_bytes())})\ndispositions=[];original_reports=[]\nfor phase in range(1,17):\n path=f'collab/gmyhf-pending-batch{phase}-review.json';original=read(path);original_reports.append({'path':path,'sha256':sha((ROOT/path).read_bytes())})\n for entry in original['entries']:\n  n=entry['global_number'];checks=entry.get('checks',{})\n  for row in checks.get('answers',{}).get('files',[]):\n   if row.get('matches') is False:\n    assert n in repaired or n in previous_answers or n==30497,(n,'未归属的答案疑点')\n    dispositions.append({'global_number':n,'input':row['input'],'kind':'原报告答案不符','resolution':'T-060修复' if n in repaired else 'T-059已修复' if n in previous_answers else '30497保留题意未核定，不擅造YES/NO'})\n  for row in checks.get('extra_contract',{}).get('files',[]):\n   if row.get('issues'):\n    assert n in repaired,(n,'未归属的额外输入契约疑点')\n    dispositions.append({'global_number':n,'input':row['input'],'kind':'额外输入契约','resolution':'T-060修复'})\n  for row in checks.get('contract_diagnostic',[]):\n   if row.get('normalized_accepted') is False:\n    assert n in repaired or n in {25570,28013,30930},(n,'未归属的规范化后拒绝')\n    dispositions.append({'global_number':n,'input':row['input'],'kind':'规范化后仍拒绝','resolution':'T-060修复' if n in repaired else '只读题面契约复核通过，保留既有valid及接入排除'})\nresult={'scope':'T-060二十批指定问题的修复收口；不是所有历史疑点已消除或已接入题库的声明。',\n 'totals':{'problems':len({g['global_number'] for g in problems}),'repaired_inputs':input_count,'repaired_answers':answer_count,'changed_statement_fields':field_count,'accepted_legal_pairs':pair_count,'recomputed_samples':sample_count,'readback_files':len(files),'detected_mutations':sum(m['detected'] for m in mutations)},\n 'reports':reports,'problems':sorted(problems,key=lambda g:(g['global_number'],g['phase'])),'mutations':mutations,\n 'additional_finding':{'global_number':28682,'rule':'1≤s_i<n；原第13批未单列10份s_i=n，现改为n−1。','files':step_findings},\n 'reference_validation':{'path':'collab/gmyhf-31241-small-proof.json','sha256':sha((ROOT/'collab/gmyhf-31241-small-proof.json').read_bytes()),'cases':388},\n 'reference_validation13':{'path':'collab/gmyhf-31239-small-proof.json','sha256':sha((ROOT/'collab/gmyhf-31239-small-proof.json').read_bytes()),'cases':654},\n 'certificate_recheck':{'path':'collab/gmyhf-30549-certificate-recheck.json','sha256':sha((ROOT/'collab/gmyhf-30549-certificate-recheck.json').read_bytes()),'pairs':101,'samples':2,'readback_files':202,'platform_writes':0,'counted_separately_from_repaired_problems':True},\n 'padding_recheck':{'path':'collab/gmyhf-29663-padding-proof.json','sha256':sha((ROOT/'collab/gmyhf-29663-padding-proof.json').read_bytes()),'small_cases':1806,'data_pairs':20},\n 'display_recheck':{'path':'collab/gmyhf-30686-display-recheck.json','sha256':sha((ROOT/'collab/gmyhf-30686-display-recheck.json').read_bytes()),'platform_writes':0},\n 'course_display_recheck':{'path':'collab/gmyhf-30686-course-display-recheck.json','sha256':sha((ROOT/'collab/gmyhf-30686-course-display-recheck.json').read_bytes()),'problem_content_verified':True,'platform_writes':0},\n 'reference_validation18':{'path':'collab/gmyhf-review-fixes-batch18-proof.json','sha256':sha((ROOT/'collab/gmyhf-review-fixes-batch18-proof.json').read_bytes()),'actual_independent_pairs':80},\n 'reference_validation19':{'path':'collab/gmyhf-review-fixes-batch19-proof.json','sha256':sha((ROOT/'collab/gmyhf-review-fixes-batch19-proof.json').read_bytes()),'actual_independent_pairs':131},\n 'reference_validation20':{'path':'collab/gmyhf-review-fixes-batch20-proof.json','sha256':sha((ROOT/'collab/gmyhf-review-fixes-batch20-proof.json').read_bytes()),'actual_independent_pairs':51,'small_swap_cases':4166,'wide_sandbox_pairs':5,'wide_preserved_pairs_without_sandbox_acceptance':5},\n 'extra_contract_recheck':{'path':'collab/gmyhf-extra-contracts-recheck.json','sha256':sha((ROOT/'collab/gmyhf-extra-contracts-recheck.json').read_bytes()),'problems':3,'input_contracts':sum(len(g['checks']) for g in extra['problems']),'readback_files':sum(len(g['readback_files']) for g in extra['problems']),'platform_writes':0,'counted_separately_from_repaired_problems':True},\n 'original_report_dispositions':{'scope':'仅对原16批已报告的答案不符、extra_contract及规范化后拒绝核对去向；并非重新证明所有算法或解除所有接入排除。','reports':original_reports,'previous_answer_repair_reports':previous_reports,'items':dispositions},\n 'remaining_holds':{'author_semantics':[19945,20139,30497],'special_judge_protocol':[27952,28341,31381],'resource_limits_examples':[27699,31033],'unavailable_downloads':14,'public_catalog_mapping_and_existing_validator_exclusions':'保留原接入排除，不属于已修复输入/答案的计数。'},\n 'next_candidates_not_exhaustive':[],\n 'preserved_exclusions':'未放宽valid、时限余量、2MiB输出或SPJ要求；无公开映射和无下载题仍保留原排除。',\n 'procedure_sha256':sha(Path(__file__).read_bytes()),'procedure_source':Path(__file__).read_text()}\n(ROOT/'collab/gmyhf-review-fixes-summary.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\\n')\nprint(json.dumps(result['totals'],ensure_ascii=False))\n"
 }

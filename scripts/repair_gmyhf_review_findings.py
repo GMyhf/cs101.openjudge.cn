@@ -19,7 +19,7 @@ BATCHES = {1: {19964: 16, 19968: 16, 30825: 15, 30920: 16, 31415: 15, 31435: 15}
            3: {21471: 9, 25563: 11, 25577: 11, 27946: 13, 30177: 14},
            5: {28187: 13, 28188: 13, 28189: 13, 28682: 13, 28696: 13},
            6: {25579: 11}, 7: {25685: 12}, 9: {28277: 13, 28680: 13},
-           10: {21729: 11, 30236: 16}, 11: {28016: 13}, 12: {31241: 10}, 13: {31239: 10}, 15: {29663: 14}, 16: {27952: 13, 28341: 13}, 17: {19965: 8, 19974: 8, 19984: 8}, 18: {18076: 5, 18209: 5, 20004: 5, 20103: 5, 21727: 5, 21728: 5}, 19: {23554: 5, 25580: 5, 27307: 6, 30222: 6, 31193: 6}}
+           10: {21729: 11, 30236: 16}, 11: {28016: 13}, 12: {31241: 10}, 13: {31239: 10}, 15: {29663: 14}, 16: {27952: 13, 28341: 13}, 17: {19965: 8, 19974: 8, 19984: 8}, 18: {18076: 5, 18209: 5, 20004: 5, 20103: 5, 21727: 5, 21728: 5}, 19: {23554: 5, 25580: 5, 27307: 6, 30222: 6, 31193: 6}, 20: {30172: 6, 27699: 8, 19962: 5}}
 
 
 def reference_command(source, language, target):
@@ -36,11 +36,29 @@ def reference_command(source, language, target):
     return reference, [sys.executable, '-I', str(reference)]
 
 
+def verification_cases(number, cases, changed_names):
+    """27699仅将五份修复输入计为沙箱Accepted；其余大数据保持且另记校核。"""
+    if number != 27699:
+        return cases
+    selected = [case for case in cases if Path(case['input']).name in changed_names]
+    require(len(changed_names) == len(selected) == 5 and
+            {Path(case['input']).name for case in selected} == changed_names, 'Wide Swap修复范围变化')
+    return selected
+
+
+def verify_wide_answer(command, given, answer):
+    """这是可信自写参考的离线答案校核，不声明沙箱接受大输出。"""
+    result = subprocess.run(command, input=given, capture_output=True, timeout=120)
+    require(result.returncode == 0 and result.stdout.split() == answer.split(), 'Wide Swap保留答案与参考不符')
+    return {'input_sha256':sha(given),'answer_sha256':sha(answer),
+            'computed_answer_sha256':sha(result.stdout),'tokens_match':True}
+
+
 def prepare(batch, work):
     groups = []
     for number, audit_batch in BATCHES[batch].items():
         evidence = ROOT / f'collab/gmyhf-pending-batch{audit_batch}-review.json'
-        if number in (18076,18209,20004,20103,21727,21728,23554,25580,27307,30222,31193):
+        if number in (18076,18209,20004,20103,21727,21728,23554,25580,27307,30222,31193,30172,27699,19962):
             evidence = ROOT / f'collab/gmyhf-{number}-authored-admin-review.json'
         if number == 30236:
             # 用户补充规则后重绑题面；原始数据及参考源码的审核证据保持不变。
@@ -76,6 +94,7 @@ def prepare(batch, work):
             checker = target / 'checker.py'
             checker.write_text(checker_source)
         changes, cases = [], []
+        wide_rechecks = []
         altered_inputs = 0
         for record in entry['checks']['answers']['files']:
             given_name, out_name = record['input'], record['output']
@@ -100,6 +119,8 @@ def prepare(batch, work):
             if checker_source is not None:
                 require(semantic.validate(number,repaired.decode(),output.decode()),
                         f'{number}: 修正后输入或答案语义不合法')
+            if number == 27699:
+                wide_rechecks.append(dict(input=given_name, **verify_wide_answer(command, repaired, output)))
             for name, before, after in ((given_name, given, repaired), (out_name, answer, output)):
                 (target / 'data' / name).write_bytes(after)
                 if before != after:
@@ -114,8 +135,10 @@ def prepare(batch, work):
                            21471: 19, 25563: 19, 25577: 1, 27946: 10, 30177: 1,
                            28187: 17, 28188: 14, 28189: 13, 28682: 20, 28696: 18,
                            25579: 12, 25685: 17, 28277: 1, 28680: 5,
-                           21729: 1, 30236: 1, 28016: 6, 31241: 1, 31239: 18, 29663: 1, 27952: 8, 28341: 1, 19965: 5, 19974: 2, 19984: 1, 18076: 20, 18209: 20, 20004: 2, 20103: 19, 21727: 10, 21728: 20, 23554: 1, 25580: 6, 27307: 3, 30222: 5, 31193: 18}
+                           21729: 1, 30236: 1, 28016: 6, 31241: 1, 31239: 18, 29663: 1, 27952: 8, 28341: 1, 19965: 5, 19974: 2, 19984: 1, 18076: 20, 18209: 20, 20004: 2, 20103: 19, 21727: 10, 21728: 20, 23554: 1, 25580: 6, 27307: 3, 30222: 5, 31193: 18, 30172: 8, 27699: 5, 19962: 1}
         require(altered_inputs == expected_inputs[number], '越界输入数量与审核证据不符')
+        all_cases = cases
+        cases = verification_cases(number, cases, {c['filename'] for c in changes if c['filename'].endswith('.in')})
         item = {'book': 'practice', 'id': str(number), 'global_number': number,
                 'tests': True, 'test_count': len(cases), 'test_cases': cases}
         if checker_source is not None:
@@ -130,6 +153,10 @@ def prepare(batch, work):
                  'reference_file': reference.name, 'baseline_files': baseline, 'changes': changes,
                  'local_dataset': str(target.relative_to(ROOT)), 'local': sanitized(receipt),
                  'verified_legal_pairs': len(cases), 'repaired_inputs': altered_inputs}
+        if number == 27699:
+            group['trusted_reference_rechecks'] = wide_rechecks
+            group['preserved_pairs_without_sandbox_acceptance'] = [Path(case['input']).name for case in all_cases if case not in cases]
+            group['acceptance_scope'] = '仅五份K越界修复输入经过原沙箱Accepted与75%余量；其余原数据保持，仅可信参考离线核对，不解除2MiB/性能排除。'
         if number == 30236:
             group['reference_policy'] = {'rule':'操作数不能包含前导零；用户已明确确认',
                                          'original_reference_sha256':proof['sha256']}
