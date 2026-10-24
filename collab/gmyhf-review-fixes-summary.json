@@ -4602,7 +4602,7 @@
       27699,
       31033
     ],
-    "unavailable_downloads": 14,
+    "unavailable_downloads": 3,
     "public_catalog_mapping_and_existing_validator_exclusions": "保留原接入排除，不属于已修复输入/答案的计数。",
     "remote_special_judge": [],
     "deprecated_excluded": [
@@ -4618,6 +4618,26 @@
     "placeholder_excluded": [
       28979,
       31248
+    ],
+    "without_downloads_remaining_ids": [
+      28979,
+      31195,
+      31248
+    ],
+    "new_benchmark_output_over_2MiB": [
+      31028,
+      31029,
+      31030,
+      31031,
+      31032
+    ],
+    "new_made_without_local_catalog": [
+      27207,
+      29337,
+      29893,
+      29894,
+      31178,
+      31200
     ]
   },
   "next_candidates_not_exhaustive": [],
@@ -4697,6 +4717,34 @@
         "activated_problems": 0
       },
       "procedure_source": "import hashlib,json\nfrom pathlib import Path\nroot=Path.cwd();proof=root/'collab/gmyhf-placeholder-exclusions.json';r=json.loads(proof.read_text())\nassert r['summary']['fixed_excluded']==[28979,31195,31248] and r['summary']['platform_writes']==0\nassert len(r['entries'])==14 and all(e['form_unchanged'] for e in r['entries'])\np=root/'collab/gmyhf-review-fixes-summary.json';d=json.loads(p.read_text())\nd['remaining_holds']['deprecated_excluded']=sorted(set(d['remaining_holds']['deprecated_excluded'])|{31195})\nd['remaining_holds']['placeholder_excluded']=[28979,31248]\nd['post_review_updates']['without_download_placeholders']={\n 'decision':'按用户第1项选择，28979测试占位、31195明确to remove、31248占位模板固定排除；其余11题不认定废弃，维持无数据状态。',\n 'proof':str(proof.relative_to(root)),'proof_sha256':hashlib.sha256(proof.read_bytes()).hexdigest(),\n 'summary':r['summary'],'procedure_source':Path(__file__).read_text()}\np.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n')\n"
+    },
+    "missing_data_added": {
+      "decision": "按用户要求为11题补齐平台数据；6题126组自产数据入库，5性能题各1组完整300万行平台数据。当前无下载题剩3个固定排除项。",
+      "proof": "collab/gmyhf-missing-data-completion.json",
+      "proof_sha256": "28f903379634ba804a6404a992c35b53bae945c18283227ddfb0c4cb8b1a117e",
+      "summary": {
+        "problems_with_new_data": 11,
+        "normal_problems": 6,
+        "normal_pairs": 126,
+        "benchmark_problems": 5,
+        "benchmark_pairs": 5,
+        "total_new_pairs": 131,
+        "total_new_files": 262,
+        "remaining_without_downloads": [
+          28979,
+          31195,
+          31248
+        ],
+        "statement_writes": 0,
+        "limit_changes": 0,
+        "course_changes": 0,
+        "new_public_catalog_entries": 0,
+        "local_accepted_pairs": 126,
+        "negative_probes_rejected": 12,
+        "mutation_count": 20
+      },
+      "limits": "本批不新增公开题库/课程绑定，不改限额；6题本地数据暂未启用，5性能题答案超过2MiB继续排除。",
+      "procedure_source": "import hashlib,json\nfrom pathlib import Path\nroot=Path.cwd();p=root/'collab/gmyhf-review-fixes-summary.json';d=json.loads(p.read_text())\nproof=root/'collab/gmyhf-missing-data-completion.json';r=json.loads(proof.read_text());s=r['summary']\nassert s['problems_with_new_data']==11 and s['total_new_pairs']==131 and s['total_new_files']==262\nassert s['remaining_without_downloads']==[28979,31195,31248]\nd['remaining_holds']['unavailable_downloads']=3\nd['remaining_holds']['without_downloads_remaining_ids']=s['remaining_without_downloads']\nd['remaining_holds']['new_benchmark_output_over_2MiB']=list(range(31028,31033))\nd['remaining_holds']['new_made_without_local_catalog']=[27207,29337,29893,29894,31178,31200]\nd['post_review_updates']['missing_data_added']={\n 'decision':'按用户要求为11题补齐平台数据；6题126组自产数据入库，5性能题各1组完整300万行平台数据。当前无下载题剩3个固定排除项。',\n 'proof':str(proof.relative_to(root)),'proof_sha256':hashlib.sha256(proof.read_bytes()).hexdigest(),'summary':s,\n 'limits':'本批不新增公开题库/课程绑定，不改限额；6题本地数据暂未启用，5性能题答案超过2MiB继续排除。',\n 'procedure_source':Path(__file__).read_text()}\np.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n')\n"
     }
   }
 }

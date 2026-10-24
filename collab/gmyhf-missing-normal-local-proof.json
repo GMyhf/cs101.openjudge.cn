@@ -1,0 +1,516 @@
+{
+  "scope": "6题126组自产数据，独立答案/契约/复现由离线回归覆盖；原沙箱实际复判和错解探针。",
+  "entries": [
+    {
+      "global_number": 27207,
+      "cases": 21,
+      "local_judge": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 331,
+        "memory_kb": 17168,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 21,
+            "time_ms": 39,
+            "case_limit_ms": 10000,
+            "ratio": 0.0039
+          }
+        }
+      },
+      "negative_probes": [
+        {
+          "source": "print(0)\n",
+          "status": "Wrong Answer",
+          "case": 1
+        },
+        {
+          "source": "print(4)\n",
+          "status": "Wrong Answer",
+          "case": 2
+        }
+      ],
+      "stated_limits": {
+        "total_ms": 1000,
+        "case_ms": 1000,
+        "memory_kb": 65536
+      },
+      "files_sha256": {
+        "data/openjudge/tests/20000-29982/27207_made/samplecode.py": "c417e0507007ac2523c16aa184075dce495414daadf3aee642d2992516d30e78",
+        "data/openjudge/tests/20000-29982/27207_made/producecase.py": "403495a2afdd6414b38a738df3a9331819ad4bf248c319df83b42f5137728047",
+        "data/openjudge/tests/20000-29982/27207_made/data/0.in": "744b9d782a5f2ac3c890c39904901796d9064f7d1d7e78f3cc943dd6753464e5",
+        "data/openjudge/tests/20000-29982/27207_made/data/0.out": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+        "data/openjudge/tests/20000-29982/27207_made/data/1.in": "87245131c3c9907dd12fbaa3a677995bb632ccacaed6363bc229a40919845550",
+        "data/openjudge/tests/20000-29982/27207_made/data/1.out": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "data/openjudge/tests/20000-29982/27207_made/data/2.in": "ea0c142a5cdb086c88c1ebd89acdd0e8be344baa7c6e96de87abcb62b7937baa",
+        "data/openjudge/tests/20000-29982/27207_made/data/2.out": "876e13f4e07bb39705302c01f445ffd2d2c3b180a207e4d959d6b671c67da09b",
+        "data/openjudge/tests/20000-29982/27207_made/data/3.in": "721de110248418fac7621d0ad50f18b3e930b3d01a101a75d3ec53efa11188b9",
+        "data/openjudge/tests/20000-29982/27207_made/data/3.out": "10159baf262b43a92d95db59dae1f72c645127301661e0a3ce4e38b295a97c58",
+        "data/openjudge/tests/20000-29982/27207_made/data/4.in": "9fbb6b0c0b19c3994607476ac8b3d2748b2b933e59c421326cc1618842822220",
+        "data/openjudge/tests/20000-29982/27207_made/data/4.out": "917df3320d778ddbaa5c5c7742bc4046bf803c36ed2b050f30844ed206783469",
+        "data/openjudge/tests/20000-29982/27207_made/data/5.in": "afe9f8c4f3099a338a05fa0efa8bd68380f41b77ee9f07880b5010f2d9ca8930",
+        "data/openjudge/tests/20000-29982/27207_made/data/5.out": "9a92adbc0cee38ef658c71ce1b1bf8c65668f166bfb213644c895ccb1ad07a25",
+        "data/openjudge/tests/20000-29982/27207_made/data/6.in": "bbb23f9c696ef8d370e45f9f9569c2bb921a1706e2ad3a5dbc2869fd61f81bb5",
+        "data/openjudge/tests/20000-29982/27207_made/data/6.out": "4146d5ff179defa5abf13ace816d70fc2009edb0ea695152e35fd25b6327410f",
+        "data/openjudge/tests/20000-29982/27207_made/data/7.in": "bf8360a35dda922767a0af164fab74b51c14556ac464a88d935ec11cc5358122",
+        "data/openjudge/tests/20000-29982/27207_made/data/7.out": "e9ab67fb5ba64dac0a575372ff0300f297996f42583687d130403f91854b27a2",
+        "data/openjudge/tests/20000-29982/27207_made/data/8.in": "5fc35c813d912e3f317827f5419f6d4a249a9012c7b36d6135aa180fd018e8a3",
+        "data/openjudge/tests/20000-29982/27207_made/data/8.out": "24f01570387b7276771f205b0a6681516b0cf3692d446d30adaa379066b20798",
+        "data/openjudge/tests/20000-29982/27207_made/data/9.in": "4f875e481782d7da941f012c6425c510b99a5e50001e94353d504d5bc0d29d40",
+        "data/openjudge/tests/20000-29982/27207_made/data/9.out": "62aa81f3aca93975c11766194791cbd0c510d2ecb2426fd070e516a6a008ff1d",
+        "data/openjudge/tests/20000-29982/27207_made/data/10.in": "d9e3576b4427c5b00599042a320830c219baf5326a9c186ce7be3200723e6aff",
+        "data/openjudge/tests/20000-29982/27207_made/data/10.out": "d7bbff2cdc9c1ab9b8879cea81c16822d2d763e3fe1e9dc1cb4831aa22ce067e",
+        "data/openjudge/tests/20000-29982/27207_made/data/11.in": "a48572006261591aa67816609307708d1ec2cb6a7793d3a7ad585b842734f071",
+        "data/openjudge/tests/20000-29982/27207_made/data/11.out": "7d0ca58d53645b85582d3a779c47ee21fa6f7092c92e5b572195a77c0b8f5d0d",
+        "data/openjudge/tests/20000-29982/27207_made/data/12.in": "a1bd1a178244a50d676a493103c2c8bbde6e9552d9bbd206632e3198f3f2042d",
+        "data/openjudge/tests/20000-29982/27207_made/data/12.out": "242b120ba5e18405312e53c3b2cb9e5150198ea87653917a2d420e4adaf93db5",
+        "data/openjudge/tests/20000-29982/27207_made/data/13.in": "6f39fc7fd40a15856e3b7cb4ef18393a8dcaab98762cbc45b519497ab0231111",
+        "data/openjudge/tests/20000-29982/27207_made/data/13.out": "b0fc830a8fd60db7cdf0939b7bc756efb8a3cb10739cbe7d584ed782a74e7bc4",
+        "data/openjudge/tests/20000-29982/27207_made/data/14.in": "855b85a9ebb5bcab520993afc7526d94b6c58faa0619ac07cd1f8c1609d46a38",
+        "data/openjudge/tests/20000-29982/27207_made/data/14.out": "3300483d58f264979e4bdbac572cd35f9dfd0d4586b9d9c5da56e09a2201c1c3",
+        "data/openjudge/tests/20000-29982/27207_made/data/15.in": "f207f9695e8e6b61396c9d4100ca9ccb31c44e53e7b561915eccd14ee873af9d",
+        "data/openjudge/tests/20000-29982/27207_made/data/15.out": "7fc2533a9041dcdb9b9d74ef9d111368131cda24a205c2b4b958b10cb95e8e87",
+        "data/openjudge/tests/20000-29982/27207_made/data/16.in": "1db16ba54455372ecc4118b16f1dbae7fcb630b3fa49fac933c4287ed5420594",
+        "data/openjudge/tests/20000-29982/27207_made/data/16.out": "3fd301cf09e77c7acd6fd1976acc633c738c9333973d41bac1adda7c3ef9e78c",
+        "data/openjudge/tests/20000-29982/27207_made/data/17.in": "56d94b771cf6378b1491cb3b9cf8e50fd4929dff54b938a22b3c9e573c1ab590",
+        "data/openjudge/tests/20000-29982/27207_made/data/17.out": "88a1b9d1d369ddc25d4fa44e820e0df3b2ce56bb08d235567bad3687f4b5525f",
+        "data/openjudge/tests/20000-29982/27207_made/data/18.in": "2624d01213fc27f67cb67ce77e5c9981cbae58a24f62ffccafdc9adf1b76bd63",
+        "data/openjudge/tests/20000-29982/27207_made/data/18.out": "58b91a9ac77798a99aa0b71e99ce203c72f7dfd33d54e5fb2e6fdeec5379c95b",
+        "data/openjudge/tests/20000-29982/27207_made/data/19.in": "e75b623e9928d8f1fdff109d526c16fde450ee66467ee0aab2c657e53a1e6fcb",
+        "data/openjudge/tests/20000-29982/27207_made/data/19.out": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "data/openjudge/tests/20000-29982/27207_made/data/20.in": "f441a8f2c59090ec485747431cdbe591aa8af1144ff15c0a3d243430b7cca92a",
+        "data/openjudge/tests/20000-29982/27207_made/data/20.out": "58b91a9ac77798a99aa0b71e99ce203c72f7dfd33d54e5fb2e6fdeec5379c95b"
+      },
+      "catalog_activated": false,
+      "note": "未公开的题目不新增镜像条目；通过临时题目绑定使用原judge和平台限额复判。"
+    },
+    {
+      "global_number": 29337,
+      "cases": 21,
+      "local_judge": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 256,
+        "memory_kb": 17224,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 12,
+            "time_ms": 13,
+            "case_limit_ms": 10000,
+            "ratio": 0.0013
+          }
+        }
+      },
+      "negative_probes": [
+        {
+          "source": "print(0)\n",
+          "status": "Wrong Answer",
+          "case": 1
+        },
+        {
+          "source": "print(5)\n",
+          "status": "Wrong Answer",
+          "case": 2
+        }
+      ],
+      "stated_limits": {
+        "total_ms": 1000,
+        "case_ms": 1000,
+        "memory_kb": 65536
+      },
+      "files_sha256": {
+        "data/openjudge/tests/20000-29982/29337_made/samplecode.py": "d9e8450a548ae6b1b0b12bfc1ba27831c32ac963cc549e236ffe8dc2e0e89169",
+        "data/openjudge/tests/20000-29982/29337_made/producecase.py": "ce400d05c0678c886295a3a1d159b572733342e61757c6ef6ea393cf270c7149",
+        "data/openjudge/tests/20000-29982/29337_made/data/0.in": "60d7af9a43014c7068ea95578d0975da2fe5a64ab414e065d42c9335f6803f47",
+        "data/openjudge/tests/20000-29982/29337_made/data/0.out": "f0b5c2c2211c8d67ed15e75e656c7862d086e9245420892a7de62cd9ec582a06",
+        "data/openjudge/tests/20000-29982/29337_made/data/1.in": "207659f9a4c1a18cac29fe95d0aba51a1143753c32794a13394ffaaf37d1f2a6",
+        "data/openjudge/tests/20000-29982/29337_made/data/1.out": "be3b3a973edc5f34763d5808c7d0866e068ff309898e83e80bb37674405ce7a7",
+        "data/openjudge/tests/20000-29982/29337_made/data/2.in": "82c1315e6c757f33c4a77ca58b2a184f5a88614470c05ec77f3d28918db6b8ae",
+        "data/openjudge/tests/20000-29982/29337_made/data/2.out": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "data/openjudge/tests/20000-29982/29337_made/data/3.in": "b36f81c2111c9b77fd090a20474d46035b35c0888cf80050dbf98fb35cd94250",
+        "data/openjudge/tests/20000-29982/29337_made/data/3.out": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "data/openjudge/tests/20000-29982/29337_made/data/4.in": "a60eacdea40438373705f1e2792e14dfb67cdd4c73449ff8c39741243322122d",
+        "data/openjudge/tests/20000-29982/29337_made/data/4.out": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "data/openjudge/tests/20000-29982/29337_made/data/5.in": "5d90ef7fc0d040fd56a1e48697cfa99e0dfaf4fd803aefefc3b5053ec1d36aea",
+        "data/openjudge/tests/20000-29982/29337_made/data/5.out": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "data/openjudge/tests/20000-29982/29337_made/data/6.in": "ad0fadf63cc7cd779ce475e345bf4063565b63a3c2efef1eebc89790aaa6acba",
+        "data/openjudge/tests/20000-29982/29337_made/data/6.out": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "data/openjudge/tests/20000-29982/29337_made/data/7.in": "908516a06a4532ef8c3708d1fb614131df17df5acd9dc1821abf7bb3b533af43",
+        "data/openjudge/tests/20000-29982/29337_made/data/7.out": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+        "data/openjudge/tests/20000-29982/29337_made/data/8.in": "e03b05409f67df857017d0a3ff488fabd8a11b976ff4ccd66d936a8f38fdf1ac",
+        "data/openjudge/tests/20000-29982/29337_made/data/8.out": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "data/openjudge/tests/20000-29982/29337_made/data/9.in": "796f33587b8a47e58632ad8023b0f8e987fd469415cf91590733c8110c1e4286",
+        "data/openjudge/tests/20000-29982/29337_made/data/9.out": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "data/openjudge/tests/20000-29982/29337_made/data/10.in": "10210be6cc62d065e1e6e8b9e9e90843eb6158a2b1b42d416298bef5762c3431",
+        "data/openjudge/tests/20000-29982/29337_made/data/10.out": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+        "data/openjudge/tests/20000-29982/29337_made/data/11.in": "fa9f6522a3ca45172889078cb5628ac549962432355c83bae4cbca2b5da4612f",
+        "data/openjudge/tests/20000-29982/29337_made/data/11.out": "a8c6785a4fa00a96038f4d67f57c8c547ec3a250f7bd24a9f48194b82290688f",
+        "data/openjudge/tests/20000-29982/29337_made/data/12.in": "a2e5aa895337d5a157a8b359bcf82120682721dd96c747c5bac5eef91ae502be",
+        "data/openjudge/tests/20000-29982/29337_made/data/12.out": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "data/openjudge/tests/20000-29982/29337_made/data/13.in": "6ea31380387367dc5cf0a791c006fd6a193746283616d9e25538ee70d7a55abc",
+        "data/openjudge/tests/20000-29982/29337_made/data/13.out": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "data/openjudge/tests/20000-29982/29337_made/data/14.in": "9a3f16312fd221da3cb716ca03118fbfdd0d105b905f06edb34c6daf2d6440ee",
+        "data/openjudge/tests/20000-29982/29337_made/data/14.out": "4f6635fab154104736e0968c922ca1ecddf0a43758e4bbf89005b1208689251e",
+        "data/openjudge/tests/20000-29982/29337_made/data/15.in": "87f5062190a88f6580f78fb7f9549f1b155b105b83f09c8d0d13f7f51dc95bae",
+        "data/openjudge/tests/20000-29982/29337_made/data/15.out": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "data/openjudge/tests/20000-29982/29337_made/data/16.in": "b8b129e8713217ddc5903b89db1abd910cb69d3823c854110bbbd9941788a9db",
+        "data/openjudge/tests/20000-29982/29337_made/data/16.out": "544576690bac339ae660f983e9863faadf94bf0bb67dc56952d7923b62fc3adb",
+        "data/openjudge/tests/20000-29982/29337_made/data/17.in": "7746fc4741ef7bc9f719f81bb27caa3243d4c41643443dba0c03e3b9529f16f8",
+        "data/openjudge/tests/20000-29982/29337_made/data/17.out": "c9334892ca93f7d2ca016f64f961d8ad6c0fd717d067625c34ef94f70f79babd",
+        "data/openjudge/tests/20000-29982/29337_made/data/18.in": "1555d63b892a96e59eeda85fff39acff0e61471723e9fb9aa8e76f67aebf3514",
+        "data/openjudge/tests/20000-29982/29337_made/data/18.out": "335d5659e0ee05b0b0055f4f4bb19f5864e0e6a8a313c0af9e763ac227064423",
+        "data/openjudge/tests/20000-29982/29337_made/data/19.in": "a9d297cfc3c20090776dd91db91cc2ea96a23cb0c1a17582547ebf76efee8d2a",
+        "data/openjudge/tests/20000-29982/29337_made/data/19.out": "a4161247c36e5d17a760ebce590f469b7a1ebc6988fb56d3ede9d600bf882dfa",
+        "data/openjudge/tests/20000-29982/29337_made/data/20.in": "f6e0a8ad18229d19c38e2a05224ef86fff56600fe1a56a5c04da8166f3af94af",
+        "data/openjudge/tests/20000-29982/29337_made/data/20.out": "521f792c6ad01842c46f76646e38adf29fad5d3ff8abb1e7f00bab075a9497df"
+      },
+      "catalog_activated": false,
+      "note": "未公开的题目不新增镜像条目；通过临时题目绑定使用原judge和平台限额复判。"
+    },
+    {
+      "global_number": 29893,
+      "cases": 21,
+      "local_judge": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 255,
+        "memory_kb": 17260,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 11,
+            "time_ms": 13,
+            "case_limit_ms": 10000,
+            "ratio": 0.0013
+          }
+        }
+      },
+      "negative_probes": [
+        {
+          "source": "print(0)\n",
+          "status": "Wrong Answer",
+          "case": 1
+        },
+        {
+          "source": "print(13)\n",
+          "status": "Wrong Answer",
+          "case": 2
+        }
+      ],
+      "stated_limits": {
+        "total_ms": 1000,
+        "case_ms": 1000,
+        "memory_kb": 65536
+      },
+      "files_sha256": {
+        "data/openjudge/tests/20000-29982/29893_made/samplecode.py": "1f69bf3f02fbd0296551bcfd441d1caf2df616f4a4fe77ec2783c83809b703da",
+        "data/openjudge/tests/20000-29982/29893_made/producecase.py": "32fb15a2513a2d094b7564851914a128db9782143874e2fd3b0cd083487a2c9d",
+        "data/openjudge/tests/20000-29982/29893_made/data/0.in": "75558b680e06c234653dc273265467f6c3e4d5cd628b5382cfb1922d147fce6d",
+        "data/openjudge/tests/20000-29982/29893_made/data/0.out": "1a252402972f6057fa53cc172b52b9ffca698e18311facd0f3b06ecaaef79e17",
+        "data/openjudge/tests/20000-29982/29893_made/data/1.in": "4aa6d7b46da654a8d73e37e9b43331fa2dd70fbed0216ce53db2c37fdf6e179a",
+        "data/openjudge/tests/20000-29982/29893_made/data/1.out": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "data/openjudge/tests/20000-29982/29893_made/data/2.in": "ce6dae8201a6f4b05945b6733394485d70ae002dd4aa4d913350988e484467c9",
+        "data/openjudge/tests/20000-29982/29893_made/data/2.out": "10159baf262b43a92d95db59dae1f72c645127301661e0a3ce4e38b295a97c58",
+        "data/openjudge/tests/20000-29982/29893_made/data/3.in": "3e4ec75511bf8fcbcd0420314566f6402b443ea1ae5d658b955663d3ebc244db",
+        "data/openjudge/tests/20000-29982/29893_made/data/3.out": "aa67a169b0bba217aa0aa88a65346920c84c42447c36ba5f7ea65f422c1fe5d8",
+        "data/openjudge/tests/20000-29982/29893_made/data/4.in": "b384999dfdbdb8bf42ebb9d9e15cd26534c6f31fb32d3de8813c71beed5ab847",
+        "data/openjudge/tests/20000-29982/29893_made/data/4.out": "10159baf262b43a92d95db59dae1f72c645127301661e0a3ce4e38b295a97c58",
+        "data/openjudge/tests/20000-29982/29893_made/data/5.in": "99aabacc8019f0f9f1d6862e8a6cf54c73e9332cff23c43ae9350af010f62ec0",
+        "data/openjudge/tests/20000-29982/29893_made/data/5.out": "1a252402972f6057fa53cc172b52b9ffca698e18311facd0f3b06ecaaef79e17",
+        "data/openjudge/tests/20000-29982/29893_made/data/6.in": "d7751fa17fa064ef1b123512cf3879d5a6386b80ef12c91fe99790ef82bd6c49",
+        "data/openjudge/tests/20000-29982/29893_made/data/6.out": "5b7d0c39a1f3a365e8a029d88a8025f7fe5b837a179c1d9b3c0d9ff17f99ddc7",
+        "data/openjudge/tests/20000-29982/29893_made/data/7.in": "e8afb67bc0a9361d1d738bfd0c9b05f9c50c181160c19936c0a7ced444d7a6da",
+        "data/openjudge/tests/20000-29982/29893_made/data/7.out": "88bc5b63c7e7bc136d43a9a059985b2669e1de7bc1ffb3dd9704626bd4decaeb",
+        "data/openjudge/tests/20000-29982/29893_made/data/8.in": "2fb393e9b054bd37c6b576e7de13886653bfada414e5659f36d2c8b27c9126ac",
+        "data/openjudge/tests/20000-29982/29893_made/data/8.out": "eea8254c7500ba3de996aa8ad6af399183f04e17d4a8102fde539dbc93a90012",
+        "data/openjudge/tests/20000-29982/29893_made/data/9.in": "56f1e32c819398c90da00add19eb4b51cb295af527be985efbc163322a7f1bde",
+        "data/openjudge/tests/20000-29982/29893_made/data/9.out": "f0b5c2c2211c8d67ed15e75e656c7862d086e9245420892a7de62cd9ec582a06",
+        "data/openjudge/tests/20000-29982/29893_made/data/10.in": "6a93325934e737727011477a92e3a3cd029f549220ccf9605b75c7c7cad6cf6b",
+        "data/openjudge/tests/20000-29982/29893_made/data/10.out": "2115cdb6bfcfb008eb2bab2bb79347cb064a48e4e7c4115ccbe4469c787bb6c4",
+        "data/openjudge/tests/20000-29982/29893_made/data/11.in": "4ff61581fd87c238ca3951dae160c98967d8c60d8f689c95168bb22c814f78af",
+        "data/openjudge/tests/20000-29982/29893_made/data/11.out": "f14b4987904bcb5814e4459a057ed4d20f58a633152288a761214dcd28780b56",
+        "data/openjudge/tests/20000-29982/29893_made/data/12.in": "add0b1aecfd8458df338ddb548c15d162951861ff4312424b1c49ee514a7af6c",
+        "data/openjudge/tests/20000-29982/29893_made/data/12.out": "123b8a895b694ee1d8b609ef177179f52a500128b15b71e95b0daf75503cb0c5",
+        "data/openjudge/tests/20000-29982/29893_made/data/13.in": "1c4fde71654419fa281adc46c80f1991dab729a11efa99edc28316bd02f79b3b",
+        "data/openjudge/tests/20000-29982/29893_made/data/13.out": "38a407cd7d38b41132709485046d7817571b73c32433877751399e229ce11ce2",
+        "data/openjudge/tests/20000-29982/29893_made/data/14.in": "a01e65693348c98728d478f16ccfa1899092c45665a4c7ed564b73ab7a508b30",
+        "data/openjudge/tests/20000-29982/29893_made/data/14.out": "77a60c200656e08ac5403f38b58657ecec155293323bd5313290399b75cf1c3d",
+        "data/openjudge/tests/20000-29982/29893_made/data/15.in": "2119f6b688fcf467399f546d2dcc981e9769cbdf406dfed3e79f685c00204073",
+        "data/openjudge/tests/20000-29982/29893_made/data/15.out": "5378796307535df3ec8d8b15a2e2dc5641419c3d3060cfe32238c0fa973f7aa3",
+        "data/openjudge/tests/20000-29982/29893_made/data/16.in": "b4e795617431ca2e50068c14b1d4b73d1c74ec0024cfcb117f55b96fc10db2fa",
+        "data/openjudge/tests/20000-29982/29893_made/data/16.out": "edd15e147bc65df67f5162a896b6cccf3a8b7257c76af69a39faa06c64c20b0a",
+        "data/openjudge/tests/20000-29982/29893_made/data/17.in": "1b3c07b875d5b007e644ce4abca5ab972ec23d94faa694b62ec2657d0a33ac2f",
+        "data/openjudge/tests/20000-29982/29893_made/data/17.out": "89e56b272669de11431602f3c77e560ecf6c61512fa8db5ac0006606e88d5282",
+        "data/openjudge/tests/20000-29982/29893_made/data/18.in": "4555f653ebe275efcaa7c1263abcdfcf989f9deb8fb9c0c99dcfcd0657bdcc97",
+        "data/openjudge/tests/20000-29982/29893_made/data/18.out": "06e9d52c1720fca412803e3b07c4b228ff113e303f4c7ab94665319d832bbfb7",
+        "data/openjudge/tests/20000-29982/29893_made/data/19.in": "753ae9d7d1a08171edab149d1ee1d858ef9d721eea52f95752a06ccf073dff7d",
+        "data/openjudge/tests/20000-29982/29893_made/data/19.out": "eea8254c7500ba3de996aa8ad6af399183f04e17d4a8102fde539dbc93a90012",
+        "data/openjudge/tests/20000-29982/29893_made/data/20.in": "6eb51e3e98e9cde27178a88456aca89d315429367a5e20cdd993b57ada0dae14",
+        "data/openjudge/tests/20000-29982/29893_made/data/20.out": "3840bc236ee03aacbb1ef7d5108ddfa347c59f10b68d4174affbb53140f31273"
+      },
+      "catalog_activated": false,
+      "note": "未公开的题目不新增镜像条目；通过临时题目绑定使用原judge和平台限额复判。"
+    },
+    {
+      "global_number": 29894,
+      "cases": 21,
+      "local_judge": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 255,
+        "memory_kb": 17296,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 1,
+            "time_ms": 12,
+            "case_limit_ms": 10000,
+            "ratio": 0.0012
+          }
+        }
+      },
+      "negative_probes": [
+        {
+          "source": "print(0)\n",
+          "status": "Wrong Answer",
+          "case": 1
+        },
+        {
+          "source": "print(13)\n",
+          "status": "Wrong Answer",
+          "case": 2
+        }
+      ],
+      "stated_limits": {
+        "total_ms": 1000,
+        "case_ms": 1000,
+        "memory_kb": 65536
+      },
+      "files_sha256": {
+        "data/openjudge/tests/20000-29982/29894_made/samplecode.py": "1f69bf3f02fbd0296551bcfd441d1caf2df616f4a4fe77ec2783c83809b703da",
+        "data/openjudge/tests/20000-29982/29894_made/producecase.py": "2d81c03fe4dd3bdfd5ecde9800920594075b9d996ce301782132d42e7f28b842",
+        "data/openjudge/tests/20000-29982/29894_made/data/0.in": "75558b680e06c234653dc273265467f6c3e4d5cd628b5382cfb1922d147fce6d",
+        "data/openjudge/tests/20000-29982/29894_made/data/0.out": "1a252402972f6057fa53cc172b52b9ffca698e18311facd0f3b06ecaaef79e17",
+        "data/openjudge/tests/20000-29982/29894_made/data/1.in": "4aa6d7b46da654a8d73e37e9b43331fa2dd70fbed0216ce53db2c37fdf6e179a",
+        "data/openjudge/tests/20000-29982/29894_made/data/1.out": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+        "data/openjudge/tests/20000-29982/29894_made/data/2.in": "ce6dae8201a6f4b05945b6733394485d70ae002dd4aa4d913350988e484467c9",
+        "data/openjudge/tests/20000-29982/29894_made/data/2.out": "10159baf262b43a92d95db59dae1f72c645127301661e0a3ce4e38b295a97c58",
+        "data/openjudge/tests/20000-29982/29894_made/data/3.in": "3e4ec75511bf8fcbcd0420314566f6402b443ea1ae5d658b955663d3ebc244db",
+        "data/openjudge/tests/20000-29982/29894_made/data/3.out": "aa67a169b0bba217aa0aa88a65346920c84c42447c36ba5f7ea65f422c1fe5d8",
+        "data/openjudge/tests/20000-29982/29894_made/data/4.in": "b384999dfdbdb8bf42ebb9d9e15cd26534c6f31fb32d3de8813c71beed5ab847",
+        "data/openjudge/tests/20000-29982/29894_made/data/4.out": "10159baf262b43a92d95db59dae1f72c645127301661e0a3ce4e38b295a97c58",
+        "data/openjudge/tests/20000-29982/29894_made/data/5.in": "99aabacc8019f0f9f1d6862e8a6cf54c73e9332cff23c43ae9350af010f62ec0",
+        "data/openjudge/tests/20000-29982/29894_made/data/5.out": "1a252402972f6057fa53cc172b52b9ffca698e18311facd0f3b06ecaaef79e17",
+        "data/openjudge/tests/20000-29982/29894_made/data/6.in": "d7751fa17fa064ef1b123512cf3879d5a6386b80ef12c91fe99790ef82bd6c49",
+        "data/openjudge/tests/20000-29982/29894_made/data/6.out": "5b7d0c39a1f3a365e8a029d88a8025f7fe5b837a179c1d9b3c0d9ff17f99ddc7",
+        "data/openjudge/tests/20000-29982/29894_made/data/7.in": "e8afb67bc0a9361d1d738bfd0c9b05f9c50c181160c19936c0a7ced444d7a6da",
+        "data/openjudge/tests/20000-29982/29894_made/data/7.out": "88bc5b63c7e7bc136d43a9a059985b2669e1de7bc1ffb3dd9704626bd4decaeb",
+        "data/openjudge/tests/20000-29982/29894_made/data/8.in": "2fb393e9b054bd37c6b576e7de13886653bfada414e5659f36d2c8b27c9126ac",
+        "data/openjudge/tests/20000-29982/29894_made/data/8.out": "eea8254c7500ba3de996aa8ad6af399183f04e17d4a8102fde539dbc93a90012",
+        "data/openjudge/tests/20000-29982/29894_made/data/9.in": "56f1e32c819398c90da00add19eb4b51cb295af527be985efbc163322a7f1bde",
+        "data/openjudge/tests/20000-29982/29894_made/data/9.out": "f0b5c2c2211c8d67ed15e75e656c7862d086e9245420892a7de62cd9ec582a06",
+        "data/openjudge/tests/20000-29982/29894_made/data/10.in": "6a93325934e737727011477a92e3a3cd029f549220ccf9605b75c7c7cad6cf6b",
+        "data/openjudge/tests/20000-29982/29894_made/data/10.out": "2115cdb6bfcfb008eb2bab2bb79347cb064a48e4e7c4115ccbe4469c787bb6c4",
+        "data/openjudge/tests/20000-29982/29894_made/data/11.in": "612077198d480552ee0382c555f40d9022725cbe6d6eb0913864b27b6eb7ad33",
+        "data/openjudge/tests/20000-29982/29894_made/data/11.out": "238903180cc104ec2c5d8b3f20c5bc61b389ec0a967df8cc208cdc7cd454174f",
+        "data/openjudge/tests/20000-29982/29894_made/data/12.in": "e78dd84b762a01ed6b301803786e9ce7f0fb745b2c06d72a6d67a3268aa8036c",
+        "data/openjudge/tests/20000-29982/29894_made/data/12.out": "a1fb50e6c86fae1679ef3351296fd6713411a08cf8dd1790a4fd05fae8688164",
+        "data/openjudge/tests/20000-29982/29894_made/data/13.in": "c722d4a087682c6ec588d984fa2d17d42209ca823ac6d590c7a9ff333b88bb66",
+        "data/openjudge/tests/20000-29982/29894_made/data/13.out": "8f8eea956d0ea50d6442fdab213326f75bb6f584268b0795ad452faa85db5f9d",
+        "data/openjudge/tests/20000-29982/29894_made/data/14.in": "762c0602f19e4e43644f4bac64b78ead21f94ff487c7d6fa670ebf19beeacde4",
+        "data/openjudge/tests/20000-29982/29894_made/data/14.out": "fa59590321d671bad3bbfbc6f1c235a6ab530e389597b77a772142f8dea40d66",
+        "data/openjudge/tests/20000-29982/29894_made/data/15.in": "b322b203c6d0fc2b4cd83c870ecdf9fed0c96ec1f4b26fb2dfaa10da4b7c5f1d",
+        "data/openjudge/tests/20000-29982/29894_made/data/15.out": "7ea9844ae84eccbf55e8330640865e36c43521e45a1baec24233327aab7e6595",
+        "data/openjudge/tests/20000-29982/29894_made/data/16.in": "53b3f9aee498f6ae0eac0d40e39c3d1d2464cf553ce18e9efeadb8be3e450b56",
+        "data/openjudge/tests/20000-29982/29894_made/data/16.out": "35df0798260af14ce26e8d1562578d4bfb96cb1b0e65a62702084d7dc822f937",
+        "data/openjudge/tests/20000-29982/29894_made/data/17.in": "b66a47d9e468534e7349e8194492f39ebc73a6db09b36833aaa184c2f115fc04",
+        "data/openjudge/tests/20000-29982/29894_made/data/17.out": "13c1dc569ae4a0d7f90d8f83d22fc9c8fa526e133f8fea0f9526c8533c4d8da3",
+        "data/openjudge/tests/20000-29982/29894_made/data/18.in": "30588f529cc90a7233bcf811774747b1fddb74dc1edfc955ab4c40b6fa397e48",
+        "data/openjudge/tests/20000-29982/29894_made/data/18.out": "084c799cd551dd1d8d5c5f9a5d593b2e931f5e36122ee5c793c1d08a19839cc0",
+        "data/openjudge/tests/20000-29982/29894_made/data/19.in": "3379e2c22fd37d81aacf21a9b2ad6bbaa97e57d24aa7a8641be43b2c9dc82bc9",
+        "data/openjudge/tests/20000-29982/29894_made/data/19.out": "06e9d52c1720fca412803e3b07c4b228ff113e303f4c7ab94665319d832bbfb7",
+        "data/openjudge/tests/20000-29982/29894_made/data/20.in": "262542286912b13f5b08b499387aa020c4d26f23042cd80395bfeda6da439617",
+        "data/openjudge/tests/20000-29982/29894_made/data/20.out": "25d4f2a86deb5e2574bb3210b67bb24fcc4afb19f93a7b65a057daa874a9d18e"
+      },
+      "catalog_activated": false,
+      "note": "未公开的题目不新增镜像条目；通过临时题目绑定使用原judge和平台限额复判。"
+    },
+    {
+      "global_number": 31178,
+      "cases": 21,
+      "local_judge": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 256,
+        "memory_kb": 17328,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 2,
+            "time_ms": 14,
+            "case_limit_ms": 4000,
+            "ratio": 0.0035
+          }
+        }
+      },
+      "negative_probes": [
+        {
+          "source": "print(0)\n",
+          "status": "Wrong Answer",
+          "case": 1
+        },
+        {
+          "source": "print(\"Hello, OJ Inject!\")\n",
+          "status": "Wrong Answer",
+          "case": 2
+        }
+      ],
+      "stated_limits": {
+        "total_ms": 1000,
+        "case_ms": 100,
+        "memory_kb": 65536
+      },
+      "files_sha256": {
+        "data/openjudge/tests/30000-/31178_made/samplecode.py": "269ba9fb34e61d9b0005b9ba0b28eb32248f12bbbdd82c77cf9e014bea2dfc09",
+        "data/openjudge/tests/30000-/31178_made/producecase.py": "c3fb15042637caf54e100a9b45307ca309abbc762c7f72f767144313bab50420",
+        "data/openjudge/tests/30000-/31178_made/data/0.in": "327beac81536d4634a3f8698b224dc6db6300e7e85a7aee92a15c7f2bcdf328a",
+        "data/openjudge/tests/30000-/31178_made/data/0.out": "327beac81536d4634a3f8698b224dc6db6300e7e85a7aee92a15c7f2bcdf328a",
+        "data/openjudge/tests/30000-/31178_made/data/1.in": "87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7",
+        "data/openjudge/tests/30000-/31178_made/data/1.out": "87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7",
+        "data/openjudge/tests/30000-/31178_made/data/2.in": "ec39b67830c0c34d71b0b6bf1d1c424eb7caab9222eb401fdaef044cf2145e9b",
+        "data/openjudge/tests/30000-/31178_made/data/2.out": "ec39b67830c0c34d71b0b6bf1d1c424eb7caab9222eb401fdaef044cf2145e9b",
+        "data/openjudge/tests/30000-/31178_made/data/3.in": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "data/openjudge/tests/30000-/31178_made/data/3.out": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+        "data/openjudge/tests/30000-/31178_made/data/4.in": "7ddcfda184b55ee06b0c81e0ad136b1aa4a86daeb1078bcaeccc246eb2c8693b",
+        "data/openjudge/tests/30000-/31178_made/data/4.out": "7ddcfda184b55ee06b0c81e0ad136b1aa4a86daeb1078bcaeccc246eb2c8693b",
+        "data/openjudge/tests/30000-/31178_made/data/5.in": "c4042d6c47e5cdee0906df461d0cd66b73068c8a4d92de8d5f99226bb46c4f62",
+        "data/openjudge/tests/30000-/31178_made/data/5.out": "c4042d6c47e5cdee0906df461d0cd66b73068c8a4d92de8d5f99226bb46c4f62",
+        "data/openjudge/tests/30000-/31178_made/data/6.in": "3ba81c80b8b23ead1ff322d46b1f7d70b5503096a5df33c1cd7013639adf1692",
+        "data/openjudge/tests/30000-/31178_made/data/6.out": "3ba81c80b8b23ead1ff322d46b1f7d70b5503096a5df33c1cd7013639adf1692",
+        "data/openjudge/tests/30000-/31178_made/data/7.in": "60014324a48291f61ea339f4d3597238d2c36acea795430786d277c6c234a9eb",
+        "data/openjudge/tests/30000-/31178_made/data/7.out": "60014324a48291f61ea339f4d3597238d2c36acea795430786d277c6c234a9eb",
+        "data/openjudge/tests/30000-/31178_made/data/8.in": "5dd1197866f479824d9b483e1b7ae9ad3e518f3b4fd447c6b92d127dda6178c5",
+        "data/openjudge/tests/30000-/31178_made/data/8.out": "5dd1197866f479824d9b483e1b7ae9ad3e518f3b4fd447c6b92d127dda6178c5",
+        "data/openjudge/tests/30000-/31178_made/data/9.in": "3bd942be6716d807271a415dab43bddf607b8782a3562ea94a948b8f3d6a31a2",
+        "data/openjudge/tests/30000-/31178_made/data/9.out": "3bd942be6716d807271a415dab43bddf607b8782a3562ea94a948b8f3d6a31a2",
+        "data/openjudge/tests/30000-/31178_made/data/10.in": "ec29dd83f08a39a33484a7a554ac111707151660395cd06e640a8fef8dc97f95",
+        "data/openjudge/tests/30000-/31178_made/data/10.out": "ec29dd83f08a39a33484a7a554ac111707151660395cd06e640a8fef8dc97f95",
+        "data/openjudge/tests/30000-/31178_made/data/11.in": "7868f695d67ae41778ac4b9ebc01f7856154af24e8709223a50df1755f62c953",
+        "data/openjudge/tests/30000-/31178_made/data/11.out": "7868f695d67ae41778ac4b9ebc01f7856154af24e8709223a50df1755f62c953",
+        "data/openjudge/tests/30000-/31178_made/data/12.in": "a0931f4c6696fffd241a5638d94c778bade8364783212db2c3cbab460eb0704e",
+        "data/openjudge/tests/30000-/31178_made/data/12.out": "a0931f4c6696fffd241a5638d94c778bade8364783212db2c3cbab460eb0704e",
+        "data/openjudge/tests/30000-/31178_made/data/13.in": "2e9ebd0e4a8125e4488bfa7ac622db8b87b76e4c0adcc643feabc298957f0589",
+        "data/openjudge/tests/30000-/31178_made/data/13.out": "2e9ebd0e4a8125e4488bfa7ac622db8b87b76e4c0adcc643feabc298957f0589",
+        "data/openjudge/tests/30000-/31178_made/data/14.in": "151a1d51a1870dc244f07f4844f46ee65fae19a8efeb60b203a074aff899e27d",
+        "data/openjudge/tests/30000-/31178_made/data/14.out": "151a1d51a1870dc244f07f4844f46ee65fae19a8efeb60b203a074aff899e27d",
+        "data/openjudge/tests/30000-/31178_made/data/15.in": "35b5ddc59454ec1a33d83a78f147afa11f98785d22e427f005bab5dadb9204c5",
+        "data/openjudge/tests/30000-/31178_made/data/15.out": "35b5ddc59454ec1a33d83a78f147afa11f98785d22e427f005bab5dadb9204c5",
+        "data/openjudge/tests/30000-/31178_made/data/16.in": "b064478c0b16f4804b7550509fefba1c6bf9d967b13f43b08867bfa6ef51101d",
+        "data/openjudge/tests/30000-/31178_made/data/16.out": "b064478c0b16f4804b7550509fefba1c6bf9d967b13f43b08867bfa6ef51101d",
+        "data/openjudge/tests/30000-/31178_made/data/17.in": "c2ff90e1b54719a14d0bee42394d7151d560b63c9994ccc469b5645a6e2edff9",
+        "data/openjudge/tests/30000-/31178_made/data/17.out": "c2ff90e1b54719a14d0bee42394d7151d560b63c9994ccc469b5645a6e2edff9",
+        "data/openjudge/tests/30000-/31178_made/data/18.in": "c97085a269f9bebe2a2591f477c289373266af9553b63f0719babc4516ea49b8",
+        "data/openjudge/tests/30000-/31178_made/data/18.out": "c97085a269f9bebe2a2591f477c289373266af9553b63f0719babc4516ea49b8",
+        "data/openjudge/tests/30000-/31178_made/data/19.in": "1643fdd5a78cd30f2abc82d5731b89db67f134be612c82348778e5b2f041eb60",
+        "data/openjudge/tests/30000-/31178_made/data/19.out": "1643fdd5a78cd30f2abc82d5731b89db67f134be612c82348778e5b2f041eb60",
+        "data/openjudge/tests/30000-/31178_made/data/20.in": "a2a206863d4831c26940dfc4e472b8050917f280df14bc3016410f47e8830a82",
+        "data/openjudge/tests/30000-/31178_made/data/20.out": "a2a206863d4831c26940dfc4e472b8050917f280df14bc3016410f47e8830a82"
+      },
+      "catalog_activated": false,
+      "note": "未公开的题目不新增镜像条目；通过临时题目绑定使用原judge和平台限额复判。"
+    },
+    {
+      "global_number": 31200,
+      "cases": 21,
+      "local_judge": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 255,
+        "memory_kb": 17344,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 2,
+            "time_ms": 13,
+            "case_limit_ms": 4000,
+            "ratio": 0.0032
+          }
+        }
+      },
+      "negative_probes": [
+        {
+          "source": "print(0)\n",
+          "status": "Wrong Answer",
+          "case": 1
+        },
+        {
+          "source": "print(\"153 370 371 407\")\n",
+          "status": "Wrong Answer",
+          "case": 3
+        }
+      ],
+      "stated_limits": {
+        "total_ms": 1000,
+        "case_ms": 100,
+        "memory_kb": 65536
+      },
+      "files_sha256": {
+        "data/openjudge/tests/30000-/31200_made/samplecode.py": "c49d21cfb72ad1fc93c268ebc949fc26f80c8fd727a08e3d6e5c94cec40726d4",
+        "data/openjudge/tests/30000-/31200_made/producecase.py": "26e43d7e2fc932cb49886f9202d76eaa615b6adf50c5b9f8f136c0afdcb5092c",
+        "data/openjudge/tests/30000-/31200_made/data/0.in": "24caea8bd5e0d31f4d80eca2d58bc38be804d72d50825c9fb7f03ed00fe6dd10",
+        "data/openjudge/tests/30000-/31200_made/data/0.out": "70e39d9e383138288a9ff8239fac52f3d81f9ec32df55cc46eaf0c635758b60a",
+        "data/openjudge/tests/30000-/31200_made/data/1.in": "5831571f2dbca393ac5029e8ea127ebb22ab188cd1f018c94772f52e6e29466e",
+        "data/openjudge/tests/30000-/31200_made/data/1.out": "70e39d9e383138288a9ff8239fac52f3d81f9ec32df55cc46eaf0c635758b60a",
+        "data/openjudge/tests/30000-/31200_made/data/2.in": "3b461abd3ddda8bc605d29c8dce4a4de3dec52d157ca12e749efc241cdd3c296",
+        "data/openjudge/tests/30000-/31200_made/data/2.out": "af489f7170eaf213b960628333c4752e3907304303ed0b052b43d864d2653c2e",
+        "data/openjudge/tests/30000-/31200_made/data/3.in": "8db7a56e9a57cb72b9cce928df9ec381505339167b7395e2ca26b5e0717a1562",
+        "data/openjudge/tests/30000-/31200_made/data/3.out": "1128e21c6f4fbe8d60954f40b65239c00c2c58f1dc17c7995f108623001892e1",
+        "data/openjudge/tests/30000-/31200_made/data/4.in": "061b28cf1300236430539496c19a86b51278fbe461e7be05cbc62f139d0c5e2e",
+        "data/openjudge/tests/30000-/31200_made/data/4.out": "519e761ddb19faf2ac73ece89e2fc42787a96faedb8d6954fba2bc2682f920c5",
+        "data/openjudge/tests/30000-/31200_made/data/5.in": "ace4b3742f9113208791d58e1d86deb49fd0a7251090c93795b9f088ee5fc05d",
+        "data/openjudge/tests/30000-/31200_made/data/5.out": "ccf447d47bb93d91db635267d9f165d1e391673ed2633790e4e421a27455c73b",
+        "data/openjudge/tests/30000-/31200_made/data/6.in": "37b26abc9c8e1af827e42db5e5d828ef302872d17fadc312536b91068f3e2670",
+        "data/openjudge/tests/30000-/31200_made/data/6.out": "cfe72034a9f298fb79a6c1f2302673bb449c826d446b3efafdde95e6c48dc3ca",
+        "data/openjudge/tests/30000-/31200_made/data/7.in": "d0a28f470f2a771fa62c5132152213c5945cce872636bee270bb9f9cbbc015d7",
+        "data/openjudge/tests/30000-/31200_made/data/7.out": "cfe72034a9f298fb79a6c1f2302673bb449c826d446b3efafdde95e6c48dc3ca",
+        "data/openjudge/tests/30000-/31200_made/data/8.in": "accbcc6389483cefc70a5930a4805732716edc95feb8f0df20d00de6eba10dc6",
+        "data/openjudge/tests/30000-/31200_made/data/8.out": "cfe72034a9f298fb79a6c1f2302673bb449c826d446b3efafdde95e6c48dc3ca",
+        "data/openjudge/tests/30000-/31200_made/data/9.in": "a833e067e8640fb63f30ac783b5ddfa6f119220c20148efdb51842f87aed9c97",
+        "data/openjudge/tests/30000-/31200_made/data/9.out": "cfe72034a9f298fb79a6c1f2302673bb449c826d446b3efafdde95e6c48dc3ca",
+        "data/openjudge/tests/30000-/31200_made/data/10.in": "a23a33629fc991fd623b4a891cc6e3e2ec5870a65309d20182b35833dd9dc57c",
+        "data/openjudge/tests/30000-/31200_made/data/10.out": "cfe72034a9f298fb79a6c1f2302673bb449c826d446b3efafdde95e6c48dc3ca",
+        "data/openjudge/tests/30000-/31200_made/data/11.in": "6deadc163239a1044293628280b0321f968da461ff2e1545b0998ac239ec8c36",
+        "data/openjudge/tests/30000-/31200_made/data/11.out": "af489f7170eaf213b960628333c4752e3907304303ed0b052b43d864d2653c2e",
+        "data/openjudge/tests/30000-/31200_made/data/12.in": "28d6dab12ed40f7b2ce4670aa4c1a9a0d5b969775cc90dda15eaf067070db837",
+        "data/openjudge/tests/30000-/31200_made/data/12.out": "af489f7170eaf213b960628333c4752e3907304303ed0b052b43d864d2653c2e",
+        "data/openjudge/tests/30000-/31200_made/data/13.in": "99ec2c37e328b12f3bcf07ceab074ce23b1649cccf451ccb79ea39501654ab3d",
+        "data/openjudge/tests/30000-/31200_made/data/13.out": "1128e21c6f4fbe8d60954f40b65239c00c2c58f1dc17c7995f108623001892e1",
+        "data/openjudge/tests/30000-/31200_made/data/14.in": "5f199cecd77d028a40255bc7c5d9357395a2df82d55ea67eaeae9984d90b15b6",
+        "data/openjudge/tests/30000-/31200_made/data/14.out": "5f199cecd77d028a40255bc7c5d9357395a2df82d55ea67eaeae9984d90b15b6",
+        "data/openjudge/tests/30000-/31200_made/data/15.in": "472c5786a974f52f424f6ad0a38a242136d6b87b56459e6afe6b4a2ce068ce96",
+        "data/openjudge/tests/30000-/31200_made/data/15.out": "519e761ddb19faf2ac73ece89e2fc42787a96faedb8d6954fba2bc2682f920c5",
+        "data/openjudge/tests/30000-/31200_made/data/16.in": "255777b99080fa35d9112bfc470ebe6715fcd6e3038556ae9701f789e81f8bf9",
+        "data/openjudge/tests/30000-/31200_made/data/16.out": "ccf447d47bb93d91db635267d9f165d1e391673ed2633790e4e421a27455c73b",
+        "data/openjudge/tests/30000-/31200_made/data/17.in": "fe600903c61f66f5e83a8a555ff9a5a93ed9a652772907360de01076167f5dd5",
+        "data/openjudge/tests/30000-/31200_made/data/17.out": "ccf447d47bb93d91db635267d9f165d1e391673ed2633790e4e421a27455c73b",
+        "data/openjudge/tests/30000-/31200_made/data/18.in": "42f34650be6efaf3ba224fa17a83db54a3d14fffa4e86ca5e3548212394156f1",
+        "data/openjudge/tests/30000-/31200_made/data/18.out": "cfe72034a9f298fb79a6c1f2302673bb449c826d446b3efafdde95e6c48dc3ca",
+        "data/openjudge/tests/30000-/31200_made/data/19.in": "a50c99bcfa276af649886590b9846215cc95ca978db34a487834e70bdf4387b3",
+        "data/openjudge/tests/30000-/31200_made/data/19.out": "70e39d9e383138288a9ff8239fac52f3d81f9ec32df55cc46eaf0c635758b60a",
+        "data/openjudge/tests/30000-/31200_made/data/20.in": "c3827c97dcbc91c15e9abd1c6d797b9a52880f13d7d06ca58b8cce0064044d4f",
+        "data/openjudge/tests/30000-/31200_made/data/20.out": "97e1430bf89ae94266a6124125acdc3161609be274c85f0341fd24e9d97dfeaf"
+      },
+      "catalog_activated": false,
+      "note": "未公开的题目不新增镜像条目；通过临时题目绑定使用原judge和平台限额复判。"
+    }
+  ],
+  "procedure_source": "import hashlib,json,sys\nfrom pathlib import Path\nfrom unittest.mock import patch\nroot=Path.cwd();sys.path.insert(0,str(root));import judge\nfrom tests.test_gmyhf_missing_normal_data import directory,NUMBERS,load,oracle\nentries=[]\nfor n in NUMBERS:\n d=directory(n);cases=[{'input':str(p.relative_to(judge.MIRROR)),'output':str(p.with_suffix('.out').relative_to(judge.MIRROR))} for p in sorted((d/'data').glob('*.in'),key=lambda p:int(p.stem))]\n item={'book':'practice','id':str(n),'global_number':n,'tests':True,'test_count':21,'test_cases':cases}\n limits={'total_ms':1000,'case_ms':100 if n in (31178,31200) else 1000,'memory_kb':65536}\n with patch.object(judge,'catalog_item',return_value=item),patch.dict(judge.LIMITS_CACHE,{str(n):limits},clear=True):\n  result=judge.judge('practice',str(n),'python3',(d/'samplecode.py').read_text(),collect_case_times=True)\n  assert result['status']=='Accepted',(n,result)\n  result={k:v for k,v in result.items() if k in ('status','cases','time_ms','memory_kb','timing_audit')}\n  if 'timing_audit' in result:result['timing_audit'].pop('cases',None)\n  negative=[]\n  bad=['print(0)\\n']\n  if n==31178:bad.append('print(\"Hello, OJ Inject!\")\\n')\n  elif n==29337:bad.append('print(5)\\n')\n  elif n in (29893,29894):bad.append('print(13)\\n')\n  elif n==31200:bad.append('print(\"153 370 371 407\")\\n')\n  else:bad.append('print(4)\\n')\n  for source in bad:\n   rejected=judge.judge('practice',str(n),'python3',source)\n   assert rejected['status']=='Wrong Answer',(n,rejected)\n   negative.append({'source':source,'status':rejected['status'],'case':rejected.get('case')})\n files={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in d.rglob('*') if p.is_file() and '__pycache__' not in p.parts}\n entries.append({'global_number':n,'cases':21,'local_judge':result,'negative_probes':negative,'stated_limits':limits,'files_sha256':files,'catalog_activated':False,'note':'未公开的题目不新增镜像条目；通过临时题目绑定使用原judge和平台限额复判。'})\n print(n,result['status'],result['cases'],'组；两份固定输出错解均WA',flush=True)\n(root/'collab/gmyhf-missing-normal-local-proof.json').write_text(json.dumps({'scope':'6题126组自产数据，独立答案/契约/复现由离线回归覆盖；原沙箱实际复判和错解探针。','entries':entries,'procedure_source':Path(__file__).read_text()},ensure_ascii=False,indent=2)+'\\n')\n"
+}
