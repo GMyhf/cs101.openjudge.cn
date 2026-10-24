@@ -13,7 +13,8 @@ from repair_gmyhf_pending_answers import (ROOT, sha, save, require, listed_files
                                          form_sha, audit_statement, sanitized, platform, judge)
 from gmyhf_review_fixes import repair_input
 
-BATCHES = {1: {19964: 16, 19968: 16, 30825: 15, 30920: 16, 31415: 15, 31435: 15}}
+BATCHES = {1: {19964: 16, 19968: 16, 30825: 15, 30920: 16, 31415: 15, 31435: 15},
+           2: {27945: 13, 28014: 13, 28191: 13, 28339: 13, 29905: 14}}
 
 
 def prepare(batch, work):
@@ -71,7 +72,8 @@ def prepare(batch, work):
                                     'pair_after': {given_name: sha(repaired), out_name: sha(output)}})
             cases.append({'input': str(target / 'data' / given_name),
                           'output': str(target / 'data' / out_name)})
-        expected_inputs = {19964: 8, 19968: 7, 30825: 2, 30920: 2, 31415: 0, 31435: 0}
+        expected_inputs = {19964: 8, 19968: 7, 30825: 2, 30920: 2, 31415: 0, 31435: 0,
+                           27945: 1, 28014: 1, 28191: 4, 28339: 1, 29905: 20}
         require(altered_inputs == expected_inputs[number], '越界输入数量与审核证据不符')
         item = {'book': 'practice', 'id': str(number), 'global_number': number,
                 'tests': True, 'test_count': len(cases), 'test_cases': cases}

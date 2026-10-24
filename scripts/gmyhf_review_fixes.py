@@ -35,6 +35,53 @@ def repair_input(number, payload):
         if m >= 2:
             return payload
         return f'{n} 2\n'.encode()
+    if number == 27945:
+        lines = text.splitlines()
+        rows = [list(map(int, line.split())) for line in lines[1:]]
+        assert 1 <= len(rows) <= 3500 and all(rows)
+        assert all(row == sorted(row) for row in rows)
+        if int(lines[0]) == len(rows):
+            return payload
+        return (str(len(rows)) + '\n' + '\n'.join(lines[1:]) + '\n').encode()
+    if number == 28014:
+        lines = text.splitlines()
+        operations = lines[1:]
+        assert 1 <= len(operations) <= 1000
+        for line in operations:
+            tokens = line.split()
+            assert tokens == ['popSmallest'] or (len(tokens) == 2 and tokens[0] == 'addBack' and 1 <= int(tokens[1]) <= 1000)
+        if int(lines[0]) == len(operations):
+            return payload
+        return (str(len(operations)) + '\n' + '\n'.join(operations) + '\n').encode()
+    if number == 28191:
+        values = list(map(int, text.split()))
+        n = values[0]
+        heights, energies = values[1::2], values[2::2]
+        assert 1 <= n <= 10**6 and len(values) == 2 * n + 1
+        assert len(set(heights)) == n and all(1 <= x <= 10**9 for x in heights)
+        assert all(x >= 1 for x in energies)
+        factor = (max(energies) + 9999) // 10000
+        if factor == 1:
+            return payload
+        # 整组同比例缩放，保留能量差异，避免大量截断为相同的上界。
+        energies = [(x + factor - 1) // factor for x in energies]
+        assert sum(energies) < 2**31
+        return (str(n) + '\n' + '\n'.join(f'{h} {v}' for h, v in zip(heights, energies)) + '\n').encode()
+    if number == 28339:
+        values = list(map(int, text.split()))
+        assert len(values) >= 2 and all(1 <= x <= 10**9 for x in values)
+        if len(values) <= 50000:
+            return payload
+        return (' '.join(map(str, values[:50000])) + '\n').encode()
+    if number == 29905:
+        values = list(map(int, text.split()))
+        n, m = values[:2]
+        distances = values[2:]
+        assert 1 <= m <= n < 200 and all(1 <= x <= 100 for x in distances)
+        assert len(distances) in (n - 1, n)
+        if len(distances) == n - 1:
+            return payload
+        return (f'{n} {m}\n' + ' '.join(map(str, distances[:n-1])) + '\n').encode()
     return payload
 
 

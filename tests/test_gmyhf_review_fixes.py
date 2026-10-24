@@ -99,6 +99,91 @@ class ReviewRulesTests(unittest.TestCase):
                     seen.update(range(i + 1, min(len(a), i + a[i] + 1)))
             self.assertEqual('true' if len(a)-1 in seen else 'false', solve(' '.join(map(str,a))))
 
+    def test_second_batch_rules_and_legal_inputs_unchanged(self):
+        self.assertEqual(b'4\n1 4\n2 5\n3 6\n0 7\n',
+                         rules.repair_input(27945, b'3\n1 4\n2 5\n3 6\n0 7\n'))
+        self.assertEqual(b'2\npopSmallest\naddBack 1\n',
+                         rules.repair_input(28014, b'1\npopSmallest\naddBack 1\n'))
+        self.assertEqual(b'3\n1 10000\n2 1\n3 2346\n',
+                         rules.repair_input(28191, b'3\n1 99999\n2 1\n3 23456\n'))
+        fixed = rules.repair_input(28339, (' '.join(map(str, range(1,50002)))).encode())
+        self.assertEqual(list(range(1,50001)), list(map(int,fixed.split())))
+        self.assertEqual(b'3 1\n2 4\n', rules.repair_input(29905, b'3 1\n2 4 7\n'))
+        for n, value in ((27945,b'2\n1 2\n3 4'), (28014,b'1\npopSmallest'),
+                         (28191,b'2\n1 2\n2 3'), (28339,b'2 3'), (29905,b'2 1\n4')):
+            self.assertEqual(value, rules.repair_input(n,value))
+
+    def test_smallest_range_against_cartesian_choices(self):
+        solve = self.reference(27945,13,'smallest_range')
+        rng = random.Random(61)
+        for _ in range(100):
+            rows = [sorted(rng.sample(range(-5,10),3)) for _ in range(4)]
+            expected = min((max(v)-min(v),min(v),max(v)) for v in itertools.product(*rows))
+            text = '4\n'+'\n'.join(' '.join(map(str,row)) for row in rows)
+            self.assertEqual(f'{expected[1]} {expected[2]}', solve(text))
+
+    def test_infinite_set_against_explicit_set(self):
+        solve = self.reference(28014,13,'infinite_set')
+        rng = random.Random(62)
+        remaining = set(range(1,2001))
+        operations, expected = [], []
+        for _ in range(1000):
+            if rng.randrange(2):
+                value = min(remaining)
+                remaining.remove(value)
+                expected.append(str(value))
+                operations.append('popSmallest')
+            else:
+                value = rng.randrange(1,1001)
+                remaining.add(value)
+                operations.append(f'addBack {value}')
+        self.assertEqual('\n'.join(expected),solve('1000\n'+'\n'.join(operations)))
+
+    def test_stations_against_direct_nearest_higher(self):
+        solve = self.reference(28191,13,'stations')
+        rng = random.Random(63)
+        for n in range(1,30):
+            height = rng.sample(range(100),n)
+            energy = [rng.randrange(1,10001) for _ in range(n)]
+            received = [0]*n
+            for i in range(n):
+                for direction in (-1,1):
+                    j = i+direction
+                    while 0 <= j < n:
+                        if height[j] > height[i]:
+                            received[j] += energy[i]
+                            break
+                        j += direction
+            text = str(n)+'\n'+'\n'.join(f'{h+1} {v}' for h,v in zip(height,energy))
+            self.assertEqual(str(max(received)),solve(text))
+
+    def test_deviation_against_all_reachable_choices(self):
+        solve = self.reference(28339,13,'deviation')
+        def reachable(x):
+            choices = {x}
+            if x%2:
+                choices.add(x*2)
+            else:
+                while x%2 == 0:
+                    x //= 2
+                    choices.add(x)
+            return choices
+        for a in itertools.product(range(1,9),repeat=3):
+            expected = min(max(v)-min(v) for v in itertools.product(*(reachable(x) for x in a)))
+            self.assertEqual(str(expected),solve(' '.join(map(str,a))))
+
+    def test_schools_against_all_school_locations(self):
+        solve = self.reference(29905,14,'schools')
+        for gaps in itertools.product(range(1,4),repeat=4):
+            positions = [0]
+            for gap in gaps:
+                positions.append(positions[-1]+gap)
+            for m in range(1,6):
+                expected = min(sum(min(abs(x-school) for school in schools) for x in positions)
+                               for schools in itertools.combinations(positions,m))
+                self.assertEqual(str(expected),solve(f'5 {m}\n'+' '.join(map(str,gaps))))
+
+
 
 class ReviewUploadTests(unittest.TestCase):
     def setUp(self):
