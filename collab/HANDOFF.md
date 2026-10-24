@@ -6746,3 +6746,8 @@ T-060第21批：课程39路由/38全局题号逐页显式核对，E3417实际314
 T-060第22批：用户要求增加31381 SPJ，已在31381_made/checker.py实现本地标准逐题接口，按UTF-8字符重数判断排列、保留空白，只容许一个末尾LF/CRLF；不读取原错误金标准，非法输出42、坏输入3。三项离线测试与10种实际源码变异通过，另实时回读原两文件绑定SHA，六自产程序走现有沙箱得到三AC三WA，平台零写入。未改judge.py或catalog，31381仍缺映射，未替换远端SPJ。详细源码/回执见gmyhf-31381-spj-implementation.json；累计159定向测试254变异，原修复数据统计不变。
 
 第22批最终完整闸门 `PATH=/tmp/gmyhf-python311/bin:$PATH python3 tools/handoff.py --verify` 退出码0，全套测试、语法、待返工检查及full_sweep通过；第21批8a8c39a90远端gate已绿。
+
+
+T-060第23批：用户明确授权本地绑定启用31381，已新增practice/31381干净题面、列表行与catalog映射，并启用既有checker；21组自产数据含原样例，生成器可复现、独立输入契约/范围账本/valid棘轮同步。真实catalog上三Python与一C++正解各21组AC，六类错解WA，样例运行checker通过。缺失checker时索引停用，不回退精确比对；10种启用链路变异检出，4新回归，累计163项定向回归264变异。当前2047条catalog、2046条有测试。平台零写入，远端SPJ未替换；回执gmyhf-31381-activation.json。第22批9a33f7f86已推送。
+
+第23批完整闸门 `PATH=/tmp/gmyhf-python311/bin:$PATH python3 tools/handoff.py --verify` 退出码0，全套测试、Python/JS语法、待返工检查与full_sweep全部通过；第22批9a33f7f86远端gate已绿。

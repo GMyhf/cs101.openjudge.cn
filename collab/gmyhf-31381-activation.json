@@ -1,0 +1,809 @@
+{
+  "scope": "用户授权在本地practice/31381绑定并启用，21组自产数据、既有逐题SPJ；未更改OpenJudge远端配置或测试。",
+  "checked_at": "2026-10-24T05:39:55.537155+00:00",
+  "local_path": "/practice/31381/",
+  "source_url": "http://cs101.openjudge.cn/2026fallcs101testing/E31381/",
+  "global_number": 31381,
+  "test_count": 21,
+  "checker": "tests/30000-/31381_made/checker.py",
+  "data_files_sha256": {
+    "data/openjudge/tests/30000-/31381_made/data/0.in": "9dff75beccfe581b2a5d5bd23871bbe00a443d8c63c7795c1c0b51c68a1706dd",
+    "data/openjudge/tests/30000-/31381_made/data/0.out": "bb23ba939180c44f75d58d8c6d950d819182bfd73692b69c9cebcdfafe011f50",
+    "data/openjudge/tests/30000-/31381_made/data/1.in": "87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7",
+    "data/openjudge/tests/30000-/31381_made/data/1.out": "87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7",
+    "data/openjudge/tests/30000-/31381_made/data/10.in": "2106c36011520fe73876d45bfb9ef8bf7b2e9f4362096a320376d8ee9b27ef12",
+    "data/openjudge/tests/30000-/31381_made/data/10.out": "2106c36011520fe73876d45bfb9ef8bf7b2e9f4362096a320376d8ee9b27ef12",
+    "data/openjudge/tests/30000-/31381_made/data/11.in": "a6c2f444cb8047d0c4dfc7f112e53ae019fb7bdf3dfcd9a52ac2af322d26975c",
+    "data/openjudge/tests/30000-/31381_made/data/11.out": "346a635722519eaa431f0b8c55c0b325e7ddbf9c48e86f5e83099e80a47581d5",
+    "data/openjudge/tests/30000-/31381_made/data/12.in": "95aa70546fa7495dff049fee5a4b6be63b88d6057560f91360019adcc0898ff2",
+    "data/openjudge/tests/30000-/31381_made/data/12.out": "4b5527fc71e53bd2ce7659fb376faedca327365b2947e5b436b55bc0845933c3",
+    "data/openjudge/tests/30000-/31381_made/data/13.in": "17360e8b90a980c5ed1564a9d6da9bbbc638c28373aad2856966c97f309aa2f6",
+    "data/openjudge/tests/30000-/31381_made/data/13.out": "17360e8b90a980c5ed1564a9d6da9bbbc638c28373aad2856966c97f309aa2f6",
+    "data/openjudge/tests/30000-/31381_made/data/14.in": "f78941fc09d917da42c85770e6fa5afad9979d90bcf28fa86999b2650ba7ddae",
+    "data/openjudge/tests/30000-/31381_made/data/14.out": "4f0686594ff622145deba0982df5b2769b35874f620f04dce6043ca44591e8f6",
+    "data/openjudge/tests/30000-/31381_made/data/15.in": "3d3514bc154768be971fad825da323a0035c0ff9afa9db8576e63561b67eb5de",
+    "data/openjudge/tests/30000-/31381_made/data/15.out": "71fa32fa44f5415ed80acfbf54fe13d329016b0664ec91b03aa78fbf905b00f8",
+    "data/openjudge/tests/30000-/31381_made/data/16.in": "0f694f884427968791595d66646ab4ade82bb0fdbb08da3f89175339ce62b9a4",
+    "data/openjudge/tests/30000-/31381_made/data/16.out": "74ce46e960933bf51bbe907c4c6165ce59b189b35f619ff91d80a56ce8b4ac70",
+    "data/openjudge/tests/30000-/31381_made/data/17.in": "75d1c93886ecbab189e4b32a62ef768a85aae39f1f573377392b9f95fc2e02e1",
+    "data/openjudge/tests/30000-/31381_made/data/17.out": "63d56abc93ebc1734f4919c3f75bb1852129f8e68387ccf250d5022eef22cbaa",
+    "data/openjudge/tests/30000-/31381_made/data/18.in": "7d8c31c1aefd12b45e7c7a35c07030526780dbacf28dfc52c5bad39c56fb8f42",
+    "data/openjudge/tests/30000-/31381_made/data/18.out": "a936ccbe7884f74f708e790953563fc9b57be00674391ea8ac9568195761f5fa",
+    "data/openjudge/tests/30000-/31381_made/data/19.in": "02fe7d76b71e2bfd8c761c45652a812b33f0b9c30cde1a43227b75b6d6ac8b1a",
+    "data/openjudge/tests/30000-/31381_made/data/19.out": "d05c7fcf56298a36af492dc5e3f355599fe6f1e8a875e5fc61fded8ba0149541",
+    "data/openjudge/tests/30000-/31381_made/data/2.in": "72be0aa10eb226762322b185b3dbceb6c21baec9e58d528c8a07b16f9e4c7e1d",
+    "data/openjudge/tests/30000-/31381_made/data/2.out": "9a5841f7a57707e84cebb8fdee06e25f1f5b918dee9fbf23b28fdc1dce1383c9",
+    "data/openjudge/tests/30000-/31381_made/data/20.in": "0abe7b3e0b37452254ac54453b556c3b10eee327c689daa50a258225dfd48492",
+    "data/openjudge/tests/30000-/31381_made/data/20.out": "ce9e1b791dfcba8ea2e9bd335579d7fcc7902f66f70665a24292bb28a6927e9a",
+    "data/openjudge/tests/30000-/31381_made/data/3.in": "3fe1a3938782c0fb2bf47746f2ba9e5a56ecab2afc57589b4cc97713e00b3bb4",
+    "data/openjudge/tests/30000-/31381_made/data/3.out": "70a314aed5374219af38ab254b5d7b9a3dc50af6dacfb9ea425a85a817941848",
+    "data/openjudge/tests/30000-/31381_made/data/4.in": "d44e7717c4c0066dfe36cc1ae735795746a42deef25c31b5ada33d6bf23c07c5",
+    "data/openjudge/tests/30000-/31381_made/data/4.out": "d44e7717c4c0066dfe36cc1ae735795746a42deef25c31b5ada33d6bf23c07c5",
+    "data/openjudge/tests/30000-/31381_made/data/5.in": "a06d28b5720989b9d73bd7cb23062a1eee8cbb624bcb013ca5ed015879a902dd",
+    "data/openjudge/tests/30000-/31381_made/data/5.out": "140a3495c6092e7ee494be7ef54422b6b5e94693313ab32ba75b2f54fa4e255f",
+    "data/openjudge/tests/30000-/31381_made/data/6.in": "7ff81c51b056ab11b414989083fa085495e3b1c6791570046f756ddb771b93cc",
+    "data/openjudge/tests/30000-/31381_made/data/6.out": "7ff81c51b056ab11b414989083fa085495e3b1c6791570046f756ddb771b93cc",
+    "data/openjudge/tests/30000-/31381_made/data/7.in": "9ee808d8b350b7dbc2eb617a16f8d12cedfec06c06d154351b90789101b5d9d4",
+    "data/openjudge/tests/30000-/31381_made/data/7.out": "0f16ad8ae8437376d758ae1707bc70ee70e742c7de5b42dd00f2d2d868987b3f",
+    "data/openjudge/tests/30000-/31381_made/data/8.in": "b311c4328611ca284e869ecc3e02523943c970667c583ae59272f68cd297671b",
+    "data/openjudge/tests/30000-/31381_made/data/8.out": "b76b1a3d86816db3fdf6415957f2539d9e828c565db1fa2bbc606e5b3b864442",
+    "data/openjudge/tests/30000-/31381_made/data/9.in": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    "data/openjudge/tests/30000-/31381_made/data/9.out": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+  },
+  "binding_and_sources_sha256": {
+    "data/openjudge/tests/30000-/31381_made/checker.py": "5ff5cb4c3d09ac1f237b4231b1e4cc8681abe5fcf8b996093b07b3b44c82c388",
+    "data/openjudge/tests/30000-/31381_made/producecase.py": "6859b39128e885887285a70d760a0a99e4dc0b02eb05d4eb150cf7ef01aeb458",
+    "data/openjudge/tests/30000-/31381_made/samplecode.py": "d6012be4b9e96b91ed0869e4fdd99a2d04b5db5956ef62a1077a5b06284546cc",
+    "data/openjudge/pages/practice__31381.html": "72f1a420158c0027bf031bc665a90fc8308b1999e78e0a13e3ea42ebfcaf008b",
+    "data/openjudge/catalog.json": "00de9954192687216a84e3f78e7551ef7d36a5f1a1efb4921a3584160050346c",
+    "data/openjudge/test_index.json": "5ede2e27b6cf083ba0026414a99b4b045768a10df15a720f0b9094e8a50e5799",
+    "data/openjudge/limits.json": "f0452c70764ee30581cdc37f3cfead8e165532dc0355f074038f9b5c8ca463b3",
+    "scripts/index_tests.py": "1911f1f0c93479c1833294a232e36e166d2deb4cd762304813cfded9ddf8c835",
+    "tests/test_31381_activation.py": "80b3ec28b9f2952178db65efa43b498b39c18f58ada3cd8364e16718c1bb9d11",
+    "tests/test_input_constraints.py": "28804f9efd645540fe09bdcdeb163b958bdad4fc5bc6fd8709167f17a1aeaef0",
+    "collab/gmyhf-31381-activation-mutations.json": "0e9b5b5857be1b90f5d799a721851a7946730c992ed0106a77748a1594670ddd"
+  },
+  "catalog_entry_sha256": "c3e565557a24a3691ba12dbdb11bce8caac6a2f7a23d2329b8d886492b7520a1",
+  "results": [
+    {
+      "name": "identity",
+      "language": "python",
+      "source": "s = input()\nprint(s)\n",
+      "source_sha256": "f60efadd98ae732ffd394802acedbbfc508577a08fcd61da3d3706949f4eacd4",
+      "expected": "Accepted",
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 748,
+        "memory_kb": 64192,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 1,
+            "time_ms": 16,
+            "case_limit_ms": 10000,
+            "ratio": 0.0016
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 16,
+              "case_limit_ms": 10000,
+              "ratio": 0.0016
+            },
+            {
+              "case": 2,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 3,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 4,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 5,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 6,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 7,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 8,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 9,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 10,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 11,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 12,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 13,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 14,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 15,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 16,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 17,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 18,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 19,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 20,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 21,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "reverse",
+      "language": "python",
+      "source": "\"\"\"31381自产参考：将整行字符反转，来源为本仓库实现，无外部提交代码。\"\"\"\nimport sys\n\n\ndef solve(text):\n    if text.endswith('\\n'):\n        text = text[:-1]\n        if text.endswith('\\r'):\n            text = text[:-1]\n    return text[::-1]\n\n\nif __name__ == '__main__':\n    print(solve(sys.stdin.read()))\n",
+      "source_sha256": "d6012be4b9e96b91ed0869e4fdd99a2d04b5db5956ef62a1077a5b06284546cc",
+      "expected": "Accepted",
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 761,
+        "memory_kb": 90580,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 2,
+            "time_ms": 14,
+            "case_limit_ms": 10000,
+            "ratio": 0.0014
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 2,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 3,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 4,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 5,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 6,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 7,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 8,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 9,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 10,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 11,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 12,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 13,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 14,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 15,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 16,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 17,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 18,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 19,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 20,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 21,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "sorted",
+      "language": "python",
+      "source": "s = input()\nprint(''.join(sorted(s)))\n",
+      "source_sha256": "3f240100e158d5ebba76ab41d38655084ff53ae07f7c1889071aeaaebad9dbd3",
+      "expected": "Accepted",
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 768,
+        "memory_kb": 92628,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 2,
+            "time_ms": 14,
+            "case_limit_ms": 10000,
+            "ratio": 0.0014
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 2,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 3,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 4,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 5,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 6,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 7,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 8,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 9,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 10,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 11,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 12,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 13,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 14,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 15,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 16,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 17,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 18,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 19,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 20,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 21,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "append_invalid",
+      "language": "python",
+      "source": "s = input()\nprint(s + '~')\n",
+      "source_sha256": "8d5fb20657080a057b48750cd87ba4e188f76e70e455c0f8818cfdea8106c31c",
+      "expected": "Wrong Answer",
+      "result": {
+        "status": "Wrong Answer",
+        "case": 1,
+        "time_ms": 13,
+        "memory_kb": 113524,
+        "expected_tokens": 1,
+        "actual_tokens": 1,
+        "message": "输出字符及其出现次数必须与输入一致",
+        "actual_output": {
+          "text": "1234567890qwertyuiopasdfghjklzxcvbnm~\n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 38
+        }
+      }
+    },
+    {
+      "name": "replace_invalid",
+      "language": "python",
+      "source": "s = input()\nprint(chr(ord(s[0]) ^ 1)+s[1:] if s else '~')\n",
+      "source_sha256": "d5be2dfd322b26e7ad219cedace32fd77e122b164acfff42936f15394a5895c4",
+      "expected": "Wrong Answer",
+      "result": {
+        "status": "Wrong Answer",
+        "case": 1,
+        "time_ms": 13,
+        "memory_kb": 114548,
+        "expected_tokens": 1,
+        "actual_tokens": 1,
+        "message": "输出字符及其出现次数必须与输入一致",
+        "actual_output": {
+          "text": "0234567890qwertyuiopasdfghjklzxcvbnm\n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 37
+        }
+      }
+    },
+    {
+      "name": "drop_invalid",
+      "language": "python",
+      "source": "s = input()\nprint(s[1:] if s else '~')\n",
+      "source_sha256": "5e7b3a820869c6b1c05301ec3cf00e656848dbcace082a6cba9bd2341e2ae04b",
+      "expected": "Wrong Answer",
+      "result": {
+        "status": "Wrong Answer",
+        "case": 1,
+        "time_ms": 13,
+        "memory_kb": 138484,
+        "expected_tokens": 1,
+        "actual_tokens": 1,
+        "message": "输出字符及其出现次数必须与输入一致",
+        "actual_output": {
+          "text": "234567890qwertyuiopasdfghjklzxcvbnm\n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 36
+        }
+      }
+    },
+    {
+      "name": "strip_invalid",
+      "language": "python",
+      "source": "s = input()\nprint(s.strip())\n",
+      "source_sha256": "231977aa23632d3c90f0e4b3ecee7510388950a32ede06343f517acbb2cca396",
+      "expected": "Wrong Answer",
+      "result": {
+        "status": "Wrong Answer",
+        "case": 3,
+        "time_ms": 91,
+        "memory_kb": 161404,
+        "expected_tokens": 0,
+        "actual_tokens": 0,
+        "message": "输出字符及其出现次数必须与输入一致",
+        "actual_output": {
+          "text": "\n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 1
+        }
+      }
+    },
+    {
+      "name": "set_invalid",
+      "language": "python",
+      "source": "s = input()\nprint(''.join(sorted(set(s))))\n",
+      "source_sha256": "1ac29f4c338459f9073879bc1a2c97d89808a2d2c7467b31d38e5e983d87f671",
+      "expected": "Wrong Answer",
+      "result": {
+        "status": "Wrong Answer",
+        "case": 3,
+        "time_ms": 89,
+        "memory_kb": 162428,
+        "expected_tokens": 0,
+        "actual_tokens": 0,
+        "message": "输出字符及其出现次数必须与输入一致",
+        "actual_output": {
+          "text": " \n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 2
+        }
+      }
+    },
+    {
+      "name": "extra_line_invalid",
+      "language": "python",
+      "source": "s = input()\nprint(s + '\\n')\n",
+      "source_sha256": "8606b56278142161bdbc7cae949bb28aa07dae34b55aaad00f1f4f8ca91e6e37",
+      "expected": "Wrong Answer",
+      "result": {
+        "status": "Wrong Answer",
+        "case": 1,
+        "time_ms": 13,
+        "memory_kb": 163456,
+        "expected_tokens": 1,
+        "actual_tokens": 1,
+        "message": "输出必须是一行UTF-8字符串",
+        "actual_output": {
+          "text": "1234567890qwertyuiopasdfghjklzxcvbnm\n\n",
+          "truncated": false,
+          "total_lines": 2,
+          "total_chars": 38
+        }
+      }
+    },
+    {
+      "name": "cpp_identity",
+      "language": "cpp",
+      "source": "#include <iostream>\n#include <string>\nint main(){std::string s;std::getline(std::cin,s);std::cout<<s<<\"\\n\";}\n",
+      "source_sha256": "d8caad9d68b0f528af65d2bc7407f199865368b7fdaf591faa5c253e4d40d03b",
+      "expected": "Accepted",
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 613,
+        "memory_kb": 165504,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 1,
+            "time_ms": 6,
+            "case_limit_ms": 4000,
+            "ratio": 0.0015
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 2,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 3,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 4,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 5,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 6,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 7,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 8,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 9,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 10,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 11,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 12,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 13,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 14,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 15,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 16,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 17,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 18,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 19,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 20,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 21,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "platform_writes": 0,
+  "mutation_count": 10,
+  "procedure_source": "\"\"\"31381本地启用回执：从真实catalog逐组复判，记录自产数据与绑定哈希。\"\"\"\nimport hashlib\nimport json\nfrom pathlib import Path\nimport shutil\nimport sys\nfrom datetime import datetime,timezone\n\nROOT=Path.cwd();sys.path.insert(0,str(ROOT));import judge\nsha=lambda raw:hashlib.sha256(raw).hexdigest()\nitem=judge.catalog_item('practice','31381');assert item['test_count']==21 and item['checker'].endswith('/31381_made/checker.py')\nbase=ROOT/'data/openjudge/tests/30000-/31381_made';prefix='s = input()\\n'\nprograms={'identity':prefix+'print(s)\\n','reverse':(base/'samplecode.py').read_text(),'sorted':prefix+\"print(''.join(sorted(s)))\\n\",'append_invalid':prefix+\"print(s + '~')\\n\",'replace_invalid':prefix+\"print(chr(ord(s[0]) ^ 1)+s[1:] if s else '~')\\n\",'drop_invalid':prefix+\"print(s[1:] if s else '~')\\n\",'strip_invalid':prefix+'print(s.strip())\\n','set_invalid':prefix+\"print(''.join(sorted(set(s))))\\n\",'extra_line_invalid':prefix+\"print(s + '\\\\n')\\n\"}\nresults=[]\nfor name,source in programs.items():\n    wanted='Wrong Answer' if name.endswith('_invalid') else 'Accepted'\n    result=judge.judge('practice','31381','python',source,collect_case_times=True)\n    assert result['status']==wanted,(name,result)\n    results.append({'name':name,'language':'python','source':source,'source_sha256':sha(source.encode()),'expected':wanted,'result':result});print(name,result['status'],flush=True)\nif shutil.which('g++'):\n    source='#include <iostream>\\n#include <string>\\nint main(){std::string s;std::getline(std::cin,s);std::cout<<s<<\"\\\\n\";}\\n'\n    result=judge.judge('practice','31381','cpp',source,collect_case_times=True);assert result['status']=='Accepted',result\n    results.append({'name':'cpp_identity','language':'cpp','source':source,'source_sha256':sha(source.encode()),'expected':'Accepted','result':result});print('cpp_identity',result['status'],flush=True)\nfiles={str(p.relative_to(ROOT)):sha(p.read_bytes()) for p in sorted((base/'data').iterdir())}\nsource=Path(__file__).read_text();paths=[base/'checker.py',base/'producecase.py',base/'samplecode.py',ROOT/'data/openjudge/pages/practice__31381.html',ROOT/'data/openjudge/catalog.json',ROOT/'data/openjudge/test_index.json',ROOT/'data/openjudge/limits.json',ROOT/'scripts/index_tests.py',ROOT/'tests/test_31381_activation.py',ROOT/'tests/test_input_constraints.py',ROOT/'collab/gmyhf-31381-activation-mutations.json']\nreport={'scope':'用户授权在本地practice/31381绑定并启用，21组自产数据、既有逐题SPJ；未更改OpenJudge远端配置或测试。','checked_at':datetime.now(timezone.utc).isoformat(),'local_path':'/practice/31381/','source_url':item['source_url'],'global_number':31381,'test_count':21,'checker':item['checker'],'data_files_sha256':files,'binding_and_sources_sha256':{str(p.relative_to(ROOT)):sha(p.read_bytes()) for p in paths},'catalog_entry_sha256':sha(json.dumps(item,ensure_ascii=False,sort_keys=True).encode()),'results':results,'platform_writes':0,'mutation_count':10,'procedure_source':source,'procedure_sha256':sha(source.encode())}\n(ROOT/'collab/gmyhf-31381-activation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\\n')\nprint('真实catalog绑定、21组数据、自产正误程序验收完成',flush=True)\n",
+  "procedure_sha256": "286fd24bb37a80ea150a42888836908715b15dd938e147ac22eb6ecc450a5478"
+}

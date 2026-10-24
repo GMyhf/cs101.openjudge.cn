@@ -1,0 +1,73 @@
+{
+  "results": [
+    {
+      "mutation": "未绑定SPJ",
+      "path": "data/openjudge/catalog.json",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "遗漏活动用例",
+      "path": "data/openjudge/catalog.json",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "缺失checker时仍允许精确判题",
+      "path": "scripts/index_tests.py",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "全局题号绑定错误",
+      "path": "data/openjudge/pages/practice__31381.html",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "列表漏掉新题",
+      "path": "data/openjudge/books/practice__11.html",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "生成器丢失输入契约",
+      "path": "data/openjudge/tests/30000-/31381_made/producecase.py",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "参考解错误忽略空格",
+      "path": "data/openjudge/tests/30000-/31381_made/samplecode.py",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "生成器产生重复输入",
+      "path": "data/openjudge/tests/30000-/31381_made/producecase.py",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "题面独立契约不拒绝多行",
+      "path": "tests/test_input_constraints.py",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "数据样例被修改",
+      "path": "data/openjudge/tests/30000-/31381_made/data/0.out",
+      "detected": true,
+      "exit_code": 1
+    }
+  ],
+  "procedure_source": "\"\"\"逐项改坏31381启用链路，独立执行对应测试，并恢复全部文件。\"\"\"\nimport hashlib\nimport json\nimport os\nfrom pathlib import Path\nimport subprocess\n\nroot=Path.cwd();base=root/'data/openjudge/tests/30000-/31381_made'\nrows=[]\n\ndef detect(name,path,broken,test):\n    original=path.read_bytes()\n    try:\n        path.write_bytes(broken)\n        run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest','tests.test_31381_activation.Activation31381Tests.'+test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'),timeout=30)\n        assert run.returncode!=0,name\n        rows.append({'mutation':name,'path':str(path.relative_to(root)),'detected':True,'exit_code':run.returncode})\n    finally:path.write_bytes(original)\n\ncatalog=root/'data/openjudge/catalog.json';obj=json.loads(catalog.read_text());entry=next(r for r in obj['problems'] if r['book']=='practice' and r['id']=='31381')\nfor name,key,value in [('未绑定SPJ','checker',None),('遗漏活动用例','test_count',20)]:\n    old=entry[key]\n    if value is None:del entry[key]\n    else:entry[key]=value\n    detect(name,catalog,json.dumps(obj,ensure_ascii=False,indent=2).encode(),'test_catalog_page_samples_and_checker_binding');entry[key]=old\ncases=[\n ('缺失checker时仍允许精确判题',root/'scripts/index_tests.py',b'SPECIAL_JUDGE_GLOBAL_NUMBERS = {27150, 30193, 31381}',b'SPECIAL_JUDGE_GLOBAL_NUMBERS = {27150, 30193}','test_catalog_page_samples_and_checker_binding'),\n ('全局题号绑定错误',root/'data/openjudge/pages/practice__31381.html',b'<dd>31381</dd>',b'<dd>31382</dd>','test_catalog_page_samples_and_checker_binding'),\n ('列表漏掉新题',root/'data/openjudge/books/practice__11.html',b'class=\"problem-id\"><a href=\"/practice/31381/\">31381',b'class=\"not-id\"><a href=\"/practice/31381/\">31381','test_catalog_page_samples_and_checker_binding'),\n ('生成器丢失输入契约',base/'producecase.py',b\"return isinstance(text, str) and re.fullmatch(r'[^\\\\r\\\\n]*(?:\\\\r?\\\\n)?', text) is not None\",b'return True','test_generator_reproduces_all_tracked_bytes'),\n ('参考解错误忽略空格',base/'samplecode.py',b'return text[::-1]',b'return text.strip()[::-1]','test_generator_reproduces_all_tracked_bytes'),\n ('生成器产生重复输入',base/'producecase.py',b\"return SHAPES[seed-1] + '\\\\n'\",b\"return SHAPES[0] + '\\\\n'\",'test_generator_reproduces_all_tracked_bytes'),\n ('题面独立契约不拒绝多行',root/'tests/test_input_constraints.py',b\"if '\\\\n' in body or '\\\\r' in body:\",b'if False:','test_generator_reproduces_all_tracked_bytes'),\n ('数据样例被修改',base/'data/0.out',b'mnbvcxz',b'mnbvcxx','test_generator_reproduces_all_tracked_bytes')]\nfor name,path,before,after,test in cases:\n    original=path.read_bytes();assert original.count(before)==1,name\n    detect(name,path,original.replace(before,after),test)\nsource=Path(__file__).read_text();sha=lambda b:hashlib.sha256(b).hexdigest()\n(root/'collab/gmyhf-31381-activation-mutations.json').write_text(json.dumps({'results':rows,'procedure_source':source,'procedure_sha256':sha(source.encode()),'tested_sources':{str(p.relative_to(root)):sha(p.read_bytes()) for p in (base/'producecase.py',base/'samplecode.py',root/'scripts/index_tests.py',root/'tests/test_31381_activation.py',root/'tests/test_input_constraints.py')}},ensure_ascii=False,indent=2)+'\\n')\nprint(len(rows),'种启用链路变异检出，全部文件恢复')\n",
+  "procedure_sha256": "13ea6381a67cba412bf60d7ab223beed20160993945e12bec692a91ba7348029",
+  "tested_sources": {
+    "data/openjudge/tests/30000-/31381_made/producecase.py": "6859b39128e885887285a70d760a0a99e4dc0b02eb05d4eb150cf7ef01aeb458",
+    "data/openjudge/tests/30000-/31381_made/samplecode.py": "d6012be4b9e96b91ed0869e4fdd99a2d04b5db5956ef62a1077a5b06284546cc",
+    "scripts/index_tests.py": "1911f1f0c93479c1833294a232e36e166d2deb4cd762304813cfded9ddf8c835",
+    "tests/test_31381_activation.py": "80b3ec28b9f2952178db65efa43b498b39c18f58ada3cd8364e16718c1bb9d11",
+    "tests/test_input_constraints.py": "28804f9efd645540fe09bdcdeb163b958bdad4fc5bc6fd8709167f17a1aeaef0"
+  }
+}

@@ -645,7 +645,20 @@ def check_1000001(text):
     return None
 
 
+def check_31381(text):
+    """31381题面：一行字符串；空格与重复字符都是内容，没有数值上界。"""
+    body = text
+    if body.endswith('\n'):
+        body = body[:-1]
+        if body.endswith('\r'):
+            body = body[:-1]
+    if '\n' in body or '\r' in body:
+        return '必须是一行字符串'
+    return None
+
+
 VALIDATORS = {
+    ("practice", "31381"): check_31381,
     ("practice", "01958"): check_01958,
     ("codeforces", "25A"): check_25a,
     ("codeforces", "34B"): check_34b,
