@@ -1,0 +1,317 @@
+{
+  "batch": 14,
+  "baseline": "b11d6fc5fb254bd01b8141763d3aad53af0c5689",
+  "procedure_sha256": "8064f7de9d26f851f8eea6e5d80dffe4744cbfea079d369ff912187ef20f2697",
+  "rules_sha256": "c5e5290436d11f9797620b5f4b4319e93c0f12bb9fbaec566d03f44dc6b3d01e",
+  "common_sha256": "6c004fd4b9aaf57fa9c8c984bc5978811944b65be2c23f771e913aff909fa14e",
+  "applied": true,
+  "problems": [
+    {
+      "global_number": 27934,
+      "evidence": "collab/gmyhf-27934-pairing-review.json",
+      "evidence_sha256": "3df2c4c16a4759e398468cf6f247a5464315725a87a0e9f41583c5ecbf4148b4",
+      "reference_source": "import sys, math, itertools, random, heapq, bisect\nfrom collections import Counter, deque, defaultdict\nfrom functools import lru_cache\n\ndef valeriy(text):\n    v = list(map(int, text.split()))\n    (n, q) = v[:2]\n    a = deque(v[2:2 + n])\n    queries = v[2 + n:]\n    maximum = max(a)\n    prefix = []\n    while a[0] != maximum:\n        (x, y) = (a.popleft(), a.popleft())\n        prefix.append((x, y))\n        if x > y:\n            a.appendleft(x)\n            a.append(y)\n        else:\n            a.appendleft(y)\n            a.append(x)\n    a.popleft()\n    cycle = list(a)\n    out = []\n    for query in queries:\n        (x, y) = prefix[query - 1] if query <= len(prefix) else (maximum, cycle[(query - len(prefix) - 1) % (n - 1)])\n        out.append(f'{x} {y}')\n    return '\\n'.join(out)\nimport sys\nsys.stdout.write(valeriy(sys.stdin.read()) + '\\n')\n",
+      "reference_sha256": "e782aa1c04b3bdf136f745d91c5c8b74832dfcee2d49e6ee983e0a8f3855fbd8",
+      "local_dataset": "data/openjudge/tests/admin_review_repaired/27934",
+      "baseline_files": {
+        "1.in": "01638b9ad17eb09fcb2164bf493595712e626bb1c31a3e930d70813ce88e4eda",
+        "1.out": "8b13e54d3b518195b4b2489adb150ba8c2018046db67a281a5fc90bdbcb6f9da",
+        "10.in": "11445b0636b474a6c3baa8078e596a3e772e2916898a387e2c6a5755ec40dcfe",
+        "10.out": "0edde16f23952078535b0fe485bd886a9805753708c738527c8303c9818c0bbf",
+        "11.in": "656ecd4670bd6f9fd6a557029f00fd270d85d2e1ac06d85f16e12b67888f23dc",
+        "11.out": "26b7e4f58cb904570a331229ed3807468fb01c161ed884142dadd26616383fdd",
+        "12.in": "1df1bbadd1a5ca6ff52eafa3128e2ddabb98e721b5515db5e07da2f227d64c09",
+        "12.out": "bd69cf8c3551357b75bcf7641fec3374d60a4e7f6992303793b5cefcc27b90ce",
+        "13.in": "e9d71de7e984425e9e7f585b0e1c6deef1afa94893927563003b818abd51eaab",
+        "13.out": "9e916a6f21050f1fb861989e193405d5415b7194090d78640a5a56553f084973",
+        "14.in": "0d2876c6a9737e959224d6cff2eaedbd0a915bfc3c0c70695a72bd55c0c2193f",
+        "14.out": "3e0be8e4eabd37bdd34ddee946ad808a63b04a6c878a074eced76d4e69b1330c",
+        "15.in": "f9f1c8c114b4e4ad4170e5313e982cbd0bcacaf4f6a368be6a31f6d9619174c6",
+        "15.out": "19059367f1461ed8c2500fc03a93c8cad779400fb2bbb448985e23d159f633db",
+        "16.in": "c3548e5965ada5d9b35fca8d755b9f3d4384903f7f5e01d1697059ef4db9b866",
+        "16.out": "d8820763bb191aab01c7d43d58ca87c7beec61e3771b3e490124d1de9a457240",
+        "17.in": "ad997733a59cdce32d6d7127704203ec91369826a2769983cadf8c57fcbd5e48",
+        "17.out": "aa5d731e2ec96d68ce321eb86a1ab975b07b2394ca3cb843ae4697e7b694a25d",
+        "18.in": "7c07181d685380963b7bf43eceb0a90b30e4af037b0ecbf21ceac8c4aa0d88be",
+        "18.out": "c0e920d72f7c22987093340a9eac336d4aefbd65a0f6a2655261a361e09e6a3a",
+        "19.in": "539c0030c62a7da8e9edb5cc03c018fc77d7c470e5b399d77f497af9c4fc68c2",
+        "19.out": "f3b03ac0e2fb1d8c3697856a5f992ab930b292dd530f9df96965f3169d960b4e",
+        "2.in": "bb73ad5448cb7852521b5cec14268f3fde5b5e7c0eb6090f6252af825cccd4b4",
+        "2.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "20.in": "9327daff4cb38f7826d4d9fd95eb025e57662735b857d7f1638e193c6d27c730",
+        "20.out": "e6c4642efbbf4d97f0430ad04751167f85252a0653dea27dafd26b679f522bc0",
+        "3,in": "3f9e72253c3dfee1b634fd9dd543a31217ea60b6f05d9e5d68136d64137ffaf0",
+        "3.out": "f251ddc12234e0da8d3b778bd0f7463fb477f16f47757f5617dc8b4ff4d4f14a",
+        "4.in": "f137f528aae5d226231bfa713fdfa4be50277c9c038cbfb49d734abb640e423c",
+        "4.out": "85ffbe16987f193c82003d573442381f7a49fe6f779652fb39af7bdffbc364a8",
+        "5.in": "6c774b49af1f0f495b4018719c790f171c3f7238d4da656ebdb11d7e9f33bacc",
+        "5.out": "51571c63dd988ac88c8a33e74dc50699edc0d2123a23cda8a413677aa040bfa9",
+        "6.in": "39c1f39554e0ece3ce3118b5e4eb880ae070251b52b9ae2178ad2bd42a1f2e2e",
+        "6.out": "4c122eabbd59eb90daf23614e4b4c6e98280d104f54820aa3e36f336e2909698",
+        "7.in": "4848bafcbb5a9ed73e8a03a64f8472a870a192368961ef6869e654febcdb808a",
+        "7.out": "ffda7bf7d42941a58272de1a09eb3aa4727943111c342620aae74bde44b98ce8",
+        "8.in": "0a8d08d871c9936499362866dfea7d56fa66366c90bafe822f6b1c65fcf7afd5",
+        "8.out": "9895d869c06efbe554bc44de36afe327a4c8030ab69425f547b4ade4c76593e2",
+        "9.in": "1ebe924154e9e6490180a9bc5279c88149d9b813795f8a9f03e9af0c5506b1a6",
+        "9.out": "5c64f9f30fe20d54216a93d95d4ceb818d1abe5374f9f09fa0d28f29f92abb40",
+        "data.py": "e30a5307df1f774f56dd83608bfbdb2971c1a9d1f30766c6e97a097e3fa65ee4",
+        "solve.py": "bc83e896fd152beacd43ddd3f5445406f1c0086c6d9d065a24f9b4f867e0bf6d"
+      },
+      "changes": [
+        {
+          "filename": "3.in",
+          "before_sha256": null,
+          "after_sha256": "3f9e72253c3dfee1b634fd9dd543a31217ea60b6f05d9e5d68136d64137ffaf0"
+        }
+      ],
+      "added_files": {
+        "3.in": "3f9e72253c3dfee1b634fd9dd543a31217ea60b6f05d9e5d68136d64137ffaf0"
+      },
+      "local": {
+        "status": "Accepted",
+        "cases": 20,
+        "time_ms": 1014,
+        "memory_kb": 34352,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 13,
+            "time_ms": 100,
+            "case_limit_ms": 4000,
+            "ratio": 0.025
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 21,
+              "case_limit_ms": 4000,
+              "ratio": 0.0053
+            },
+            {
+              "case": 2,
+              "time_ms": 29,
+              "case_limit_ms": 4000,
+              "ratio": 0.0073
+            },
+            {
+              "case": 3,
+              "time_ms": 41,
+              "case_limit_ms": 4000,
+              "ratio": 0.0103
+            },
+            {
+              "case": 4,
+              "time_ms": 47,
+              "case_limit_ms": 4000,
+              "ratio": 0.0118
+            },
+            {
+              "case": 5,
+              "time_ms": 59,
+              "case_limit_ms": 4000,
+              "ratio": 0.0147
+            },
+            {
+              "case": 6,
+              "time_ms": 47,
+              "case_limit_ms": 4000,
+              "ratio": 0.0118
+            },
+            {
+              "case": 7,
+              "time_ms": 53,
+              "case_limit_ms": 4000,
+              "ratio": 0.0132
+            },
+            {
+              "case": 8,
+              "time_ms": 53,
+              "case_limit_ms": 4000,
+              "ratio": 0.0132
+            },
+            {
+              "case": 9,
+              "time_ms": 43,
+              "case_limit_ms": 4000,
+              "ratio": 0.0107
+            },
+            {
+              "case": 10,
+              "time_ms": 66,
+              "case_limit_ms": 4000,
+              "ratio": 0.0165
+            },
+            {
+              "case": 11,
+              "time_ms": 68,
+              "case_limit_ms": 4000,
+              "ratio": 0.017
+            },
+            {
+              "case": 12,
+              "time_ms": 22,
+              "case_limit_ms": 4000,
+              "ratio": 0.0055
+            },
+            {
+              "case": 13,
+              "time_ms": 100,
+              "case_limit_ms": 4000,
+              "ratio": 0.025
+            },
+            {
+              "case": 14,
+              "time_ms": 20,
+              "case_limit_ms": 4000,
+              "ratio": 0.005
+            },
+            {
+              "case": 15,
+              "time_ms": 21,
+              "case_limit_ms": 4000,
+              "ratio": 0.0053
+            },
+            {
+              "case": 16,
+              "time_ms": 24,
+              "case_limit_ms": 4000,
+              "ratio": 0.006
+            },
+            {
+              "case": 17,
+              "time_ms": 31,
+              "case_limit_ms": 4000,
+              "ratio": 0.0077
+            },
+            {
+              "case": 18,
+              "time_ms": 33,
+              "case_limit_ms": 4000,
+              "ratio": 0.0083
+            },
+            {
+              "case": 19,
+              "time_ms": 40,
+              "case_limit_ms": 4000,
+              "ratio": 0.01
+            },
+            {
+              "case": 20,
+              "time_ms": 20,
+              "case_limit_ms": 4000,
+              "ratio": 0.005
+            }
+          ]
+        }
+      },
+      "verified_legal_pairs": 20,
+      "repaired_inputs": 1,
+      "input_policy": "将已核验的3,in原样复制为3.in；原答案和全部原文件保持，错名原件不删除，附件不执行。",
+      "before_files": {
+        "1.in": "01638b9ad17eb09fcb2164bf493595712e626bb1c31a3e930d70813ce88e4eda",
+        "1.out": "8b13e54d3b518195b4b2489adb150ba8c2018046db67a281a5fc90bdbcb6f9da",
+        "10.in": "11445b0636b474a6c3baa8078e596a3e772e2916898a387e2c6a5755ec40dcfe",
+        "10.out": "0edde16f23952078535b0fe485bd886a9805753708c738527c8303c9818c0bbf",
+        "11.in": "656ecd4670bd6f9fd6a557029f00fd270d85d2e1ac06d85f16e12b67888f23dc",
+        "11.out": "26b7e4f58cb904570a331229ed3807468fb01c161ed884142dadd26616383fdd",
+        "12.in": "1df1bbadd1a5ca6ff52eafa3128e2ddabb98e721b5515db5e07da2f227d64c09",
+        "12.out": "bd69cf8c3551357b75bcf7641fec3374d60a4e7f6992303793b5cefcc27b90ce",
+        "13.in": "e9d71de7e984425e9e7f585b0e1c6deef1afa94893927563003b818abd51eaab",
+        "13.out": "9e916a6f21050f1fb861989e193405d5415b7194090d78640a5a56553f084973",
+        "14.in": "0d2876c6a9737e959224d6cff2eaedbd0a915bfc3c0c70695a72bd55c0c2193f",
+        "14.out": "3e0be8e4eabd37bdd34ddee946ad808a63b04a6c878a074eced76d4e69b1330c",
+        "15.in": "f9f1c8c114b4e4ad4170e5313e982cbd0bcacaf4f6a368be6a31f6d9619174c6",
+        "15.out": "19059367f1461ed8c2500fc03a93c8cad779400fb2bbb448985e23d159f633db",
+        "16.in": "c3548e5965ada5d9b35fca8d755b9f3d4384903f7f5e01d1697059ef4db9b866",
+        "16.out": "d8820763bb191aab01c7d43d58ca87c7beec61e3771b3e490124d1de9a457240",
+        "17.in": "ad997733a59cdce32d6d7127704203ec91369826a2769983cadf8c57fcbd5e48",
+        "17.out": "aa5d731e2ec96d68ce321eb86a1ab975b07b2394ca3cb843ae4697e7b694a25d",
+        "18.in": "7c07181d685380963b7bf43eceb0a90b30e4af037b0ecbf21ceac8c4aa0d88be",
+        "18.out": "c0e920d72f7c22987093340a9eac336d4aefbd65a0f6a2655261a361e09e6a3a",
+        "19.in": "539c0030c62a7da8e9edb5cc03c018fc77d7c470e5b399d77f497af9c4fc68c2",
+        "19.out": "f3b03ac0e2fb1d8c3697856a5f992ab930b292dd530f9df96965f3169d960b4e",
+        "2.in": "bb73ad5448cb7852521b5cec14268f3fde5b5e7c0eb6090f6252af825cccd4b4",
+        "2.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "20.in": "9327daff4cb38f7826d4d9fd95eb025e57662735b857d7f1638e193c6d27c730",
+        "20.out": "e6c4642efbbf4d97f0430ad04751167f85252a0653dea27dafd26b679f522bc0",
+        "3,in": "3f9e72253c3dfee1b634fd9dd543a31217ea60b6f05d9e5d68136d64137ffaf0",
+        "3.out": "f251ddc12234e0da8d3b778bd0f7463fb477f16f47757f5617dc8b4ff4d4f14a",
+        "4.in": "f137f528aae5d226231bfa713fdfa4be50277c9c038cbfb49d734abb640e423c",
+        "4.out": "85ffbe16987f193c82003d573442381f7a49fe6f779652fb39af7bdffbc364a8",
+        "5.in": "6c774b49af1f0f495b4018719c790f171c3f7238d4da656ebdb11d7e9f33bacc",
+        "5.out": "51571c63dd988ac88c8a33e74dc50699edc0d2123a23cda8a413677aa040bfa9",
+        "6.in": "39c1f39554e0ece3ce3118b5e4eb880ae070251b52b9ae2178ad2bd42a1f2e2e",
+        "6.out": "4c122eabbd59eb90daf23614e4b4c6e98280d104f54820aa3e36f336e2909698",
+        "7.in": "4848bafcbb5a9ed73e8a03a64f8472a870a192368961ef6869e654febcdb808a",
+        "7.out": "ffda7bf7d42941a58272de1a09eb3aa4727943111c342620aae74bde44b98ce8",
+        "8.in": "0a8d08d871c9936499362866dfea7d56fa66366c90bafe822f6b1c65fcf7afd5",
+        "8.out": "9895d869c06efbe554bc44de36afe327a4c8030ab69425f547b4ade4c76593e2",
+        "9.in": "1ebe924154e9e6490180a9bc5279c88149d9b813795f8a9f03e9af0c5506b1a6",
+        "9.out": "5c64f9f30fe20d54216a93d95d4ceb818d1abe5374f9f09fa0d28f29f92abb40",
+        "data.py": "e30a5307df1f774f56dd83608bfbdb2971c1a9d1f30766c6e97a097e3fa65ee4",
+        "solve.py": "bc83e896fd152beacd43ddd3f5445406f1c0086c6d9d065a24f9b4f867e0bf6d"
+      },
+      "configuration_sha256": "fcab9077860dc997dd764bd94a7338946afc4228c8741701c60c8b9bf196625c",
+      "absence_binding_sha256": "a74a2373e9a3f587eccbc20d85c7c5dcb71be704ba1a9d72a02dc19c7114f997",
+      "final_files": {
+        "1.in": "01638b9ad17eb09fcb2164bf493595712e626bb1c31a3e930d70813ce88e4eda",
+        "1.out": "8b13e54d3b518195b4b2489adb150ba8c2018046db67a281a5fc90bdbcb6f9da",
+        "10.in": "11445b0636b474a6c3baa8078e596a3e772e2916898a387e2c6a5755ec40dcfe",
+        "10.out": "0edde16f23952078535b0fe485bd886a9805753708c738527c8303c9818c0bbf",
+        "11.in": "656ecd4670bd6f9fd6a557029f00fd270d85d2e1ac06d85f16e12b67888f23dc",
+        "11.out": "26b7e4f58cb904570a331229ed3807468fb01c161ed884142dadd26616383fdd",
+        "12.in": "1df1bbadd1a5ca6ff52eafa3128e2ddabb98e721b5515db5e07da2f227d64c09",
+        "12.out": "bd69cf8c3551357b75bcf7641fec3374d60a4e7f6992303793b5cefcc27b90ce",
+        "13.in": "e9d71de7e984425e9e7f585b0e1c6deef1afa94893927563003b818abd51eaab",
+        "13.out": "9e916a6f21050f1fb861989e193405d5415b7194090d78640a5a56553f084973",
+        "14.in": "0d2876c6a9737e959224d6cff2eaedbd0a915bfc3c0c70695a72bd55c0c2193f",
+        "14.out": "3e0be8e4eabd37bdd34ddee946ad808a63b04a6c878a074eced76d4e69b1330c",
+        "15.in": "f9f1c8c114b4e4ad4170e5313e982cbd0bcacaf4f6a368be6a31f6d9619174c6",
+        "15.out": "19059367f1461ed8c2500fc03a93c8cad779400fb2bbb448985e23d159f633db",
+        "16.in": "c3548e5965ada5d9b35fca8d755b9f3d4384903f7f5e01d1697059ef4db9b866",
+        "16.out": "d8820763bb191aab01c7d43d58ca87c7beec61e3771b3e490124d1de9a457240",
+        "17.in": "ad997733a59cdce32d6d7127704203ec91369826a2769983cadf8c57fcbd5e48",
+        "17.out": "aa5d731e2ec96d68ce321eb86a1ab975b07b2394ca3cb843ae4697e7b694a25d",
+        "18.in": "7c07181d685380963b7bf43eceb0a90b30e4af037b0ecbf21ceac8c4aa0d88be",
+        "18.out": "c0e920d72f7c22987093340a9eac336d4aefbd65a0f6a2655261a361e09e6a3a",
+        "19.in": "539c0030c62a7da8e9edb5cc03c018fc77d7c470e5b399d77f497af9c4fc68c2",
+        "19.out": "f3b03ac0e2fb1d8c3697856a5f992ab930b292dd530f9df96965f3169d960b4e",
+        "2.in": "bb73ad5448cb7852521b5cec14268f3fde5b5e7c0eb6090f6252af825cccd4b4",
+        "2.out": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "20.in": "9327daff4cb38f7826d4d9fd95eb025e57662735b857d7f1638e193c6d27c730",
+        "20.out": "e6c4642efbbf4d97f0430ad04751167f85252a0653dea27dafd26b679f522bc0",
+        "3,in": "3f9e72253c3dfee1b634fd9dd543a31217ea60b6f05d9e5d68136d64137ffaf0",
+        "3.out": "f251ddc12234e0da8d3b778bd0f7463fb477f16f47757f5617dc8b4ff4d4f14a",
+        "4.in": "f137f528aae5d226231bfa713fdfa4be50277c9c038cbfb49d734abb640e423c",
+        "4.out": "85ffbe16987f193c82003d573442381f7a49fe6f779652fb39af7bdffbc364a8",
+        "5.in": "6c774b49af1f0f495b4018719c790f171c3f7238d4da656ebdb11d7e9f33bacc",
+        "5.out": "51571c63dd988ac88c8a33e74dc50699edc0d2123a23cda8a413677aa040bfa9",
+        "6.in": "39c1f39554e0ece3ce3118b5e4eb880ae070251b52b9ae2178ad2bd42a1f2e2e",
+        "6.out": "4c122eabbd59eb90daf23614e4b4c6e98280d104f54820aa3e36f336e2909698",
+        "7.in": "4848bafcbb5a9ed73e8a03a64f8472a870a192368961ef6869e654febcdb808a",
+        "7.out": "ffda7bf7d42941a58272de1a09eb3aa4727943111c342620aae74bde44b98ce8",
+        "8.in": "0a8d08d871c9936499362866dfea7d56fa66366c90bafe822f6b1c65fcf7afd5",
+        "8.out": "9895d869c06efbe554bc44de36afe327a4c8030ab69425f547b4ade4c76593e2",
+        "9.in": "1ebe924154e9e6490180a9bc5279c88149d9b813795f8a9f03e9af0c5506b1a6",
+        "9.out": "5c64f9f30fe20d54216a93d95d4ceb818d1abe5374f9f09fa0d28f29f92abb40",
+        "data.py": "e30a5307df1f774f56dd83608bfbdb2971c1a9d1f30766c6e97a097e3fa65ee4",
+        "solve.py": "bc83e896fd152beacd43ddd3f5445406f1c0086c6d9d065a24f9b4f867e0bf6d",
+        "3.in": "3f9e72253c3dfee1b634fd9dd543a31217ea60b6f05d9e5d68136d64137ffaf0"
+      },
+      "form_unchanged": false,
+      "configuration_unchanged": true,
+      "file_list_unchanged": false,
+      "only_expected_files_added": true
+    }
+  ],
+  "policy": "仅为27934从错名原件恢复3.in；原答案和全部原文件保持，不改题面或配置。",
+  "uploads": [
+    {
+      "filename": "3.in",
+      "sha256": "3f9e72253c3dfee1b634fd9dd543a31217ea60b6f05d9e5d68136d64137ffaf0",
+      "verified": true
+    }
+  ],
+  "verified_at": "2026-10-24T02:33:25.701627+00:00"
+}

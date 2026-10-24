@@ -1,0 +1,718 @@
+{
+  "original_evidence": "collab/gmyhf-pending-batch12-review.json",
+  "original_evidence_sha256": "f0c3ccdac3a4e300479a80c7dd6b722bdc7f4240a6be81ec5888daae1e8856e0",
+  "scope": "原清单未包含3,in及两个源码附件；完整回读补审，3.in确实不存在，附件仅备份和哈希不执行。",
+  "input_alias": "3,in",
+  "expected_input": "3.in",
+  "local_snapshot": "data/openjudge/tests/admin_pairing_review/27934",
+  "configuration_sha256": "fcab9077860dc997dd764bd94a7338946afc4228c8741701c60c8b9bf196625c",
+  "platform_writes": 0,
+  "procedure_source": "\"\"\"只读补审旧清单遗漏的错名输入与源码附件；附件不执行。\"\"\"\nimport copy,json,sys\nfrom pathlib import Path\nsys.path.insert(0,str(Path.cwd()/'scripts'));import repair_gmyhf_pending_answers as c\nroot=Path.cwd();original=root/'collab/gmyhf-pending-batch12-review.json';entry=next(e for e in json.loads(original.read_text())['entries'] if e['global_number']==27934)\ns=c.platform.oj_submit.Session().login();page=s._get(c.platform.oj_submit.HOST+'/admin/problems/edit/?id=27934');c.audit_statement(page,entry);fingerprint=c.form_sha(page)\nbaseline={r['filename']:r['sha256'] for r in entry['checks']['readback']['files']};names=c.listed_files(page,27934)\nassert set(names)-set(baseline)=={'3,in','data.py','solve.py'} and set(baseline)<=set(names) and '3.in' not in names\nsnapshot=root/'data/openjudge/tests/admin_pairing_review/27934';snapshot.mkdir(parents=True,exist_ok=True)\nfiles=[]\nfor name in names:\n raw=c.platform.download(s,27934,name)\n if name in baseline:assert c.sha(raw)==baseline[name]\n path=snapshot/name\n if path.exists():assert path.read_bytes()==raw\n else:path.write_bytes(raw)\n files.append({'filename':name,'sha256':c.sha(raw)})\npage=s._get(c.platform.oj_submit.HOST+'/admin/problems/edit/?id=27934');assert c.form_sha(page)==fingerprint and c.listed_files(page,27934)==names\nupdated=copy.deepcopy(entry);updated['checks']['readback']['files']=files\nsource=Path(__file__).read_text();report={'original_evidence':str(original.relative_to(root)),'original_evidence_sha256':c.sha(original.read_bytes()),'scope':'原清单未包含3,in及两个源码附件；完整回读补审，3.in确实不存在，附件仅备份和哈希不执行。','input_alias':'3,in','expected_input':'3.in','local_snapshot':str(snapshot.relative_to(root)),'configuration_sha256':fingerprint,'platform_writes':0,'procedure_source':source,'procedure_sha256':c.sha(source.encode()),'entries':[updated]}\nc.save(root/'collab/gmyhf-27934-pairing-review.json',report);print('27934全部42文件只读回读及备份一致，确认错名输入，原39文件保持')\n",
+  "procedure_sha256": "3ce08ff1dd83b23014b50a945ec3923b82653fed5efef1d9fdaf9fe8d00fce46",
+  "entries": [
+    {
+      "global_number": 27934,
+      "title": "Valeriy and Deque",
+      "reference": "/tmp/gmyhf-authored-27934.py",
+      "reference_sha256": "e782aa1c04b3bdf136f745d91c5c8b74832dfcee2d49e6ee983e0a8f3855fbd8",
+      "validator": "/tmp/gmyhf_batch12_oracles.py",
+      "validator_sha256": "177bd07c8b3d70987e3628b940cfef7af9bd1eff757e429f481812a8dbbed9d1",
+      "page": "/tmp/gmyhf-admin-statements/27934.json",
+      "page_sha256": "ad535c08c412804ee63530ecb444107c2c02a97258fc0b28727d962e408e615e",
+      "checks": {
+        "pairing": {
+          "complete_pairs": 19,
+          "total_files": 39,
+          "unpaired": [
+            {
+              "filename": "3.out",
+              "sha256": "f251ddc12234e0da8d3b778bd0f7463fb477f16f47757f5617dc8b4ff4d4f14a",
+              "reason": "缺少对应输入或输出"
+            }
+          ]
+        },
+        "statement": {
+          "changed_fields": [],
+          "available": false,
+          "admin_available": true,
+          "source": "admin",
+          "checked_at": "2026-10-23T19:55:07.719062+00:00",
+          "field_sha256": {
+            "description": "f9041e4d890110093d9c47fba8ca045878f50512882b2dc5c87530cc1ce94f93",
+            "input": "9639f78aaf7f228ec0db04e1eb5675d2b4c7a80288faa430c26b1add813afc3a",
+            "output": "9cc6a67c29bd66e64459ca5242499304e0e9df2a0b76784df1a083baff93c562",
+            "hint": "3cf66c3fcff11f4484b72cfa571cdeccfe1c8a6d08cdf549ca3862c0b8f82b51",
+            "sampleInput": "f10f286e0da648cddbc4974225ed69410110b7fdc9dd3500e2da3b852d06e023",
+            "sampleOutput": "d86082acd259cf32a2630a10e6bd3797cefc1b0981efcebd81e432e0b9b9d4d7"
+          },
+          "binding": "管理员编辑页全局题号与下载链接的problem id一致；未建立公开题库映射"
+        },
+        "readback": {
+          "files": [
+            {
+              "filename": "1.in",
+              "sha256": "01638b9ad17eb09fcb2164bf493595712e626bb1c31a3e930d70813ce88e4eda"
+            },
+            {
+              "filename": "1.out",
+              "sha256": "8b13e54d3b518195b4b2489adb150ba8c2018046db67a281a5fc90bdbcb6f9da"
+            },
+            {
+              "filename": "10.in",
+              "sha256": "11445b0636b474a6c3baa8078e596a3e772e2916898a387e2c6a5755ec40dcfe"
+            },
+            {
+              "filename": "10.out",
+              "sha256": "0edde16f23952078535b0fe485bd886a9805753708c738527c8303c9818c0bbf"
+            },
+            {
+              "filename": "11.in",
+              "sha256": "656ecd4670bd6f9fd6a557029f00fd270d85d2e1ac06d85f16e12b67888f23dc"
+            },
+            {
+              "filename": "11.out",
+              "sha256": "26b7e4f58cb904570a331229ed3807468fb01c161ed884142dadd26616383fdd"
+            },
+            {
+              "filename": "12.in",
+              "sha256": "1df1bbadd1a5ca6ff52eafa3128e2ddabb98e721b5515db5e07da2f227d64c09"
+            },
+            {
+              "filename": "12.out",
+              "sha256": "bd69cf8c3551357b75bcf7641fec3374d60a4e7f6992303793b5cefcc27b90ce"
+            },
+            {
+              "filename": "13.in",
+              "sha256": "e9d71de7e984425e9e7f585b0e1c6deef1afa94893927563003b818abd51eaab"
+            },
+            {
+              "filename": "13.out",
+              "sha256": "9e916a6f21050f1fb861989e193405d5415b7194090d78640a5a56553f084973"
+            },
+            {
+              "filename": "14.in",
+              "sha256": "0d2876c6a9737e959224d6cff2eaedbd0a915bfc3c0c70695a72bd55c0c2193f"
+            },
+            {
+              "filename": "14.out",
+              "sha256": "3e0be8e4eabd37bdd34ddee946ad808a63b04a6c878a074eced76d4e69b1330c"
+            },
+            {
+              "filename": "15.in",
+              "sha256": "f9f1c8c114b4e4ad4170e5313e982cbd0bcacaf4f6a368be6a31f6d9619174c6"
+            },
+            {
+              "filename": "15.out",
+              "sha256": "19059367f1461ed8c2500fc03a93c8cad779400fb2bbb448985e23d159f633db"
+            },
+            {
+              "filename": "16.in",
+              "sha256": "c3548e5965ada5d9b35fca8d755b9f3d4384903f7f5e01d1697059ef4db9b866"
+            },
+            {
+              "filename": "16.out",
+              "sha256": "d8820763bb191aab01c7d43d58ca87c7beec61e3771b3e490124d1de9a457240"
+            },
+            {
+              "filename": "17.in",
+              "sha256": "ad997733a59cdce32d6d7127704203ec91369826a2769983cadf8c57fcbd5e48"
+            },
+            {
+              "filename": "17.out",
+              "sha256": "aa5d731e2ec96d68ce321eb86a1ab975b07b2394ca3cb843ae4697e7b694a25d"
+            },
+            {
+              "filename": "18.in",
+              "sha256": "7c07181d685380963b7bf43eceb0a90b30e4af037b0ecbf21ceac8c4aa0d88be"
+            },
+            {
+              "filename": "18.out",
+              "sha256": "c0e920d72f7c22987093340a9eac336d4aefbd65a0f6a2655261a361e09e6a3a"
+            },
+            {
+              "filename": "19.in",
+              "sha256": "539c0030c62a7da8e9edb5cc03c018fc77d7c470e5b399d77f497af9c4fc68c2"
+            },
+            {
+              "filename": "19.out",
+              "sha256": "f3b03ac0e2fb1d8c3697856a5f992ab930b292dd530f9df96965f3169d960b4e"
+            },
+            {
+              "filename": "2.in",
+              "sha256": "bb73ad5448cb7852521b5cec14268f3fde5b5e7c0eb6090f6252af825cccd4b4"
+            },
+            {
+              "filename": "2.out",
+              "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "filename": "20.in",
+              "sha256": "9327daff4cb38f7826d4d9fd95eb025e57662735b857d7f1638e193c6d27c730"
+            },
+            {
+              "filename": "20.out",
+              "sha256": "e6c4642efbbf4d97f0430ad04751167f85252a0653dea27dafd26b679f522bc0"
+            },
+            {
+              "filename": "3,in",
+              "sha256": "3f9e72253c3dfee1b634fd9dd543a31217ea60b6f05d9e5d68136d64137ffaf0"
+            },
+            {
+              "filename": "3.out",
+              "sha256": "f251ddc12234e0da8d3b778bd0f7463fb477f16f47757f5617dc8b4ff4d4f14a"
+            },
+            {
+              "filename": "4.in",
+              "sha256": "f137f528aae5d226231bfa713fdfa4be50277c9c038cbfb49d734abb640e423c"
+            },
+            {
+              "filename": "4.out",
+              "sha256": "85ffbe16987f193c82003d573442381f7a49fe6f779652fb39af7bdffbc364a8"
+            },
+            {
+              "filename": "5.in",
+              "sha256": "6c774b49af1f0f495b4018719c790f171c3f7238d4da656ebdb11d7e9f33bacc"
+            },
+            {
+              "filename": "5.out",
+              "sha256": "51571c63dd988ac88c8a33e74dc50699edc0d2123a23cda8a413677aa040bfa9"
+            },
+            {
+              "filename": "6.in",
+              "sha256": "39c1f39554e0ece3ce3118b5e4eb880ae070251b52b9ae2178ad2bd42a1f2e2e"
+            },
+            {
+              "filename": "6.out",
+              "sha256": "4c122eabbd59eb90daf23614e4b4c6e98280d104f54820aa3e36f336e2909698"
+            },
+            {
+              "filename": "7.in",
+              "sha256": "4848bafcbb5a9ed73e8a03a64f8472a870a192368961ef6869e654febcdb808a"
+            },
+            {
+              "filename": "7.out",
+              "sha256": "ffda7bf7d42941a58272de1a09eb3aa4727943111c342620aae74bde44b98ce8"
+            },
+            {
+              "filename": "8.in",
+              "sha256": "0a8d08d871c9936499362866dfea7d56fa66366c90bafe822f6b1c65fcf7afd5"
+            },
+            {
+              "filename": "8.out",
+              "sha256": "9895d869c06efbe554bc44de36afe327a4c8030ab69425f547b4ade4c76593e2"
+            },
+            {
+              "filename": "9.in",
+              "sha256": "1ebe924154e9e6490180a9bc5279c88149d9b813795f8a9f03e9af0c5506b1a6"
+            },
+            {
+              "filename": "9.out",
+              "sha256": "5c64f9f30fe20d54216a93d95d4ceb818d1abe5374f9f09fa0d28f29f92abb40"
+            },
+            {
+              "filename": "data.py",
+              "sha256": "e30a5307df1f774f56dd83608bfbdb2971c1a9d1f30766c6e97a097e3fa65ee4"
+            },
+            {
+              "filename": "solve.py",
+              "sha256": "bc83e896fd152beacd43ddd3f5445406f1c0086c6d9d065a24f9b4f867e0bf6d"
+            }
+          ],
+          "checked_at": "2026-10-23T19:55:14.586611+00:00"
+        },
+        "contract": {
+          "cases": 19,
+          "rejected": [],
+          "definition": "按管理员题意的extra_contract核输入约束；没有借用其他题号或放宽既有valid。",
+          "checks": [
+            {
+              "input": "1.in",
+              "issues": []
+            },
+            {
+              "input": "10.in",
+              "issues": []
+            },
+            {
+              "input": "11.in",
+              "issues": []
+            },
+            {
+              "input": "12.in",
+              "issues": []
+            },
+            {
+              "input": "13.in",
+              "issues": []
+            },
+            {
+              "input": "14.in",
+              "issues": []
+            },
+            {
+              "input": "15.in",
+              "issues": []
+            },
+            {
+              "input": "16.in",
+              "issues": []
+            },
+            {
+              "input": "17.in",
+              "issues": []
+            },
+            {
+              "input": "18.in",
+              "issues": []
+            },
+            {
+              "input": "19.in",
+              "issues": []
+            },
+            {
+              "input": "2.in",
+              "issues": []
+            },
+            {
+              "input": "20.in",
+              "issues": []
+            },
+            {
+              "input": "4.in",
+              "issues": []
+            },
+            {
+              "input": "5.in",
+              "issues": []
+            },
+            {
+              "input": "6.in",
+              "issues": []
+            },
+            {
+              "input": "7.in",
+              "issues": []
+            },
+            {
+              "input": "8.in",
+              "issues": []
+            },
+            {
+              "input": "9.in",
+              "issues": []
+            }
+          ]
+        },
+        "extra_contract": {
+          "definition": "按解码题面补足原valid未覆盖的语义范围；实现见独立复算器extra_contract",
+          "files": [
+            {
+              "input": "1.in",
+              "issues": []
+            },
+            {
+              "input": "10.in",
+              "issues": []
+            },
+            {
+              "input": "11.in",
+              "issues": []
+            },
+            {
+              "input": "12.in",
+              "issues": []
+            },
+            {
+              "input": "13.in",
+              "issues": []
+            },
+            {
+              "input": "14.in",
+              "issues": []
+            },
+            {
+              "input": "15.in",
+              "issues": []
+            },
+            {
+              "input": "16.in",
+              "issues": []
+            },
+            {
+              "input": "17.in",
+              "issues": []
+            },
+            {
+              "input": "18.in",
+              "issues": []
+            },
+            {
+              "input": "19.in",
+              "issues": []
+            },
+            {
+              "input": "2.in",
+              "issues": []
+            },
+            {
+              "input": "20.in",
+              "issues": []
+            },
+            {
+              "input": "4.in",
+              "issues": []
+            },
+            {
+              "input": "5.in",
+              "issues": []
+            },
+            {
+              "input": "6.in",
+              "issues": []
+            },
+            {
+              "input": "7.in",
+              "issues": []
+            },
+            {
+              "input": "8.in",
+              "issues": []
+            },
+            {
+              "input": "9.in",
+              "issues": []
+            }
+          ]
+        },
+        "answers": {
+          "method": "最大元素上前前缀与其后n−1周期",
+          "official_samples": 2,
+          "official_samples_examined": 2,
+          "official_sample_checks": [
+            {
+              "index": 1,
+              "matches": true,
+              "oracle_sha256": "2d8e0f727e2cf25b6b4b20edced2ba37f49f91b42c4ac1931d65aa336474c029",
+              "statement_output_sha256": "2d8e0f727e2cf25b6b4b20edced2ba37f49f91b42c4ac1931d65aa336474c029"
+            },
+            {
+              "index": 2,
+              "matches": true,
+              "oracle_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "statement_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            }
+          ],
+          "sample_dispute": null,
+          "files": [
+            {
+              "input": "1.in",
+              "output": "1.out",
+              "input_sha256": "01638b9ad17eb09fcb2164bf493595712e626bb1c31a3e930d70813ce88e4eda",
+              "output_sha256": "8b13e54d3b518195b4b2489adb150ba8c2018046db67a281a5fc90bdbcb6f9da",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "10.in",
+              "output": "10.out",
+              "input_sha256": "11445b0636b474a6c3baa8078e596a3e772e2916898a387e2c6a5755ec40dcfe",
+              "output_sha256": "0edde16f23952078535b0fe485bd886a9805753708c738527c8303c9818c0bbf",
+              "matches": true,
+              "oracle_ms": 8
+            },
+            {
+              "input": "11.in",
+              "output": "11.out",
+              "input_sha256": "656ecd4670bd6f9fd6a557029f00fd270d85d2e1ac06d85f16e12b67888f23dc",
+              "output_sha256": "26b7e4f58cb904570a331229ed3807468fb01c161ed884142dadd26616383fdd",
+              "matches": true,
+              "oracle_ms": 17
+            },
+            {
+              "input": "12.in",
+              "output": "12.out",
+              "input_sha256": "1df1bbadd1a5ca6ff52eafa3128e2ddabb98e721b5515db5e07da2f227d64c09",
+              "output_sha256": "bd69cf8c3551357b75bcf7641fec3374d60a4e7f6992303793b5cefcc27b90ce",
+              "matches": true,
+              "oracle_ms": 30
+            },
+            {
+              "input": "13.in",
+              "output": "13.out",
+              "input_sha256": "e9d71de7e984425e9e7f585b0e1c6deef1afa94893927563003b818abd51eaab",
+              "output_sha256": "9e916a6f21050f1fb861989e193405d5415b7194090d78640a5a56553f084973",
+              "matches": true,
+              "oracle_ms": 44
+            },
+            {
+              "input": "14.in",
+              "output": "14.out",
+              "input_sha256": "0d2876c6a9737e959224d6cff2eaedbd0a915bfc3c0c70695a72bd55c0c2193f",
+              "output_sha256": "3e0be8e4eabd37bdd34ddee946ad808a63b04a6c878a074eced76d4e69b1330c",
+              "matches": true,
+              "oracle_ms": 29
+            },
+            {
+              "input": "15.in",
+              "output": "15.out",
+              "input_sha256": "f9f1c8c114b4e4ad4170e5313e982cbd0bcacaf4f6a368be6a31f6d9619174c6",
+              "output_sha256": "19059367f1461ed8c2500fc03a93c8cad779400fb2bbb448985e23d159f633db",
+              "matches": true,
+              "oracle_ms": 33
+            },
+            {
+              "input": "16.in",
+              "output": "16.out",
+              "input_sha256": "c3548e5965ada5d9b35fca8d755b9f3d4384903f7f5e01d1697059ef4db9b866",
+              "output_sha256": "d8820763bb191aab01c7d43d58ca87c7beec61e3771b3e490124d1de9a457240",
+              "matches": true,
+              "oracle_ms": 34
+            },
+            {
+              "input": "17.in",
+              "output": "17.out",
+              "input_sha256": "ad997733a59cdce32d6d7127704203ec91369826a2769983cadf8c57fcbd5e48",
+              "output_sha256": "aa5d731e2ec96d68ce321eb86a1ab975b07b2394ca3cb843ae4697e7b694a25d",
+              "matches": true,
+              "oracle_ms": 25
+            },
+            {
+              "input": "18.in",
+              "output": "18.out",
+              "input_sha256": "7c07181d685380963b7bf43eceb0a90b30e4af037b0ecbf21ceac8c4aa0d88be",
+              "output_sha256": "c0e920d72f7c22987093340a9eac336d4aefbd65a0f6a2655261a361e09e6a3a",
+              "matches": true,
+              "oracle_ms": 55
+            },
+            {
+              "input": "19.in",
+              "output": "19.out",
+              "input_sha256": "539c0030c62a7da8e9edb5cc03c018fc77d7c470e5b399d77f497af9c4fc68c2",
+              "output_sha256": "f3b03ac0e2fb1d8c3697856a5f992ab930b292dd530f9df96965f3169d960b4e",
+              "matches": true,
+              "oracle_ms": 50
+            },
+            {
+              "input": "2.in",
+              "output": "2.out",
+              "input_sha256": "bb73ad5448cb7852521b5cec14268f3fde5b5e7c0eb6090f6252af825cccd4b4",
+              "output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "20.in",
+              "output": "20.out",
+              "input_sha256": "9327daff4cb38f7826d4d9fd95eb025e57662735b857d7f1638e193c6d27c730",
+              "output_sha256": "e6c4642efbbf4d97f0430ad04751167f85252a0653dea27dafd26b679f522bc0",
+              "matches": true,
+              "oracle_ms": 84
+            },
+            {
+              "input": "4.in",
+              "output": "4.out",
+              "input_sha256": "f137f528aae5d226231bfa713fdfa4be50277c9c038cbfb49d734abb640e423c",
+              "output_sha256": "85ffbe16987f193c82003d573442381f7a49fe6f779652fb39af7bdffbc364a8",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "5.in",
+              "output": "5.out",
+              "input_sha256": "6c774b49af1f0f495b4018719c790f171c3f7238d4da656ebdb11d7e9f33bacc",
+              "output_sha256": "51571c63dd988ac88c8a33e74dc50699edc0d2123a23cda8a413677aa040bfa9",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "6.in",
+              "output": "6.out",
+              "input_sha256": "39c1f39554e0ece3ce3118b5e4eb880ae070251b52b9ae2178ad2bd42a1f2e2e",
+              "output_sha256": "4c122eabbd59eb90daf23614e4b4c6e98280d104f54820aa3e36f336e2909698",
+              "matches": true,
+              "oracle_ms": 5
+            },
+            {
+              "input": "7.in",
+              "output": "7.out",
+              "input_sha256": "4848bafcbb5a9ed73e8a03a64f8472a870a192368961ef6869e654febcdb808a",
+              "output_sha256": "ffda7bf7d42941a58272de1a09eb3aa4727943111c342620aae74bde44b98ce8",
+              "matches": true,
+              "oracle_ms": 10
+            },
+            {
+              "input": "8.in",
+              "output": "8.out",
+              "input_sha256": "0a8d08d871c9936499362866dfea7d56fa66366c90bafe822f6b1c65fcf7afd5",
+              "output_sha256": "9895d869c06efbe554bc44de36afe327a4c8030ab69425f547b4ade4c76593e2",
+              "matches": true,
+              "oracle_ms": 9
+            },
+            {
+              "input": "9.in",
+              "output": "9.out",
+              "input_sha256": "1ebe924154e9e6490180a9bc5279c88149d9b813795f8a9f03e9af0c5506b1a6",
+              "output_sha256": "5c64f9f30fe20d54216a93d95d4ceb818d1abe5374f9f09fa0d28f29f92abb40",
+              "matches": true,
+              "oracle_ms": 18
+            }
+          ]
+        },
+        "local": {
+          "status": "Accepted",
+          "cases": 19,
+          "time_ms": 1037,
+          "memory_kb": 91252,
+          "timing_audit": {
+            "status": "passed",
+            "required_max_ratio": 0.75,
+            "max_case": {
+              "case": 13,
+              "time_ms": 113,
+              "case_limit_ms": 4000,
+              "ratio": 0.0283
+            },
+            "cases": [
+              {
+                "case": 1,
+                "time_ms": 27,
+                "case_limit_ms": 4000,
+                "ratio": 0.0067
+              },
+              {
+                "case": 2,
+                "time_ms": 33,
+                "case_limit_ms": 4000,
+                "ratio": 0.0083
+              },
+              {
+                "case": 3,
+                "time_ms": 43,
+                "case_limit_ms": 4000,
+                "ratio": 0.0107
+              },
+              {
+                "case": 4,
+                "time_ms": 54,
+                "case_limit_ms": 4000,
+                "ratio": 0.0135
+              },
+              {
+                "case": 5,
+                "time_ms": 69,
+                "case_limit_ms": 4000,
+                "ratio": 0.0173
+              },
+              {
+                "case": 6,
+                "time_ms": 53,
+                "case_limit_ms": 4000,
+                "ratio": 0.0132
+              },
+              {
+                "case": 7,
+                "time_ms": 56,
+                "case_limit_ms": 4000,
+                "ratio": 0.014
+              },
+              {
+                "case": 8,
+                "time_ms": 56,
+                "case_limit_ms": 4000,
+                "ratio": 0.014
+              },
+              {
+                "case": 9,
+                "time_ms": 48,
+                "case_limit_ms": 4000,
+                "ratio": 0.012
+              },
+              {
+                "case": 10,
+                "time_ms": 74,
+                "case_limit_ms": 4000,
+                "ratio": 0.0185
+              },
+              {
+                "case": 11,
+                "time_ms": 72,
+                "case_limit_ms": 4000,
+                "ratio": 0.018
+              },
+              {
+                "case": 12,
+                "time_ms": 22,
+                "case_limit_ms": 4000,
+                "ratio": 0.0055
+              },
+              {
+                "case": 13,
+                "time_ms": 113,
+                "case_limit_ms": 4000,
+                "ratio": 0.0283
+              },
+              {
+                "case": 14,
+                "time_ms": 23,
+                "case_limit_ms": 4000,
+                "ratio": 0.0057
+              },
+              {
+                "case": 15,
+                "time_ms": 23,
+                "case_limit_ms": 4000,
+                "ratio": 0.0057
+              },
+              {
+                "case": 16,
+                "time_ms": 29,
+                "case_limit_ms": 4000,
+                "ratio": 0.0073
+              },
+              {
+                "case": 17,
+                "time_ms": 34,
+                "case_limit_ms": 4000,
+                "ratio": 0.0085
+              },
+              {
+                "case": 18,
+                "time_ms": 34,
+                "case_limit_ms": 4000,
+                "ratio": 0.0085
+              },
+              {
+                "case": 19,
+                "time_ms": 43,
+                "case_limit_ms": 4000,
+                "ratio": 0.0107
+              }
+            ]
+          }
+        },
+        "platform": {
+          "final": "Not submitted",
+          "attempts": [],
+          "reason": "题面只在管理员视角可见；本次不向不可见题提交源码，独立复算与原限制本地执行分别记录"
+        },
+        "admission_boundary": {
+          "original_reason": "not_in_catalog",
+          "preserve_exclusion": true,
+          "reason": "原题号绑定或资源排除未改；答案核对通过不能自动激活"
+        },
+        "contract_resolution": {
+          "conclusion": "后台缺少3.in而保留3.out；已回读全部39个文件核SHA。19个完整测试对独立答案一致，孤立答案只记录哈希，不能构成可执行测试对。",
+          "complete_pair_coverage": true,
+          "missing_companion_detected": true
+        }
+      },
+      "authored_reference": {
+        "source": "import sys, math, itertools, random, heapq, bisect\nfrom collections import Counter, deque, defaultdict\nfrom functools import lru_cache\n\ndef valeriy(text):\n    v = list(map(int, text.split()))\n    (n, q) = v[:2]\n    a = deque(v[2:2 + n])\n    queries = v[2 + n:]\n    maximum = max(a)\n    prefix = []\n    while a[0] != maximum:\n        (x, y) = (a.popleft(), a.popleft())\n        prefix.append((x, y))\n        if x > y:\n            a.appendleft(x)\n            a.append(y)\n        else:\n            a.appendleft(y)\n            a.append(x)\n    a.popleft()\n    cycle = list(a)\n    out = []\n    for query in queries:\n        (x, y) = prefix[query - 1] if query <= len(prefix) else (maximum, cycle[(query - len(prefix) - 1) % (n - 1)])\n        out.append(f'{x} {y}')\n    return '\\n'.join(out)\nimport sys\nsys.stdout.write(valeriy(sys.stdin.read()) + '\\n')\n",
+        "sha256": "e782aa1c04b3bdf136f745d91c5c8b74832dfcee2d49e6ee983e0a8f3855fbd8",
+        "procedure": "从自写独立复算器按AST函数依赖闭包提取，保留导入并添加标准输入输出入口；不读取或拼接任何后台测试内容"
+      },
+      "passed": false,
+      "complete": true
+    }
+  ]
+}

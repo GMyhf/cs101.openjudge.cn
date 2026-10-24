@@ -1,0 +1,77 @@
+{
+  "batch": 14,
+  "results": [
+    {
+      "mutation": "接管无缺失证明的同名输入",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "忽略缺失证明计划哈希",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "忽略原件回读变化",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "忽略最终配置变化",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "忽略最终非目标文件变化",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "未即时回读也记录成功",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "未经参考哈希审核即执行",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "复制时破坏原完整数据对",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "不验证错名输入与孤立答案成对",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "默认即写平台",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错名输入允许单元素deque",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错名输入忽略数据长度",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错名输入允许零查询",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "大查询循环位置偏移一位",
+      "detected": true,
+      "failures": 1
+    }
+  ],
+  "procedure_source": "import copy,hashlib,io,json,os,subprocess,sys,unittest\nfrom pathlib import Path\nfrom unittest.mock import patch\npipe=Path('scripts/repair_gmyhf_missing_pair.py');rules=Path('scripts/gmyhf_review_fixes.py');originals={p:p.read_text() for p in (pipe,rules)}\nwriter='tests.test_gmyhf_missing_pair.MissingPairWriterTests.';proof='tests.test_gmyhf_missing_pair.MissingPairProofTests.'\ncases=[\n(pipe,'接管无缺失证明的同名输入',\"else:require(names==old_names,'没有原始缺失证明，不接管已经存在的3.in')\",\"else:pass\",writer+'test_existing_new_input_without_absence_proof_is_rejected'),\n(pipe,'忽略缺失证明计划哈希',\"require(json.loads(binding_path.read_text())==binding,'缺失状态备份与当前计划或配置变化')\",\"None\",writer+'test_modified_absence_binding_prevents_writes'),\n(pipe,'忽略原件回读变化',\"require(sha(live) in (digest,expected[name]),'已有文件出现未审核变化')\",\"pass\",writer+'test_original_file_drift_prevents_all_writes'),\n(pipe,'忽略最终配置变化',\"require(configuration_sha(page)==fingerprint and listed_files(page,NUMBER)==final_names,'最终配置或清单变化')\",\"pass\",writer+'test_configuration_change_stops_completion_then_retry_resumes'),\n(pipe,'忽略最终非目标文件变化',\"require(sha(raw)==digest,'最终全文件回读不符')\",\"None\",writer+'test_final_unrelated_file_drift_never_claims_completion'),\n(pipe,'未即时回读也记录成功',\"require(sha(platform.download(session,NUMBER,name))==expected[name],'上传后回读不符')\",\"pass\",writer+'test_failed_upload_never_claims_completion'),\n(pipe,'未经参考哈希审核即执行',\"require(sha(source.encode())==proof['sha256'] and proof.get('language','python3')=='python3','自写参考来源或语言不符')\",\"pass\",proof+'test_prepare_restores_alias_and_preserves_all_answers'),\n(pipe,'复制时破坏原完整数据对',\"(target/'data'/name).write_bytes(raw)\",\"(target/'data'/name).write_bytes(b'broken')\",proof+'test_prepare_restores_alias_and_preserves_all_answers'),\n(pipe,'不验证错名输入与孤立答案成对',\"require(answer==(target/'data'/OUTPUT).read_bytes(),'错名输入与原孤立答案不匹配')\",\"pass\",proof+'test_prepare_restores_alias_and_preserves_all_answers'),\n(pipe,'默认即写平台',\"if not apply:return\",\"if False:return\",writer+'test_default_is_readonly_and_saves_original_absence'),\n(rules,'错名输入允许单元素deque','assert 2 <= n <= 10**5 and 0 <= q <= 3*10**5','assert 1 <= n <= 10**5 and 0 <= q <= 3*10**5',proof+'test_alias_contract_rejects_malformed_or_out_of_range_content'),\n(rules,'错名输入忽略数据长度','assert len(values) == 2 + n + q','assert True',proof+'test_alias_contract_rejects_malformed_or_out_of_range_content'),\n(rules,'错名输入允许零查询','assert all(1 <= x <= 10**18 for x in values[2+n:])','assert all(0 <= x <= 10**18 for x in values[2+n:])',proof+'test_alias_contract_rejects_malformed_or_out_of_range_content')]\n\nresults=[]\ntry:\n for p,name,old,new,test in cases:\n  assert originals[p].count(old)>=1,(name,originals[p].count(old));p.write_text(originals[p].replace(old,new))\n  run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest',test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert run.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':run.returncode});p.write_text(originals[p])\nfinally:\n for p,s in originals.items():p.write_text(s)\nsys.path.insert(0,str(Path.cwd()));from tests.test_gmyhf_missing_pair import MissingPairProofTests\nentry=next(e for e in json.loads(Path('collab/gmyhf-pending-batch12-review.json').read_text())['entries'] if e['global_number']==27934);entry=copy.deepcopy(entry)\nentry['authored_reference']['source']=entry['authored_reference']['source'].replace('query - len(prefix) - 1','query - len(prefix)')\nentry['authored_reference']['sha256']=hashlib.sha256(entry['authored_reference']['source'].encode()).hexdigest()\nwith patch('tests.test_gmyhf_missing_pair.json.loads',return_value={'entries':[entry]}):\n result=unittest.TextTestRunner(stream=io.StringIO()).run(MissingPairProofTests('test_authored_case_and_reference_against_direct_deque_steps'));assert not result.wasSuccessful()\nresults.append({'mutation':'大查询循环位置偏移一位','detected':True,'failures':len(result.failures)})\ns=Path(__file__).read_text();Path('collab/gmyhf-review-fixes-batch14-mutations.json').write_text(json.dumps({'batch':14,'results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n');print(len(results),'种变异检出，源码已恢复')\n",
+  "procedure_sha256": "923bbbd259b57803eefaca9dca388ef17ca7367a2cc2de5bd8615e5254f432b8"
+}

@@ -3,6 +3,17 @@ import ast
 import json
 
 
+def validate_missing_deque_input(payload):
+    """恢复错名输入前验证完整规格，返回原始字节。"""
+    values = list(map(int, payload.split()))
+    n, q = values[:2]
+    assert 2 <= n <= 10**5 and 0 <= q <= 3*10**5
+    assert len(values) == 2 + n + q
+    assert all(0 <= x <= 10**9 for x in values[2:2+n])
+    assert all(1 <= x <= 10**18 for x in values[2+n:])
+    return payload
+
+
 def repair_input(number, payload):
     text = payload.decode()
     if number == 31239:
