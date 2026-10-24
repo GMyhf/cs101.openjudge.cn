@@ -4607,12 +4607,17 @@
     "remote_special_judge": [],
     "deprecated_excluded": [
       19945,
-      20139
+      20139,
+      31195
     ],
     "platform_spj_unsupported": [
       27952,
       28341,
       31381
+    ],
+    "placeholder_excluded": [
+      28979,
+      31248
     ]
   },
   "next_candidates_not_exhaustive": [],
@@ -4657,6 +4662,41 @@
       "proof_sha256": "f81b10fc969c5baef9f3bf79e21fce690b5404a5fa1fc7244477d6fa2dede261",
       "scope_limit": "撤下已知测试课程绑定，全局私有题及历史提交未作删除；未宣称提供了平台全局禁用开关。",
       "procedure_source": "import hashlib,json\nfrom pathlib import Path\nroot=Path.cwd();p=root/'collab/gmyhf-review-fixes-summary.json';d=json.loads(p.read_text())\nproof=root/'collab/gmyhf-spj-platform-retirement.json';r=json.loads(proof.read_text())\nassert r['applied'] and r['removed_routes']==['E31381']\nassert r['other_bindings_unchanged'] and r['test_files_unchanged'] and r['global_forms_unchanged']\nassert r['local_31381']['active'] and r['local_31381']['cases']==21\nassert all(not item['enabled'] for item in r['local_candidates'].values())\nd['remaining_holds']['special_judge_protocol']=[]\nd['remaining_holds']['remote_special_judge']=[]\nd['remaining_holds']['platform_spj_unsupported']=[27952,28341,31381]\nd['post_review_updates']['platform_spj_unsupported']={\n 'decision':'用户确认OpenJudge不支持SPJ；31381撤下测试课程绑定且本地保持启用，27952/28341固定排除后台数据接入，仅考虑本地SPJ，不再等待平台部署协议。',\n 'proof':str(proof.relative_to(root)), 'proof_sha256':hashlib.sha256(proof.read_bytes()).hexdigest(),\n 'scope_limit':r['scope_limit'], 'procedure_source':Path(__file__).read_text()}\np.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n')\n"
+    },
+    "without_download_placeholders": {
+      "decision": "按用户第1项选择，28979测试占位、31195明确to remove、31248占位模板固定排除；其余11题不认定废弃，维持无数据状态。",
+      "proof": "collab/gmyhf-placeholder-exclusions.json",
+      "proof_sha256": "8a77b7ccbac17228dda88d7d5cb73a69c053517b7f07ba34a652bfec15080d6d",
+      "summary": {
+        "reviewed": 14,
+        "fixed_excluded": [
+          28979,
+          31195,
+          31248
+        ],
+        "algorithm_problems_not_retired": [
+          27207,
+          29337,
+          29893,
+          29894,
+          31200
+        ],
+        "benchmarks_not_retired": [
+          31028,
+          31029,
+          31030,
+          31031,
+          31032
+        ],
+        "demonstrations_not_retired": [
+          31178
+        ],
+        "still_without_downloads": 14,
+        "platform_writes": 0,
+        "new_data_pairs": 0,
+        "activated_problems": 0
+      },
+      "procedure_source": "import hashlib,json\nfrom pathlib import Path\nroot=Path.cwd();proof=root/'collab/gmyhf-placeholder-exclusions.json';r=json.loads(proof.read_text())\nassert r['summary']['fixed_excluded']==[28979,31195,31248] and r['summary']['platform_writes']==0\nassert len(r['entries'])==14 and all(e['form_unchanged'] for e in r['entries'])\np=root/'collab/gmyhf-review-fixes-summary.json';d=json.loads(p.read_text())\nd['remaining_holds']['deprecated_excluded']=sorted(set(d['remaining_holds']['deprecated_excluded'])|{31195})\nd['remaining_holds']['placeholder_excluded']=[28979,31248]\nd['post_review_updates']['without_download_placeholders']={\n 'decision':'按用户第1项选择，28979测试占位、31195明确to remove、31248占位模板固定排除；其余11题不认定废弃，维持无数据状态。',\n 'proof':str(proof.relative_to(root)),'proof_sha256':hashlib.sha256(proof.read_bytes()).hexdigest(),\n 'summary':r['summary'],'procedure_source':Path(__file__).read_text()}\np.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n')\n"
     }
   }
 }

@@ -1,0 +1,42 @@
+{
+  "results": [
+    {
+      "mutation": "test60排除",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "797af25b6c47610925a6276e45a8f52fb770a84c2b5b00a704780839815a8af7"
+    },
+    {
+      "mutation": "待移除题排除",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "1c62ddddd7940a09a1ad8454a1627c5b410ecff4155b05f14bb7ebfab4067cab"
+    },
+    {
+      "mutation": "占位模板排除",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "be221ee33d4770361aa7f5635737bcf5b7ac60a3cb2c9016f7ddcda6b9d20427"
+    },
+    {
+      "mutation": "绕过固定排除",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "135c6e19a7173c1b0d70ebe3b0ab080e4bbab45cabffa6c0db242b22122126b5"
+    },
+    {
+      "mutation": "跳过后继续落盘",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "487a150a6d90048d075880d8eb5c5a998fb9d0556f4e28099d3cd2f86baf592d"
+    },
+    {
+      "mutation": "首题排除后漏掉后续题",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "466a2f4a8f5d6236f7475e8d4b7bcdd19a7da99b81bcc3648a0ad218d5a4d30d"
+    }
+  ],
+  "restored_source_sha256": "c4d3c86a42d2004d6b186146f0783e066fabebde00a7dbc0f1a4c3a0855c0909",
+  "procedure_source": "import hashlib,json,subprocess,sys\nfrom pathlib import Path\nroot=Path.cwd();p=root/'scripts/materialize_gmyhf_downloads.py';original=p.read_bytes();source=original.decode()\nmutants=[('test60排除', '28979: \"2026-10-24 审核：test60测试占位，保持排除\",',''),\n ('待移除题排除','31195: \"2026-10-24 审核：题名标记to remove，废弃题保持排除\",',''),\n ('占位模板排除','31248: \"2026-10-24 审核：占位模板题，保持排除\",',''),\n ('绕过固定排除','if number in MANUAL_EXCLUSIONS:','if False:'),\n ('跳过后继续落盘','skip(number, \"manual_exclusion\", detail=MANUAL_EXCLUSIONS[number])\\n            continue','skip(number, \"manual_exclusion\", detail=MANUAL_EXCLUSIONS[number])\\n            pass'),\n ('首题排除后漏掉后续题','skip(number, \"manual_exclusion\", detail=MANUAL_EXCLUSIONS[number])\\n            continue','skip(number, \"manual_exclusion\", detail=MANUAL_EXCLUSIONS[number])\\n            break')]\nresults=[]\ntry:\n for label,old,new in mutants:\n  assert source.count(old)==1,(label,source.count(old))\n  mutated=source.replace(old,new);p.write_text(mutated)\n  try:\n   run=subprocess.run([sys.executable,'-m','unittest','tests.test_gmyhf_placeholder_exclusions'],capture_output=True,text=True,timeout=30)\n   assert run.returncode!=0,('变异未检出',label)\n   assert 'SyntaxError' not in run.stderr and 'ImportError' not in run.stderr,('变异无效',label)\n   results.append({'mutation':label,'detected':True,'exit_code':run.returncode,'source_sha256':hashlib.sha256(mutated.encode()).hexdigest()});print(label,'已检出',flush=True)\n  finally:p.write_bytes(original)\nfinally:p.write_bytes(original)\nreport={'results':results,'restored_source_sha256':hashlib.sha256(original).hexdigest(),'procedure_source':Path(__file__).read_text()}\n(root/'collab/gmyhf-placeholder-exclusions-mutations.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\\n')\n"
+}
