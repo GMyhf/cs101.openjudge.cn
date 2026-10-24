@@ -1,0 +1,77 @@
+{
+  "batch": 15,
+  "results": [
+    {
+      "mutation": "省略父节点右空位",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "只移动根节点孩子",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "向左循环",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "错误循环模数",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "删除输出空位",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "不修复空根",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "改动其他节点",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "忽略孤立节点",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放宽位移上界",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放宽节点上界",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "忽略节点数",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "只重算改输入的答案",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "漏写末尾空位说明",
+      "detected": true,
+      "exit_code": 1
+    }
+  ],
+  "procedure_source": "import hashlib,io,json,os,subprocess,sys,unittest\nfrom pathlib import Path\nfrom unittest.mock import patch\nsys.path.insert(0,str(Path.cwd()))\nfrom tests import test_gmyhf_padded_tree as tests\nresults=[]\nproof=next(e for e in json.loads(Path('collab/gmyhf-pending-batch14-review.json').read_text())['entries'] if e['global_number']==29663)['authored_reference']\nsource=proof['source'].split('import sys\\nsys.stdout.write')[0]\nfor name,old,new in [\n ('省略父节点右空位','for child in node[1:]','for child in node[1:2]'),\n ('只移动根节点孩子','levels[::-1]','levels[:1]'),\n ('向左循环','slots[-amount:] + slots[:-amount]','slots[amount:] + slots[:amount]'),\n ('错误循环模数','k % len(slots)','k % (len(slots)+1)'),\n ('删除输出空位',\"output.append(str(node[0]) if node else '-1')\",\"output.extend([str(node[0])] if node else [])\")]:\n assert source.count(old)==1,name\n ns={};exec(source.replace(old,new),ns)\n with patch.object(tests,'reference',return_value=ns['shift_tree']):\n  run=unittest.TextTestRunner(stream=io.StringIO()).run(tests.PaddedTreeTests('test_padding_witness_and_bottom_up_order'))\n  assert not run.wasSuccessful(),name\n results.append({'mutation':name,'detected':True,'failures':len(run.failures),'errors':len(run.errors)})\ncases=[\n ('不修复空根','scripts/gmyhf_review_fixes.py','nodes[0] = 0','nodes[0] = -1','test_repair_changes_only_root_token_and_preserves_legal_bytes'),\n ('改动其他节点','scripts/gmyhf_review_fixes.py',\"payload[root.end():]\",\"payload[root.end():].replace(b'2', b'3')\",'test_repair_changes_only_root_token_and_preserves_legal_bytes'),\n ('忽略孤立节点','scripts/gmyhf_review_fixes.py','assert slots > 0','assert True','test_repair_rejects_unreachable_nodes_and_invalid_bounds'),\n ('放宽位移上界','scripts/gmyhf_review_fixes.py','k <= 1000','k <= 1001','test_repair_rejects_unreachable_nodes_and_invalid_bounds'),\n ('放宽节点上界','scripts/gmyhf_review_fixes.py','n <= 10001','n <= 10002','test_repair_rejects_unreachable_nodes_and_invalid_bounds'),\n ('忽略节点数','scripts/gmyhf_review_fixes.py','len(values) == n + 2','len(values) >= n + 2','test_repair_rejects_unreachable_nodes_and_invalid_bounds'),\n ('只重算改输入的答案','scripts/repair_gmyhf_review_findings.py','(31415, 31435, 30236, 29663)','(31415, 31435, 30236)','test_prepare_recomputes_unchanged_input_and_binds_confirmed_policy'),\n ('漏写末尾空位说明','scripts/gmyhf_statement_fixes.py','层序输入末尾省略的空孩子也参与循环','末尾空孩子不参与循环','test_statement_adds_only_confirmed_padding_rule')]\nfor name,path,old,new,test in cases:\n p=Path(path);original=p.read_text()\n try:\n  assert original.count(old)==1,(name,original.count(old));p.write_text(original.replace(old,new))\n  run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest','tests.test_gmyhf_padded_tree.PaddedTreeTests.'+test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert run.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':run.returncode})\n finally:p.write_text(original)\ns=Path(__file__).read_text();Path('collab/gmyhf-review-fixes-batch15-mutations.json').write_text(json.dumps({'batch':15,'results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n')\nprint(len(results),'种变异检出，源码已恢复')\n",
+  "procedure_sha256": "f5e14e58f794ac49eb285f0f8703410c1310204fe1e68d73a729afabb45655b5"
+}

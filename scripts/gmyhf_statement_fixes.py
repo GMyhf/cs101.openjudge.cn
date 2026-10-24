@@ -35,7 +35,11 @@ def recovered_samples(number, fields):
 
 def changed_form(number,fields,answers):
     result=dict(fields)
-    if number==21729:
+    if number==29663:
+        note = '位移前须补齐每个非空父节点的左右孩子空位，再按该层全部孩子槽位（含空位）向右循环位移；层序输入末尾省略的空孩子也参与循环。空节点本身没有孩子。'
+        assert note not in result['description']
+        result['description'] += '\r\n<p>' + note + '</p>'
+    elif number==21729:
         import re
         assert answers==['2','15']
         result['sampleOutput'],count=re.subn(r'(?m)^16(?=\r?$)',answers[1],result['sampleOutput'])

@@ -1,6 +1,7 @@
 """审核后确定性派生合法输入；保留原件，答案由已审核的整数参考重算。"""
 import ast
 import json
+import re
 
 
 def validate_missing_deque_input(payload):
@@ -16,6 +17,26 @@ def validate_missing_deque_input(payload):
 
 def repair_input(number, payload):
     text = payload.decode()
+    if number == 29663:
+        values = list(map(int, text.split()))
+        k, n = values[:2]
+        assert 1 <= k <= 1000 and 2 <= n <= 10001 and len(values) == n + 2
+        nodes = values[2:]
+        changed = nodes[0] == -1
+        if changed:
+            # 空根后存在实体节点；仅将根改为合法值0，其余值与输入布局保持。
+            nodes[0] = 0
+        slots = 1
+        for value in nodes:
+            assert slots > 0
+            slots -= 1
+            if value != -1:
+                slots += 2
+        if not changed:
+            return payload
+        tokens = list(re.finditer(rb'\S+', payload))
+        root = tokens[2]
+        return payload[:root.start()] + b'0' + payload[root.end():]
     if number == 31239:
         lines = text.splitlines()
         header = list(map(int, lines[0].split()))

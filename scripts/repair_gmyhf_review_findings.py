@@ -18,7 +18,7 @@ BATCHES = {1: {19964: 16, 19968: 16, 30825: 15, 30920: 16, 31415: 15, 31435: 15}
            3: {21471: 9, 25563: 11, 25577: 11, 27946: 13, 30177: 14},
            5: {28187: 13, 28188: 13, 28189: 13, 28682: 13, 28696: 13},
            6: {25579: 11}, 7: {25685: 12}, 9: {28277: 13, 28680: 13},
-           10: {21729: 11, 30236: 16}, 11: {28016: 13}, 12: {31241: 10}, 13: {31239: 10}}
+           10: {21729: 11, 30236: 16}, 11: {28016: 13}, 12: {31241: 10}, 13: {31239: 10}, 15: {29663: 14}}
 
 
 def reference_command(source, language, target):
@@ -83,7 +83,7 @@ def prepare(batch, work):
             repaired = repair_input(number, given)
             altered_inputs += repaired != given
             output = answer
-            if repaired != given or number in (31415, 31435, 30236):
+            if repaired != given or number in (31415, 31435, 30236, 29663):
                 result = subprocess.run(command, input=repaired,
                                         capture_output=True, timeout=120)
                 require(result.returncode == 0, f'{number}: 自写参考失败')
@@ -103,7 +103,7 @@ def prepare(batch, work):
                            21471: 19, 25563: 19, 25577: 1, 27946: 10, 30177: 1,
                            28187: 17, 28188: 14, 28189: 13, 28682: 20, 28696: 18,
                            25579: 12, 25685: 17, 28277: 1, 28680: 5,
-                           21729: 1, 30236: 1, 28016: 6, 31241: 1, 31239: 18}
+                           21729: 1, 30236: 1, 28016: 6, 31241: 1, 31239: 18, 29663: 1}
         require(altered_inputs == expected_inputs[number], '越界输入数量与审核证据不符')
         item = {'book': 'practice', 'id': str(number), 'global_number': number,
                 'tests': True, 'test_count': len(cases), 'test_cases': cases}
@@ -120,6 +120,10 @@ def prepare(batch, work):
         if number == 30236:
             group['reference_policy'] = {'rule':'操作数不能包含前导零；用户已明确确认',
                                          'original_reference_sha256':proof['sha256']}
+        if number == 29663:
+            group['reference_policy'] = {'rule': '用户确认：补齐每个父节点的左右空位后再循环；自底向上处理，空节点本身没有孩子。',
+                'original_reference_sha256': proof['sha256'], 'recompute_all_answers': True,
+                'input_repair': '仅将9.in的空根改为0，其余节点、k、N与布局保持；所有给定节点须可达。'}
         if number == 31239:
             group['input_policy'] = '仅移除首行第2～4项旧参数，保留N及后续数量表的全部字节。'
         if prior:
