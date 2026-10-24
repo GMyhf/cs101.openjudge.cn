@@ -1,0 +1,71 @@
+{
+  "tests": "tests.test_gmyhf_sample_repairs",
+  "results": [
+    {
+      "mutation": "只读模式误写",
+      "detected": true,
+      "exit_code": 1,
+      "test_log_sha256": "83454fd5805376490ded9c9ae6fdecb129cf7d3a59a0436741cd2616f6830433"
+    },
+    {
+      "mutation": "漏改样例答案",
+      "detected": true,
+      "exit_code": 1,
+      "test_log_sha256": "668a2b3e7b4aa7e8f33712972e5148ee43dc4e5f186f0c447da5384ea5705907"
+    },
+    {
+      "mutation": "跳过全部绑定保护",
+      "detected": true,
+      "exit_code": 1,
+      "test_log_sha256": "e733d25c7ffd97582fcc3b381897b70e39681329ac5c4e252d1025a2d50bc0b9"
+    },
+    {
+      "mutation": "漏查修复期间数据变化",
+      "detected": true,
+      "exit_code": 1,
+      "test_log_sha256": "552dd1984222acf6a730ef183e6f0dfe035a870d606fd456d89d8fa3790be484"
+    },
+    {
+      "mutation": "乘法解释仍删除错误元素",
+      "detected": true,
+      "exit_code": 1,
+      "test_log_sha256": "7957ea9caf1dabdcbdbd5bb2b82fd65f82bcb3564fcc526ba0b3ee5329565f9e"
+    },
+    {
+      "mutation": "显存优化保留误导提示",
+      "detected": true,
+      "exit_code": 1,
+      "test_log_sha256": "579a021170e48d4edb7e77d7470c94e22ab7d70572317c5d402d49532b71cbfd"
+    },
+    {
+      "mutation": "放过参考与样例证明冲突",
+      "detected": true,
+      "exit_code": 1,
+      "test_log_sha256": "401a548108759cdfc080381987706239fd2ba9181291ba8edce3dc4cc49d249a"
+    },
+    {
+      "mutation": "漏查本地题面漂移",
+      "detected": true,
+      "exit_code": 1,
+      "test_log_sha256": "88908e6f0644202cbee584289c96279a4026f02711273665329ee59905a11500"
+    },
+    {
+      "mutation": "提示实体未解码",
+      "detected": true,
+      "exit_code": 1,
+      "test_log_sha256": "f5a2712233d41b0d7f28dfe58dd1d18d58a19015983694d5d8f2af9878fe763b"
+    },
+    {
+      "mutation": "富文本实体被误解码",
+      "detected": true,
+      "exit_code": 1,
+      "test_log_sha256": "8d7dbfbf60a4309cfd0ede1ba8c7f1966d39ca82fe3b297dc9eb49623ae2e688"
+    },
+    {
+      "mutation": "提示实体解码两次",
+      "detected": true,
+      "exit_code": 1,
+      "test_log_sha256": "d99ceed3d0e12bc564c837ee14e038735259bfd0ddc8ead81ed6a5ac4b38d652"
+    }
+  ]
+}

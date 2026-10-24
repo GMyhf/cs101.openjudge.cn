@@ -1,0 +1,33 @@
+{
+  "global_number": 30205,
+  "reason": "首次提交hint时把回读HTML实体再次提交，产生一层重复转义；按hint解码一次提交恢复目标，富文本字段原样保持。",
+  "observed_form_sha256": "17167182b566ae7b20d55a997088942e3c5694b592fcfb7f4d552eff0296f99b",
+  "restored_form_sha256": "347f5bbfe6ca13232ef8927a0780566d2c8ea2bb3fafbf9bb157ac3644bab6a3",
+  "all_files_unchanged": true,
+  "files": {
+    "1.in": "9e56be253b71fd36a83f424359ddf54e62fa8481bfc73fa30b049ca74480e133",
+    "1.out": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+    "10.in": "9d9c19eb645ab7354431dcc2292b67f22523e9de403307a71e9c254b6a3e2e4d",
+    "10.out": "d098f6f27a805739292c70bf46aa38ebf583c7ea7b0f656005a61b86c614e192",
+    "11.in": "2c83e8dd05166a7a8338c05e1bf669b583eefdbfd1f62e81c4015f68ddbc9b11",
+    "11.out": "9cad0995774fe34df2f7d7818a9d4980bc10d8dedf72ec88a47a2dcfb54ab16b",
+    "2.in": "25bbddf8928f67aa3c16195643343c8a4e9cad1df3bbce372348fb46cb751da7",
+    "2.out": "2ca63db5fa601d92c5a6267a23fe162c6d9dfed8381120b664e538c4610c493c",
+    "3.in": "cade2a2c51ec5bd75b010df0b55dcd7dcc1775d00bcab8c496222a3cb99f4490",
+    "3.out": "e3e3696cd46378ab06cfcf96a0d27b309973f80aa601b0a0e582a9b93fb4b6e0",
+    "4.in": "1102e0d5439e11d6bfdcb7f3ecb81c4a650dd9af845f159e3864a0094d6321f6",
+    "4.out": "d908880d8138655501a63b5df775ea29e49241485b0998ba53db584d0c13fde5",
+    "5.in": "157fc24bd0b58436a091fd10f77bd849e479671dd3c9bd55e6665206d97f5cc3",
+    "5.out": "ff46685d16338e0091c2573a2f42aa8f3b41ed5097aefa307d18e1c8fb716261",
+    "6.in": "3f044ebb495438df26498d599dd3967f08fe8807056ba137a3977c41beb1526f",
+    "6.out": "f3cac91ab52b0b6d1e59b3f96523f4d2c2104043397028bedf6ac458e88c321d",
+    "7.in": "769b98f64c40a76679ba092d577a37f6b5320c01f4620113058119ee00e179b2",
+    "7.out": "7de4610f808eef4d90cfe670fe0f3cf71e066c47827cc6a6bc8f5f2bc5c803ca",
+    "8.in": "11bcdb3842498313da3f8afd028049b813de281b8c017f583a6bb0207c643cbe",
+    "8.out": "ca694b94995c10df9855b36d573d21593fd8b47094b46a81327bdd34f6b90f24",
+    "9.in": "d78a0b84f71630b726692802df47c00c3e6ed08adce7f3e0fc542e6be47e5559",
+    "9.out": "5e0043bb348f98f5c0508da9f4dc497fe257e28e82c65c3c888314c0d0ed4e65"
+  },
+  "procedure_sha256": "53dce997a730cfadac13d0a646e1e16f6844a530ab9e6f9d06d21f3cabebc680",
+  "procedure_source": "\"\"\"只接受本次已知的30205重复转义状态，恢复到审核目标；保留全文件哈希证据。\"\"\"\nimport json,sys\nfrom pathlib import Path\nsys.path.insert(0,str(Path.cwd()/'scripts'))\nimport repair_gmyhf_sample_findings as r\nnumber=30205\nwork=Path('/tmp/gmyhf-sample-repairs')\nafter=json.loads((r.ROOT/'data/openjudge/tests/admin_review_statements/30205/fields.json').read_text())\nr.require(r.fingerprint(after)=='347f5bbfe6ca13232ef8927a0780566d2c8ea2bb3fafbf9bb157ac3644bab6a3','目标表单变化')\nexpected=dict(after);expected['hint']=after['hint'].replace('&','&amp;')\nr.require(r.fingerprint(expected)=='17167182b566ae7b20d55a997088942e3c5694b592fcfb7f4d552eff0296f99b','恢复候选不符')\ngroup=next(g for g in json.loads((work/'plan.json').read_text())['problems'] if g['global_number']==number)\ns=r.platform.oj_submit.Session().login()\ndef check_files(page):\n r.require(r.listed_files(page,number)==sorted(group['before_files']),'文件清单变化')\n files={n:r.sha(r.platform.download(s,number,n)) for n in group['before_files']}\n r.require(files==group['before_files'],'文件变化')\n return files\npage=s._get(r.platform.oj_submit.HOST+f'/admin/problems/edit/?id={number}')\nr.require(r.fingerprint(r.platform.parse_form(page))==r.fingerprint(expected),'现状不是已知转义状态')\ncheck_files(page)\ns._post(r.platform.oj_submit.HOST+'/api/global-problem/modify/',r.submitted_form(after))\npage=s._get(r.platform.oj_submit.HOST+f'/admin/problems/edit/?id={number}')\nr.require(r.fingerprint(r.platform.parse_form(page))==r.fingerprint(after),'恢复后表单回读不符')\nfiles=check_files(page)\nr.save(r.ROOT/'collab/gmyhf-sample-serialization-recovery.json',{\n 'global_number':number,'reason':'首次提交hint时把回读HTML实体再次提交，产生一层重复转义；按hint解码一次提交恢复目标，富文本字段原样保持。',\n 'observed_form_sha256':r.fingerprint(expected),'restored_form_sha256':r.fingerprint(after),\n 'all_files_unchanged':True,'files':files,'procedure_sha256':r.sha(Path(__file__).read_bytes()),\n 'procedure_source':Path(__file__).read_text()})\nprint('30205恢复目标题面，22文件回读未变')\n"
+}
