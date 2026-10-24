@@ -1,0 +1,73 @@
+{
+  "scope": "课程/SPJ复核自产程序的离线变异，不提交变异程序到平台。",
+  "results": [
+    {
+      "mutation": "遗漏字母前缀路由",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "导航误作题目路由",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "接受重复全局号声明",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "只比较字符集合不比较重数",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "丢弃字符串空格",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "负探针错误变成合法原样输出",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "默认只读错误提交源码",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错把平台WA当作与题面一致",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "未拒绝已变化的后台输入",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "未校验提交后的表单",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "未校验提交后的文件清单",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "未核对题面字段原哈希",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错误计数后台测试写入",
+      "detected": true,
+      "exit_code": 1
+    }
+  ],
+  "procedure_source": "\"\"\"实际改坏新增审核代码，并逐次离线执行对应测试，最后恢复原文。\"\"\"\nimport hashlib,json,os,subprocess\nfrom pathlib import Path\ncases=[\n ('遗漏字母前缀路由','[A-Za-z0-9_]+/','[0-9]+/','test_routes_keep_prefix_aliases_and_reject_external_or_navigation'),\n ('导航误作题目路由','sorted(set(matches)-navigation)','sorted(set(matches))','test_routes_keep_prefix_aliases_and_reject_external_or_navigation'),\n ('接受重复全局号声明','len(matches)==1','len(matches)>=1','test_global_number_is_unique_explicit_metadata'),\n ('只比较字符集合不比较重数',\"Counter(given.rstrip('\\\\r\\\\n')) == Counter(actual.rstrip('\\\\r\\\\n'))\",\"set(given.rstrip('\\\\r\\\\n')) == set(actual.rstrip('\\\\r\\\\n'))\",'test_permutation_preserves_multiplicity_spaces_and_unicode'),\n ('丢弃字符串空格',\"given.rstrip('\\\\r\\\\n')\",\"given.replace(' ','').rstrip('\\\\r\\\\n')\",'test_permutation_preserves_multiplicity_spaces_and_unicode'),\n ('负探针错误变成合法原样输出',\"print(s + '~')\",\"print(s)\",'test_real_probe_programs_have_expected_semantics'),\n ('默认只读错误提交源码','    if submit:','    if True:','test_audit_defaults_to_no_submission_and_records_probe_disagreement'),\n ('错把平台WA当作与题面一致',\"receipt['verdict']==wanted\",'True','test_audit_defaults_to_no_submission_and_records_probe_disagreement'),\n ('未拒绝已变化的后台输入','common.sha(payload)==expected[name]','True','test_audit_defaults_to_no_submission_and_records_probe_disagreement'),\n ('未校验提交后的表单','common.form_sha(after)==common.form_sha(before)','True','test_audit_defaults_to_no_submission_and_records_probe_disagreement'),\n ('未校验提交后的文件清单','common.listed_files(after,NUMBER)==names','True','test_audit_defaults_to_no_submission_and_records_probe_disagreement'),\n ('未核对题面字段原哈希','    common.audit_statement(before,entry)','    pass','test_audit_defaults_to_no_submission_and_records_probe_disagreement'),\n ('错误计数后台测试写入',\"'test_data_writes':0\",\"'test_data_writes':1\",'test_audit_defaults_to_no_submission_and_records_probe_disagreement')]\np=Path('scripts/audit_gmyhf_course_spj.py');original=p.read_text();results=[]\ntry:\n for name,old,new,test in cases:\n  assert original.count(old)==1,(name,original.count(old));p.write_text(original.replace(old,new))\n  run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest','tests.test_gmyhf_course_spj.CourseSpjTests.'+test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert run.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':run.returncode});p.write_text(original)\nfinally:p.write_text(original)\ns=Path(__file__).read_text();Path('collab/gmyhf-course-spj-mutations.json').write_text(json.dumps({'scope':'课程/SPJ复核自产程序的离线变异，不提交变异程序到平台。','results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest(),'tested_source_sha256':hashlib.sha256(original.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n');print(len(results),'种变异检出，源码恢复')\n",
+  "procedure_sha256": "ece41af1fcf8913f8c1a188b3d146098a58d446f339146f08fa1a4259c57217b",
+  "tested_source_sha256": "1962d2a36698e87c662c3253e25d59296ef0f1b9640965fdfa8c4abbe39a9a2c"
+}

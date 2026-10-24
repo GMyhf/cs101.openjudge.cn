@@ -1,0 +1,126 @@
+{
+  "scope": "第21批：31381六次实际平台判题及课程会话映射复核；不等同于修复或全部SPJ协议验收。",
+  "sources": [
+    {
+      "path": "collab/gmyhf-course-spj-recheck-initial.json",
+      "sha256": "43139d1cbbea7dc9c1da727e4903d385a3fb6fa8bd4f77991fa0b328d4549f15"
+    },
+    {
+      "path": "collab/gmyhf-course-spj-recheck.json",
+      "sha256": "34b0851ee8a656f661373220e226d5ca0bc565067225acc9469eba8fced867a9"
+    },
+    {
+      "path": "scripts/audit_gmyhf_course_spj.py",
+      "sha256": "1962d2a36698e87c662c3253e25d59296ef0f1b9640965fdfa8c4abbe39a9a2c"
+    },
+    {
+      "path": "tests/test_gmyhf_course_spj.py",
+      "sha256": "71d99fbb50aeea17fab4acd8754dc88aa97b169242baa29b18c0a37f218f9844"
+    },
+    {
+      "path": "collab/gmyhf-course-spj-mutations.json",
+      "sha256": "2b4d15352744d468830bb002d236ae9ac868cdae7653c2e449f2954d4b49bdaf"
+    }
+  ],
+  "route_count": 39,
+  "distinct_global_numbers": 38,
+  "submission_writes": 6,
+  "test_data_writes": 0,
+  "statement_writes": 0,
+  "configuration_writes": 0,
+  "probes": [
+    {
+      "probe": "identity",
+      "source": "import sys\ns = sys.stdin.read().rstrip('\\r\\n')\nprint(s)\n",
+      "source_sha256": "c40816f6bf367d8495f1f8243ec4e39e7556caf79623348cd8604d696da14cd8",
+      "expected_verdict": "Accepted",
+      "observed": {
+        "verdict": "Accepted",
+        "ms": null,
+        "solution_id": "53585885"
+      },
+      "matches_statement_expectation": true,
+      "url": "http://cs101.openjudge.cn/2026fallcs101testing/solution/53585885/"
+    },
+    {
+      "probe": "reverse",
+      "source": "import sys\ns = sys.stdin.read().rstrip('\\r\\n')\nprint(s[::-1])\n",
+      "source_sha256": "712b25c72388393eed2d6506f9c8245a9951b2564e7cf7dc4600458806657020",
+      "expected_verdict": "Accepted",
+      "observed": {
+        "verdict": "Accepted",
+        "ms": null,
+        "solution_id": "53585886"
+      },
+      "matches_statement_expectation": true,
+      "url": "http://cs101.openjudge.cn/2026fallcs101testing/solution/53585886/"
+    },
+    {
+      "probe": "sorted",
+      "source": "import sys\ns = sys.stdin.read().rstrip('\\r\\n')\nprint(''.join(sorted(s)))\n",
+      "source_sha256": "fa3086e48ca18a370b5331e4fd02bc1240edda8ce63a089557ec3fa14ce53bd9",
+      "expected_verdict": "Accepted",
+      "observed": {
+        "verdict": "Accepted",
+        "ms": null,
+        "solution_id": "53585887"
+      },
+      "matches_statement_expectation": true,
+      "url": "http://cs101.openjudge.cn/2026fallcs101testing/solution/53585887/"
+    },
+    {
+      "probe": "append_invalid",
+      "source": "import sys\ns = sys.stdin.read().rstrip('\\r\\n')\nprint(s + '~')\n",
+      "source_sha256": "a119dfa263ecfe454bd0e175d6436d789af65cf5ac5307de1fffc08e18ed97b8",
+      "expected_verdict": "Wrong Answer",
+      "observed": {
+        "verdict": "Accepted",
+        "ms": null,
+        "solution_id": "53585888"
+      },
+      "matches_statement_expectation": false,
+      "url": "http://cs101.openjudge.cn/2026fallcs101testing/solution/53585888/"
+    },
+    {
+      "probe": "replace_invalid",
+      "source": "import sys\ns = sys.stdin.read().rstrip('\\r\\n')\nprint(chr(ord(s[0]) ^ 1) + s[1:] if s else '~')\n",
+      "source_sha256": "08bceccb250da5451a93b4f51340cfc933438a547447a1c63335677857f00208",
+      "expected_verdict": "Wrong Answer",
+      "observed": {
+        "verdict": "Accepted",
+        "ms": null,
+        "solution_id": "53585912"
+      },
+      "matches_statement_expectation": false,
+      "url": "http://cs101.openjudge.cn/2026fallcs101testing/solution/53585912/"
+    },
+    {
+      "probe": "drop_invalid",
+      "source": "import sys\ns = sys.stdin.read().rstrip('\\r\\n')\nprint(s[1:] if s else '~')\n",
+      "source_sha256": "4f7c5e2b3121df0af39f2e26c0ed7a9ede44c9f38afad76a2e43da9bf7905b07",
+      "expected_verdict": "Wrong Answer",
+      "observed": {
+        "verdict": "Accepted",
+        "ms": null,
+        "solution_id": "53585913"
+      },
+      "matches_statement_expectation": false,
+      "url": "http://cs101.openjudge.cn/2026fallcs101testing/solution/53585913/"
+    }
+  ],
+  "invalid_outputs_accepted": [
+    "append_invalid",
+    "replace_invalid",
+    "drop_invalid"
+  ],
+  "conclusion": "当前绑定的一组数据上，增添字符、等长替换字符及删除字符三种非法输出均被平台接受；合法排列三种也均接受。尚未获得SPJ实现，不能推断任意程序均会AC。保留原SPJ接入排除，不用改金标准答案替代修复校验器。",
+  "mutation_count": 13,
+  "preserve_existing_spj_exclusion": true,
+  "catalog_changed": false,
+  "original_materialization_skip": {
+    "reason": "not_in_catalog",
+    "evidence": "collab/gmyhf-download-materialize.json",
+    "sha256": "b6e8625d761d49725a2aab8355f39fad66d0ae081b0ff5b9b92ff458f6fabfb7"
+  },
+  "activation_decision": "未改catalog；原缺映射排除仍在，且本轮证实平台SPJ缺陷，不能凭平台AC解除多解判定边界。"
+}
