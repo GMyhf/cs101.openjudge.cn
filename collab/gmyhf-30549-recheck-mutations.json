@@ -1,0 +1,35 @@
+{
+  "global_number": 30549,
+  "results": [
+    {
+      "mutation": "漏掉强制连吃",
+      "detected": true
+    },
+    {
+      "mutation": "忽略日志回合数",
+      "detected": true
+    },
+    {
+      "mutation": "忽略最终棋盘",
+      "detected": true
+    },
+    {
+      "mutation": "不处理升变",
+      "detected": true
+    },
+    {
+      "mutation": "不核对行动颜色",
+      "detected": true
+    },
+    {
+      "mutation": "漏掉全局强制吃子",
+      "detected": true
+    },
+    {
+      "mutation": "普通兵错误允许后退吃子",
+      "detected": true
+    }
+  ],
+  "procedure_source": "import hashlib,io,json,sys\nfrom pathlib import Path\nsource=Path('/tmp/recheck_gmyhf_30549.py').read_text().split('def run():')[0]\ncases=[\n('漏掉强制连吃','if capture and not promoted and jumps(board,p):','if False:'),\n('忽略日志回合数',\"turn not in ('W','B') or len(logs)-1!=int(count)\",\"turn not in ('W','B')\"),\n('忽略最终棋盘','return board==finish','return True'),\n('不处理升变','board[q]=piece.upper();promoted=True','promoted=True'),\n('不核对行动颜色',\"if p not in board or board[p].lower()!=turn.lower():\",\"if p not in board:\"),\n('漏掉全局强制吃子',\"if not capture and any(jumps(board,q) for q in board if board[q].lower()==turn.lower()):\",\"if False:\"),\n('普通兵错误允许后退吃子',\"drs=(-1,1) if piece.isupper() else (1,) if piece=='b' else (-1,)\",\"drs=(-1,1)\")]\nresults=[]\nfor name,old,new in cases:\n assert source.count(old)==1,(name,source.count(old));ns={};exec(source.replace(old,new),ns)\n try:ns['selfcheck']()\n except AssertionError:results.append({'mutation':name,'detected':True})\n else:raise AssertionError(name)\nns={};exec(source,ns);assert ns['selfcheck']()==8\ns=Path(__file__).read_text();Path('collab/gmyhf-30549-recheck-mutations.json').write_text(json.dumps({'global_number':30549,'results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n');print(len(results),'种证书验证器变异检出')\n",
+  "procedure_sha256": "217cc04eb4006cf7053678878267609ca8c503818bc1b18edc48b49abac98db8"
+}

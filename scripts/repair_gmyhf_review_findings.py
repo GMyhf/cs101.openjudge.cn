@@ -18,7 +18,7 @@ BATCHES = {1: {19964: 16, 19968: 16, 30825: 15, 30920: 16, 31415: 15, 31435: 15}
            3: {21471: 9, 25563: 11, 25577: 11, 27946: 13, 30177: 14},
            5: {28187: 13, 28188: 13, 28189: 13, 28682: 13, 28696: 13},
            6: {25579: 11}, 7: {25685: 12}, 9: {28277: 13, 28680: 13},
-           10: {21729: 11, 30236: 16}, 11: {28016: 13}, 12: {31241: 10}}
+           10: {21729: 11, 30236: 16}, 11: {28016: 13}, 12: {31241: 10}, 13: {31239: 10}}
 
 
 def reference_command(source, language, target):
@@ -42,9 +42,9 @@ def prepare(batch, work):
         if number == 30236:
             # 用户补充规则后重绑题面；原始数据及参考源码的审核证据保持不变。
             evidence = ROOT / 'collab/gmyhf-30236-rule-review.json'
-        if number == 31241:
+        if number in (31239, 31241):
             # 原审核仅含公开注入题面；后台载荷核对一致后补齐六字段绑定。
-            evidence = ROOT / 'collab/gmyhf-31241-admin-form-review.json'
+            evidence = ROOT / f'collab/gmyhf-{number}-admin-form-review.json'
         entry = next(e for e in json.loads(evidence.read_text())['entries']
                      if e['global_number'] == number)
         proof = entry['authored_reference']
@@ -103,7 +103,7 @@ def prepare(batch, work):
                            21471: 19, 25563: 19, 25577: 1, 27946: 10, 30177: 1,
                            28187: 17, 28188: 14, 28189: 13, 28682: 20, 28696: 18,
                            25579: 12, 25685: 17, 28277: 1, 28680: 5,
-                           21729: 1, 30236: 1, 28016: 6, 31241: 1}
+                           21729: 1, 30236: 1, 28016: 6, 31241: 1, 31239: 18}
         require(altered_inputs == expected_inputs[number], '越界输入数量与审核证据不符')
         item = {'book': 'practice', 'id': str(number), 'global_number': number,
                 'tests': True, 'test_count': len(cases), 'test_cases': cases}
@@ -120,6 +120,8 @@ def prepare(batch, work):
         if number == 30236:
             group['reference_policy'] = {'rule':'操作数不能包含前导零；用户已明确确认',
                                          'original_reference_sha256':proof['sha256']}
+        if number == 31239:
+            group['input_policy'] = '仅移除首行第2～4项旧参数，保留N及后续数量表的全部字节。'
         if prior:
             group['prior_repair'] = {'path': str(prior_path.relative_to(ROOT)),
                                      'sha256': sha(prior_path.read_bytes())}

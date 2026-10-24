@@ -5,6 +5,22 @@ import json
 
 def repair_input(number, payload):
     text = payload.decode()
+    if number == 31239:
+        lines = text.splitlines()
+        header = list(map(int, lines[0].split()))
+        assert len(header) in (1, 4)
+        n = header[0]
+        assert 2 <= n <= 10**5 and len(lines) == n + 1
+        rows = [list(map(int, line.split())) for line in lines[1:]]
+        assert all(len(row) == 3 and all(0 <= v <= 10**9 for v in row) for row in rows)
+        assert any(v for row in rows for v in row)
+        if len(header) == 1:
+            return payload
+        # 已审核的旧头为N及三个多余参数；当前题面只定义N和后续数量表。
+        assert header[1] >= 1 and header[2:] == [1, 2]
+        first, separator, body = payload.partition(b'\n')
+        assert separator
+        return str(n).encode() + (b'\r' if first.endswith(b'\r') else b'') + separator + body
     if number == 31241:
         values = list(map(int, text.split()))
         n, m, k = values[:3]

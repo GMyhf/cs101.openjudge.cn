@@ -16,6 +16,39 @@ import repair_gmyhf_review_findings as repair
 
 
 class ReviewRulesTests(unittest.TestCase):
+    def test_three_flavors_repair_only_removes_legacy_header(self):
+        body = b'0 1000000000 0\r\n  1 0 3\r\n'
+        self.assertEqual(b'2\r\n'+body,rules.repair_input(31239,b'2 17 1 2\r\n'+body))
+        legal = b'2  \n0 1000000000 0\n1 0 3'
+        self.assertEqual(legal,rules.repair_input(31239,legal))
+        for n in (2,5,1000,100000):
+            body=(b'1 0 0\n'*(n-1))+b'0 1 0\n'
+            fixed=rules.repair_input(31239,f'{n} 9 1 2\n'.encode()+body)
+            self.assertEqual(str(n).encode()+b'\n'+body,fixed)
+
+    def test_three_flavors_repair_rejects_unreviewed_schema(self):
+        with self.assertRaises(AssertionError):
+            rules.repair_input(31239,b'100001\n'+b'1 0 0\n'*100001)
+        for raw in (b'2 9 2 1\n1 0 0\n0 1 0',b'2 0 1 2\n1 0 0\n0 1 0',
+                    b'2 9\n1 0 0\n0 1 0',b'2\n0 0 0\n0 0 0',
+                    b'2\n1 0 0\n0 -1 0',b'2\n1000000001 0 0\n0 1 0',
+                    b'2\n1 0 0\n0 1 0\n0 1 0',b'1\n1 0 0',
+                    b'2\n1 0\n0 1 0'):
+            with self.assertRaises(AssertionError):rules.repair_input(31239,raw)
+
+    def test_three_flavors_reference_against_adversarial_draws(self):
+        solve=self.reference(31239,10,'single_pair')
+        patterns=list(itertools.product((0,1),repeat=3))
+        for rows in itertools.product(patterns,repeat=2):
+            if not any(map(any,rows)):continue
+            bad=set()
+            for drawn in itertools.product(*(range(v+1) for row in rows for v in row)):
+                if not (drawn[0] and drawn[4] or drawn[1] and drawn[3]):
+                    bad.add((sum(drawn[:3]),sum(drawn[3:])))
+            expected=min((a+b for a in range(sum(rows[0])+1) for b in range(sum(rows[1])+1)
+                          if (a,b) not in bad),default=-1)
+            self.assertEqual(expected,solve(rows))
+
     def test_candy_row_budget_preserves_flavor_support_and_pair_table(self):
         rng = random.Random(31241)
         for m in range(2,11):

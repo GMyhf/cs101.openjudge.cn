@@ -1,0 +1,52 @@
+{
+  "batch": 13,
+  "results": [
+    {
+      "mutation": "N改成N减一",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "重排数量表",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "忽略CRLF",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "允许全零袋子",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错误旧口味参数",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放宽数量表列数",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "忽略多余数量行",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放宽形状数上界",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "允许同一形状配对",
+      "detected": true,
+      "failures": 1
+    }
+  ],
+  "procedure_source": "import hashlib,io,json,os,subprocess,sys,unittest\nfrom pathlib import Path\nfrom unittest.mock import patch\np=Path('scripts/gmyhf_review_fixes.py');original=p.read_text();base='tests.test_gmyhf_review_fixes.ReviewRulesTests.'\ncases=[\n('N改成N减一',\"return str(n).encode() + (b'\\\\r'\",\"return str(n-1).encode() + (b'\\\\r'\",'test_three_flavors_repair_only_removes_legacy_header'),\n('重排数量表',\"+ separator + body\",\"+ separator + b' '.join(body.split())\",'test_three_flavors_repair_only_removes_legacy_header'),\n('忽略CRLF',\"(b'\\\\r' if first.endswith(b'\\\\r') else b'')\",\"b''\",'test_three_flavors_repair_only_removes_legacy_header'),\n('允许全零袋子','assert any(v for row in rows for v in row)','assert True','test_three_flavors_repair_rejects_unreviewed_schema'),\n('错误旧口味参数','header[2:] == [1, 2]','header[2:] == [2, 1]','test_three_flavors_repair_only_removes_legacy_header'),\n('放宽数量表列数','len(row) == 3 and','len(row) >= 2 and','test_three_flavors_repair_rejects_unreviewed_schema'),\n('忽略多余数量行','len(lines) == n + 1','len(lines) >= n + 1','test_three_flavors_repair_rejects_unreviewed_schema'),\n('放宽形状数上界','2 <= n <= 10**5','2 <= n <= 10**6','test_three_flavors_repair_rejects_unreviewed_schema')]\nresults=[]\ntry:\n for name,old,new,test in cases:\n  assert original.count(old)==1,(name,original.count(old));p.write_text(original.replace(old,new))\n  run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest',base+test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert run.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':run.returncode});p.write_text(original)\nfinally:p.write_text(original)\nsys.path.insert(0,str(Path.cwd()));from tests.test_gmyhf_review_fixes import ReviewRulesTests\nentry=next(e for e in json.loads(Path('collab/gmyhf-pending-batch10-review.json').read_text())['entries'] if e['global_number']==31239)\nsource=entry['authored_reference']['source'].split('import sys\\nsys.stdout.write')[0].replace('if j != i','if True');ns={};exec(source,ns)\nwith patch.object(ReviewRulesTests,'reference',return_value=ns['single_pair']):\n result=unittest.TextTestRunner(stream=io.StringIO()).run(ReviewRulesTests('test_three_flavors_reference_against_adversarial_draws'));assert not result.wasSuccessful()\nresults.append({'mutation':'允许同一形状配对','detected':True,'failures':len(result.failures)})\ns=Path(__file__).read_text();Path('collab/gmyhf-review-fixes-batch13-mutations.json').write_text(json.dumps({'batch':13,'results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n');print(len(results),'种变异检出，源码已恢复')\n",
+  "procedure_sha256": "f776924e5d8e979a1ff3bbb588d05db41cee16b0195cb3e9862f9bf392752540"
+}
