@@ -3,6 +3,7 @@ import ast
 import json
 import re
 from fractions import Fraction
+from decimal import Decimal, localcontext
 
 
 def validate_missing_deque_input(payload):
@@ -18,6 +19,87 @@ def validate_missing_deque_input(payload):
 
 def repair_input(number, payload):
     text = payload.decode()
+    if number == 18076:
+        values = list(map(int, text.split()))
+        n, m = values[:2]
+        assert n >= 1 and m >= 1 and len(values) == 2 + 4*(n+m)
+        rows = [values[i:i+4] for i in range(2, len(values), 4)]
+        for group in (rows[:n], rows[n:]):
+            assert all(row[0] == i and (row[1] == -1 if i == 0 else 0 <= row[1] < i)
+                       and 1 <= row[2] <= 118 and 1 <= row[3] <= 3 for i, row in enumerate(group))
+        if n < 1000 and m < 1000:
+            return payload
+        sizes = min(n, 999), min(m, 999)
+        kept = rows[:sizes[0]] + rows[n:n+sizes[1]]
+        return (f'{sizes[0]} {sizes[1]}\n'+'\n'.join(' '.join(map(str, row)) for row in kept)+'\n').encode()
+    if number == 18209:
+        tokens = text.split()
+        n = int(tokens[0])
+        assert n >= 3 and len(tokens) == n+1
+        with localcontext() as context:
+            context.prec = max(80, max(map(len, tokens))+len(str(n))+10)
+            probabilities = [Decimal(x) for x in tokens[1:]]
+            assert all(p.is_finite() and 0 <= p <= 1 for p in probabilities)
+            delta = Decimal(1)-sum(probabilities)
+            assert abs(delta) <= Decimal('1e-12')
+            if delta == 0:
+                return payload
+            index = max(range(n), key=lambda i: probabilities[i])
+            probabilities[index] += delta
+            assert sum(probabilities) == 1 and 0 <= probabilities[index] <= 1
+            spans = list(re.finditer(rb'\S+', payload))
+            changed = spans[index+1]
+            return payload[:changed.start()] + format(probabilities[index], 'f').encode() + payload[changed.end():]
+    if number == 20004:
+        tokens = text.split()
+        assert tokens and len(tokens) < 10**6
+        assert all(re.fullmatch(r'-?\d+(\.\d+)?%', x) for x in tokens)
+        if len(tokens) > 10:
+            return payload
+        # 第一组官方十项样例原文作为既有例外保持，其他短序列补中性0%至11项。
+        if len(tokens) == 10:
+            sample = '3.5407% -7.1619% -6.8417% -5.6495% 9.0260% 7.7859% -0.6648% -0.8765% -0.5759% -7.8740%'.split()
+            if tokens == sample:
+                return payload
+        return (text.rstrip()+' '+' '.join(['0%']*(11-len(tokens)))+'\n').encode()
+    if number == 20103:
+        values = list(map(int, text.split())); n = values[0]
+        assert 1 <= n <= 100000 and len(values) == 1+2*n
+        rows = list(zip(values[1::2], values[2::2]))
+        assert all(length >= 0 for _, length in rows) and all(rows[i][0] < rows[i+1][0] for i in range(n-1))
+        if all(length > 0 for _, length in rows):
+            return payload
+        return (str(n)+'\n'+'\n'.join(f'{m} {max(1,length)}' for m,length in rows)+'\n').encode()
+    if number == 21727:
+        values = list(map(int, text.split())); n, capacity = values[:2]; volumes = values[2:]
+        assert 1 <= n <= 100 and 1 <= capacity <= 1000 and len(volumes) == n
+        assert volumes == sorted(volumes) and min(volumes) > 0
+        fixed = []; previous = 0
+        for volume in volumes:
+            previous = max(volume, previous+1); fixed.append(previous)
+        if fixed == volumes:
+            return payload
+        return (f'{n} {capacity}\n'+' '.join(map(str,fixed))+'\n').encode()
+    if number == 21728:
+        values = list(map(int, text.split())); n = values[0]
+        assert 1 <= n <= 1000 and len(values) == 2*n+1
+        times, order = values[1:1+n], values[1+n:]
+        assert min(times) >= 0 and all(1 <= x <= n for x in order)
+        if len(set(order)) == n:
+            return payload
+        missing = iter(sorted(set(range(1,n+1))-set(order)))
+        seen = set(); fixed = []
+        for student in order:
+            if student in seen:
+                fixed.append(next(missing))
+            else:
+                fixed.append(student); seen.add(student)
+        spans = list(re.finditer(rb'\S+',payload)); result = payload
+        for i in reversed(range(n)):
+            if fixed[i] != order[i]:
+                span = spans[1+n+i]
+                result = result[:span.start()] + str(fixed[i]).encode() + result[span.end():]
+        return result
     if number == 19965:
         values = list(map(int, text.split()))
         assert len(values) == 3 and min(values) >= 1

@@ -1,0 +1,106 @@
+{
+  "batch": 18,
+  "results": [
+    {
+      "mutation": "基团截断上界错一",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "混入第一基团的尾部",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "允许父节点自指",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "概率残差方向反了",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "未校准概率和",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "丢失长小数尾部",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "短收益序列补成10项",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "擅改官方例外样例",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "允许无百分号序列",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "零长度依旧为零",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放过负长度",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "砖的重复值未递增",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "学生重复编号用已存在值替换",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "学生顺序替换错位到时长",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放宽学生编号范围",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "闭区间接触也视作不相交",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "零一背包错误当完全背包",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "等待人数多算一个",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "相同回撤不更新持续长度",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    }
+  ],
+  "procedure_source": "import ast,hashlib,io,json,os,subprocess,sys,unittest\nfrom pathlib import Path\nfrom unittest.mock import patch\ncases=[\n ('基团截断上界错一','sizes = min(n, 999), min(m, 999)','sizes = min(n, 1000), min(m, 1000)','test_group_prefixes_keep_both_groups_and_parent_links'),\n ('混入第一基团的尾部','rows[n:n+sizes[1]]','rows[sizes[0]:sizes[0]+sizes[1]]','test_group_prefixes_keep_both_groups_and_parent_links'),\n ('允许父节点自指','0 <= row[1] < i','0 <= row[1] <= i','test_group_prefixes_keep_both_groups_and_parent_links'),\n ('概率残差方向反了','Decimal(1)-sum(probabilities)','sum(probabilities)-Decimal(1)','test_entropy_adjusts_only_largest_cell_with_exact_sum'),\n ('未校准概率和','probabilities[index] += delta','probabilities[index] += 0','test_entropy_adjusts_only_largest_cell_with_exact_sum'),\n ('丢失长小数尾部','context.prec = max(80, max(map(len, tokens))+len(str(n))+10)','context.prec = 28','test_entropy_adjusts_only_largest_cell_with_exact_sum'),\n ('短收益序列补成10项',\"['0%']*(11-len(tokens))\",\"['0%']*(10-len(tokens))\",'test_drawdown_short_input_gets_neutral_suffix_sample_preserved'),\n ('擅改官方例外样例','if tokens == sample:','if False:','test_drawdown_short_input_gets_neutral_suffix_sample_preserved'),\n ('允许无百分号序列',\"assert all(re.fullmatch(r'-?\\\\d+(\\\\.\\\\d+)?%', x) for x in tokens)\",'assert True','test_drawdown_short_input_gets_neutral_suffix_sample_preserved'),\n ('零长度依旧为零','f\\'{m} {max(1,length)}\\'','f\\'{m} {length}\\'','test_pedestrian_changes_only_zero_lengths'),\n ('放过负长度','all(length >= 0 for _, length in rows)','all(length >= -1 for _, length in rows)','test_pedestrian_changes_only_zero_lengths'),\n ('砖的重复值未递增','previous = max(volume, previous+1)','previous = max(volume, previous)','test_brick_distinctness_is_nearest_strict_increase'),\n ('学生重复编号用已存在值替换','fixed.append(next(missing))','fixed.append(1)','test_waiting_preserves_first_occurrences_and_all_time_bytes'),\n ('学生顺序替换错位到时长','span = spans[1+n+i]','span = spans[1+i]','test_waiting_preserves_first_occurrences_and_all_time_bytes'),\n ('放宽学生编号范围','1 <= x <= n for x in order','0 <= x <= n+1 for x in order','test_waiting_preserves_first_occurrences_and_all_time_bytes')]\np=Path('scripts/gmyhf_review_fixes.py');original=p.read_text();results=[]\ntry:\n for name,old,new,test in cases:\n  assert original.count(old)==1,(name,original.count(old));p.write_text(original.replace(old,new))\n  run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest','tests.test_gmyhf_early_semantics.EarlySemanticTests.'+test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert run.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':run.returncode});p.write_text(original)\nfinally:p.write_text(original)\nsys.path.insert(0,str(Path.cwd()));from tests import test_gmyhf_early_semantics as tests\nfor n,name,old,new,test in [\n (20103,'闭区间接触也视作不相交','left>last','left>=last','test_pedestrian_reference_against_all_interval_subsets'),\n (21727,'零一背包错误当完全背包','range(M,x-1,-1)','range(x,M+1)','test_bricks_reference_against_all_subset_weights'),\n (21728,'等待人数多算一个','(n-1-i)*times[x-1]','(n-i)*times[x-1]','test_waiting_reference_against_fifo_simulation'),\n (20004,'相同回撤不更新持续长度','span=i-start','span=0','test_drawdown_reference_against_all_price_pairs')]:\n proof=json.loads(Path(f'collab/gmyhf-{n}-authored-admin-review.json').read_text())['entries'][0]['authored_reference'];source=proof['source'];assert source.count(old)==1;tree=ast.parse(source.replace(old,new));tree.body=[v for v in tree.body if isinstance(v,(ast.Import,ast.ImportFrom,ast.FunctionDef))];ns={};exec(compile(tree,'<自产参考变异>','exec'),ns)\n with patch.object(tests,'reference',return_value=ns[proof['function']]):\n  run=unittest.TextTestRunner(stream=io.StringIO()).run(tests.EarlySemanticTests(test));assert not run.wasSuccessful(),name\n results.append({'mutation':name,'detected':True,'failures':len(run.failures),'errors':len(run.errors)})\ns=Path(__file__).read_text();Path('collab/gmyhf-review-fixes-batch18-mutations.json').write_text(json.dumps({'batch':18,'results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n');print(len(results),'种变异检出，源码已恢复')\n",
+  "procedure_sha256": "d7d658ea200f4b0adb6f4d95b9f32877ffd5e98df7ebd27367a338e46cf1d705"
+}
