@@ -33,4 +33,5 @@ for i in range(n):
         else:
             break
     ans = max(ans,right-i+1)
-print(ans)
+# 本仓库修正：没有满足条件的两头奶牛时，题面要求输出 0。
+print(ans if ans > 1 else 0)

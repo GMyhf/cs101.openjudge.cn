@@ -192,6 +192,13 @@ def generate(number, seed):
             groups.append(f"{len(values)}\n" + " ".join(map(str, values)))
         return f"{len(groups)}\n" + "\n".join(groups) + "\n"
     if number == 28190:
+        # 补足零解及端点重复；原有种子的随机输入保持不变。
+        boundaries = ([2, 1], [7, 7], list(range(10000, 0, -1)),
+                      [5] * 10000, [1, 2], [1, 1, 2, 2],
+                      [1, 2, 3, 3], [1, 1, 2, 3])
+        if 40 <= seed < 48:
+            values = boundaries[seed - 40]
+            return f"{len(values)}\n" + "\n".join(map(str, values)) + "\n"
         n = 100000 if seed == 20 else r.randint(2, 5000)
         return f"{n}\n" + "\n".join(str(r.randint(1, 2**31 - 1)) for _ in range(n)) + "\n"
     if number == 30159:
@@ -282,7 +289,7 @@ def valid(number, text):
 
 import subprocess as _subprocess, sys as _sys, tempfile as _tempfile
 from pathlib import Path as _Path
-REFERENCE='# External reference: http://cs101.openjudge.cn/practice/28190/statistics/\n# Accepted submission: 52726662\n# Source: http://cs101.openjudge.cn/practice/solution/52726662/\n# License: not declared on the submission page; no license is inferred.\n\nn = int(input())\narr = [int(input()) for _ in range(n)]\nans = -1\n# 预处理maxs和mins\nmaxs = [n]*n\nstack = []\nfor i in range(n-1,-1,-1):\n    while stack and arr[stack[-1]] <= arr[i]:\n        stack.pop()\n    maxs[i] = stack[-1] if stack else n\n    stack.append(i)\nmins = [n]*n\nstack = []\nfor i in range(n-1,-1,-1):\n    while stack and arr[stack[-1]] > arr[i]:\n        stack.pop()\n    mins[i] = stack[-1] if stack else n\n    stack.append(i)\nright = 0\nfor i in range(n):\n    lmt = mins[i]# 右端点受到左端点最小值条件限制\n    if right < i:#右端点必须在左端点右侧\n        right = i\n    while right < lmt:\n        nxt = maxs[right]#扩展右端点\n        if nxt < lmt:\n            right = nxt\n        else:\n            break\n    ans = max(ans,right-i+1)\nprint(ans)\n'
+REFERENCE='# External reference: http://cs101.openjudge.cn/practice/28190/statistics/\n# Accepted submission: 52726662\n# Source: http://cs101.openjudge.cn/practice/solution/52726662/\n# License: not declared on the submission page; no license is inferred.\n\nn = int(input())\narr = [int(input()) for _ in range(n)]\nans = -1\n# 预处理maxs和mins\nmaxs = [n]*n\nstack = []\nfor i in range(n-1,-1,-1):\n    while stack and arr[stack[-1]] <= arr[i]:\n        stack.pop()\n    maxs[i] = stack[-1] if stack else n\n    stack.append(i)\nmins = [n]*n\nstack = []\nfor i in range(n-1,-1,-1):\n    while stack and arr[stack[-1]] > arr[i]:\n        stack.pop()\n    mins[i] = stack[-1] if stack else n\n    stack.append(i)\nright = 0\nfor i in range(n):\n    lmt = mins[i]# 右端点受到左端点最小值条件限制\n    if right < i:#右端点必须在左端点右侧\n        right = i\n    while right < lmt:\n        nxt = maxs[right]#扩展右端点\n        if nxt < lmt:\n            right = nxt\n        else:\n            break\n    ans = max(ans,right-i+1)\n# 本仓库修正：没有满足条件的两头奶牛时，题面要求输出 0。\nprint(ans if ans > 1 else 0)\n'
 LANGUAGE='Python3'
 NUMBER=28190
 SAMPLE='5\n1\n2\n3\n4\n1\n'
@@ -294,7 +301,7 @@ def _build():
    exe=folder/'s';_subprocess.run(['g++','-std=c++20','-O2','-pipe',str(src),'-o',str(exe)],check=True);cmd=[str(exe)]
   out=_Path('data');out.mkdir(exist_ok=True)
   for path in out.glob('*'):path.unlink()
-  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,seed) for seed in range(1, 40)]
+  cases=([SAMPLE] if SAMPLE else [])+[generate(NUMBER,seed) for seed in range(1, 48)]
   for index,case in enumerate(cases):
    result=_subprocess.run(cmd,input=case,text=True,capture_output=True,timeout=120,check=True)
    answer='\n'.join(line.rstrip() for line in result.stdout.rstrip().splitlines())+'\n'

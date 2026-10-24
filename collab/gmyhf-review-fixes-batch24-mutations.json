@@ -1,0 +1,77 @@
+{
+  "task": "T-060",
+  "batch": 24,
+  "count": 10,
+  "mutations": [
+    {
+      "mutation": "零解错误回退",
+      "source": "data/openjudge/tests/20000-29982/28190_made/samplecode.py",
+      "test": "tests.test_28190_review.Review28190Tests.test_small_domain_and_official_samples",
+      "exit_code": 1,
+      "mutated_sha256": "51189bf658e64d2866621ddd4e1fe39823603134b0a12f2f330a8b875d827ae8"
+    },
+    {
+      "mutation": "允许相等最小端点",
+      "source": "data/openjudge/tests/20000-29982/28190_made/samplecode.py",
+      "test": "tests.test_28190_review.Review28190Tests.test_small_domain_and_official_samples",
+      "exit_code": 1,
+      "mutated_sha256": "4778fd831bb0890ebfa50927735cdcfd7344b66908d8e2b23331320380404d81"
+    },
+    {
+      "mutation": "允许相等最大端点",
+      "source": "data/openjudge/tests/20000-29982/28190_made/samplecode.py",
+      "test": "tests.test_28190_review.Review28190Tests.test_small_domain_and_official_samples",
+      "exit_code": 1,
+      "mutated_sha256": "f46d7625fc4830827199366a92684a22c32a02da4fe85305608b76ccad3c1069"
+    },
+    {
+      "mutation": "零解种子改成递增",
+      "source": "data/openjudge/tests/20000-29982/28190_made/producecase.py",
+      "test": "tests.test_28190_review.Review28190Tests.test_generated_boundaries_and_reproduction",
+      "exit_code": 1,
+      "mutated_sha256": "a47d38253beac1fdd6ace124ca158c9ded54d6fa47f1e697b41d0b3d3e4111a0"
+    },
+    {
+      "mutation": "生成器漏最后一组",
+      "source": "data/openjudge/tests/20000-29982/28190_made/producecase.py",
+      "test": "tests.test_28190_review.Review28190Tests.test_generated_boundaries_and_reproduction",
+      "exit_code": 1,
+      "mutated_sha256": "2df4a41f681dfe0a2b75d1f202560455f6a5469460a7b499083c6716443ae079"
+    },
+    {
+      "mutation": "生成器嵌入旧解",
+      "source": "data/openjudge/tests/20000-29982/28190_made/producecase.py",
+      "test": "tests.test_28190_review.Review28190Tests.test_generated_boundaries_and_reproduction",
+      "exit_code": 1,
+      "mutated_sha256": "a2f552f455189996ac40fe30e82ddfaedf83e231e203e4385033ce04fab038c3"
+    },
+    {
+      "mutation": "零解金标错为1",
+      "source": "data/openjudge/tests/20000-29982/28190_made/data/40.out",
+      "test": "tests.test_28190_review.Review28190Tests.test_generated_boundaries_and_reproduction",
+      "exit_code": 1,
+      "mutated_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+    },
+    {
+      "mutation": "撤销废弃排除",
+      "source": "scripts/materialize_gmyhf_downloads.py",
+      "test": "tests.test_28190_review.Review28190Tests.test_deprecated_20139_stays_excluded",
+      "exit_code": 1,
+      "mutated_sha256": "2fbcd990fc0b5bcc74448366df6ad311111c9103f7cf35535d469b916c5ab4a8"
+    },
+    {
+      "mutation": "独立解允许相等最小值",
+      "source": "tests/test_28190_review.py",
+      "test": "tests.test_28190_review.Review28190Tests.test_small_domain_and_official_samples",
+      "exit_code": 1,
+      "mutated_sha256": "d940c26482ce206b6d059e371b6bc2ee56702fa54247c7bba492b4b194714317"
+    },
+    {
+      "mutation": "独立解最大值相同选最后一次",
+      "source": "tests/test_28190_review.py",
+      "test": "tests.test_28190_review.Review28190Tests.test_small_domain_and_official_samples",
+      "exit_code": 1,
+      "mutated_sha256": "1c70e9a47c93c0dd810de0c5c624bbc1ccf6d3535ac3d0c23d6491152b50126c"
+    }
+  ]
+}

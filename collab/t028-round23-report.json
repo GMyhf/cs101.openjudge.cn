@@ -1888,7 +1888,7 @@
         "status": "passed",
         "failed_seeds": []
       },
-      "test_cases": 40,
+      "test_cases": 48,
       "max_input_bytes": 1048504,
       "max_output_bytes": 6,
       "constraint": "2..1000000 positive heights are each below 2^31",
@@ -1902,17 +1902,17 @@
       },
       "self_audit": {
         "distinct_cases": {
-          "total": 40,
-          "distinct": 40,
+          "total": 48,
+          "distinct": 48,
           "threshold": 15,
           "status": "passed"
         },
         "constant_output_probe": {
-          "frequency": 1,
-          "total": 40,
+          "frequency": 4,
+          "total": 48,
           "status": "rejected",
           "exemption": null,
-          "share": 0.025
+          "share": 0.08333333333333333
         },
         "sample_is_case_zero": {
           "input_matches": "passed",
@@ -1921,7 +1921,7 @@
         },
         "samplecode_recompute": {
           "status": "passed",
-          "cases": 40,
+          "cases": 48,
           "mismatched": []
         },
         "constraint_checklist": {
@@ -1950,8 +1950,14 @@
         "verdict": "Accepted",
         "book": "practice",
         "problem": "28190",
-        "merged_cases": 40,
-        "total_ms": 584
+        "merged_cases": 48,
+        "total_ms": 1078
+      },
+      "local_revalidation": {
+        "date": "2026-10-24",
+        "task": "T-060 第24批",
+        "proof": "collab/gmyhf-review-fixes-batch24-proof.json",
+        "note": "平台提交号和存档交叉核验保留原历史；本地参考解已补零解修正，当前自产数据和自检数值重新实测。"
       }
     },
     {
