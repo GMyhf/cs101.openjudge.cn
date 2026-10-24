@@ -16,6 +16,56 @@ import repair_gmyhf_review_findings as repair
 
 
 class ReviewRulesTests(unittest.TestCase):
+    def test_meeting_endpoints_and_signed_target_bounds(self):
+        self.assertEqual(b'7 4\n1 2\n',rules.repair_input(21729,b'7 4\n1 1'))
+        self.assertEqual(b'7 4\n6 4\n',rules.repair_input(21729,b'7 4\n7 4'))
+        self.assertEqual(b'123\n2147483647\n',rules.repair_input(30236,b'123 6736333374'))
+        self.assertEqual(b'012\n-2147483648\n',rules.repair_input(30236,b'012 -9999999999'))
+        for n,b in ((21729,b'7 4  1 2'),(30236,b'012 -2147483648')):
+            self.assertEqual(b,rules.repair_input(n,b))
+        for n,b in ((21729,b'4 3 4 1'),(30236,b'12345678901 0'),(30236,b'1a 0')):
+            with self.assertRaises(AssertionError):rules.repair_input(n,b)
+
+    def test_trapezoid_reference_against_all_monotone_paths(self):
+        solve=self.reference(21729,11,'meeting_one')
+        for m in range(3,8):
+            for n in range(2,m):
+                for y in range(1,n+1):
+                    for x in range(1,m-n+y+1):
+                        total=x+y-2;count=0
+                        for up in itertools.combinations(range(total),y-1):
+                            i=j=1;valid=True
+                            for step in range(total):
+                                if step in up:j+=1
+                                else:i+=1
+                                if i>m-n+j:valid=False;break
+                            count+=valid
+                        self.assertEqual(str(count),solve(f'{m} {n} {x} {y}'))
+        self.assertEqual('15',solve('10 4 5 3'))
+
+    def test_expression_reference_without_leading_zeros_against_all_separators(self):
+        entry=next(e for e in json.loads((repair.ROOT/'collab/gmyhf-pending-batch16-review.json').read_text())['entries'] if e['global_number']==30236)
+        source=rules.no_leading_zero_reference(entry['authored_reference']['source'])
+        ns={};exec(source.split('import sys\nsys.stdout.write')[0],ns)
+        self.assertEqual('2',ns['expressions']('105 5'))
+        rng=random.Random(611)
+        for _ in range(100):
+            digits=''.join(str(rng.randrange(4)) for i in range(rng.randrange(1,7)))
+            target=rng.randrange(-10,31);expected=0
+            for separators in itertools.product(('', '+','-','*'),repeat=len(digits)-1):
+                terms=[digits[0]];ops=[]
+                for op,digit in zip(separators,digits[1:]):
+                    if op:ops.append(op);terms.append(digit)
+                    else:terms[-1]+=digit
+                if any(len(t)>1 and t[0]=='0' for t in terms):continue
+                values=list(map(int,terms));total=0;product=values[0];sign=1
+                for op,value in zip(ops,values[1:]):
+                    if op=='*':product*=value
+                    else:total+=sign*product;product=value;sign=1 if op=='+' else -1
+                expected+=total+sign*product==target
+            self.assertEqual(str(expected),ns['expressions'](f'{digits} {target}'))
+        with self.assertRaises(AssertionError):rules.no_leading_zero_reference('print(0)')
+
     def test_grid_and_digit_repairs_preserve_unaffected_values(self):
         before = ('2 250\n'+' '.join(['1']*249+['4'])+'\n'+' '.join(['2']*249+['3'])).encode()
         fixed = list(map(int,rules.repair_input(28277,before).split()))

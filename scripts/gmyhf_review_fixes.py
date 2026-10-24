@@ -5,6 +5,22 @@ import json
 
 def repair_input(number, payload):
     text = payload.decode()
+    if number == 21729:
+        m,n,x,y = map(int,text.split())
+        assert 1 < n < m < 30 and 1 <= y <= n and 1 <= x <= m-n+y
+        if (x,y)==(1,1):
+            return f'{m} {n}\n1 2\n'.encode()
+        if (x,y)==(m,n):
+            return f'{m} {n}\n{m-1} {n}\n'.encode()
+        return payload
+    if number == 30236:
+        digits,target = text.split()
+        target = int(target)
+        assert 1 <= len(digits) <= 10 and all('0' <= c <= '9' for c in digits)
+        legal = max(-2**31,min(2**31-1,target))
+        if legal == target:
+            return payload
+        return f'{digits}\n{legal}\n'.encode()
     if number == 28277:
         values = list(map(int, text.split()))
         m,n = values[:2]
@@ -290,3 +306,10 @@ def canonical_ranges(text):
     if start is not None:
         out.append(str(start) if start == end else f'{start}->{end}')
     return json.dumps(out, separators=(',', ':'))
+
+
+def no_leading_zero_reference(source):
+    """沿用原自写整数枚举器，按用户确认禁用多位数的前导零。"""
+    old = 'return expressions_model(text, True)'
+    assert source.count(old) == 1
+    return source.replace(old,'return expressions_model(text, False)')

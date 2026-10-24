@@ -1,0 +1,3462 @@
+{
+  "original_evidence": "collab/gmyhf-pending-batch16-review.json",
+  "original_evidence_sha256": "4ec0d145708f5cd4705c1e16b28f5cb9bcd3480db1a7a90a72077db2246b8ec1",
+  "rule": "用户明确确认：返回表达式中的操作数不应该包含前导零。平台已补入此规则；本次不重复写题面。",
+  "only_description_inserted": "<p><span class=\"md-plain md-expand\"><span class=\"md-pair-s md-expand\"><strong><span class=\"md-plain\">注意，返回表达式中的操作数 不应该 包含前导零。</span></strong></span></span></p>",
+  "procedure_source": "import json,html,hashlib,copy\nfrom pathlib import Path\nsha=lambda b:hashlib.sha256(b).hexdigest()\np=Path('collab/gmyhf-pending-batch16-review.json'); old=next(e for e in json.loads(p.read_text())['entries'] if e['global_number']==30236)\nf=json.loads(Path('/tmp/gmyhf-30236-current-form.json').read_text()); snapshot=json.loads(Path('/tmp/gmyhf-admin-statements/30236.json').read_text())['fields']\nline='<p><span class=\"md-plain md-expand\"><span class=\"md-pair-s md-expand\"><strong><span class=\"md-plain\">注意，返回表达式中的操作数 不应该 包含前导零。</span></strong></span></span></p>'\nd=html.unescape(f['description']);assert d.count(line)==1\nassert d.replace(line+'\\r\\n','').replace(line+'\\n','')==snapshot['description']\nfor k,v in f.items():\n assert sha(snapshot[k].encode())==old['checks']['statement']['field_sha256'][k]\n if k!='description':assert html.unescape(v)==snapshot[k]\nentry=copy.deepcopy(old);entry['checks']['statement']['field_sha256']={k:sha(html.unescape(v).encode()) for k,v in f.items()}\nr={'original_evidence':str(p),'original_evidence_sha256':sha(p.read_bytes()),'rule':'用户明确确认：返回表达式中的操作数不应该包含前导零。平台已补入此规则；本次不重复写题面。','only_description_inserted':line,'procedure_source':Path(__file__).read_text(),'procedure_sha256':sha(Path(__file__).read_bytes()),'entries':[entry]}\nPath('collab/gmyhf-30236-rule-review.json').write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\\n')\n",
+  "procedure_sha256": "892be074fbe918ebbd415bb380fd619e5156137544986affecbe2e39b80cef52",
+  "entries": [
+    {
+      "global_number": 30236,
+      "title": "给表达式添加运算符",
+      "reference": "/tmp/gmyhf-authored-30236.py",
+      "reference_sha256": "d52844890cdc0dd810222e8531adc069d431e5ef3ae195b080773bb01a6d85f5",
+      "validator": "/tmp/gmyhf_batch16_combined.py",
+      "validator_sha256": "c1e3508aace0d01468751d00f2c35aa801c328b6ae159f7b45b8af3792482ba7",
+      "page": "/tmp/gmyhf-admin-statements/30236.json",
+      "page_sha256": "3d078d6000511e8dcd58cec6fa20fbf8324c62f9d60b9640e7cf88714a02d397",
+      "checks": {
+        "pairing": {
+          "complete_pairs": 103,
+          "total_files": 206,
+          "unpaired": []
+        },
+        "statement": {
+          "changed_fields": [],
+          "available": false,
+          "admin_available": true,
+          "source": "admin",
+          "checked_at": "2026-10-23T21:38:56.602840+00:00",
+          "field_sha256": {
+            "description": "b96ac8307dd7df84233cbcb7dfbd0c6667272d10fdc4ddb2e8132935e533982c",
+            "input": "6aa68a289272802a0064b38aac43120d30badf072bbe92b20affd46f7243df9b",
+            "output": "68e124d07838e4b35fc41b9d56094972a15832eb870b0a4f4fc32180537e8f99",
+            "hint": "c7f29d418dceb73ad30b50e03298f1d5df6a6885fd86f92ef6c50045dacfd638",
+            "sampleInput": "bd2795071f5ce91ac94cee190e594da1d6755331da0e4ee4c1f2dd9403efb18e",
+            "sampleOutput": "29b5edca153731e365eb75e566de9c41bb3c7ed1de582b345c7ba2a15d4105e9"
+          },
+          "binding": "管理员编辑页全局题号与下载链接的problem id一致；未建立公开题库映射"
+        },
+        "readback": {
+          "files": [
+            {
+              "filename": "0.in",
+              "sha256": "98c1f820c63255e84e58ebaf4b29498bfa51cde2300ac850eab911d10ddfa83e",
+              "matches": true
+            },
+            {
+              "filename": "0.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "1.in",
+              "sha256": "034dde84b189b5ab733d33193b3a71542975c14632dbea63ce850ffb243b8424",
+              "matches": true
+            },
+            {
+              "filename": "1.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "10.in",
+              "sha256": "d7509be45a72f2c21cbfe89074bc42ea703dd772ea1b182d26285d9fb2572ee1",
+              "matches": true
+            },
+            {
+              "filename": "10.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "11.in",
+              "sha256": "df5877c5a2f440a30a5777f661dcf45d78568b003471339d77a842bcfa2b46ee",
+              "matches": true
+            },
+            {
+              "filename": "11.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "12.in",
+              "sha256": "c7965dbecbd69954b577a9c37fa0882e267ccd1f1d6ce5d310ca7bb4de59cdb5",
+              "matches": true
+            },
+            {
+              "filename": "12.out",
+              "sha256": "a9742eb8ee320e006666aef25ae9aeed948247f3125c9cafa7cf97b7e7467dd5",
+              "matches": true
+            },
+            {
+              "filename": "13.in",
+              "sha256": "67941a36687340c47e5c94a17dc74bd2ee55e50d21d0565f9336235e808da4b3",
+              "matches": true
+            },
+            {
+              "filename": "13.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "14.in",
+              "sha256": "ef83edbe4c45cae43a677038784b716c79eda1e9019e58856b1e0a9713d6e942",
+              "matches": true
+            },
+            {
+              "filename": "14.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "15.in",
+              "sha256": "087d66bbdf2a6f1d09c52d9aea232bcd53ab3b8ef448708da5340f819a37ad13",
+              "matches": true
+            },
+            {
+              "filename": "15.out",
+              "sha256": "f0448ca7d8645d6c1d4902a2c058a37abfc44f1de59ab54163c80faaf72f6a4c",
+              "matches": true
+            },
+            {
+              "filename": "16.in",
+              "sha256": "fb17fe959d5fe2e092b07213d1431eb42b577e99755c3655014c13ed0630330b",
+              "matches": true
+            },
+            {
+              "filename": "16.out",
+              "sha256": "95cf32708a31caa478a0e9141103ac567d85e5186e697e7e0c81f75589999e31",
+              "matches": true
+            },
+            {
+              "filename": "17.in",
+              "sha256": "5d96968713cc57b3c1e2e4b684fb422b65b1d38e027127b5ebde20a1a125b55d",
+              "matches": true
+            },
+            {
+              "filename": "17.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "18.in",
+              "sha256": "3fd2656cf78042fde6dc61dded2ceb653bc1497b81194f319593e22f02a5f234",
+              "matches": true
+            },
+            {
+              "filename": "18.out",
+              "sha256": "be4ba010e48e7d5c7c60457e7f40538407a26f4ead94b392beff67a3a5546b8a",
+              "matches": true
+            },
+            {
+              "filename": "19.in",
+              "sha256": "f5457ce20104705346384b943ec5f0d263a7b8835dc93995024d618f6138a3b7",
+              "matches": true
+            },
+            {
+              "filename": "19.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "2.in",
+              "sha256": "ed00de385da22f4dc0ec4e6f193de04e01c2d2c427c2749dec8aae77921116c8",
+              "matches": true
+            },
+            {
+              "filename": "2.out",
+              "sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+              "matches": true
+            },
+            {
+              "filename": "20.in",
+              "sha256": "2ce886b008414a1c1cb50b89fe25d322d9cc31096ff680e61df7187898edc5f5",
+              "matches": true
+            },
+            {
+              "filename": "20.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "21.in",
+              "sha256": "3275c31dd99be467469cb4b2308e6cdf1d88173b34e1f729620be77ee34993c5",
+              "matches": true
+            },
+            {
+              "filename": "21.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "22.in",
+              "sha256": "77c0879e570f5b03370daa06bcad1c8b6854f4f72f89319da2bb7c941ab574bd",
+              "matches": true
+            },
+            {
+              "filename": "22.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "23.in",
+              "sha256": "21202dc3e4943e951e52fe820df5b5844bd4818796254a166ff6523c46a02771",
+              "matches": true
+            },
+            {
+              "filename": "23.out",
+              "sha256": "a1fb50e6c86fae1679ef3351296fd6713411a08cf8dd1790a4fd05fae8688164",
+              "matches": true
+            },
+            {
+              "filename": "24.in",
+              "sha256": "2041a04273fe2526dd89425cd1af474f55cec69b622f2d05dc6c73e662e22e3e",
+              "matches": true
+            },
+            {
+              "filename": "24.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "25.in",
+              "sha256": "11af9d1cbbe02f90e9b45c7e71148673ef701788b9eceedc0f3f2b0b91c17c4d",
+              "matches": true
+            },
+            {
+              "filename": "25.out",
+              "sha256": "54183f4323f377b737433a1e98229ead0fdc686f93bab057ecb612daa94002b5",
+              "matches": true
+            },
+            {
+              "filename": "26.in",
+              "sha256": "78ba1684c63fe303e1cbc16be0f1ab583fc643045ba19bf559bf5bb15800df3d",
+              "matches": true
+            },
+            {
+              "filename": "26.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "27.in",
+              "sha256": "49b861ab52d5aaa37b81d07179aada180600ded8b27f791fbad4324cdf36e898",
+              "matches": true
+            },
+            {
+              "filename": "27.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "28.in",
+              "sha256": "b83e10b315198f0ab7decc7323ed5086771119fcba794660584bd1c62fff8913",
+              "matches": true
+            },
+            {
+              "filename": "28.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "29.in",
+              "sha256": "d58e8656a67091bf1fb3a5f685fe6b40703757ff177a5c0bc41e82459eaf9037",
+              "matches": true
+            },
+            {
+              "filename": "29.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "3.in",
+              "sha256": "abf84049262a9a5a2128aa830d48a6bb67355852e834b83c5d874adf7945324e",
+              "matches": true
+            },
+            {
+              "filename": "3.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "30.in",
+              "sha256": "dc42bdfc06fe356685e2c58caa7594dd2b3c1a06e3cf0aa94a306c77a91743eb",
+              "matches": true
+            },
+            {
+              "filename": "30.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "31.in",
+              "sha256": "8467cfe581f6f5c15d65010219287a97d90eabc73468cfbd33c8a3c51bb320c5",
+              "matches": true
+            },
+            {
+              "filename": "31.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "32.in",
+              "sha256": "446b0bca2188bd660de67cd72d7fa19350254aba420d1183cd0922e873b93f7c",
+              "matches": true
+            },
+            {
+              "filename": "32.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "33.in",
+              "sha256": "a1347258b4f99fc7a6789867eaabe6b76777ae9ca5f7aca01b4044845fa27a78",
+              "matches": true
+            },
+            {
+              "filename": "33.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "34.in",
+              "sha256": "336b95d3a77d4dd74431f70fcc21b58f71af4d485396ebe1121b1dbdfbc48e4d",
+              "matches": true
+            },
+            {
+              "filename": "34.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "35.in",
+              "sha256": "35321e8318c7194c08cdf18c8f9e063f01cf052b63491c21b3a68aa35978d11c",
+              "matches": true
+            },
+            {
+              "filename": "35.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "36.in",
+              "sha256": "c473bcd618dbe90d50e6c59e9156aae6a76583aacfbb5904ef1fa7e147926c46",
+              "matches": true
+            },
+            {
+              "filename": "36.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "37.in",
+              "sha256": "cde29d18ed8bf6f735930ff008648ba35c84f4b8c8e2227ffaab9733c7348f0d",
+              "matches": true
+            },
+            {
+              "filename": "37.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "38.in",
+              "sha256": "ab61555840217cae812733688e0243b1928d11904a5fd0da47053779da272fb3",
+              "matches": true
+            },
+            {
+              "filename": "38.out",
+              "sha256": "06e9d52c1720fca412803e3b07c4b228ff113e303f4c7ab94665319d832bbfb7",
+              "matches": true
+            },
+            {
+              "filename": "39.in",
+              "sha256": "399671d445dd680af121744acca8c72d3988462a94da195bac71c36cce4072bd",
+              "matches": true
+            },
+            {
+              "filename": "39.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "4.in",
+              "sha256": "80559e04be1f4aba1b4f9d6d9ce2de2a2f5da9f40d40f7ab43bfb5106f1c55cb",
+              "matches": true
+            },
+            {
+              "filename": "4.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "40.in",
+              "sha256": "4b68f5664c2fd375750ad0489cbfbca70bcde9e4f27ad6bb883952d95b24d10f",
+              "matches": true
+            },
+            {
+              "filename": "40.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "41.in",
+              "sha256": "1e5040b4db14ca674e235de801fd4c74b1f0448e6eb1f838d1e9d4e443d99074",
+              "matches": true
+            },
+            {
+              "filename": "41.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "42.in",
+              "sha256": "b34bc5d0e1553372fe5a77bcef998fc8cd4e2e391d5f6eedf89c69b6e9ea61a8",
+              "matches": true
+            },
+            {
+              "filename": "42.out",
+              "sha256": "a1fb50e6c86fae1679ef3351296fd6713411a08cf8dd1790a4fd05fae8688164",
+              "matches": true
+            },
+            {
+              "filename": "43.in",
+              "sha256": "941372970ff787798486b0737ace9c2b489891a73adb5d122d61f3720a660303",
+              "matches": true
+            },
+            {
+              "filename": "43.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "44.in",
+              "sha256": "bd65fe8c44de65c23d78c8840bbee30a9f8267ddcb1f0544f8620a0a7ed324e6",
+              "matches": true
+            },
+            {
+              "filename": "44.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "45.in",
+              "sha256": "a65e8b24efd7ed4da3619e14071a30b43492a2842ece0e7969e55a62da516e56",
+              "matches": true
+            },
+            {
+              "filename": "45.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "46.in",
+              "sha256": "bf8f93b97e6fdf1351ec5c8ca7d0a68b35ede8b03742d6ebe8debe5330b9addb",
+              "matches": true
+            },
+            {
+              "filename": "46.out",
+              "sha256": "f16c302d5d30e1d3fbe955cf4f637f58a871adeba597922e3baad0aeeb13f656",
+              "matches": true
+            },
+            {
+              "filename": "47.in",
+              "sha256": "4d22be7c300798eb884c093efa72bdf3e8c1781a916b8658aed1d19484e94770",
+              "matches": true
+            },
+            {
+              "filename": "47.out",
+              "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+              "matches": true
+            },
+            {
+              "filename": "48.in",
+              "sha256": "fc39ee6e37a6fccbf3e169b6696059c2619513250fd907eea8ef7723aecf21fe",
+              "matches": true
+            },
+            {
+              "filename": "48.out",
+              "sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+              "matches": true
+            },
+            {
+              "filename": "49.in",
+              "sha256": "0b9ae3a6fc661a56678a2d9e16c8a9315a9dd63ebbbcab2c5a956ec0bc155b0b",
+              "matches": true
+            },
+            {
+              "filename": "49.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "5.in",
+              "sha256": "1abbc3b945ec1be2bddf581637476b798d44f885bff1219cced83d18b9ea6710",
+              "matches": true
+            },
+            {
+              "filename": "5.out",
+              "sha256": "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2",
+              "matches": true
+            },
+            {
+              "filename": "50.in",
+              "sha256": "0a9e074c4eecea7e25a1a22621a8ee6f488b7f4751e39032e94ec45043881096",
+              "matches": true
+            },
+            {
+              "filename": "50.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "51.in",
+              "sha256": "04438ebc9a44e71740cfefdf30334e52fc036d3772bd09237aa25b06df733fe2",
+              "matches": true
+            },
+            {
+              "filename": "51.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "52.in",
+              "sha256": "a17c7cd19f011fffe1b752747af03c14516f60c54477b93b2e3508db800470f0",
+              "matches": true
+            },
+            {
+              "filename": "52.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "53.in",
+              "sha256": "01d994101bf61ee51e0648eb63629078d8bc485a363f8bfaaa7bdfdb95c880a2",
+              "matches": true
+            },
+            {
+              "filename": "53.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "54.in",
+              "sha256": "6de14e59015e7e08236ecb6f1b538ca9c7ff1c9bdee948c8927d7e6d8be6ab6d",
+              "matches": true
+            },
+            {
+              "filename": "54.out",
+              "sha256": "8f35c5749fd690a5701e7b51b59d683929f3df817dcb1f2ba30c25c058107b98",
+              "matches": true
+            },
+            {
+              "filename": "55.in",
+              "sha256": "ac539f45a2e8093e4b062cfc766819698e327508544cffe9314e86cf0e1f093a",
+              "matches": true
+            },
+            {
+              "filename": "55.out",
+              "sha256": "1a252402972f6057fa53cc172b52b9ffca698e18311facd0f3b06ecaaef79e17",
+              "matches": true
+            },
+            {
+              "filename": "56.in",
+              "sha256": "6e9e6d0b56f98a61ed2558e6ae980ccac5c36bb6e312216550fb8fced2d7aac1",
+              "matches": true
+            },
+            {
+              "filename": "56.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "57.in",
+              "sha256": "6a213db34e43231fe6fe08e9c75a5d237827cb00f9327188d1c61a42b7cdf271",
+              "matches": true
+            },
+            {
+              "filename": "57.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "58.in",
+              "sha256": "82ed534fe34cda7dc10786b730d30234e4820d9c952af75f43d4463d5d708e85",
+              "matches": true
+            },
+            {
+              "filename": "58.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "59.in",
+              "sha256": "b3d47e6084e5e06cdf9262452a54854d86f621a4b997e4d5c42bd703c507540a",
+              "matches": true
+            },
+            {
+              "filename": "59.out",
+              "sha256": "aa67a169b0bba217aa0aa88a65346920c84c42447c36ba5f7ea65f422c1fe5d8",
+              "matches": true
+            },
+            {
+              "filename": "6.in",
+              "sha256": "0e43ae1c978303276280fadf2cd705802f9bf47b2d01b9ee72c4d809825956a8",
+              "matches": true
+            },
+            {
+              "filename": "6.out",
+              "sha256": "d7e8500765bd1614fd80b297021a89a0311296f37726c145efaa641bb8de9f7e",
+              "matches": true
+            },
+            {
+              "filename": "60.in",
+              "sha256": "49b527219b13dea89d6c03c6c9c5bad9aecd3a2e8183bd237d146e4c8775cb04",
+              "matches": true
+            },
+            {
+              "filename": "60.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "61.in",
+              "sha256": "a89136f00cf2ae82e4fd4dbd2019f813c3acb0c275192ea353e1fb08c7594a4d",
+              "matches": true
+            },
+            {
+              "filename": "61.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "62.in",
+              "sha256": "e52a81842fa3927bf0c0a4034ae8efc978cb80eee32eedf88a6e4cd006c24768",
+              "matches": true
+            },
+            {
+              "filename": "62.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "63.in",
+              "sha256": "064edbd36223cd9950608b3ce8650a3d3b2247ec78ee1102d4c9f8c1ff655cc1",
+              "matches": true
+            },
+            {
+              "filename": "63.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "64.in",
+              "sha256": "b5bfd0b2124d5e537e1f4caebb08c2215f605be305fe721ab5e3dc011db96ad2",
+              "matches": true
+            },
+            {
+              "filename": "64.out",
+              "sha256": "461144ccfd56ee3cf0f9a9d80e520c5b872166b23092d5fd838ecbdb46d64dab",
+              "matches": true
+            },
+            {
+              "filename": "65.in",
+              "sha256": "3b472fd6eb32c27c775ba549ed4ea1f480a237eaf9fe1e1bbf7eb7d56bfe52ef",
+              "matches": true
+            },
+            {
+              "filename": "65.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "66.in",
+              "sha256": "17b7066f36d6fc990613138ee64e1c6ccfdf06b7f5f12256dfbdf803c7d585d4",
+              "matches": true
+            },
+            {
+              "filename": "66.out",
+              "sha256": "732e64e47ffb9c524031887a048b6973dda5f8a9a8b697cd27b5e045df359af2",
+              "matches": true
+            },
+            {
+              "filename": "67.in",
+              "sha256": "bb7b6fb2b1a3a14c82f98ab4fec74f79767bcc3ddf82707872e7ad8c455514aa",
+              "matches": true
+            },
+            {
+              "filename": "67.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "68.in",
+              "sha256": "a2579fbb00552341f1b5fc15c12ac9f1539e352d4e4e24b2bf3407246672e6e9",
+              "matches": true
+            },
+            {
+              "filename": "68.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "69.in",
+              "sha256": "5aecfd94b4f41c40289d5e9c9fca965507c229637a4a5c6cb7509b215873275c",
+              "matches": true
+            },
+            {
+              "filename": "69.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "7.in",
+              "sha256": "a0878830b518d07f66bf6eed4258e90d02e0a3c57d0e5f4ac159e3b50afa4586",
+              "matches": true
+            },
+            {
+              "filename": "7.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "70.in",
+              "sha256": "1fee77cb958e4b0e21766966b6b7c6e742e5826159da080dea684fa64d4017ce",
+              "matches": true
+            },
+            {
+              "filename": "70.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "71.in",
+              "sha256": "133f46e9df9c594a4bd844a0ad79a12dfa578d0d86f881d0b0d4c016068a4b90",
+              "matches": true
+            },
+            {
+              "filename": "71.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "72.in",
+              "sha256": "57f793c4647dcf56dfa4a6e8322b1d04c092fe92b846b1a2ce111f5d8f2c1e2a",
+              "matches": true
+            },
+            {
+              "filename": "72.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "73.in",
+              "sha256": "787ad069c3ac514c5951db82b91c5c348e6ebaa5fbe42d010d872bd756702450",
+              "matches": true
+            },
+            {
+              "filename": "73.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "74.in",
+              "sha256": "01d9625921314707ad14ded9869ec2d23cd8a19c9dd2914949336757b524eca4",
+              "matches": true
+            },
+            {
+              "filename": "74.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "75.in",
+              "sha256": "7fbacad3a88c4b18bba85372c8b01826b9cbb417fb5359d170821d1a9303fca0",
+              "matches": true
+            },
+            {
+              "filename": "75.out",
+              "sha256": "10159baf262b43a92d95db59dae1f72c645127301661e0a3ce4e38b295a97c58",
+              "matches": true
+            },
+            {
+              "filename": "76.in",
+              "sha256": "55bbec7c3bdbf4e45179f96fd34aaa36e7da7046996038bac2eb656064631460",
+              "matches": true
+            },
+            {
+              "filename": "76.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "77.in",
+              "sha256": "e2f1a4ace511ca7dcc6732ab83940f7364d7f40bee7f67b8300bad8fcf584b21",
+              "matches": true
+            },
+            {
+              "filename": "77.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "78.in",
+              "sha256": "065a7a6c10e2817b3344d417ef4de528c4546164863c4da92a1b313ca874ebb6",
+              "matches": true
+            },
+            {
+              "filename": "78.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "79.in",
+              "sha256": "6354ae31b7ba0838953ecc550dac3bfec538296a0868fc8f4c547e32d961911c",
+              "matches": true
+            },
+            {
+              "filename": "79.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "8.in",
+              "sha256": "0569f390d0bcd6098303a0ccd31c0f6da8ad8fcc5b8448bf8e50172ac720dc2d",
+              "matches": true
+            },
+            {
+              "filename": "8.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "80.in",
+              "sha256": "5aa8432c859d2129beb04e9663297626eed0125384d125b165e8aede7fe8cc0e",
+              "matches": true
+            },
+            {
+              "filename": "80.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "81.in",
+              "sha256": "029dce20c8fe2a30ceee1201409e9ea29563e802e6e93f4334ade758caef5a7b",
+              "matches": true
+            },
+            {
+              "filename": "81.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "82.in",
+              "sha256": "5879b3d9cecd34520ad66dc722812a1c90dd0acf20b07b055fbdb233f77d61e1",
+              "matches": true
+            },
+            {
+              "filename": "82.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "83.in",
+              "sha256": "e0e5403ce3dcf9d0b4ba69dd9caba2181fa1bc14bafedbe0632f9b91ad01df33",
+              "matches": true
+            },
+            {
+              "filename": "83.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "84.in",
+              "sha256": "a231fdd7f62ed74992a63de791c79c468e2c3fa07830eee025dec0c86a0c2684",
+              "matches": true
+            },
+            {
+              "filename": "84.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "85.in",
+              "sha256": "8a8c4c8b3386a9591a5bd36f80b03ac9cb944ad16d835e817a1ec46e6bcf46c6",
+              "matches": true
+            },
+            {
+              "filename": "85.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "86.in",
+              "sha256": "a8944cbccb2b77fb1ebc2198327a2fa01278f3f084a4457cb33d444b6b28e635",
+              "matches": true
+            },
+            {
+              "filename": "86.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "87.in",
+              "sha256": "aa2d7f0b2665d298b920e42b14058db91b6244641fd86ec5f370815190e1cce8",
+              "matches": true
+            },
+            {
+              "filename": "87.out",
+              "sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+              "matches": true
+            },
+            {
+              "filename": "88.in",
+              "sha256": "eb3b95aa5a8eed65f14da5c5404340ec4add9bc14d9f0877e33f684a280f1e42",
+              "matches": true
+            },
+            {
+              "filename": "88.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "89.in",
+              "sha256": "b08784dd7767f1f0ec6ea629c096abe53a30f68c2b7a10fb2bb7014e650b3881",
+              "matches": true
+            },
+            {
+              "filename": "89.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "9.in",
+              "sha256": "8d801050545a24ee3026104840ec53141ccf881a4e561ad61b473c2f16328be0",
+              "matches": true
+            },
+            {
+              "filename": "9.out",
+              "sha256": "aa67a169b0bba217aa0aa88a65346920c84c42447c36ba5f7ea65f422c1fe5d8",
+              "matches": true
+            },
+            {
+              "filename": "90.in",
+              "sha256": "2a4dfa0c783db11ec233445677bb054005f23ec93a0ddc97d03cadb2bfb9d993",
+              "matches": true
+            },
+            {
+              "filename": "90.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "91.in",
+              "sha256": "f8ab717104ad9e5e6bdef0d838b20cc230ba98b503472db02436ea2587aad3a1",
+              "matches": true
+            },
+            {
+              "filename": "91.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "92.in",
+              "sha256": "b7b2bacd9abdbdbae3a37e09e2d9dffd4384fc8f609a49cd845179a816f6c4ac",
+              "matches": true
+            },
+            {
+              "filename": "92.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "93.in",
+              "sha256": "8d7b03f54bbe6eebe32546dd3f00746b05298f22d66bbce827bc2a71c3c75946",
+              "matches": true
+            },
+            {
+              "filename": "93.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "94.in",
+              "sha256": "174e6f879e33a29a9dfd138bc439eec105be744b6abd8321038a42165a12d38a",
+              "matches": true
+            },
+            {
+              "filename": "94.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "95.in",
+              "sha256": "ad0fadf63cc7cd779ce475e345bf4063565b63a3c2efef1eebc89790aaa6acba",
+              "matches": true
+            },
+            {
+              "filename": "95.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "96.in",
+              "sha256": "19e16bd832f1aecb14bd2a2ddbfeae837f707aadcd17be484b704aa7928de2f8",
+              "matches": true
+            },
+            {
+              "filename": "96.out",
+              "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true
+            },
+            {
+              "filename": "97.in",
+              "sha256": "a05154378fe710c5f8de15a734db7e03817c2a098483fac3256c44723b258db0",
+              "matches": true
+            },
+            {
+              "filename": "97.out",
+              "sha256": "10159baf262b43a92d95db59dae1f72c645127301661e0a3ce4e38b295a97c58",
+              "matches": true
+            },
+            {
+              "filename": "98.in",
+              "sha256": "dae6781ac98f1bd88e3dc3c27d6987fa682dffc4a0d5f2c7888b0352231c4b4d",
+              "matches": true
+            },
+            {
+              "filename": "98.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "99.in",
+              "sha256": "2cb560c5495a704f4f500db565ce5eccb09bb278a31a996608f38dc90eb046a4",
+              "matches": true
+            },
+            {
+              "filename": "99.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "sample1.in",
+              "sha256": "8d534e72b4074236a61a249e0a3b4f67e1b4937d027148a8097d3f1c419e07c1",
+              "matches": true
+            },
+            {
+              "filename": "sample1.out",
+              "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+              "matches": true
+            },
+            {
+              "filename": "sample2.in",
+              "sha256": "c54edc4604ae7f71028e6d7dec5eec24a9628c17d776c7150f14f518776d84e1",
+              "matches": true
+            },
+            {
+              "filename": "sample2.out",
+              "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true
+            },
+            {
+              "filename": "sample3.in",
+              "sha256": "4fb6ed748e06216bc6d9030a71812778bb84c83f1766edf6a165fb3ff86f6f4f",
+              "matches": true
+            },
+            {
+              "filename": "sample3.out",
+              "sha256": "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2",
+              "matches": true
+            }
+          ],
+          "checked_at": "2026-10-23T21:39:21.543928+00:00"
+        },
+        "contract": {
+          "cases": 103,
+          "rejected": [
+            "51.in"
+          ],
+          "definition": "按管理员题意的extra_contract核输入约束；没有借用其他题号或放宽既有valid。",
+          "checks": [
+            {
+              "input": "0.in",
+              "issues": []
+            },
+            {
+              "input": "1.in",
+              "issues": []
+            },
+            {
+              "input": "10.in",
+              "issues": []
+            },
+            {
+              "input": "11.in",
+              "issues": []
+            },
+            {
+              "input": "12.in",
+              "issues": []
+            },
+            {
+              "input": "13.in",
+              "issues": []
+            },
+            {
+              "input": "14.in",
+              "issues": []
+            },
+            {
+              "input": "15.in",
+              "issues": []
+            },
+            {
+              "input": "16.in",
+              "issues": []
+            },
+            {
+              "input": "17.in",
+              "issues": []
+            },
+            {
+              "input": "18.in",
+              "issues": []
+            },
+            {
+              "input": "19.in",
+              "issues": []
+            },
+            {
+              "input": "2.in",
+              "issues": []
+            },
+            {
+              "input": "20.in",
+              "issues": []
+            },
+            {
+              "input": "21.in",
+              "issues": []
+            },
+            {
+              "input": "22.in",
+              "issues": []
+            },
+            {
+              "input": "23.in",
+              "issues": []
+            },
+            {
+              "input": "24.in",
+              "issues": []
+            },
+            {
+              "input": "25.in",
+              "issues": []
+            },
+            {
+              "input": "26.in",
+              "issues": []
+            },
+            {
+              "input": "27.in",
+              "issues": []
+            },
+            {
+              "input": "28.in",
+              "issues": []
+            },
+            {
+              "input": "29.in",
+              "issues": []
+            },
+            {
+              "input": "3.in",
+              "issues": []
+            },
+            {
+              "input": "30.in",
+              "issues": []
+            },
+            {
+              "input": "31.in",
+              "issues": []
+            },
+            {
+              "input": "32.in",
+              "issues": []
+            },
+            {
+              "input": "33.in",
+              "issues": []
+            },
+            {
+              "input": "34.in",
+              "issues": []
+            },
+            {
+              "input": "35.in",
+              "issues": []
+            },
+            {
+              "input": "36.in",
+              "issues": []
+            },
+            {
+              "input": "37.in",
+              "issues": []
+            },
+            {
+              "input": "38.in",
+              "issues": []
+            },
+            {
+              "input": "39.in",
+              "issues": []
+            },
+            {
+              "input": "4.in",
+              "issues": []
+            },
+            {
+              "input": "40.in",
+              "issues": []
+            },
+            {
+              "input": "41.in",
+              "issues": []
+            },
+            {
+              "input": "42.in",
+              "issues": []
+            },
+            {
+              "input": "43.in",
+              "issues": []
+            },
+            {
+              "input": "44.in",
+              "issues": []
+            },
+            {
+              "input": "45.in",
+              "issues": []
+            },
+            {
+              "input": "46.in",
+              "issues": []
+            },
+            {
+              "input": "47.in",
+              "issues": []
+            },
+            {
+              "input": "48.in",
+              "issues": []
+            },
+            {
+              "input": "49.in",
+              "issues": []
+            },
+            {
+              "input": "5.in",
+              "issues": []
+            },
+            {
+              "input": "50.in",
+              "issues": []
+            },
+            {
+              "input": "51.in",
+              "issues": [
+                "数字串或目标范围"
+              ]
+            },
+            {
+              "input": "52.in",
+              "issues": []
+            },
+            {
+              "input": "53.in",
+              "issues": []
+            },
+            {
+              "input": "54.in",
+              "issues": []
+            },
+            {
+              "input": "55.in",
+              "issues": []
+            },
+            {
+              "input": "56.in",
+              "issues": []
+            },
+            {
+              "input": "57.in",
+              "issues": []
+            },
+            {
+              "input": "58.in",
+              "issues": []
+            },
+            {
+              "input": "59.in",
+              "issues": []
+            },
+            {
+              "input": "6.in",
+              "issues": []
+            },
+            {
+              "input": "60.in",
+              "issues": []
+            },
+            {
+              "input": "61.in",
+              "issues": []
+            },
+            {
+              "input": "62.in",
+              "issues": []
+            },
+            {
+              "input": "63.in",
+              "issues": []
+            },
+            {
+              "input": "64.in",
+              "issues": []
+            },
+            {
+              "input": "65.in",
+              "issues": []
+            },
+            {
+              "input": "66.in",
+              "issues": []
+            },
+            {
+              "input": "67.in",
+              "issues": []
+            },
+            {
+              "input": "68.in",
+              "issues": []
+            },
+            {
+              "input": "69.in",
+              "issues": []
+            },
+            {
+              "input": "7.in",
+              "issues": []
+            },
+            {
+              "input": "70.in",
+              "issues": []
+            },
+            {
+              "input": "71.in",
+              "issues": []
+            },
+            {
+              "input": "72.in",
+              "issues": []
+            },
+            {
+              "input": "73.in",
+              "issues": []
+            },
+            {
+              "input": "74.in",
+              "issues": []
+            },
+            {
+              "input": "75.in",
+              "issues": []
+            },
+            {
+              "input": "76.in",
+              "issues": []
+            },
+            {
+              "input": "77.in",
+              "issues": []
+            },
+            {
+              "input": "78.in",
+              "issues": []
+            },
+            {
+              "input": "79.in",
+              "issues": []
+            },
+            {
+              "input": "8.in",
+              "issues": []
+            },
+            {
+              "input": "80.in",
+              "issues": []
+            },
+            {
+              "input": "81.in",
+              "issues": []
+            },
+            {
+              "input": "82.in",
+              "issues": []
+            },
+            {
+              "input": "83.in",
+              "issues": []
+            },
+            {
+              "input": "84.in",
+              "issues": []
+            },
+            {
+              "input": "85.in",
+              "issues": []
+            },
+            {
+              "input": "86.in",
+              "issues": []
+            },
+            {
+              "input": "87.in",
+              "issues": []
+            },
+            {
+              "input": "88.in",
+              "issues": []
+            },
+            {
+              "input": "89.in",
+              "issues": []
+            },
+            {
+              "input": "9.in",
+              "issues": []
+            },
+            {
+              "input": "90.in",
+              "issues": []
+            },
+            {
+              "input": "91.in",
+              "issues": []
+            },
+            {
+              "input": "92.in",
+              "issues": []
+            },
+            {
+              "input": "93.in",
+              "issues": []
+            },
+            {
+              "input": "94.in",
+              "issues": []
+            },
+            {
+              "input": "95.in",
+              "issues": []
+            },
+            {
+              "input": "96.in",
+              "issues": []
+            },
+            {
+              "input": "97.in",
+              "issues": []
+            },
+            {
+              "input": "98.in",
+              "issues": []
+            },
+            {
+              "input": "99.in",
+              "issues": []
+            },
+            {
+              "input": "sample1.in",
+              "issues": []
+            },
+            {
+              "input": "sample2.in",
+              "issues": []
+            },
+            {
+              "input": "sample3.in",
+              "issues": []
+            }
+          ]
+        },
+        "extra_contract": {
+          "definition": "按解码题面补足原valid未覆盖的语义范围；实现见独立复算器extra_contract",
+          "files": [
+            {
+              "input": "0.in",
+              "issues": []
+            },
+            {
+              "input": "1.in",
+              "issues": []
+            },
+            {
+              "input": "10.in",
+              "issues": []
+            },
+            {
+              "input": "11.in",
+              "issues": []
+            },
+            {
+              "input": "12.in",
+              "issues": []
+            },
+            {
+              "input": "13.in",
+              "issues": []
+            },
+            {
+              "input": "14.in",
+              "issues": []
+            },
+            {
+              "input": "15.in",
+              "issues": []
+            },
+            {
+              "input": "16.in",
+              "issues": []
+            },
+            {
+              "input": "17.in",
+              "issues": []
+            },
+            {
+              "input": "18.in",
+              "issues": []
+            },
+            {
+              "input": "19.in",
+              "issues": []
+            },
+            {
+              "input": "2.in",
+              "issues": []
+            },
+            {
+              "input": "20.in",
+              "issues": []
+            },
+            {
+              "input": "21.in",
+              "issues": []
+            },
+            {
+              "input": "22.in",
+              "issues": []
+            },
+            {
+              "input": "23.in",
+              "issues": []
+            },
+            {
+              "input": "24.in",
+              "issues": []
+            },
+            {
+              "input": "25.in",
+              "issues": []
+            },
+            {
+              "input": "26.in",
+              "issues": []
+            },
+            {
+              "input": "27.in",
+              "issues": []
+            },
+            {
+              "input": "28.in",
+              "issues": []
+            },
+            {
+              "input": "29.in",
+              "issues": []
+            },
+            {
+              "input": "3.in",
+              "issues": []
+            },
+            {
+              "input": "30.in",
+              "issues": []
+            },
+            {
+              "input": "31.in",
+              "issues": []
+            },
+            {
+              "input": "32.in",
+              "issues": []
+            },
+            {
+              "input": "33.in",
+              "issues": []
+            },
+            {
+              "input": "34.in",
+              "issues": []
+            },
+            {
+              "input": "35.in",
+              "issues": []
+            },
+            {
+              "input": "36.in",
+              "issues": []
+            },
+            {
+              "input": "37.in",
+              "issues": []
+            },
+            {
+              "input": "38.in",
+              "issues": []
+            },
+            {
+              "input": "39.in",
+              "issues": []
+            },
+            {
+              "input": "4.in",
+              "issues": []
+            },
+            {
+              "input": "40.in",
+              "issues": []
+            },
+            {
+              "input": "41.in",
+              "issues": []
+            },
+            {
+              "input": "42.in",
+              "issues": []
+            },
+            {
+              "input": "43.in",
+              "issues": []
+            },
+            {
+              "input": "44.in",
+              "issues": []
+            },
+            {
+              "input": "45.in",
+              "issues": []
+            },
+            {
+              "input": "46.in",
+              "issues": []
+            },
+            {
+              "input": "47.in",
+              "issues": []
+            },
+            {
+              "input": "48.in",
+              "issues": []
+            },
+            {
+              "input": "49.in",
+              "issues": []
+            },
+            {
+              "input": "5.in",
+              "issues": []
+            },
+            {
+              "input": "50.in",
+              "issues": []
+            },
+            {
+              "input": "51.in",
+              "issues": [
+                "数字串或目标范围"
+              ]
+            },
+            {
+              "input": "52.in",
+              "issues": []
+            },
+            {
+              "input": "53.in",
+              "issues": []
+            },
+            {
+              "input": "54.in",
+              "issues": []
+            },
+            {
+              "input": "55.in",
+              "issues": []
+            },
+            {
+              "input": "56.in",
+              "issues": []
+            },
+            {
+              "input": "57.in",
+              "issues": []
+            },
+            {
+              "input": "58.in",
+              "issues": []
+            },
+            {
+              "input": "59.in",
+              "issues": []
+            },
+            {
+              "input": "6.in",
+              "issues": []
+            },
+            {
+              "input": "60.in",
+              "issues": []
+            },
+            {
+              "input": "61.in",
+              "issues": []
+            },
+            {
+              "input": "62.in",
+              "issues": []
+            },
+            {
+              "input": "63.in",
+              "issues": []
+            },
+            {
+              "input": "64.in",
+              "issues": []
+            },
+            {
+              "input": "65.in",
+              "issues": []
+            },
+            {
+              "input": "66.in",
+              "issues": []
+            },
+            {
+              "input": "67.in",
+              "issues": []
+            },
+            {
+              "input": "68.in",
+              "issues": []
+            },
+            {
+              "input": "69.in",
+              "issues": []
+            },
+            {
+              "input": "7.in",
+              "issues": []
+            },
+            {
+              "input": "70.in",
+              "issues": []
+            },
+            {
+              "input": "71.in",
+              "issues": []
+            },
+            {
+              "input": "72.in",
+              "issues": []
+            },
+            {
+              "input": "73.in",
+              "issues": []
+            },
+            {
+              "input": "74.in",
+              "issues": []
+            },
+            {
+              "input": "75.in",
+              "issues": []
+            },
+            {
+              "input": "76.in",
+              "issues": []
+            },
+            {
+              "input": "77.in",
+              "issues": []
+            },
+            {
+              "input": "78.in",
+              "issues": []
+            },
+            {
+              "input": "79.in",
+              "issues": []
+            },
+            {
+              "input": "8.in",
+              "issues": []
+            },
+            {
+              "input": "80.in",
+              "issues": []
+            },
+            {
+              "input": "81.in",
+              "issues": []
+            },
+            {
+              "input": "82.in",
+              "issues": []
+            },
+            {
+              "input": "83.in",
+              "issues": []
+            },
+            {
+              "input": "84.in",
+              "issues": []
+            },
+            {
+              "input": "85.in",
+              "issues": []
+            },
+            {
+              "input": "86.in",
+              "issues": []
+            },
+            {
+              "input": "87.in",
+              "issues": []
+            },
+            {
+              "input": "88.in",
+              "issues": []
+            },
+            {
+              "input": "89.in",
+              "issues": []
+            },
+            {
+              "input": "9.in",
+              "issues": []
+            },
+            {
+              "input": "90.in",
+              "issues": []
+            },
+            {
+              "input": "91.in",
+              "issues": []
+            },
+            {
+              "input": "92.in",
+              "issues": []
+            },
+            {
+              "input": "93.in",
+              "issues": []
+            },
+            {
+              "input": "94.in",
+              "issues": []
+            },
+            {
+              "input": "95.in",
+              "issues": []
+            },
+            {
+              "input": "96.in",
+              "issues": []
+            },
+            {
+              "input": "97.in",
+              "issues": []
+            },
+            {
+              "input": "98.in",
+              "issues": []
+            },
+            {
+              "input": "99.in",
+              "issues": []
+            },
+            {
+              "input": "sample1.in",
+              "issues": []
+            },
+            {
+              "input": "sample2.in",
+              "issues": []
+            },
+            {
+              "input": "sample3.in",
+              "issues": []
+            }
+          ]
+        },
+        "answers": {
+          "method": "末项乘法优先级表达式枚举，同时记录前导零约定",
+          "official_samples": 3,
+          "official_samples_examined": 3,
+          "official_sample_checks": [
+            {
+              "index": 1,
+              "matches": true,
+              "oracle_sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35",
+              "statement_output_sha256": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
+            },
+            {
+              "index": 2,
+              "matches": true,
+              "oracle_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9",
+              "statement_output_sha256": "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+            },
+            {
+              "index": 3,
+              "matches": true,
+              "oracle_sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce",
+              "statement_output_sha256": "4e07408562bedb8b60ce05c1decfe3ad16b72230967de01f640b7e4729b49fce"
+            }
+          ],
+          "sample_dispute": null,
+          "files": [
+            {
+              "input": "0.in",
+              "output": "0.out",
+              "input_sha256": "98c1f820c63255e84e58ebaf4b29498bfa51cde2300ac850eab911d10ddfa83e",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "1.in",
+              "output": "1.out",
+              "input_sha256": "034dde84b189b5ab733d33193b3a71542975c14632dbea63ce850ffb243b8424",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "10.in",
+              "output": "10.out",
+              "input_sha256": "d7509be45a72f2c21cbfe89074bc42ea703dd772ea1b182d26285d9fb2572ee1",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "11.in",
+              "output": "11.out",
+              "input_sha256": "df5877c5a2f440a30a5777f661dcf45d78568b003471339d77a842bcfa2b46ee",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "12.in",
+              "output": "12.out",
+              "input_sha256": "c7965dbecbd69954b577a9c37fa0882e267ccd1f1d6ce5d310ca7bb4de59cdb5",
+              "output_sha256": "a9742eb8ee320e006666aef25ae9aeed948247f3125c9cafa7cf97b7e7467dd5",
+              "matches": null,
+              "oracle_ms": 77,
+              "original_allow_leading_zero_matches": false,
+              "not_compared_reason": "题面未明确是否允许数字前导零，两种解释计数不同；条件结果另列，不擅添加LeetCode附加规则"
+            },
+            {
+              "input": "13.in",
+              "output": "13.out",
+              "input_sha256": "67941a36687340c47e5c94a17dc74bd2ee55e50d21d0565f9336235e808da4b3",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "14.in",
+              "output": "14.out",
+              "input_sha256": "ef83edbe4c45cae43a677038784b716c79eda1e9019e58856b1e0a9713d6e942",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "15.in",
+              "output": "15.out",
+              "input_sha256": "087d66bbdf2a6f1d09c52d9aea232bcd53ab3b8ef448708da5340f819a37ad13",
+              "output_sha256": "f0448ca7d8645d6c1d4902a2c058a37abfc44f1de59ab54163c80faaf72f6a4c",
+              "matches": true,
+              "oracle_ms": 78
+            },
+            {
+              "input": "16.in",
+              "output": "16.out",
+              "input_sha256": "fb17fe959d5fe2e092b07213d1431eb42b577e99755c3655014c13ed0630330b",
+              "output_sha256": "95cf32708a31caa478a0e9141103ac567d85e5186e697e7e0c81f75589999e31",
+              "matches": true,
+              "oracle_ms": 78
+            },
+            {
+              "input": "17.in",
+              "output": "17.out",
+              "input_sha256": "5d96968713cc57b3c1e2e4b684fb422b65b1d38e027127b5ebde20a1a125b55d",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "18.in",
+              "output": "18.out",
+              "input_sha256": "3fd2656cf78042fde6dc61dded2ceb653bc1497b81194f319593e22f02a5f234",
+              "output_sha256": "be4ba010e48e7d5c7c60457e7f40538407a26f4ead94b392beff67a3a5546b8a",
+              "matches": true,
+              "oracle_ms": 19
+            },
+            {
+              "input": "19.in",
+              "output": "19.out",
+              "input_sha256": "f5457ce20104705346384b943ec5f0d263a7b8835dc93995024d618f6138a3b7",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 5
+            },
+            {
+              "input": "2.in",
+              "output": "2.out",
+              "input_sha256": "ed00de385da22f4dc0ec4e6f193de04e01c2d2c427c2749dec8aae77921116c8",
+              "output_sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "20.in",
+              "output": "20.out",
+              "input_sha256": "2ce886b008414a1c1cb50b89fe25d322d9cc31096ff680e61df7187898edc5f5",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 19
+            },
+            {
+              "input": "21.in",
+              "output": "21.out",
+              "input_sha256": "3275c31dd99be467469cb4b2308e6cdf1d88173b34e1f729620be77ee34993c5",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "22.in",
+              "output": "22.out",
+              "input_sha256": "77c0879e570f5b03370daa06bcad1c8b6854f4f72f89319da2bb7c941ab574bd",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "23.in",
+              "output": "23.out",
+              "input_sha256": "21202dc3e4943e951e52fe820df5b5844bd4818796254a166ff6523c46a02771",
+              "output_sha256": "a1fb50e6c86fae1679ef3351296fd6713411a08cf8dd1790a4fd05fae8688164",
+              "matches": null,
+              "oracle_ms": 77,
+              "original_allow_leading_zero_matches": false,
+              "not_compared_reason": "题面未明确是否允许数字前导零，两种解释计数不同；条件结果另列，不擅添加LeetCode附加规则"
+            },
+            {
+              "input": "24.in",
+              "output": "24.out",
+              "input_sha256": "2041a04273fe2526dd89425cd1af474f55cec69b622f2d05dc6c73e662e22e3e",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "25.in",
+              "output": "25.out",
+              "input_sha256": "11af9d1cbbe02f90e9b45c7e71148673ef701788b9eceedc0f3f2b0b91c17c4d",
+              "output_sha256": "54183f4323f377b737433a1e98229ead0fdc686f93bab057ecb612daa94002b5",
+              "matches": null,
+              "oracle_ms": 77,
+              "original_allow_leading_zero_matches": false,
+              "not_compared_reason": "题面未明确是否允许数字前导零，两种解释计数不同；条件结果另列，不擅添加LeetCode附加规则"
+            },
+            {
+              "input": "26.in",
+              "output": "26.out",
+              "input_sha256": "78ba1684c63fe303e1cbc16be0f1ab583fc643045ba19bf559bf5bb15800df3d",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "27.in",
+              "output": "27.out",
+              "input_sha256": "49b861ab52d5aaa37b81d07179aada180600ded8b27f791fbad4324cdf36e898",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "28.in",
+              "output": "28.out",
+              "input_sha256": "b83e10b315198f0ab7decc7323ed5086771119fcba794660584bd1c62fff8913",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "29.in",
+              "output": "29.out",
+              "input_sha256": "d58e8656a67091bf1fb3a5f685fe6b40703757ff177a5c0bc41e82459eaf9037",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "3.in",
+              "output": "3.out",
+              "input_sha256": "abf84049262a9a5a2128aa830d48a6bb67355852e834b83c5d874adf7945324e",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "30.in",
+              "output": "30.out",
+              "input_sha256": "dc42bdfc06fe356685e2c58caa7594dd2b3c1a06e3cf0aa94a306c77a91743eb",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "31.in",
+              "output": "31.out",
+              "input_sha256": "8467cfe581f6f5c15d65010219287a97d90eabc73468cfbd33c8a3c51bb320c5",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "32.in",
+              "output": "32.out",
+              "input_sha256": "446b0bca2188bd660de67cd72d7fa19350254aba420d1183cd0922e873b93f7c",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 5
+            },
+            {
+              "input": "33.in",
+              "output": "33.out",
+              "input_sha256": "a1347258b4f99fc7a6789867eaabe6b76777ae9ca5f7aca01b4044845fa27a78",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "34.in",
+              "output": "34.out",
+              "input_sha256": "336b95d3a77d4dd74431f70fcc21b58f71af4d485396ebe1121b1dbdfbc48e4d",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 5
+            },
+            {
+              "input": "35.in",
+              "output": "35.out",
+              "input_sha256": "35321e8318c7194c08cdf18c8f9e063f01cf052b63491c21b3a68aa35978d11c",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "36.in",
+              "output": "36.out",
+              "input_sha256": "c473bcd618dbe90d50e6c59e9156aae6a76583aacfbb5904ef1fa7e147926c46",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "37.in",
+              "output": "37.out",
+              "input_sha256": "cde29d18ed8bf6f735930ff008648ba35c84f4b8c8e2227ffaab9733c7348f0d",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "38.in",
+              "output": "38.out",
+              "input_sha256": "ab61555840217cae812733688e0243b1928d11904a5fd0da47053779da272fb3",
+              "output_sha256": "06e9d52c1720fca412803e3b07c4b228ff113e303f4c7ab94665319d832bbfb7",
+              "matches": null,
+              "oracle_ms": 1,
+              "original_allow_leading_zero_matches": false,
+              "not_compared_reason": "题面未明确是否允许数字前导零，两种解释计数不同；条件结果另列，不擅添加LeetCode附加规则"
+            },
+            {
+              "input": "39.in",
+              "output": "39.out",
+              "input_sha256": "399671d445dd680af121744acca8c72d3988462a94da195bac71c36cce4072bd",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "4.in",
+              "output": "4.out",
+              "input_sha256": "80559e04be1f4aba1b4f9d6d9ce2de2a2f5da9f40d40f7ab43bfb5106f1c55cb",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "40.in",
+              "output": "40.out",
+              "input_sha256": "4b68f5664c2fd375750ad0489cbfbca70bcde9e4f27ad6bb883952d95b24d10f",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "41.in",
+              "output": "41.out",
+              "input_sha256": "1e5040b4db14ca674e235de801fd4c74b1f0448e6eb1f838d1e9d4e443d99074",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "42.in",
+              "output": "42.out",
+              "input_sha256": "b34bc5d0e1553372fe5a77bcef998fc8cd4e2e391d5f6eedf89c69b6e9ea61a8",
+              "output_sha256": "a1fb50e6c86fae1679ef3351296fd6713411a08cf8dd1790a4fd05fae8688164",
+              "matches": true,
+              "oracle_ms": 19
+            },
+            {
+              "input": "43.in",
+              "output": "43.out",
+              "input_sha256": "941372970ff787798486b0737ace9c2b489891a73adb5d122d61f3720a660303",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 5
+            },
+            {
+              "input": "44.in",
+              "output": "44.out",
+              "input_sha256": "bd65fe8c44de65c23d78c8840bbee30a9f8267ddcb1f0544f8620a0a7ed324e6",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "45.in",
+              "output": "45.out",
+              "input_sha256": "a65e8b24efd7ed4da3619e14071a30b43492a2842ece0e7969e55a62da516e56",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "46.in",
+              "output": "46.out",
+              "input_sha256": "bf8f93b97e6fdf1351ec5c8ca7d0a68b35ede8b03742d6ebe8debe5330b9addb",
+              "output_sha256": "f16c302d5d30e1d3fbe955cf4f637f58a871adeba597922e3baad0aeeb13f656",
+              "matches": null,
+              "oracle_ms": 19,
+              "original_allow_leading_zero_matches": false,
+              "not_compared_reason": "题面未明确是否允许数字前导零，两种解释计数不同；条件结果另列，不擅添加LeetCode附加规则"
+            },
+            {
+              "input": "47.in",
+              "output": "47.out",
+              "input_sha256": "4d22be7c300798eb884c093efa72bdf3e8c1781a916b8658aed1d19484e94770",
+              "output_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "48.in",
+              "output": "48.out",
+              "input_sha256": "fc39ee6e37a6fccbf3e169b6696059c2619513250fd907eea8ef7723aecf21fe",
+              "output_sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+              "matches": null,
+              "oracle_ms": 78,
+              "original_allow_leading_zero_matches": false,
+              "not_compared_reason": "题面未明确是否允许数字前导零，两种解释计数不同；条件结果另列，不擅添加LeetCode附加规则"
+            },
+            {
+              "input": "49.in",
+              "output": "49.out",
+              "input_sha256": "0b9ae3a6fc661a56678a2d9e16c8a9315a9dd63ebbbcab2c5a956ec0bc155b0b",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "5.in",
+              "output": "5.out",
+              "input_sha256": "1abbc3b945ec1be2bddf581637476b798d44f885bff1219cced83d18b9ea6710",
+              "output_sha256": "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "50.in",
+              "output": "50.out",
+              "input_sha256": "0a9e074c4eecea7e25a1a22621a8ee6f488b7f4751e39032e94ec45043881096",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "51.in",
+              "output": "51.out",
+              "input_sha256": "04438ebc9a44e71740cfefdf30334e52fc036d3772bd09237aa25b06df733fe2",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "52.in",
+              "output": "52.out",
+              "input_sha256": "a17c7cd19f011fffe1b752747af03c14516f60c54477b93b2e3508db800470f0",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "53.in",
+              "output": "53.out",
+              "input_sha256": "01d994101bf61ee51e0648eb63629078d8bc485a363f8bfaaa7bdfdb95c880a2",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "54.in",
+              "output": "54.out",
+              "input_sha256": "6de14e59015e7e08236ecb6f1b538ca9c7ff1c9bdee948c8927d7e6d8be6ab6d",
+              "output_sha256": "8f35c5749fd690a5701e7b51b59d683929f3df817dcb1f2ba30c25c058107b98",
+              "matches": null,
+              "oracle_ms": 19,
+              "original_allow_leading_zero_matches": false,
+              "not_compared_reason": "题面未明确是否允许数字前导零，两种解释计数不同；条件结果另列，不擅添加LeetCode附加规则"
+            },
+            {
+              "input": "55.in",
+              "output": "55.out",
+              "input_sha256": "ac539f45a2e8093e4b062cfc766819698e327508544cffe9314e86cf0e1f093a",
+              "output_sha256": "1a252402972f6057fa53cc172b52b9ffca698e18311facd0f3b06ecaaef79e17",
+              "matches": true,
+              "oracle_ms": 19
+            },
+            {
+              "input": "56.in",
+              "output": "56.out",
+              "input_sha256": "6e9e6d0b56f98a61ed2558e6ae980ccac5c36bb6e312216550fb8fced2d7aac1",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "57.in",
+              "output": "57.out",
+              "input_sha256": "6a213db34e43231fe6fe08e9c75a5d237827cb00f9327188d1c61a42b7cdf271",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "58.in",
+              "output": "58.out",
+              "input_sha256": "82ed534fe34cda7dc10786b730d30234e4820d9c952af75f43d4463d5d708e85",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "59.in",
+              "output": "59.out",
+              "input_sha256": "b3d47e6084e5e06cdf9262452a54854d86f621a4b997e4d5c42bd703c507540a",
+              "output_sha256": "aa67a169b0bba217aa0aa88a65346920c84c42447c36ba5f7ea65f422c1fe5d8",
+              "matches": true,
+              "oracle_ms": 5
+            },
+            {
+              "input": "6.in",
+              "output": "6.out",
+              "input_sha256": "0e43ae1c978303276280fadf2cd705802f9bf47b2d01b9ee72c4d809825956a8",
+              "output_sha256": "d7e8500765bd1614fd80b297021a89a0311296f37726c145efaa641bb8de9f7e",
+              "matches": true,
+              "oracle_ms": 76
+            },
+            {
+              "input": "60.in",
+              "output": "60.out",
+              "input_sha256": "49b527219b13dea89d6c03c6c9c5bad9aecd3a2e8183bd237d146e4c8775cb04",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "61.in",
+              "output": "61.out",
+              "input_sha256": "a89136f00cf2ae82e4fd4dbd2019f813c3acb0c275192ea353e1fb08c7594a4d",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "62.in",
+              "output": "62.out",
+              "input_sha256": "e52a81842fa3927bf0c0a4034ae8efc978cb80eee32eedf88a6e4cd006c24768",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "63.in",
+              "output": "63.out",
+              "input_sha256": "064edbd36223cd9950608b3ce8650a3d3b2247ec78ee1102d4c9f8c1ff655cc1",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "64.in",
+              "output": "64.out",
+              "input_sha256": "b5bfd0b2124d5e537e1f4caebb08c2215f605be305fe721ab5e3dc011db96ad2",
+              "output_sha256": "461144ccfd56ee3cf0f9a9d80e520c5b872166b23092d5fd838ecbdb46d64dab",
+              "matches": null,
+              "oracle_ms": 76,
+              "original_allow_leading_zero_matches": false,
+              "not_compared_reason": "题面未明确是否允许数字前导零，两种解释计数不同；条件结果另列，不擅添加LeetCode附加规则"
+            },
+            {
+              "input": "65.in",
+              "output": "65.out",
+              "input_sha256": "3b472fd6eb32c27c775ba549ed4ea1f480a237eaf9fe1e1bbf7eb7d56bfe52ef",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 19
+            },
+            {
+              "input": "66.in",
+              "output": "66.out",
+              "input_sha256": "17b7066f36d6fc990613138ee64e1c6ccfdf06b7f5f12256dfbdf803c7d585d4",
+              "output_sha256": "732e64e47ffb9c524031887a048b6973dda5f8a9a8b697cd27b5e045df359af2",
+              "matches": null,
+              "oracle_ms": 19,
+              "original_allow_leading_zero_matches": false,
+              "not_compared_reason": "题面未明确是否允许数字前导零，两种解释计数不同；条件结果另列，不擅添加LeetCode附加规则"
+            },
+            {
+              "input": "67.in",
+              "output": "67.out",
+              "input_sha256": "bb7b6fb2b1a3a14c82f98ab4fec74f79767bcc3ddf82707872e7ad8c455514aa",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "68.in",
+              "output": "68.out",
+              "input_sha256": "a2579fbb00552341f1b5fc15c12ac9f1539e352d4e4e24b2bf3407246672e6e9",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "69.in",
+              "output": "69.out",
+              "input_sha256": "5aecfd94b4f41c40289d5e9c9fca965507c229637a4a5c6cb7509b215873275c",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "7.in",
+              "output": "7.out",
+              "input_sha256": "a0878830b518d07f66bf6eed4258e90d02e0a3c57d0e5f4ac159e3b50afa4586",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "70.in",
+              "output": "70.out",
+              "input_sha256": "1fee77cb958e4b0e21766966b6b7c6e742e5826159da080dea684fa64d4017ce",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "71.in",
+              "output": "71.out",
+              "input_sha256": "133f46e9df9c594a4bd844a0ad79a12dfa578d0d86f881d0b0d4c016068a4b90",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "72.in",
+              "output": "72.out",
+              "input_sha256": "57f793c4647dcf56dfa4a6e8322b1d04c092fe92b846b1a2ce111f5d8f2c1e2a",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "73.in",
+              "output": "73.out",
+              "input_sha256": "787ad069c3ac514c5951db82b91c5c348e6ebaa5fbe42d010d872bd756702450",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "74.in",
+              "output": "74.out",
+              "input_sha256": "01d9625921314707ad14ded9869ec2d23cd8a19c9dd2914949336757b524eca4",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "75.in",
+              "output": "75.out",
+              "input_sha256": "7fbacad3a88c4b18bba85372c8b01826b9cbb417fb5359d170821d1a9303fca0",
+              "output_sha256": "10159baf262b43a92d95db59dae1f72c645127301661e0a3ce4e38b295a97c58",
+              "matches": null,
+              "oracle_ms": 76,
+              "original_allow_leading_zero_matches": false,
+              "not_compared_reason": "题面未明确是否允许数字前导零，两种解释计数不同；条件结果另列，不擅添加LeetCode附加规则"
+            },
+            {
+              "input": "76.in",
+              "output": "76.out",
+              "input_sha256": "55bbec7c3bdbf4e45179f96fd34aaa36e7da7046996038bac2eb656064631460",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "77.in",
+              "output": "77.out",
+              "input_sha256": "e2f1a4ace511ca7dcc6732ab83940f7364d7f40bee7f67b8300bad8fcf584b21",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 5
+            },
+            {
+              "input": "78.in",
+              "output": "78.out",
+              "input_sha256": "065a7a6c10e2817b3344d417ef4de528c4546164863c4da92a1b313ca874ebb6",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "79.in",
+              "output": "79.out",
+              "input_sha256": "6354ae31b7ba0838953ecc550dac3bfec538296a0868fc8f4c547e32d961911c",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "8.in",
+              "output": "8.out",
+              "input_sha256": "0569f390d0bcd6098303a0ccd31c0f6da8ad8fcc5b8448bf8e50172ac720dc2d",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "80.in",
+              "output": "80.out",
+              "input_sha256": "5aa8432c859d2129beb04e9663297626eed0125384d125b165e8aede7fe8cc0e",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "81.in",
+              "output": "81.out",
+              "input_sha256": "029dce20c8fe2a30ceee1201409e9ea29563e802e6e93f4334ade758caef5a7b",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": null,
+              "oracle_ms": 0,
+              "original_allow_leading_zero_matches": false,
+              "not_compared_reason": "题面未明确是否允许数字前导零，两种解释计数不同；条件结果另列，不擅添加LeetCode附加规则"
+            },
+            {
+              "input": "82.in",
+              "output": "82.out",
+              "input_sha256": "5879b3d9cecd34520ad66dc722812a1c90dd0acf20b07b055fbdb233f77d61e1",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "83.in",
+              "output": "83.out",
+              "input_sha256": "e0e5403ce3dcf9d0b4ba69dd9caba2181fa1bc14bafedbe0632f9b91ad01df33",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "84.in",
+              "output": "84.out",
+              "input_sha256": "a231fdd7f62ed74992a63de791c79c468e2c3fa07830eee025dec0c86a0c2684",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "85.in",
+              "output": "85.out",
+              "input_sha256": "8a8c4c8b3386a9591a5bd36f80b03ac9cb944ad16d835e817a1ec46e6bcf46c6",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "86.in",
+              "output": "86.out",
+              "input_sha256": "a8944cbccb2b77fb1ebc2198327a2fa01278f3f084a4457cb33d444b6b28e635",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "87.in",
+              "output": "87.out",
+              "input_sha256": "aa2d7f0b2665d298b920e42b14058db91b6244641fd86ec5f370815190e1cce8",
+              "output_sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "88.in",
+              "output": "88.out",
+              "input_sha256": "eb3b95aa5a8eed65f14da5c5404340ec4add9bc14d9f0877e33f684a280f1e42",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "89.in",
+              "output": "89.out",
+              "input_sha256": "b08784dd7767f1f0ec6ea629c096abe53a30f68c2b7a10fb2bb7014e650b3881",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "9.in",
+              "output": "9.out",
+              "input_sha256": "8d801050545a24ee3026104840ec53141ccf881a4e561ad61b473c2f16328be0",
+              "output_sha256": "aa67a169b0bba217aa0aa88a65346920c84c42447c36ba5f7ea65f422c1fe5d8",
+              "matches": true,
+              "oracle_ms": 76
+            },
+            {
+              "input": "90.in",
+              "output": "90.out",
+              "input_sha256": "2a4dfa0c783db11ec233445677bb054005f23ec93a0ddc97d03cadb2bfb9d993",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 6
+            },
+            {
+              "input": "91.in",
+              "output": "91.out",
+              "input_sha256": "f8ab717104ad9e5e6bdef0d838b20cc230ba98b503472db02436ea2587aad3a1",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "92.in",
+              "output": "92.out",
+              "input_sha256": "b7b2bacd9abdbdbae3a37e09e2d9dffd4384fc8f609a49cd845179a816f6c4ac",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "93.in",
+              "output": "93.out",
+              "input_sha256": "8d7b03f54bbe6eebe32546dd3f00746b05298f22d66bbce827bc2a71c3c75946",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 22
+            },
+            {
+              "input": "94.in",
+              "output": "94.out",
+              "input_sha256": "174e6f879e33a29a9dfd138bc439eec105be744b6abd8321038a42165a12d38a",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "95.in",
+              "output": "95.out",
+              "input_sha256": "ad0fadf63cc7cd779ce475e345bf4063565b63a3c2efef1eebc89790aaa6acba",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "96.in",
+              "output": "96.out",
+              "input_sha256": "19e16bd832f1aecb14bd2a2ddbfeae837f707aadcd17be484b704aa7928de2f8",
+              "output_sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "97.in",
+              "output": "97.out",
+              "input_sha256": "a05154378fe710c5f8de15a734db7e03817c2a098483fac3256c44723b258db0",
+              "output_sha256": "10159baf262b43a92d95db59dae1f72c645127301661e0a3ce4e38b295a97c58",
+              "matches": null,
+              "oracle_ms": 0,
+              "original_allow_leading_zero_matches": false,
+              "not_compared_reason": "题面未明确是否允许数字前导零，两种解释计数不同；条件结果另列，不擅添加LeetCode附加规则"
+            },
+            {
+              "input": "98.in",
+              "output": "98.out",
+              "input_sha256": "dae6781ac98f1bd88e3dc3c27d6987fa682dffc4a0d5f2c7888b0352231c4b4d",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "99.in",
+              "output": "99.out",
+              "input_sha256": "2cb560c5495a704f4f500db565ce5eccb09bb278a31a996608f38dc90eb046a4",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "sample1.in",
+              "output": "sample1.out",
+              "input_sha256": "8d534e72b4074236a61a249e0a3b4f67e1b4937d027148a8097d3f1c419e07c1",
+              "output_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "sample2.in",
+              "output": "sample2.out",
+              "input_sha256": "c54edc4604ae7f71028e6d7dec5eec24a9628c17d776c7150f14f518776d84e1",
+              "output_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+              "matches": true,
+              "oracle_ms": 77
+            },
+            {
+              "input": "sample3.in",
+              "output": "sample3.out",
+              "input_sha256": "4fb6ed748e06216bc6d9030a71812778bb84c83f1766edf6a165fb3ff86f6f4f",
+              "output_sha256": "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2",
+              "matches": true,
+              "oracle_ms": 20
+            }
+          ]
+        },
+        "local": {
+          "status": "Wrong Answer",
+          "case": 5,
+          "time_ms": 267,
+          "memory_kb": 216312,
+          "expected_tokens": 1,
+          "actual_tokens": 1,
+          "actual_output_sha256": "5444528093ee09f46799df6a270a882f1eba760bcc49dbec62e4339ba10dce2d",
+          "actual_output_bytes": 72
+        },
+        "platform": {
+          "final": "Not submitted",
+          "attempts": [],
+          "reason": "题面只在管理员视角可见；本次不向不可见题提交源码，独立复算与原限制本地执行分别记录"
+        },
+        "admission_boundary": {
+          "original_reason": "not_in_catalog",
+          "preserve_exclusion": true,
+          "reason": "原题号绑定或资源排除未改；答案核对通过不能自动激活"
+        },
+        "semantic_counterexample": {
+          "conclusion": "题面只规定数字串与二元运算，没有明确禁止多位数字前导零；逐份记录允许/禁止两个模型，在结果不同时保留约定未定，避免直接认定后台算法错误。",
+          "conditional_files": [
+            {
+              "input": "0.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "1.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "10.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "11.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "12.in",
+              "models_agree": false,
+              "allow_leading_zero_matches": false,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "13.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "14.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "15.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "16.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "17.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "18.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "19.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "2.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "20.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "21.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "22.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "23.in",
+              "models_agree": false,
+              "allow_leading_zero_matches": false,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "24.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "25.in",
+              "models_agree": false,
+              "allow_leading_zero_matches": false,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "26.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "27.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "28.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "29.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "3.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "30.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "31.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "32.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "33.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "34.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "35.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "36.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "37.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "38.in",
+              "models_agree": false,
+              "allow_leading_zero_matches": false,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "39.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "4.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "40.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "41.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "42.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "43.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "44.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "45.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "46.in",
+              "models_agree": false,
+              "allow_leading_zero_matches": false,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "47.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "48.in",
+              "models_agree": false,
+              "allow_leading_zero_matches": false,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "49.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "5.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "50.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "51.in",
+              "contract_rejected": true
+            },
+            {
+              "input": "52.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "53.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "54.in",
+              "models_agree": false,
+              "allow_leading_zero_matches": false,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "55.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "56.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "57.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "58.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "59.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "6.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "60.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "61.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "62.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "63.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "64.in",
+              "models_agree": false,
+              "allow_leading_zero_matches": false,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "65.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "66.in",
+              "models_agree": false,
+              "allow_leading_zero_matches": false,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "67.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "68.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "69.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "7.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "70.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "71.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "72.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "73.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "74.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "75.in",
+              "models_agree": false,
+              "allow_leading_zero_matches": false,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "76.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "77.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "78.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "79.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "8.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "80.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "81.in",
+              "models_agree": false,
+              "allow_leading_zero_matches": false,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "82.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "83.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "84.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "85.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "86.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "87.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "88.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "89.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "9.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "90.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "91.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "92.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "93.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "94.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "95.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "96.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "97.in",
+              "models_agree": false,
+              "allow_leading_zero_matches": false,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "98.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "99.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "sample1.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "sample2.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            },
+            {
+              "input": "sample3.in",
+              "models_agree": true,
+              "allow_leading_zero_matches": true,
+              "forbid_leading_zero_matches": true
+            }
+          ],
+          "authored_example": {
+            "input": "00\n0",
+            "allow_leading_zero_count": 4,
+            "forbid_leading_zero_count": 3
+          }
+        },
+        "contract_resolution": {
+          "conclusion": "输入存在题面显式数值范围违规；逐项范围布尔证明另列。超范围条件算法结果不代替合法输入验收。",
+          "files": [
+            {
+              "input": "51.in",
+              "exactly_two_fields": true,
+              "digit_string_length_in_bounds": true,
+              "digits_only": true,
+              "target_in_signed32": false
+            }
+          ]
+        }
+      },
+      "authored_reference": {
+        "source": "import math, itertools, random, heapq, sys, subprocess, hashlib\nfrom array import array\nfrom pathlib import Path\n\ndef expressions_model(text, leading_zero=True):\n    (s, target) = text.split()\n    target = int(target)\n    n = len(s)\n    answer = 0\n\n    def visit(at, total, last):\n        nonlocal answer\n        if at == n:\n            if total == target:\n                answer += 1\n            return\n        value = 0\n        for end in range(at, n):\n            if not leading_zero and end > at and (s[at] == '0'):\n                break\n            value = value * 10 + int(s[end])\n            if not at:\n                visit(end + 1, value, value)\n            else:\n                visit(end + 1, total + value, value)\n                visit(end + 1, total - value, -value)\n                visit(end + 1, total - last + last * value, last * value)\n    visit(0, 0, 0)\n    return str(answer)\n\ndef expressions(text):\n    return expressions_model(text, True)\nimport sys\nsys.stdout.write(expressions(sys.stdin.read()) + '\\n')\n",
+        "sha256": "d52844890cdc0dd810222e8531adc069d431e5ef3ae195b080773bb01a6d85f5",
+        "procedure": "从自写独立复算器按AST函数依赖闭包提取，保留导入并添加标准输入输出入口；不读取或拼接任何后台测试内容"
+      },
+      "passed": false,
+      "complete": true
+    }
+  ]
+}

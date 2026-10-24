@@ -1,0 +1,62 @@
+{
+  "batch": 10,
+  "results": [
+    {
+      "mutation": "允许前导零",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "目标上界差一",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错误去掉数字串的前导零",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "仍使用禁止的起点",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "题面把禁止写为允许",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "梯形样例仍填16",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "表达式样例重复首组",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "题面复算仍用旧参考",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "误报参考哈希未变化",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "题面误用上一批数据回执",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "梯形路径误按矩形宽度",
+      "detected": true,
+      "failures": 1
+    }
+  ],
+  "procedure_source": "import hashlib,json,os,subprocess,sys,unittest,io\nfrom pathlib import Path\nroot=Path.cwd();rules=root/'scripts/gmyhf_review_fixes.py';recipes=root/'scripts/gmyhf_statement_fixes.py';pipe=root/'scripts/repair_gmyhf_sample_findings.py'\noriginals={p:p.read_text() for p in (rules,recipes,pipe)}\ncases=[\n(rules,'允许前导零',\"return source.replace(old,'return expressions_model(text, False)')\",\"return source.replace(old,'return expressions_model(text, True)')\",'test_gmyhf_review_fixes.ReviewRulesTests.test_expression_reference_without_leading_zeros_against_all_separators'),\n(rules,'目标上界差一','legal = max(-2**31,min(2**31-1,target))','legal = max(-2**31,min(2**31,target))','test_gmyhf_review_fixes.ReviewRulesTests.test_meeting_endpoints_and_signed_target_bounds'),\n(rules,'错误去掉数字串的前导零',\"return f'{digits}\\\\n{legal}\\\\n'.encode()\",\"return f'{int(digits)}\\\\n{legal}\\\\n'.encode()\",'test_gmyhf_review_fixes.ReviewRulesTests.test_meeting_endpoints_and_signed_target_bounds'),\n(rules,'仍使用禁止的起点',\"return f'{m} {n}\\\\n1 2\\\\n'.encode()\",\"return payload\",'test_gmyhf_review_fixes.ReviewRulesTests.test_meeting_endpoints_and_signed_target_bounds'),\n(recipes,'题面把禁止写为允许','操作数不应该包含前导零','操作数应该包含前导零','test_gmyhf_statement_fixes.StatementFixTests.test_trapezoid_sample_and_explicit_no_leading_zero_rule'),\n(recipes,'梯形样例仍填16',\"answers[1],result['sampleOutput']\",\"'16',result['sampleOutput']\",'test_gmyhf_statement_fixes.StatementFixTests.test_trapezoid_sample_and_explicit_no_leading_zero_rule'),\n(recipes,'表达式样例重复首组','m[1].strip() for m in re.finditer','m[0].strip() for m in re.finditer','test_gmyhf_statement_fixes.StatementFixTests.test_expression_samples_are_split_in_the_original_order'),\n(pipe,'题面复算仍用旧参考',\"source = review_rules.no_leading_zero_reference(proof['source']) if number==30236 else proof['source']\",\"source = proof['source']\",'test_gmyhf_statement_fixes.FollowupWriterTests.test_tenth_batch_uses_the_confirmed_reference_and_preserves_data'),\n(pipe,'误报参考哈希未变化',\"'reference_sha256':sha((local/'reference.py').read_bytes())\",\"'reference_sha256':entry['authored_reference']['sha256']\",'test_gmyhf_statement_fixes.FollowupWriterTests.test_tenth_batch_uses_the_confirmed_reference_and_preserves_data'),\n(pipe,'题面误用上一批数据回执',\"else 'collab/gmyhf-review-fixes-batch10.json'\",\"else 'collab/gmyhf-review-fixes-batch9.json'\",'test_gmyhf_statement_fixes.FollowupWriterTests.test_tenth_batch_uses_the_confirmed_reference_and_preserves_data')]\nresults=[]\ntry:\n for p,name,old,new,test in cases:\n  assert originals[p].count(old)==1,(name,originals[p].count(old));p.write_text(originals[p].replace(old,new))\n  run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest','tests.'+test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert run.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':run.returncode});p.write_text(originals[p])\nfinally:\n for p,s in originals.items():p.write_text(s)\nsys.path.insert(0,str(root));from tests.test_gmyhf_review_fixes import ReviewRulesTests\nfrom unittest.mock import patch\nentry=next(e for e in json.loads((root/'collab/gmyhf-pending-batch11-review.json').read_text())['entries'] if e['global_number']==21729)\nsource=entry['authored_reference']['source'].split('import sys\\nsys.stdout.write')[0].replace('range(1, m - n + j + 1)','range(1, m - n + 1)')\nns={};exec(source,ns)\nwith patch.object(ReviewRulesTests,'reference',return_value=ns['meeting_one']):\n result=unittest.TextTestRunner(stream=io.StringIO()).run(ReviewRulesTests('test_trapezoid_reference_against_all_monotone_paths'));assert not result.wasSuccessful()\nresults.append({'mutation':'梯形路径误按矩形宽度','detected':True,'failures':len(result.failures)})\ns=Path(__file__).read_text()\n(root/'collab/gmyhf-review-fixes-batch10-mutations.json').write_text(json.dumps({'batch':10,'results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n')\nprint(len(results),'种变异检出，源码已恢复')\n",
+  "procedure_sha256": "a097f6deff25f636a1b9f2758e7d38870f49afceb62d6ac1532bef5172a61f05"
+}

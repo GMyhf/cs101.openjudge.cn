@@ -6,6 +6,23 @@ import gmyhf_statement_fixes as recipes
 import repair_gmyhf_sample_findings as pipeline
 
 class StatementFixTests(unittest.TestCase):
+    def test_trapezoid_sample_and_explicit_no_leading_zero_rule(self):
+        fields={'sampleInput':'sample1 in:\n4 3\n3 2\n\nsample1 out:\n2',
+                'sampleOutput':'sample2 in:\n10 4\n5 3\n\nsample2 out:\n16','description':'原规则保持'}
+        self.assertEqual(['4 3\n3 2','10 4\n5 3'],pipeline.sample_inputs(21729,fields))
+        fixed=pipeline.repaired_form(21729,fields,['2','15'])
+        self.assertTrue(fixed['sampleOutput'].endswith('out:\n15'))
+        fixed=pipeline.repaired_form(30236,fields,['2','0','3'])
+        self.assertEqual('原规则保持\r\n注意，返回表达式中的操作数不应该包含前导零。',fixed['description'])
+        with self.assertRaises(AssertionError):recipes.changed_form(21729,fields,['2','16'])
+        with self.assertRaises(AssertionError):recipes.changed_form(30236,dict(fields,description='前导零规则已存在'),[])
+
+    def test_expression_samples_are_split_in_the_original_order(self):
+        f={'sampleInput':'sample1 input:\n105\n5\n\nsample1 output:\n2\n解释保留\nsample2 input:\n123\n6\n\nsample2 output:\n2',
+           'sampleOutput':'sample3 input:\n00\n0\n\nsample3 output:\n3'}
+        self.assertEqual(['105\n5','123\n6','00\n0'],pipeline.sample_inputs(30236,f))
+        with self.assertRaises(AssertionError):recipes.recovered_samples(30236,dict(f,sampleOutput='缺失第三样例'))
+
     def test_goal_and_digit_output_use_the_defined_variables(self):
         fields={'description':'起点(0,0)，终点(m,n)，其余保持','output':'数字 2出现的次数。'}
         result=pipeline.repaired_form(28277,fields,['3','0'])
@@ -167,3 +184,29 @@ class FollowupWriterTests(unittest.TestCase):
             self.assertEqual({'description'} if number==28277 else {'output'},set(report['problems'][0]['changed_fields']))
             self.assertEqual(pipeline.sha((self.root/'collab/gmyhf-review-fixes-batch9.json').read_bytes()),
                              report['problems'][0]['prior_repair_sha256'])
+
+    def test_tenth_batch_uses_the_confirmed_reference_and_preserves_data(self):
+        from unittest.mock import patch
+        self.number=30236
+        self.fields={k:'自产夹具' for k in pipeline.FIELDS}
+        self.fields.update(id='30236',sampleInput='sample1 input:\n105\n5\n\nsample1 output:\n2\n\nsample2 input:\n105\n5\n\nsample2 output:\n2',
+                           sampleOutput='sample3 input:\n105\n5\n\nsample3 output:\n2')
+        self.files={'a.in':b'105\n5\n','a.out':b'2\n'}
+        source="def expressions_model(text, leading_zero=True):\n    return '3' if leading_zero else '2'\ndef expressions(text):\n    return expressions_model(text, True)\nimport sys\nsys.stdout.write(expressions(sys.stdin.read())+'\\n')\n"
+        entry={'global_number':30236,'authored_reference':{'source':source,'sha256':pipeline.sha(source.encode())},
+               'checks':{'statement':{'field_sha256':{k:pipeline.sha(html.unescape(self.fields[k]).encode()) for k in pipeline.FIELDS}},
+                         'readback':{'files':[{'filename':n,'sha256':pipeline.sha(b'old invalid')} for n in self.files]},
+                         'answers':{'official_sample_checks':[{'oracle_sha256':pipeline.sha(b'2')}]*3}}}
+        pipeline.save(self.root/'collab/gmyhf-pending-batch16-review.json',{'entries':[entry]})
+        prior={'problems':[{'global_number':30236,'final_files':{n:pipeline.sha(v) for n,v in self.files.items()}}]}
+        pipeline.save(self.root/'collab/gmyhf-review-fixes-batch10.json',prior)
+        before=dict(self.files)
+        with patch.object(pipeline,'FOLLOWUP10',{30236:16}):pipeline.run(self.work,True,10)
+        report=json.loads((self.root/'collab/gmyhf-statement-repairs-batch10.json').read_text())
+        self.assertEqual(10,report['batch']);self.assertTrue(report['applied'])
+        self.assertEqual(before,self.files)
+        self.assertIn('操作数不应该包含前导零',self.fields['description'])
+        g=report['problems'][0]
+        self.assertEqual(pipeline.sha(source.encode()),g['original_reference_sha256'])
+        self.assertNotEqual(g['original_reference_sha256'],g['reference_sha256'])
+        self.assertEqual({'description'},set(g['changed_fields']))

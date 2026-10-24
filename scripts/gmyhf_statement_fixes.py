@@ -1,13 +1,22 @@
 """修正可证明的题面约束及缺失样例参数；不改变算法规则。"""
 
 def recovered_samples(number, fields):
-    if number in (28277,28680):
+    if number in (21729,28277,28680):
         import re
         result=[]
         for i,key in ((1,'sampleInput'),(2,'sampleOutput')):
-            match=re.search(rf'sample{i} input:\s*(.*?)\s*sample{i} output:',fields[key],re.S)
+            label = 'in' if number==21729 else 'input'
+            endlabel = 'out' if number==21729 else 'output'
+            match=re.search(rf'sample{i} {label}:\s*(.*?)\s*sample{i} {endlabel}:',fields[key],re.S)
             assert match is not None
             result.append(match[1].strip())
+        return result
+    if number == 30236:
+        import re
+        result=[]
+        for key in ('sampleInput','sampleOutput'):
+            result.extend(m[1].strip() for m in re.finditer(r'sample[123] input:\s*(.*?)\s*sample[123] output:',fields[key],re.S))
+        assert len(result)==3
         return result
     if number == 25685:
         v=list(map(int,fields['sampleInput'].split()))
@@ -26,7 +35,15 @@ def recovered_samples(number, fields):
 
 def changed_form(number,fields,answers):
     result=dict(fields)
-    if number==28277:
+    if number==21729:
+        import re
+        assert answers==['2','15']
+        result['sampleOutput'],count=re.subn(r'(?m)^16(?=\r?$)',answers[1],result['sampleOutput'])
+        assert count==1
+    elif number==30236:
+        assert '前导零' not in result['description']
+        result['description']+='\r\n注意，返回表达式中的操作数不应该包含前导零。'
+    elif number==28277:
         assert result['description'].count('(m,n)')==1
         result['description']=result['description'].replace('(m,n)','(m-1,n-1)')
     elif number==28680:

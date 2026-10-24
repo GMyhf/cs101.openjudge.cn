@@ -11,24 +11,29 @@ from unittest.mock import patch
 import repair_gmyhf_pending_answers as common
 from repair_gmyhf_pending_answers import (ROOT, sha, save, require, listed_files,
                                          form_sha, audit_statement, sanitized, platform, judge)
-from gmyhf_review_fixes import repair_input
+from gmyhf_review_fixes import repair_input, no_leading_zero_reference
 
 BATCHES = {1: {19964: 16, 19968: 16, 30825: 15, 30920: 16, 31415: 15, 31435: 15},
            2: {27945: 13, 28014: 13, 28191: 13, 28339: 13, 29905: 14},
            3: {21471: 9, 25563: 11, 25577: 11, 27946: 13, 30177: 14},
            5: {28187: 13, 28188: 13, 28189: 13, 28682: 13, 28696: 13},
-           6: {25579: 11}, 7: {25685: 12}, 9: {28277: 13, 28680: 13}}
+           6: {25579: 11}, 7: {25685: 12}, 9: {28277: 13, 28680: 13}, 10: {21729: 11, 30236: 16}}
 
 
 def prepare(batch, work):
     groups = []
     for number, audit_batch in BATCHES[batch].items():
         evidence = ROOT / f'collab/gmyhf-pending-batch{audit_batch}-review.json'
+        if number == 30236:
+            # 用户补充规则后重绑题面；原始数据及参考源码的审核证据保持不变。
+            evidence = ROOT / 'collab/gmyhf-30236-rule-review.json'
         entry = next(e for e in json.loads(evidence.read_text())['entries']
                      if e['global_number'] == number)
         proof = entry['authored_reference']
         require(sha(proof['source'].encode()) == proof['sha256'], '参考源码哈希不符')
         source = proof['source']
+        if number == 30236:
+            source = no_leading_zero_reference(source)
         if number == 31435:
             # 把自产格式化函数一并写入独立参考，隔离判题不依赖仓库导入。
             source = (ROOT / 'scripts/gmyhf_review_fixes.py').read_text() + (
@@ -60,7 +65,7 @@ def prepare(batch, work):
             repaired = repair_input(number, given)
             altered_inputs += repaired != given
             output = answer
-            if repaired != given or number in (31415, 31435):
+            if repaired != given or number in (31415, 31435, 30236):
                 result = subprocess.run([sys.executable, '-I', str(reference)], input=repaired,
                                         capture_output=True, timeout=120)
                 require(result.returncode == 0, f'{number}: 自写参考失败')
@@ -79,7 +84,7 @@ def prepare(batch, work):
                            27945: 1, 28014: 1, 28191: 4, 28339: 1, 29905: 20,
                            21471: 19, 25563: 19, 25577: 1, 27946: 10, 30177: 1,
                            28187: 17, 28188: 14, 28189: 13, 28682: 20, 28696: 18,
-                           25579: 12, 25685: 17, 28277: 1, 28680: 5}
+                           25579: 12, 25685: 17, 28277: 1, 28680: 5, 21729: 1, 30236: 1}
         require(altered_inputs == expected_inputs[number], '越界输入数量与审核证据不符')
         item = {'book': 'practice', 'id': str(number), 'global_number': number,
                 'tests': True, 'test_count': len(cases), 'test_cases': cases}
@@ -92,6 +97,9 @@ def prepare(batch, work):
                  'reference_source': source, 'baseline_files': baseline, 'changes': changes,
                  'local_dataset': str(target.relative_to(ROOT)), 'local': sanitized(receipt),
                  'verified_legal_pairs': len(cases), 'repaired_inputs': altered_inputs}
+        if number == 30236:
+            group['reference_policy'] = {'rule':'操作数不能包含前导零；用户已明确确认',
+                                         'original_reference_sha256':proof['sha256']}
         if prior:
             group['prior_repair'] = {'path': str(prior_path.relative_to(ROOT)),
                                      'sha256': sha(prior_path.read_bytes())}
