@@ -248,6 +248,127 @@ class ReviewRulesTests(unittest.TestCase):
                     self.assertEqual(str(first_missing-1),solve(f'{len(coins)} {k}\n'+' '.join(map(str,coins))))
 
 
+    def test_tree_repair_keeps_forest_edges_and_connects_all_vertices(self):
+        result = list(map(int,rules.repair_input(28187,b'5\n1 2\n2 3\n3 1\n0 4\n').split()))
+        n = result[0]
+        edges = list(zip(result[1::2],result[2::2]))
+        self.assertEqual(4,len(edges))
+        self.assertIn((1,2),edges)
+        self.assertIn((2,3),edges)
+        graph = [[] for _ in range(n+1)]
+        for u,v in edges:
+            self.assertTrue(1<=u<=n and 1<=v<=n and u!=v)
+            graph[u].append(v);graph[v].append(u)
+        reached = {1}
+        todo = [1]
+        while todo:
+            for v in graph[todo.pop()]:
+                if v not in reached:
+                    reached.add(v);todo.append(v)
+        self.assertEqual(set(range(1,n+1)),reached)
+
+    def test_hotel_outgoing_edges_only_are_removed(self):
+        result = list(map(int,rules.repair_input(28188,b'5\n0 1 0 1 0\n0 1 2 3 4\n').split()))
+        self.assertEqual([5,0,1,0,1,0,0,1,0,3,0],result)
+
+    def test_restaurant_total_preserves_whole_test_prefix(self):
+        cases = [(400,[1]*400,[2]*400),(400,[3]*400,[4]*400),(300,[5]*300,[6]*300)]
+        rows = ['3']
+        for n,a,b in cases:
+            rows += [str(n),' '.join(map(str,a)),' '.join(map(str,b))]
+        result = list(map(int,rules.repair_input(28189,'\n'.join(rows).encode()).split()))
+        expected = [2]
+        for n,a,b in cases[:2]:expected += [n]+a+b
+        self.assertEqual(expected,result)
+        self.assertEqual(800,sum(c[0] for c in cases[:2]))
+
+    def test_toy_names_are_distinct_and_steps_strictly_bounded(self):
+        fixed = rules.repair_input(28682,b'4 2\n0 a\n1 a\n0 fixa\n1 c\n0 4\n1 1\n').decode().splitlines()
+        people = [line.split() for line in fixed[1:5]]
+        names = [name for d,name in people]
+        self.assertEqual(4,len(set(names)))
+        self.assertEqual(['a','fixa','c'],[names[i] for i in (0,2,3)])
+        self.assertTrue(all(name.isascii() and name.isalpha() and len(name)<=10 for name in names))
+        self.assertEqual(['0','1','0','1'],[d for d,name in people])
+        self.assertEqual(['0 3','1 1'],fixed[5:])
+
+    def test_mouse_ranks_are_distinct_and_preserve_unequal_order(self):
+        health = [3,3,-2,100,100]
+        ranks = list(map(int,rules.repair_input(28696,b'5\n3 3 -2 100 100').split()))[1:]
+        self.assertEqual(5,len(set(ranks)))
+        for i,j in itertools.product(range(5),repeat=2):
+            if health[i]<health[j]:self.assertLess(ranks[i],ranks[j])
+
+    def test_fifth_batch_valid_inputs_stay_byte_identical(self):
+        for n,value in ((28187,b'2\n1 2'),(28188,b'2\n0 1\n0 1'),
+                        (28189,b'1\n2\n1 1\n1 1'),(28682,b'2 1\n0 a\n1 b\n0 1'),(28696,b'2\n10 -3')):
+            self.assertEqual(value,rules.repair_input(n,value))
+
+    def test_vacation_against_all_deterministic_forward_paths(self):
+        solve = self.reference(28188,13,'vacation')
+        rng = random.Random(66)
+        for _ in range(100):
+            n = 8
+            kinds = [rng.randrange(2) for _ in range(n)]
+            kinds[-1] = 1
+            parents = [rng.randrange(n+1) for _ in range(n)]
+            parents = [p if not p or not kinds[p-1] else 0 for p in parents]
+            graph = [[] for _ in range(n)]
+            for i,p in enumerate(parents):
+                if p:graph[p-1].append(i)
+            candidates = []
+            for start in range(n):
+                path,seen,at = [],set(),start
+                while at not in seen:
+                    path.append(at+1);seen.add(at)
+                    if kinds[at]:
+                        candidates.append(path);break
+                    if len(graph[at])!=1:break
+                    at = graph[at][0]
+            best = min(candidates,key=lambda p:(-len(p),p[-1]))
+            given = str(n)+'\n'+' '.join(map(str,kinds))+'\n'+' '.join(map(str,parents))
+            self.assertEqual([len(best)]+best,list(map(int,solve(given).split())))
+
+    def test_restaurant_against_all_disjoint_affordable_groups(self):
+        solve = self.reference(28189,13,'restaurant')
+        rng = random.Random(67)
+        for _ in range(80):
+            n = 7
+            a,b = [[rng.randrange(1,8) for _ in range(n)] for _ in range(2)]
+            valid = [mask for mask in range(1,1<<n) if bin(mask).count('1')>=2 and
+                     sum(b[i]-a[i] for i in range(n) if mask>>i&1)>=0]
+            dp = [0]*(1<<n)
+            for mask in range(1,1<<n):
+                first = mask&-mask
+                dp[mask] = dp[mask^first]
+                for group in valid:
+                    if group&first and group&mask==group:
+                        dp[mask] = max(dp[mask],1+dp[mask^group])
+            given = f'1\n{n}\n'+' '.join(map(str,a))+'\n'+' '.join(map(str,b))
+            self.assertEqual(str(dp[-1]),solve(given))
+
+    def test_toys_against_counting_each_individual_step(self):
+        solve = self.reference(28682,13,'toys')
+        rng = random.Random(68)
+        for n in range(2,10):
+            people = [(rng.randrange(2),chr(ord('a')+i)) for i in range(n)]
+            commands = [(rng.randrange(2),rng.randrange(1,n)) for _ in range(20)]
+            at = 0
+            for direction,steps in commands:
+                increment = -1 if direction==people[at][0] else 1
+                for _ in range(steps):at=(at+increment)%n
+            given = f'{n} 20\n'+'\n'.join(f'{d} {name}' for d,name in people)+'\n'+'\n'.join(f'{d} {s}' for d,s in commands)
+            self.assertEqual(people[at][1],solve(given))
+
+    def test_mice_against_all_pair_differences(self):
+        solve = self.reference(28696,13,'mice')
+        rng = random.Random(69)
+        for n in range(2,20):
+            a = rng.sample(range(-1000,1001),n)
+            _,i,j = max((a[i]-a[j],i,j) for i in range(n) for j in range(n) if i!=j)
+            self.assertEqual(f'{i+1} {j+1}',solve(str(n)+'\n'+' '.join(map(str,a))))
+
+
 
 class ReviewUploadTests(unittest.TestCase):
     def setUp(self):

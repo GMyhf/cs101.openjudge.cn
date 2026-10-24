@@ -126,6 +126,103 @@ def repair_input(number, payload):
             return payload
         # 单组输入只保留声明的m个面值，移除串接在末尾的额外内容。
         return (f'{m} {k}\n' + ' '.join(map(str,coins)) + '\n').encode()
+    if number == 28187:
+        values = list(map(int,text.split()))
+        n = values[0]
+        assert 2 <= n <= 100000 and len(values)%2 == 1
+        parent = list(range(n+1))
+        def find(x):
+            while parent[x] != x:
+                parent[x] = parent[parent[x]]
+                x = parent[x]
+            return x
+        edges = []
+        for u,v in zip(values[1::2],values[2::2]):
+            if 1 <= u <= n and 1 <= v <= n:
+                ru,rv = find(u),find(v)
+                if ru != rv:
+                    edges.append((u,v))
+                    parent[rv] = ru
+        if len(edges) == n-1 and len(values) == 2*n-1:
+            return payload
+        for v in range(2,n+1):
+            ru,rv = find(1),find(v)
+            if ru != rv:
+                edges.append((1,v))
+                parent[rv] = ru
+        assert len(edges) == n-1 and all(find(v)==find(1) for v in range(1,n+1))
+        return (str(n)+'\n'+'\n'.join(f'{u} {v}' for u,v in edges)+'\n').encode()
+    if number == 28188:
+        values = list(map(int,text.split()))
+        n = values[0]
+        kinds,parents = values[1:n+1],values[n+1:]
+        assert 1 <= n <= 100000 and len(values) == 2*n+1
+        assert all(t in (0,1) for t in kinds) and 1 in kinds and all(0 <= p <= n for p in parents)
+        fixed = [p if not p or not kinds[p-1] else 0 for p in parents]
+        if fixed == parents:
+            return payload
+        return (str(n)+'\n'+' '.join(map(str,kinds))+'\n'+' '.join(map(str,fixed))+'\n').encode()
+    if number == 28189:
+        values = list(map(int,text.split()))
+        t = values[0]
+        assert 1 <= t <= 1000
+        at,cases,total = 1,[],0
+        for _ in range(t):
+            n = values[at]
+            a,b = values[at+1:at+1+n],values[at+1+n:at+1+2*n]
+            assert 1 <= n <= 1000 and len(a) == len(b) == n and all(1 <= x <= 1000 for x in a+b)
+            cases.append((n,a,b));total += n;at += 1+2*n
+        assert at == len(values)
+        if total <= 1000:
+            return payload
+        kept,total = [],0
+        for case in cases:
+            if total+case[0] > 1000:
+                break
+            kept.append(case);total += case[0]
+        assert kept and total <= 1000
+        rows = [str(len(kept))]
+        for n,a,b in kept:
+            rows += [str(n),' '.join(map(str,a)),' '.join(map(str,b))]
+        return ('\n'.join(rows)+'\n').encode()
+    if number == 28682:
+        tokens = text.split()
+        n,m = map(int,tokens[:2])
+        assert 2 <= n <= 100000 and 1 <= m <= 100000 and len(tokens) == 2+2*(n+m)
+        people = [(int(tokens[2+2*i]),tokens[3+2*i]) for i in range(n)]
+        operations = [tuple(map(int,tokens[2+2*n+2*i:4+2*n+2*i])) for i in range(m)]
+        assert all(d in (0,1) and 1 <= len(name) <= 10 and name.isascii() and name.isalpha() for d,name in people)
+        assert all(d in (0,1) and 1 <= steps <= n for d,steps in operations)
+        fixed_operations = [(d,min(steps,n-1)) for d,steps in operations]
+        reserved = {name for d,name in people}
+        if len(reserved) == n and fixed_operations == operations:
+            return payload
+        seen,fixed,counter = set(),[],0
+        for direction,name in people:
+            if name in seen:
+                while True:
+                    x,letters = counter,[]
+                    while True:
+                        letters.append(chr(ord('a')+x%26));x //= 26
+                        if not x:break
+                    candidate = 'fix'+''.join(reversed(letters));counter += 1
+                    if candidate not in reserved:break
+                name = candidate;reserved.add(name)
+            seen.add(name);fixed.append((direction,name))
+        assert len(seen) == n and all(len(name) <= 10 for d,name in fixed)
+        rows = [f'{n} {m}']+[f'{d} {name}' for d,name in fixed]+[f'{d} {steps}' for d,steps in fixed_operations]
+        return ('\n'.join(rows)+'\n').encode()
+    if number == 28696:
+        values = list(map(int,text.split()))
+        n,health = values[0],values[1:]
+        assert 2 <= n <= 1000 and len(health) == n
+        if len(set(health)) == n:
+            return payload
+        ranks = [0]*n
+        for rank,index in enumerate(sorted(range(n),key=lambda i:(health[i],i)),1):
+            ranks[index] = rank
+        assert len(set(ranks)) == n
+        return (str(n)+'\n'+' '.join(map(str,ranks))+'\n').encode()
     return payload
 
 
