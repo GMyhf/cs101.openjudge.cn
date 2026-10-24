@@ -6,6 +6,24 @@ import gmyhf_statement_fixes as recipes
 import repair_gmyhf_sample_findings as pipeline
 
 class StatementFixTests(unittest.TestCase):
+    def test_goal_and_digit_output_use_the_defined_variables(self):
+        fields={'description':'起点(0,0)，终点(m,n)，其余保持','output':'数字 2出现的次数。'}
+        result=pipeline.repaired_form(28277,fields,['3','0'])
+        self.assertEqual('起点(0,0)，终点(m-1,n-1)，其余保持',result['description'])
+        self.assertEqual(fields['output'],result['output'])
+        result=pipeline.repaired_form(28680,fields,['6','20'])
+        self.assertEqual('数字 a出现的次数。',result['output'])
+        self.assertEqual(fields['description'],result['description'])
+        with self.assertRaises(AssertionError):recipes.changed_form(28277,{'description':'目标已变化'},[])
+        with self.assertRaises(AssertionError):recipes.changed_form(28680,{'output':'输出已变化'},[])
+
+    def test_embedded_grid_and_digit_samples_are_not_mixed_with_answers(self):
+        f={'sampleInput':'sample1 input:\n1 2\n1 4\n\nsample1 output:\n0',
+           'sampleOutput':'sample2 input:\n1 1\n2\n\nsample2 output:\n0'}
+        for n in (28277,28680):
+            self.assertEqual(['1 2\n1 4','1 1\n2'],pipeline.sample_inputs(n,f))
+        with self.assertRaises(AssertionError):recipes.recovered_samples(28277,dict(f,sampleOutput='无第二样例'))
+
     def test_missing_window_size_is_unique_and_verified(self):
         f={'sampleInput':'2 1 4 3','sampleOutput':'2 4 4'}
         self.assertEqual(['2 1 4 3\n2'],recipes.recovered_samples(31303,f))
@@ -122,3 +140,30 @@ class FollowupWriterTests(unittest.TestCase):
         report=json.loads((self.root/'collab/gmyhf-statement-repairs-batch8.json').read_text())
         self.assertEqual(pipeline.sha((self.root/'collab/gmyhf-review-fixes-batch7.json').read_bytes()),
                          report['problems'][0]['prior_repair_sha256'])
+
+    def test_ninth_batch_binds_repaired_files_for_both_statement_changes(self):
+        from unittest.mock import patch
+        for number in (28277,28680):
+            self.number=number
+            self.fields={k:'自产夹具' for k in pipeline.FIELDS}
+            given,answer=('1 1\n1','0') if number==28277 else ('1 1 1','1')
+            self.fields.update(id=str(number),timeLimit='1000',description='终点(m,n)',output='数字 2出现的次数。',
+                               sampleInput='sample1 input:\n'+given+'\n\nsample1 output:\n'+answer,
+                               sampleOutput='sample2 input:\n'+given+'\n\nsample2 output:\n'+answer)
+            self.files={'a.in':given.encode(),'a.out':answer.encode()}
+            source=f'print({answer})\n'
+            entry={'global_number':number,'authored_reference':{'source':source,'sha256':pipeline.sha(source.encode())},
+                   'checks':{'statement':{'field_sha256':{k:pipeline.sha(html.unescape(self.fields[k]).encode()) for k in pipeline.FIELDS}},
+                             'readback':{'files':[{'filename':n,'sha256':pipeline.sha(b'old invalid')} for n in self.files]},
+                             'answers':{'official_sample_checks':[{'oracle_sha256':pipeline.sha(answer.encode())}]*2}}}
+            pipeline.save(self.root/'collab/gmyhf-pending-batch13-review.json',{'entries':[entry]})
+            prior={'problems':[{'global_number':number,'final_files':{n:pipeline.sha(v) for n,v in self.files.items()}}]}
+            pipeline.save(self.root/'collab/gmyhf-review-fixes-batch9.json',prior)
+            before=dict(self.files)
+            with patch.object(pipeline,'FOLLOWUP9',{number:13}):pipeline.run(self.work,True,9)
+            report=json.loads((self.root/'collab/gmyhf-statement-repairs-batch9.json').read_text())
+            self.assertEqual(9,report['batch']);self.assertTrue(report['applied'])
+            self.assertEqual(before,self.files)
+            self.assertEqual({'description'} if number==28277 else {'output'},set(report['problems'][0]['changed_fields']))
+            self.assertEqual(pipeline.sha((self.root/'collab/gmyhf-review-fixes-batch9.json').read_bytes()),
+                             report['problems'][0]['prior_repair_sha256'])

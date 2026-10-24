@@ -1,0 +1,62 @@
+{
+  "batch": 9,
+  "results": [
+    {
+      "mutation": "放过等于250的尺寸",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错误裁去首列",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "将二维网格误作平面前缀",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "仍保留零查询",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "意外修改查询区间",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "目标列仍越界",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "输出仍固定数字2",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "样例混入标签与答案",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "未绑定第9批数据回执",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "28277参考代价或位数边界反转",
+      "detected": true,
+      "failures": 1
+    },
+    {
+      "mutation": "28680参考代价或位数边界反转",
+      "detected": true,
+      "failures": 1
+    }
+  ],
+  "procedure_source": "import hashlib,json,os,subprocess,sys,unittest,io\nfrom pathlib import Path\nroot=Path.cwd();rules=root/'scripts/gmyhf_review_fixes.py';recipes=root/'scripts/gmyhf_statement_fixes.py';pipe=root/'scripts/repair_gmyhf_sample_findings.py'\noriginals={p:p.read_text() for p in (rules,recipes,pipe)}\ncases=[\n(rules,'放过等于250的尺寸','if m < 250 and n < 250:','if m <= 250 and n <= 250:','test_gmyhf_review_fixes.ReviewRulesTests.test_grid_and_digit_repairs_preserve_unaffected_values'),\n(rules,'错误裁去首列','row[:width]','row[-width:]','test_gmyhf_review_fixes.ReviewRulesTests.test_grid_and_digit_repairs_preserve_unaffected_values'),\n(rules,'将二维网格误作平面前缀','values[2+i*n:2+(i+1)*n]','values[2+i*249:2+(i+1)*249]','test_gmyhf_review_fixes.ReviewRulesTests.test_grid_and_digit_repairs_preserve_unaffected_values'),\n(rules,'仍保留零查询',\"return f'{left} {right} 1\\\\n'.encode()\",\"return f'{left} {right} 0\\\\n'.encode()\",'test_gmyhf_review_fixes.ReviewRulesTests.test_grid_and_digit_repairs_preserve_unaffected_values'),\n(rules,'意外修改查询区间',\"return f'{left} {right} 1\\\\n'.encode()\",\"return f'{left+1} {right} 1\\\\n'.encode()\",'test_gmyhf_review_fixes.ReviewRulesTests.test_grid_and_digit_repairs_preserve_unaffected_values'),\n(recipes,'目标列仍越界',\"replace('(m,n)','(m-1,n-1)')\",\"replace('(m,n)','(m-1,n)')\",'test_gmyhf_statement_fixes.StatementFixTests.test_goal_and_digit_output_use_the_defined_variables'),\n(recipes,'输出仍固定数字2',\"replace('数字 2','数字 a')\",\"replace('数字 2','数字 2')\",'test_gmyhf_statement_fixes.StatementFixTests.test_goal_and_digit_output_use_the_defined_variables'),\n(recipes,'样例混入标签与答案','result.append(match[1].strip())','result.append(match[0].strip())','test_gmyhf_statement_fixes.StatementFixTests.test_embedded_grid_and_digit_samples_are_not_mixed_with_answers'),\n(pipe,'未绑定第9批数据回执',\"else 'collab/gmyhf-review-fixes-batch9.json'\",\"else 'collab/gmyhf-review-fixes-batch7.json'\",'test_gmyhf_statement_fixes.FollowupWriterTests.test_ninth_batch_binds_repaired_files_for_both_statement_changes')]\nresults=[]\ntry:\n for p,name,old,new,test in cases:\n  assert originals[p].count(old)==1,(name,originals[p].count(old));p.write_text(originals[p].replace(old,new))\n  run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest','tests.'+test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert run.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':run.returncode});p.write_text(originals[p])\nfinally:\n for p,s in originals.items():p.write_text(s)\nsys.path.insert(0,str(root));from tests.test_gmyhf_review_fixes import ReviewRulesTests\nfrom unittest.mock import patch\nfor n,fn,old,new,test in [(28277,'arrows','int(a[u] != direction)','int(a[u] == direction)','test_arrows_reference_against_heap_shortest_paths'),(28680,'digit_count','if cur > digit:','if cur >= digit:','test_digit_reference_against_direct_decimal_strings')]:\n entry=next(e for e in json.loads((root/'collab/gmyhf-pending-batch13-review.json').read_text())['entries'] if e['global_number']==n)\n source=entry['authored_reference']['source'].split('import sys\\nsys.stdout.write')[0]\n assert source.count(old)==1;ns={};exec(source.replace(old,new),ns)\n with patch.object(ReviewRulesTests,'reference',return_value=ns[fn]):\n  result=unittest.TextTestRunner(stream=io.StringIO()).run(ReviewRulesTests(test));assert not result.wasSuccessful()\n results.append({'mutation':f'{n}参考代价或位数边界反转','detected':True,'failures':len(result.failures)})\ns=Path(__file__).read_text()\n(root/'collab/gmyhf-review-fixes-batch9-mutations.json').write_text(json.dumps({'batch':9,'results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n')\nprint(len(results),'种变异检出，源码已恢复')\n",
+  "procedure_sha256": "73842daae460ba39e59a2acb77ac53c95f708d163dc008c9956ccd4110416bad"
+}

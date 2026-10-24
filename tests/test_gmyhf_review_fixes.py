@@ -16,6 +16,42 @@ import repair_gmyhf_review_findings as repair
 
 
 class ReviewRulesTests(unittest.TestCase):
+    def test_grid_and_digit_repairs_preserve_unaffected_values(self):
+        before = ('2 250\n'+' '.join(['1']*249+['4'])+'\n'+' '.join(['2']*249+['3'])).encode()
+        fixed = list(map(int,rules.repair_input(28277,before).split()))
+        self.assertEqual([2,249]+[1]*249+[2]*249,fixed)
+        self.assertEqual(b'10 33 1\n',rules.repair_input(28680,b'10 33 0'))
+        for number,legal in ((28277,b'1 2  1 4'),(28680,b'10 33  9')):
+            self.assertEqual(legal,rules.repair_input(number,legal))
+        for number,bad in ((28277,b'1 1 5'),(28277,b'0 1'),(28680,b'0 5 0'),(28680,b'5 4 1'),(28680,b'1 5 10')):
+            with self.assertRaises(AssertionError):rules.repair_input(number,bad)
+
+    def test_arrows_reference_against_heap_shortest_paths(self):
+        import heapq
+        solve=self.reference(28277,13,'arrows');rng=random.Random(609)
+        for m in range(1,5):
+            for n in range(1,5):
+                for _ in range(10):
+                    a=[rng.randrange(1,5) for i in range(m*n)]
+                    dist={(0,0):0};heap=[(0,0,0)]
+                    while heap:
+                        cost,r,c=heapq.heappop(heap)
+                        if cost!=dist[r,c]:continue
+                        for direction,(dr,dc) in enumerate(((0,1),(0,-1),(1,0),(-1,0)),1):
+                            x,y=r+dr,c+dc
+                            if not (0<=x<m and 0<=y<n):continue
+                            candidate=cost+(direction!=a[r*n+c])
+                            if candidate<dist.get((x,y),10**9):
+                                dist[x,y]=candidate;heapq.heappush(heap,(candidate,x,y))
+                    self.assertEqual(str(dist[m-1,n-1]),solve(' '.join(map(str,[m,n]+a))))
+
+    def test_digit_reference_against_direct_decimal_strings(self):
+        solve=self.reference(28680,13,'digit_count');rng=random.Random(610)
+        for _ in range(300):
+            left=rng.randrange(1,200);right=rng.randrange(left,500);digit=rng.randrange(1,10)
+            expected=sum(str(x).count(str(digit)) for x in range(left,right+1))
+            self.assertEqual(str(expected),solve(f'{left} {right} {digit}'))
+
     def test_wealth_repair_uses_nearest_unique_values_in_original_order(self):
         given = b'5\n50 10 10 11\n'
         self.assertEqual(b'5\n50 10 11 12\n', rules.repair_input(25685, given))

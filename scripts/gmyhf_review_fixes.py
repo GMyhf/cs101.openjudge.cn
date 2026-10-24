@@ -5,6 +5,23 @@ import json
 
 def repair_input(number, payload):
     text = payload.decode()
+    if number == 28277:
+        values = list(map(int, text.split()))
+        m,n = values[:2]
+        assert 1 <= m <= 250 and 1 <= n <= 250 and len(values) == 2 + m*n
+        assert all(1 <= x <= 4 for x in values[2:])
+        if m < 250 and n < 250:
+            return payload
+        rows = [values[2+i*n:2+(i+1)*n] for i in range(m)]
+        height,width = min(m,249),min(n,249)
+        return (f'{height} {width}\n'+'\n'.join(' '.join(map(str,row[:width])) for row in rows[:height])+'\n').encode()
+    if number == 28680:
+        left,right,digit = map(int,text.split())
+        assert 1 <= left <= right and 0 <= digit <= 9
+        if digit > 0:
+            return payload
+        # 依原题正整数约束，0查询替换为最近合法数字1，区间不变。
+        return f'{left} {right} 1\n'.encode()
     if number == 25685:
         values = list(map(int, text.split()))
         m, wealth = values[0], values[1:]

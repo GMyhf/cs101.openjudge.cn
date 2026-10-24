@@ -1,6 +1,14 @@
 """修正可证明的题面约束及缺失样例参数；不改变算法规则。"""
 
 def recovered_samples(number, fields):
+    if number in (28277,28680):
+        import re
+        result=[]
+        for i,key in ((1,'sampleInput'),(2,'sampleOutput')):
+            match=re.search(rf'sample{i} input:\s*(.*?)\s*sample{i} output:',fields[key],re.S)
+            assert match is not None
+            result.append(match[1].strip())
+        return result
     if number == 25685:
         v=list(map(int,fields['sampleInput'].split()))
         m,a=v[0],v[1:]
@@ -18,7 +26,13 @@ def recovered_samples(number, fields):
 
 def changed_form(number,fields,answers):
     result=dict(fields)
-    if number==25685:
+    if number==28277:
+        assert result['description'].count('(m,n)')==1
+        result['description']=result['description'].replace('(m,n)','(m-1,n-1)')
+    elif number==28680:
+        assert result['output'].count('数字 2')==1
+        result['output']=result['output'].replace('数字 2','数字 a')
+    elif number==25685:
         assert answers==['2']
         result['sampleInput']=recovered_samples(number,fields)[0]
         result['sampleOutput']='2\n解释：[3,5,9]收发款变成[3+3,5+3,9-3]即[6,8,6]时，有最小贫富差距8-6=2。'
