@@ -16,6 +16,31 @@ import repair_gmyhf_review_findings as repair
 
 
 class ReviewRulesTests(unittest.TestCase):
+    def test_wealth_repair_uses_nearest_unique_values_in_original_order(self):
+        given = b'5\n50 10 10 11\n'
+        self.assertEqual(b'5\n50 10 11 12\n', rules.repair_input(25685, given))
+        legal = b'5  50 10 11'
+        self.assertEqual(legal, rules.repair_input(25685, legal))
+        for bad in (b'5 4 6', b'-1 0 1', b'5 6'):
+            with self.assertRaises(AssertionError):rules.repair_input(25685, bad)
+
+    def test_wealth_reference_against_all_payment_signs(self):
+        solve = self.reference(25685, 12, 'smallest_gap')
+        rng = random.Random(607)
+        for n in range(2, 10):
+            for _ in range(20):
+                m = rng.randrange(5)
+                a = [rng.randrange(m,m+20) for i in range(n)]
+                given = (' '.join(map(str,[m]+a))).encode()
+                fixed = list(map(int,rules.repair_input(25685,given).split()))[1:]
+                self.assertEqual(n,len(set(fixed)))
+                self.assertTrue(all(x>=m for x in fixed))
+                self.assertTrue(all(fixed[i]<fixed[j] for i in range(n) for j in range(n) if a[i]<a[j]))
+                for values in (a,fixed):
+                    expected = min(max(z)-min(z) for signs in itertools.product((-1,1),repeat=n)
+                                   for z in [[x+m*d for x,d in zip(values,signs)]])
+                    self.assertEqual(str(expected),solve(' '.join(map(str,[m]+values))))
+
     def test_stock_repair_preserves_each_price_difference(self):
         before = b'4\n0 8 2 5\n4 7 0 9\n'
         self.assertEqual(b'4\n1 9 3 6\n5 8 1 10\n', rules.repair_input(25579, before))

@@ -5,6 +5,20 @@ import json
 
 def repair_input(number, payload):
     text = payload.decode()
+    if number == 25685:
+        values = list(map(int, text.split()))
+        m, wealth = values[0], values[1:]
+        assert m >= 0 and 2 <= len(wealth) <= 1000 and min(wealth) >= m
+        if len(set(wealth)) == len(wealth):
+            return payload
+        # 按原财富及输入位置稳定排序，仅在相邻值冲突时递增至最近合法整数。
+        fixed = wealth[:]
+        previous = m - 1
+        for i in sorted(range(len(wealth)), key=lambda i: (wealth[i], i)):
+            fixed[i] = max(wealth[i], previous + 1)
+            previous = fixed[i]
+        assert len(set(fixed)) == len(fixed) and min(fixed) >= m
+        return (str(m) + '\n' + ' '.join(map(str, fixed)) + '\n').encode()
     if number == 25579:
         values = list(map(int, text.split()))
         n = values[0]

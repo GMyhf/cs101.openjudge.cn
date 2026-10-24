@@ -1,14 +1,14 @@
 {
-  "scope": "T-060本轮六批指定问题的修复收口；不是所有历史疑点已消除或已接入题库的声明。",
+  "scope": "T-060本轮七批指定问题的修复收口；不是所有历史疑点已消除或已接入题库的声明。",
   "totals": {
-    "problems": 29,
-    "repaired_inputs": 190,
+    "problems": 30,
+    "repaired_inputs": 207,
     "repaired_answers": 192,
     "changed_statement_fields": 9,
-    "accepted_legal_pairs": 608,
+    "accepted_legal_pairs": 628,
     "recomputed_samples": 9,
-    "readback_files": 1689,
-    "detected_mutations": 41
+    "readback_files": 1729,
+    "detected_mutations": 47
   },
   "reports": [
     {
@@ -35,6 +35,11 @@
       "phase": 6,
       "path": "collab/gmyhf-review-fixes-batch6.json",
       "sha256": "c28f88985483f594af44e1d538f9606f01777b41209d3adc6fbdf1fda440424a"
+    },
+    {
+      "phase": 7,
+      "path": "collab/gmyhf-review-fixes-batch7.json",
+      "sha256": "996a23954ef29b46552f100abc4ee96309b2c431c4dc423fda50735ded4be4ed"
     },
     {
       "phase": 4,
@@ -94,6 +99,13 @@
       "report": "collab/gmyhf-review-fixes-batch6.json",
       "scope": "本批输入/答案修复及全量回读已完成",
       "changes": 12
+    },
+    {
+      "global_number": 25685,
+      "phase": 7,
+      "report": "collab/gmyhf-review-fixes-batch7.json",
+      "scope": "本批输入/答案修复及全量回读已完成",
+      "changes": 17
     },
     {
       "global_number": 27945,
@@ -293,6 +305,11 @@
       "path": "collab/gmyhf-review-fixes-batch6-mutations.json",
       "sha256": "77e1e5ef52208d07740b7bb40e284a758936a13ebf87de37158ea5e714d5e74f",
       "detected": 6
+    },
+    {
+      "path": "collab/gmyhf-review-fixes-batch7-mutations.json",
+      "sha256": "2dd52eba4e523e7119cf184f642ae322cf2a72c46a380e539788baf2534c6539",
+      "detected": 6
     }
   ],
   "additional_finding": {
@@ -373,7 +390,6 @@
   },
   "next_candidates_not_exhaustive": [
     21729,
-    25685,
     27934,
     27952,
     28016,
@@ -391,6 +407,6 @@
     31303
   ],
   "preserved_exclusions": "未放宽valid、时限余量、2MiB输出或SPJ要求；无公开映射和无下载题仍保留原排除。",
-  "procedure_sha256": "0dd6311f85bc79c7ef6e4d7c0202161450ac6ad2f7baf5def23e902602b3a774",
-  "procedure_source": "\"\"\"只读收口校验六批回执、历史源码绑定和本地结果；归档新增步长边界发现。\"\"\"\nimport hashlib,json,subprocess\nfrom pathlib import Path\nROOT=Path.cwd()\ndef sha(b):return hashlib.sha256(b).hexdigest()\ndef read(path):return json.loads((ROOT/path).read_text())\nreports=[];problems=[];files=set();input_count=answer_count=pair_count=0\ncommits={1:'2a8bc7d21',2:'79fe0c992',3:'27aabcd3e',5:'ae51f71fa'}\nfor batch in (1,2,3,5,6):\n path=f'collab/gmyhf-review-fixes-batch{batch}.json';report=read(path);assert report['applied']\n for key,code in [('procedure_sha256','scripts/repair_gmyhf_review_findings.py'),('rules_sha256','scripts/gmyhf_review_fixes.py'),('common_sha256','scripts/repair_gmyhf_pending_answers.py')]:\n  source=subprocess.check_output(['git','show',f'{commits[batch]}:{code}']) if batch in commits else (ROOT/code).read_bytes()\n  assert sha(source)==report[key],(batch,key)\n reports.append({'phase':batch,'path':path,'sha256':sha((ROOT/path).read_bytes())})\n for group in report['problems']:\n  n=group['global_number'];assert group['local']['status']=='Accepted' and group['local']['timing_audit']['status']=='passed'\n  assert group['form_unchanged'] and group['file_list_unchanged']\n  evidence=ROOT/group['evidence'];assert sha(evidence.read_bytes())==group['evidence_sha256']\n  directory=ROOT/group['local_dataset'];assert sha((directory/'reference.py').read_bytes())==group['reference_sha256']==sha(group['reference_source'].encode())\n  expected=dict(group['before_files'])\n  for change in group['changes']:\n   assert expected[change['filename']]==change['before_sha256']\n   expected[change['filename']]=change['after_sha256']\n   if change['filename'].endswith('.in'):input_count+=1\n   elif change['filename'].endswith('.out'):answer_count+=1\n  assert expected==group['final_files']\n  for name,digest in group['final_files'].items():\n   assert (n,name) not in files;files.add((n,name))\n   if name.endswith(('.in','.out')):assert sha((directory/'data'/name).read_bytes())==digest\n  pair_count+=group['verified_legal_pairs']\n  problems.append({'global_number':n,'phase':batch,'report':path,'scope':'本批输入/答案修复及全量回读已完成','changes':len(group['changes'])})\npath='collab/gmyhf-sample-repairs.json';report=read(path);assert report['applied']\nassert report['procedure_sha256']==sha((ROOT/'scripts/repair_gmyhf_sample_findings.py').read_bytes())\nreports.append({'phase':4,'path':path,'sha256':sha((ROOT/path).read_bytes())})\nsample_count=field_count=0\nfor group in report['problems']:\n n=group['global_number'];assert group['before_files']==group['final_files'] and group['local_matches'] and group['only_allowed_fields_changed']\n assert sha((ROOT/group['evidence']).read_bytes())==group['evidence_sha256']\n local=read(group['local_statement']+'/fields.json')\n normalized={k:v.replace('\\r\\n','\\n') for k,v in local.items()}\n assert sha(json.dumps(normalized,ensure_ascii=False,sort_keys=True).encode())==group['after_form_sha256']\n for name in group['final_files']:\n  assert (n,name) not in files;files.add((n,name))\n sample_count+=len(group['samples']);field_count+=len(group['changed_fields'])\n problems.append({'global_number':n,'phase':4,'report':path,'scope':'本批样例/讲解修复及全量回读已完成','changed_fields':sorted(group['changed_fields'])})\nstep_findings=[]\ngroup=next(g for g in read('collab/gmyhf-review-fixes-batch5.json')['problems'] if g['global_number']==28682)\nfor row in next(e for e in read(group['evidence'])['entries'] if e['global_number']==28682)['checks']['answers']['files']:\n before=(ROOT/f'data/openjudge/tests/admin_download/28682/{row[\"input\"]}').read_bytes()\n tokens=before.split();n,m=map(int,tokens[:2]);steps=[int(tokens[3+2*n+2*i]) for i in range(m)]\n if n in steps:\n  after=(ROOT/group['local_dataset']/'data'/row['input']).read_bytes();fixed=after.split()\n  assert sha(before)==row['input_sha256'] and sha(after)==group['final_files'][row['input']]\n  assert all(1<=int(fixed[3+2*n+2*i])<n for i in range(m))\n  step_findings.append({'input':row['input'],'before_sha256':sha(before),'after_sha256':sha(after),\n                        'original_steps_equal_n':steps.count(n),'corrected_steps_strictly_less_than_n':True})\nassert len(step_findings)==10\nmutations=[]\nfor path in ['collab/gmyhf-review-fixes-mutations.json','collab/gmyhf-review-fixes-batch2-mutations.json','collab/gmyhf-review-fixes-batch3-mutations.json','collab/gmyhf-sample-repairs-mutations.json','collab/gmyhf-review-fixes-batch5-mutations.json','collab/gmyhf-review-fixes-batch6-mutations.json']:\n report=read(path);assert all(row['detected'] for row in report['results'])\n mutations.append({'path':path,'sha256':sha((ROOT/path).read_bytes()),'detected':len(report['results'])})\nassert len({g['global_number'] for g in problems})==29\nresult={'scope':'T-060本轮六批指定问题的修复收口；不是所有历史疑点已消除或已接入题库的声明。',\n 'totals':{'problems':len(problems),'repaired_inputs':input_count,'repaired_answers':answer_count,'changed_statement_fields':field_count,\n           'accepted_legal_pairs':pair_count,'recomputed_samples':sample_count,'readback_files':len(files),'detected_mutations':sum(m['detected'] for m in mutations)},\n 'reports':reports,'problems':sorted(problems,key=lambda g:g['global_number']),'mutations':mutations,\n 'additional_finding':{'global_number':28682,'rule':'1≤s_i<n；原第13批未单列10份s_i=n，现改为n−1。',\n                       'files':step_findings},\n 'next_candidates_not_exhaustive':[21729,25685,27934,27952,28016,28277,28341,28680,29329,29663,30125,30236,30549,30686,31239,31241,31303],\n 'preserved_exclusions':'未放宽valid、时限余量、2MiB输出或SPJ要求；无公开映射和无下载题仍保留原排除。',\n 'procedure_sha256':sha(Path(__file__).read_bytes()),'procedure_source':Path(__file__).read_text()}\n(ROOT/'collab/gmyhf-review-fixes-summary.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\\n')\nprint(json.dumps(result['totals'],ensure_ascii=False))\n"
+  "procedure_sha256": "d07b22c45b2b3c4bc880ca8610bfbcefa295ca91dd6b25b87c752396bc04f586",
+  "procedure_source": "\"\"\"只读收口校验七批回执、历史源码绑定和本地结果；归档新增步长边界发现。\"\"\"\nimport hashlib,json,subprocess\nfrom pathlib import Path\nROOT=Path.cwd()\ndef sha(b):return hashlib.sha256(b).hexdigest()\ndef read(path):return json.loads((ROOT/path).read_text())\nreports=[];problems=[];files=set();input_count=answer_count=pair_count=0\ncommits={1:'2a8bc7d21',2:'79fe0c992',3:'27aabcd3e',5:'ae51f71fa',6:'56772cd62'}\nfor batch in (1,2,3,5,6,7):\n path=f'collab/gmyhf-review-fixes-batch{batch}.json';report=read(path);assert report['applied']\n for key,code in [('procedure_sha256','scripts/repair_gmyhf_review_findings.py'),('rules_sha256','scripts/gmyhf_review_fixes.py'),('common_sha256','scripts/repair_gmyhf_pending_answers.py')]:\n  source=subprocess.check_output(['git','show',f'{commits[batch]}:{code}']) if batch in commits else (ROOT/code).read_bytes()\n  assert sha(source)==report[key],(batch,key)\n reports.append({'phase':batch,'path':path,'sha256':sha((ROOT/path).read_bytes())})\n for group in report['problems']:\n  n=group['global_number'];assert group['local']['status']=='Accepted' and group['local']['timing_audit']['status']=='passed'\n  assert group['form_unchanged'] and group['file_list_unchanged']\n  evidence=ROOT/group['evidence'];assert sha(evidence.read_bytes())==group['evidence_sha256']\n  directory=ROOT/group['local_dataset'];assert sha((directory/'reference.py').read_bytes())==group['reference_sha256']==sha(group['reference_source'].encode())\n  expected=dict(group['before_files'])\n  for change in group['changes']:\n   assert expected[change['filename']]==change['before_sha256']\n   expected[change['filename']]=change['after_sha256']\n   if change['filename'].endswith('.in'):input_count+=1\n   elif change['filename'].endswith('.out'):answer_count+=1\n  assert expected==group['final_files']\n  for name,digest in group['final_files'].items():\n   assert (n,name) not in files;files.add((n,name))\n   if name.endswith(('.in','.out')):assert sha((directory/'data'/name).read_bytes())==digest\n  pair_count+=group['verified_legal_pairs']\n  problems.append({'global_number':n,'phase':batch,'report':path,'scope':'本批输入/答案修复及全量回读已完成','changes':len(group['changes'])})\npath='collab/gmyhf-sample-repairs.json';report=read(path);assert report['applied']\nassert report['procedure_sha256']==sha((ROOT/'scripts/repair_gmyhf_sample_findings.py').read_bytes())\nreports.append({'phase':4,'path':path,'sha256':sha((ROOT/path).read_bytes())})\nsample_count=field_count=0\nfor group in report['problems']:\n n=group['global_number'];assert group['before_files']==group['final_files'] and group['local_matches'] and group['only_allowed_fields_changed']\n assert sha((ROOT/group['evidence']).read_bytes())==group['evidence_sha256']\n local=read(group['local_statement']+'/fields.json')\n normalized={k:v.replace('\\r\\n','\\n') for k,v in local.items()}\n assert sha(json.dumps(normalized,ensure_ascii=False,sort_keys=True).encode())==group['after_form_sha256']\n for name in group['final_files']:\n  assert (n,name) not in files;files.add((n,name))\n sample_count+=len(group['samples']);field_count+=len(group['changed_fields'])\n problems.append({'global_number':n,'phase':4,'report':path,'scope':'本批样例/讲解修复及全量回读已完成','changed_fields':sorted(group['changed_fields'])})\nstep_findings=[]\ngroup=next(g for g in read('collab/gmyhf-review-fixes-batch5.json')['problems'] if g['global_number']==28682)\nfor row in next(e for e in read(group['evidence'])['entries'] if e['global_number']==28682)['checks']['answers']['files']:\n before=(ROOT/f'data/openjudge/tests/admin_download/28682/{row[\"input\"]}').read_bytes()\n tokens=before.split();n,m=map(int,tokens[:2]);steps=[int(tokens[3+2*n+2*i]) for i in range(m)]\n if n in steps:\n  after=(ROOT/group['local_dataset']/'data'/row['input']).read_bytes();fixed=after.split()\n  assert sha(before)==row['input_sha256'] and sha(after)==group['final_files'][row['input']]\n  assert all(1<=int(fixed[3+2*n+2*i])<n for i in range(m))\n  step_findings.append({'input':row['input'],'before_sha256':sha(before),'after_sha256':sha(after),\n                        'original_steps_equal_n':steps.count(n),'corrected_steps_strictly_less_than_n':True})\nassert len(step_findings)==10\nmutations=[]\nfor path in ['collab/gmyhf-review-fixes-mutations.json','collab/gmyhf-review-fixes-batch2-mutations.json','collab/gmyhf-review-fixes-batch3-mutations.json','collab/gmyhf-sample-repairs-mutations.json','collab/gmyhf-review-fixes-batch5-mutations.json','collab/gmyhf-review-fixes-batch6-mutations.json','collab/gmyhf-review-fixes-batch7-mutations.json']:\n report=read(path);assert all(row['detected'] for row in report['results'])\n mutations.append({'path':path,'sha256':sha((ROOT/path).read_bytes()),'detected':len(report['results'])})\nassert len({g['global_number'] for g in problems})==30\nresult={'scope':'T-060本轮七批指定问题的修复收口；不是所有历史疑点已消除或已接入题库的声明。',\n 'totals':{'problems':len(problems),'repaired_inputs':input_count,'repaired_answers':answer_count,'changed_statement_fields':field_count,\n           'accepted_legal_pairs':pair_count,'recomputed_samples':sample_count,'readback_files':len(files),'detected_mutations':sum(m['detected'] for m in mutations)},\n 'reports':reports,'problems':sorted(problems,key=lambda g:g['global_number']),'mutations':mutations,\n 'additional_finding':{'global_number':28682,'rule':'1≤s_i<n；原第13批未单列10份s_i=n，现改为n−1。',\n                       'files':step_findings},\n 'next_candidates_not_exhaustive':[21729,27934,27952,28016,28277,28341,28680,29329,29663,30125,30236,30549,30686,31239,31241,31303],\n 'preserved_exclusions':'未放宽valid、时限余量、2MiB输出或SPJ要求；无公开映射和无下载题仍保留原排除。',\n 'procedure_sha256':sha(Path(__file__).read_bytes()),'procedure_source':Path(__file__).read_text()}\n(ROOT/'collab/gmyhf-review-fixes-summary.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\\n')\nprint(json.dumps(result['totals'],ensure_ascii=False))\n"
 }

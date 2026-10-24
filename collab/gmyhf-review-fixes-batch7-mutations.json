@@ -1,0 +1,37 @@
+{
+  "batch": 7,
+  "results": [
+    {
+      "mutation": "保留财富重复",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "用排名替换原财富",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "打乱市民输入位置",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放过财富下限",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放过负收发款",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "将最小贫富差距误取最大",
+      "detected": true,
+      "failures": 1
+    }
+  ],
+  "procedure_source": "import hashlib,json,os,subprocess,sys,unittest,io\nfrom pathlib import Path\nroot=Path.cwd();path=root/'scripts/gmyhf_review_fixes.py';original=path.read_text()\nvariants=[('保留财富重复','fixed[i] = max(wealth[i], previous + 1)','fixed[i] = wealth[i]'),('用排名替换原财富','fixed[i] = max(wealth[i], previous + 1)','fixed[i] = previous + 1'),('打乱市民输入位置',\"' '.join(map(str, fixed))\",\"' '.join(map(str, sorted(fixed)))\"),('放过财富下限','and min(wealth) >= m',''),('放过负收发款','assert m >= 0 and 2 <= len(wealth)','assert 2 <= len(wealth)')]\nresults=[]\ntry:\n for name,old,new in variants:\n  assert original.count(old)==1,(name,original.count(old))\n  path.write_text(original.replace(old,new))\n  p=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest','tests.test_gmyhf_review_fixes.ReviewRulesTests.test_wealth_repair_uses_nearest_unique_values_in_original_order'],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert p.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':p.returncode})\nfinally:path.write_text(original)\nsys.path.insert(0,str(root));from tests.test_gmyhf_review_fixes import ReviewRulesTests\nentry=next(e for e in json.loads((root/'collab/gmyhf-pending-batch12-review.json').read_text())['entries'] if e['global_number']==25685)\nsource=entry['authored_reference']['source'].split('import sys\\nsys.stdout.write')[0].replace('best = min(best,','best = max(best,')\nns={};exec(source,ns)\nfrom unittest.mock import patch\nwith patch.object(ReviewRulesTests,'reference',return_value=ns['smallest_gap']):\n result=unittest.TextTestRunner(stream=io.StringIO()).run(ReviewRulesTests('test_wealth_reference_against_all_payment_signs'))\n assert not result.wasSuccessful()\nresults.append({'mutation':'将最小贫富差距误取最大','detected':True,'failures':len(result.failures)})\nprocedure=Path(__file__).read_text()\n(root/'collab/gmyhf-review-fixes-batch7-mutations.json').write_text(json.dumps({'batch':7,'results':results,'procedure_source':procedure,'procedure_sha256':hashlib.sha256(procedure.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n')\nprint('6种变异全部检出，已恢复源码')\n",
+  "procedure_sha256": "bcc86e8a03eb8163ad86ef795523d5fffd7e7011c240d7ddcc0f9914765be895"
+}
