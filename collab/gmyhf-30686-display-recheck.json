@@ -1,0 +1,51 @@
+{
+  "global_number": 30686,
+  "scope": "后台原文的只读实体解析复核，不是公开页面渲染已验证的声明。",
+  "evidence": "collab/gmyhf-pending-batch15-review.json",
+  "evidence_sha256": "daf49d623f2cfd66dab22327561eca3ed9a39cc1688447754716677c2780cec1",
+  "admin_form_sha256": "175358464fdb4e201377ed26f9313db23901a377168bf14f9ca8905df2789134",
+  "admin_form_unchanged": true,
+  "original_statement_fields_match_audit": true,
+  "reference_sha256": "354a07085b56ab072d5a712ee3deb40ce3132a4d7138865a364923e93fb66eb9",
+  "comparisons": [
+    {
+      "method": "single_html_parse",
+      "visible_sha256": "41060db212152c7c82ada37e0b92ef37d9c68364e0e7f28551a9ddc8ecdf5e06",
+      "reference_answers": [
+        "true",
+        "true",
+        "false"
+      ],
+      "sample_input_sha256": [
+        "278f51bd69e394c971018465a3c03a62eb11b2a49bc73713af2e217010315f88",
+        "c420430c8623ef936b485ae8c8d93aaf1bb136ba0efc0e107d2f14153c4613cd",
+        "79934667f6bd54e4d765ec8a4ea68c40c1a14fd3ca72235e52e55f855dec6736"
+      ]
+    },
+    {
+      "method": "extra_unescape_before_html_parse",
+      "visible_sha256": "bf86f2727b423ebae7b8baa10abacea438e21e8d5b4e900a14ae49a073c3769d",
+      "reference_answers": [
+        "false",
+        "false",
+        "false"
+      ],
+      "sample_input_sha256": [
+        "d21d4d535ac70def968e0523b611b28c00eb58558d72f27d1c1631347dcd9f79",
+        "0b41382b0760fd0d7f84623844a3fa6f33ea25aa83685a0de1a7d48cd90b1001",
+        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      ]
+    }
+  ],
+  "platform_writes": 0,
+  "finding": "一次HTML解析保留实体中的代码标签，三样例为true/true/false；先额外unescape再剥HTML会造成原审核的false/false/false。不能据此重写已转义的原文。",
+  "public_route": {
+    "url": "http://cs101.openjudge.cn/practice/30686/",
+    "response_sha256": "975a3ac5e17252d69b4ccff1b4367b7cef0c48956dba4d54ee89e5c13c1ed197",
+    "problem_content_verified": false,
+    "observation": "返回OpenJudge登录入口，未得到题目正文。"
+  },
+  "next_step": "暂缓题面写入；若继续核实际显示，应使用可访问的课程题目路由确认渲染层。",
+  "procedure_sha256": "4eba098eacdf9c8f3eadab60d16825af3e157cfd0065209f8f137639363b38d8",
+  "procedure_source": "\"\"\"只读复核30686的实体边界；不提交表单或上传文件。\"\"\"\nimport html,json,re,sys\nfrom pathlib import Path\nfrom html.parser import HTMLParser\nsys.path.insert(0,str(Path.cwd()/'scripts'))\nimport repair_gmyhf_sample_findings as helper\nclass Visible(HTMLParser):\n    def __init__(self):super().__init__();self.parts=[]\n    def handle_data(self,d):self.parts.append(d)\ndef render(s):\n    p=Visible();p.feed(s);return ''.join(p.parts)\nroot=Path.cwd();before=json.loads(Path('/tmp/gmyhf-statement-repairs-batch8/before/30686/form.json').read_text())\nsession=helper.platform.oj_submit.Session().login()\npage=session._get(helper.platform.oj_submit.HOST+'/admin/problems/edit/?id=30686')\ncurrent=helper.platform.parse_form(page)\nassert helper.fingerprint(current)==helper.fingerprint(before)\nevidence=root/'collab/gmyhf-pending-batch15-review.json'\nentry=next(e for e in json.loads(evidence.read_text())['entries'] if e['global_number']==30686)\nassert {k:helper.sha(html.unescape(before[k]).encode()) for k in helper.FIELDS}==entry['checks']['statement']['field_sha256']\nns={};exec(entry['authored_reference']['source'].split('import sys\\nsys.stdout.write')[0],ns)\nrows=[]\nfor mode,s in [('single_html_parse',before['sampleInput']),('extra_unescape_before_html_parse',html.unescape(before['sampleInput']))]:\n    visible=render(s)\n    samples=re.split(r'sample[123]:\\s*',visible)\n    assert len(samples)==4 and not samples[0].strip()\n    answers=[ns['tag_valid'](p.strip()) for p in samples[1:]]\n    rows.append({'method':mode,'visible_sha256':helper.sha(visible.encode()),'reference_answers':answers,\n                 'sample_input_sha256':[helper.sha(p.strip().encode()) for p in samples[1:]]})\nassert rows[0]['reference_answers']==['true','true','false']\nassert rows[1]['reference_answers']==['false','false','false']\nassert '&lt;DIV&gt;' in before['sampleInput'] and '<DIV>' not in before['sampleInput']\npublic=Path('/tmp/gmyhf-30686-public.html').read_bytes()\nsource=Path(__file__).read_text()\nreport={'global_number':30686,'scope':'后台原文的只读实体解析复核，不是公开页面渲染已验证的声明。',\n        'evidence':str(evidence.relative_to(root)),'evidence_sha256':helper.sha(evidence.read_bytes()),\n        'admin_form_sha256':helper.fingerprint(before),'admin_form_unchanged':True,\n        'original_statement_fields_match_audit':True,'reference_sha256':entry['authored_reference']['sha256'],\n        'comparisons':rows,'platform_writes':0,\n        'finding':'一次HTML解析保留实体中的代码标签，三样例为true/true/false；先额外unescape再剥HTML会造成原审核的false/false/false。不能据此重写已转义的原文。',\n        'public_route':{'url':'http://cs101.openjudge.cn/practice/30686/','response_sha256':helper.sha(public),\n                        'problem_content_verified':False,'observation':'返回OpenJudge登录入口，未得到题目正文。'},\n        'next_step':'暂缓题面写入；若继续核实际显示，应使用可访问的课程题目路由确认渲染层。',\n        'procedure_sha256':helper.sha(source.encode()),'procedure_source':source}\nhelper.save(root/'collab/gmyhf-30686-display-recheck.json',report)\nprint('后台表单保持；一次解析样例true/true/false，重复解码后false/false/false；零写入。')\n"
+}

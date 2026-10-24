@@ -1,0 +1,52 @@
+{
+  "batch": 8,
+  "results": [
+    {
+      "mutation": "窗口长度差一",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "不验证推导窗口的输出",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "样例不修财富下界",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "仍保留反向人数约束",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "仍强制Pass骰子点数",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "覆盖历史第4批回执",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "未绑定上一批财富数据",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "只读模式仍写平台",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "参考不匹配原样例仍放行",
+      "detected": true,
+      "exit_code": 1
+    }
+  ],
+  "procedure_source": "import hashlib,json,os,subprocess\nfrom pathlib import Path\nroot=Path.cwd();rules=root/'scripts/gmyhf_statement_fixes.py';pipe=root/'scripts/repair_gmyhf_sample_findings.py'\noriginals={rules:rules.read_text(),pipe:pipe.read_text()}\ncases=[\n(rules,'窗口长度差一','k=len(a)-len(out)+1','k=len(a)-len(out)+2','StatementFixTests.test_missing_window_size_is_unique_and_verified'),\n(rules,'不验证推导窗口的输出',' and [max(a[i:i+k]) for i in range(len(a)-k+1)]==out','','StatementFixTests.test_missing_window_size_is_unique_and_verified'),\n(rules,'样例不修财富下界','shift=max(0,m-min(a))','shift=0','StatementFixTests.test_wealth_sample_translation_keeps_minimum_gap'),\n(rules,'仍保留反向人数约束',\"replace(old,'1 <= K <= N <= 10^6')\",\"replace(old,'1 <= N <= K <= 10^6')\",'StatementFixTests.test_meeting_and_pass_change_only_the_conflicting_clause'),\n(rules,'仍强制Pass骰子点数','Pass可省略掷骰点数','Pass须提供掷骰点数','StatementFixTests.test_meeting_and_pass_change_only_the_conflicting_clause'),\n(pipe,'覆盖历史第4批回执',\"'gmyhf-sample-repairs.json' if batch==4 else 'gmyhf-statement-repairs-batch8.json'\",\"'gmyhf-sample-repairs.json'\",'FollowupWriterTests.test_batch_selection_readback_retry_and_historical_receipt'),\n(pipe,'未绑定上一批财富数据',\"if number in (30205,25685):\\n            prior\", \"if number==30205:\\n            prior\",'FollowupWriterTests.test_previous_data_repair_is_bound_before_wealth_sample_update'),\n(pipe,'只读模式仍写平台','    if not apply:return','    if False:return','FollowupWriterTests.test_followup_default_readonly_and_drift_guard')]\ncases.append((pipe,'参考不匹配原样例仍放行',\"require(sha(answer.encode())==expected,\",\"require(True,\",'StatementFixTests.test_missing_parameter_sample_cannot_change_the_original_output'))\nresults=[]\ntry:\n for path,name,old,new,test in cases:\n  assert originals[path].count(old)==1,(name,originals[path].count(old))\n  path.write_text(originals[path].replace(old,new))\n  p=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest','tests.test_gmyhf_statement_fixes.'+test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert p.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':p.returncode})\n  path.write_text(originals[path])\nfinally:\n for path,source in originals.items():path.write_text(source)\nsource=Path(__file__).read_text()\n(root/'collab/gmyhf-statement-repairs-batch8-mutations.json').write_text(json.dumps({'batch':8,'results':results,'procedure_source':source,'procedure_sha256':hashlib.sha256(source.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n')\nprint(len(results),'种题面变异全部检出，源码已恢复')\n",
+  "procedure_sha256": "18b65780655f9fb855563528472a64d795a61dd95fa51076daf3a9d8778e9033"
+}

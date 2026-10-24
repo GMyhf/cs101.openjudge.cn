@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""回填审核确认的样例/讲解冲突；默认只备份和生成计划，--apply才写平台。"""
+"""回填审核确认的样例、讲解与输入说明冲突；默认只备份和生成计划，--apply才写平台。"""
 import argparse
 from datetime import datetime, timezone
 import html
@@ -11,6 +11,11 @@ import sys
 
 from repair_gmyhf_pending_answers import (ROOT, sha, save, require, listed_files,
                                          platform)
+
+import gmyhf_statement_fixes as statement_rules
+from gmyhf_statement_fixes import recovered_samples, changed_form
+
+FOLLOWUP = {25685:12,29329:13,30125:14,31303:15}
 
 PROBLEMS = {30205:14, 30176:14, 30916:15, 28698:13, 29951:14, 30078:14, 25576:11}
 FIELDS = {'description','input','output','hint','sampleInput','sampleOutput'}
@@ -27,6 +32,8 @@ def submitted_form(fields):
 
 
 def sample_inputs(number, fields):
+    if number in FOLLOWUP:
+        return recovered_samples(number, fields)
     if number == 25576:
         result = []
         for i, key in ((1,'sampleInput'),(2,'sampleOutput')):
@@ -49,7 +56,9 @@ def replace_line(text, old, new):
 
 def repaired_form(number, fields, answers):
     result = dict(fields)
-    if number == 25576:
+    if number in FOLLOWUP:
+        result = changed_form(number, fields, answers)
+    elif number == 25576:
         require(len(answers)==2 and answers[1]=='15','乘法游戏第二样例变化')
         result['sampleInput'] = replace_line(result['sampleInput'],'5',answers[0])
         old = '[2,5]->[2]'
@@ -64,7 +73,8 @@ def repaired_form(number, fields, answers):
             result['hint'] = result['hint'].replace(old_hint,
                 '先求全局最大加载价值，再按临界分数统计最优配置；使用二项式计数，全程采用精确整数运算。')
     changed = {k for k in fields if fields[k]!=result[k]}
-    allowed = {'sampleInput','sampleOutput'} if number==25576 else (
+    followup_allowed = {25685:{'sampleInput','sampleOutput'},29329:{'input'},30125:{'input'},31303:{'sampleInput'}}
+    allowed = followup_allowed[number] if number in FOLLOWUP else {'sampleInput','sampleOutput'} if number==25576 else (
         {'sampleOutput','hint'} if number==30205 else {'sampleOutput'})
     require(changed==allowed,'修改字段不符合本题修复计划')
     return result
@@ -78,29 +88,34 @@ def compute_samples(number, entry, fields, target):
     reference.write_text(proof['source'])
     inputs = sample_inputs(number,fields)
     checks = entry['checks']['answers']['official_sample_checks']
-    require(len(inputs)==len(checks),'样例组数与审核不符')
+    require(len(inputs)==len(checks) or (number==31303 and len(inputs)==1 and not checks),'样例组数与审核不符')
+    if number==31303:
+        checks=[{'statement_output_sha256':sha(fields['sampleOutput'].strip().encode())}]
     answers, receipts = [], []
     for given,check in zip(inputs,checks):
         result = subprocess.run([sys.executable,'-I',str(reference)],input=given.encode(),
                                 capture_output=True,timeout=60)
         require(result.returncode==0,'样例参考运行失败')
         answer = result.stdout.decode().strip()
-        require(sha(answer.encode())==check['oracle_sha256'],'样例复算与独立审核不符')
+        expected = check['statement_output_sha256'] if number == 31303 else check['oracle_sha256']
+        require(sha(answer.encode())==expected,'样例复算与独立审核或原样例输出不符')
         answers.append(answer)
         receipts.append({'input_sha256':sha(given.encode()),'answer_sha256':sha(answer.encode()),
-                         'audit_matches':True})
+                         'audit_matches':number != 31303,
+                         'restored_source_matches_statement_output':number == 31303})
     return answers, receipts
 
 
-def run(work, apply=False):
+def run(work, apply=False, batch=4):
     session = platform.oj_submit.Session().login()
-    report = {'procedure_sha256':sha(Path(__file__).read_bytes()),'applied':False,
+    require(batch in (4,8),'未知题面修复批次')
+    report = {'batch':batch,'recipes_sha256':sha(Path(statement_rules.__file__).read_bytes()),'procedure_sha256':sha(Path(__file__).read_bytes()),'applied':False,
               'baseline':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
-              'policy':'只修复7题已核定的样例与讲解；全文件备份和最终回读，不改测试数据或题目配置。',
+              'policy':'只修复所选批次已核定的题面冲突；全文件备份和最终回读，不改测试数据或题目配置。',
               'problems':[]}
     plans = []
-    for number,batch in PROBLEMS.items():
-        evidence = ROOT/f'collab/gmyhf-pending-batch{batch}-review.json'
+    for number,audit_batch in (PROBLEMS if batch==4 else FOLLOWUP).items():
+        evidence = ROOT/f'collab/gmyhf-pending-batch{audit_batch}-review.json'
         entry = next(e for e in json.loads(evidence.read_text())['entries'] if e['global_number']==number)
         page = session._get(platform.oj_submit.HOST+f'/admin/problems/edit/?id={number}')
         observed = platform.parse_form(page)
@@ -121,8 +136,8 @@ def run(work, apply=False):
         require(fingerprint(observed) in (fingerprint(before),fingerprint(after)),'题面或配置出现未审核变化')
         names = listed_files(page,number)
         audited = {r['filename']:r['sha256'] for r in entry['checks']['readback']['files']}
-        if number==30205:
-            prior = ROOT/'collab/gmyhf-answer-repairs-batch2.json'
+        if number in (30205,25685):
+            prior = ROOT/('collab/gmyhf-answer-repairs-batch2.json' if number==30205 else 'collab/gmyhf-review-fixes-batch7.json')
             group = next(g for g in json.loads(prior.read_text())['problems'] if g['global_number']==number)
             audited.update(group['final_files'])
         require({n for n in names if n.endswith(('.in','.out'))}=={n for n in audited if n.endswith(('.in','.out'))},
@@ -143,7 +158,7 @@ def run(work, apply=False):
                  'changed_fields':{k:{'before_sha256':sha(before[k].encode()),'after_sha256':sha(after[k].encode())}
                                    for k in FIELDS if before[k]!=after[k]},
                  'before_files':files,'local_statement':str(local.relative_to(ROOT))}
-        if number==30205:group['prior_repair_sha256']=sha(prior.read_bytes())
+        if number in (30205,25685):group['prior_repair_sha256']=sha(prior.read_bytes())
         report['problems'].append(group)
         plans.append((group,before,after))
         print(number,'样例复算及全文件预检通过',len(files),flush=True)
@@ -174,12 +189,14 @@ def run(work, apply=False):
         print(number,'本地题面与平台全部文件最终核验通过',flush=True)
     report.update(applied=True,verified_at=datetime.now(timezone.utc).isoformat())
     save(work/'result.json',report)
-    save(ROOT/'collab/gmyhf-sample-repairs.json',report)
+    output = 'gmyhf-sample-repairs.json' if batch==4 else 'gmyhf-statement-repairs-batch8.json'
+    save(ROOT/'collab'/output,report)
 
 
 if __name__=='__main__':
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--batch',type=int,choices=(4,8),default=4)
     parser.add_argument('--work',type=Path,default=Path('/tmp/gmyhf-sample-repairs'))
     parser.add_argument('--apply',action='store_true')
     args = parser.parse_args()
-    run(args.work,args.apply)
+    run(args.work,args.apply,args.batch)
