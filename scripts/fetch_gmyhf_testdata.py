@@ -10,6 +10,7 @@
 - 被 .gitignore 的 `data/openjudge/tests/**` 盖住，默认不入库；
 - 与已验证入库的 `*_GMyhf/`（audit_gmyhf_data 产物）互不干扰。
 
+续传也回读完整正文；只有字节相同才保留原文件。Content-Length相同不能证明内容未变。
 口令只从 OJ_USER/OJ_PASS 读（红线 2），脚本不接收、不打印、不落盘凭据。
 """
 from __future__ import annotations
@@ -96,18 +97,11 @@ def downloadable_files(entry):
 def download_one(number, directory, filename, force):
     target = directory / filename
     url = f"{oj_submit.HOST}/admin/download?problem_id={number}&filename={urllib.parse.quote(filename)}"
-    if target.is_file() and not force:
-        head = session()._opener.open(
-            session()._request(url), timeout=60)
-        with head:
-            length = head.headers.get("Content-Length")
-        time.sleep(REQUEST_PAUSE)
-        if length is not None and target.stat().st_size == int(length):
-            return {"filename": filename, "bytes": target.stat().st_size,
-                    "sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
-                    "skipped": True}
     payload = get_bytes(url)
     time.sleep(REQUEST_PAUSE)
+    if not force and target.is_file() and target.read_bytes() == payload:
+        return {"filename": filename, "bytes": len(payload),
+                "sha256": hashlib.sha256(payload).hexdigest(), "skipped": True}
     target.write_bytes(payload)
     return {"filename": filename, "bytes": len(payload),
             "sha256": hashlib.sha256(payload).hexdigest()}
@@ -118,7 +112,7 @@ def main():
     parser.add_argument("--list-only", action="store_true",
                         help="只枚举权限和文件清单，不下载")
     parser.add_argument("--force", action="store_true",
-                        help="忽略已有文件，全部重新下载")
+                        help="回读后即使正文相同也重写本地文件")
     args = parser.parse_args()
 
     session()  # 主线程先登录，口令缺失时尽早报错

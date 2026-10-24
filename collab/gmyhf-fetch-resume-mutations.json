@@ -1,0 +1,81 @@
+{
+  "task": "T-060",
+  "batch": 27,
+  "count": 10,
+  "mutations": [
+    {
+      "mutation": "只比较长度",
+      "test": "tests.test_fetch_gmyhf_testdata.FetchDataTests.test_equal_size_changed_body_replaces_cached_answer",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "82bc08b88e7448e502570041168c6f16507870c8345cf9d2871a24cf004c769f"
+    },
+    {
+      "mutation": "用旧缓存冒充远端正文",
+      "test": "tests.test_fetch_gmyhf_testdata.FetchDataTests.test_equal_size_changed_body_replaces_cached_answer",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "925ebb91b22133629a198747a62c550647b61bfba60a60c941d4ff77dd98c8c9"
+    },
+    {
+      "mutation": "相同内容仍重复写文件",
+      "test": "tests.test_fetch_gmyhf_testdata.FetchDataTests.test_equal_body_is_read_back_without_rewriting_cached_file",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "6902a30e15010ad9268204bc5a7eeeff2acac120f727bca572997196f4d96478"
+    },
+    {
+      "mutation": "忽略force",
+      "test": "tests.test_fetch_gmyhf_testdata.FetchDataTests.test_missing_different_length_and_forced_download",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "3f1ea14ff957772d6d0a990a3cb7c175b4752c9a53f7244a7553a0ad1f3b8646"
+    },
+    {
+      "mutation": "漏写新正文",
+      "test": "tests.test_fetch_gmyhf_testdata.FetchDataTests.test_equal_size_changed_body_replaces_cached_answer",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "3a9ea8bc2746531dbf2fedc060e42a01c022832e2e82aee1cd3877d9a8dba4ca"
+    },
+    {
+      "mutation": "回执哈希错误",
+      "test": "tests.test_fetch_gmyhf_testdata.FetchDataTests.test_missing_different_length_and_forced_download",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "c423393699a773bb77bdbcc7b28d107a58697396bca04b6b051f35cf036856cf"
+    },
+    {
+      "mutation": "回执长度错误",
+      "test": "tests.test_fetch_gmyhf_testdata.FetchDataTests.test_missing_different_length_and_forced_download",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "87da9b26ba2fde3cf8f24813db869112e08833570120dacd60fe29fb812c71e2"
+    },
+    {
+      "mutation": "断网退回缓存报成功",
+      "test": "tests.test_fetch_gmyhf_testdata.FetchDataTests.test_failed_readback_keeps_old_bytes_and_does_not_report_success",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "75d73b79975f67b24ea6824a2d3908d4c27198c964bbe4719214e460cc1fa879"
+    },
+    {
+      "mutation": "读完前先清空缓存",
+      "test": "tests.test_fetch_gmyhf_testdata.FetchDataTests.test_failed_readback_keeps_old_bytes_and_does_not_report_success",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "d9c6b2270b9719c5d1418379a84a503d497f43f72175914de2cd148b6fe10e0a"
+    },
+    {
+      "mutation": "下载题号错绑",
+      "test": "tests.test_fetch_gmyhf_testdata.FetchDataTests.test_equal_size_changed_body_replaces_cached_answer",
+      "detected": true,
+      "exit_code": 1,
+      "mutated_sha256": "1d230cb2ff7da403a2ef505b037a6736c6a47965a527dba76c3dd47116a2ac34"
+    }
+  ],
+  "original_reference_sha256": "04eaddf872e996ebd6e90b1cdfc1ce78bbdbdf528c4e8e4c57b264c98e652b9a",
+  "before_fix_failure_log_sha256": "36c369ca54d9f784fa7822d66ace7377da8003b4780e35c8b67cc5de03b5f05c",
+  "source_sha256": "c767f1cd2deb045f37308554e75c7bf21754f1151506699457e09f9253cced30",
+  "tests_sha256": "d425a46c5912bd1a358a4af442577c346c17029fc20915d7f388b971ab8051a7"
+}

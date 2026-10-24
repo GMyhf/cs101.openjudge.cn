@@ -1,0 +1,36 @@
+{
+  "task": "T-060",
+  "batch": 27,
+  "baseline": "154c41dccfcee538ad8a8fc6a0a8aefdc38a2510",
+  "problem": 30497,
+  "filename": "0.out",
+  "remote_bytes": 11,
+  "remote_sha256": "91f30934bc09ccc82ca215955da88acfc1f3d82759438b69e480b7ed08d32e57",
+  "remote_content_length": "11",
+  "changed_equal_length_cache": {
+    "filename": "0.out",
+    "bytes": 11,
+    "sha256": "91f30934bc09ccc82ca215955da88acfc1f3d82759438b69e480b7ed08d32e57"
+  },
+  "identical_body_cache": {
+    "filename": "0.out",
+    "bytes": 11,
+    "sha256": "91f30934bc09ccc82ca215955da88acfc1f3d82759438b69e480b7ed08d32e57",
+    "skipped": true
+  },
+  "force_same_body": {
+    "filename": "0.out",
+    "bytes": 11,
+    "sha256": "91f30934bc09ccc82ca215955da88acfc1f3d82759438b69e480b7ed08d32e57"
+  },
+  "unchanged_cache_mtime_preserved": true,
+  "platform_form_unchanged": true,
+  "platform_writes": 0,
+  "raw_snapshot_modified": false,
+  "sources_sha256": {
+    "scripts/fetch_gmyhf_testdata.py": "c767f1cd2deb045f37308554e75c7bf21754f1151506699457e09f9253cced30",
+    "tests/test_fetch_gmyhf_testdata.py": "d425a46c5912bd1a358a4af442577c346c17029fc20915d7f388b971ab8051a7"
+  },
+  "procedure_source": "\"\"\"真实平台文件只读复核；所有模拟旧缓存仅写临时目录。\"\"\"\nimport hashlib,json,os,subprocess,sys,tempfile\nfrom pathlib import Path\nroot=Path.cwd();sys.path.insert(0,str(root/'scripts'))\nimport fetch_gmyhf_testdata as fetch\nimport repair_gmyhf_pending_answers as common\nsha=lambda raw:hashlib.sha256(raw).hexdigest()\nsession=fetch.session();url=fetch.oj_submit.HOST+'/admin/download?problem_id=30497&filename=0.out'\npage_url=fetch.oj_submit.HOST+'/admin/problems/edit/?id=30497'\nbefore=session._get(page_url)\nwith session._opener.open(session._request(url),timeout=60) as response:\n payload=response.read();length=response.headers.get('Content-Length')\nassert payload and payload!=b'X'*len(payload)\nwith tempfile.TemporaryDirectory(prefix='gmyhf-fetch-resume-') as temporary:\n folder=Path(temporary);target=folder/'0.out';target.write_bytes(b'X'*len(payload))\n changed=fetch.download_one(30497,folder,'0.out',False)\n assert target.read_bytes()==payload and changed['sha256']==sha(payload) and not changed.get('skipped')\n os.utime(target,ns=(10**9,10**9));mtime=target.stat().st_mtime_ns\n same=fetch.download_one(30497,folder,'0.out',False)\n assert same['skipped'] and target.stat().st_mtime_ns==mtime\n forced=fetch.download_one(30497,folder,'0.out',True)\n assert not forced.get('skipped') and target.read_bytes()==payload and target.stat().st_mtime_ns!=mtime\n assert all(r['bytes']==len(payload) and r['sha256']==sha(payload) for r in (changed,same,forced))\nafter=session._get(page_url);assert common.form_sha(before)==common.form_sha(after)\nreport={'task':'T-060','batch':27,'baseline':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'problem':30497,'filename':'0.out','remote_bytes':len(payload),'remote_sha256':sha(payload),'remote_content_length':length,'changed_equal_length_cache':changed,'identical_body_cache':same,'force_same_body':forced,'unchanged_cache_mtime_preserved':True,'platform_form_unchanged':True,'platform_writes':0,'raw_snapshot_modified':False,'sources_sha256':{str(path.relative_to(root)):sha(path.read_bytes()) for path in (root/'scripts/fetch_gmyhf_testdata.py',root/'tests/test_fetch_gmyhf_testdata.py')},'procedure_source':Path(__file__).read_text(),'procedure_sha256':sha(Path(__file__).read_bytes())}\n(root/'collab/gmyhf-fetch-resume-proof.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\\n')\nprint('真实平台回读通过：等长旧缓存已更新，相同正文保留mtime，force重写；平台和原始快照零改动')\n",
+  "procedure_sha256": "93359bcf99b6c94f4085e1b1b3c585e5c2c433962db9b7daaf3902d74f46af25"
+}
