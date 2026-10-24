@@ -19,6 +19,70 @@ def validate_missing_deque_input(payload):
 
 def repair_input(number, payload):
     text = payload.decode()
+    if number == 23554:
+        values = list(map(int, text.split())); n = values[0]; seen = values[1:]
+        assert 1 <= n <= 200 and seen and all(1 <= x <= 10000 for x in seen)
+        insiders = [x for x in seen if x <= n]
+        assert len(insiders) == len(set(insiders)) and any(x > n for x in seen)
+        if len(insiders) < n:
+            return payload
+        # 只移除一个本班观察值，保留其他编号的顺序及重复外班编号。
+        spans = list(re.finditer(rb'\S+', payload)); removed = spans[1+seen.index(n)]
+        return payload[:removed.start()] + payload[removed.end():]
+    if number == 25580:
+        tokens = text.split(); height, distance, n = map(int, tokens[:3])
+        assert 0 < height < 100000 and 0 <= distance < 10000 and 0 < n < 100 and len(tokens) == 3+n
+        speeds = [Fraction(x) for x in tokens[3:]]
+        assert min(speeds) > 0 and len(set(speeds)) == n
+        def required_height(length, velocities):
+            return height - 5*(Fraction(length)/sorted(velocities)[n//2])**2
+        assert required_height(distance, speeds) > 0
+        if max(speeds) < 1000:
+            return payload
+        power = 0; factor = 1
+        while max(speeds) >= 1000*factor:
+            power += 1; factor *= 10
+        # 同比缩小速度与水平距离，距离向下取整使所需木板高度仍为正。
+        distance //= factor
+        scaled = [speed/factor for speed in speeds]
+        assert max(scaled) < 1000 and required_height(distance, scaled) > 0
+        with localcontext() as context:
+            context.prec = max(80, max(map(len, tokens))+10)
+            values = [format(Decimal(x).scaleb(-power), 'f') for x in tokens[3:]]
+        assert list(map(Fraction, values)) == scaled
+        return (f'{height} {distance} {n}\n'+' '.join(values)+'\n').encode()
+    if number == 27307:
+        values = list(map(int, text.split())); n = values[0]
+        assert n >= 1 and len(values) == 1+2*n
+        hp, times = values[1:1+n], values[1+n:]
+        assert all(1 <= v <= 10**6 for v in hp) and all(1 <= v <= 500 for v in times)
+        if n <= 200:
+            return payload
+        return ('200\n'+' '.join(map(str,hp[:200]))+'\n'+' '.join(map(str,times[:200]))+'\n').encode()
+    if number == 30222:
+        lines = payload.splitlines(keepends=True)
+        assert len(lines) >= 3
+        n, m = map(int, lines[0].split()); times = list(map(int,lines[1].split()))
+        assert 1 <= n <= 2000 and 1 <= m <= 100000 and len(times) == n and all(1 <= t <= 100 for t in times)
+        edges = [list(map(int,line.split())) for line in lines[2:]]
+        assert all(len(edge) == 2 and all(1 <= node <= n for node in edge) for edge in edges)
+        if len(edges) == m:
+            return payload
+        # 五份已审核输入各仅多出最后一条未声明的边，原M条关系原样保留。
+        assert n == 2000 and m == 10000 and len(edges) == m+1
+        return b''.join(lines[:2+m])
+    if number == 31193:
+        lines = payload.splitlines(keepends=True)
+        assert len(lines) >= 4 and len(lines[0].split()) == 1
+        n, rank = int(lines[1]), int(lines[2]); rows = lines[3:]
+        assert n >= 1 and len(rows) == n and rank >= 1
+        vocabulary = {word for row in rows for word in row.split()}
+        assert vocabulary
+        if rank <= len(vocabulary):
+            return payload
+        # 只改排名数值，查询词、行数和全部文本字节保持。
+        span = re.search(rb'\S+',lines[2]); lines[2] = lines[2][:span.start()] + str(len(vocabulary)).encode() + lines[2][span.end():]
+        return b''.join(lines)
     if number == 18076:
         values = list(map(int, text.split()))
         n, m = values[:2]

@@ -1,0 +1,999 @@
+{
+  "original_evidence": "collab/gmyhf-pending-batch6-review.json",
+  "original_evidence_sha256": "4f54de42c5d22cfb6d17fefd20d739242457d6c2128e4bbbdcf21845a7a70083",
+  "public_page_sha256": "1cbf8e4b3429b511123812eedb1a513afabfc8e8a6eb9e4d322ed1acdcbc1456",
+  "comparison_modes": {
+    "description": "raw",
+    "input": "br_as_newline",
+    "output": "br_as_newline",
+    "hint": "br_as_newline",
+    "sampleInput": "raw",
+    "sampleOutput": "raw"
+  },
+  "scope": "独立审核自产函数按原源码哈希提取；公开题面六字段与后台一致（pre包装、行尾、边缘空白、NBSP与空格和已标明的br换行），绑定当前后台原字段哈希。",
+  "platform_writes": 0,
+  "procedure_source": "\"\"\"从已入库独立审核提取自写参考，并只读绑定原公开题面与后台六字段。\"\"\"\nimport ast,copy,html,json,re,sys\nfrom pathlib import Path\nsys.path.insert(0,str(Path.cwd()/'scripts'));import repair_gmyhf_pending_answers as c\nmapping={23554:(5,'outing'),25580:(5,'plank'),27307:(6,'assist'),30222:(6,'quantum'),31193:(6,'documents')}\nkeys={'描述':'description','输入':'input','输出':'output','提示':'hint','样例输入':'sampleInput','样例输出':'sampleOutput'}\nsession=c.platform.oj_submit.Session().login()\nfor n,(batch,function) in mapping.items():\n original=Path(f'collab/gmyhf-pending-batch{batch}-review.json');data=json.loads(original.read_text());proc=next(p for p in data['procedures'] if p['filename']==f'gmyhf_batch{batch}_oracles.py');assert c.sha(proc['source'].encode())==proc['sha256'];tree=ast.parse(proc['source'])\n entry=copy.deepcopy(next(e for e in data['entries'] if e['global_number']==n));public_page=Path(entry['page']).read_bytes();assert c.sha(public_page)==entry['page_sha256']\n section=re.search(r'<dl class=\"problem-content\">(.*?)</dl>',public_page.decode(),re.S)[1];public={k:'' for k in keys.values()}\n for label,value in re.findall(r'<dt>(.*?)</dt>\\s*<dd>(.*?)</dd>',section,re.S):\n  if label not in keys:continue\n  public[keys[label]]=value[5:-6] if value.startswith('<pre>') and value.endswith('</pre>') else value\n fields=c.platform.parse_form(session._get(c.platform.oj_submit.HOST+f'/admin/problems/edit/?id={n}'))\n def canonical(s):return html.unescape(s).replace('\\xa0',' ').replace('\\r\\n','\\n').strip()\n modes={}\n for key in public:\n  a,b=canonical(public[key]),canonical(fields[key]);mode='raw'\n  if a!=b:\n   a=re.sub(r'<br\\s*/?>','\\n',a);b=re.sub(r'<br\\s*/?>','\\n',b);mode='br_as_newline'\n  if a!=b:\n   import difflib\n   print(n,key,'diff',repr('\\n'.join(difflib.unified_diff(a.splitlines(),b.splitlines()))[:1600]),flush=True)\n  assert a==b,(n,key)\n  modes[key]=mode\n node=next(v for v in tree.body if isinstance(v,ast.FunctionDef) and v.name==function);body=ast.get_source_segment(proc['source'],node)\n source='from decimal import Decimal, localcontext, ROUND_HALF_EVEN\\nfrom functools import lru_cache, cmp_to_key\\nfrom collections import Counter, defaultdict\\nimport heapq\\nimport sys\\nsys.setrecursionlimit(10000)\\n'+body+f'\\n\\nsys.stdout.write({function}(sys.stdin.read()) + \"\\\\n\")\\n'\n entry['authored_reference']={'source':source,'sha256':c.sha(source.encode()),'language':'python3','origin':'原独立审核自产函数，未取用平台附件或他人AC源码','original_procedure_sha256':proc['sha256'],'function':function,'function_sha256':c.sha(body.encode())}\n entry['checks']['statement']['field_sha256']={k:c.sha(html.unescape(fields[k]).encode()) for k in public}\n s=Path(__file__).read_text();c.save(Path(f'/tmp/gmyhf-{n}-authored-admin-review.json'),{'original_evidence':str(original),'original_evidence_sha256':c.sha(original.read_bytes()),'public_page_sha256':c.sha(public_page),'comparison_modes':modes,'scope':'独立审核自产函数按原源码哈希提取；公开题面六字段与后台一致（pre包装、行尾、边缘空白、NBSP与空格和已标明的br换行），绑定当前后台原字段哈希。','platform_writes':0,'procedure_source':s,'procedure_sha256':c.sha(s.encode()),'entries':[entry]})\n print(n,'自写参考溯源及后台题面绑定通过',flush=True)\n",
+  "procedure_sha256": "ec82e1b1f84795aea541cd88c99c688efcd5dbbd690114505023fc19f7f5d1fc",
+  "entries": [
+    {
+      "global_number": 31193,
+      "title": "倒排文档",
+      "reference": "data/openjudge/tests/30000-/31193_made/samplecode.py",
+      "reference_sha256": "e693da9edfd6fbac8dc8fd5571c79ea09153526bc64ede8eeebea33c8704bffb",
+      "validator": "data/openjudge/tests/30000-/31193_made/producecase.py",
+      "validator_sha256": "e4fecef7e56600a56ffad0a54c2a773429f6d16e985576acbc571e81a406eadc",
+      "page": "data/openjudge/pages/practice__31193.html",
+      "page_sha256": "1cbf8e4b3429b511123812eedb1a513afabfc8e8a6eb9e4d322ed1acdcbc1456",
+      "checks": {
+        "statement": {
+          "changed_fields": [],
+          "available": true,
+          "checked_at": "2026-10-23T18:02:14.426868+00:00",
+          "field_sha256": {
+            "description": "7d18d376e30aaf60f32cea03dfd492de77329ce94be675ffcdc1e34e569864eb",
+            "input": "80b0dc70c8184c86f69569be5fb7b2c9ae725e7751ec76f779373b5fe8a6cd65",
+            "output": "161bf2d35e3fcfc58838b791249259f9a6179fa7f7f0642e23202f142ea3c760",
+            "hint": "a69bb179cd8062b335ecea5e501c9aaabef9e987efe0250b4124cbaa251b9f61",
+            "sampleInput": "4a38dcdd2f598e014df3355d80847eb7315d580a74b06605966461edd9a0b728",
+            "sampleOutput": "4c658626587765a5f2881fba469104aac1a66d2eab999bc5ff3781749eaf95c5"
+          }
+        },
+        "readback": {
+          "files": [
+            {
+              "filename": "0.in",
+              "sha256": "d66c0344d7019735ba689a6f2b17e25e02ad08c9a62af3766b93a146b701d43c",
+              "matches": true
+            },
+            {
+              "filename": "0.out",
+              "sha256": "34415c6c8f056c9b68ef9b4c6707b188ee7f12b245ddfef0bfbb1e79d3d7f307",
+              "matches": true
+            },
+            {
+              "filename": "1.in",
+              "sha256": "88fb72ab312ba0160c955e7d8313e859427e9e1c70792aa4a26453fa73b52a9c",
+              "matches": true
+            },
+            {
+              "filename": "1.out",
+              "sha256": "4fcb720bc36ac28e5c8df867df13c49b41908f6925beb79637f0fce0ae4db3b9",
+              "matches": true
+            },
+            {
+              "filename": "10.in",
+              "sha256": "49a706026777ac46439809e3f0bd527bb63a1bd84c7ad2e4f73499eae56bc5ee",
+              "matches": true
+            },
+            {
+              "filename": "10.out",
+              "sha256": "7fe2ed2fcdd3880c4e8e9e75c6aa22006eb5b30e25ec4bc9feafb53d6755d3c5",
+              "matches": true
+            },
+            {
+              "filename": "11.in",
+              "sha256": "d83f8ff5555604d67adf0a0f8440d0370f16542dac1a8b6c1177387c3d162198",
+              "matches": true
+            },
+            {
+              "filename": "11.out",
+              "sha256": "c8646f09fdae8a42785c41792949bf8d566c6f443c047997b48489b687caa9c3",
+              "matches": true
+            },
+            {
+              "filename": "12.in",
+              "sha256": "00a5b69a68e9bbf2a142c692435d09dc0cfed5bf9223c772ebf737ea29dc286d",
+              "matches": true
+            },
+            {
+              "filename": "12.out",
+              "sha256": "452d00f6359a864176795927bd070498aa34bd8630a5220590703632aae828b8",
+              "matches": true
+            },
+            {
+              "filename": "13.in",
+              "sha256": "7b09059d627858c656b3bbb594957361aca9bd418b816dee437619e5b27ad46e",
+              "matches": true
+            },
+            {
+              "filename": "13.out",
+              "sha256": "4f3bcd001d9fa430c93c8f1b3e204706c5f790a89974cff5faede5972f408dbf",
+              "matches": true
+            },
+            {
+              "filename": "14.in",
+              "sha256": "3702d11d377954177a3166757b369a926b121703356369b4e28f220a9fe680b7",
+              "matches": true
+            },
+            {
+              "filename": "14.out",
+              "sha256": "4517e8f80340109f2b87e28f0f8275d39cb46cb6ac3157ab99c55dc32b4f22f7",
+              "matches": true
+            },
+            {
+              "filename": "15.in",
+              "sha256": "ed4d5ed532a75761750090d97a9708b893c67cc96d4b493a0e0ef71fd97d99b8",
+              "matches": true
+            },
+            {
+              "filename": "15.out",
+              "sha256": "7a98e177dc0f270e6de058aeabdda49c34af743cf34a9c3097950a958d9e76c4",
+              "matches": true
+            },
+            {
+              "filename": "16.in",
+              "sha256": "714c082aa75b4eac093eae5696deb1350168ec42c59656aee9e8235400f7aae7",
+              "matches": true
+            },
+            {
+              "filename": "16.out",
+              "sha256": "452d00f6359a864176795927bd070498aa34bd8630a5220590703632aae828b8",
+              "matches": true
+            },
+            {
+              "filename": "17.in",
+              "sha256": "44ac895de9572f5df31060ad647c2d50a7b9030d46d47db527b851672880f4b2",
+              "matches": true
+            },
+            {
+              "filename": "17.out",
+              "sha256": "4f3bcd001d9fa430c93c8f1b3e204706c5f790a89974cff5faede5972f408dbf",
+              "matches": true
+            },
+            {
+              "filename": "18.in",
+              "sha256": "0889e4a18e71123f7611f3cf45c44241912e6b38db99af80cb16015a23c88027",
+              "matches": true
+            },
+            {
+              "filename": "18.out",
+              "sha256": "5d90ef7fc0d040fd56a1e48697cfa99e0dfaf4fd803aefefc3b5053ec1d36aea",
+              "matches": true
+            },
+            {
+              "filename": "19.in",
+              "sha256": "4e12dc2d6fd36b06d6f411a9d429499d3ca234a301e9568eb0e87574755e1f39",
+              "matches": true
+            },
+            {
+              "filename": "19.out",
+              "sha256": "b8912d3338d07dad90e2f5eff19b8efa48c9702f7a5919ccee18f1ca1c598c24",
+              "matches": true
+            },
+            {
+              "filename": "2.in",
+              "sha256": "70035dd5eed48bfd8be51a7ccefd5f19e8894cc46304cd00b300da733cb9e5f5",
+              "matches": true
+            },
+            {
+              "filename": "2.out",
+              "sha256": "a1351e267f31d033c0c2ee230c5ce80ac0d3540b8b66d988f892a27a7e63b861",
+              "matches": true
+            },
+            {
+              "filename": "20.in",
+              "sha256": "862617eb5d40645717c03eb86f85beb2721e7cdd035be419ce9d1f3b0df45bba",
+              "matches": true
+            },
+            {
+              "filename": "20.out",
+              "sha256": "452d00f6359a864176795927bd070498aa34bd8630a5220590703632aae828b8",
+              "matches": true
+            },
+            {
+              "filename": "3.in",
+              "sha256": "e4cc6b34d4da37748ec6a90ab851ce23323a6946fa9b66b2d265a4add5f11aa6",
+              "matches": true
+            },
+            {
+              "filename": "3.out",
+              "sha256": "9d5b474778a220828f096fd3d2fb392e951ee3f3867257a9b13a16a04aad8739",
+              "matches": true
+            },
+            {
+              "filename": "4.in",
+              "sha256": "16ef8318bf310c343f60957ac720086d25b974a15610092074f34664757f82e9",
+              "matches": true
+            },
+            {
+              "filename": "4.out",
+              "sha256": "8d768149cfd95f9bafc3da5bdcd40cb7f9eeda5f93ccbb3179b7990c4c24a89a",
+              "matches": true
+            },
+            {
+              "filename": "5.in",
+              "sha256": "baa5260a904702c4cb0160ac5b8643172730d609ea22acac017eb8bf3e8ed3da",
+              "matches": true
+            },
+            {
+              "filename": "5.out",
+              "sha256": "fc44aa52cb7fe80de2ddf50fa16d2fdc2f042af54c85381d0bc7ffcfba3474a4",
+              "matches": true
+            },
+            {
+              "filename": "6.in",
+              "sha256": "1f214400563ebdde378ea47c53aea087712a73459d6269690d7a58ed188fb3f1",
+              "matches": true
+            },
+            {
+              "filename": "6.out",
+              "sha256": "5693e7941094886a924bbeeac5ec74531ae132133e59ea783b013415e2bc12eb",
+              "matches": true
+            },
+            {
+              "filename": "7.in",
+              "sha256": "96e48d2aaa784f69ec1ebbf4fd01baa3efa0a60f791a4e120f16f4285e54e1c7",
+              "matches": true
+            },
+            {
+              "filename": "7.out",
+              "sha256": "3edf731d45460df83d93412a27074e829fa02302c8838ec3aec662526d30b915",
+              "matches": true
+            },
+            {
+              "filename": "8.in",
+              "sha256": "b3da4fccea44ed29b7c9b056e9fcb426fb932f4adfb623b186ee69e0b4566bca",
+              "matches": true
+            },
+            {
+              "filename": "8.out",
+              "sha256": "452d00f6359a864176795927bd070498aa34bd8630a5220590703632aae828b8",
+              "matches": true
+            },
+            {
+              "filename": "9.in",
+              "sha256": "91983a4c732b33a91eba4b98a68047a6fc2c3060569868d18f4ec3ad73ae8839",
+              "matches": true
+            },
+            {
+              "filename": "9.out",
+              "sha256": "452d00f6359a864176795927bd070498aa34bd8630a5220590703632aae828b8",
+              "matches": true
+            }
+          ],
+          "checked_at": "2026-10-23T18:02:19.572601+00:00"
+        },
+        "contract": {
+          "cases": 21,
+          "rejected": [
+            "10.in: valid() -> False",
+            "11.in: valid() -> False",
+            "12.in: valid() -> False",
+            "13.in: valid() -> False",
+            "14.in: valid() -> False",
+            "15.in: valid() -> False",
+            "16.in: valid() -> False",
+            "17.in: valid() -> False",
+            "18.in: valid() -> False",
+            "19.in: valid() -> False",
+            "2.in: valid() -> False",
+            "20.in: valid() -> False",
+            "3.in: valid() -> False",
+            "5.in: valid() -> False",
+            "6.in: valid() -> False",
+            "7.in: valid() -> False",
+            "8.in: valid() -> False",
+            "9.in: valid() -> False"
+          ],
+          "definition": "def valid(text):\n    \"\"\"题面契约：第一行查询词 W（一个单词）；第二行行数 N；第三行频次排名 R；\n    其后恰 N 行文本，单词之间以空格隔开；排名 R 必须对应一个真实存在的词（1 <= R <= 不同单词数）。\"\"\"\n    if not text.endswith(\"\\n\") or \"\\r\" in text or \"\\t\" in text:\n        return False\n    lines = text[:-1].split(\"\\n\")\n    if len(lines) < 3:\n        return False\n    word = lines[0]\n    if not word or \" \" in word:\n        return False\n    def count(x):\n        return int(x) if x.isdigit() and x[0] != \"0\" else None\n    n, rank = count(lines[1]), count(lines[2])\n    if n is None or rank is None or len(lines) != n + 3:\n        return False\n    vocab = set()\n    for row in lines[3:]:\n        tokens = row.split(\" \")\n        if not row or any(t == \"\" for t in tokens):\n            return False\n        vocab.update(tokens)\n    return 1 <= rank <= len(vocab)"
+        },
+        "contract_diagnostic": [
+          {
+            "input": "10.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "11.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "12.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "13.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "14.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "15.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "16.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "17.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "18.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "19.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "2.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "20.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "3.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "5.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "6.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "7.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "8.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          },
+          {
+            "input": "9.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 31,
+                "source": "    return 1 <= rank <= len(vocab)"
+              }
+            ]
+          }
+        ],
+        "answers": {
+          "method": "文档倒排映射和词频序列选择",
+          "official_samples": 1,
+          "files": [
+            {
+              "input": "0.in",
+              "output": "0.out",
+              "input_sha256": "d66c0344d7019735ba689a6f2b17e25e02ad08c9a62af3766b93a146b701d43c",
+              "output_sha256": "34415c6c8f056c9b68ef9b4c6707b188ee7f12b245ddfef0bfbb1e79d3d7f307",
+              "shared_with_made": true,
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "1.in",
+              "output": "1.out",
+              "input_sha256": "88fb72ab312ba0160c955e7d8313e859427e9e1c70792aa4a26453fa73b52a9c",
+              "output_sha256": "4fcb720bc36ac28e5c8df867df13c49b41908f6925beb79637f0fce0ae4db3b9",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "10.in",
+              "output": "10.out",
+              "input_sha256": "49a706026777ac46439809e3f0bd527bb63a1bd84c7ad2e4f73499eae56bc5ee",
+              "output_sha256": "7fe2ed2fcdd3880c4e8e9e75c6aa22006eb5b30e25ec4bc9feafb53d6755d3c5",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "11.in",
+              "output": "11.out",
+              "input_sha256": "d83f8ff5555604d67adf0a0f8440d0370f16542dac1a8b6c1177387c3d162198",
+              "output_sha256": "c8646f09fdae8a42785c41792949bf8d566c6f443c047997b48489b687caa9c3",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "12.in",
+              "output": "12.out",
+              "input_sha256": "00a5b69a68e9bbf2a142c692435d09dc0cfed5bf9223c772ebf737ea29dc286d",
+              "output_sha256": "452d00f6359a864176795927bd070498aa34bd8630a5220590703632aae828b8",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "13.in",
+              "output": "13.out",
+              "input_sha256": "7b09059d627858c656b3bbb594957361aca9bd418b816dee437619e5b27ad46e",
+              "output_sha256": "4f3bcd001d9fa430c93c8f1b3e204706c5f790a89974cff5faede5972f408dbf",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "14.in",
+              "output": "14.out",
+              "input_sha256": "3702d11d377954177a3166757b369a926b121703356369b4e28f220a9fe680b7",
+              "output_sha256": "4517e8f80340109f2b87e28f0f8275d39cb46cb6ac3157ab99c55dc32b4f22f7",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "15.in",
+              "output": "15.out",
+              "input_sha256": "ed4d5ed532a75761750090d97a9708b893c67cc96d4b493a0e0ef71fd97d99b8",
+              "output_sha256": "7a98e177dc0f270e6de058aeabdda49c34af743cf34a9c3097950a958d9e76c4",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "16.in",
+              "output": "16.out",
+              "input_sha256": "714c082aa75b4eac093eae5696deb1350168ec42c59656aee9e8235400f7aae7",
+              "output_sha256": "452d00f6359a864176795927bd070498aa34bd8630a5220590703632aae828b8",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "17.in",
+              "output": "17.out",
+              "input_sha256": "44ac895de9572f5df31060ad647c2d50a7b9030d46d47db527b851672880f4b2",
+              "output_sha256": "4f3bcd001d9fa430c93c8f1b3e204706c5f790a89974cff5faede5972f408dbf",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "18.in",
+              "output": "18.out",
+              "input_sha256": "0889e4a18e71123f7611f3cf45c44241912e6b38db99af80cb16015a23c88027",
+              "output_sha256": "5d90ef7fc0d040fd56a1e48697cfa99e0dfaf4fd803aefefc3b5053ec1d36aea",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "19.in",
+              "output": "19.out",
+              "input_sha256": "4e12dc2d6fd36b06d6f411a9d429499d3ca234a301e9568eb0e87574755e1f39",
+              "output_sha256": "b8912d3338d07dad90e2f5eff19b8efa48c9702f7a5919ccee18f1ca1c598c24",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "2.in",
+              "output": "2.out",
+              "input_sha256": "70035dd5eed48bfd8be51a7ccefd5f19e8894cc46304cd00b300da733cb9e5f5",
+              "output_sha256": "a1351e267f31d033c0c2ee230c5ce80ac0d3540b8b66d988f892a27a7e63b861",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "20.in",
+              "output": "20.out",
+              "input_sha256": "862617eb5d40645717c03eb86f85beb2721e7cdd035be419ce9d1f3b0df45bba",
+              "output_sha256": "452d00f6359a864176795927bd070498aa34bd8630a5220590703632aae828b8",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "3.in",
+              "output": "3.out",
+              "input_sha256": "e4cc6b34d4da37748ec6a90ab851ce23323a6946fa9b66b2d265a4add5f11aa6",
+              "output_sha256": "9d5b474778a220828f096fd3d2fb392e951ee3f3867257a9b13a16a04aad8739",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "4.in",
+              "output": "4.out",
+              "input_sha256": "16ef8318bf310c343f60957ac720086d25b974a15610092074f34664757f82e9",
+              "output_sha256": "8d768149cfd95f9bafc3da5bdcd40cb7f9eeda5f93ccbb3179b7990c4c24a89a",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "5.in",
+              "output": "5.out",
+              "input_sha256": "baa5260a904702c4cb0160ac5b8643172730d609ea22acac017eb8bf3e8ed3da",
+              "output_sha256": "fc44aa52cb7fe80de2ddf50fa16d2fdc2f042af54c85381d0bc7ffcfba3474a4",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "6.in",
+              "output": "6.out",
+              "input_sha256": "1f214400563ebdde378ea47c53aea087712a73459d6269690d7a58ed188fb3f1",
+              "output_sha256": "5693e7941094886a924bbeeac5ec74531ae132133e59ea783b013415e2bc12eb",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "7.in",
+              "output": "7.out",
+              "input_sha256": "96e48d2aaa784f69ec1ebbf4fd01baa3efa0a60f791a4e120f16f4285e54e1c7",
+              "output_sha256": "3edf731d45460df83d93412a27074e829fa02302c8838ec3aec662526d30b915",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "8.in",
+              "output": "8.out",
+              "input_sha256": "b3da4fccea44ed29b7c9b056e9fcb426fb932f4adfb623b186ee69e0b4566bca",
+              "output_sha256": "452d00f6359a864176795927bd070498aa34bd8630a5220590703632aae828b8",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            },
+            {
+              "input": "9.in",
+              "output": "9.out",
+              "input_sha256": "91983a4c732b33a91eba4b98a68047a6fc2c3060569868d18f4ec3ad73ae8839",
+              "output_sha256": "452d00f6359a864176795927bd070498aa34bd8630a5220590703632aae828b8",
+              "shared_with_made": false,
+              "matches": null,
+              "not_compared_reason": "频次排名超出词表，题面未定义该排名词频；原valid拒绝，不把参考兜底0作为正确答案",
+              "oracle_ms": 0
+            }
+          ]
+        },
+        "local": {
+          "status": "Accepted",
+          "cases": 21,
+          "time_ms": 326,
+          "memory_kb": 68436,
+          "timing_audit": {
+            "status": "passed",
+            "required_max_ratio": 0.75,
+            "max_case": {
+              "case": 1,
+              "time_ms": 16,
+              "case_limit_ms": 10000,
+              "ratio": 0.0016
+            },
+            "cases": [
+              {
+                "case": 1,
+                "time_ms": 16,
+                "case_limit_ms": 10000,
+                "ratio": 0.0016
+              },
+              {
+                "case": 2,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 3,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 4,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 5,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 6,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 7,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 8,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 9,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 10,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 11,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 12,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 13,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 14,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 15,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 16,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 17,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 18,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 19,
+                "time_ms": 16,
+                "case_limit_ms": 10000,
+                "ratio": 0.0016
+              },
+              {
+                "case": 20,
+                "time_ms": 16,
+                "case_limit_ms": 10000,
+                "ratio": 0.0016
+              },
+              {
+                "case": 21,
+                "time_ms": 16,
+                "case_limit_ms": 10000,
+                "ratio": 0.0016
+              }
+            ]
+          }
+        },
+        "platform": {
+          "final": "Accepted",
+          "attempts": [
+            {
+              "language": "Python3",
+              "solution_id": "53582441",
+              "url": "http://cs101.openjudge.cn/practice/solution/53582441/",
+              "verdict": "Accepted",
+              "ms": 27
+            }
+          ],
+          "checked_at": "2026-10-23T18:03:40.701377+00:00"
+        }
+      },
+      "platform_attempts": [
+        {
+          "language": "Python3",
+          "solution_id": "53582441",
+          "url": "http://cs101.openjudge.cn/practice/solution/53582441/",
+          "verdict": "Accepted",
+          "ms": 27
+        }
+      ],
+      "passed": false,
+      "complete": true,
+      "authored_reference": {
+        "source": "from decimal import Decimal, localcontext, ROUND_HALF_EVEN\nfrom functools import lru_cache, cmp_to_key\nfrom collections import Counter, defaultdict\nimport heapq\nimport sys\nsys.setrecursionlimit(10000)\ndef documents(s):\n lines=s.splitlines();word=lines[0].strip();n,rank=int(lines[1]),int(lines[2]);rows=lines[3:];inverted=defaultdict(list);freq=defaultdict(int)\n for i,row in enumerate(rows,1):\n  tokens=row.split()\n  for token in tokens:freq[token]+=1\n  for token in set(tokens):inverted[token].append(i)\n values=sorted(freq.values(),reverse=True);assert 1<=rank<=len(values);return (' '.join(map(str,inverted[word])) or '-1')+'\\n'+str(values[rank-1])\n\nsys.stdout.write(documents(sys.stdin.read()) + \"\\n\")\n",
+        "sha256": "465118f195efe8cf6e204b8773e1c7f183fff253172df5a912cd82889f2a1c68",
+        "language": "python3",
+        "origin": "原独立审核自产函数，未取用平台附件或他人AC源码",
+        "original_procedure_sha256": "388cf8269b19bab893a34f0296210c7d57c76529fd3c0b3484b036deaf2c5ba5",
+        "function": "documents",
+        "function_sha256": "388f69e13dd67c9c5b1e36ee84e4cfe1110a61f4da8523bd4a24462665a6fc5b"
+      }
+    }
+  ]
+}

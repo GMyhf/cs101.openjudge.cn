@@ -1,0 +1,713 @@
+{
+  "original_evidence": "collab/gmyhf-pending-batch6-review.json",
+  "original_evidence_sha256": "4f54de42c5d22cfb6d17fefd20d739242457d6c2128e4bbbdcf21845a7a70083",
+  "public_page_sha256": "f9747660d157c8c8a921fec31dc159268ef8266bf273d13fbb356c352389bf83",
+  "comparison_modes": {
+    "description": "raw",
+    "input": "br_as_newline",
+    "output": "raw",
+    "hint": "raw",
+    "sampleInput": "raw",
+    "sampleOutput": "raw"
+  },
+  "scope": "独立审核自产函数按原源码哈希提取；公开题面六字段与后台一致（pre包装、行尾、边缘空白、NBSP与空格和已标明的br换行），绑定当前后台原字段哈希。",
+  "platform_writes": 0,
+  "procedure_source": "\"\"\"从已入库独立审核提取自写参考，并只读绑定原公开题面与后台六字段。\"\"\"\nimport ast,copy,html,json,re,sys\nfrom pathlib import Path\nsys.path.insert(0,str(Path.cwd()/'scripts'));import repair_gmyhf_pending_answers as c\nmapping={23554:(5,'outing'),25580:(5,'plank'),27307:(6,'assist'),30222:(6,'quantum'),31193:(6,'documents')}\nkeys={'描述':'description','输入':'input','输出':'output','提示':'hint','样例输入':'sampleInput','样例输出':'sampleOutput'}\nsession=c.platform.oj_submit.Session().login()\nfor n,(batch,function) in mapping.items():\n original=Path(f'collab/gmyhf-pending-batch{batch}-review.json');data=json.loads(original.read_text());proc=next(p for p in data['procedures'] if p['filename']==f'gmyhf_batch{batch}_oracles.py');assert c.sha(proc['source'].encode())==proc['sha256'];tree=ast.parse(proc['source'])\n entry=copy.deepcopy(next(e for e in data['entries'] if e['global_number']==n));public_page=Path(entry['page']).read_bytes();assert c.sha(public_page)==entry['page_sha256']\n section=re.search(r'<dl class=\"problem-content\">(.*?)</dl>',public_page.decode(),re.S)[1];public={k:'' for k in keys.values()}\n for label,value in re.findall(r'<dt>(.*?)</dt>\\s*<dd>(.*?)</dd>',section,re.S):\n  if label not in keys:continue\n  public[keys[label]]=value[5:-6] if value.startswith('<pre>') and value.endswith('</pre>') else value\n fields=c.platform.parse_form(session._get(c.platform.oj_submit.HOST+f'/admin/problems/edit/?id={n}'))\n def canonical(s):return html.unescape(s).replace('\\xa0',' ').replace('\\r\\n','\\n').strip()\n modes={}\n for key in public:\n  a,b=canonical(public[key]),canonical(fields[key]);mode='raw'\n  if a!=b:\n   a=re.sub(r'<br\\s*/?>','\\n',a);b=re.sub(r'<br\\s*/?>','\\n',b);mode='br_as_newline'\n  if a!=b:\n   import difflib\n   print(n,key,'diff',repr('\\n'.join(difflib.unified_diff(a.splitlines(),b.splitlines()))[:1600]),flush=True)\n  assert a==b,(n,key)\n  modes[key]=mode\n node=next(v for v in tree.body if isinstance(v,ast.FunctionDef) and v.name==function);body=ast.get_source_segment(proc['source'],node)\n source='from decimal import Decimal, localcontext, ROUND_HALF_EVEN\\nfrom functools import lru_cache, cmp_to_key\\nfrom collections import Counter, defaultdict\\nimport heapq\\nimport sys\\nsys.setrecursionlimit(10000)\\n'+body+f'\\n\\nsys.stdout.write({function}(sys.stdin.read()) + \"\\\\n\")\\n'\n entry['authored_reference']={'source':source,'sha256':c.sha(source.encode()),'language':'python3','origin':'原独立审核自产函数，未取用平台附件或他人AC源码','original_procedure_sha256':proc['sha256'],'function':function,'function_sha256':c.sha(body.encode())}\n entry['checks']['statement']['field_sha256']={k:c.sha(html.unescape(fields[k]).encode()) for k in public}\n s=Path(__file__).read_text();c.save(Path(f'/tmp/gmyhf-{n}-authored-admin-review.json'),{'original_evidence':str(original),'original_evidence_sha256':c.sha(original.read_bytes()),'public_page_sha256':c.sha(public_page),'comparison_modes':modes,'scope':'独立审核自产函数按原源码哈希提取；公开题面六字段与后台一致（pre包装、行尾、边缘空白、NBSP与空格和已标明的br换行），绑定当前后台原字段哈希。','platform_writes':0,'procedure_source':s,'procedure_sha256':c.sha(s.encode()),'entries':[entry]})\n print(n,'自写参考溯源及后台题面绑定通过',flush=True)\n",
+  "procedure_sha256": "ec82e1b1f84795aea541cd88c99c688efcd5dbbd690114505023fc19f7f5d1fc",
+  "entries": [
+    {
+      "global_number": 27307,
+      "title": "大佬相助",
+      "reference": "data/openjudge/tests/20000-29982/27307_made/samplecode.py",
+      "reference_sha256": "180fcab0e112b926995da5d1bf5ff4777858a7842f2356ab0ce316283b8e5661",
+      "validator": "data/openjudge/tests/20000-29982/27307_made/producecase.py",
+      "validator_sha256": "dce39c357fdce072a8de695d35dc7156587152b8727dffb7a43d490206857570",
+      "page": "data/openjudge/pages/practice__27307.html",
+      "page_sha256": "f9747660d157c8c8a921fec31dc159268ef8266bf273d13fbb356c352389bf83",
+      "checks": {
+        "statement": {
+          "changed_fields": [],
+          "available": true,
+          "checked_at": "2026-10-23T17:46:38.759113+00:00",
+          "field_sha256": {
+            "description": "a939974ee7e1ef72fa377c0768ee23d1333ad28b017930f1f6a6b991334e916c",
+            "input": "95f81e8060ecc3c9eef1e4319b7e9e23dded040d75f9c2e2639a95f6c29d21bb",
+            "output": "02c4d38c626e5501f5496dbbbe196b7cc4614fbff0ce158e07c590bf73774f76",
+            "hint": "b5402580ecccbf43a4d82e625c3d3ee64536d2c0f5df3d0bb3a160cbe8affe10",
+            "sampleInput": "eaf630f5118188e7185f1b76df2c5b05bf1e01e83378a9d8ddf5996bdb5f9d6e",
+            "sampleOutput": "b25443846844e6f1826859c17523b1b68bd2a7f3114b296dae342f0c256fefa3"
+          }
+        },
+        "readback": {
+          "files": [
+            {
+              "filename": "0.in",
+              "sha256": "bac42163e97d0572515230c695f33da51067335a3133f8286d073586e3b8529e",
+              "matches": true
+            },
+            {
+              "filename": "0.out",
+              "sha256": "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2",
+              "matches": true
+            },
+            {
+              "filename": "1.in",
+              "sha256": "ac22d26a746bd2e06c48789b4d7f954b74e3e71dd2d3ca4f404f2893984b5ad3",
+              "matches": true
+            },
+            {
+              "filename": "1.out",
+              "sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+              "matches": true
+            },
+            {
+              "filename": "10.in",
+              "sha256": "16137bae94fd4866722a8efac7c8ffbe740d7de0df2538e73c77eb9798b3e314",
+              "matches": true
+            },
+            {
+              "filename": "10.out",
+              "sha256": "e16a55fa765d6e2bf68092d1fa6ff91b3abadda4854f2bde4d9ed18844e1ef83",
+              "matches": true
+            },
+            {
+              "filename": "11.in",
+              "sha256": "e31640ccdb30ed85c6639a55b5e94e064d6cfc3d6f6edd695b6629b9deeb7de2",
+              "matches": true
+            },
+            {
+              "filename": "11.out",
+              "sha256": "76661bf233ef9303e9662ff8ffd4a40f93b600abdbf36792a0fcceef5cd8b8c8",
+              "matches": true
+            },
+            {
+              "filename": "12.in",
+              "sha256": "61942222e1b8f0573f370a333f8b78cc538564610b94b9f6217430310616b442",
+              "matches": true
+            },
+            {
+              "filename": "12.out",
+              "sha256": "aa1a9b660bf38b7a832c31a6534d75e6e8c7d0b3c455d948bdd89ca8b3446b22",
+              "matches": true
+            },
+            {
+              "filename": "13.in",
+              "sha256": "f7e7f239a00f3a405174dc8a629eacad051de8f54c2092d3b6a433323096f31e",
+              "matches": true
+            },
+            {
+              "filename": "13.out",
+              "sha256": "882c45fe80885ef91e5ced0165a3d00b1c24ebf1a8ba6ca410335b62270e7892",
+              "matches": true
+            },
+            {
+              "filename": "14.in",
+              "sha256": "1121305aa544346942d2ca15948c739b7e58bfbcf179df7e2e915f5e14219d7b",
+              "matches": true
+            },
+            {
+              "filename": "14.out",
+              "sha256": "744f419bb8bedfc18987232ce135fa4db40b20d69ff907d7174ac8bf3718d92c",
+              "matches": true
+            },
+            {
+              "filename": "15.in",
+              "sha256": "fa866a2d0a314feeda7d15e426a03b930c5ed1cb105f10fa6e63e63496ff3298",
+              "matches": true
+            },
+            {
+              "filename": "15.out",
+              "sha256": "270fe76734f439a968ecbacf1daec20508058f827c9cc48e865ade7f8290dfcc",
+              "matches": true
+            },
+            {
+              "filename": "16.in",
+              "sha256": "1195e744c8a07abe56bb5aec39f210f2d3657886827b4492f23374cdd0feb629",
+              "matches": true
+            },
+            {
+              "filename": "16.out",
+              "sha256": "9e9812700e40608a058ea56fd2f84c1418535bd223a54e0d152bc4349fbc6f0a",
+              "matches": true
+            },
+            {
+              "filename": "17.in",
+              "sha256": "f6ad82e01667db11c4e39c3ba33c6561531ef3744f89918a4c149b71db72cc85",
+              "matches": true
+            },
+            {
+              "filename": "17.out",
+              "sha256": "144f1a23a0e969709fd8393e15b62c86a48f2554496cfa7c08cec2407e1e8a9d",
+              "matches": true
+            },
+            {
+              "filename": "18.in",
+              "sha256": "d9054397863bebb4b23a8c6f36b675ee72f61e8914e3eed3d595ccc4196dc51e",
+              "matches": true
+            },
+            {
+              "filename": "18.out",
+              "sha256": "d2491a397b491ca82c6e71233512169d5bbba19a94a1f49c3f040885d63a4669",
+              "matches": true
+            },
+            {
+              "filename": "19.in",
+              "sha256": "72f129e6ffbe9af43ee956b86ba3640150c601ebd671609f8e577148f4bd9cba",
+              "matches": true
+            },
+            {
+              "filename": "19.out",
+              "sha256": "506da7b7204cbac317008a24e914f48c5698be8b0532b524ca6381ac5b1b8198",
+              "matches": true
+            },
+            {
+              "filename": "2.in",
+              "sha256": "e6cd61a8b77455f1a0166bdc9ec5cab285e749f9cbe7cb25e3ccf91378f25e85",
+              "matches": true
+            },
+            {
+              "filename": "2.out",
+              "sha256": "a5d2720575bed630523e87ad294ff4a25a9502682065f6baab0b92eb5efdb70b",
+              "matches": true
+            },
+            {
+              "filename": "3.in",
+              "sha256": "c93811f243bbfaa5afafbe3d176263a618379b7ed7c81405dbbf2ca87e9ddef2",
+              "matches": true
+            },
+            {
+              "filename": "3.out",
+              "sha256": "af49f8feebe003120af1e721df9346d6a22b5d8dffe8232184a1023ba6639c02",
+              "matches": true
+            },
+            {
+              "filename": "4.in",
+              "sha256": "a09b2276983c5669a564484c616184e25b64a43d8b864ad052f5fc146123e574",
+              "matches": true
+            },
+            {
+              "filename": "4.out",
+              "sha256": "6fcc496773430657659cfede749b80df7d7fad9203ce3d859011c13a33673b62",
+              "matches": true
+            },
+            {
+              "filename": "5.in",
+              "sha256": "06bb141db8914203ceffe6925d5bf34566a4ee812126373f15ab3fae42de4d80",
+              "matches": true
+            },
+            {
+              "filename": "5.out",
+              "sha256": "5d2e5c04ea16558814c3fd8b49271ffd43e6031e7aa9799c8c2cadc119046b3b",
+              "matches": true
+            },
+            {
+              "filename": "6.in",
+              "sha256": "1893322394e6c66fee441d2dc6584e0b0f036f0f776201ec0d56cfa195ea79a3",
+              "matches": true
+            },
+            {
+              "filename": "6.out",
+              "sha256": "bd6d963d3ed6385c641e7d4d2a78b83ba6bcf6357f961cd3259e0809473c0550",
+              "matches": true
+            },
+            {
+              "filename": "7.in",
+              "sha256": "40baf6eab1d057f4ff99393e2c1e0a7d2d96d34528f0568fac2892fd004e97c1",
+              "matches": true
+            },
+            {
+              "filename": "7.out",
+              "sha256": "a21094e15cc1911baff13883362c71aab1565638187ccbaf03d8f8eda55a595b",
+              "matches": true
+            },
+            {
+              "filename": "8.in",
+              "sha256": "cb07d05e9f6136f0e96503fc3b2a783170c50b47f0ab75636372e38d590b8481",
+              "matches": true
+            },
+            {
+              "filename": "8.out",
+              "sha256": "1beb5c270f76d52b77a2985347cfa23884c74a41eebdce1ec4dffa580cc9b595",
+              "matches": true
+            },
+            {
+              "filename": "9.in",
+              "sha256": "3f7b3fe2852ececfb0f6ea4b7ac35c602e88f11bfb5ac0718ca6331a7d8384df",
+              "matches": true
+            },
+            {
+              "filename": "9.out",
+              "sha256": "ee44d3291837c9f63dc6aa4b4e92d7afdac090c93045f911febe8ebbaa9bc806",
+              "matches": true
+            }
+          ],
+          "checked_at": "2026-10-23T17:46:43.623352+00:00"
+        },
+        "contract": {
+          "cases": 20,
+          "rejected": [
+            "0.in: valid() -> False",
+            "1.in: valid() -> False",
+            "2.in: valid() -> False",
+            "3.in: valid() -> False",
+            "4.in: valid() -> False",
+            "5.in: valid() -> False"
+          ],
+          "definition": "def valid(text):\n    lines = text.split(\"\\n\")\n    if len(lines) != 4 or lines[3] != \"\":\n        return False\n    n = int(lines[0]); hp = list(map(int, lines[1].split())); tm = list(map(int, lines[2].split()))\n    return (1 <= n <= 200 and len(hp) == len(tm) == n\n            and all(1 <= x <= 10**6 for x in hp) and all(1 <= x <= 500 for x in tm))"
+        },
+        "contract_diagnostic": [
+          {
+            "input": "0.in",
+            "original_accepted": false,
+            "normalized_accepted": true,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 25,
+                "source": "        return False"
+              }
+            ],
+            "normalized_return_locations": []
+          },
+          {
+            "input": "1.in",
+            "original_accepted": false,
+            "normalized_accepted": true,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 25,
+                "source": "        return False"
+              }
+            ],
+            "normalized_return_locations": []
+          },
+          {
+            "input": "2.in",
+            "original_accepted": false,
+            "normalized_accepted": true,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 25,
+                "source": "        return False"
+              }
+            ],
+            "normalized_return_locations": []
+          },
+          {
+            "input": "3.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 25,
+                "source": "        return False"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 27,
+                "source": "    return (1 <= n <= 200 and len(hp) == len(tm) == n"
+              }
+            ]
+          },
+          {
+            "input": "4.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 25,
+                "source": "        return False"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 27,
+                "source": "    return (1 <= n <= 200 and len(hp) == len(tm) == n"
+              }
+            ]
+          },
+          {
+            "input": "5.in",
+            "original_accepted": false,
+            "normalized_accepted": false,
+            "normalization": "逐行空白token以单空格连接并补末尾换行；不转换数值/不重排行或元素",
+            "return_locations": [
+              {
+                "line": 25,
+                "source": "        return False"
+              }
+            ],
+            "normalized_return_locations": [
+              {
+                "line": 27,
+                "source": "    return (1 <= n <= 200 and len(hp) == len(tm) == n"
+              }
+            ]
+          }
+        ],
+        "answers": {
+          "method": "带后缀剪枝的覆盖量记忆化搜索",
+          "official_samples": 2,
+          "files": [
+            {
+              "input": "0.in",
+              "output": "0.out",
+              "input_sha256": "bac42163e97d0572515230c695f33da51067335a3133f8286d073586e3b8529e",
+              "output_sha256": "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "1.in",
+              "output": "1.out",
+              "input_sha256": "ac22d26a746bd2e06c48789b4d7f954b74e3e71dd2d3ca4f404f2893984b5ad3",
+              "output_sha256": "53c234e5e8472b6ac51c1ae1cab3fe06fad053beb8ebfd8977b010655bfdd3c3",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "10.in",
+              "output": "10.out",
+              "input_sha256": "16137bae94fd4866722a8efac7c8ffbe740d7de0df2538e73c77eb9798b3e314",
+              "output_sha256": "e16a55fa765d6e2bf68092d1fa6ff91b3abadda4854f2bde4d9ed18844e1ef83",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 9
+            },
+            {
+              "input": "11.in",
+              "output": "11.out",
+              "input_sha256": "e31640ccdb30ed85c6639a55b5e94e064d6cfc3d6f6edd695b6629b9deeb7de2",
+              "output_sha256": "76661bf233ef9303e9662ff8ffd4a40f93b600abdbf36792a0fcceef5cd8b8c8",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "12.in",
+              "output": "12.out",
+              "input_sha256": "61942222e1b8f0573f370a333f8b78cc538564610b94b9f6217430310616b442",
+              "output_sha256": "aa1a9b660bf38b7a832c31a6534d75e6e8c7d0b3c455d948bdd89ca8b3446b22",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "13.in",
+              "output": "13.out",
+              "input_sha256": "f7e7f239a00f3a405174dc8a629eacad051de8f54c2092d3b6a433323096f31e",
+              "output_sha256": "882c45fe80885ef91e5ced0165a3d00b1c24ebf1a8ba6ca410335b62270e7892",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "14.in",
+              "output": "14.out",
+              "input_sha256": "1121305aa544346942d2ca15948c739b7e58bfbcf179df7e2e915f5e14219d7b",
+              "output_sha256": "744f419bb8bedfc18987232ce135fa4db40b20d69ff907d7174ac8bf3718d92c",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 13
+            },
+            {
+              "input": "15.in",
+              "output": "15.out",
+              "input_sha256": "fa866a2d0a314feeda7d15e426a03b930c5ed1cb105f10fa6e63e63496ff3298",
+              "output_sha256": "270fe76734f439a968ecbacf1daec20508058f827c9cc48e865ade7f8290dfcc",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "16.in",
+              "output": "16.out",
+              "input_sha256": "1195e744c8a07abe56bb5aec39f210f2d3657886827b4492f23374cdd0feb629",
+              "output_sha256": "9e9812700e40608a058ea56fd2f84c1418535bd223a54e0d152bc4349fbc6f0a",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 6
+            },
+            {
+              "input": "17.in",
+              "output": "17.out",
+              "input_sha256": "f6ad82e01667db11c4e39c3ba33c6561531ef3744f89918a4c149b71db72cc85",
+              "output_sha256": "144f1a23a0e969709fd8393e15b62c86a48f2554496cfa7c08cec2407e1e8a9d",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 17
+            },
+            {
+              "input": "18.in",
+              "output": "18.out",
+              "input_sha256": "d9054397863bebb4b23a8c6f36b675ee72f61e8914e3eed3d595ccc4196dc51e",
+              "output_sha256": "d2491a397b491ca82c6e71233512169d5bbba19a94a1f49c3f040885d63a4669",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 2
+            },
+            {
+              "input": "19.in",
+              "output": "19.out",
+              "input_sha256": "72f129e6ffbe9af43ee956b86ba3640150c601ebd671609f8e577148f4bd9cba",
+              "output_sha256": "506da7b7204cbac317008a24e914f48c5698be8b0532b524ca6381ac5b1b8198",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 7
+            },
+            {
+              "input": "2.in",
+              "output": "2.out",
+              "input_sha256": "e6cd61a8b77455f1a0166bdc9ec5cab285e749f9cbe7cb25e3ccf91378f25e85",
+              "output_sha256": "a5d2720575bed630523e87ad294ff4a25a9502682065f6baab0b92eb5efdb70b",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "3.in",
+              "output": "3.out",
+              "input_sha256": "c93811f243bbfaa5afafbe3d176263a618379b7ed7c81405dbbf2ca87e9ddef2",
+              "output_sha256": "af49f8feebe003120af1e721df9346d6a22b5d8dffe8232184a1023ba6639c02",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 69
+            },
+            {
+              "input": "4.in",
+              "output": "4.out",
+              "input_sha256": "a09b2276983c5669a564484c616184e25b64a43d8b864ad052f5fc146123e574",
+              "output_sha256": "6fcc496773430657659cfede749b80df7d7fad9203ce3d859011c13a33673b62",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 137
+            },
+            {
+              "input": "5.in",
+              "output": "5.out",
+              "input_sha256": "06bb141db8914203ceffe6925d5bf34566a4ee812126373f15ab3fae42de4d80",
+              "output_sha256": "5d2e5c04ea16558814c3fd8b49271ffd43e6031e7aa9799c8c2cadc119046b3b",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 84
+            },
+            {
+              "input": "6.in",
+              "output": "6.out",
+              "input_sha256": "1893322394e6c66fee441d2dc6584e0b0f036f0f776201ec0d56cfa195ea79a3",
+              "output_sha256": "bd6d963d3ed6385c641e7d4d2a78b83ba6bcf6357f961cd3259e0809473c0550",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 4
+            },
+            {
+              "input": "7.in",
+              "output": "7.out",
+              "input_sha256": "40baf6eab1d057f4ff99393e2c1e0a7d2d96d34528f0568fac2892fd004e97c1",
+              "output_sha256": "a21094e15cc1911baff13883362c71aab1565638187ccbaf03d8f8eda55a595b",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 15
+            },
+            {
+              "input": "8.in",
+              "output": "8.out",
+              "input_sha256": "cb07d05e9f6136f0e96503fc3b2a783170c50b47f0ab75636372e38d590b8481",
+              "output_sha256": "1beb5c270f76d52b77a2985347cfa23884c74a41eebdce1ec4dffa580cc9b595",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 3
+            },
+            {
+              "input": "9.in",
+              "output": "9.out",
+              "input_sha256": "3f7b3fe2852ececfb0f6ea4b7ac35c602e88f11bfb5ac0718ca6331a7d8384df",
+              "output_sha256": "ee44d3291837c9f63dc6aa4b4e92d7afdac090c93045f911febe8ebbaa9bc806",
+              "shared_with_made": false,
+              "matches": true,
+              "oracle_ms": 0
+            }
+          ]
+        },
+        "local": {
+          "status": "Accepted",
+          "cases": 20,
+          "time_ms": 584,
+          "memory_kb": 145584,
+          "timing_audit": {
+            "status": "passed",
+            "required_max_ratio": 0.75,
+            "max_case": {
+              "case": 15,
+              "time_ms": 113,
+              "case_limit_ms": 10000,
+              "ratio": 0.0113
+            },
+            "cases": [
+              {
+                "case": 1,
+                "time_ms": 16,
+                "case_limit_ms": 10000,
+                "ratio": 0.0016
+              },
+              {
+                "case": 2,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 3,
+                "time_ms": 22,
+                "case_limit_ms": 10000,
+                "ratio": 0.0022
+              },
+              {
+                "case": 4,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 5,
+                "time_ms": 16,
+                "case_limit_ms": 10000,
+                "ratio": 0.0016
+              },
+              {
+                "case": 6,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 7,
+                "time_ms": 25,
+                "case_limit_ms": 10000,
+                "ratio": 0.0025
+              },
+              {
+                "case": 8,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 9,
+                "time_ms": 20,
+                "case_limit_ms": 10000,
+                "ratio": 0.002
+              },
+              {
+                "case": 10,
+                "time_ms": 30,
+                "case_limit_ms": 10000,
+                "ratio": 0.003
+              },
+              {
+                "case": 11,
+                "time_ms": 17,
+                "case_limit_ms": 10000,
+                "ratio": 0.0017
+              },
+              {
+                "case": 12,
+                "time_ms": 21,
+                "case_limit_ms": 10000,
+                "ratio": 0.0021
+              },
+              {
+                "case": 13,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 14,
+                "time_ms": 69,
+                "case_limit_ms": 10000,
+                "ratio": 0.0069
+              },
+              {
+                "case": 15,
+                "time_ms": 113,
+                "case_limit_ms": 10000,
+                "ratio": 0.0113
+              },
+              {
+                "case": 16,
+                "time_ms": 79,
+                "case_limit_ms": 10000,
+                "ratio": 0.0079
+              },
+              {
+                "case": 17,
+                "time_ms": 18,
+                "case_limit_ms": 10000,
+                "ratio": 0.0018
+              },
+              {
+                "case": 18,
+                "time_ms": 27,
+                "case_limit_ms": 10000,
+                "ratio": 0.0027
+              },
+              {
+                "case": 19,
+                "time_ms": 18,
+                "case_limit_ms": 10000,
+                "ratio": 0.0018
+              },
+              {
+                "case": 20,
+                "time_ms": 15,
+                "case_limit_ms": 10000,
+                "ratio": 0.0015
+              }
+            ]
+          }
+        },
+        "platform": {
+          "final": "Accepted",
+          "attempts": [
+            {
+              "language": "Python3",
+              "solution_id": "53582412",
+              "url": "http://cs101.openjudge.cn/practice/solution/53582412/",
+              "verdict": "Accepted",
+              "ms": null
+            }
+          ],
+          "checked_at": "2026-10-23T17:46:44.877724+00:00"
+        }
+      },
+      "platform_attempts": [
+        {
+          "language": "Python3",
+          "solution_id": "53582412",
+          "url": "http://cs101.openjudge.cn/practice/solution/53582412/",
+          "verdict": "Accepted",
+          "ms": null
+        }
+      ],
+      "passed": false,
+      "complete": true,
+      "authored_reference": {
+        "source": "from decimal import Decimal, localcontext, ROUND_HALF_EVEN\nfrom functools import lru_cache, cmp_to_key\nfrom collections import Counter, defaultdict\nimport heapq\nimport sys\nsys.setrecursionlimit(10000)\ndef assist(s):\n v=list(map(int,s.split()));n=v[0];hp=v[1:n+1];tm=v[n+1:];items=sorted(zip(hp,tm),key=lambda p:p[0]);suffix=[0]*(n+1)\n for i in range(n-1,-1,-1):suffix[i]=suffix[i+1]+items[i][1]+1\n @lru_cache(None)\n def cover(i,needed):\n  if needed<=0:return 0\n  if i==n or suffix[i]<needed:return 10**30\n  cost,time=items[i];return min(cover(i+1,needed),cost+cover(i+1,needed-time-1))\n return str(cover(0,n))\n\nsys.stdout.write(assist(sys.stdin.read()) + \"\\n\")\n",
+        "sha256": "bc54a249e1e2c71c0858c39b02eadd79a41bf640f0efc20fa55fd814a0e9429a",
+        "language": "python3",
+        "origin": "原独立审核自产函数，未取用平台附件或他人AC源码",
+        "original_procedure_sha256": "388cf8269b19bab893a34f0296210c7d57c76529fd3c0b3484b036deaf2c5ba5",
+        "function": "assist",
+        "function_sha256": "572d947e58f0fa60f40f21600680ea6212245724b6b44b378e6b6c7a1a8869d8"
+      }
+    }
+  ]
+}

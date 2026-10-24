@@ -1,0 +1,97 @@
+{
+  "batch": 19,
+  "results": [
+    {
+      "mutation": "春游未删除满员编号",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "春游遗漏外班保证",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放过严格速度上界",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "速度缩放错方向",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "水平距离未同步缩小",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "漏查非正所需高度",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "怪物时间错用生命值",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "怪物截断越界",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "多删除一条已声明依赖",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "擅自接受任意多余依赖",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "排名缩成零基下标",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "词汇计数按总词数非去重",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "遗漏最后一个走失学号",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "半数阈值错误",
+      "detected": true,
+      "failures": 0,
+      "errors": 1
+    },
+    {
+      "mutation": "漏计小A消灭的怪物",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "错误取最短任务完成时间",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "词频翻倍",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    }
+  ],
+  "procedure_source": "import ast,hashlib,io,json,os,subprocess,sys,unittest\nfrom pathlib import Path\nfrom unittest.mock import patch\ncases=[\n ('春游未删除满员编号','removed = spans[1+seen.index(n)]','removed = spans[0]','test_outing_removes_only_last_insider_and_preserves_outsiders'),\n ('春游遗漏外班保证','and any(x > n for x in seen)','and True','test_outing_removes_only_last_insider_and_preserves_outsiders'),\n ('放过严格速度上界','if max(speeds) < 1000:','if max(speeds) <= 1000:','test_plank_scaling_preserves_positive_height_and_speed_order'),\n ('速度缩放错方向','Decimal(x).scaleb(-power)','Decimal(x).scaleb(power)','test_plank_scaling_preserves_positive_height_and_speed_order'),\n ('水平距离未同步缩小','distance //= factor','distance //= 1','test_plank_scaling_preserves_positive_height_and_speed_order'),\n ('漏查非正所需高度','assert required_height(distance, speeds) > 0','assert True','test_plank_scaling_preserves_positive_height_and_speed_order'),\n ('怪物时间错用生命值','map(str,times[:200])','map(str,hp[:200])','test_assist_keeps_original_pair_offsets'),\n ('怪物截断越界','map(str,hp[:200])','map(str,hp[:201])','test_assist_keeps_original_pair_offsets'),\n ('多删除一条已声明依赖','lines[:2+m]','lines[:1+m]','test_quantum_removes_only_undeclared_last_line'),\n ('擅自接受任意多余依赖','assert n == 2000 and m == 10000 and len(edges) == m+1','assert True','test_quantum_removes_only_undeclared_last_line'),\n ('排名缩成零基下标','str(len(vocabulary)).encode()','str(len(vocabulary)-1).encode()','test_document_rank_changes_only_rank_token'),\n ('词汇计数按总词数非去重','vocabulary = {word for row in rows for word in row.split()}','vocabulary = [word for row in rows for word in row.split()]','test_document_rank_changes_only_rank_token')]\np=Path('scripts/gmyhf_review_fixes.py');original=p.read_text();results=[]\ntry:\n for name,old,new,test in cases:\n  assert original.count(old)==1,(name,original.count(old));p.write_text(original.replace(old,new))\n  run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest','tests.test_gmyhf_early_structure.EarlyStructureTests.'+test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert run.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':run.returncode});p.write_text(original)\nfinally:p.write_text(original)\nsys.path.insert(0,str(Path.cwd()));from tests import test_gmyhf_early_structure as tests\nfor n,name,old,new,test in [\n (23554,'遗漏最后一个走失学号','range(1,n+1)','range(1,n)','test_outing_reference_against_direct_counts'),\n (25580,'半数阈值错误','n-(n//2+1)','n-(n//2)','test_plank_reference_against_each_candidate_height'),\n (27307,'漏计小A消灭的怪物','needed-time-1','needed-time','test_assist_reference_against_all_subsets'),\n (30222,'错误取最短任务完成时间','max(done)','min(done)','test_quantum_reference_against_schedule_dp'),\n (31193,'词频翻倍','freq[token]+=1','freq[token]+=2','test_document_reference_counts_repeated_words_once_per_line')]:\n proof=json.loads(Path(f'collab/gmyhf-{n}-authored-admin-review.json').read_text())['entries'][0]['authored_reference'];source=proof['source'];assert source.count(old)==1;tree=ast.parse(source.replace(old,new));tree.body=[v for v in tree.body if isinstance(v,(ast.Import,ast.ImportFrom,ast.FunctionDef))];ns={};exec(compile(tree,'<自产参考变异>','exec'),ns)\n with patch.object(tests,'reference',return_value=ns[proof['function']]):\n  run=unittest.TextTestRunner(stream=io.StringIO()).run(tests.EarlyStructureTests(test));assert not run.wasSuccessful(),name\n results.append({'mutation':name,'detected':True,'failures':len(run.failures),'errors':len(run.errors)})\ns=Path(__file__).read_text();Path('collab/gmyhf-review-fixes-batch19-mutations.json').write_text(json.dumps({'batch':19,'results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n');print(len(results),'种变异检出，源码已恢复')\n",
+  "procedure_sha256": "c4a43acb4232a9ca54c0852d2e7ab029497d873774db8fc78754fa772e88da12"
+}
