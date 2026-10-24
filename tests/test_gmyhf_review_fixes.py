@@ -16,6 +16,38 @@ import repair_gmyhf_review_findings as repair
 
 
 class ReviewRulesTests(unittest.TestCase):
+    def test_mayan_initial_stabilization_against_independent_run_scanner(self):
+        settle = self.reference(28016, 13, 'settle')
+        rng = random.Random(28016)
+        boards = [
+            [[1,2,1], [2,1,2], [1,1,1], [3,1,3], [1,2,1]],
+            [[1,1,1,2], [2], [2], [], []],
+            [[1,2], [1,2], [1,2], [], []],
+            [[1,1,1,1,1,1,1], [], [], [], []],
+        ]
+        boards += [[[rng.randint(1,4) for _ in range(rng.randrange(8))]
+                    for _ in range(5)] for _ in range(300)]
+        for board in boards:
+            expected = [list(col) for col in settle(board)]
+            result = rules.stable_mayan_board(board)
+            self.assertEqual(expected, result)
+            self.assertEqual(result, rules.stable_mayan_board(result))
+            payload = ('3\n' + '\n'.join(' '.join(map(str,col+[0])) for col in board) + '\n').encode()
+            fixed = rules.repair_input(28016,payload)
+            parsed = [list(map(int,line.split()))[:-1] for line in fixed.decode().splitlines()[1:]]
+            self.assertEqual(expected,parsed)
+            self.assertEqual('3',fixed.decode().splitlines()[0])
+        # 第一轮竖消除后，剩余三个2横向级联消除；不是只扫描一轮。
+        self.assertEqual([[],[],[],[],[]],rules.stable_mayan_board(boards[1]))
+
+    def test_mayan_legal_bytes_and_input_structure(self):
+        raw = b'1\n1 2 0\n2 1 0\n0\n0\n0'
+        self.assertEqual(raw,rules.repair_input(28016,raw))
+        for raw in (b'4\n0\n0\n0\n0\n0', b'1\n0\n0\n0\n0',
+                    b'1\n1 2\n0\n0\n0\n0',b'1\n0 1 0\n0\n0\n0\n0',
+                    b'1\n11 0\n0\n0\n0\n0',b'1\n1 2 1 2 1 2 1 2 0\n0\n0\n0\n0'):
+            with self.assertRaises(AssertionError):rules.repair_input(28016,raw)
+
     def test_meeting_endpoints_and_signed_target_bounds(self):
         self.assertEqual(b'7 4\n1 2\n',rules.repair_input(21729,b'7 4\n1 1'))
         self.assertEqual(b'7 4\n6 4\n',rules.repair_input(21729,b'7 4\n7 4'))

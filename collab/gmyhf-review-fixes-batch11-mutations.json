@@ -1,0 +1,52 @@
+{
+  "batch": 11,
+  "results": [
+    {
+      "mutation": "漏掉竖向消除",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "只删除匹配的两个格",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "漏掉连锁消除",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "落下时颠倒余块",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "仍保留非法局面",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放宽步数到4",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放宽单列高度",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "合法字节也重写",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "忽略列末哨兵",
+      "detected": true,
+      "exit_code": 1
+    }
+  ],
+  "procedure_source": "import hashlib,json,os,subprocess\nfrom pathlib import Path\np=Path('scripts/gmyhf_review_fixes.py');original=p.read_text()\ncases=[\n('漏掉竖向消除','((1, 0), (0, 1))','((1, 0),)'),\n('只删除匹配的两个格','removed.update(cells)','removed.update(cells[:2])'),\n('漏掉连锁消除','if not removed:\\n            return board','if not removed or board != columns:\\n            return board'),\n('落下时颠倒余块','for x, col in enumerate(board)]','for x, col in enumerate(board)][::-1]'),\n('仍保留非法局面','settled = stable_mayan_board(board)','settled = board'),\n('放宽步数到4','assert 1 <= steps <= 3','assert 1 <= steps <= 4'),\n('放宽单列高度','1 <= len(col) <= 8','1 <= len(col) <= 9'),\n('合法字节也重写','if settled == board:','if False:'),\n('忽略列末哨兵','col[-1] == 0','True')]\nresults=[]\ntry:\n for name,old,new in cases:\n  assert original.count(old)==1,(name,original.count(old))\n  p.write_text(original.replace(old,new))\n  run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest','tests.test_gmyhf_review_fixes.ReviewRulesTests.test_mayan_initial_stabilization_against_independent_run_scanner','tests.test_gmyhf_review_fixes.ReviewRulesTests.test_mayan_legal_bytes_and_input_structure'],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert run.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':run.returncode})\nfinally:p.write_text(original)\ns=Path(__file__).read_text()\nPath('collab/gmyhf-review-fixes-batch11-mutations.json').write_text(json.dumps({'batch':11,'results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n')\nprint(len(results),'种变异检出，源码已恢复')\n",
+  "procedure_sha256": "08c6cbbfa72ae9013a567c86cd251dedeea8dc9511d03129afcdc0ce7272bf5c"
+}

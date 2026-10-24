@@ -5,6 +5,20 @@ import json
 
 def repair_input(number, payload):
     text = payload.decode()
+    if number == 28016:
+        lines = text.splitlines()
+        assert len(lines) == 6
+        steps = int(lines[0])
+        assert 1 <= steps <= 3
+        columns = [list(map(int, line.split())) for line in lines[1:]]
+        assert all(1 <= len(col) <= 8 and col[-1] == 0 and
+                   all(1 <= v <= 10 for v in col[:-1]) for col in columns)
+        board = [col[:-1] for col in columns]
+        settled = stable_mayan_board(board)
+        if settled == board:
+            return payload
+        return (str(steps) + '\n' + '\n'.join(
+            ' '.join(map(str, col + [0])) for col in settled) + '\n').encode()
     if number == 21729:
         m,n,x,y = map(int,text.split())
         assert 1 < n < m < 30 and 1 <= y <= n and 1 <= x <= m-n+y
@@ -313,3 +327,25 @@ def no_leading_zero_reference(source):
     old = 'return expressions_model(text, True)'
     assert source.count(old) == 1
     return source.replace(old,'return expressions_model(text, False)')
+
+
+def stable_mayan_board(columns):
+    """非法初始局面先同时消除并落定，级联到稳定；不消耗玩家步数。"""
+    board = [list(col) for col in columns]
+    while True:
+        grid = [[board[x][y] if y < len(board[x]) else 0
+                 for x in range(5)] for y in range(7)]
+        removed = set()
+        for y in range(7):
+            for x in range(5):
+                if not grid[y][x]:
+                    continue
+                for dx, dy in ((1, 0), (0, 1)):
+                    if x + 2*dx < 5 and y + 2*dy < 7:
+                        cells = [(x + i*dx, y + i*dy) for i in range(3)]
+                        if all(grid[b][a] == grid[y][x] for a, b in cells):
+                            removed.update(cells)
+        if not removed:
+            return board
+        board = [[v for y, v in enumerate(col) if (x, y) not in removed]
+                 for x, col in enumerate(board)]
