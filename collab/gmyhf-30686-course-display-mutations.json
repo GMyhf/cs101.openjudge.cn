@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "mutation": "输入重复解码",
+      "detected": true,
+      "mutated_source_sha256": "1da0b9d65f4591ec4f309f56595e7ed0cfd55723e5e2f3544400f830726805b4"
+    },
+    {
+      "mutation": "输出重复解码",
+      "detected": true,
+      "mutated_source_sha256": "94768f8e04ff10b848b0044eb7ff7587c736aa3174d244b2ada5ccbee525f7c2"
+    },
+    {
+      "mutation": "删除代码文本",
+      "detected": true,
+      "mutated_source_sha256": "830acb29ea7b80cb1dfa83740d810a85c5e6ba317acca6aad614ccd4daea9899"
+    },
+    {
+      "mutation": "忽略br换行",
+      "detected": true,
+      "mutated_source_sha256": "0e9c9c019854303652555fb14fbfa5a364edf26d6575a321f04f03f1fb5fba95"
+    }
+  ],
+  "baseline_procedure_sha256": "c1b5f49f674f1d4bea5b48e6d02bde48e106b37795b07a3c94e6f2077f8d758b",
+  "authored_selfchecks": 5,
+  "procedure_source": "import ast,hashlib,html,json\nfrom html.parser import HTMLParser\nfrom pathlib import Path\np=Path('/tmp/recheck_gmyhf_30686_course.py');source=p.read_text()\ndef check(s):\n tree=ast.parse(s);nodes=[n for n in tree.body if isinstance(n,(ast.ClassDef,ast.FunctionDef))];ns={'HTMLParser':HTMLParser,'html':html};exec(compile(ast.Module(body=nodes,type_ignores=[]),'<只读显示自检>','exec'),ns);return ns['selfchecks']()\nassert check(source)==5\nrows=[]\nfor name,old,new in [('输入重复解码','p.feed(s)','p.feed(html.unescape(s))'),('输出重复解码',\"return ''.join(p.parts)\",\"return html.unescape(''.join(p.parts))\"),('删除代码文本','self.parts.append(d)','pass'),('忽略br换行',\"if t=='br':self.parts.append('\\\\n')\",\"if False:self.parts.append('\\\\n')\")]:\n assert source.count(old)==1\n try:check(source.replace(old,new))\n except AssertionError:pass\n else:raise AssertionError(name)\n rows.append({'mutation':name,'detected':True,'mutated_source_sha256':hashlib.sha256(source.replace(old,new).encode()).hexdigest()})\ns=Path(__file__).read_text();Path('collab/gmyhf-30686-course-display-mutations.json').write_text(json.dumps({'results':rows,'baseline_procedure_sha256':hashlib.sha256(source.encode()).hexdigest(),'authored_selfchecks':5,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n');print('5显示夹具、4变异全部通过；零网络、零写入')\n",
+  "procedure_sha256": "0b3d42bcdb3e650396295b3937e7ee834fd00b6abeacd884ce54793be47d9b61"
+}

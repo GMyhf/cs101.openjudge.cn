@@ -1,0 +1,29 @@
+{
+  "global_number": 30686,
+  "course_url": "http://cs101.openjudge.cn/2026fallcs101testing/30686/",
+  "course_page_sha256": "42a0780db0e3298f525ed8e340ea925f76b0803cb67155f9040c8f3128c4dc64",
+  "global_number_verified": true,
+  "problem_content_verified": true,
+  "single_html_parse_samples_match_admin": true,
+  "visible_sample_input_sha256": [
+    "278f51bd69e394c971018465a3c03a62eb11b2a49bc73713af2e217010315f88",
+    "c420430c8623ef936b485ae8c8d93aaf1bb136ba0efc0e107d2f14153c4613cd",
+    "79934667f6bd54e4d765ec8a4ea68c40c1a14fd3ca72235e52e55f855dec6736"
+  ],
+  "reference_answers": [
+    "true",
+    "true",
+    "false"
+  ],
+  "visible_sample_output_matches": true,
+  "admin_form_unchanged": true,
+  "admin_form_sha256": "175358464fdb4e201377ed26f9313db23901a377168bf14f9ca8905df2789134",
+  "reference_sha256": "354a07085b56ab072d5a712ee3deb40ce3132a4d7138865a364923e93fb66eb9",
+  "previous_recheck": "collab/gmyhf-30686-display-recheck.json",
+  "previous_recheck_sha256": "db78b45e5554cdc839b05b1a443ae3bd97398243e699fc2c5a3c8e70d64e9ada",
+  "platform_writes": 0,
+  "authored_selfchecks": 5,
+  "finding": "用户给定课程路由确有题目正文；一次HTML解析保留样例标签与CDATA，三样例及答案与后台和自写参考一致。原重复解码误报关闭，不需要重写题面；其他接入边界保持。",
+  "procedure_source": "\"\"\"只读核对用户指定课程页：一次HTML解析保留标签代码，样例与后台一致。\"\"\"\nimport html,json,re,sys\nfrom html.parser import HTMLParser\nfrom pathlib import Path\nsys.path.insert(0,str(Path.cwd()/'scripts'));import repair_gmyhf_sample_findings as helper\nclass Visible(HTMLParser):\n def __init__(self):super().__init__();self.parts=[]\n def handle_data(self,d):self.parts.append(d)\n def handle_starttag(self,t,a):\n  if t=='br':self.parts.append('\\n')\ndef render(s):\n p=Visible();p.feed(s);return ''.join(p.parts)\ndef selfchecks():\n fixtures=[('&lt;A&gt;&lt;/A&gt;','<A></A>'),('<pre>&lt;A&gt;text&lt;/A&gt;</pre>','<A>text</A>'),\n           ('&lt;![CDATA[&lt;div&gt;]]&gt;','<![CDATA[<div>]]>'),('&amp;lt;A&amp;gt;','&lt;A&gt;'),('a<br />b','a\\nb')]\n for given,expected in fixtures:assert render(given)==expected\n return len(fixtures)\nchecks=selfchecks()\nroot=Path.cwd();previous=root/'collab/gmyhf-30686-display-recheck.json';old=json.loads(previous.read_text());evidence=root/'collab/gmyhf-pending-batch15-review.json';entry=next(e for e in json.loads(evidence.read_text())['entries'] if e['global_number']==30686)\nurl='http://cs101.openjudge.cn/2026fallcs101testing/30686/'\nsession=helper.platform.oj_submit.Session().login();public=session._get(url);Path('/tmp/gmyhf-30686-course-public.html').write_text(public)\nassert re.search(r'<dt>全局题号</dt>\\s*<dd>30686</dd>',public,re.S),'课程页全局题号不符'\nsection=re.search(r'<dl class=\"problem-content\">(.*?)</dl>',public,re.S);assert section,'没有题目正文'\nfields=dict(re.findall(r'<dt>(.*?)</dt>\\s*<dd>(.*?)</dd>',section[1],re.S));assert '样例输入' in fields and '样例输出' in fields\nvisible=render(fields['样例输入']);parts=re.split(r'sample[123]:\\s*',visible);assert len(parts)==4 and not parts[0].strip()\ninputs=[p.strip() for p in parts[1:]];assert [helper.sha(p.encode()) for p in inputs]==old['comparisons'][0]['sample_input_sha256']\nproof=entry['authored_reference'];assert helper.sha(proof['source'].encode())==proof['sha256'];ns={};exec(proof['source'].split('import sys\\nsys.stdout.write')[0],ns);answers=[ns['tag_valid'](p) for p in inputs];assert answers==['true','true','false'];assert [p.strip().splitlines()[0] for p in re.split(r'sample[123]:\\s*',render(fields['样例输出']))[1:]]==answers\npage=session._get(helper.platform.oj_submit.HOST+'/admin/problems/edit/?id=30686');current=helper.platform.parse_form(page);assert helper.fingerprint(current)==old['admin_form_sha256']\ns=Path(__file__).read_text();report={'global_number':30686,'course_url':url,'course_page_sha256':helper.sha(public.encode()),'global_number_verified':True,'problem_content_verified':True,'single_html_parse_samples_match_admin':True,'visible_sample_input_sha256':[helper.sha(p.encode()) for p in inputs],'reference_answers':answers,'visible_sample_output_matches':True,'admin_form_unchanged':True,'admin_form_sha256':old['admin_form_sha256'],'reference_sha256':proof['sha256'],'previous_recheck':str(previous.relative_to(root)),'previous_recheck_sha256':helper.sha(previous.read_bytes()),'platform_writes':0,'authored_selfchecks':checks,'finding':'用户给定课程路由确有题目正文；一次HTML解析保留样例标签与CDATA，三样例及答案与后台和自写参考一致。原重复解码误报关闭，不需要重写题面；其他接入边界保持。','procedure_source':s,'procedure_sha256':helper.sha(s.encode())}\nhelper.save(Path('/tmp/gmyhf-30686-course-display-recheck.json'),report);print('30686实际课程正文及全局号一致，三样例true/true/false，标签代码保留；后台未变，零写入。')\n",
+  "procedure_sha256": "c1b5f49f674f1d4bea5b48e6d02bde48e106b37795b07a3c94e6f2077f8d758b"
+}

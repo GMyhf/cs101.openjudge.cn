@@ -1,0 +1,168 @@
+{
+  "original_evidence": "collab/gmyhf-pending-batch8-review.json",
+  "original_evidence_sha256": "f32179ba25bb87b53478334f84b3a067c17e8ca9d526164606669638553a4569",
+  "public_page_sha256": "86daddf71f7697d0dd4238ab5e48d3bb4a8f3013f07bac0622da99c2b9e4cb3a",
+  "scope": "公开题面六字段与当前后台逐项一致（移除公开样例pre包装、仅统一行尾和边缘空白、实体解码一次）；19974的纯文字input、19984的纯文字input/output另精确比对公开br与编辑页实际换行；补齐后台原载荷精确哈希。",
+  "platform_writes": 0,
+  "procedure_source": "\"\"\"将历史公开题面与当前后台六字段只读核对，绑定后续修复；不修改平台。\"\"\"\nimport copy,html,json,re,sys\nfrom pathlib import Path\nsys.path.insert(0,str(Path.cwd()/'scripts'));import repair_gmyhf_pending_answers as c\nkeys={'描述':'description','输入':'input','输出':'output','提示':'hint','样例输入':'sampleInput','样例输出':'sampleOutput'}\noriginal=Path('collab/gmyhf-pending-batch8-review.json');data=json.loads(original.read_text());session=c.platform.oj_submit.Session().login()\nfor n in (19965,19974,19984):\n e=next(e for e in data['entries'] if e['global_number']==n);page=Path(e['page']).read_bytes();assert c.sha(page)==e['page_sha256']\n section=re.search(r'<dl class=\"problem-content\">(.*?)</dl>',page.decode(),re.S)[1];public={k:'' for k in keys.values()}\n for label,value in re.findall(r'<dt>(.*?)</dt>\\s*<dd>(.*?)</dd>',section,re.S):\n  if label not in keys:continue\n  if value.startswith('<pre>') and value.endswith('</pre>'):value=value[5:-6]\n  public[keys[label]]=value\n live=session._get(c.platform.oj_submit.HOST+f'/admin/problems/edit/?id={n}');fields=c.platform.parse_form(live)\n def canonical(s):return html.unescape(s).replace('\\r\\n','\\n').strip()\n if n==19974:\n  # 此字段为纯文字：公开页用br，编辑页保存实际换行，仅核对此已定位差异。\n  public['input']=public['input'].replace('<br />','\\n')\n if n==19984:\n  for key in ('input','output'):public[key]=public[key].replace('<br />','\\n')\n assert all(canonical(public[k])==canonical(fields[k]) for k in public),[k for k in public if canonical(public[k])!=canonical(fields[k])]\n entry=copy.deepcopy(e);entry['checks']['statement']['field_sha256']={k:c.sha(html.unescape(fields[k]).encode()) for k in public}\n s=Path(__file__).read_text();c.save(Path(f'/tmp/gmyhf-{n}-admin-form-review.json'),{'original_evidence':str(original),'original_evidence_sha256':c.sha(original.read_bytes()),'public_page_sha256':c.sha(page),'scope':'公开题面六字段与当前后台逐项一致（移除公开样例pre包装、仅统一行尾和边缘空白、实体解码一次）；19974的纯文字input、19984的纯文字input/output另精确比对公开br与编辑页实际换行；补齐后台原载荷精确哈希。','platform_writes':0,'procedure_source':s,'procedure_sha256':c.sha(s.encode()),'entries':[entry]})\n print(n,'六字段只读绑定通过',flush=True)\n",
+  "procedure_sha256": "babe672b658af50a01abe79c59a2fce8abc14d69e8a437be66d8a70d4a01fa86",
+  "entries": [
+    {
+      "global_number": 19974,
+      "title": "看电影",
+      "reference": "/tmp/gmyhf-authored-19974.py",
+      "reference_sha256": "75e3db6abaf8bd1eea9b6cd45b36d78f9700db4dd1daaa2c3304c7e910b40ecd",
+      "validator": "/tmp/gmyhf_batch8_oracles.py",
+      "validator_sha256": "cb132c1c4938bb8edd1f3f21c609e98183b3b2ab7a7cebfe7f5be50ebf915ebc",
+      "page": "data/openjudge/pages/practice__19974.html",
+      "page_sha256": "86daddf71f7697d0dd4238ab5e48d3bb4a8f3013f07bac0622da99c2b9e4cb3a",
+      "checks": {
+        "statement": {
+          "changed_fields": [],
+          "available": true,
+          "checked_at": "2026-10-23T18:44:04.501915+00:00",
+          "field_sha256": {
+            "description": "e353a67cc545982005924595b444be7798eaa33f86a6d1a7157196faf4d4ebea",
+            "input": "556297baefa82d6426b379edc2536f32f1e860d0cf539bfe832010557c2ca784",
+            "output": "585f1a3d23800e3deb731bbf058eefd219255498d5faa1c4f9fc7a0728811c64",
+            "hint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sampleInput": "a3d2e264ed278d25a3656436810a29cc177572521bc3ade4ed0542fef74cdfea",
+            "sampleOutput": "d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35"
+          }
+        },
+        "readback": {
+          "files": [
+            {
+              "filename": "1.in",
+              "sha256": "0c242c0c2474f7c3041b3c6eb3e1000b771625333e4327ee8873c7a05b68b304",
+              "matches": true
+            },
+            {
+              "filename": "1.out",
+              "sha256": "ed7c8dbbed37d49bfa5e3f290dac2f5294db3e11d44f390988588dd3a2cc7494",
+              "matches": true
+            },
+            {
+              "filename": "2.in",
+              "sha256": "2a8462a75bfdf8adce1c31c679115b0f5184c8d475057bc1a58850749e4bde1a",
+              "matches": true
+            },
+            {
+              "filename": "2.out",
+              "sha256": "1e8a9afe9357b6e330d0102408c01b1fe5d71c8c901ba6f7a4535c0abd0fbe44",
+              "matches": true
+            }
+          ],
+          "checked_at": "2026-10-23T18:44:05.012444+00:00"
+        },
+        "contract": {
+          "cases": 2,
+          "rejected": [
+            "1.in",
+            "2.in"
+          ],
+          "definition": "原分类未提供_made参考和valid；按独立复算器extra_contract核题面约束，不声称通过既有valid。",
+          "checks": [
+            {
+              "input": "1.in",
+              "issues": [
+                "组数或终点正数约束不符"
+              ]
+            },
+            {
+              "input": "2.in",
+              "issues": [
+                "组数或终点正数约束不符"
+              ]
+            }
+          ]
+        },
+        "extra_contract": {
+          "definition": "按解码题面补足原valid未覆盖的语义范围；实现见独立复算器extra_contract",
+          "files": [
+            {
+              "input": "1.in",
+              "issues": [
+                "组数或终点正数约束不符"
+              ]
+            },
+            {
+              "input": "2.in",
+              "issues": [
+                "组数或终点正数约束不符"
+              ]
+            }
+          ]
+        },
+        "answers": {
+          "method": "反射原理组合计数，与格点DP对拍",
+          "official_samples": 1,
+          "files": [
+            {
+              "input": "1.in",
+              "output": "1.out",
+              "input_sha256": "0c242c0c2474f7c3041b3c6eb3e1000b771625333e4327ee8873c7a05b68b304",
+              "output_sha256": "ed7c8dbbed37d49bfa5e3f290dac2f5294db3e11d44f390988588dd3a2cc7494",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "2.in",
+              "output": "2.out",
+              "input_sha256": "2a8462a75bfdf8adce1c31c679115b0f5184c8d475057bc1a58850749e4bde1a",
+              "output_sha256": "1e8a9afe9357b6e330d0102408c01b1fe5d71c8c901ba6f7a4535c0abd0fbe44",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            }
+          ]
+        },
+        "local": {
+          "status": "Wrong Answer",
+          "case": 1,
+          "time_ms": 32,
+          "memory_kb": 144792,
+          "expected_tokens": 149,
+          "actual_tokens": 1,
+          "actual_output_sha256": "75928cc501ac2d72d93999e2950653942381c8b62e91b366a3bf02edb3c17fad",
+          "actual_output_bytes": 71
+        },
+        "platform": {
+          "final": "Wrong Answer",
+          "attempts": [
+            {
+              "language": "Python3",
+              "solution_id": "53582472",
+              "url": "http://cs101.openjudge.cn/practice/solution/53582472/",
+              "verdict": "Wrong Answer",
+              "ms": 39
+            }
+          ],
+          "checked_at": "2026-10-23T18:44:08.324961+00:00"
+        },
+        "admission_boundary": {
+          "original_reason": "no_bucket",
+          "preserve_exclusion": true,
+          "reason": "原题号绑定或资源排除未改；答案核对通过不能自动激活"
+        }
+      },
+      "authored_reference": {
+        "source": "import math, heapq, random, itertools, re, html\nfrom pathlib import Path\nfrom collections import deque, Counter\nfrom decimal import Decimal, localcontext, ROUND_HALF_EVEN\nfrom fractions import Fraction\n\ndef cinema(s):\n    v = iter(map(int, s.split()))\n    out = []\n    for _ in range(next(v)):\n        (m, p, q) = (next(v), next(v), next(v))\n        if m == 0 or (q - p - m) * -m <= 0:\n            out.append('0')\n            continue\n        total = math.comb(p + q, p)\n        r = p + m\n        out.append(str(total - (math.comb(p + q, r) if 0 <= r <= p + q else 0)))\n    return '\\n'.join(out)\nimport sys\nsys.stdout.write(cinema(sys.stdin.read()) + '\\n')\n",
+        "sha256": "75e3db6abaf8bd1eea9b6cd45b36d78f9700db4dd1daaa2c3304c7e910b40ecd",
+        "procedure": "从自写独立复算器按AST函数依赖闭包提取，保留导入并添加标准输入输出入口；不读取或拼接任何后台测试内容"
+      },
+      "platform_attempts": [
+        {
+          "language": "Python3",
+          "solution_id": "53582472",
+          "url": "http://cs101.openjudge.cn/practice/solution/53582472/",
+          "verdict": "Wrong Answer",
+          "ms": 39
+        }
+      ],
+      "passed": false,
+      "complete": true
+    }
+  ]
+}

@@ -2,6 +2,7 @@
 import ast
 import json
 import re
+from fractions import Fraction
 
 
 def validate_missing_deque_input(payload):
@@ -17,6 +18,48 @@ def validate_missing_deque_input(payload):
 
 def repair_input(number, payload):
     text = payload.decode()
+    if number == 19965:
+        values = list(map(int, text.split()))
+        assert len(values) == 3 and min(values) >= 1
+        fixed = [min(v, 10000) for v in values]
+        return payload if fixed == values else (' '.join(map(str, fixed))+'\n').encode()
+    if number == 19974:
+        lines = [line for line in text.splitlines() if line.strip()]
+        assert lines
+        header = lines[0].split()
+        has_header = len(header) == 1
+        rows = [list(map(int, line.split())) for line in lines[1:] if line.strip()] if has_header else [list(map(int, line.split())) for line in lines]
+        assert rows and all(len(row) == 3 and row[1] > 0 and row[2] > 0 for row in rows)
+        if has_header:
+            assert int(header[0]) == len(rows)
+            return payload
+        # 旧文件每行本就是一组，原始坐标、顺序、布局全部保留，只补总数。
+        return (str(len(rows))+'\n').encode() + payload
+    if number == 19984:
+        lines = payload.splitlines(keepends=True)
+        assert len(lines) >= 2
+        n = int(lines[0]); int(lines[1])
+        assert 1 <= n <= 20 and len(lines) == n + 2
+        rows = [list(map(Fraction, line.decode().split())) for line in lines[2:]]
+        changed = False
+        for i, row in enumerate(rows):
+            assert all(0 <= p <= 1 for p in row)
+            if len(row) != i + 1:
+                # 仅接受审核定位的10级表第9行多出一项；不平移后续行的概率。
+                assert n == 10 and i == 8 and len(row) == 10
+                spans = list(re.finditer(rb'\S+', lines[i+2]))
+                extra = spans[-1]
+                lines[i+2] = lines[i+2][:extra.start()] + lines[i+2][extra.end():]
+                rows[i] = row[:i+1]
+                changed = True
+        # 题面保证有限且最优路线唯一；精确比较，拒绝未审核的不可达/并列数据。
+        costs = [Fraction(int(lines[1]))]
+        for i, row in enumerate(rows):
+            choices = [(costs[i] + costs[j] + 100 - ((1-p)*costs[i-1] if i else 0))/p
+                       for j, p in enumerate(row) if p > 0]
+            assert choices and choices.count(min(choices)) == 1
+            costs.append(min(choices))
+        return b''.join(lines) if changed else payload
     if number == 27952:
         values = list(map(int, text.split()))
         n = values[0]

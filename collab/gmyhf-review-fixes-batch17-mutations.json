@@ -1,0 +1,80 @@
+{
+  "batch": 17,
+  "results": [
+    {
+      "mutation": "未裁剪第一项",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "上界少一",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "允许零肉块",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "漏掉首个旧用例",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错加一组",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "允许零坐标",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "不校已有组数",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "删除错误概率",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "允许概率超出1",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "不检查最优唯一",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "扩大未审核的多余列修复",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "肉块消耗向下取整",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "边界反射错误加回",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    },
+    {
+      "mutation": "五成双误用一律进位",
+      "detected": true,
+      "failures": 1,
+      "errors": 0
+    }
+  ],
+  "procedure_source": "import hashlib,io,json,os,subprocess,sys,unittest\nfrom pathlib import Path\nfrom unittest.mock import patch\ncases=[\n ('未裁剪第一项','min(v, 10000) for v in values','min(v, 10000) if i else v for i, v in enumerate(values)','test_luffy_clamps_only_upper_bounds'),\n ('上界少一','min(v, 10000) for v in values','min(v, 9999) for v in values','test_luffy_clamps_only_upper_bounds'),\n ('允许零肉块','min(values) >= 1','min(values) >= 0','test_luffy_clamps_only_upper_bounds'),\n ('漏掉首个旧用例',\"(str(len(rows))+'\\\\n').encode() + payload\",\"(str(len(rows)-1)+'\\\\n').encode() + payload.split(b'\\\\n',1)[1]\",'test_cinema_restores_count_preserves_all_cases_and_layout'),\n ('错加一组',\"(str(len(rows))+'\\\\n').encode() + payload\",\"(str(len(rows)+1)+'\\\\n').encode() + payload\",'test_cinema_restores_count_preserves_all_cases_and_layout'),\n ('允许零坐标','row[1] > 0 and row[2] > 0','row[1] >= 0 and row[2] >= 0','test_cinema_restores_count_preserves_all_cases_and_layout'),\n ('不校已有组数','assert int(header[0]) == len(rows)','assert True','test_cinema_restores_count_preserves_all_cases_and_layout'),\n ('删除错误概率','extra = spans[-1]','extra = spans[0]','test_synthesis_removes_only_out_of_triangle_cell'),\n ('允许概率超出1','0 <= p <= 1','0 <= p <= 2','test_synthesis_rejects_unknown_schema_unreachable_or_ties'),\n ('不检查最优唯一','choices and choices.count(min(choices)) == 1','choices','test_synthesis_rejects_unknown_schema_unreachable_or_ties'),\n ('扩大未审核的多余列修复','n == 10 and i == 8 and len(row) == 10','len(row) == i + 2','test_synthesis_rejects_unknown_schema_unreachable_or_ties')]\np=Path('scripts/gmyhf_review_fixes.py');original=p.read_text();results=[]\ntry:\n for name,old,new,test in cases:\n  assert original.count(old)==1,(name,original.count(old));p.write_text(original.replace(old,new))\n  run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest','tests.test_gmyhf_legacy_inputs.LegacyInputTests.'+test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert run.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':run.returncode});p.write_text(original)\nfinally:p.write_text(original)\nsys.path.insert(0,str(Path.cwd()));from tests import test_gmyhf_legacy_inputs as tests\nfor n,name,old,new,test in [\n (19965,'肉块消耗向下取整','(a + b - 1) // b','a // b','test_luffy_reference_against_all_meat_consumption_choices'),\n (19974,'边界反射错误加回','total - (math.comb','total + (math.comb','test_cinema_reference_against_lattice_paths_on_both_sides'),\n (19984,'五成双误用一律进位','cents % 2','True','test_synthesis_reference_against_credit_equation_and_decimal_rounding')]:\n proof=next(e for e in json.loads(Path('collab/gmyhf-pending-batch8-review.json').read_text())['entries'] if e['global_number']==n)['authored_reference'];source=proof['source'].split('import sys\\nsys.stdout.write')[0];assert source.count(old)==1\n ns={};exec(source.replace(old,new),ns);function={19965:'luffy',19974:'cinema',19984:'synthesis'}[n]\n with patch.object(tests,'reference',return_value=ns[function]):\n  run=unittest.TextTestRunner(stream=io.StringIO()).run(tests.LegacyInputTests(test));assert not run.wasSuccessful(),name\n results.append({'mutation':name,'detected':True,'failures':len(run.failures),'errors':len(run.errors)})\ns=Path(__file__).read_text();Path('collab/gmyhf-review-fixes-batch17-mutations.json').write_text(json.dumps({'batch':17,'results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n');print(len(results),'种变异检出，源码已恢复')\n",
+  "procedure_sha256": "3d74269816bbbb20865cb8705c3c5f4fe015c0beb53506ed0bc147048ccf2fa0"
+}

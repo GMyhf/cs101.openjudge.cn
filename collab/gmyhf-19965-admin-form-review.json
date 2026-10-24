@@ -1,0 +1,494 @@
+{
+  "original_evidence": "collab/gmyhf-pending-batch8-review.json",
+  "original_evidence_sha256": "f32179ba25bb87b53478334f84b3a067c17e8ca9d526164606669638553a4569",
+  "public_page_sha256": "cfc9967c7f9dce8707808f11c210dc2803bb9be93d00a43107ad93fe907fb281",
+  "scope": "公开题面六字段与当前后台逐项一致（移除公开样例pre包装、仅统一行尾和边缘空白、实体解码一次）；19974的纯文字input、19984的纯文字input/output另精确比对公开br与编辑页实际换行；补齐后台原载荷精确哈希。",
+  "platform_writes": 0,
+  "procedure_source": "\"\"\"将历史公开题面与当前后台六字段只读核对，绑定后续修复；不修改平台。\"\"\"\nimport copy,html,json,re,sys\nfrom pathlib import Path\nsys.path.insert(0,str(Path.cwd()/'scripts'));import repair_gmyhf_pending_answers as c\nkeys={'描述':'description','输入':'input','输出':'output','提示':'hint','样例输入':'sampleInput','样例输出':'sampleOutput'}\noriginal=Path('collab/gmyhf-pending-batch8-review.json');data=json.loads(original.read_text());session=c.platform.oj_submit.Session().login()\nfor n in (19965,19974,19984):\n e=next(e for e in data['entries'] if e['global_number']==n);page=Path(e['page']).read_bytes();assert c.sha(page)==e['page_sha256']\n section=re.search(r'<dl class=\"problem-content\">(.*?)</dl>',page.decode(),re.S)[1];public={k:'' for k in keys.values()}\n for label,value in re.findall(r'<dt>(.*?)</dt>\\s*<dd>(.*?)</dd>',section,re.S):\n  if label not in keys:continue\n  if value.startswith('<pre>') and value.endswith('</pre>'):value=value[5:-6]\n  public[keys[label]]=value\n live=session._get(c.platform.oj_submit.HOST+f'/admin/problems/edit/?id={n}');fields=c.platform.parse_form(live)\n def canonical(s):return html.unescape(s).replace('\\r\\n','\\n').strip()\n if n==19974:\n  # 此字段为纯文字：公开页用br，编辑页保存实际换行，仅核对此已定位差异。\n  public['input']=public['input'].replace('<br />','\\n')\n if n==19984:\n  for key in ('input','output'):public[key]=public[key].replace('<br />','\\n')\n assert all(canonical(public[k])==canonical(fields[k]) for k in public),[k for k in public if canonical(public[k])!=canonical(fields[k])]\n entry=copy.deepcopy(e);entry['checks']['statement']['field_sha256']={k:c.sha(html.unescape(fields[k]).encode()) for k in public}\n s=Path(__file__).read_text();c.save(Path(f'/tmp/gmyhf-{n}-admin-form-review.json'),{'original_evidence':str(original),'original_evidence_sha256':c.sha(original.read_bytes()),'public_page_sha256':c.sha(page),'scope':'公开题面六字段与当前后台逐项一致（移除公开样例pre包装、仅统一行尾和边缘空白、实体解码一次）；19974的纯文字input、19984的纯文字input/output另精确比对公开br与编辑页实际换行；补齐后台原载荷精确哈希。','platform_writes':0,'procedure_source':s,'procedure_sha256':c.sha(s.encode()),'entries':[entry]})\n print(n,'六字段只读绑定通过',flush=True)\n",
+  "procedure_sha256": "babe672b658af50a01abe79c59a2fce8abc14d69e8a437be66d8a70d4a01fa86",
+  "entries": [
+    {
+      "global_number": 19965,
+      "title": "海贼王路飞v0.2",
+      "reference": "/tmp/gmyhf-authored-19965.py",
+      "reference_sha256": "af7f649ddbb6f338d0fde9107dfdf5aa6d8d3c059db95abad8f8e0db809ea735",
+      "validator": "/tmp/gmyhf_batch8_oracles.py",
+      "validator_sha256": "cb132c1c4938bb8edd1f3f21c609e98183b3b2ab7a7cebfe7f5be50ebf915ebc",
+      "page": "data/openjudge/pages/practice__19965.html",
+      "page_sha256": "cfc9967c7f9dce8707808f11c210dc2803bb9be93d00a43107ad93fe907fb281",
+      "checks": {
+        "statement": {
+          "changed_fields": [],
+          "available": true,
+          "checked_at": "2026-10-23T18:43:08.687498+00:00",
+          "field_sha256": {
+            "description": "4ef7be49661c8f286f5e4b80eec08e1e02953f399b65c63aac3a8c1a54793436",
+            "input": "0bf80c00bc52b42fac28467769bfb28ed484fc66cd569461c27c858dc5a285ce",
+            "output": "3c019bcbfa4372a04a67474335d1619de94ac8b37b93190f42194c404808a6ca",
+            "hint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sampleInput": "63a5473935ea5c5eb99b96816726d20c24302c7a3d2ee9bd84a4f42161703ca1",
+            "sampleOutput": "5e347954174c88f144d44f4f898d0c38fbb8bcb479d645ef4ec8644fdd94e498"
+          }
+        },
+        "readback": {
+          "files": [
+            {
+              "filename": "1.in",
+              "sha256": "eb6ed362103d9e1263926ef7c0f5482f0e61b60a62c02d279f433b353246c27e",
+              "matches": true
+            },
+            {
+              "filename": "1.out",
+              "sha256": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+              "matches": true
+            },
+            {
+              "filename": "10.in",
+              "sha256": "7be00193d0f23ccb5028d7af32d38d3ac7fb61604997244dfe886fe11d07f41b",
+              "matches": true
+            },
+            {
+              "filename": "10.out",
+              "sha256": "6affdae3b3c1aa6aa7689e9b6a7b3225a636aa1ac0025f490cca1285ceaf1487",
+              "matches": true
+            },
+            {
+              "filename": "11.in",
+              "sha256": "d033746e3e4c82effc178307613ddce76d16ac4d0b59643b60022b452905e8dd",
+              "matches": true
+            },
+            {
+              "filename": "11.out",
+              "sha256": "1bf196d734a6d14527c8634c1d456b392ae1fd0d9a91ad80bbef8ea87f581c00",
+              "matches": true
+            },
+            {
+              "filename": "2.in",
+              "sha256": "8ef45af984433f87892ef61ddf71deeee4b029321b21fa80d49a6e7a9465592f",
+              "matches": true
+            },
+            {
+              "filename": "2.out",
+              "sha256": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+              "matches": true
+            },
+            {
+              "filename": "3.in",
+              "sha256": "3d8e345734a2f1f7502671c2a4b97e035526fc26e7413340a3780f9fce1996f8",
+              "matches": true
+            },
+            {
+              "filename": "3.out",
+              "sha256": "41cfc0d1f2d127b04555b7246d84019b4d27710a3f3aff6e7764375b1e06e05d",
+              "matches": true
+            },
+            {
+              "filename": "4.in",
+              "sha256": "5fe9cef976b3257549555428a12d385c48ba5b7c7904529a42d25f428987cd44",
+              "matches": true
+            },
+            {
+              "filename": "4.out",
+              "sha256": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443",
+              "matches": true
+            },
+            {
+              "filename": "5.in",
+              "sha256": "41bf74e8112ab70acb63278f89ead3d10956b32abe8d46086fcf5f8b04435c32",
+              "matches": true
+            },
+            {
+              "filename": "5.out",
+              "sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+              "matches": true
+            },
+            {
+              "filename": "6.in",
+              "sha256": "38cc100a8017c21e568d92a4128f100c38055f6cc75c90d92240262e59fc107f",
+              "matches": true
+            },
+            {
+              "filename": "6.out",
+              "sha256": "d066c2778ffdb1a902b8362cfed1a49ec8530ae9c2674b5cd2a18a0263032d95",
+              "matches": true
+            },
+            {
+              "filename": "7.in",
+              "sha256": "e5c312fe2d3a7ffd92af174be6920191ba63d623142db08f7abfdeec5f2f8109",
+              "matches": true
+            },
+            {
+              "filename": "7.out",
+              "sha256": "44592b77d53e97496c2a69ffda1e670e1829613cf7a620ebcfdead588a75f5ae",
+              "matches": true
+            },
+            {
+              "filename": "8.in",
+              "sha256": "ca752a0d723f6086c88eea4923c888605f387abfb44b0801826bc422203f2a9c",
+              "matches": true
+            },
+            {
+              "filename": "8.out",
+              "sha256": "6e73a9ee394de721f40ce06adb1e5f58c2085166e8756a64d6792aa479a22e45",
+              "matches": true
+            },
+            {
+              "filename": "9.in",
+              "sha256": "f9f34167d00191fa66ef78c8b1c70118788a38f70abb22ba5cb8982a34b87e52",
+              "matches": true
+            },
+            {
+              "filename": "9.out",
+              "sha256": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443",
+              "matches": true
+            }
+          ],
+          "checked_at": "2026-10-23T18:43:11.397543+00:00"
+        },
+        "contract": {
+          "cases": 11,
+          "rejected": [
+            "10.in",
+            "11.in",
+            "6.in",
+            "7.in",
+            "8.in"
+          ],
+          "definition": "原分类未提供_made参考和valid；按独立复算器extra_contract核题面约束，不声称通过既有valid。",
+          "checks": [
+            {
+              "input": "1.in",
+              "issues": []
+            },
+            {
+              "input": "10.in",
+              "issues": [
+                "容量战力肉块数范围不符"
+              ]
+            },
+            {
+              "input": "11.in",
+              "issues": [
+                "容量战力肉块数范围不符"
+              ]
+            },
+            {
+              "input": "2.in",
+              "issues": []
+            },
+            {
+              "input": "3.in",
+              "issues": []
+            },
+            {
+              "input": "4.in",
+              "issues": []
+            },
+            {
+              "input": "5.in",
+              "issues": []
+            },
+            {
+              "input": "6.in",
+              "issues": [
+                "容量战力肉块数范围不符"
+              ]
+            },
+            {
+              "input": "7.in",
+              "issues": [
+                "容量战力肉块数范围不符"
+              ]
+            },
+            {
+              "input": "8.in",
+              "issues": [
+                "容量战力肉块数范围不符"
+              ]
+            },
+            {
+              "input": "9.in",
+              "issues": []
+            }
+          ]
+        },
+        "extra_contract": {
+          "definition": "按解码题面补足原valid未覆盖的语义范围；实现见独立复算器extra_contract",
+          "files": [
+            {
+              "input": "1.in",
+              "issues": []
+            },
+            {
+              "input": "10.in",
+              "issues": [
+                "容量战力肉块数范围不符"
+              ]
+            },
+            {
+              "input": "11.in",
+              "issues": [
+                "容量战力肉块数范围不符"
+              ]
+            },
+            {
+              "input": "2.in",
+              "issues": []
+            },
+            {
+              "input": "3.in",
+              "issues": []
+            },
+            {
+              "input": "4.in",
+              "issues": []
+            },
+            {
+              "input": "5.in",
+              "issues": []
+            },
+            {
+              "input": "6.in",
+              "issues": [
+                "容量战力肉块数范围不符"
+              ]
+            },
+            {
+              "input": "7.in",
+              "issues": [
+                "容量战力肉块数范围不符"
+              ]
+            },
+            {
+              "input": "8.in",
+              "issues": [
+                "容量战力肉块数范围不符"
+              ]
+            },
+            {
+              "input": "9.in",
+              "issues": []
+            }
+          ]
+        },
+        "answers": {
+          "method": "按每轮最小饱腹肉块数模拟战力跃迁",
+          "official_samples": 3,
+          "files": [
+            {
+              "input": "1.in",
+              "output": "1.out",
+              "input_sha256": "eb6ed362103d9e1263926ef7c0f5482f0e61b60a62c02d279f433b353246c27e",
+              "output_sha256": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "10.in",
+              "output": "10.out",
+              "input_sha256": "7be00193d0f23ccb5028d7af32d38d3ac7fb61604997244dfe886fe11d07f41b",
+              "output_sha256": "6affdae3b3c1aa6aa7689e9b6a7b3225a636aa1ac0025f490cca1285ceaf1487",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "11.in",
+              "output": "11.out",
+              "input_sha256": "d033746e3e4c82effc178307613ddce76d16ac4d0b59643b60022b452905e8dd",
+              "output_sha256": "1bf196d734a6d14527c8634c1d456b392ae1fd0d9a91ad80bbef8ea87f581c00",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "2.in",
+              "output": "2.out",
+              "input_sha256": "8ef45af984433f87892ef61ddf71deeee4b029321b21fa80d49a6e7a9465592f",
+              "output_sha256": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "3.in",
+              "output": "3.out",
+              "input_sha256": "3d8e345734a2f1f7502671c2a4b97e035526fc26e7413340a3780f9fce1996f8",
+              "output_sha256": "41cfc0d1f2d127b04555b7246d84019b4d27710a3f3aff6e7764375b1e06e05d",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "4.in",
+              "output": "4.out",
+              "input_sha256": "5fe9cef976b3257549555428a12d385c48ba5b7c7904529a42d25f428987cd44",
+              "output_sha256": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "5.in",
+              "output": "5.out",
+              "input_sha256": "41bf74e8112ab70acb63278f89ead3d10956b32abe8d46086fcf5f8b04435c32",
+              "output_sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "6.in",
+              "output": "6.out",
+              "input_sha256": "38cc100a8017c21e568d92a4128f100c38055f6cc75c90d92240262e59fc107f",
+              "output_sha256": "d066c2778ffdb1a902b8362cfed1a49ec8530ae9c2674b5cd2a18a0263032d95",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "7.in",
+              "output": "7.out",
+              "input_sha256": "e5c312fe2d3a7ffd92af174be6920191ba63d623142db08f7abfdeec5f2f8109",
+              "output_sha256": "44592b77d53e97496c2a69ffda1e670e1829613cf7a620ebcfdead588a75f5ae",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "8.in",
+              "output": "8.out",
+              "input_sha256": "ca752a0d723f6086c88eea4923c888605f387abfb44b0801826bc422203f2a9c",
+              "output_sha256": "6e73a9ee394de721f40ce06adb1e5f58c2085166e8756a64d6792aa479a22e45",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "9.in",
+              "output": "9.out",
+              "input_sha256": "f9f34167d00191fa66ef78c8b1c70118788a38f70abb22ba5cb8982a34b87e52",
+              "output_sha256": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443",
+              "matches": true,
+              "oracle_ms": 0
+            }
+          ]
+        },
+        "local": {
+          "status": "Accepted",
+          "cases": 11,
+          "time_ms": 368,
+          "memory_kb": 86372,
+          "timing_audit": {
+            "status": "passed",
+            "required_max_ratio": 0.75,
+            "max_case": {
+              "case": 8,
+              "time_ms": 39,
+              "case_limit_ms": 10000,
+              "ratio": 0.0039
+            },
+            "cases": [
+              {
+                "case": 1,
+                "time_ms": 31,
+                "case_limit_ms": 10000,
+                "ratio": 0.0031
+              },
+              {
+                "case": 2,
+                "time_ms": 29,
+                "case_limit_ms": 10000,
+                "ratio": 0.0029
+              },
+              {
+                "case": 3,
+                "time_ms": 31,
+                "case_limit_ms": 10000,
+                "ratio": 0.0031
+              },
+              {
+                "case": 4,
+                "time_ms": 30,
+                "case_limit_ms": 10000,
+                "ratio": 0.003
+              },
+              {
+                "case": 5,
+                "time_ms": 38,
+                "case_limit_ms": 10000,
+                "ratio": 0.0038
+              },
+              {
+                "case": 6,
+                "time_ms": 34,
+                "case_limit_ms": 10000,
+                "ratio": 0.0034
+              },
+              {
+                "case": 7,
+                "time_ms": 31,
+                "case_limit_ms": 10000,
+                "ratio": 0.0031
+              },
+              {
+                "case": 8,
+                "time_ms": 39,
+                "case_limit_ms": 10000,
+                "ratio": 0.0039
+              },
+              {
+                "case": 9,
+                "time_ms": 34,
+                "case_limit_ms": 10000,
+                "ratio": 0.0034
+              },
+              {
+                "case": 10,
+                "time_ms": 31,
+                "case_limit_ms": 10000,
+                "ratio": 0.0031
+              },
+              {
+                "case": 11,
+                "time_ms": 36,
+                "case_limit_ms": 10000,
+                "ratio": 0.0036
+              }
+            ]
+          }
+        },
+        "platform": {
+          "final": "Accepted",
+          "attempts": [
+            {
+              "language": "Python3",
+              "solution_id": "53582467",
+              "url": "http://cs101.openjudge.cn/practice/solution/53582467/",
+              "verdict": "Accepted",
+              "ms": 45
+            }
+          ],
+          "checked_at": "2026-10-23T18:43:15.069679+00:00"
+        },
+        "admission_boundary": {
+          "original_reason": "no_bucket",
+          "preserve_exclusion": true,
+          "reason": "原题号绑定或资源排除未改；答案核对通过不能自动激活"
+        }
+      },
+      "authored_reference": {
+        "source": "import math, heapq, random, itertools, re, html\nfrom pathlib import Path\nfrom collections import deque, Counter\nfrom decimal import Decimal, localcontext, ROUND_HALF_EVEN\nfrom fractions import Fraction\n\ndef luffy(s):\n    (a, b, c) = map(int, s.split())\n    while b <= a:\n        need = (a + b - 1) // b\n        if c < need:\n            break\n        c -= need\n        b += a // b\n    return str(b)\nimport sys\nsys.stdout.write(luffy(sys.stdin.read()) + '\\n')\n",
+        "sha256": "af7f649ddbb6f338d0fde9107dfdf5aa6d8d3c059db95abad8f8e0db809ea735",
+        "procedure": "从自写独立复算器按AST函数依赖闭包提取，保留导入并添加标准输入输出入口；不读取或拼接任何后台测试内容"
+      },
+      "platform_attempts": [
+        {
+          "language": "Python3",
+          "solution_id": "53582467",
+          "url": "http://cs101.openjudge.cn/practice/solution/53582467/",
+          "verdict": "Accepted",
+          "ms": 45
+        }
+      ],
+      "passed": false,
+      "complete": true
+    }
+  ]
+}

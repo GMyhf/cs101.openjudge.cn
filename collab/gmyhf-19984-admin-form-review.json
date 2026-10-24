@@ -1,0 +1,500 @@
+{
+  "original_evidence": "collab/gmyhf-pending-batch8-review.json",
+  "original_evidence_sha256": "f32179ba25bb87b53478334f84b3a067c17e8ca9d526164606669638553a4569",
+  "public_page_sha256": "b1c874aab5c753c4c585ea621e565624e04069225291c0486ceb86758864d550",
+  "scope": "公开题面六字段与当前后台逐项一致（移除公开样例pre包装、仅统一行尾和边缘空白、实体解码一次）；19974的纯文字input、19984的纯文字input/output另精确比对公开br与编辑页实际换行；补齐后台原载荷精确哈希。",
+  "platform_writes": 0,
+  "procedure_source": "\"\"\"将历史公开题面与当前后台六字段只读核对，绑定后续修复；不修改平台。\"\"\"\nimport copy,html,json,re,sys\nfrom pathlib import Path\nsys.path.insert(0,str(Path.cwd()/'scripts'));import repair_gmyhf_pending_answers as c\nkeys={'描述':'description','输入':'input','输出':'output','提示':'hint','样例输入':'sampleInput','样例输出':'sampleOutput'}\noriginal=Path('collab/gmyhf-pending-batch8-review.json');data=json.loads(original.read_text());session=c.platform.oj_submit.Session().login()\nfor n in (19965,19974,19984):\n e=next(e for e in data['entries'] if e['global_number']==n);page=Path(e['page']).read_bytes();assert c.sha(page)==e['page_sha256']\n section=re.search(r'<dl class=\"problem-content\">(.*?)</dl>',page.decode(),re.S)[1];public={k:'' for k in keys.values()}\n for label,value in re.findall(r'<dt>(.*?)</dt>\\s*<dd>(.*?)</dd>',section,re.S):\n  if label not in keys:continue\n  if value.startswith('<pre>') and value.endswith('</pre>'):value=value[5:-6]\n  public[keys[label]]=value\n live=session._get(c.platform.oj_submit.HOST+f'/admin/problems/edit/?id={n}');fields=c.platform.parse_form(live)\n def canonical(s):return html.unescape(s).replace('\\r\\n','\\n').strip()\n if n==19974:\n  # 此字段为纯文字：公开页用br，编辑页保存实际换行，仅核对此已定位差异。\n  public['input']=public['input'].replace('<br />','\\n')\n if n==19984:\n  for key in ('input','output'):public[key]=public[key].replace('<br />','\\n')\n assert all(canonical(public[k])==canonical(fields[k]) for k in public),[k for k in public if canonical(public[k])!=canonical(fields[k])]\n entry=copy.deepcopy(e);entry['checks']['statement']['field_sha256']={k:c.sha(html.unescape(fields[k]).encode()) for k in public}\n s=Path(__file__).read_text();c.save(Path(f'/tmp/gmyhf-{n}-admin-form-review.json'),{'original_evidence':str(original),'original_evidence_sha256':c.sha(original.read_bytes()),'public_page_sha256':c.sha(page),'scope':'公开题面六字段与当前后台逐项一致（移除公开样例pre包装、仅统一行尾和边缘空白、实体解码一次）；19974的纯文字input、19984的纯文字input/output另精确比对公开br与编辑页实际换行；补齐后台原载荷精确哈希。','platform_writes':0,'procedure_source':s,'procedure_sha256':c.sha(s.encode()),'entries':[entry]})\n print(n,'六字段只读绑定通过',flush=True)\n",
+  "procedure_sha256": "babe672b658af50a01abe79c59a2fce8abc14d69e8a437be66d8a70d4a01fa86",
+  "entries": [
+    {
+      "global_number": 19984,
+      "title": "合成路线",
+      "reference": "/tmp/gmyhf-authored-19984.py",
+      "reference_sha256": "129853b01c4bdf46266048c9a5643d69cbbe2d029452b68f9173c8d8c51a62bc",
+      "validator": "/tmp/gmyhf_batch8_oracles.py",
+      "validator_sha256": "cb132c1c4938bb8edd1f3f21c609e98183b3b2ab7a7cebfe7f5be50ebf915ebc",
+      "page": "data/openjudge/pages/practice__19984.html",
+      "page_sha256": "b1c874aab5c753c4c585ea621e565624e04069225291c0486ceb86758864d550",
+      "checks": {
+        "statement": {
+          "changed_fields": [],
+          "available": true,
+          "checked_at": "2026-10-23T18:44:08.443936+00:00",
+          "field_sha256": {
+            "description": "4a14c0ca6869ef82bf99f56c00c3e70eb566551e1eb987319712ba959b2f0ffb",
+            "input": "4a9f07680d42ac08ff69df42ad2b4a90fa7fbe7f5c8f76989c89fcb6bba7e765",
+            "output": "af16291042ddc6e427fd5c679e1fa68b2dcaf994564ba5badb16818c967ed861",
+            "hint": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "sampleInput": "139c81f170243b8425d0a30fb396f8703698563e23c8b6ee7cf7d3919d5b5362",
+            "sampleOutput": "ea24d4cc369256e61dffaf6dcbcbb358876ea7b0cef5096a90d093b6fb62edc5"
+          }
+        },
+        "readback": {
+          "files": [
+            {
+              "filename": "1.in",
+              "sha256": "49c63a5f3e8e94f7256c0eb8bb18314e73f2a0883dc4dbb2f91b45935b41c48c",
+              "matches": true
+            },
+            {
+              "filename": "1.out",
+              "sha256": "0c1ae5d3e4ff8f4207836a64519d82dbe56228b22f0d0b92c276f4c5d0b2aa59",
+              "matches": true
+            },
+            {
+              "filename": "10.in",
+              "sha256": "6d3bedd54bcd3176d0f0e00e091170a833f58ad6101fba9072fb70feef337a99",
+              "matches": true
+            },
+            {
+              "filename": "10.out",
+              "sha256": "0c123728d5b9c1cf1a66b9f9357a5cdf89fa5a7652be5e3ae2ca1b39abd4c5ae",
+              "matches": true
+            },
+            {
+              "filename": "11.in",
+              "sha256": "5c853658c0b9f9be3c9efdb35e97989b344c85231fd3fe5af1b08f9735781e7f",
+              "matches": true
+            },
+            {
+              "filename": "11.out",
+              "sha256": "8091e8a0a57ddee020441d49be3fa257fea5dd44017a4c222f1f7bfd43a4b63c",
+              "matches": true
+            },
+            {
+              "filename": "12.in",
+              "sha256": "5edd5d467ee84ef6bcde95aa77877387c55bd193a25f3c517f74604b0b2820d0",
+              "matches": true
+            },
+            {
+              "filename": "12.out",
+              "sha256": "e272a57ffbd4a8556d7323035687232b3e38ea634f90731ad6c605dbfb5ee44c",
+              "matches": true
+            },
+            {
+              "filename": "13.in",
+              "sha256": "a17a84dc192f910754fcbd0068822fd0b5e7d4eaecbf5631cefdd4d4905dddab",
+              "matches": true
+            },
+            {
+              "filename": "13.out",
+              "sha256": "5623487a8314cb13eabb4044cb144d0dfe3fd02163ebf6af18bc85eca43394b9",
+              "matches": true
+            },
+            {
+              "filename": "14.in",
+              "sha256": "0db8ff5562e6547e2576224deca0c70cc60786ee61f76cefb5922c67fb1a568a",
+              "matches": true
+            },
+            {
+              "filename": "14.out",
+              "sha256": "ce152ad4cb84bcd24ee8d2d81b51ccb71431bed7bce182ed472051e25dd85dfb",
+              "matches": true
+            },
+            {
+              "filename": "15.in",
+              "sha256": "5bfee287dd4f3cbd90bb9de8d48ef8707b48fa3838e3a6acffc90670394652ca",
+              "matches": true
+            },
+            {
+              "filename": "15.out",
+              "sha256": "d10aea4361f44cdaa701ec839c9a9ad84d9523fcca033c12500789268a5f185d",
+              "matches": true
+            },
+            {
+              "filename": "2.in",
+              "sha256": "8d7f92e474f5a1fe0ce50b44b29fa5cde659493dcd9082543cf396cf301fa69e",
+              "matches": true
+            },
+            {
+              "filename": "2.out",
+              "sha256": "d8ba3d8c49624f932672fbeb462df9d03511d5c86ff550e345920a68c25e1357",
+              "matches": true
+            },
+            {
+              "filename": "3.in",
+              "sha256": "a6769f237ada80f72855b35e008d5b785e68e251195c354e29c39b64b3361f2e",
+              "matches": true
+            },
+            {
+              "filename": "3.out",
+              "sha256": "c797216a3ce997354daf34327dbd9702c04a3af5af304d4d394d9976043c6827",
+              "matches": true
+            },
+            {
+              "filename": "4.in",
+              "sha256": "9014cac4de261c041bf26f9b7de0f9e615182f759d5bc87e792de15f5740966f",
+              "matches": true
+            },
+            {
+              "filename": "4.out",
+              "sha256": "677c4a3ebbafe884c48b919f2bb1d946c783c63f63ed3a9ff319d498666a1891",
+              "matches": true
+            },
+            {
+              "filename": "5.in",
+              "sha256": "f386a172a94c20f3dbb341faba4d17d68fe816be611ca8851fc45fe0216f3c0c",
+              "matches": true
+            },
+            {
+              "filename": "5.out",
+              "sha256": "4536390b53b9711a60efcde9c58bf669eb5670098b3299ce740d6e765a7c3626",
+              "matches": true
+            },
+            {
+              "filename": "6.in",
+              "sha256": "a89a295b9b83da2be42b1fea798dc06d42591b93b5565402dbc59b02f682ed70",
+              "matches": true
+            },
+            {
+              "filename": "6.out",
+              "sha256": "255cadb4cc8e939d873b46ba36f67b5b1cfb73beb37d448df22d517ef08188ee",
+              "matches": true
+            },
+            {
+              "filename": "7.in",
+              "sha256": "c404142a2b9ccc9a54d76115b4509c4ada54011ccd32b012a7b334f7dcc7327a",
+              "matches": true
+            },
+            {
+              "filename": "7.out",
+              "sha256": "b30c611f8d0eebc44954f12ac080185c037eca0bf9c5ee3bf425133a4040ad83",
+              "matches": true
+            },
+            {
+              "filename": "8.in",
+              "sha256": "808422eedb34ca403275c59519b9ef8fa720a180f71eacec5d7bd7b0dd6c7e0c",
+              "matches": true
+            },
+            {
+              "filename": "8.out",
+              "sha256": "eb2d0799d58f6226e60298adbd3753409d8df6a2de3c8449f95d6eb9dba7f46d",
+              "matches": true
+            },
+            {
+              "filename": "9.in",
+              "sha256": "9cfcd070f2119ce29d254296177054650e9a03a1bd530a88263df79912dbb40c",
+              "matches": true
+            },
+            {
+              "filename": "9.out",
+              "sha256": "ef5ce9f7068d7d0dacb6b8e2156877f639177768c380b115ff888569ced430c7",
+              "matches": true
+            }
+          ],
+          "checked_at": "2026-10-23T18:44:12.086942+00:00"
+        },
+        "contract": {
+          "cases": 15,
+          "rejected": [
+            "4.in"
+          ],
+          "definition": "原分类未提供_made参考和valid；按独立复算器extra_contract核题面约束，不声称通过既有valid。",
+          "checks": [
+            {
+              "input": "1.in",
+              "issues": []
+            },
+            {
+              "input": "10.in",
+              "issues": []
+            },
+            {
+              "input": "11.in",
+              "issues": []
+            },
+            {
+              "input": "12.in",
+              "issues": []
+            },
+            {
+              "input": "13.in",
+              "issues": []
+            },
+            {
+              "input": "14.in",
+              "issues": []
+            },
+            {
+              "input": "15.in",
+              "issues": []
+            },
+            {
+              "input": "2.in",
+              "issues": []
+            },
+            {
+              "input": "3.in",
+              "issues": []
+            },
+            {
+              "input": "4.in",
+              "issues": [
+                "产物级数或概率范围不符"
+              ]
+            },
+            {
+              "input": "5.in",
+              "issues": []
+            },
+            {
+              "input": "6.in",
+              "issues": []
+            },
+            {
+              "input": "7.in",
+              "issues": []
+            },
+            {
+              "input": "8.in",
+              "issues": []
+            },
+            {
+              "input": "9.in",
+              "issues": []
+            }
+          ]
+        },
+        "extra_contract": {
+          "definition": "按解码题面补足原valid未覆盖的语义范围；实现见独立复算器extra_contract",
+          "files": [
+            {
+              "input": "1.in",
+              "issues": []
+            },
+            {
+              "input": "10.in",
+              "issues": []
+            },
+            {
+              "input": "11.in",
+              "issues": []
+            },
+            {
+              "input": "12.in",
+              "issues": []
+            },
+            {
+              "input": "13.in",
+              "issues": []
+            },
+            {
+              "input": "14.in",
+              "issues": []
+            },
+            {
+              "input": "15.in",
+              "issues": []
+            },
+            {
+              "input": "2.in",
+              "issues": []
+            },
+            {
+              "input": "3.in",
+              "issues": []
+            },
+            {
+              "input": "4.in",
+              "issues": [
+                "产物级数或概率范围不符"
+              ]
+            },
+            {
+              "input": "5.in",
+              "issues": []
+            },
+            {
+              "input": "6.in",
+              "issues": []
+            },
+            {
+              "input": "7.in",
+              "issues": []
+            },
+            {
+              "input": "8.in",
+              "issues": []
+            },
+            {
+              "input": "9.in",
+              "issues": []
+            }
+          ]
+        },
+        "answers": {
+          "method": "精确有理数比较每阶段成本，整数余数实现五成双",
+          "official_samples": 1,
+          "files": [
+            {
+              "input": "1.in",
+              "output": "1.out",
+              "input_sha256": "49c63a5f3e8e94f7256c0eb8bb18314e73f2a0883dc4dbb2f91b45935b41c48c",
+              "output_sha256": "0c1ae5d3e4ff8f4207836a64519d82dbe56228b22f0d0b92c276f4c5d0b2aa59",
+              "matches": true,
+              "oracle_ms": 2
+            },
+            {
+              "input": "10.in",
+              "output": "10.out",
+              "input_sha256": "6d3bedd54bcd3176d0f0e00e091170a833f58ad6101fba9072fb70feef337a99",
+              "output_sha256": "0c123728d5b9c1cf1a66b9f9357a5cdf89fa5a7652be5e3ae2ca1b39abd4c5ae",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "11.in",
+              "output": "11.out",
+              "input_sha256": "5c853658c0b9f9be3c9efdb35e97989b344c85231fd3fe5af1b08f9735781e7f",
+              "output_sha256": "8091e8a0a57ddee020441d49be3fa257fea5dd44017a4c222f1f7bfd43a4b63c",
+              "matches": true,
+              "oracle_ms": 3
+            },
+            {
+              "input": "12.in",
+              "output": "12.out",
+              "input_sha256": "5edd5d467ee84ef6bcde95aa77877387c55bd193a25f3c517f74604b0b2820d0",
+              "output_sha256": "e272a57ffbd4a8556d7323035687232b3e38ea634f90731ad6c605dbfb5ee44c",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "13.in",
+              "output": "13.out",
+              "input_sha256": "a17a84dc192f910754fcbd0068822fd0b5e7d4eaecbf5631cefdd4d4905dddab",
+              "output_sha256": "5623487a8314cb13eabb4044cb144d0dfe3fd02163ebf6af18bc85eca43394b9",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "14.in",
+              "output": "14.out",
+              "input_sha256": "0db8ff5562e6547e2576224deca0c70cc60786ee61f76cefb5922c67fb1a568a",
+              "output_sha256": "ce152ad4cb84bcd24ee8d2d81b51ccb71431bed7bce182ed472051e25dd85dfb",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "15.in",
+              "output": "15.out",
+              "input_sha256": "5bfee287dd4f3cbd90bb9de8d48ef8707b48fa3838e3a6acffc90670394652ca",
+              "output_sha256": "d10aea4361f44cdaa701ec839c9a9ad84d9523fcca033c12500789268a5f185d",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "2.in",
+              "output": "2.out",
+              "input_sha256": "8d7f92e474f5a1fe0ce50b44b29fa5cde659493dcd9082543cf396cf301fa69e",
+              "output_sha256": "d8ba3d8c49624f932672fbeb462df9d03511d5c86ff550e345920a68c25e1357",
+              "matches": true,
+              "oracle_ms": 0
+            },
+            {
+              "input": "3.in",
+              "output": "3.out",
+              "input_sha256": "a6769f237ada80f72855b35e008d5b785e68e251195c354e29c39b64b3361f2e",
+              "output_sha256": "c797216a3ce997354daf34327dbd9702c04a3af5af304d4d394d9976043c6827",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "4.in",
+              "output": "4.out",
+              "input_sha256": "9014cac4de261c041bf26f9b7de0f9e615182f759d5bc87e792de15f5740966f",
+              "output_sha256": "677c4a3ebbafe884c48b919f2bb1d946c783c63f63ed3a9ff319d498666a1891",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "5.in",
+              "output": "5.out",
+              "input_sha256": "f386a172a94c20f3dbb341faba4d17d68fe816be611ca8851fc45fe0216f3c0c",
+              "output_sha256": "4536390b53b9711a60efcde9c58bf669eb5670098b3299ce740d6e765a7c3626",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "6.in",
+              "output": "6.out",
+              "input_sha256": "a89a295b9b83da2be42b1fea798dc06d42591b93b5565402dbc59b02f682ed70",
+              "output_sha256": "255cadb4cc8e939d873b46ba36f67b5b1cfb73beb37d448df22d517ef08188ee",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "7.in",
+              "output": "7.out",
+              "input_sha256": "c404142a2b9ccc9a54d76115b4509c4ada54011ccd32b012a7b334f7dcc7327a",
+              "output_sha256": "b30c611f8d0eebc44954f12ac080185c037eca0bf9c5ee3bf425133a4040ad83",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "8.in",
+              "output": "8.out",
+              "input_sha256": "808422eedb34ca403275c59519b9ef8fa720a180f71eacec5d7bd7b0dd6c7e0c",
+              "output_sha256": "eb2d0799d58f6226e60298adbd3753409d8df6a2de3c8449f95d6eb9dba7f46d",
+              "matches": true,
+              "oracle_ms": 1
+            },
+            {
+              "input": "9.in",
+              "output": "9.out",
+              "input_sha256": "9cfcd070f2119ce29d254296177054650e9a03a1bd530a88263df79912dbb40c",
+              "output_sha256": "ef5ce9f7068d7d0dacb6b8e2156877f639177768c380b115ff888569ced430c7",
+              "matches": true,
+              "oracle_ms": 0
+            }
+          ]
+        },
+        "local": {
+          "status": "Wrong Answer",
+          "case": 10,
+          "time_ms": 316,
+          "memory_kb": 144792,
+          "expected_tokens": 11,
+          "actual_tokens": 11,
+          "actual_output_sha256": "b6582120e6f8876230c234faebc37b92ec6c8cd210b0de86e8af9f46a7c1f435",
+          "actual_output_bytes": 100
+        },
+        "platform": {
+          "final": "Wrong Answer",
+          "attempts": [
+            {
+              "language": "Python3",
+              "solution_id": "53582474",
+              "url": "http://cs101.openjudge.cn/practice/solution/53582474/",
+              "verdict": "Wrong Answer",
+              "ms": 41
+            }
+          ],
+          "checked_at": "2026-10-23T18:44:15.707929+00:00"
+        },
+        "admission_boundary": {
+          "original_reason": "no_bucket",
+          "preserve_exclusion": true,
+          "reason": "原题号绑定或资源排除未改；答案核对通过不能自动激活"
+        }
+      },
+      "authored_reference": {
+        "source": "import math, heapq, random, itertools, re, html\nfrom pathlib import Path\nfrom collections import deque, Counter\nfrom decimal import Decimal, localcontext, ROUND_HALF_EVEN\nfrom fractions import Fraction\n\ndef synthesis(s):\n    v = iter(s.split())\n    n = int(next(v))\n    cost = [Fraction(next(v))]\n    route = []\n    for i in range(n):\n        probs = [Fraction(next(v)) for _ in range(i + 1)]\n        options = [((cost[i] + cost[j] + 100 - (1 - p) * cost[i - 1] if i else cost[i] + cost[j] + 100) / p, j) for (j, p) in enumerate(probs) if p > 0]\n        if not options:\n            return 'UNREACHABLE'\n        (best, j) = min(options)\n        cost.append(best)\n        route.append(j)\n    value = cost[-1]\n    (cents, remainder) = divmod(abs(value.numerator) * 100, value.denominator)\n    if 2 * remainder > value.denominator or (2 * remainder == value.denominator and cents % 2):\n        cents += 1\n    price = ('-' if value < 0 and cents else '') + f'{cents // 100}.{cents % 100:02d}'\n    return ' '.join(map(str, route)) + '\\n' + price\nimport sys\nsys.stdout.write(synthesis(sys.stdin.read()) + '\\n')\n",
+        "sha256": "129853b01c4bdf46266048c9a5643d69cbbe2d029452b68f9173c8d8c51a62bc",
+        "procedure": "从自写独立复算器按AST函数依赖闭包提取，保留导入并添加标准输入输出入口；不读取或拼接任何后台测试内容"
+      },
+      "platform_attempts": [
+        {
+          "language": "Python3",
+          "solution_id": "53582474",
+          "url": "http://cs101.openjudge.cn/practice/solution/53582474/",
+          "verdict": "Wrong Answer",
+          "ms": 41
+        }
+      ],
+      "passed": false,
+      "complete": true
+    }
+  ]
+}

@@ -1,0 +1,826 @@
+{
+  "batch": 17,
+  "baseline": "4557973c9bf46fe11007581510ac6b7e6bb5cf8b",
+  "procedure_sha256": "faa39ffa859f8db968f44a0e9a5349a1e4fa123d7b15da3c5fb37c4fb22d8988",
+  "rules_sha256": "3d7d10d00fddbfab88a37245ff613da88ed81354075e754b11456da3cd185b39",
+  "common_sha256": "6c004fd4b9aaf57fa9c8c984bc5978811944b65be2c23f771e913aff909fa14e",
+  "applied": true,
+  "policy": "修复明确越界输入和输出格式；保留原始及上一轮修正快照，不自动接入题库。",
+  "changed_files": 16,
+  "problems": [
+    {
+      "global_number": 19965,
+      "evidence": "collab/gmyhf-19965-admin-form-review.json",
+      "evidence_sha256": "0ece6f3bbe626e2b7a592a6238ef6f9000592448cc0a77191a4842ca1a203e1c",
+      "reference_sha256": "af7f649ddbb6f338d0fde9107dfdf5aa6d8d3c059db95abad8f8e0db809ea735",
+      "reference_source": "import math, heapq, random, itertools, re, html\nfrom pathlib import Path\nfrom collections import deque, Counter\nfrom decimal import Decimal, localcontext, ROUND_HALF_EVEN\nfrom fractions import Fraction\n\ndef luffy(s):\n    (a, b, c) = map(int, s.split())\n    while b <= a:\n        need = (a + b - 1) // b\n        if c < need:\n            break\n        c -= need\n        b += a // b\n    return str(b)\nimport sys\nsys.stdout.write(luffy(sys.stdin.read()) + '\\n')\n",
+      "reference_language": "python3",
+      "reference_file": "reference.py",
+      "baseline_files": {
+        "1.in": "eb6ed362103d9e1263926ef7c0f5482f0e61b60a62c02d279f433b353246c27e",
+        "1.out": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+        "10.in": "7be00193d0f23ccb5028d7af32d38d3ac7fb61604997244dfe886fe11d07f41b",
+        "10.out": "6affdae3b3c1aa6aa7689e9b6a7b3225a636aa1ac0025f490cca1285ceaf1487",
+        "11.in": "d033746e3e4c82effc178307613ddce76d16ac4d0b59643b60022b452905e8dd",
+        "11.out": "1bf196d734a6d14527c8634c1d456b392ae1fd0d9a91ad80bbef8ea87f581c00",
+        "2.in": "8ef45af984433f87892ef61ddf71deeee4b029321b21fa80d49a6e7a9465592f",
+        "2.out": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+        "3.in": "3d8e345734a2f1f7502671c2a4b97e035526fc26e7413340a3780f9fce1996f8",
+        "3.out": "41cfc0d1f2d127b04555b7246d84019b4d27710a3f3aff6e7764375b1e06e05d",
+        "4.in": "5fe9cef976b3257549555428a12d385c48ba5b7c7904529a42d25f428987cd44",
+        "4.out": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443",
+        "5.in": "41bf74e8112ab70acb63278f89ead3d10956b32abe8d46086fcf5f8b04435c32",
+        "5.out": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "6.in": "38cc100a8017c21e568d92a4128f100c38055f6cc75c90d92240262e59fc107f",
+        "6.out": "d066c2778ffdb1a902b8362cfed1a49ec8530ae9c2674b5cd2a18a0263032d95",
+        "7.in": "e5c312fe2d3a7ffd92af174be6920191ba63d623142db08f7abfdeec5f2f8109",
+        "7.out": "44592b77d53e97496c2a69ffda1e670e1829613cf7a620ebcfdead588a75f5ae",
+        "8.in": "ca752a0d723f6086c88eea4923c888605f387abfb44b0801826bc422203f2a9c",
+        "8.out": "6e73a9ee394de721f40ce06adb1e5f58c2085166e8756a64d6792aa479a22e45",
+        "9.in": "f9f34167d00191fa66ef78c8b1c70118788a38f70abb22ba5cb8982a34b87e52",
+        "9.out": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443"
+      },
+      "changes": [
+        {
+          "filename": "10.in",
+          "input": "10.in",
+          "output": "10.out",
+          "before_sha256": "7be00193d0f23ccb5028d7af32d38d3ac7fb61604997244dfe886fe11d07f41b",
+          "after_sha256": "a447f5492223bdda214ea8d564b38ff2ff7bdd95970c66e9418e634fd23a8a8d",
+          "pair_before": {
+            "10.in": "7be00193d0f23ccb5028d7af32d38d3ac7fb61604997244dfe886fe11d07f41b",
+            "10.out": "6affdae3b3c1aa6aa7689e9b6a7b3225a636aa1ac0025f490cca1285ceaf1487"
+          },
+          "pair_after": {
+            "10.in": "a447f5492223bdda214ea8d564b38ff2ff7bdd95970c66e9418e634fd23a8a8d",
+            "10.out": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff"
+          }
+        },
+        {
+          "filename": "10.out",
+          "input": "10.in",
+          "output": "10.out",
+          "before_sha256": "6affdae3b3c1aa6aa7689e9b6a7b3225a636aa1ac0025f490cca1285ceaf1487",
+          "after_sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+          "pair_before": {
+            "10.in": "7be00193d0f23ccb5028d7af32d38d3ac7fb61604997244dfe886fe11d07f41b",
+            "10.out": "6affdae3b3c1aa6aa7689e9b6a7b3225a636aa1ac0025f490cca1285ceaf1487"
+          },
+          "pair_after": {
+            "10.in": "a447f5492223bdda214ea8d564b38ff2ff7bdd95970c66e9418e634fd23a8a8d",
+            "10.out": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff"
+          }
+        },
+        {
+          "filename": "11.in",
+          "input": "11.in",
+          "output": "11.out",
+          "before_sha256": "d033746e3e4c82effc178307613ddce76d16ac4d0b59643b60022b452905e8dd",
+          "after_sha256": "ec34bc8bb946f134146f0542cd7ffa2b6f64378827b589d151c0545e66a24fc5",
+          "pair_before": {
+            "11.in": "d033746e3e4c82effc178307613ddce76d16ac4d0b59643b60022b452905e8dd",
+            "11.out": "1bf196d734a6d14527c8634c1d456b392ae1fd0d9a91ad80bbef8ea87f581c00"
+          },
+          "pair_after": {
+            "11.in": "ec34bc8bb946f134146f0542cd7ffa2b6f64378827b589d151c0545e66a24fc5",
+            "11.out": "8d24a9f8aba50dda3f5b78568770b2adc16d910552906e7612627da253f79a2a"
+          }
+        },
+        {
+          "filename": "11.out",
+          "input": "11.in",
+          "output": "11.out",
+          "before_sha256": "1bf196d734a6d14527c8634c1d456b392ae1fd0d9a91ad80bbef8ea87f581c00",
+          "after_sha256": "8d24a9f8aba50dda3f5b78568770b2adc16d910552906e7612627da253f79a2a",
+          "pair_before": {
+            "11.in": "d033746e3e4c82effc178307613ddce76d16ac4d0b59643b60022b452905e8dd",
+            "11.out": "1bf196d734a6d14527c8634c1d456b392ae1fd0d9a91ad80bbef8ea87f581c00"
+          },
+          "pair_after": {
+            "11.in": "ec34bc8bb946f134146f0542cd7ffa2b6f64378827b589d151c0545e66a24fc5",
+            "11.out": "8d24a9f8aba50dda3f5b78568770b2adc16d910552906e7612627da253f79a2a"
+          }
+        },
+        {
+          "filename": "6.in",
+          "input": "6.in",
+          "output": "6.out",
+          "before_sha256": "38cc100a8017c21e568d92a4128f100c38055f6cc75c90d92240262e59fc107f",
+          "after_sha256": "722a02799e3556e8b5ecb225534b72910987c49045294c24891b7f1f690cc256",
+          "pair_before": {
+            "6.in": "38cc100a8017c21e568d92a4128f100c38055f6cc75c90d92240262e59fc107f",
+            "6.out": "d066c2778ffdb1a902b8362cfed1a49ec8530ae9c2674b5cd2a18a0263032d95"
+          },
+          "pair_after": {
+            "6.in": "722a02799e3556e8b5ecb225534b72910987c49045294c24891b7f1f690cc256",
+            "6.out": "7d09bbe3b5c67664d64024696995b1a9f91a8c9d9b65409f34bc1ee8189f2859"
+          }
+        },
+        {
+          "filename": "6.out",
+          "input": "6.in",
+          "output": "6.out",
+          "before_sha256": "d066c2778ffdb1a902b8362cfed1a49ec8530ae9c2674b5cd2a18a0263032d95",
+          "after_sha256": "7d09bbe3b5c67664d64024696995b1a9f91a8c9d9b65409f34bc1ee8189f2859",
+          "pair_before": {
+            "6.in": "38cc100a8017c21e568d92a4128f100c38055f6cc75c90d92240262e59fc107f",
+            "6.out": "d066c2778ffdb1a902b8362cfed1a49ec8530ae9c2674b5cd2a18a0263032d95"
+          },
+          "pair_after": {
+            "6.in": "722a02799e3556e8b5ecb225534b72910987c49045294c24891b7f1f690cc256",
+            "6.out": "7d09bbe3b5c67664d64024696995b1a9f91a8c9d9b65409f34bc1ee8189f2859"
+          }
+        },
+        {
+          "filename": "7.in",
+          "input": "7.in",
+          "output": "7.out",
+          "before_sha256": "e5c312fe2d3a7ffd92af174be6920191ba63d623142db08f7abfdeec5f2f8109",
+          "after_sha256": "61cfe050957f0168101c7839c5129eefb00b63bea4d6c4863084e15ac5ed9b02",
+          "pair_before": {
+            "7.in": "e5c312fe2d3a7ffd92af174be6920191ba63d623142db08f7abfdeec5f2f8109",
+            "7.out": "44592b77d53e97496c2a69ffda1e670e1829613cf7a620ebcfdead588a75f5ae"
+          },
+          "pair_after": {
+            "7.in": "61cfe050957f0168101c7839c5129eefb00b63bea4d6c4863084e15ac5ed9b02",
+            "7.out": "569962d245611bc5afb1bd1233f8cbf14b5170704e30a311ddb0b17937001b0f"
+          }
+        },
+        {
+          "filename": "7.out",
+          "input": "7.in",
+          "output": "7.out",
+          "before_sha256": "44592b77d53e97496c2a69ffda1e670e1829613cf7a620ebcfdead588a75f5ae",
+          "after_sha256": "569962d245611bc5afb1bd1233f8cbf14b5170704e30a311ddb0b17937001b0f",
+          "pair_before": {
+            "7.in": "e5c312fe2d3a7ffd92af174be6920191ba63d623142db08f7abfdeec5f2f8109",
+            "7.out": "44592b77d53e97496c2a69ffda1e670e1829613cf7a620ebcfdead588a75f5ae"
+          },
+          "pair_after": {
+            "7.in": "61cfe050957f0168101c7839c5129eefb00b63bea4d6c4863084e15ac5ed9b02",
+            "7.out": "569962d245611bc5afb1bd1233f8cbf14b5170704e30a311ddb0b17937001b0f"
+          }
+        },
+        {
+          "filename": "8.in",
+          "input": "8.in",
+          "output": "8.out",
+          "before_sha256": "ca752a0d723f6086c88eea4923c888605f387abfb44b0801826bc422203f2a9c",
+          "after_sha256": "069106831ab299969dda68e8fe48477cc715b95b147ebe5457b3fdb3b9b34588",
+          "pair_before": {
+            "8.in": "ca752a0d723f6086c88eea4923c888605f387abfb44b0801826bc422203f2a9c",
+            "8.out": "6e73a9ee394de721f40ce06adb1e5f58c2085166e8756a64d6792aa479a22e45"
+          },
+          "pair_after": {
+            "8.in": "069106831ab299969dda68e8fe48477cc715b95b147ebe5457b3fdb3b9b34588",
+            "8.out": "3696187ea0f7a69a7cbdb2dd711bdee12d3662f78ec96df29f1fdb16242d65e8"
+          }
+        },
+        {
+          "filename": "8.out",
+          "input": "8.in",
+          "output": "8.out",
+          "before_sha256": "6e73a9ee394de721f40ce06adb1e5f58c2085166e8756a64d6792aa479a22e45",
+          "after_sha256": "3696187ea0f7a69a7cbdb2dd711bdee12d3662f78ec96df29f1fdb16242d65e8",
+          "pair_before": {
+            "8.in": "ca752a0d723f6086c88eea4923c888605f387abfb44b0801826bc422203f2a9c",
+            "8.out": "6e73a9ee394de721f40ce06adb1e5f58c2085166e8756a64d6792aa479a22e45"
+          },
+          "pair_after": {
+            "8.in": "069106831ab299969dda68e8fe48477cc715b95b147ebe5457b3fdb3b9b34588",
+            "8.out": "3696187ea0f7a69a7cbdb2dd711bdee12d3662f78ec96df29f1fdb16242d65e8"
+          }
+        }
+      ],
+      "local_dataset": "data/openjudge/tests/admin_review_repaired/19965",
+      "local": {
+        "status": "Accepted",
+        "cases": 11,
+        "time_ms": 372,
+        "memory_kb": 31488,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 11,
+            "time_ms": 40,
+            "case_limit_ms": 10000,
+            "ratio": 0.004
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 35,
+              "case_limit_ms": 10000,
+              "ratio": 0.0035
+            },
+            {
+              "case": 2,
+              "time_ms": 32,
+              "case_limit_ms": 10000,
+              "ratio": 0.0032
+            },
+            {
+              "case": 3,
+              "time_ms": 33,
+              "case_limit_ms": 10000,
+              "ratio": 0.0033
+            },
+            {
+              "case": 4,
+              "time_ms": 30,
+              "case_limit_ms": 10000,
+              "ratio": 0.003
+            },
+            {
+              "case": 5,
+              "time_ms": 34,
+              "case_limit_ms": 10000,
+              "ratio": 0.0034
+            },
+            {
+              "case": 6,
+              "time_ms": 32,
+              "case_limit_ms": 10000,
+              "ratio": 0.0032
+            },
+            {
+              "case": 7,
+              "time_ms": 35,
+              "case_limit_ms": 10000,
+              "ratio": 0.0035
+            },
+            {
+              "case": 8,
+              "time_ms": 32,
+              "case_limit_ms": 10000,
+              "ratio": 0.0032
+            },
+            {
+              "case": 9,
+              "time_ms": 30,
+              "case_limit_ms": 10000,
+              "ratio": 0.003
+            },
+            {
+              "case": 10,
+              "time_ms": 35,
+              "case_limit_ms": 10000,
+              "ratio": 0.0035
+            },
+            {
+              "case": 11,
+              "time_ms": 40,
+              "case_limit_ms": 10000,
+              "ratio": 0.004
+            }
+          ]
+        }
+      },
+      "verified_legal_pairs": 11,
+      "repaired_inputs": 5,
+      "form_sha256": "484262401a43c8894013d152a62bed91b98af6cab27eb7a1f837df4b6adc9025",
+      "before_files": {
+        "1.in": "eb6ed362103d9e1263926ef7c0f5482f0e61b60a62c02d279f433b353246c27e",
+        "1.out": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+        "10.in": "7be00193d0f23ccb5028d7af32d38d3ac7fb61604997244dfe886fe11d07f41b",
+        "10.out": "6affdae3b3c1aa6aa7689e9b6a7b3225a636aa1ac0025f490cca1285ceaf1487",
+        "11.in": "d033746e3e4c82effc178307613ddce76d16ac4d0b59643b60022b452905e8dd",
+        "11.out": "1bf196d734a6d14527c8634c1d456b392ae1fd0d9a91ad80bbef8ea87f581c00",
+        "2.in": "8ef45af984433f87892ef61ddf71deeee4b029321b21fa80d49a6e7a9465592f",
+        "2.out": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+        "3.in": "3d8e345734a2f1f7502671c2a4b97e035526fc26e7413340a3780f9fce1996f8",
+        "3.out": "41cfc0d1f2d127b04555b7246d84019b4d27710a3f3aff6e7764375b1e06e05d",
+        "4.in": "5fe9cef976b3257549555428a12d385c48ba5b7c7904529a42d25f428987cd44",
+        "4.out": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443",
+        "5.in": "41bf74e8112ab70acb63278f89ead3d10956b32abe8d46086fcf5f8b04435c32",
+        "5.out": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "6.in": "38cc100a8017c21e568d92a4128f100c38055f6cc75c90d92240262e59fc107f",
+        "6.out": "d066c2778ffdb1a902b8362cfed1a49ec8530ae9c2674b5cd2a18a0263032d95",
+        "7.in": "e5c312fe2d3a7ffd92af174be6920191ba63d623142db08f7abfdeec5f2f8109",
+        "7.out": "44592b77d53e97496c2a69ffda1e670e1829613cf7a620ebcfdead588a75f5ae",
+        "8.in": "ca752a0d723f6086c88eea4923c888605f387abfb44b0801826bc422203f2a9c",
+        "8.out": "6e73a9ee394de721f40ce06adb1e5f58c2085166e8756a64d6792aa479a22e45",
+        "9.in": "f9f34167d00191fa66ef78c8b1c70118788a38f70abb22ba5cb8982a34b87e52",
+        "9.out": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443",
+        "海贼王路飞.txt": "c2673b35278abf58e03cc0804d6614d6239975b5c29cc2aaf5441b38f045d2e4"
+      },
+      "final_files": {
+        "1.in": "eb6ed362103d9e1263926ef7c0f5482f0e61b60a62c02d279f433b353246c27e",
+        "1.out": "e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
+        "10.in": "a447f5492223bdda214ea8d564b38ff2ff7bdd95970c66e9418e634fd23a8a8d",
+        "10.out": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+        "11.in": "ec34bc8bb946f134146f0542cd7ffa2b6f64378827b589d151c0545e66a24fc5",
+        "11.out": "8d24a9f8aba50dda3f5b78568770b2adc16d910552906e7612627da253f79a2a",
+        "2.in": "8ef45af984433f87892ef61ddf71deeee4b029321b21fa80d49a6e7a9465592f",
+        "2.out": "4fc82b26aecb47d2868c4efbe3581732a3e7cbcc6c2efb32062c08170a05eeb8",
+        "3.in": "3d8e345734a2f1f7502671c2a4b97e035526fc26e7413340a3780f9fce1996f8",
+        "3.out": "41cfc0d1f2d127b04555b7246d84019b4d27710a3f3aff6e7764375b1e06e05d",
+        "4.in": "5fe9cef976b3257549555428a12d385c48ba5b7c7904529a42d25f428987cd44",
+        "4.out": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443",
+        "5.in": "41bf74e8112ab70acb63278f89ead3d10956b32abe8d46086fcf5f8b04435c32",
+        "5.out": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b",
+        "6.in": "722a02799e3556e8b5ecb225534b72910987c49045294c24891b7f1f690cc256",
+        "6.out": "7d09bbe3b5c67664d64024696995b1a9f91a8c9d9b65409f34bc1ee8189f2859",
+        "7.in": "61cfe050957f0168101c7839c5129eefb00b63bea4d6c4863084e15ac5ed9b02",
+        "7.out": "569962d245611bc5afb1bd1233f8cbf14b5170704e30a311ddb0b17937001b0f",
+        "8.in": "069106831ab299969dda68e8fe48477cc715b95b147ebe5457b3fdb3b9b34588",
+        "8.out": "3696187ea0f7a69a7cbdb2dd711bdee12d3662f78ec96df29f1fdb16242d65e8",
+        "9.in": "f9f34167d00191fa66ef78c8b1c70118788a38f70abb22ba5cb8982a34b87e52",
+        "9.out": "6f4b6612125fb3a0daecd2799dfd6c9c299424fd920f9b308110a2c1fbd8f443",
+        "海贼王路飞.txt": "c2673b35278abf58e03cc0804d6614d6239975b5c29cc2aaf5441b38f045d2e4"
+      },
+      "form_unchanged": true,
+      "file_list_unchanged": true
+    },
+    {
+      "global_number": 19974,
+      "evidence": "collab/gmyhf-19974-admin-form-review.json",
+      "evidence_sha256": "39c78d760df8a446c694a715e1ca1f6607c38b8408117ac71d6c474531488065",
+      "reference_sha256": "75e3db6abaf8bd1eea9b6cd45b36d78f9700db4dd1daaa2c3304c7e910b40ecd",
+      "reference_source": "import math, heapq, random, itertools, re, html\nfrom pathlib import Path\nfrom collections import deque, Counter\nfrom decimal import Decimal, localcontext, ROUND_HALF_EVEN\nfrom fractions import Fraction\n\ndef cinema(s):\n    v = iter(map(int, s.split()))\n    out = []\n    for _ in range(next(v)):\n        (m, p, q) = (next(v), next(v), next(v))\n        if m == 0 or (q - p - m) * -m <= 0:\n            out.append('0')\n            continue\n        total = math.comb(p + q, p)\n        r = p + m\n        out.append(str(total - (math.comb(p + q, r) if 0 <= r <= p + q else 0)))\n    return '\\n'.join(out)\nimport sys\nsys.stdout.write(cinema(sys.stdin.read()) + '\\n')\n",
+      "reference_language": "python3",
+      "reference_file": "reference.py",
+      "baseline_files": {
+        "1.in": "0c242c0c2474f7c3041b3c6eb3e1000b771625333e4327ee8873c7a05b68b304",
+        "1.out": "ed7c8dbbed37d49bfa5e3f290dac2f5294db3e11d44f390988588dd3a2cc7494",
+        "2.in": "2a8462a75bfdf8adce1c31c679115b0f5184c8d475057bc1a58850749e4bde1a",
+        "2.out": "1e8a9afe9357b6e330d0102408c01b1fe5d71c8c901ba6f7a4535c0abd0fbe44"
+      },
+      "changes": [
+        {
+          "filename": "1.in",
+          "input": "1.in",
+          "output": "1.out",
+          "before_sha256": "0c242c0c2474f7c3041b3c6eb3e1000b771625333e4327ee8873c7a05b68b304",
+          "after_sha256": "3a727045189f002defe87689170d28674cec988471c8f347dff784125afa892d",
+          "pair_before": {
+            "1.in": "0c242c0c2474f7c3041b3c6eb3e1000b771625333e4327ee8873c7a05b68b304",
+            "1.out": "ed7c8dbbed37d49bfa5e3f290dac2f5294db3e11d44f390988588dd3a2cc7494"
+          },
+          "pair_after": {
+            "1.in": "3a727045189f002defe87689170d28674cec988471c8f347dff784125afa892d",
+            "1.out": "065a2ed932c4e4b240373741bb0fc58df5ae7480e45843d1186e4f4ffb8ff380"
+          }
+        },
+        {
+          "filename": "1.out",
+          "input": "1.in",
+          "output": "1.out",
+          "before_sha256": "ed7c8dbbed37d49bfa5e3f290dac2f5294db3e11d44f390988588dd3a2cc7494",
+          "after_sha256": "065a2ed932c4e4b240373741bb0fc58df5ae7480e45843d1186e4f4ffb8ff380",
+          "pair_before": {
+            "1.in": "0c242c0c2474f7c3041b3c6eb3e1000b771625333e4327ee8873c7a05b68b304",
+            "1.out": "ed7c8dbbed37d49bfa5e3f290dac2f5294db3e11d44f390988588dd3a2cc7494"
+          },
+          "pair_after": {
+            "1.in": "3a727045189f002defe87689170d28674cec988471c8f347dff784125afa892d",
+            "1.out": "065a2ed932c4e4b240373741bb0fc58df5ae7480e45843d1186e4f4ffb8ff380"
+          }
+        },
+        {
+          "filename": "2.in",
+          "input": "2.in",
+          "output": "2.out",
+          "before_sha256": "2a8462a75bfdf8adce1c31c679115b0f5184c8d475057bc1a58850749e4bde1a",
+          "after_sha256": "b492e9c199f3c9b6bf9853a3b51c14989ffc0810a12b084dbc15934f382ea828",
+          "pair_before": {
+            "2.in": "2a8462a75bfdf8adce1c31c679115b0f5184c8d475057bc1a58850749e4bde1a",
+            "2.out": "1e8a9afe9357b6e330d0102408c01b1fe5d71c8c901ba6f7a4535c0abd0fbe44"
+          },
+          "pair_after": {
+            "2.in": "b492e9c199f3c9b6bf9853a3b51c14989ffc0810a12b084dbc15934f382ea828",
+            "2.out": "f51a8306c12d4d857a114704cca5de63c37d285adf4e7970aa657f9af275846b"
+          }
+        },
+        {
+          "filename": "2.out",
+          "input": "2.in",
+          "output": "2.out",
+          "before_sha256": "1e8a9afe9357b6e330d0102408c01b1fe5d71c8c901ba6f7a4535c0abd0fbe44",
+          "after_sha256": "f51a8306c12d4d857a114704cca5de63c37d285adf4e7970aa657f9af275846b",
+          "pair_before": {
+            "2.in": "2a8462a75bfdf8adce1c31c679115b0f5184c8d475057bc1a58850749e4bde1a",
+            "2.out": "1e8a9afe9357b6e330d0102408c01b1fe5d71c8c901ba6f7a4535c0abd0fbe44"
+          },
+          "pair_after": {
+            "2.in": "b492e9c199f3c9b6bf9853a3b51c14989ffc0810a12b084dbc15934f382ea828",
+            "2.out": "f51a8306c12d4d857a114704cca5de63c37d285adf4e7970aa657f9af275846b"
+          }
+        }
+      ],
+      "local_dataset": "data/openjudge/tests/admin_review_repaired/19974",
+      "local": {
+        "status": "Accepted",
+        "cases": 2,
+        "time_ms": 68,
+        "memory_kb": 31744,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 1,
+            "time_ms": 36,
+            "case_limit_ms": 10000,
+            "ratio": 0.0036
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 36,
+              "case_limit_ms": 10000,
+              "ratio": 0.0036
+            },
+            {
+              "case": 2,
+              "time_ms": 32,
+              "case_limit_ms": 10000,
+              "ratio": 0.0032
+            }
+          ]
+        }
+      },
+      "verified_legal_pairs": 2,
+      "repaired_inputs": 2,
+      "form_sha256": "107dbaa819d02b68e4f59b240cb03024d13bc16ce7ab95bba4f837f2a5023404",
+      "before_files": {
+        "1.in": "0c242c0c2474f7c3041b3c6eb3e1000b771625333e4327ee8873c7a05b68b304",
+        "1.out": "ed7c8dbbed37d49bfa5e3f290dac2f5294db3e11d44f390988588dd3a2cc7494",
+        "2.in": "2a8462a75bfdf8adce1c31c679115b0f5184c8d475057bc1a58850749e4bde1a",
+        "2.out": "1e8a9afe9357b6e330d0102408c01b1fe5d71c8c901ba6f7a4535c0abd0fbe44",
+        "sample code.py": "f24c101564bb7b23910dc9e61ab5ec62e7afd6ad79037e6cfd66ff189a479a4a",
+        "题目描述.txt": "e3c4ca3293b455be9201af4abf59c45e5a9623ae2083d81fadb9d1b3525fa16e"
+      },
+      "final_files": {
+        "1.in": "3a727045189f002defe87689170d28674cec988471c8f347dff784125afa892d",
+        "1.out": "065a2ed932c4e4b240373741bb0fc58df5ae7480e45843d1186e4f4ffb8ff380",
+        "2.in": "b492e9c199f3c9b6bf9853a3b51c14989ffc0810a12b084dbc15934f382ea828",
+        "2.out": "f51a8306c12d4d857a114704cca5de63c37d285adf4e7970aa657f9af275846b",
+        "sample code.py": "f24c101564bb7b23910dc9e61ab5ec62e7afd6ad79037e6cfd66ff189a479a4a",
+        "题目描述.txt": "e3c4ca3293b455be9201af4abf59c45e5a9623ae2083d81fadb9d1b3525fa16e"
+      },
+      "form_unchanged": true,
+      "file_list_unchanged": true
+    },
+    {
+      "global_number": 19984,
+      "evidence": "collab/gmyhf-19984-admin-form-review.json",
+      "evidence_sha256": "ed21946c014198d0aff8cd3718efee65dd8c653c28d25ef827260fb05433b026",
+      "reference_sha256": "129853b01c4bdf46266048c9a5643d69cbbe2d029452b68f9173c8d8c51a62bc",
+      "reference_source": "import math, heapq, random, itertools, re, html\nfrom pathlib import Path\nfrom collections import deque, Counter\nfrom decimal import Decimal, localcontext, ROUND_HALF_EVEN\nfrom fractions import Fraction\n\ndef synthesis(s):\n    v = iter(s.split())\n    n = int(next(v))\n    cost = [Fraction(next(v))]\n    route = []\n    for i in range(n):\n        probs = [Fraction(next(v)) for _ in range(i + 1)]\n        options = [((cost[i] + cost[j] + 100 - (1 - p) * cost[i - 1] if i else cost[i] + cost[j] + 100) / p, j) for (j, p) in enumerate(probs) if p > 0]\n        if not options:\n            return 'UNREACHABLE'\n        (best, j) = min(options)\n        cost.append(best)\n        route.append(j)\n    value = cost[-1]\n    (cents, remainder) = divmod(abs(value.numerator) * 100, value.denominator)\n    if 2 * remainder > value.denominator or (2 * remainder == value.denominator and cents % 2):\n        cents += 1\n    price = ('-' if value < 0 and cents else '') + f'{cents // 100}.{cents % 100:02d}'\n    return ' '.join(map(str, route)) + '\\n' + price\nimport sys\nsys.stdout.write(synthesis(sys.stdin.read()) + '\\n')\n",
+      "reference_language": "python3",
+      "reference_file": "reference.py",
+      "baseline_files": {
+        "1.in": "49c63a5f3e8e94f7256c0eb8bb18314e73f2a0883dc4dbb2f91b45935b41c48c",
+        "1.out": "0c1ae5d3e4ff8f4207836a64519d82dbe56228b22f0d0b92c276f4c5d0b2aa59",
+        "10.in": "6d3bedd54bcd3176d0f0e00e091170a833f58ad6101fba9072fb70feef337a99",
+        "10.out": "0c123728d5b9c1cf1a66b9f9357a5cdf89fa5a7652be5e3ae2ca1b39abd4c5ae",
+        "11.in": "5c853658c0b9f9be3c9efdb35e97989b344c85231fd3fe5af1b08f9735781e7f",
+        "11.out": "8091e8a0a57ddee020441d49be3fa257fea5dd44017a4c222f1f7bfd43a4b63c",
+        "12.in": "5edd5d467ee84ef6bcde95aa77877387c55bd193a25f3c517f74604b0b2820d0",
+        "12.out": "e272a57ffbd4a8556d7323035687232b3e38ea634f90731ad6c605dbfb5ee44c",
+        "13.in": "a17a84dc192f910754fcbd0068822fd0b5e7d4eaecbf5631cefdd4d4905dddab",
+        "13.out": "5623487a8314cb13eabb4044cb144d0dfe3fd02163ebf6af18bc85eca43394b9",
+        "14.in": "0db8ff5562e6547e2576224deca0c70cc60786ee61f76cefb5922c67fb1a568a",
+        "14.out": "ce152ad4cb84bcd24ee8d2d81b51ccb71431bed7bce182ed472051e25dd85dfb",
+        "15.in": "5bfee287dd4f3cbd90bb9de8d48ef8707b48fa3838e3a6acffc90670394652ca",
+        "15.out": "d10aea4361f44cdaa701ec839c9a9ad84d9523fcca033c12500789268a5f185d",
+        "2.in": "8d7f92e474f5a1fe0ce50b44b29fa5cde659493dcd9082543cf396cf301fa69e",
+        "2.out": "d8ba3d8c49624f932672fbeb462df9d03511d5c86ff550e345920a68c25e1357",
+        "3.in": "a6769f237ada80f72855b35e008d5b785e68e251195c354e29c39b64b3361f2e",
+        "3.out": "c797216a3ce997354daf34327dbd9702c04a3af5af304d4d394d9976043c6827",
+        "4.in": "9014cac4de261c041bf26f9b7de0f9e615182f759d5bc87e792de15f5740966f",
+        "4.out": "677c4a3ebbafe884c48b919f2bb1d946c783c63f63ed3a9ff319d498666a1891",
+        "5.in": "f386a172a94c20f3dbb341faba4d17d68fe816be611ca8851fc45fe0216f3c0c",
+        "5.out": "4536390b53b9711a60efcde9c58bf669eb5670098b3299ce740d6e765a7c3626",
+        "6.in": "a89a295b9b83da2be42b1fea798dc06d42591b93b5565402dbc59b02f682ed70",
+        "6.out": "255cadb4cc8e939d873b46ba36f67b5b1cfb73beb37d448df22d517ef08188ee",
+        "7.in": "c404142a2b9ccc9a54d76115b4509c4ada54011ccd32b012a7b334f7dcc7327a",
+        "7.out": "b30c611f8d0eebc44954f12ac080185c037eca0bf9c5ee3bf425133a4040ad83",
+        "8.in": "808422eedb34ca403275c59519b9ef8fa720a180f71eacec5d7bd7b0dd6c7e0c",
+        "8.out": "eb2d0799d58f6226e60298adbd3753409d8df6a2de3c8449f95d6eb9dba7f46d",
+        "9.in": "9cfcd070f2119ce29d254296177054650e9a03a1bd530a88263df79912dbb40c",
+        "9.out": "ef5ce9f7068d7d0dacb6b8e2156877f639177768c380b115ff888569ced430c7"
+      },
+      "changes": [
+        {
+          "filename": "4.in",
+          "input": "4.in",
+          "output": "4.out",
+          "before_sha256": "9014cac4de261c041bf26f9b7de0f9e615182f759d5bc87e792de15f5740966f",
+          "after_sha256": "37bb3ad2ab14ebcd5ba026a0ab73c789949fc1f6db56cc55d9b8d2c346d936a4",
+          "pair_before": {
+            "4.in": "9014cac4de261c041bf26f9b7de0f9e615182f759d5bc87e792de15f5740966f",
+            "4.out": "677c4a3ebbafe884c48b919f2bb1d946c783c63f63ed3a9ff319d498666a1891"
+          },
+          "pair_after": {
+            "4.in": "37bb3ad2ab14ebcd5ba026a0ab73c789949fc1f6db56cc55d9b8d2c346d936a4",
+            "4.out": "d612b9b423db71dbda80a5d6b1e8ce0495728c6778cba83a34f0cdafe143e7bf"
+          }
+        },
+        {
+          "filename": "4.out",
+          "input": "4.in",
+          "output": "4.out",
+          "before_sha256": "677c4a3ebbafe884c48b919f2bb1d946c783c63f63ed3a9ff319d498666a1891",
+          "after_sha256": "d612b9b423db71dbda80a5d6b1e8ce0495728c6778cba83a34f0cdafe143e7bf",
+          "pair_before": {
+            "4.in": "9014cac4de261c041bf26f9b7de0f9e615182f759d5bc87e792de15f5740966f",
+            "4.out": "677c4a3ebbafe884c48b919f2bb1d946c783c63f63ed3a9ff319d498666a1891"
+          },
+          "pair_after": {
+            "4.in": "37bb3ad2ab14ebcd5ba026a0ab73c789949fc1f6db56cc55d9b8d2c346d936a4",
+            "4.out": "d612b9b423db71dbda80a5d6b1e8ce0495728c6778cba83a34f0cdafe143e7bf"
+          }
+        }
+      ],
+      "local_dataset": "data/openjudge/tests/admin_review_repaired/19984",
+      "local": {
+        "status": "Accepted",
+        "cases": 15,
+        "time_ms": 531,
+        "memory_kb": 31744,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 1,
+            "time_ms": 41,
+            "case_limit_ms": 10000,
+            "ratio": 0.0041
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 41,
+              "case_limit_ms": 10000,
+              "ratio": 0.0041
+            },
+            {
+              "case": 2,
+              "time_ms": 36,
+              "case_limit_ms": 10000,
+              "ratio": 0.0036
+            },
+            {
+              "case": 3,
+              "time_ms": 34,
+              "case_limit_ms": 10000,
+              "ratio": 0.0034
+            },
+            {
+              "case": 4,
+              "time_ms": 34,
+              "case_limit_ms": 10000,
+              "ratio": 0.0034
+            },
+            {
+              "case": 5,
+              "time_ms": 39,
+              "case_limit_ms": 10000,
+              "ratio": 0.0039
+            },
+            {
+              "case": 6,
+              "time_ms": 36,
+              "case_limit_ms": 10000,
+              "ratio": 0.0036
+            },
+            {
+              "case": 7,
+              "time_ms": 32,
+              "case_limit_ms": 10000,
+              "ratio": 0.0032
+            },
+            {
+              "case": 8,
+              "time_ms": 31,
+              "case_limit_ms": 10000,
+              "ratio": 0.0031
+            },
+            {
+              "case": 9,
+              "time_ms": 32,
+              "case_limit_ms": 10000,
+              "ratio": 0.0032
+            },
+            {
+              "case": 10,
+              "time_ms": 39,
+              "case_limit_ms": 10000,
+              "ratio": 0.0039
+            },
+            {
+              "case": 11,
+              "time_ms": 34,
+              "case_limit_ms": 10000,
+              "ratio": 0.0034
+            },
+            {
+              "case": 12,
+              "time_ms": 37,
+              "case_limit_ms": 10000,
+              "ratio": 0.0037
+            },
+            {
+              "case": 13,
+              "time_ms": 32,
+              "case_limit_ms": 10000,
+              "ratio": 0.0032
+            },
+            {
+              "case": 14,
+              "time_ms": 32,
+              "case_limit_ms": 10000,
+              "ratio": 0.0032
+            },
+            {
+              "case": 15,
+              "time_ms": 39,
+              "case_limit_ms": 10000,
+              "ratio": 0.0039
+            }
+          ]
+        }
+      },
+      "verified_legal_pairs": 15,
+      "repaired_inputs": 1,
+      "form_sha256": "810a369af57f9133f4a0a56aeb5aa7ad42e1f4ed326fe4e9ef9f1a78d14f70da",
+      "before_files": {
+        "1.in": "49c63a5f3e8e94f7256c0eb8bb18314e73f2a0883dc4dbb2f91b45935b41c48c",
+        "1.out": "0c1ae5d3e4ff8f4207836a64519d82dbe56228b22f0d0b92c276f4c5d0b2aa59",
+        "10.in": "6d3bedd54bcd3176d0f0e00e091170a833f58ad6101fba9072fb70feef337a99",
+        "10.out": "0c123728d5b9c1cf1a66b9f9357a5cdf89fa5a7652be5e3ae2ca1b39abd4c5ae",
+        "11.in": "5c853658c0b9f9be3c9efdb35e97989b344c85231fd3fe5af1b08f9735781e7f",
+        "11.out": "8091e8a0a57ddee020441d49be3fa257fea5dd44017a4c222f1f7bfd43a4b63c",
+        "12.in": "5edd5d467ee84ef6bcde95aa77877387c55bd193a25f3c517f74604b0b2820d0",
+        "12.out": "e272a57ffbd4a8556d7323035687232b3e38ea634f90731ad6c605dbfb5ee44c",
+        "13.in": "a17a84dc192f910754fcbd0068822fd0b5e7d4eaecbf5631cefdd4d4905dddab",
+        "13.out": "5623487a8314cb13eabb4044cb144d0dfe3fd02163ebf6af18bc85eca43394b9",
+        "14.in": "0db8ff5562e6547e2576224deca0c70cc60786ee61f76cefb5922c67fb1a568a",
+        "14.out": "ce152ad4cb84bcd24ee8d2d81b51ccb71431bed7bce182ed472051e25dd85dfb",
+        "15.in": "5bfee287dd4f3cbd90bb9de8d48ef8707b48fa3838e3a6acffc90670394652ca",
+        "15.out": "d10aea4361f44cdaa701ec839c9a9ad84d9523fcca033c12500789268a5f185d",
+        "2.in": "8d7f92e474f5a1fe0ce50b44b29fa5cde659493dcd9082543cf396cf301fa69e",
+        "2.out": "d8ba3d8c49624f932672fbeb462df9d03511d5c86ff550e345920a68c25e1357",
+        "3.in": "a6769f237ada80f72855b35e008d5b785e68e251195c354e29c39b64b3361f2e",
+        "3.out": "c797216a3ce997354daf34327dbd9702c04a3af5af304d4d394d9976043c6827",
+        "4.in": "9014cac4de261c041bf26f9b7de0f9e615182f759d5bc87e792de15f5740966f",
+        "4.out": "677c4a3ebbafe884c48b919f2bb1d946c783c63f63ed3a9ff319d498666a1891",
+        "5.in": "f386a172a94c20f3dbb341faba4d17d68fe816be611ca8851fc45fe0216f3c0c",
+        "5.out": "4536390b53b9711a60efcde9c58bf669eb5670098b3299ce740d6e765a7c3626",
+        "6.in": "a89a295b9b83da2be42b1fea798dc06d42591b93b5565402dbc59b02f682ed70",
+        "6.out": "255cadb4cc8e939d873b46ba36f67b5b1cfb73beb37d448df22d517ef08188ee",
+        "7.in": "c404142a2b9ccc9a54d76115b4509c4ada54011ccd32b012a7b334f7dcc7327a",
+        "7.out": "b30c611f8d0eebc44954f12ac080185c037eca0bf9c5ee3bf425133a4040ad83",
+        "8.in": "808422eedb34ca403275c59519b9ef8fa720a180f71eacec5d7bd7b0dd6c7e0c",
+        "8.out": "eb2d0799d58f6226e60298adbd3753409d8df6a2de3c8449f95d6eb9dba7f46d",
+        "9.in": "9cfcd070f2119ce29d254296177054650e9a03a1bd530a88263df79912dbb40c",
+        "9.out": "ef5ce9f7068d7d0dacb6b8e2156877f639177768c380b115ff888569ced430c7",
+        "samplecode.py": "e54a8bf54b37de57baae0d0f981bb4f55e71606fc2aa1d2443914633b30d9797",
+        "合成路线.txt": "0b194227bad035d89b755dc6cfe0ad95ff33faed414702ba2d37be26c396e995",
+        "检测最优路线是否唯一.py": "357a61c1a498fb71d63f1eb45b1035b65327b32b3a81a5b02f7d72370aae8c5b",
+        "生成输出数据.py": "3273844f52fac9568c0a9b12ac399f1579464b1efe57f708f72598fee1ff6f4b",
+        "输出中间数据.py": "60bdfda9dea011f654e58711d89bf745041a1a1b22e3d18286d30241230e74d8"
+      },
+      "final_files": {
+        "1.in": "49c63a5f3e8e94f7256c0eb8bb18314e73f2a0883dc4dbb2f91b45935b41c48c",
+        "1.out": "0c1ae5d3e4ff8f4207836a64519d82dbe56228b22f0d0b92c276f4c5d0b2aa59",
+        "10.in": "6d3bedd54bcd3176d0f0e00e091170a833f58ad6101fba9072fb70feef337a99",
+        "10.out": "0c123728d5b9c1cf1a66b9f9357a5cdf89fa5a7652be5e3ae2ca1b39abd4c5ae",
+        "11.in": "5c853658c0b9f9be3c9efdb35e97989b344c85231fd3fe5af1b08f9735781e7f",
+        "11.out": "8091e8a0a57ddee020441d49be3fa257fea5dd44017a4c222f1f7bfd43a4b63c",
+        "12.in": "5edd5d467ee84ef6bcde95aa77877387c55bd193a25f3c517f74604b0b2820d0",
+        "12.out": "e272a57ffbd4a8556d7323035687232b3e38ea634f90731ad6c605dbfb5ee44c",
+        "13.in": "a17a84dc192f910754fcbd0068822fd0b5e7d4eaecbf5631cefdd4d4905dddab",
+        "13.out": "5623487a8314cb13eabb4044cb144d0dfe3fd02163ebf6af18bc85eca43394b9",
+        "14.in": "0db8ff5562e6547e2576224deca0c70cc60786ee61f76cefb5922c67fb1a568a",
+        "14.out": "ce152ad4cb84bcd24ee8d2d81b51ccb71431bed7bce182ed472051e25dd85dfb",
+        "15.in": "5bfee287dd4f3cbd90bb9de8d48ef8707b48fa3838e3a6acffc90670394652ca",
+        "15.out": "d10aea4361f44cdaa701ec839c9a9ad84d9523fcca033c12500789268a5f185d",
+        "2.in": "8d7f92e474f5a1fe0ce50b44b29fa5cde659493dcd9082543cf396cf301fa69e",
+        "2.out": "d8ba3d8c49624f932672fbeb462df9d03511d5c86ff550e345920a68c25e1357",
+        "3.in": "a6769f237ada80f72855b35e008d5b785e68e251195c354e29c39b64b3361f2e",
+        "3.out": "c797216a3ce997354daf34327dbd9702c04a3af5af304d4d394d9976043c6827",
+        "4.in": "37bb3ad2ab14ebcd5ba026a0ab73c789949fc1f6db56cc55d9b8d2c346d936a4",
+        "4.out": "d612b9b423db71dbda80a5d6b1e8ce0495728c6778cba83a34f0cdafe143e7bf",
+        "5.in": "f386a172a94c20f3dbb341faba4d17d68fe816be611ca8851fc45fe0216f3c0c",
+        "5.out": "4536390b53b9711a60efcde9c58bf669eb5670098b3299ce740d6e765a7c3626",
+        "6.in": "a89a295b9b83da2be42b1fea798dc06d42591b93b5565402dbc59b02f682ed70",
+        "6.out": "255cadb4cc8e939d873b46ba36f67b5b1cfb73beb37d448df22d517ef08188ee",
+        "7.in": "c404142a2b9ccc9a54d76115b4509c4ada54011ccd32b012a7b334f7dcc7327a",
+        "7.out": "b30c611f8d0eebc44954f12ac080185c037eca0bf9c5ee3bf425133a4040ad83",
+        "8.in": "808422eedb34ca403275c59519b9ef8fa720a180f71eacec5d7bd7b0dd6c7e0c",
+        "8.out": "eb2d0799d58f6226e60298adbd3753409d8df6a2de3c8449f95d6eb9dba7f46d",
+        "9.in": "9cfcd070f2119ce29d254296177054650e9a03a1bd530a88263df79912dbb40c",
+        "9.out": "ef5ce9f7068d7d0dacb6b8e2156877f639177768c380b115ff888569ced430c7",
+        "samplecode.py": "e54a8bf54b37de57baae0d0f981bb4f55e71606fc2aa1d2443914633b30d9797",
+        "合成路线.txt": "0b194227bad035d89b755dc6cfe0ad95ff33faed414702ba2d37be26c396e995",
+        "检测最优路线是否唯一.py": "357a61c1a498fb71d63f1eb45b1035b65327b32b3a81a5b02f7d72370aae8c5b",
+        "生成输出数据.py": "3273844f52fac9568c0a9b12ac399f1579464b1efe57f708f72598fee1ff6f4b",
+        "输出中间数据.py": "60bdfda9dea011f654e58711d89bf745041a1a1b22e3d18286d30241230e74d8"
+      },
+      "form_unchanged": true,
+      "file_list_unchanged": true
+    }
+  ],
+  "uploads": [
+    {
+      "global_number": 19965,
+      "filename": "10.in",
+      "sha256": "a447f5492223bdda214ea8d564b38ff2ff7bdd95970c66e9418e634fd23a8a8d",
+      "verified": true
+    },
+    {
+      "global_number": 19965,
+      "filename": "10.out",
+      "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+      "verified": true
+    },
+    {
+      "global_number": 19965,
+      "filename": "11.in",
+      "sha256": "ec34bc8bb946f134146f0542cd7ffa2b6f64378827b589d151c0545e66a24fc5",
+      "verified": true
+    },
+    {
+      "global_number": 19965,
+      "filename": "11.out",
+      "sha256": "8d24a9f8aba50dda3f5b78568770b2adc16d910552906e7612627da253f79a2a",
+      "verified": true
+    },
+    {
+      "global_number": 19965,
+      "filename": "6.in",
+      "sha256": "722a02799e3556e8b5ecb225534b72910987c49045294c24891b7f1f690cc256",
+      "verified": true
+    },
+    {
+      "global_number": 19965,
+      "filename": "6.out",
+      "sha256": "7d09bbe3b5c67664d64024696995b1a9f91a8c9d9b65409f34bc1ee8189f2859",
+      "verified": true
+    },
+    {
+      "global_number": 19965,
+      "filename": "7.in",
+      "sha256": "61cfe050957f0168101c7839c5129eefb00b63bea4d6c4863084e15ac5ed9b02",
+      "verified": true
+    },
+    {
+      "global_number": 19965,
+      "filename": "7.out",
+      "sha256": "569962d245611bc5afb1bd1233f8cbf14b5170704e30a311ddb0b17937001b0f",
+      "verified": true
+    },
+    {
+      "global_number": 19965,
+      "filename": "8.in",
+      "sha256": "069106831ab299969dda68e8fe48477cc715b95b147ebe5457b3fdb3b9b34588",
+      "verified": true
+    },
+    {
+      "global_number": 19965,
+      "filename": "8.out",
+      "sha256": "3696187ea0f7a69a7cbdb2dd711bdee12d3662f78ec96df29f1fdb16242d65e8",
+      "verified": true
+    },
+    {
+      "global_number": 19974,
+      "filename": "1.in",
+      "sha256": "3a727045189f002defe87689170d28674cec988471c8f347dff784125afa892d",
+      "verified": true
+    },
+    {
+      "global_number": 19974,
+      "filename": "1.out",
+      "sha256": "065a2ed932c4e4b240373741bb0fc58df5ae7480e45843d1186e4f4ffb8ff380",
+      "verified": true
+    },
+    {
+      "global_number": 19974,
+      "filename": "2.in",
+      "sha256": "b492e9c199f3c9b6bf9853a3b51c14989ffc0810a12b084dbc15934f382ea828",
+      "verified": true
+    },
+    {
+      "global_number": 19974,
+      "filename": "2.out",
+      "sha256": "f51a8306c12d4d857a114704cca5de63c37d285adf4e7970aa657f9af275846b",
+      "verified": true
+    },
+    {
+      "global_number": 19984,
+      "filename": "4.in",
+      "sha256": "37bb3ad2ab14ebcd5ba026a0ab73c789949fc1f6db56cc55d9b8d2c346d936a4",
+      "verified": true
+    },
+    {
+      "global_number": 19984,
+      "filename": "4.out",
+      "sha256": "d612b9b423db71dbda80a5d6b1e8ce0495728c6778cba83a34f0cdafe143e7bf",
+      "verified": true
+    }
+  ],
+  "verified_at": "2026-10-24T03:04:06.000910+00:00"
+}
