@@ -9,6 +9,7 @@ import sys
 from unittest.mock import patch
 
 import repair_gmyhf_pending_answers as common
+import gmyhf_semantic_checkers as semantic
 from repair_gmyhf_pending_answers import (ROOT, sha, save, require, listed_files,
                                          form_sha, audit_statement, sanitized, platform, judge)
 from gmyhf_review_fixes import repair_input, no_leading_zero_reference
@@ -18,7 +19,7 @@ BATCHES = {1: {19964: 16, 19968: 16, 30825: 15, 30920: 16, 31415: 15, 31435: 15}
            3: {21471: 9, 25563: 11, 25577: 11, 27946: 13, 30177: 14},
            5: {28187: 13, 28188: 13, 28189: 13, 28682: 13, 28696: 13},
            6: {25579: 11}, 7: {25685: 12}, 9: {28277: 13, 28680: 13},
-           10: {21729: 11, 30236: 16}, 11: {28016: 13}, 12: {31241: 10}, 13: {31239: 10}, 15: {29663: 14}}
+           10: {21729: 11, 30236: 16}, 11: {28016: 13}, 12: {31241: 10}, 13: {31239: 10}, 15: {29663: 14}, 16: {27952: 13, 28341: 13}}
 
 
 def reference_command(source, language, target):
@@ -67,6 +68,11 @@ def prepare(batch, work):
         (target / 'data').mkdir(parents=True, exist_ok=True)
         language = proof.get('language', 'python3')
         reference, command = reference_command(source, language, target)
+        checker_source = None
+        if number in (27952,28341):
+            checker_source = Path(semantic.__file__).read_text() + f'\nif __name__ == "__main__": checker_main({number})\n'
+            checker = target / 'checker.py'
+            checker.write_text(checker_source)
         changes, cases = [], []
         altered_inputs = 0
         for record in entry['checks']['answers']['files']:
@@ -89,6 +95,9 @@ def prepare(batch, work):
                 require(result.returncode == 0, f'{number}: 自写参考失败')
                 output = result.stdout
                 require(0 < len(output) <= 2 * 1024 * 1024, '输出大小越界')
+            if checker_source is not None:
+                require(semantic.validate(number,repaired.decode(),output.decode()),
+                        f'{number}: 修正后输入或答案语义不合法')
             for name, before, after in ((given_name, given, repaired), (out_name, answer, output)):
                 (target / 'data' / name).write_bytes(after)
                 if before != after:
@@ -103,10 +112,12 @@ def prepare(batch, work):
                            21471: 19, 25563: 19, 25577: 1, 27946: 10, 30177: 1,
                            28187: 17, 28188: 14, 28189: 13, 28682: 20, 28696: 18,
                            25579: 12, 25685: 17, 28277: 1, 28680: 5,
-                           21729: 1, 30236: 1, 28016: 6, 31241: 1, 31239: 18, 29663: 1}
+                           21729: 1, 30236: 1, 28016: 6, 31241: 1, 31239: 18, 29663: 1, 27952: 8, 28341: 1}
         require(altered_inputs == expected_inputs[number], '越界输入数量与审核证据不符')
         item = {'book': 'practice', 'id': str(number), 'global_number': number,
                 'tests': True, 'test_count': len(cases), 'test_cases': cases}
+        if checker_source is not None:
+            item['checker'] = str(checker.relative_to(judge.MIRROR))
         with patch.object(judge, 'catalog_item', return_value=item):
             receipt = judge.judge('practice', str(number), language, source, collect_case_times=True)
         require(receipt['status'] == 'Accepted', f'{number}: 本地复判未通过')
@@ -126,6 +137,10 @@ def prepare(batch, work):
                 'input_repair': '仅将9.in的空根改为0，其余节点、k、N与布局保持；所有给定节点须可达。'}
         if number == 31239:
             group['input_policy'] = '仅移除首行第2～4项旧参数，保留N及后续数量表的全部字节。'
+        if checker_source is not None:
+            group['semantic_checker'] = {'path':item['checker'],'source':checker_source,
+                'sha256':sha(checker_source.encode()),'rules_sha256':sha(Path(semantic.__file__).read_bytes()),
+                'scope':'仅本批局部复判使用语义校验；未写入catalog，未解除平台SPJ或接入排除。'}
         if prior:
             group['prior_repair'] = {'path': str(prior_path.relative_to(ROOT)),
                                      'sha256': sha(prior_path.read_bytes())}

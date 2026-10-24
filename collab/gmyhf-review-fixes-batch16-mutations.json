@@ -1,0 +1,92 @@
+{
+  "batch": 16,
+  "results": [
+    {
+      "mutation": "路径树不再校验标签互异",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "分叉树接受任意排列",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "把任意树当路径",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错误分叉阈值",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "保留有环输入",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "连接词允许自身独立组成",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "允许重复输出连接词",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "忽略遗漏的连接词",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "允许输入重复单词",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错误空结果拼写",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "连接词限制输出排序",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "去重打乱输入顺序",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "树修复后反转原边",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "不审核已有正确输入的答案",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "漏传局部语义判题器",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "重写已有可行排列",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "错误命令行失败码",
+      "detected": true,
+      "exit_code": 1
+    }
+  ],
+  "procedure_source": "import hashlib,json,os,subprocess\nfrom pathlib import Path\ncases=[\n ('路径树不再校验标签互异','scripts/gmyhf_semantic_checkers.py','if len(labels)!=n-1 or set(labels)!=set(range(n-1)):return False','if len(labels)!=n-1:return False','test_mex_rejects_invalid_tree_labels_and_large_steiner_path'),\n ('分叉树接受任意排列','scripts/gmyhf_semantic_checkers.py','return any(alive[i] and degree[i]>=3 for i in range(n))','return True','test_mex_against_all_small_labelled_trees_and_all_label_permutations'),\n ('把任意树当路径','scripts/gmyhf_semantic_checkers.py','max(degree,default=0)<=2','max(degree,default=0)<=10000','test_mex_against_all_small_labelled_trees_and_all_label_permutations'),\n ('错误分叉阈值','scripts/gmyhf_semantic_checkers.py','alive[i] and degree[i]>=3','alive[i] and degree[i]>=4','test_mex_against_all_small_labelled_trees_and_all_label_permutations'),\n ('保留有环输入','scripts/gmyhf_semantic_checkers.py','if u==v:return False','if False:return False','test_mex_rejects_invalid_tree_labels_and_large_steiner_path'),\n ('连接词允许自身独立组成','scripts/gmyhf_semantic_checkers.py','return start>0','return True','test_words_against_all_segment_partitions_and_output_orders'),\n ('允许重复输出连接词','scripts/gmyhf_semantic_checkers.py','len(output)==len(expected) and set(output)==expected','set(output)==expected','test_words_against_all_segment_partitions_and_output_orders'),\n ('忽略遗漏的连接词','scripts/gmyhf_semantic_checkers.py','len(output)==len(expected) and set(output)==expected','set(output)<=expected','test_words_against_all_segment_partitions_and_output_orders'),\n ('允许输入重复单词','scripts/gmyhf_semantic_checkers.py',' or len(set(words))!=len(words)','', 'test_words_reject_invalid_input_and_handle_self_repetition'),\n ('错误空结果拼写','scripts/gmyhf_semantic_checkers.py',\"output==['None']\",\"output==['none']\",'test_words_reject_invalid_input_and_handle_self_repetition'),\n ('连接词限制输出排序','scripts/gmyhf_semantic_checkers.py','len(output)==len(expected) and set(output)==expected','output==sorted(expected)','test_words_against_all_segment_partitions_and_output_orders'),\n ('去重打乱输入顺序','scripts/gmyhf_review_fixes.py','unique = list(dict.fromkeys(words))','unique = sorted(set(words))','test_repairs_preserve_forest_and_first_word_occurrence'),\n ('树修复后反转原边','scripts/gmyhf_review_fixes.py','return payload if n == 1 else repair_input(28187,payload)','return payload if n == 1 else repair_input(28187,payload).replace(b\"2 3\", b\"3 2\")','test_repairs_preserve_forest_and_first_word_occurrence'),\n ('不审核已有正确输入的答案','scripts/repair_gmyhf_review_findings.py','require(semantic.validate(number,repaired.decode(),output.decode()),','require(True,','test_prepare_uses_local_checker_preserves_alternative_stored_answers'),\n ('漏传局部语义判题器','scripts/repair_gmyhf_review_findings.py',\"item['checker'] = str(checker.relative_to(judge.MIRROR))\",\"item['other'] = str(checker.relative_to(judge.MIRROR))\",'test_prepare_uses_local_checker_preserves_alternative_stored_answers'),\n ('重写已有可行排列','scripts/repair_gmyhf_review_findings.py','(31415, 31435, 30236, 29663)','(31415, 31435, 30236, 29663, 27952, 28341)','test_prepare_uses_local_checker_preserves_alternative_stored_answers'),\n ('错误命令行失败码','scripts/gmyhf_semantic_checkers.py','else 42)','else 1)','test_copied_cli_accepts_alternative_answers_and_rejects_wrong_bytes')]\nresults=[]\nfor name,path,old,new,test in cases:\n p=Path(path);original=p.read_text()\n try:\n  assert original.count(old)==1,(name,original.count(old));p.write_text(original.replace(old,new))\n  run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest','tests.test_gmyhf_semantic_checkers.SemanticCheckerTests.'+test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert run.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':run.returncode})\n finally:p.write_text(original)\ns=Path(__file__).read_text();Path('collab/gmyhf-review-fixes-batch16-mutations.json').write_text(json.dumps({'batch':16,'results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n');print(len(results),'种变异检出，源码已恢复')\n",
+  "procedure_sha256": "0a172501f1826ad5de4cf622cb69efdb501315ddbdf233e3177804c56add44f2"
+}

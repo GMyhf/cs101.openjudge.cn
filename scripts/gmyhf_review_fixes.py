@@ -17,6 +17,17 @@ def validate_missing_deque_input(payload):
 
 def repair_input(number, payload):
     text = payload.decode()
+    if number == 27952:
+        values = list(map(int, text.split()))
+        n = values[0]
+        assert 1 <= n <= 10000 and len(values) == 2*n-1
+        return payload if n == 1 else repair_input(28187,payload)
+    if number == 28341:
+        words = text.split()
+        assert 1 <= len(words) <= 10000 and all(1 <= len(w) <= 30 and
+               all('a' <= c <= 'z' for c in w) for w in words)
+        unique = list(dict.fromkeys(words))
+        return payload if len(unique) == len(words) else (' '.join(unique)+'\n').encode()
     if number == 29663:
         values = list(map(int, text.split()))
         k, n = values[:2]
