@@ -18,7 +18,21 @@ BATCHES = {1: {19964: 16, 19968: 16, 30825: 15, 30920: 16, 31415: 15, 31435: 15}
            3: {21471: 9, 25563: 11, 25577: 11, 27946: 13, 30177: 14},
            5: {28187: 13, 28188: 13, 28189: 13, 28682: 13, 28696: 13},
            6: {25579: 11}, 7: {25685: 12}, 9: {28277: 13, 28680: 13},
-           10: {21729: 11, 30236: 16}, 11: {28016: 13}}
+           10: {21729: 11, 30236: 16}, 11: {28016: 13}, 12: {31241: 10}}
+
+
+def reference_command(source, language, target):
+    """仅用于已经核对来源哈希的自写参考，不接受平台附件源码。"""
+    require(language in ('python3', 'cpp'), '未知自写参考语言')
+    reference = target / ('reference.cpp' if language == 'cpp' else 'reference.py')
+    reference.write_text(source)
+    if language == 'cpp':
+        binary = target / 'reference-bin'
+        compiled = subprocess.run(['g++', '-std=c++17', '-O2', str(reference), '-o', str(binary)],
+                                  capture_output=True, timeout=120)
+        require(compiled.returncode == 0, '自写C++参考编译失败')
+        return reference, [str(binary)]
+    return reference, [sys.executable, '-I', str(reference)]
 
 
 def prepare(batch, work):
@@ -28,6 +42,9 @@ def prepare(batch, work):
         if number == 30236:
             # 用户补充规则后重绑题面；原始数据及参考源码的审核证据保持不变。
             evidence = ROOT / 'collab/gmyhf-30236-rule-review.json'
+        if number == 31241:
+            # 原审核仅含公开注入题面；后台载荷核对一致后补齐六字段绑定。
+            evidence = ROOT / 'collab/gmyhf-31241-admin-form-review.json'
         entry = next(e for e in json.loads(evidence.read_text())['entries']
                      if e['global_number'] == number)
         proof = entry['authored_reference']
@@ -48,8 +65,8 @@ def prepare(batch, work):
             baseline.update(prior['final_files'])
         target = ROOT / f'data/openjudge/tests/admin_review_repaired/{number}'
         (target / 'data').mkdir(parents=True, exist_ok=True)
-        reference = target / 'reference.py'
-        reference.write_text(source)
+        language = proof.get('language', 'python3')
+        reference, command = reference_command(source, language, target)
         changes, cases = [], []
         altered_inputs = 0
         for record in entry['checks']['answers']['files']:
@@ -67,7 +84,7 @@ def prepare(batch, work):
             altered_inputs += repaired != given
             output = answer
             if repaired != given or number in (31415, 31435, 30236):
-                result = subprocess.run([sys.executable, '-I', str(reference)], input=repaired,
+                result = subprocess.run(command, input=repaired,
                                         capture_output=True, timeout=120)
                 require(result.returncode == 0, f'{number}: 自写参考失败')
                 output = result.stdout
@@ -86,17 +103,18 @@ def prepare(batch, work):
                            21471: 19, 25563: 19, 25577: 1, 27946: 10, 30177: 1,
                            28187: 17, 28188: 14, 28189: 13, 28682: 20, 28696: 18,
                            25579: 12, 25685: 17, 28277: 1, 28680: 5,
-                           21729: 1, 30236: 1, 28016: 6}
+                           21729: 1, 30236: 1, 28016: 6, 31241: 1}
         require(altered_inputs == expected_inputs[number], '越界输入数量与审核证据不符')
         item = {'book': 'practice', 'id': str(number), 'global_number': number,
                 'tests': True, 'test_count': len(cases), 'test_cases': cases}
         with patch.object(judge, 'catalog_item', return_value=item):
-            receipt = judge.judge('practice', str(number), 'python3', source, collect_case_times=True)
+            receipt = judge.judge('practice', str(number), language, source, collect_case_times=True)
         require(receipt['status'] == 'Accepted', f'{number}: 本地复判未通过')
         require(receipt['timing_audit']['status'] == 'passed', f'{number}: 时限余量不足')
         group = {'global_number': number, 'evidence': str(evidence.relative_to(ROOT)),
                  'evidence_sha256': sha(evidence.read_bytes()), 'reference_sha256': sha(source.encode()),
-                 'reference_source': source, 'baseline_files': baseline, 'changes': changes,
+                 'reference_source': source, 'reference_language': language,
+                 'reference_file': reference.name, 'baseline_files': baseline, 'changes': changes,
                  'local_dataset': str(target.relative_to(ROOT)), 'local': sanitized(receipt),
                  'verified_legal_pairs': len(cases), 'repaired_inputs': altered_inputs}
         if number == 30236:

@@ -1,0 +1,821 @@
+{
+  "original_evidence": "collab/gmyhf-pending-batch10-review.json",
+  "original_evidence_sha256": "115ff239b388d2378b8c5b9f57ecda5f3602dd0e691bbee2524fcfc05f894464",
+  "public_page_sha256": "ff863603cc6cec2b599f4cd0b8ebee3d905347b9cc17c4bd647d07eca0338423",
+  "scope": "原第10批审核公开题面，未记录后台六字段哈希；本次只读确认HTML题面和Markdown源码的压缩注入载荷逐字相同，补齐写前绑定。",
+  "identical_payloads": [
+    {
+      "attributes": {
+        "data-part": "0",
+        "data-version": "2",
+        "type": "application/x-oj-inject-data"
+      },
+      "sha256": "afab93192bee752249e4e13006904242e016dfe574e1d3b78dae5eecd4e1fc3f"
+    },
+    {
+      "attributes": {
+        "data-part": "1",
+        "data-version": "2",
+        "type": "application/x-oj-inject-data"
+      },
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "attributes": {
+        "data-part": "2",
+        "data-version": "2",
+        "type": "application/x-oj-inject-data"
+      },
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "attributes": {
+        "data-part": "3",
+        "data-version": "2",
+        "type": "application/x-oj-inject-data"
+      },
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "attributes": {
+        "data-format": "markdown",
+        "data-parts": "1",
+        "data-version": "2",
+        "type": "application/x-oj-inject-source"
+      },
+      "sha256": "8ae7635bdff1fd5a6e1ff0913ccaacf05e4959ed3ea39b87ba58a4bc308620f7"
+    }
+  ],
+  "platform_writes": 0,
+  "procedure_source": "\"\"\"只读绑定公开题面审核与管理员表单：要求注入题面和源码数据逐字一致。\"\"\"\nimport copy,hashlib,html,json,sys\nfrom html.parser import HTMLParser\nfrom pathlib import Path\nsys.path.insert(0,str(Path.cwd()/'scripts'));import repair_gmyhf_pending_answers as c\nclass Payloads(HTMLParser):\n def __init__(self):super().__init__();self.active=None;self.parts=[];self.result=[]\n def handle_starttag(self,tag,attrs):\n  a=dict(attrs)\n  if tag=='script' and a.get('type') in ('application/x-oj-inject-data','application/x-oj-inject-source'):\n   assert self.active is None;self.active=tuple(sorted(attrs));self.parts=[]\n def handle_data(self,d):\n  if self.active is not None:self.parts.append(d)\n def handle_endtag(self,tag):\n  if tag=='script' and self.active is not None:\n   self.result.append((self.active,''.join(self.parts)));self.active=None\np=Path('collab/gmyhf-pending-batch10-review.json');old=next(e for e in json.loads(p.read_text())['entries'] if e['global_number']==31241)\npublic=Path(old['page']).read_bytes();assert c.sha(public)==old['page_sha256']\na=Payloads();a.feed(public.decode());assert len(a.result)==5\nsession=c.platform.oj_submit.Session().login();page=session._get(c.platform.oj_submit.HOST+'/admin/problems/edit/?id=31241')\nfields=c.platform.parse_form(page);keys=('description','input','output','hint','sampleInput','sampleOutput')\nb=Payloads()\nfor k in keys:b.feed(html.unescape(fields[k]))\nassert sorted(a.result)==sorted(b.result),'公开审核题面与管理员注入内容不同'\nentry=copy.deepcopy(old);entry['checks']['statement']['field_sha256']={k:c.sha(html.unescape(fields[k]).encode()) for k in keys}\ns=Path(__file__).read_text();report={'original_evidence':str(p),'original_evidence_sha256':c.sha(p.read_bytes()),'public_page_sha256':c.sha(public),'scope':'原第10批审核公开题面，未记录后台六字段哈希；本次只读确认HTML题面和Markdown源码的压缩注入载荷逐字相同，补齐写前绑定。','identical_payloads':[{'attributes':dict(attrs),'sha256':c.sha(payload.encode())} for attrs,payload in a.result],'platform_writes':0,'procedure_source':s,'procedure_sha256':c.sha(s.encode()),'entries':[entry]}\nc.save(Path('collab/gmyhf-31241-admin-form-review.json'),report)\nprint('31241公开审核题面与管理员注入载荷一致，六字段哈希已绑定；零写入')\n",
+  "procedure_sha256": "3fb8045bf10c0a91a354a3c2795bca7a0de36cfa0b30e25a4181faeb7dde68ad",
+  "entries": [
+    {
+      "global_number": 31241,
+      "title": "糖果盲袋（难度3）",
+      "reference": "/tmp/gmyhf-authored-31241.cpp",
+      "reference_sha256": "b3cd0b7c66cc1eb75932b62de54acba3e04bc4a99295cf5df4c2f3df9f759f0b",
+      "validator": "/tmp/gmyhf_batch10_oracles.py",
+      "validator_sha256": "71c915dd83a5c3d622c33d336a2ea0d797eef5866ba664b9aaf0cd6dac55f72f",
+      "page": "/tmp/gmyhf-public-31241.html",
+      "page_sha256": "ff863603cc6cec2b599f4cd0b8ebee3d905347b9cc17c4bd647d07eca0338423",
+      "checks": {
+        "statement": {
+          "changed_fields": [],
+          "available": true,
+          "checked_at": "2026-10-23T19:19:09.300118+00:00",
+          "field_sha256": {
+            "description": "88c0993d686cb9e1622f7fc494aba655a0a0d3b68f0db191670094357953b127",
+            "input": "adc116b90e8ff24d94db30a386c031ce202f84dc47248d1d7f4d953981088711",
+            "output": "3d8b38aeeec7c79e07df22a4b5210dd01cbae3bd3b1c55e4e1dc88ed7037d2b3",
+            "hint": "c508b57c7e7a7d52947b003fa40ae80e02c682f3b87f88a5c7d19c3dc1969418",
+            "sampleInput": "3acae7e0a4dfcac485f57b8e4008962f9cf7594fb5c69b1bc89bfbc68380702c",
+            "sampleOutput": "34b392aa847a2a80ed40c8800342d8263147b3977ca2d3f4e59b55bb792e4161"
+          }
+        },
+        "readback": {
+          "files": [
+            {
+              "filename": "0.in",
+              "sha256": "9a3ce5b0e405f645a130284f119b36d207729f264d00fa169ae45e346f29312a",
+              "matches": true
+            },
+            {
+              "filename": "0.out",
+              "sha256": "6e2ae11dad0616f66bbb2b6e6556f580bb987fd911d7132aa6bee2bfc7cc7b52",
+              "matches": true
+            },
+            {
+              "filename": "1.in",
+              "sha256": "a39b253c1751570156e2336ab37af8d8eee11d88193bfca0c8802e49716cf1f0",
+              "matches": true
+            },
+            {
+              "filename": "1.out",
+              "sha256": "ee3aa64bb94a50845d5024cd4bd20202a4567aed5cd5328c0d97e9920775fc28",
+              "matches": true
+            },
+            {
+              "filename": "10.in",
+              "sha256": "288948ceb22ecb4052c291aea4372ff01ce1df6ccadfd5ea101f209e97e85f38",
+              "matches": true
+            },
+            {
+              "filename": "10.out",
+              "sha256": "cafdd1b3272ab9f9a127b953245bf806d10cff5c18b412de705340db0f838ca9",
+              "matches": true
+            },
+            {
+              "filename": "11.in",
+              "sha256": "ae2ffe7515805d9beeebce00b4274821f16bce7b4c4ed9dd6b47a645a9db9016",
+              "matches": true
+            },
+            {
+              "filename": "11.out",
+              "sha256": "28eacf5eaa9da1f41c31a8412e8dbe5e20c1860c145f1cf2650f1a0ae7a94a48",
+              "matches": true
+            },
+            {
+              "filename": "12.in",
+              "sha256": "e79c3d9c7e0972bb0e9cabe31cb663d42fe0d70f16cc27a322d0cf4ee8b5bb91",
+              "matches": true
+            },
+            {
+              "filename": "12.out",
+              "sha256": "1b84fc774ae88dd3980c8595ee3f447722b3a053e676e3491b2c72d06493f084",
+              "matches": true
+            },
+            {
+              "filename": "13.in",
+              "sha256": "a9ef64210db19fcf27dde166578e52beb7298a3c5819ef71f28b96b7eda36538",
+              "matches": true
+            },
+            {
+              "filename": "13.out",
+              "sha256": "345ebe25f0ac3f1104a2029fdf8f0885ccd9800e3ebcdbd03da014dad101a0b1",
+              "matches": true
+            },
+            {
+              "filename": "14.in",
+              "sha256": "9ee41e417bcd573e29a0606805852bb6b61693f078b1ae8aa1f9e1f4d8d6fb70",
+              "matches": true
+            },
+            {
+              "filename": "14.out",
+              "sha256": "75587a9107eab6e56a06a70851c799897dd7346a68a2d8484d0c5d799a5ea176",
+              "matches": true
+            },
+            {
+              "filename": "15.in",
+              "sha256": "19fa55ddc55740a6a723caf40c90f6f0790c33e651603ef49f294dac53cd6f53",
+              "matches": true
+            },
+            {
+              "filename": "15.out",
+              "sha256": "b784de8183627b53244847b819133b12c7cfb4b9d9b623ca59da7d6a9382eb72",
+              "matches": true
+            },
+            {
+              "filename": "16.in",
+              "sha256": "0d827011d867d89a828174b46340d72d9a25d0191ae268fe32d9e37718f78230",
+              "matches": true
+            },
+            {
+              "filename": "16.out",
+              "sha256": "e38738f76f42b7427ebd79368cce7ca15f551a06f0f8e256a47f9dc96535d9a4",
+              "matches": true
+            },
+            {
+              "filename": "17.in",
+              "sha256": "59a8281d25bd843b96acba99df3a1ecaba5b5df34fd9ca2ddd6aba3297e6a766",
+              "matches": true
+            },
+            {
+              "filename": "17.out",
+              "sha256": "c4529caa355d5e5c1727be1d48a18a1f3510fe3f6baf2b7ac60a62e458a3a68b",
+              "matches": true
+            },
+            {
+              "filename": "18.in",
+              "sha256": "c0fbcb29d14723ad1e7df2e0426bdd36bffeb331398f3beea4a721f7929ddb06",
+              "matches": true
+            },
+            {
+              "filename": "18.out",
+              "sha256": "eecd262c3ecab667b61ebb70835f3b181a1d1530d3ebc0ef99a3a8dc3d5b193f",
+              "matches": true
+            },
+            {
+              "filename": "19.in",
+              "sha256": "a2725bab4b555d3e75480b664715788a35360b11843538ad281f770bfb4a1645",
+              "matches": true
+            },
+            {
+              "filename": "19.out",
+              "sha256": "19e0aa32de64806fde9f18b9903b289e878ed8983e879da5a6d359715f147500",
+              "matches": true
+            },
+            {
+              "filename": "2.in",
+              "sha256": "bc18dc7475a9ce5db6975a64826fc7ebac05120f69b2bbb99bea4ab301a087d2",
+              "matches": true
+            },
+            {
+              "filename": "2.out",
+              "sha256": "a1fb50e6c86fae1679ef3351296fd6713411a08cf8dd1790a4fd05fae8688164",
+              "matches": true
+            },
+            {
+              "filename": "3.in",
+              "sha256": "aed7a538926285f3245f98b569795d3502f914afae3ed2098392614869792f23",
+              "matches": true
+            },
+            {
+              "filename": "3.out",
+              "sha256": "2115cdb6bfcfb008eb2bab2bb79347cb064a48e4e7c4115ccbe4469c787bb6c4",
+              "matches": true
+            },
+            {
+              "filename": "4.in",
+              "sha256": "cfc14e5c8257d8c99d610b51797e8a6dbdcc1a7614064b537bd446292b0f29d1",
+              "matches": true
+            },
+            {
+              "filename": "4.out",
+              "sha256": "2a62cf402cd3396aa00f55f892f4545f308f74d01c8caa0f2837b1982f821595",
+              "matches": true
+            },
+            {
+              "filename": "5.in",
+              "sha256": "ec0e723a084cb9aa6a90180f92b6cb05eeb902a177ea1abcecd826bdb239abae",
+              "matches": true
+            },
+            {
+              "filename": "5.out",
+              "sha256": "076320a2a08267b4c026d06573bba408ea68841e73cdc20e62cce59de165ece3",
+              "matches": true
+            },
+            {
+              "filename": "6.in",
+              "sha256": "ef4585fa37d9f1e01aef56e77b93988bb52ca3f601122f77dcc3571cd3dcebef",
+              "matches": true
+            },
+            {
+              "filename": "6.out",
+              "sha256": "654ee9da442fa353f59f11beb688fc7f76c8de62a6c18b2a181fdde2a27cc3ef",
+              "matches": true
+            },
+            {
+              "filename": "7.in",
+              "sha256": "1c6a0296eca40ef3a0bc7506a65310cd94cc68810f73b593debd5ccbedf64956",
+              "matches": true
+            },
+            {
+              "filename": "7.out",
+              "sha256": "a5e45837a2959db847f7e67a915d0ecaddd47f943af2af5fa6453be497faabca",
+              "matches": true
+            },
+            {
+              "filename": "8.in",
+              "sha256": "c604f3c579a18c27f229209b5a011e9694afab20cbc549ccf5a82c2a7b92d740",
+              "matches": true
+            },
+            {
+              "filename": "8.out",
+              "sha256": "d83eda03456fa8d40cc9aee8c1675fe4a8de32b62fd164073ad66f981d0031a6",
+              "matches": true
+            },
+            {
+              "filename": "9.in",
+              "sha256": "8ac4122d4d09ddf821488b60f8b9c632bbea5c839c68411781fd227c2305662f",
+              "matches": true
+            },
+            {
+              "filename": "9.out",
+              "sha256": "7bd79c0161b0087185ccbc5cd44b0adc53d894e2eb2d57fc134fec2bad819427",
+              "matches": true
+            }
+          ],
+          "checked_at": "2026-10-23T19:19:14.273684+00:00"
+        },
+        "contract": {
+          "cases": 20,
+          "rejected": [
+            "19.in"
+          ],
+          "definition": "原分类未提供_made参考和valid；按独立复算器extra_contract核题面约束，不声称通过既有valid。",
+          "checks": [
+            {
+              "input": "0.in",
+              "issues": []
+            },
+            {
+              "input": "1.in",
+              "issues": []
+            },
+            {
+              "input": "10.in",
+              "issues": []
+            },
+            {
+              "input": "11.in",
+              "issues": []
+            },
+            {
+              "input": "12.in",
+              "issues": []
+            },
+            {
+              "input": "13.in",
+              "issues": []
+            },
+            {
+              "input": "14.in",
+              "issues": []
+            },
+            {
+              "input": "15.in",
+              "issues": []
+            },
+            {
+              "input": "16.in",
+              "issues": []
+            },
+            {
+              "input": "17.in",
+              "issues": []
+            },
+            {
+              "input": "18.in",
+              "issues": []
+            },
+            {
+              "input": "19.in",
+              "issues": [
+                "形状、口味、数量或搭配表约束不符"
+              ]
+            },
+            {
+              "input": "2.in",
+              "issues": []
+            },
+            {
+              "input": "3.in",
+              "issues": []
+            },
+            {
+              "input": "4.in",
+              "issues": []
+            },
+            {
+              "input": "5.in",
+              "issues": []
+            },
+            {
+              "input": "6.in",
+              "issues": []
+            },
+            {
+              "input": "7.in",
+              "issues": []
+            },
+            {
+              "input": "8.in",
+              "issues": []
+            },
+            {
+              "input": "9.in",
+              "issues": []
+            }
+          ]
+        },
+        "extra_contract": {
+          "definition": "按解码题面补足原valid未覆盖的语义范围；实现见独立复算器extra_contract",
+          "files": [
+            {
+              "input": "0.in",
+              "issues": []
+            },
+            {
+              "input": "1.in",
+              "issues": []
+            },
+            {
+              "input": "10.in",
+              "issues": []
+            },
+            {
+              "input": "11.in",
+              "issues": []
+            },
+            {
+              "input": "12.in",
+              "issues": []
+            },
+            {
+              "input": "13.in",
+              "issues": []
+            },
+            {
+              "input": "14.in",
+              "issues": []
+            },
+            {
+              "input": "15.in",
+              "issues": []
+            },
+            {
+              "input": "16.in",
+              "issues": []
+            },
+            {
+              "input": "17.in",
+              "issues": []
+            },
+            {
+              "input": "18.in",
+              "issues": []
+            },
+            {
+              "input": "19.in",
+              "issues": [
+                "形状、口味、数量或搭配表约束不符"
+              ]
+            },
+            {
+              "input": "2.in",
+              "issues": []
+            },
+            {
+              "input": "3.in",
+              "issues": []
+            },
+            {
+              "input": "4.in",
+              "issues": []
+            },
+            {
+              "input": "5.in",
+              "issues": []
+            },
+            {
+              "input": "6.in",
+              "issues": []
+            },
+            {
+              "input": "7.in",
+              "issues": []
+            },
+            {
+              "input": "8.in",
+              "issues": []
+            },
+            {
+              "input": "9.in",
+              "issues": []
+            }
+          ]
+        },
+        "answers": {
+          "method": "枚举坏口味支持集和极大容量盒；深覆盖支配查询提供最小增量下界，再按代价排除坏盒；C++任意必要整数均用64位",
+          "official_samples": 1,
+          "files": [
+            {
+              "input": "0.in",
+              "output": "0.out",
+              "input_sha256": "9a3ce5b0e405f645a130284f119b36d207729f264d00fa169ae45e346f29312a",
+              "output_sha256": "6e2ae11dad0616f66bbb2b6e6556f580bb987fd911d7132aa6bee2bfc7cc7b52",
+              "matches": true,
+              "oracle_ms": 5
+            },
+            {
+              "input": "1.in",
+              "output": "1.out",
+              "input_sha256": "a39b253c1751570156e2336ab37af8d8eee11d88193bfca0c8802e49716cf1f0",
+              "output_sha256": "ee3aa64bb94a50845d5024cd4bd20202a4567aed5cd5328c0d97e9920775fc28",
+              "matches": true,
+              "oracle_ms": 6
+            },
+            {
+              "input": "10.in",
+              "output": "10.out",
+              "input_sha256": "288948ceb22ecb4052c291aea4372ff01ce1df6ccadfd5ea101f209e97e85f38",
+              "output_sha256": "cafdd1b3272ab9f9a127b953245bf806d10cff5c18b412de705340db0f838ca9",
+              "matches": true,
+              "oracle_ms": 6
+            },
+            {
+              "input": "11.in",
+              "output": "11.out",
+              "input_sha256": "ae2ffe7515805d9beeebce00b4274821f16bce7b4c4ed9dd6b47a645a9db9016",
+              "output_sha256": "28eacf5eaa9da1f41c31a8412e8dbe5e20c1860c145f1cf2650f1a0ae7a94a48",
+              "matches": true,
+              "oracle_ms": 6
+            },
+            {
+              "input": "12.in",
+              "output": "12.out",
+              "input_sha256": "e79c3d9c7e0972bb0e9cabe31cb663d42fe0d70f16cc27a322d0cf4ee8b5bb91",
+              "output_sha256": "1b84fc774ae88dd3980c8595ee3f447722b3a053e676e3491b2c72d06493f084",
+              "matches": true,
+              "oracle_ms": 9
+            },
+            {
+              "input": "13.in",
+              "output": "13.out",
+              "input_sha256": "a9ef64210db19fcf27dde166578e52beb7298a3c5819ef71f28b96b7eda36538",
+              "output_sha256": "345ebe25f0ac3f1104a2029fdf8f0885ccd9800e3ebcdbd03da014dad101a0b1",
+              "matches": true,
+              "oracle_ms": 8
+            },
+            {
+              "input": "14.in",
+              "output": "14.out",
+              "input_sha256": "9ee41e417bcd573e29a0606805852bb6b61693f078b1ae8aa1f9e1f4d8d6fb70",
+              "output_sha256": "75587a9107eab6e56a06a70851c799897dd7346a68a2d8484d0c5d799a5ea176",
+              "matches": true,
+              "oracle_ms": 7
+            },
+            {
+              "input": "15.in",
+              "output": "15.out",
+              "input_sha256": "19fa55ddc55740a6a723caf40c90f6f0790c33e651603ef49f294dac53cd6f53",
+              "output_sha256": "b784de8183627b53244847b819133b12c7cfb4b9d9b623ca59da7d6a9382eb72",
+              "matches": true,
+              "oracle_ms": 8
+            },
+            {
+              "input": "16.in",
+              "output": "16.out",
+              "input_sha256": "0d827011d867d89a828174b46340d72d9a25d0191ae268fe32d9e37718f78230",
+              "output_sha256": "e38738f76f42b7427ebd79368cce7ca15f551a06f0f8e256a47f9dc96535d9a4",
+              "matches": true,
+              "oracle_ms": 8
+            },
+            {
+              "input": "17.in",
+              "output": "17.out",
+              "input_sha256": "59a8281d25bd843b96acba99df3a1ecaba5b5df34fd9ca2ddd6aba3297e6a766",
+              "output_sha256": "c4529caa355d5e5c1727be1d48a18a1f3510fe3f6baf2b7ac60a62e458a3a68b",
+              "matches": true,
+              "oracle_ms": 8
+            },
+            {
+              "input": "18.in",
+              "output": "18.out",
+              "input_sha256": "c0fbcb29d14723ad1e7df2e0426bdd36bffeb331398f3beea4a721f7929ddb06",
+              "output_sha256": "eecd262c3ecab667b61ebb70835f3b181a1d1530d3ebc0ef99a3a8dc3d5b193f",
+              "matches": true,
+              "oracle_ms": 109
+            },
+            {
+              "input": "19.in",
+              "output": "19.out",
+              "input_sha256": "a2725bab4b555d3e75480b664715788a35360b11843538ad281f770bfb4a1645",
+              "output_sha256": "19e0aa32de64806fde9f18b9903b289e878ed8983e879da5a6d359715f147500",
+              "matches": null,
+              "not_compared_reason": "输入违反完整题面约束，不能把计算异常或未比较误作答案错误",
+              "oracle_ms": 0
+            },
+            {
+              "input": "2.in",
+              "output": "2.out",
+              "input_sha256": "bc18dc7475a9ce5db6975a64826fc7ebac05120f69b2bbb99bea4ab301a087d2",
+              "output_sha256": "a1fb50e6c86fae1679ef3351296fd6713411a08cf8dd1790a4fd05fae8688164",
+              "matches": true,
+              "oracle_ms": 7
+            },
+            {
+              "input": "3.in",
+              "output": "3.out",
+              "input_sha256": "aed7a538926285f3245f98b569795d3502f914afae3ed2098392614869792f23",
+              "output_sha256": "2115cdb6bfcfb008eb2bab2bb79347cb064a48e4e7c4115ccbe4469c787bb6c4",
+              "matches": true,
+              "oracle_ms": 7
+            },
+            {
+              "input": "4.in",
+              "output": "4.out",
+              "input_sha256": "cfc14e5c8257d8c99d610b51797e8a6dbdcc1a7614064b537bd446292b0f29d1",
+              "output_sha256": "2a62cf402cd3396aa00f55f892f4545f308f74d01c8caa0f2837b1982f821595",
+              "matches": true,
+              "oracle_ms": 7
+            },
+            {
+              "input": "5.in",
+              "output": "5.out",
+              "input_sha256": "ec0e723a084cb9aa6a90180f92b6cb05eeb902a177ea1abcecd826bdb239abae",
+              "output_sha256": "076320a2a08267b4c026d06573bba408ea68841e73cdc20e62cce59de165ece3",
+              "matches": true,
+              "oracle_ms": 8
+            },
+            {
+              "input": "6.in",
+              "output": "6.out",
+              "input_sha256": "ef4585fa37d9f1e01aef56e77b93988bb52ca3f601122f77dcc3571cd3dcebef",
+              "output_sha256": "654ee9da442fa353f59f11beb688fc7f76c8de62a6c18b2a181fdde2a27cc3ef",
+              "matches": true,
+              "oracle_ms": 10
+            },
+            {
+              "input": "7.in",
+              "output": "7.out",
+              "input_sha256": "1c6a0296eca40ef3a0bc7506a65310cd94cc68810f73b593debd5ccbedf64956",
+              "output_sha256": "a5e45837a2959db847f7e67a915d0ecaddd47f943af2af5fa6453be497faabca",
+              "matches": true,
+              "oracle_ms": 9
+            },
+            {
+              "input": "8.in",
+              "output": "8.out",
+              "input_sha256": "c604f3c579a18c27f229209b5a011e9694afab20cbc549ccf5a82c2a7b92d740",
+              "output_sha256": "d83eda03456fa8d40cc9aee8c1675fe4a8de32b62fd164073ad66f981d0031a6",
+              "matches": true,
+              "oracle_ms": 7
+            },
+            {
+              "input": "9.in",
+              "output": "9.out",
+              "input_sha256": "8ac4122d4d09ddf821488b60f8b9c632bbea5c839c68411781fd227c2305662f",
+              "output_sha256": "7bd79c0161b0087185ccbc5cd44b0adc53d894e2eb2d57fc134fec2bad819427",
+              "matches": true,
+              "oracle_ms": 7
+            }
+          ]
+        },
+        "local": {
+          "status": "Accepted",
+          "cases": 20,
+          "time_ms": 404,
+          "memory_kb": 133344,
+          "timing_audit": {
+            "status": "passed",
+            "required_max_ratio": 0.75,
+            "max_case": {
+              "case": 12,
+              "time_ms": 161,
+              "case_limit_ms": 4000,
+              "ratio": 0.0403
+            },
+            "cases": [
+              {
+                "case": 1,
+                "time_ms": 8,
+                "case_limit_ms": 4000,
+                "ratio": 0.002
+              },
+              {
+                "case": 2,
+                "time_ms": 7,
+                "case_limit_ms": 4000,
+                "ratio": 0.0018
+              },
+              {
+                "case": 3,
+                "time_ms": 8,
+                "case_limit_ms": 4000,
+                "ratio": 0.002
+              },
+              {
+                "case": 4,
+                "time_ms": 7,
+                "case_limit_ms": 4000,
+                "ratio": 0.0018
+              },
+              {
+                "case": 5,
+                "time_ms": 6,
+                "case_limit_ms": 4000,
+                "ratio": 0.0015
+              },
+              {
+                "case": 6,
+                "time_ms": 7,
+                "case_limit_ms": 4000,
+                "ratio": 0.0018
+              },
+              {
+                "case": 7,
+                "time_ms": 7,
+                "case_limit_ms": 4000,
+                "ratio": 0.0018
+              },
+              {
+                "case": 8,
+                "time_ms": 8,
+                "case_limit_ms": 4000,
+                "ratio": 0.002
+              },
+              {
+                "case": 9,
+                "time_ms": 7,
+                "case_limit_ms": 4000,
+                "ratio": 0.0018
+              },
+              {
+                "case": 10,
+                "time_ms": 8,
+                "case_limit_ms": 4000,
+                "ratio": 0.002
+              },
+              {
+                "case": 11,
+                "time_ms": 108,
+                "case_limit_ms": 4000,
+                "ratio": 0.027
+              },
+              {
+                "case": 12,
+                "time_ms": 161,
+                "case_limit_ms": 4000,
+                "ratio": 0.0403
+              },
+              {
+                "case": 13,
+                "time_ms": 5,
+                "case_limit_ms": 4000,
+                "ratio": 0.0013
+              },
+              {
+                "case": 14,
+                "time_ms": 7,
+                "case_limit_ms": 4000,
+                "ratio": 0.0018
+              },
+              {
+                "case": 15,
+                "time_ms": 7,
+                "case_limit_ms": 4000,
+                "ratio": 0.0018
+              },
+              {
+                "case": 16,
+                "time_ms": 8,
+                "case_limit_ms": 4000,
+                "ratio": 0.002
+              },
+              {
+                "case": 17,
+                "time_ms": 7,
+                "case_limit_ms": 4000,
+                "ratio": 0.0018
+              },
+              {
+                "case": 18,
+                "time_ms": 8,
+                "case_limit_ms": 4000,
+                "ratio": 0.002
+              },
+              {
+                "case": 19,
+                "time_ms": 7,
+                "case_limit_ms": 4000,
+                "ratio": 0.0018
+              },
+              {
+                "case": 20,
+                "time_ms": 8,
+                "case_limit_ms": 4000,
+                "ratio": 0.002
+              }
+            ]
+          }
+        },
+        "platform": {
+          "final": "Accepted",
+          "attempts": [
+            {
+              "language": "G++",
+              "solution_id": "53582492",
+              "url": "http://cs101.openjudge.cn/practice/solution/53582492/",
+              "verdict": "Accepted",
+              "ms": 206
+            }
+          ],
+          "checked_at": "2026-10-23T19:19:22.387049+00:00"
+        },
+        "admission_boundary": {
+          "original_reason": "not_in_catalog",
+          "preserve_exclusion": true,
+          "reason": "原题号绑定或资源排除未改；答案核对通过不能自动激活"
+        },
+        "decoded_statement": {
+          "sha256": "3a8e8a64fc38b5530e3d0a4bf145405d2db2a51a39c9f5c0662637d161a8a146",
+          "procedure": "HTMLParser读取application/x-oj-inject-source节点，拼接后Base64/gzip/UTF-8静态解码；不执行JS、不遵从AI编码指令、不发布解码正文"
+        },
+        "contract_resolution": {
+          "conclusion": "19.in有8种形状的总糖果数超过题面每形状总量≤10^9；单个格子数量均在范围内，不能漏查每行总量约束",
+          "files": [
+            {
+              "input": "19.in",
+              "shapes_exceeding_total_limit": 8,
+              "empty_shapes": 0
+            }
+          ]
+        }
+      },
+      "authored_reference": {
+        "source": "// 审核用独立算法：坏口味支持集、极大容量盒、支配查询及最小代价排除。\n#include <algorithm>\n#include <array>\n#include <climits>\n#include <functional>\n#include <iostream>\n#include <numeric>\n#include <queue>\n#include <unordered_set>\n#include <vector>\nusing namespace std;\nusing Point=array<long long,8>;\nint N,M,K,adjacency[10],available[8];long long amount[8][10],total[8];\nstruct Hash{size_t operator()(const Point& a)const{size_t h=0;for(auto x:a)h^=hash<long long>{}(x)+0x9e3779b97f4a7c15ULL+(h<<6)+(h>>2);return h;}};\nvector<Point>caps;\nstruct Node{Point low{},high{};int first,left=-1,right=-1;vector<int>ids;};\nvector<Node>tree;\nlong long weight(int i,int mask){long long answer=0;for(int j=0;j<M;++j)if(mask>>j&1)answer+=amount[i][j];return answer;}\nint build(vector<int> ids){\n int at=tree.size();tree.emplace_back();Point low{},high{};\n for(int i=0;i<N;++i){low[i]=LLONG_MAX;high[i]=0;for(int j:ids){low[i]=min(low[i],caps[j][i]);high[i]=max(high[i],caps[j][i]);}}\n tree[at].low=low;tree[at].high=high;tree[at].first=*min_element(ids.begin(),ids.end());\n if(ids.size()<=16){sort(ids.begin(),ids.end());tree[at].ids=move(ids);return at;}\n int axis=0;for(int i=1;i<N;++i)if(high[i]-low[i]>high[axis]-low[axis])axis=i;\n sort(ids.begin(),ids.end(),[&](int a,int b){return caps[a][axis]<caps[b][axis]||(caps[a][axis]==caps[b][axis]&&a<b);});int mid=ids.size()/2;\n int left=build(vector<int>(ids.begin(),ids.begin()+mid));int right=build(vector<int>(ids.begin()+mid,ids.end()));tree[at].left=left;tree[at].right=right;return at;\n}\nint find_box(int at,const Point& c,int best){\n const Node& node=tree[at];if(node.first>=best)return best;bool all=true;\n for(int i=0;i<N;++i){if(node.high[i]<c[i])return best;if(node.low[i]<c[i])all=false;}\n if(all)return node.first;\n if(node.left<0){for(int j:node.ids){if(j>=best)break;bool yes=true;for(int i=0;i<N;++i)if(caps[j][i]<c[i]){yes=false;break;}if(yes)return j;}return best;}\n int left=node.left,right=node.right;if(tree[left].first>tree[right].first)swap(left,right);best=find_box(left,c,best);return find_box(right,c,best);\n}\nlong long margin(const Point& p,const Point& c){long long answer=LLONG_MAX/4;for(int i=0;i<N;++i)if(p[i]<total[i])answer=min(answer,p[i]-c[i]+1);return answer;}\nvoid deepest_box(int at,const Point& c,int& best,long long& depth){\n const Node& node=tree[at];for(int i=0;i<N;++i)if(node.high[i]<c[i])return;\n if(margin(node.high,c)<=depth)return;\n if(node.left<0){for(int j:node.ids){bool yes=true;for(int i=0;i<N;++i)if(caps[j][i]<c[i]){yes=false;break;}if(yes){long long d=margin(caps[j],c);if(d>depth){depth=d;best=j;}}}return;}\n int left=node.left,right=node.right;if(margin(tree[left].high,c)<margin(tree[right].high,c))swap(left,right);deepest_box(left,c,best,depth);deepest_box(right,c,best,depth);\n}\nstruct State{long long cost;Point c;};\nstruct Compare{bool operator()(const State&a,const State&b)const{return a.cost!=b.cost?a.cost>b.cost:a.c>b.c;}};\nint main(){\n ios::sync_with_stdio(false);cin.tie(nullptr);if(!(cin>>N>>M>>K))return 0;\n for(int i=0;i<N;++i)for(int j=0;j<M;++j){cin>>amount[i][j];total[i]+=amount[i][j];if(amount[i][j])available[i]|=1<<j;}\n vector<pair<int,int>> edges;long long upper=LLONG_MAX;\n for(int z=0;z<K;++z){int u,v;cin>>u>>v;--u;--v;edges.emplace_back(u,v);adjacency[u]|=1<<v;adjacency[v]|=1<<u;}\n for(auto [u,v]:edges)for(int i=0;i<N;++i)for(int j=0;j<N;++j)if(i!=j){\n  if(amount[i][u]&&amount[j][v])upper=min(upper,total[i]-amount[i][u]+total[j]-amount[j][v]+2);\n  if(amount[i][v]&&amount[j][u])upper=min(upper,total[i]-amount[i][v]+total[j]-amount[j][u]+2);\n }\n if(upper==LLONG_MAX){cout<<-1<<'\\n';return 0;}\n int free_mask=0;for(int j=0;j<M;++j)if(!adjacency[j])free_mask|=1<<j;\n unordered_set<Point,Hash> unique;\n for(int mask=0;mask<(1<<M);++mask){\n  if((mask&free_mask)!=free_mask)continue;int unseen=mask,isolated=0;vector<int>components;\n  while(unseen){int todo=unseen&-unseen,component=0;while(todo){int bit=todo&-todo;todo^=bit;int u=__builtin_ctz((unsigned)bit);component|=bit;unseen&=~bit;todo|=adjacency[u]&unseen;}\n   if(component&(component-1))components.push_back(component);else isolated|=component;\n  }\n  Point c{};array<int,8> supports{};for(int i=0;i<N;++i){c[i]=weight(i,isolated);supports[i]=isolated&available[i];}\n  function<void(int)> enumerate=[&](int at){\n   if(at==(int)components.size()){\n    int prefix[9]={},suffix[9]={};for(int i=0;i<N;++i)prefix[i+1]=prefix[i]|supports[i];for(int i=N-1;i>=0;--i)suffix[i]=suffix[i+1]|supports[i];\n    for(int i=0;i<N;++i){int missing=available[i]&~supports[i],outside=prefix[i]|suffix[i+1];while(missing){int bit=missing&-missing;missing^=bit;if(!(adjacency[__builtin_ctz((unsigned)bit)]&outside))return;}}\n    unique.insert(c);return;\n   }\n   int component=components[at];for(int i=0;i<N;++i){int old=supports[i];long long add=weight(i,component);supports[i]|=component&available[i];c[i]+=add;enumerate(at+1);c[i]-=add;supports[i]=old;}\n  };enumerate(0);\n }\n caps.assign(unique.begin(),unique.end());unique.clear();sort(caps.begin(),caps.end(),[&](const Point&a,const Point&b){long long x=accumulate(a.begin(),a.begin()+N,0LL),y=accumulate(b.begin(),b.begin()+N,0LL);return x!=y?x<y:a<b;});\n tree.reserve(caps.size()*2);vector<int> ids(caps.size());iota(ids.begin(),ids.end(),0);int root=build(move(ids));priority_queue<State,vector<State>,Compare>queue;unordered_set<Point,Hash>seen;Point zero{};queue.push({0,zero});seen.insert(zero);\n while(!queue.empty()){\n  State state=queue.top();queue.pop();if(state.cost>=upper){cout<<upper<<'\\n';return 0;}int found=-1;long long depth=0;deepest_box(root,state.c,found,depth);if(found<0){cout<<state.cost<<'\\n';return 0;}\n  if(state.cost+depth>=upper)continue;const Point& bad=caps[found];for(int i=0;i<N;++i){if(bad[i]>=total[i])continue;Point next=state.c;next[i]=bad[i]+1;long long cost=state.cost+next[i]-state.c[i];if(cost<upper&&seen.insert(next).second)queue.push({cost,next});}\n }\n cout<<upper<<'\\n';\n}\n",
+        "sha256": "b3cd0b7c66cc1eb75932b62de54acba3e04bc4a99295cf5df4c2f3df9f759f0b",
+        "language": "cpp",
+        "procedure": "本次自写独立坏容量盒算法C++版本，源码不含后台测试内容；小域穷举与支配查询线性扫描分别复核"
+      },
+      "platform_attempts": [
+        {
+          "language": "G++",
+          "solution_id": "53582492",
+          "url": "http://cs101.openjudge.cn/practice/solution/53582492/",
+          "verdict": "Accepted",
+          "ms": 206
+        }
+      ],
+      "passed": false,
+      "complete": true,
+      "validator_source_resolution": {
+        "old_sha256": "8ef093e9b3a28eae2fd7433dd9603d4932fcef3301df11e1297f0b19fa35d59c",
+        "new_sha256": "71c915dd83a5c3d622c33d336a2ea0d797eef5866ba664b9aaf0cd6dac55f72f",
+        "conclusion": "仅将样例改为从题面源码节点静态解码并补解码证明；样例字节规范哈希一致，已提交程序SHA256不变，重新通过全部自检"
+      }
+    }
+  ]
+}

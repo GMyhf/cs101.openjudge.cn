@@ -1,0 +1,62 @@
+{
+  "batch": 12,
+  "results": [
+    {
+      "mutation": "向下取整丢失稀有口味",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "缩放因子少取一",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "合法边界也改写",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "放宽单项上限",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "允许零总数行",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "允许重复搭配",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "反转搭配次序",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "Python参考失去隔离",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "编译失败仍返回旧程序",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "C++错误交给Python判题",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "未经哈希审核即执行参考",
+      "detected": true,
+      "exit_code": 1
+    }
+  ],
+  "procedure_source": "import hashlib,json,os,subprocess\nfrom pathlib import Path\nrules=Path('scripts/gmyhf_review_fixes.py');pipe=Path('scripts/repair_gmyhf_review_findings.py');originals={p:p.read_text() for p in (rules,pipe)}\nbase='tests.test_gmyhf_review_fixes.ReviewRulesTests.';cmd='tests.test_gmyhf_reference_commands.ReferenceCommandTests.'\ncases=[\n(rules,'向下取整丢失稀有口味','(v + factor - 1) // factor','v // factor',base+'test_candy_row_budget_preserves_flavor_support_and_pair_table'),\n(rules,'缩放因子少取一','(total + budget - 1) // budget','total // budget',base+'test_candy_row_budget_preserves_flavor_support_and_pair_table'),\n(rules,'合法边界也改写','if total > limit:','if total >= limit:',base+'test_candy_budget_input_contract_and_legal_bytes'),\n(rules,'放宽单项上限','all(0 <= v <= 10**9 for v in row)','all(0 <= v <= 10**10 for v in row)',base+'test_candy_budget_input_contract_and_legal_bytes'),\n(rules,'允许零总数行','sum(row) >= 1','sum(row) >= 0',base+'test_candy_budget_input_contract_and_legal_bytes'),\n(rules,'允许重复搭配','len(set(pairs)) == k and ','',base+'test_candy_budget_input_contract_and_legal_bytes'),\n(rules,'反转搭配次序',\"f'{u} {v}' for u, v in pairs\",\"f'{v} {u}' for u, v in pairs\",base+'test_candy_row_budget_preserves_flavor_support_and_pair_table'),\n(pipe,'Python参考失去隔离',\"[sys.executable, '-I', str(reference)]\",\"[sys.executable, str(reference)]\",cmd+'test_python_isolated_and_unknown_language_rejected'),\n(pipe,'编译失败仍返回旧程序',\"require(compiled.returncode == 0, '自写C++参考编译失败')\",\"pass\",cmd+'test_failed_compilation_never_returns_stale_binary'),\n(pipe,'C++错误交给Python判题',\"str(number), language, source, collect_case_times=True\",\"str(number), 'python3', source, collect_case_times=True\",cmd+'test_cpp_prepare_recomputes_changed_case_and_uses_cpp_judge'),\n(pipe,'未经哈希审核即执行参考',\"require(sha(proof['source'].encode()) == proof['sha256'], '参考源码哈希不符')\",\"pass\",cmd+'test_cpp_prepare_recomputes_changed_case_and_uses_cpp_judge')]\nresults=[]\ntry:\n for p,name,old,new,test in cases:\n  assert originals[p].count(old)==1,(name,originals[p].count(old));p.write_text(originals[p].replace(old,new))\n  run=subprocess.run(['/usr/bin/python3.11','-B','-m','unittest',test],capture_output=True,env=dict(os.environ,PYTHONDONTWRITEBYTECODE='1'))\n  assert run.returncode!=0,name\n  results.append({'mutation':name,'detected':True,'exit_code':run.returncode});p.write_text(originals[p])\nfinally:\n for p,s in originals.items():p.write_text(s)\ns=Path(__file__).read_text();Path('collab/gmyhf-review-fixes-batch12-mutations.json').write_text(json.dumps({'batch':12,'results':results,'procedure_source':s,'procedure_sha256':hashlib.sha256(s.encode()).hexdigest()},ensure_ascii=False,indent=2)+'\\n');print(len(results),'种变异检出，源码已恢复')\n",
+  "procedure_sha256": "58ddb0f2369482ecb233110d9ae24b470ccd01c187118d6f3190553f4ec71dd8"
+}

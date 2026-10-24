@@ -1,0 +1,338 @@
+{
+  "batch": 12,
+  "baseline": "e865edce271b7625fa57c3a0f034daddbf8f56e6",
+  "procedure_sha256": "31f04c36e48ef3c39bd11608f7efa4a170a4c67e756ead34830d72cc39e0cd99",
+  "rules_sha256": "6ad6b1952eab300c6455124206c2bb168711a5692f010feb8c642fbe411b4ee1",
+  "common_sha256": "6c004fd4b9aaf57fa9c8c984bc5978811944b65be2c23f771e913aff909fa14e",
+  "applied": true,
+  "policy": "修复明确越界输入和输出格式；保留原始及上一轮修正快照，不自动接入题库。",
+  "changed_files": 2,
+  "problems": [
+    {
+      "global_number": 31241,
+      "evidence": "collab/gmyhf-31241-admin-form-review.json",
+      "evidence_sha256": "a7714083294f15c25d10c2a08c996348644f49a93d068659f41793a44b623d15",
+      "reference_sha256": "b3cd0b7c66cc1eb75932b62de54acba3e04bc4a99295cf5df4c2f3df9f759f0b",
+      "reference_source": "// 审核用独立算法：坏口味支持集、极大容量盒、支配查询及最小代价排除。\n#include <algorithm>\n#include <array>\n#include <climits>\n#include <functional>\n#include <iostream>\n#include <numeric>\n#include <queue>\n#include <unordered_set>\n#include <vector>\nusing namespace std;\nusing Point=array<long long,8>;\nint N,M,K,adjacency[10],available[8];long long amount[8][10],total[8];\nstruct Hash{size_t operator()(const Point& a)const{size_t h=0;for(auto x:a)h^=hash<long long>{}(x)+0x9e3779b97f4a7c15ULL+(h<<6)+(h>>2);return h;}};\nvector<Point>caps;\nstruct Node{Point low{},high{};int first,left=-1,right=-1;vector<int>ids;};\nvector<Node>tree;\nlong long weight(int i,int mask){long long answer=0;for(int j=0;j<M;++j)if(mask>>j&1)answer+=amount[i][j];return answer;}\nint build(vector<int> ids){\n int at=tree.size();tree.emplace_back();Point low{},high{};\n for(int i=0;i<N;++i){low[i]=LLONG_MAX;high[i]=0;for(int j:ids){low[i]=min(low[i],caps[j][i]);high[i]=max(high[i],caps[j][i]);}}\n tree[at].low=low;tree[at].high=high;tree[at].first=*min_element(ids.begin(),ids.end());\n if(ids.size()<=16){sort(ids.begin(),ids.end());tree[at].ids=move(ids);return at;}\n int axis=0;for(int i=1;i<N;++i)if(high[i]-low[i]>high[axis]-low[axis])axis=i;\n sort(ids.begin(),ids.end(),[&](int a,int b){return caps[a][axis]<caps[b][axis]||(caps[a][axis]==caps[b][axis]&&a<b);});int mid=ids.size()/2;\n int left=build(vector<int>(ids.begin(),ids.begin()+mid));int right=build(vector<int>(ids.begin()+mid,ids.end()));tree[at].left=left;tree[at].right=right;return at;\n}\nint find_box(int at,const Point& c,int best){\n const Node& node=tree[at];if(node.first>=best)return best;bool all=true;\n for(int i=0;i<N;++i){if(node.high[i]<c[i])return best;if(node.low[i]<c[i])all=false;}\n if(all)return node.first;\n if(node.left<0){for(int j:node.ids){if(j>=best)break;bool yes=true;for(int i=0;i<N;++i)if(caps[j][i]<c[i]){yes=false;break;}if(yes)return j;}return best;}\n int left=node.left,right=node.right;if(tree[left].first>tree[right].first)swap(left,right);best=find_box(left,c,best);return find_box(right,c,best);\n}\nlong long margin(const Point& p,const Point& c){long long answer=LLONG_MAX/4;for(int i=0;i<N;++i)if(p[i]<total[i])answer=min(answer,p[i]-c[i]+1);return answer;}\nvoid deepest_box(int at,const Point& c,int& best,long long& depth){\n const Node& node=tree[at];for(int i=0;i<N;++i)if(node.high[i]<c[i])return;\n if(margin(node.high,c)<=depth)return;\n if(node.left<0){for(int j:node.ids){bool yes=true;for(int i=0;i<N;++i)if(caps[j][i]<c[i]){yes=false;break;}if(yes){long long d=margin(caps[j],c);if(d>depth){depth=d;best=j;}}}return;}\n int left=node.left,right=node.right;if(margin(tree[left].high,c)<margin(tree[right].high,c))swap(left,right);deepest_box(left,c,best,depth);deepest_box(right,c,best,depth);\n}\nstruct State{long long cost;Point c;};\nstruct Compare{bool operator()(const State&a,const State&b)const{return a.cost!=b.cost?a.cost>b.cost:a.c>b.c;}};\nint main(){\n ios::sync_with_stdio(false);cin.tie(nullptr);if(!(cin>>N>>M>>K))return 0;\n for(int i=0;i<N;++i)for(int j=0;j<M;++j){cin>>amount[i][j];total[i]+=amount[i][j];if(amount[i][j])available[i]|=1<<j;}\n vector<pair<int,int>> edges;long long upper=LLONG_MAX;\n for(int z=0;z<K;++z){int u,v;cin>>u>>v;--u;--v;edges.emplace_back(u,v);adjacency[u]|=1<<v;adjacency[v]|=1<<u;}\n for(auto [u,v]:edges)for(int i=0;i<N;++i)for(int j=0;j<N;++j)if(i!=j){\n  if(amount[i][u]&&amount[j][v])upper=min(upper,total[i]-amount[i][u]+total[j]-amount[j][v]+2);\n  if(amount[i][v]&&amount[j][u])upper=min(upper,total[i]-amount[i][v]+total[j]-amount[j][u]+2);\n }\n if(upper==LLONG_MAX){cout<<-1<<'\\n';return 0;}\n int free_mask=0;for(int j=0;j<M;++j)if(!adjacency[j])free_mask|=1<<j;\n unordered_set<Point,Hash> unique;\n for(int mask=0;mask<(1<<M);++mask){\n  if((mask&free_mask)!=free_mask)continue;int unseen=mask,isolated=0;vector<int>components;\n  while(unseen){int todo=unseen&-unseen,component=0;while(todo){int bit=todo&-todo;todo^=bit;int u=__builtin_ctz((unsigned)bit);component|=bit;unseen&=~bit;todo|=adjacency[u]&unseen;}\n   if(component&(component-1))components.push_back(component);else isolated|=component;\n  }\n  Point c{};array<int,8> supports{};for(int i=0;i<N;++i){c[i]=weight(i,isolated);supports[i]=isolated&available[i];}\n  function<void(int)> enumerate=[&](int at){\n   if(at==(int)components.size()){\n    int prefix[9]={},suffix[9]={};for(int i=0;i<N;++i)prefix[i+1]=prefix[i]|supports[i];for(int i=N-1;i>=0;--i)suffix[i]=suffix[i+1]|supports[i];\n    for(int i=0;i<N;++i){int missing=available[i]&~supports[i],outside=prefix[i]|suffix[i+1];while(missing){int bit=missing&-missing;missing^=bit;if(!(adjacency[__builtin_ctz((unsigned)bit)]&outside))return;}}\n    unique.insert(c);return;\n   }\n   int component=components[at];for(int i=0;i<N;++i){int old=supports[i];long long add=weight(i,component);supports[i]|=component&available[i];c[i]+=add;enumerate(at+1);c[i]-=add;supports[i]=old;}\n  };enumerate(0);\n }\n caps.assign(unique.begin(),unique.end());unique.clear();sort(caps.begin(),caps.end(),[&](const Point&a,const Point&b){long long x=accumulate(a.begin(),a.begin()+N,0LL),y=accumulate(b.begin(),b.begin()+N,0LL);return x!=y?x<y:a<b;});\n tree.reserve(caps.size()*2);vector<int> ids(caps.size());iota(ids.begin(),ids.end(),0);int root=build(move(ids));priority_queue<State,vector<State>,Compare>queue;unordered_set<Point,Hash>seen;Point zero{};queue.push({0,zero});seen.insert(zero);\n while(!queue.empty()){\n  State state=queue.top();queue.pop();if(state.cost>=upper){cout<<upper<<'\\n';return 0;}int found=-1;long long depth=0;deepest_box(root,state.c,found,depth);if(found<0){cout<<state.cost<<'\\n';return 0;}\n  if(state.cost+depth>=upper)continue;const Point& bad=caps[found];for(int i=0;i<N;++i){if(bad[i]>=total[i])continue;Point next=state.c;next[i]=bad[i]+1;long long cost=state.cost+next[i]-state.c[i];if(cost<upper&&seen.insert(next).second)queue.push({cost,next});}\n }\n cout<<upper<<'\\n';\n}\n",
+      "reference_language": "cpp",
+      "reference_file": "reference.cpp",
+      "baseline_files": {
+        "0.in": "9a3ce5b0e405f645a130284f119b36d207729f264d00fa169ae45e346f29312a",
+        "0.out": "6e2ae11dad0616f66bbb2b6e6556f580bb987fd911d7132aa6bee2bfc7cc7b52",
+        "1.in": "a39b253c1751570156e2336ab37af8d8eee11d88193bfca0c8802e49716cf1f0",
+        "1.out": "ee3aa64bb94a50845d5024cd4bd20202a4567aed5cd5328c0d97e9920775fc28",
+        "10.in": "288948ceb22ecb4052c291aea4372ff01ce1df6ccadfd5ea101f209e97e85f38",
+        "10.out": "cafdd1b3272ab9f9a127b953245bf806d10cff5c18b412de705340db0f838ca9",
+        "11.in": "ae2ffe7515805d9beeebce00b4274821f16bce7b4c4ed9dd6b47a645a9db9016",
+        "11.out": "28eacf5eaa9da1f41c31a8412e8dbe5e20c1860c145f1cf2650f1a0ae7a94a48",
+        "12.in": "e79c3d9c7e0972bb0e9cabe31cb663d42fe0d70f16cc27a322d0cf4ee8b5bb91",
+        "12.out": "1b84fc774ae88dd3980c8595ee3f447722b3a053e676e3491b2c72d06493f084",
+        "13.in": "a9ef64210db19fcf27dde166578e52beb7298a3c5819ef71f28b96b7eda36538",
+        "13.out": "345ebe25f0ac3f1104a2029fdf8f0885ccd9800e3ebcdbd03da014dad101a0b1",
+        "14.in": "9ee41e417bcd573e29a0606805852bb6b61693f078b1ae8aa1f9e1f4d8d6fb70",
+        "14.out": "75587a9107eab6e56a06a70851c799897dd7346a68a2d8484d0c5d799a5ea176",
+        "15.in": "19fa55ddc55740a6a723caf40c90f6f0790c33e651603ef49f294dac53cd6f53",
+        "15.out": "b784de8183627b53244847b819133b12c7cfb4b9d9b623ca59da7d6a9382eb72",
+        "16.in": "0d827011d867d89a828174b46340d72d9a25d0191ae268fe32d9e37718f78230",
+        "16.out": "e38738f76f42b7427ebd79368cce7ca15f551a06f0f8e256a47f9dc96535d9a4",
+        "17.in": "59a8281d25bd843b96acba99df3a1ecaba5b5df34fd9ca2ddd6aba3297e6a766",
+        "17.out": "c4529caa355d5e5c1727be1d48a18a1f3510fe3f6baf2b7ac60a62e458a3a68b",
+        "18.in": "c0fbcb29d14723ad1e7df2e0426bdd36bffeb331398f3beea4a721f7929ddb06",
+        "18.out": "eecd262c3ecab667b61ebb70835f3b181a1d1530d3ebc0ef99a3a8dc3d5b193f",
+        "19.in": "a2725bab4b555d3e75480b664715788a35360b11843538ad281f770bfb4a1645",
+        "19.out": "19e0aa32de64806fde9f18b9903b289e878ed8983e879da5a6d359715f147500",
+        "2.in": "bc18dc7475a9ce5db6975a64826fc7ebac05120f69b2bbb99bea4ab301a087d2",
+        "2.out": "a1fb50e6c86fae1679ef3351296fd6713411a08cf8dd1790a4fd05fae8688164",
+        "3.in": "aed7a538926285f3245f98b569795d3502f914afae3ed2098392614869792f23",
+        "3.out": "2115cdb6bfcfb008eb2bab2bb79347cb064a48e4e7c4115ccbe4469c787bb6c4",
+        "4.in": "cfc14e5c8257d8c99d610b51797e8a6dbdcc1a7614064b537bd446292b0f29d1",
+        "4.out": "2a62cf402cd3396aa00f55f892f4545f308f74d01c8caa0f2837b1982f821595",
+        "5.in": "ec0e723a084cb9aa6a90180f92b6cb05eeb902a177ea1abcecd826bdb239abae",
+        "5.out": "076320a2a08267b4c026d06573bba408ea68841e73cdc20e62cce59de165ece3",
+        "6.in": "ef4585fa37d9f1e01aef56e77b93988bb52ca3f601122f77dcc3571cd3dcebef",
+        "6.out": "654ee9da442fa353f59f11beb688fc7f76c8de62a6c18b2a181fdde2a27cc3ef",
+        "7.in": "1c6a0296eca40ef3a0bc7506a65310cd94cc68810f73b593debd5ccbedf64956",
+        "7.out": "a5e45837a2959db847f7e67a915d0ecaddd47f943af2af5fa6453be497faabca",
+        "8.in": "c604f3c579a18c27f229209b5a011e9694afab20cbc549ccf5a82c2a7b92d740",
+        "8.out": "d83eda03456fa8d40cc9aee8c1675fe4a8de32b62fd164073ad66f981d0031a6",
+        "9.in": "8ac4122d4d09ddf821488b60f8b9c632bbea5c839c68411781fd227c2305662f",
+        "9.out": "7bd79c0161b0087185ccbc5cd44b0adc53d894e2eb2d57fc134fec2bad819427"
+      },
+      "changes": [
+        {
+          "filename": "19.in",
+          "input": "19.in",
+          "output": "19.out",
+          "before_sha256": "a2725bab4b555d3e75480b664715788a35360b11843538ad281f770bfb4a1645",
+          "after_sha256": "4431dbd1135a670b16e878d8b66324902dae5c33611dcf37de088ccf4879a3b6",
+          "pair_before": {
+            "19.in": "a2725bab4b555d3e75480b664715788a35360b11843538ad281f770bfb4a1645",
+            "19.out": "19e0aa32de64806fde9f18b9903b289e878ed8983e879da5a6d359715f147500"
+          },
+          "pair_after": {
+            "19.in": "4431dbd1135a670b16e878d8b66324902dae5c33611dcf37de088ccf4879a3b6",
+            "19.out": "e8caa0d00c7e0807165e60a890466ee54036f9c003ff8ae49f60778181385515"
+          }
+        },
+        {
+          "filename": "19.out",
+          "input": "19.in",
+          "output": "19.out",
+          "before_sha256": "19e0aa32de64806fde9f18b9903b289e878ed8983e879da5a6d359715f147500",
+          "after_sha256": "e8caa0d00c7e0807165e60a890466ee54036f9c003ff8ae49f60778181385515",
+          "pair_before": {
+            "19.in": "a2725bab4b555d3e75480b664715788a35360b11843538ad281f770bfb4a1645",
+            "19.out": "19e0aa32de64806fde9f18b9903b289e878ed8983e879da5a6d359715f147500"
+          },
+          "pair_after": {
+            "19.in": "4431dbd1135a670b16e878d8b66324902dae5c33611dcf37de088ccf4879a3b6",
+            "19.out": "e8caa0d00c7e0807165e60a890466ee54036f9c003ff8ae49f60778181385515"
+          }
+        }
+      ],
+      "local_dataset": "data/openjudge/tests/admin_review_repaired/31241",
+      "local": {
+        "status": "Accepted",
+        "cases": 20,
+        "time_ms": 336,
+        "memory_kb": 133252,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 12,
+            "time_ms": 157,
+            "case_limit_ms": 4000,
+            "ratio": 0.0393
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 2,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 3,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 4,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 5,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 6,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 7,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 8,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 9,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 10,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 11,
+              "time_ms": 105,
+              "case_limit_ms": 4000,
+              "ratio": 0.0262
+            },
+            {
+              "case": 12,
+              "time_ms": 157,
+              "case_limit_ms": 4000,
+              "ratio": 0.0393
+            },
+            {
+              "case": 13,
+              "time_ms": 3,
+              "case_limit_ms": 4000,
+              "ratio": 0.0008
+            },
+            {
+              "case": 14,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 15,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 16,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 17,
+              "time_ms": 3,
+              "case_limit_ms": 4000,
+              "ratio": 0.0008
+            },
+            {
+              "case": 18,
+              "time_ms": 3,
+              "case_limit_ms": 4000,
+              "ratio": 0.0008
+            },
+            {
+              "case": 19,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 20,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            }
+          ]
+        }
+      },
+      "verified_legal_pairs": 20,
+      "repaired_inputs": 1,
+      "form_sha256": "9e695de05bc53ee05c118ca9c15430b1227f769e90ee28c7f0d4fccfaaadbdc6",
+      "before_files": {
+        "0.in": "9a3ce5b0e405f645a130284f119b36d207729f264d00fa169ae45e346f29312a",
+        "0.out": "6e2ae11dad0616f66bbb2b6e6556f580bb987fd911d7132aa6bee2bfc7cc7b52",
+        "1.in": "a39b253c1751570156e2336ab37af8d8eee11d88193bfca0c8802e49716cf1f0",
+        "1.out": "ee3aa64bb94a50845d5024cd4bd20202a4567aed5cd5328c0d97e9920775fc28",
+        "10.in": "288948ceb22ecb4052c291aea4372ff01ce1df6ccadfd5ea101f209e97e85f38",
+        "10.out": "cafdd1b3272ab9f9a127b953245bf806d10cff5c18b412de705340db0f838ca9",
+        "11.in": "ae2ffe7515805d9beeebce00b4274821f16bce7b4c4ed9dd6b47a645a9db9016",
+        "11.out": "28eacf5eaa9da1f41c31a8412e8dbe5e20c1860c145f1cf2650f1a0ae7a94a48",
+        "12.in": "e79c3d9c7e0972bb0e9cabe31cb663d42fe0d70f16cc27a322d0cf4ee8b5bb91",
+        "12.out": "1b84fc774ae88dd3980c8595ee3f447722b3a053e676e3491b2c72d06493f084",
+        "13.in": "a9ef64210db19fcf27dde166578e52beb7298a3c5819ef71f28b96b7eda36538",
+        "13.out": "345ebe25f0ac3f1104a2029fdf8f0885ccd9800e3ebcdbd03da014dad101a0b1",
+        "14.in": "9ee41e417bcd573e29a0606805852bb6b61693f078b1ae8aa1f9e1f4d8d6fb70",
+        "14.out": "75587a9107eab6e56a06a70851c799897dd7346a68a2d8484d0c5d799a5ea176",
+        "15.in": "19fa55ddc55740a6a723caf40c90f6f0790c33e651603ef49f294dac53cd6f53",
+        "15.out": "b784de8183627b53244847b819133b12c7cfb4b9d9b623ca59da7d6a9382eb72",
+        "16.in": "0d827011d867d89a828174b46340d72d9a25d0191ae268fe32d9e37718f78230",
+        "16.out": "e38738f76f42b7427ebd79368cce7ca15f551a06f0f8e256a47f9dc96535d9a4",
+        "17.in": "59a8281d25bd843b96acba99df3a1ecaba5b5df34fd9ca2ddd6aba3297e6a766",
+        "17.out": "c4529caa355d5e5c1727be1d48a18a1f3510fe3f6baf2b7ac60a62e458a3a68b",
+        "18.in": "c0fbcb29d14723ad1e7df2e0426bdd36bffeb331398f3beea4a721f7929ddb06",
+        "18.out": "eecd262c3ecab667b61ebb70835f3b181a1d1530d3ebc0ef99a3a8dc3d5b193f",
+        "19.in": "a2725bab4b555d3e75480b664715788a35360b11843538ad281f770bfb4a1645",
+        "19.out": "19e0aa32de64806fde9f18b9903b289e878ed8983e879da5a6d359715f147500",
+        "2.in": "bc18dc7475a9ce5db6975a64826fc7ebac05120f69b2bbb99bea4ab301a087d2",
+        "2.out": "a1fb50e6c86fae1679ef3351296fd6713411a08cf8dd1790a4fd05fae8688164",
+        "3.in": "aed7a538926285f3245f98b569795d3502f914afae3ed2098392614869792f23",
+        "3.out": "2115cdb6bfcfb008eb2bab2bb79347cb064a48e4e7c4115ccbe4469c787bb6c4",
+        "4.in": "cfc14e5c8257d8c99d610b51797e8a6dbdcc1a7614064b537bd446292b0f29d1",
+        "4.out": "2a62cf402cd3396aa00f55f892f4545f308f74d01c8caa0f2837b1982f821595",
+        "5.in": "ec0e723a084cb9aa6a90180f92b6cb05eeb902a177ea1abcecd826bdb239abae",
+        "5.out": "076320a2a08267b4c026d06573bba408ea68841e73cdc20e62cce59de165ece3",
+        "6.in": "ef4585fa37d9f1e01aef56e77b93988bb52ca3f601122f77dcc3571cd3dcebef",
+        "6.out": "654ee9da442fa353f59f11beb688fc7f76c8de62a6c18b2a181fdde2a27cc3ef",
+        "7.in": "1c6a0296eca40ef3a0bc7506a65310cd94cc68810f73b593debd5ccbedf64956",
+        "7.out": "a5e45837a2959db847f7e67a915d0ecaddd47f943af2af5fa6453be497faabca",
+        "8.in": "c604f3c579a18c27f229209b5a011e9694afab20cbc549ccf5a82c2a7b92d740",
+        "8.out": "d83eda03456fa8d40cc9aee8c1675fe4a8de32b62fd164073ad66f981d0031a6",
+        "9.in": "8ac4122d4d09ddf821488b60f8b9c632bbea5c839c68411781fd227c2305662f",
+        "9.out": "7bd79c0161b0087185ccbc5cd44b0adc53d894e2eb2d57fc134fec2bad819427"
+      },
+      "final_files": {
+        "0.in": "9a3ce5b0e405f645a130284f119b36d207729f264d00fa169ae45e346f29312a",
+        "0.out": "6e2ae11dad0616f66bbb2b6e6556f580bb987fd911d7132aa6bee2bfc7cc7b52",
+        "1.in": "a39b253c1751570156e2336ab37af8d8eee11d88193bfca0c8802e49716cf1f0",
+        "1.out": "ee3aa64bb94a50845d5024cd4bd20202a4567aed5cd5328c0d97e9920775fc28",
+        "10.in": "288948ceb22ecb4052c291aea4372ff01ce1df6ccadfd5ea101f209e97e85f38",
+        "10.out": "cafdd1b3272ab9f9a127b953245bf806d10cff5c18b412de705340db0f838ca9",
+        "11.in": "ae2ffe7515805d9beeebce00b4274821f16bce7b4c4ed9dd6b47a645a9db9016",
+        "11.out": "28eacf5eaa9da1f41c31a8412e8dbe5e20c1860c145f1cf2650f1a0ae7a94a48",
+        "12.in": "e79c3d9c7e0972bb0e9cabe31cb663d42fe0d70f16cc27a322d0cf4ee8b5bb91",
+        "12.out": "1b84fc774ae88dd3980c8595ee3f447722b3a053e676e3491b2c72d06493f084",
+        "13.in": "a9ef64210db19fcf27dde166578e52beb7298a3c5819ef71f28b96b7eda36538",
+        "13.out": "345ebe25f0ac3f1104a2029fdf8f0885ccd9800e3ebcdbd03da014dad101a0b1",
+        "14.in": "9ee41e417bcd573e29a0606805852bb6b61693f078b1ae8aa1f9e1f4d8d6fb70",
+        "14.out": "75587a9107eab6e56a06a70851c799897dd7346a68a2d8484d0c5d799a5ea176",
+        "15.in": "19fa55ddc55740a6a723caf40c90f6f0790c33e651603ef49f294dac53cd6f53",
+        "15.out": "b784de8183627b53244847b819133b12c7cfb4b9d9b623ca59da7d6a9382eb72",
+        "16.in": "0d827011d867d89a828174b46340d72d9a25d0191ae268fe32d9e37718f78230",
+        "16.out": "e38738f76f42b7427ebd79368cce7ca15f551a06f0f8e256a47f9dc96535d9a4",
+        "17.in": "59a8281d25bd843b96acba99df3a1ecaba5b5df34fd9ca2ddd6aba3297e6a766",
+        "17.out": "c4529caa355d5e5c1727be1d48a18a1f3510fe3f6baf2b7ac60a62e458a3a68b",
+        "18.in": "c0fbcb29d14723ad1e7df2e0426bdd36bffeb331398f3beea4a721f7929ddb06",
+        "18.out": "eecd262c3ecab667b61ebb70835f3b181a1d1530d3ebc0ef99a3a8dc3d5b193f",
+        "19.in": "4431dbd1135a670b16e878d8b66324902dae5c33611dcf37de088ccf4879a3b6",
+        "19.out": "e8caa0d00c7e0807165e60a890466ee54036f9c003ff8ae49f60778181385515",
+        "2.in": "bc18dc7475a9ce5db6975a64826fc7ebac05120f69b2bbb99bea4ab301a087d2",
+        "2.out": "a1fb50e6c86fae1679ef3351296fd6713411a08cf8dd1790a4fd05fae8688164",
+        "3.in": "aed7a538926285f3245f98b569795d3502f914afae3ed2098392614869792f23",
+        "3.out": "2115cdb6bfcfb008eb2bab2bb79347cb064a48e4e7c4115ccbe4469c787bb6c4",
+        "4.in": "cfc14e5c8257d8c99d610b51797e8a6dbdcc1a7614064b537bd446292b0f29d1",
+        "4.out": "2a62cf402cd3396aa00f55f892f4545f308f74d01c8caa0f2837b1982f821595",
+        "5.in": "ec0e723a084cb9aa6a90180f92b6cb05eeb902a177ea1abcecd826bdb239abae",
+        "5.out": "076320a2a08267b4c026d06573bba408ea68841e73cdc20e62cce59de165ece3",
+        "6.in": "ef4585fa37d9f1e01aef56e77b93988bb52ca3f601122f77dcc3571cd3dcebef",
+        "6.out": "654ee9da442fa353f59f11beb688fc7f76c8de62a6c18b2a181fdde2a27cc3ef",
+        "7.in": "1c6a0296eca40ef3a0bc7506a65310cd94cc68810f73b593debd5ccbedf64956",
+        "7.out": "a5e45837a2959db847f7e67a915d0ecaddd47f943af2af5fa6453be497faabca",
+        "8.in": "c604f3c579a18c27f229209b5a011e9694afab20cbc549ccf5a82c2a7b92d740",
+        "8.out": "d83eda03456fa8d40cc9aee8c1675fe4a8de32b62fd164073ad66f981d0031a6",
+        "9.in": "8ac4122d4d09ddf821488b60f8b9c632bbea5c839c68411781fd227c2305662f",
+        "9.out": "7bd79c0161b0087185ccbc5cd44b0adc53d894e2eb2d57fc134fec2bad819427"
+      },
+      "form_unchanged": true,
+      "file_list_unchanged": true
+    }
+  ],
+  "uploads": [
+    {
+      "global_number": 31241,
+      "filename": "19.in",
+      "sha256": "4431dbd1135a670b16e878d8b66324902dae5c33611dcf37de088ccf4879a3b6",
+      "verified": true
+    },
+    {
+      "global_number": 31241,
+      "filename": "19.out",
+      "sha256": "e8caa0d00c7e0807165e60a890466ee54036f9c003ff8ae49f60778181385515",
+      "verified": true
+    }
+  ],
+  "verified_at": "2026-10-24T02:09:52.429307+00:00"
+}

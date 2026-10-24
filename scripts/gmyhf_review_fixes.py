@@ -5,6 +5,30 @@ import json
 
 def repair_input(number, payload):
     text = payload.decode()
+    if number == 31241:
+        values = list(map(int, text.split()))
+        n, m, k = values[:3]
+        assert 2 <= n <= 8 and 2 <= m <= 10 and 1 <= k <= m*(m-1)//2
+        assert len(values) == 3 + n*m + 2*k
+        rows = [values[3+i*m:3+(i+1)*m] for i in range(n)]
+        pairs = list(zip(values[3+n*m::2], values[4+n*m::2]))
+        assert len(set(pairs)) == k and all(1 <= u < v <= m for u, v in pairs)
+        assert all(sum(row) >= 1 and all(0 <= v <= 10**9 for v in row) for row in rows)
+        limit = 10**9
+        changed = False
+        for i, row in enumerate(rows):
+            total = sum(row)
+            if total > limit:
+                # 上取整保留每种口味的存在性；留出最多m−1的取整误差。
+                budget = limit - m + 1
+                factor = (total + budget - 1) // budget
+                rows[i] = [(v + factor - 1) // factor for v in row]
+                assert 1 <= sum(rows[i]) <= limit
+                changed = True
+        if not changed:
+            return payload
+        return (f'{n} {m} {k}\n' + '\n'.join(' '.join(map(str, row)) for row in rows) +
+                '\n' + '\n'.join(f'{u} {v}' for u, v in pairs) + '\n').encode()
     if number == 28016:
         lines = text.splitlines()
         assert len(lines) == 6

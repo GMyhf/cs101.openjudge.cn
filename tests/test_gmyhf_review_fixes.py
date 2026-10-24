@@ -16,6 +16,36 @@ import repair_gmyhf_review_findings as repair
 
 
 class ReviewRulesTests(unittest.TestCase):
+    def test_candy_row_budget_preserves_flavor_support_and_pair_table(self):
+        rng = random.Random(31241)
+        for m in range(2,11):
+            for _ in range(10):
+                rows = [[rng.choice((0,1,10**9,rng.randrange(10**9))) for j in range(m)]
+                        for i in range(8)]
+                rows[0] = [10**9]+[0]*(m-1)
+                rows[1] = [10**9]*m
+                rows = [r if any(r) else [1]+r[1:] for r in rows]
+                pairs = list(itertools.combinations(range(1,m+1),2))
+                raw = (f'8 {m} {len(pairs)}\n'+'\n'.join(' '.join(map(str,r)) for r in rows)+
+                       '\n'+'\n'.join(f'{u} {v}' for u,v in pairs)+'\n').encode()
+                fixed = list(map(int,rules.repair_input(31241,raw).split()))
+                self.assertEqual([8,m,len(pairs)],fixed[:3])
+                self.assertEqual(list(itertools.chain.from_iterable(pairs)),fixed[3+8*m:])
+                for i,r in enumerate(rows):
+                    after = fixed[3+i*m:3+(i+1)*m]
+                    self.assertTrue(1 <= sum(after) <= 10**9)
+                    self.assertEqual([bool(v) for v in r],[bool(v) for v in after])
+                    self.assertTrue(all(0 <= a <= b for a,b in zip(after,r)))
+                    if sum(r) <= 10**9:self.assertEqual(r,after)
+
+    def test_candy_budget_input_contract_and_legal_bytes(self):
+        legal = b'2  2 1\n0 1000000000\n1 0\n1 2'
+        self.assertEqual(legal,rules.repair_input(31241,legal))
+        for bad in (b'2 2 1 0 0 1 0 1 2',b'2 2 1 -1 1 1 0 1 2',
+                    b'2 2 1 1000000001 0 1 0 1 2',b'2 2 1 1 0 1 0 2 1',
+                    b'2 3 2 1 0 0 1 0 0 1 2 1 2', b'2 2 1 1 0 1 0 1'):
+            with self.assertRaises(AssertionError):rules.repair_input(31241,bad)
+
     def test_mayan_initial_stabilization_against_independent_run_scanner(self):
         settle = self.reference(28016, 13, 'settle')
         rng = random.Random(28016)
