@@ -4597,22 +4597,22 @@
   },
   "remaining_holds": {
     "author_semantics": [],
-    "special_judge_protocol": [
-      27952,
-      28341
-    ],
+    "special_judge_protocol": [],
     "resource_limits_examples": [
       27699,
       31033
     ],
     "unavailable_downloads": 14,
     "public_catalog_mapping_and_existing_validator_exclusions": "保留原接入排除，不属于已修复输入/答案的计数。",
-    "remote_special_judge": [
-      31381
-    ],
+    "remote_special_judge": [],
     "deprecated_excluded": [
       19945,
       20139
+    ],
+    "platform_spj_unsupported": [
+      27952,
+      28341,
+      31381
     ]
   },
   "next_candidates_not_exhaustive": [],
@@ -4650,6 +4650,13 @@
       "proof_sha256": "7f996dc9afa851902ffd1c2179d1e09085e2ed124d8665575f6160a1ba6a6b8e",
       "platform_writes": 0,
       "original_snapshot_changed": false
+    },
+    "platform_spj_unsupported": {
+      "decision": "用户确认OpenJudge不支持SPJ；31381撤下测试课程绑定且本地保持启用，27952/28341固定排除后台数据接入，仅考虑本地SPJ，不再等待平台部署协议。",
+      "proof": "collab/gmyhf-spj-platform-retirement.json",
+      "proof_sha256": "f81b10fc969c5baef9f3bf79e21fce690b5404a5fa1fc7244477d6fa2dede261",
+      "scope_limit": "撤下已知测试课程绑定，全局私有题及历史提交未作删除；未宣称提供了平台全局禁用开关。",
+      "procedure_source": "import hashlib,json\nfrom pathlib import Path\nroot=Path.cwd();p=root/'collab/gmyhf-review-fixes-summary.json';d=json.loads(p.read_text())\nproof=root/'collab/gmyhf-spj-platform-retirement.json';r=json.loads(proof.read_text())\nassert r['applied'] and r['removed_routes']==['E31381']\nassert r['other_bindings_unchanged'] and r['test_files_unchanged'] and r['global_forms_unchanged']\nassert r['local_31381']['active'] and r['local_31381']['cases']==21\nassert all(not item['enabled'] for item in r['local_candidates'].values())\nd['remaining_holds']['special_judge_protocol']=[]\nd['remaining_holds']['remote_special_judge']=[]\nd['remaining_holds']['platform_spj_unsupported']=[27952,28341,31381]\nd['post_review_updates']['platform_spj_unsupported']={\n 'decision':'用户确认OpenJudge不支持SPJ；31381撤下测试课程绑定且本地保持启用，27952/28341固定排除后台数据接入，仅考虑本地SPJ，不再等待平台部署协议。',\n 'proof':str(proof.relative_to(root)), 'proof_sha256':hashlib.sha256(proof.read_bytes()).hexdigest(),\n 'scope_limit':r['scope_limit'], 'procedure_source':Path(__file__).read_text()}\np.write_text(json.dumps(d,ensure_ascii=False,indent=2)+'\\n')\n"
     }
   }
 }

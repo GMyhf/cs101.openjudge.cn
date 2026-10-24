@@ -1,0 +1,63 @@
+{
+  "results": [
+    {
+      "mutation": "目标路由改绑保护",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "0495a9fd04b4a173e9bfde90eaa14000a47989b1cf9d614ee71d7081a274e6ef"
+    },
+    {
+      "mutation": "目标额外别名保护",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "2066454c349c69885768d09fe45f963f3233d03884c00edda360a6a644e36b9d"
+    },
+    {
+      "mutation": "其他题目绑定回读",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "a56fdac565a2e24944c44ab8bfadaad4f0029a09d9a5347f5a4100cb4b93d79c"
+    },
+    {
+      "mutation": "课程重复题号保护",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "271fce1179b511b8c57bfc950e96be9186c32d09f8e76fcb580f1dda5c76b296"
+    },
+    {
+      "mutation": "课程ID绑定保护",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "e07fc70096f5e1a9fbca90b26339970977292b24926254644cf992ffde04fc8a"
+    },
+    {
+      "mutation": "默认只读保护",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "d6e0e5b62f476f324a6ba0f4401443299ea60e891ed9cbc9bca87af2a97532b2"
+    },
+    {
+      "mutation": "解绑接口不可改全局删除",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "0212f84abbcbc2bf0be28e3640bf2335530d9541790ba730d9a42a1f6e24afac"
+    },
+    {
+      "mutation": "27952固定排除",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "c6b75c4044b33b2fee70c9bfa3d86f037f406df510976547c1b0c368d9abd11d"
+    },
+    {
+      "mutation": "28341固定排除",
+      "detected": true,
+      "exit_code": 1,
+      "source_sha256": "60b5f0e26e34350a1d3c3e6278bd2bac08af18d38f73b571eec715dd8630fc65"
+    }
+  ],
+  "source_sha256": {
+    "scripts/retire_gmyhf_31381.py": "abef02b4886768aa7d499a4d4507db37e6e31f6f1fae77bc435610695e7737a2",
+    "scripts/materialize_gmyhf_downloads.py": "7ef6104fc2f337a381e66aefdc99236272f12f009c15bbd63d691165b923438d"
+  },
+  "procedure_source": "import hashlib,json,subprocess,sys\nfrom pathlib import Path\nroot=Path.cwd();a=root/'scripts/retire_gmyhf_31381.py';b=root/'scripts/materialize_gmyhf_downloads.py'\noriginal={p:p.read_bytes() for p in (a,b)}\nmutants=[\n (a,'目标路由改绑保护',\"before.get(NUMBER) in (None, GLOBAL_NUMBER)\",'True'),\n (a,'目标额外别名保护',\"[n for n, g in before.items() if g == GLOBAL_NUMBER] in ([], [NUMBER])\",'True'),\n (a,'其他题目绑定回读',\"after == retirement_plan(before)\",'True'),\n (a,'课程重复题号保护',\"number not in result\",'True'),\n (a,'课程ID绑定保护',\"row['contestId'] == CONTEST_ID\",'True'),\n (a,'默认只读保护',\"if not apply:\",'if False:'),\n (a,'解绑接口不可改全局删除',\"'/api/contest/delete-problem/'\",\"'/api/global-problem/delete/'\"),\n (b,'27952固定排除', '27952: \"2026-10-24 人拍板：OpenJudge不支持SPJ，本地须另行绑定checker\",',''),\n (b,'28341固定排除', '28341: \"2026-10-24 人拍板：OpenJudge不支持SPJ，本地须另行绑定checker\",',''),\n]\nresults=[]\ntry:\n for path,label,old,new in mutants:\n  source=original[path].decode();assert source.count(old)==1,(label,source.count(old))\n  mutated=source.replace(old,new);path.write_text(mutated)\n  try:\n   proc=subprocess.run([sys.executable,'-m','unittest','tests.test_gmyhf_spj_retirement'],capture_output=True,text=True,timeout=40)\n   if proc.returncode==0:raise RuntimeError('变异未检出:'+label)\n   if 'SyntaxError' in proc.stderr or 'ImportError' in proc.stderr:raise RuntimeError('变异因导入错误失败:'+label)\n   results.append({'mutation':label,'detected':True,'exit_code':proc.returncode,'source_sha256':hashlib.sha256(mutated.encode()).hexdigest()})\n   print(label,'已检出',flush=True)\n  finally:path.write_bytes(original[path])\nfinally:\n for p,payload in original.items():p.write_bytes(payload)\nreport={'results':results,'source_sha256':{str(p.relative_to(root)):hashlib.sha256(v).hexdigest() for p,v in original.items()},'procedure_source':Path(__file__).read_text()}\n(root/'collab/gmyhf-spj-platform-retirement-mutations.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\\n')\n"
+}
