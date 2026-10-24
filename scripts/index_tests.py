@@ -31,6 +31,13 @@ ARCHIVE_BUCKETS = {"1000-1999", "2000-2999", "3000-3682"}
 # These problems permit multiple correct outputs, while judge.py currently does
 # exact token comparison. Keep every available corpus offline until an SPJ exists.
 SPECIAL_JUDGE_GLOBAL_NUMBERS = {27150, 30193, 31381}
+# 用户于2026-10-25裁定：29894重复29893，31178/31200为占位题。
+# 即使保留自产数据或未来新增其他题库映射，也不参与本地判题。
+PLACEHOLDER_EXCLUSIONS = {
+    29894: "2026-10-25 人拍板：与29893重复，记为占位题",
+    31178: "2026-10-25 人拍板：功能展示占位题，保持排除",
+    31200: "2026-10-25 人拍板：占位题，保持排除",
+}
 
 
 def is_archive(bucket, directory_name):
@@ -258,6 +265,7 @@ def main():
             # currently exist only in a sub-book, so accept that suffix only when
             # it maps to exactly one global problem.
             if global_number is None: continue
+            if global_number in PLACEHOLDER_EXCLUSIONS: continue
             pairs = []
             test_files = list(directory.glob("*.in")) + list((directory / "data").glob("*.in"))
             output_files = list(directory.glob("*.out")) + list((directory / "data").glob("*.out"))

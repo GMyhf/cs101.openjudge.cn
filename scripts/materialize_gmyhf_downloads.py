@@ -32,7 +32,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 import full_sweep                                  # noqa: E402
 from audit_gmyhf_data import RUNTIME_MARGIN_REJECTIONS  # noqa: E402
-from index_tests import SPECIAL_JUDGE_GLOBAL_NUMBERS    # noqa: E402
+from index_tests import SPECIAL_JUDGE_GLOBAL_NUMBERS, PLACEHOLDER_EXCLUSIONS  # noqa: E402
 from gmyhf_input_repairs import load_repairs, repair_pair  # noqa: E402
 
 OPENJUDGE = ROOT / "data" / "openjudge"
@@ -52,7 +52,8 @@ BUCKET_RANGES = ((4000, 8210, "4000-8210"), (10000, 19963, "10000-19963"),
 # 19945/20139：2026-10-24 用户确认废弃题保持排除，不再等待题意澄清。
 # 27952/28341：OpenJudge不支持SPJ；保持后台数据排除，本地启用须另行绑定checker。
 # 28979/31248为测试占位，31195题名明确to remove；用户选择占位/废弃题保持排除。
-MANUAL_EXCLUSIONS = {28979: "2026-10-24 审核：test60测试占位，保持排除",
+MANUAL_EXCLUSIONS = {**PLACEHOLDER_EXCLUSIONS,
+                     28979: "2026-10-24 审核：test60测试占位，保持排除",
                      31195: "2026-10-24 审核：题名标记to remove，废弃题保持排除",
                      31248: "2026-10-24 审核：占位模板题，保持排除",
                      27952: "2026-10-24 人拍板：OpenJudge不支持SPJ，本地须另行绑定checker",

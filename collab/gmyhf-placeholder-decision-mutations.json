@@ -1,0 +1,53 @@
+{
+  "mutation_count": 9,
+  "results": [
+    {
+      "mutation": "删除29894索引排除",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "删除29894抓取排除",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "删除31178索引排除",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "删除31178抓取排除",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "删除31200索引排除",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "删除31200抓取排除",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "绕过索引排除执行",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "物化器忽略共享排除",
+      "detected": true,
+      "exit_code": 1
+    },
+    {
+      "mutation": "正式来源链接错误",
+      "detected": true,
+      "exit_code": 1
+    }
+  ],
+  "all_original_bytes_restored": true,
+  "restored_tests_exit_code": 0,
+  "procedure_source": "import json,subprocess,sys\nfrom pathlib import Path\nR=Path.cwd();index=R/'scripts/index_tests.py';crawl=R/'scripts/crawl_openjudge.py';material=R/'scripts/materialize_gmyhf_downloads.py';catalog=R/'data/openjudge/catalog.json'\nbackups={p:p.read_bytes() for p in (index,crawl,material,catalog)};rows=[]\ndef run(name,path,edit,test):\n try:\n  path.write_bytes(edit(backups[path]));result=subprocess.run([sys.executable,'-B','-m','unittest',test],capture_output=True,text=True)\n  assert result.returncode!=0,(name,result.stdout,result.stderr);assert 'SyntaxError' not in result.stderr,result.stderr\n  rows.append({'mutation':name,'detected':True,'exit_code':result.returncode})\n finally:path.write_bytes(backups[path])\nfor n in (29894,31178,31200):\n line=next(line for line in backups[index].splitlines(keepends=True) if line.startswith(f'    {n}:'.encode()))\n run(f'删除{n}索引排除',index,lambda b,line=line:b.replace(line,b''),'tests.test_gmyhf_normal_activation.PlaceholderRetirementTests.test_reindex_excludes_every_corpus_and_alias_even_with_checker')\n line=next(line for line in backups[crawl].splitlines(keepends=True) if line.startswith(f'    (\"practice\", \"{n}\"):'.encode()))\n run(f'删除{n}抓取排除',crawl,lambda b,line=line:b.replace(line,b''),'tests.test_gmyhf_normal_activation.PlaceholderRetirementTests.test_placeholders_have_no_public_entry_page_or_book_link')\nrun('绕过索引排除执行',index,lambda b:b.replace(b'            if global_number in PLACEHOLDER_EXCLUSIONS: continue\\n',b''),'tests.test_gmyhf_normal_activation.PlaceholderRetirementTests.test_reindex_excludes_every_corpus_and_alias_even_with_checker')\nrun('物化器忽略共享排除',material,lambda b:b.replace(b'{**PLACEHOLDER_EXCLUSIONS,',b'{'),'tests.test_gmyhf_placeholder_exclusions')\ndef change_url(raw):\n d=json.loads(raw);next(r for r in d['problems'] if r['book']=='practice' and r['id']=='27207')['source_url']='wrong';return json.dumps(d).encode()\nrun('正式来源链接错误',catalog,change_url,'tests.test_gmyhf_normal_activation.NormalActivationTests.test_real_bindings_pages_limits_and_samples')\nfor p,b in backups.items():assert p.read_bytes()==b\nr=subprocess.run([sys.executable,'-B','-m','unittest','tests.test_gmyhf_normal_activation','tests.test_gmyhf_placeholder_exclusions'],capture_output=True,text=True);assert r.returncode==0,r.stderr\n(R/'collab/gmyhf-placeholder-decision-mutations.json').write_text(json.dumps({'mutation_count':len(rows),'results':rows,'all_original_bytes_restored':True,'restored_tests_exit_code':0,'procedure_source':Path(__file__).read_text()},ensure_ascii=False,indent=2)+'\\n');print(len(rows),'种变异全部检出')\n"
+}

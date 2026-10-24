@@ -13,7 +13,7 @@ from scripts import materialize_gmyhf_downloads as materializer
 
 class PlaceholderExclusionTests(unittest.TestCase):
     def test_future_downloads_and_mapping_cannot_reactivate_retired_problems(self):
-        numbers = (28979, 31195, 31248)
+        numbers = (28979, 29894, 31178, 31195, 31200, 31248)
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             downloads = root / 'tests/admin_download'

@@ -1,0 +1,1092 @@
+{
+  "date": "2026-10-25",
+  "decision": "用户指定27207、29337、29893正式链接；29894重复29893，31178和31200记为占位题。",
+  "active_problems": [
+    27207,
+    29337,
+    29893
+  ],
+  "placeholder_exclusions": {
+    "29894": "重复29893；正式题保留29893",
+    "31178": "用户裁定占位题",
+    "31200": "用户裁定占位题"
+  },
+  "public_pages_verified": [
+    {
+      "number": 27207,
+      "url": "http://cs101.openjudge.cn/practice/27207/",
+      "global_number": 27207,
+      "title": "OpenJudge - 27207:铑纳米管",
+      "raw_page_sha256": "8a7f619fd045b3b7e2ad00193de4a05dd35fba99720cba45d7e3e3f6b23eae30",
+      "platform_writes": 0
+    },
+    {
+      "number": 29337,
+      "url": "http://cs101.openjudge.cn/practice/29337/",
+      "global_number": 29337,
+      "title": "OpenJudge - 29337:目标和",
+      "raw_page_sha256": "c7c34c3946acbcb489d7995d9b062ecbfbf7c595ba5c8df1be2536354e0ecfbb",
+      "platform_writes": 0
+    },
+    {
+      "number": 29893,
+      "url": "http://cs101.openjudge.cn/practice/29893/",
+      "global_number": 29893,
+      "title": "OpenJudge - 29893:车站",
+      "raw_page_sha256": "7e779c28b1b8a5ae658c390be20667348e48b8ab43451825f627b6f22dd1b144",
+      "platform_writes": 0
+    }
+  ],
+  "platform_writes": 0,
+  "historical_data_and_generators_unchanged": true,
+  "historical_hash_reference": "collab/gmyhf-normal-local-activation.json",
+  "supersedes": "第30批非废弃分类、第31批补数据及第32批六题启用均为历史；当前仅三题正式启用，其余三题占位排除，历史数据不删除。",
+  "retired_contract_baseline_dirs": [
+    "tests/20000-29982/29894_made",
+    "tests/30000-/31178_made",
+    "tests/30000-/31200_made"
+  ],
+  "contract_note": "按明确占位退役裁定移出活目录账本；实际valid函数及数据字节保留，没有修改判据或放宽契约。",
+  "catalog_count": 2050,
+  "catalog_with_tests": 2049,
+  "accepted_python_cases": 63,
+  "accepted_cpp_cases": 63,
+  "wrong_answer_probes": 6,
+  "results": [
+    {
+      "number": 27207,
+      "language": "python",
+      "expected": "Accepted",
+      "source_sha256": "c417e0507007ac2523c16aa184075dce495414daadf3aee642d2992516d30e78",
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 360,
+        "memory_kb": 16560,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 14,
+            "time_ms": 39,
+            "case_limit_ms": 10000,
+            "ratio": 0.0039
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 21,
+              "case_limit_ms": 10000,
+              "ratio": 0.0021
+            },
+            {
+              "case": 2,
+              "time_ms": 16,
+              "case_limit_ms": 10000,
+              "ratio": 0.0016
+            },
+            {
+              "case": 3,
+              "time_ms": 16,
+              "case_limit_ms": 10000,
+              "ratio": 0.0016
+            },
+            {
+              "case": 4,
+              "time_ms": 15,
+              "case_limit_ms": 10000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 5,
+              "time_ms": 16,
+              "case_limit_ms": 10000,
+              "ratio": 0.0016
+            },
+            {
+              "case": 6,
+              "time_ms": 15,
+              "case_limit_ms": 10000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 7,
+              "time_ms": 16,
+              "case_limit_ms": 10000,
+              "ratio": 0.0016
+            },
+            {
+              "case": 8,
+              "time_ms": 16,
+              "case_limit_ms": 10000,
+              "ratio": 0.0016
+            },
+            {
+              "case": 9,
+              "time_ms": 16,
+              "case_limit_ms": 10000,
+              "ratio": 0.0016
+            },
+            {
+              "case": 10,
+              "time_ms": 16,
+              "case_limit_ms": 10000,
+              "ratio": 0.0016
+            },
+            {
+              "case": 11,
+              "time_ms": 17,
+              "case_limit_ms": 10000,
+              "ratio": 0.0017
+            },
+            {
+              "case": 12,
+              "time_ms": 15,
+              "case_limit_ms": 10000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 13,
+              "time_ms": 17,
+              "case_limit_ms": 10000,
+              "ratio": 0.0017
+            },
+            {
+              "case": 14,
+              "time_ms": 39,
+              "case_limit_ms": 10000,
+              "ratio": 0.0039
+            },
+            {
+              "case": 15,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 16,
+              "time_ms": 15,
+              "case_limit_ms": 10000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 17,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 18,
+              "time_ms": 15,
+              "case_limit_ms": 10000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 19,
+              "time_ms": 15,
+              "case_limit_ms": 10000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 20,
+              "time_ms": 16,
+              "case_limit_ms": 10000,
+              "ratio": 0.0016
+            },
+            {
+              "case": 21,
+              "time_ms": 15,
+              "case_limit_ms": 10000,
+              "ratio": 0.0015
+            }
+          ]
+        }
+      }
+    },
+    {
+      "number": 27207,
+      "language": "python",
+      "expected": "Wrong Answer",
+      "source_sha256": "0b4a82039ef0f6758ebe01370e28afd40c737a3bd15ba9bdc368ec08da60082d",
+      "result": {
+        "status": "Wrong Answer",
+        "case": 1,
+        "time_ms": 14,
+        "memory_kb": 20840,
+        "expected_tokens": 1,
+        "actual_tokens": 1,
+        "actual_output": {
+          "text": "0\n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 2
+        }
+      }
+    },
+    {
+      "number": 27207,
+      "language": "python",
+      "expected": "Wrong Answer",
+      "source_sha256": "961ecce99fd34f54af99ac1e792d7323ff1023628939dd64b6b92110095613f5",
+      "result": {
+        "status": "Wrong Answer",
+        "case": 1,
+        "time_ms": 14,
+        "memory_kb": 21848,
+        "expected_tokens": 1,
+        "actual_tokens": 1,
+        "actual_output": {
+          "text": "13\n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 3
+        }
+      }
+    },
+    {
+      "number": 27207,
+      "language": "cpp",
+      "expected": "Accepted",
+      "source_sha256": "9aea85558bd07e8fb7c0ff54f62afa43a7487c9566cc012be460db5e452dd2b9",
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 99,
+        "memory_kb": 210356,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 14,
+            "time_ms": 11,
+            "case_limit_ms": 4000,
+            "ratio": 0.0027
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 2,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 3,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 4,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 5,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 6,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 7,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 8,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 9,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 10,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 11,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 12,
+              "time_ms": 3,
+              "case_limit_ms": 4000,
+              "ratio": 0.0008
+            },
+            {
+              "case": 13,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 14,
+              "time_ms": 11,
+              "case_limit_ms": 4000,
+              "ratio": 0.0027
+            },
+            {
+              "case": 15,
+              "time_ms": 3,
+              "case_limit_ms": 4000,
+              "ratio": 0.0008
+            },
+            {
+              "case": 16,
+              "time_ms": 3,
+              "case_limit_ms": 4000,
+              "ratio": 0.0008
+            },
+            {
+              "case": 17,
+              "time_ms": 3,
+              "case_limit_ms": 4000,
+              "ratio": 0.0008
+            },
+            {
+              "case": 18,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 19,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 20,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 21,
+              "time_ms": 3,
+              "case_limit_ms": 4000,
+              "ratio": 0.0008
+            }
+          ]
+        }
+      }
+    },
+    {
+      "number": 29337,
+      "language": "python",
+      "expected": "Accepted",
+      "source_sha256": "d9e8450a548ae6b1b0b12bfc1ba27831c32ac963cc549e236ffe8dc2e0e89169",
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 264,
+        "memory_kb": 210356,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 3,
+            "time_ms": 14,
+            "case_limit_ms": 10000,
+            "ratio": 0.0014
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 2,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 3,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 4,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 5,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 6,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 7,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 8,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 9,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 10,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 11,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 12,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 13,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 14,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 15,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 16,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 17,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 18,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 19,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 20,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            },
+            {
+              "case": 21,
+              "time_ms": 12,
+              "case_limit_ms": 10000,
+              "ratio": 0.0012
+            }
+          ]
+        }
+      }
+    },
+    {
+      "number": 29337,
+      "language": "python",
+      "expected": "Wrong Answer",
+      "source_sha256": "0b4a82039ef0f6758ebe01370e28afd40c737a3bd15ba9bdc368ec08da60082d",
+      "result": {
+        "status": "Wrong Answer",
+        "case": 1,
+        "time_ms": 13,
+        "memory_kb": 210356,
+        "expected_tokens": 1,
+        "actual_tokens": 1,
+        "actual_output": {
+          "text": "0\n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 2
+        }
+      }
+    },
+    {
+      "number": 29337,
+      "language": "python",
+      "expected": "Wrong Answer",
+      "source_sha256": "961ecce99fd34f54af99ac1e792d7323ff1023628939dd64b6b92110095613f5",
+      "result": {
+        "status": "Wrong Answer",
+        "case": 1,
+        "time_ms": 13,
+        "memory_kb": 210356,
+        "expected_tokens": 1,
+        "actual_tokens": 1,
+        "actual_output": {
+          "text": "13\n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 3
+        }
+      }
+    },
+    {
+      "number": 29337,
+      "language": "cpp",
+      "expected": "Accepted",
+      "source_sha256": "f4a1b6c4f727e8e4be26b5d990aa19d4be161ea21d341d58e3b364a73c2bf7d3",
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 97,
+        "memory_kb": 213568,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 1,
+            "time_ms": 6,
+            "case_limit_ms": 4000,
+            "ratio": 0.0015
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 2,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 3,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 4,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 5,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 6,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 7,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 8,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 9,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 10,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 11,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 12,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 13,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 14,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 15,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 16,
+              "time_ms": 3,
+              "case_limit_ms": 4000,
+              "ratio": 0.0008
+            },
+            {
+              "case": 17,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 18,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 19,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 20,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 21,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            }
+          ]
+        }
+      }
+    },
+    {
+      "number": 29893,
+      "language": "python",
+      "expected": "Accepted",
+      "source_sha256": "1f69bf3f02fbd0296551bcfd441d1caf2df616f4a4fe77ec2783c83809b703da",
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 315,
+        "memory_kb": 213568,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 2,
+            "time_ms": 19,
+            "case_limit_ms": 10000,
+            "ratio": 0.0019
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 18,
+              "case_limit_ms": 10000,
+              "ratio": 0.0018
+            },
+            {
+              "case": 2,
+              "time_ms": 19,
+              "case_limit_ms": 10000,
+              "ratio": 0.0019
+            },
+            {
+              "case": 3,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 4,
+              "time_ms": 15,
+              "case_limit_ms": 10000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 5,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 6,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 7,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 8,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 9,
+              "time_ms": 15,
+              "case_limit_ms": 10000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 10,
+              "time_ms": 15,
+              "case_limit_ms": 10000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 11,
+              "time_ms": 16,
+              "case_limit_ms": 10000,
+              "ratio": 0.0016
+            },
+            {
+              "case": 12,
+              "time_ms": 15,
+              "case_limit_ms": 10000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 13,
+              "time_ms": 16,
+              "case_limit_ms": 10000,
+              "ratio": 0.0016
+            },
+            {
+              "case": 14,
+              "time_ms": 15,
+              "case_limit_ms": 10000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 15,
+              "time_ms": 16,
+              "case_limit_ms": 10000,
+              "ratio": 0.0016
+            },
+            {
+              "case": 16,
+              "time_ms": 15,
+              "case_limit_ms": 10000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 17,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 18,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 19,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            },
+            {
+              "case": 20,
+              "time_ms": 13,
+              "case_limit_ms": 10000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 21,
+              "time_ms": 14,
+              "case_limit_ms": 10000,
+              "ratio": 0.0014
+            }
+          ]
+        }
+      }
+    },
+    {
+      "number": 29893,
+      "language": "python",
+      "expected": "Wrong Answer",
+      "source_sha256": "0b4a82039ef0f6758ebe01370e28afd40c737a3bd15ba9bdc368ec08da60082d",
+      "result": {
+        "status": "Wrong Answer",
+        "case": 1,
+        "time_ms": 15,
+        "memory_kb": 213568,
+        "expected_tokens": 1,
+        "actual_tokens": 1,
+        "actual_output": {
+          "text": "0\n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 2
+        }
+      }
+    },
+    {
+      "number": 29893,
+      "language": "python",
+      "expected": "Wrong Answer",
+      "source_sha256": "961ecce99fd34f54af99ac1e792d7323ff1023628939dd64b6b92110095613f5",
+      "result": {
+        "status": "Wrong Answer",
+        "case": 2,
+        "time_ms": 27,
+        "memory_kb": 213568,
+        "expected_tokens": 1,
+        "actual_tokens": 1,
+        "actual_output": {
+          "text": "13\n",
+          "truncated": false,
+          "total_lines": 1,
+          "total_chars": 3
+        }
+      }
+    },
+    {
+      "number": 29893,
+      "language": "cpp",
+      "expected": "Accepted",
+      "source_sha256": "fc94359dae0a149e53a6e4cdf85156a048f08cb7b8bcf8eb063868395ca433fe",
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 107,
+        "memory_kb": 213568,
+        "timing_audit": {
+          "status": "passed",
+          "required_max_ratio": 0.75,
+          "max_case": {
+            "case": 10,
+            "time_ms": 8,
+            "case_limit_ms": 4000,
+            "ratio": 0.002
+          },
+          "cases": [
+            {
+              "case": 1,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 2,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 3,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 4,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 5,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 6,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 7,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 8,
+              "time_ms": 3,
+              "case_limit_ms": 4000,
+              "ratio": 0.0008
+            },
+            {
+              "case": 9,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 10,
+              "time_ms": 8,
+              "case_limit_ms": 4000,
+              "ratio": 0.002
+            },
+            {
+              "case": 11,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 12,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 13,
+              "time_ms": 3,
+              "case_limit_ms": 4000,
+              "ratio": 0.0008
+            },
+            {
+              "case": 14,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 15,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 16,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 17,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 18,
+              "time_ms": 6,
+              "case_limit_ms": 4000,
+              "ratio": 0.0015
+            },
+            {
+              "case": 19,
+              "time_ms": 5,
+              "case_limit_ms": 4000,
+              "ratio": 0.0013
+            },
+            {
+              "case": 20,
+              "time_ms": 4,
+              "case_limit_ms": 4000,
+              "ratio": 0.001
+            },
+            {
+              "case": 21,
+              "time_ms": 3,
+              "case_limit_ms": 4000,
+              "ratio": 0.0008
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "sources_sha256": {
+    "scripts/index_tests.py": "77e20005e62cd2706d91ee27c8717070af745c2f130002941e30c49f0522d31c",
+    "scripts/crawl_openjudge.py": "4233470e77710915f2aeaf78651f216f781cdcd22d3891f385f67e225c26ec9e",
+    "scripts/materialize_gmyhf_downloads.py": "85b88994d38958eaa2cf6c89dcdfb9c882cc98328bbd4517770c2ea2e4741707",
+    "tests/test_gmyhf_normal_activation.py": "e02c87f462da867ed7953cf4b5a94e2da6a085855dd1357b6a7bd3a9a10c58d3",
+    "tests/test_gmyhf_placeholder_exclusions.py": "89d8de839a113065eb4b64dec484e804739dbdf709c567e989020565cb9ff59a",
+    "data/openjudge/catalog.json": "cfdecabc264338bc580e6f41308ec34b8581d2e5b596a7c769e4d9d07dacf4f1",
+    "data/openjudge/test_index.json": "964a3ccfb79d01014c6debb82f579557f406ba08b9a2a64511ea426ca9aec1f1",
+    "data/openjudge/books/practice__11.html": "a0940b0de6c7303c5d66787763c57558e6dad3cf5144489849177d4e10ebe7bf",
+    "data/openjudge/limits.json": "ede317bfb8e2aecf49ef34e07a79bc5d95f4616d2b8e7201c708c7c1e3c57641",
+    "collab/input-domains.json": "15bcf442a0d6f53ad2599f99561d28ccba8b126c47b5de83a9b354196c0bb09c",
+    "collab/valid-contracts.json": "84a3209711242e980122fd90dacef6ef7e1d607a8fd898e4d414555c7c8e1f83",
+    "collab/gmyhf-placeholder-decision-mutations.json": "a612afb1113dda59dc4f11c14f1aae9aaf54817ef270fe03ab3663539b6857ea"
+  },
+  "procedure_source": "import json,hashlib,sys,re,html\nfrom pathlib import Path\nR=Path.cwd();sys.path.insert(0,str(R));import judge\nfrom scripts.index_tests import read_global_number\nold=json.loads((R/'collab/gmyhf-normal-local-activation.json').read_text());kept=(27207,29337,29893);retired=(29894,31178,31200)\nsha=lambda b:hashlib.sha256(b).hexdigest()\nfor path,digest in old['unchanged_data_and_generators_sha256'].items():assert sha((R/path).read_bytes())==digest,path\nresults=[];remote=[]\nfor n in kept:\n page=Path(f'/tmp/gmyhf-practice-confirmed-{n}.html');raw=page.read_bytes();assert read_global_number(page)==n\n remote.append({'number':n,'url':f'http://cs101.openjudge.cn/practice/{n}/','global_number':n,'title':html.unescape(re.search(r'<title>(.*?)</title>',raw.decode(),re.S).group(1)),'raw_page_sha256':sha(raw),'platform_writes':0})\n previous=next(e for e in old['entries'] if e['number']==n)\n for check in previous['results']:\n  result=judge.judge('practice',str(n),check['language'],check['source'],collect_case_times=True);assert result['status']==check['expected'],(n,result)\n  results.append({'number':n,'language':check['language'],'expected':check['expected'],'source_sha256':sha(check['source'].encode()),'result':result});print(n,check['language'],result['status'],flush=True)\npaths=['scripts/index_tests.py','scripts/crawl_openjudge.py','scripts/materialize_gmyhf_downloads.py','tests/test_gmyhf_normal_activation.py','tests/test_gmyhf_placeholder_exclusions.py','data/openjudge/catalog.json','data/openjudge/test_index.json','data/openjudge/books/practice__11.html','data/openjudge/limits.json','collab/input-domains.json','collab/valid-contracts.json','collab/gmyhf-placeholder-decision-mutations.json']\nreport={'date':'2026-10-25','decision':'用户指定27207、29337、29893正式链接；29894重复29893，31178和31200记为占位题。','active_problems':list(kept),'placeholder_exclusions':{'29894':'重复29893；正式题保留29893','31178':'用户裁定占位题','31200':'用户裁定占位题'},'public_pages_verified':remote,'platform_writes':0,'historical_data_and_generators_unchanged':True,'historical_hash_reference':'collab/gmyhf-normal-local-activation.json','supersedes':'第30批非废弃分类、第31批补数据及第32批六题启用均为历史；当前仅三题正式启用，其余三题占位排除，历史数据不删除。','retired_contract_baseline_dirs':[f'tests/{\"20000-29982\" if n<30000 else \"30000-\"}/{n}_made' for n in retired],'contract_note':'按明确占位退役裁定移出活目录账本；实际valid函数及数据字节保留，没有修改判据或放宽契约。','catalog_count':2050,'catalog_with_tests':2049,'accepted_python_cases':63,'accepted_cpp_cases':63,'wrong_answer_probes':6,'results':results,'sources_sha256':{p:sha((R/p).read_bytes()) for p in paths},'procedure_source':Path(__file__).read_text()}\n(R/'collab/gmyhf-placeholder-decision.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\\n')\n"
+}
