@@ -1,7 +1,7 @@
 {
   "min_cases": 20,
   "description": "每题通常至少 20 组测试数据。课题组自出题直接收录平台原始数据，不足 20 组时登记例外，无需为满足组数补造数据；其他不足组数的题也须写明原因。tools/full_sweep.py 第 12 条（check_short_data_is_recorded）会拦下没登记的短数据和已经补够却没删的条目。OpenJudge 按全局题号登记，外部题库按「来源:题号」。",
-  "updated": "2026-10-23",
+  "updated": "2026-10-31",
   "entries": [
     {
       "key": "openjudge:12065",
@@ -116,6 +116,15 @@
       "test_count": 1,
       "category": "official_batched_cases",
       "reason": "课题组自出题，用户明确授权直接复用官方测试数据。后台提供 1 对原始文件，内含 100 个独立的唯一解样例，以 0 0 结束；保留原文件及 SHA-256，不拆分或生成额外数据。"
+    },
+    {
+      "key": "openjudge:31461",
+      "problems": [
+        "practice/31461"
+      ],
+      "test_count": 3,
+      "category": "official_reused_data",
+      "reason": "课题组自出题，用户于 2026-10-31 明确授权直接复用官方测试数据。后台提供 3 对原始文件，内含 14704 组进制转换（含 n=0 的空输出）；保留原文件及 SHA-256，不拆分或生成额外数据。"
     },
     {
       "key": "openjudge:3190",

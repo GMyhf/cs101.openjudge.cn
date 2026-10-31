@@ -6751,3 +6751,11 @@ T-060第22批：用户要求增加31381 SPJ，已在31381_made/checker.py实现�
 T-060第23批：用户明确授权本地绑定启用31381，已新增practice/31381干净题面、列表行与catalog映射，并启用既有checker；21组自产数据含原样例，生成器可复现、独立输入契约/范围账本/valid棘轮同步。真实catalog上三Python与一C++正解各21组AC，六类错解WA，样例运行checker通过。缺失checker时索引停用，不回退精确比对；10种启用链路变异检出，4新回归，累计163项定向回归264变异。当前2047条catalog、2046条有测试。平台零写入，远端SPJ未替换；回执gmyhf-31381-activation.json。第22批9a33f7f86已推送。
 
 第23批完整闸门 `PATH=/tmp/gmyhf-python311/bin:$PATH python3 tools/handoff.py --verify` 退出码0，全套测试、Python/JS语法、待返工检查与full_sweep全部通过；第22批9a33f7f86远端gate已绿。
+
+## 2026-10-31 · QoderCN · T-061 practice/31461 收录
+
+用户明确说明本题为课程组自出题、官方测试数据可直接使用，并要求公开样例按实际列出的 7 组计算。单题抓取保留完整 OJ Inject 节点，本地渲染 HTML 与 Markdown 源码中的样例首行均由 6 修正为 7，上游平台未改；practice 第 11 页按字节只新增目标 8 行。
+
+通过独立 staging 仅下载全局题号 31461 的 3 对原始文件并物化为 `31461_GMyhf`，共 14704 组转换，包含 `n=0` 的合法空输出。`SOURCE.json` 保留原始文件名、字节数、SHA-256、课程组授权与题面来源；不足 20 对文件已登记官方数据例外，未补造或拆分数据。catalog、test_index、limits、输入域账本及图片清单均已重建。
+
+新增 `tests/test_31461.py`：独立 oracle 全量复核 14704 组答案与 int64 输入约束，公开样例七项输出、int64 上下界、前导零、大小写和 `-0` 规范化均通过；参考程序真实判题 Accepted，忽略目标进制的程序 Wrong Answer。4 项单题测试通过；将参考程序的大写输出变异为小写后，样例与完整判题两项测试均按预期变红，恢复后重新通过。全库扫描 1280 份在判数据、862 条报告记录干净；本地服务实际访问题面和提交页均为 200，样例载荷为 7 组输入及对应 7 行输出。最终 `python3 tools/handoff.py --verify` 退出码 0，全套 unittest、Python 语法、待返工检查、full_sweep 与静态 JS 语法全部通过。
