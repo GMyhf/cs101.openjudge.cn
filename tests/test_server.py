@@ -563,7 +563,7 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertEqual(status, 200)
         self.assertEqual([p["id"] for p in json.loads(body)["problems"]], ["1000000", "1000001", "1000002", "1000003"])
         full = json.loads(request(self.port, "GET", "/api/catalog", cookie=admin)[2])
-        self.assertEqual(full["book_meta"]["private"], {"name": "私有题库", "count": 3})
+        self.assertEqual(full["book_meta"]["private"], {"name": "私有题库", "count": 4})
         self.assertEqual([p["id"] for p in full["problems"] if p["book"] == "private"], ["1000000", "1000001", "1000002", "1000003"])
         # 「收录 N 题」只算公开题：私有题不该让所有人看到的总数变
         anonymous = json.loads(request(self.port, "GET", "/api/catalog")[2])
