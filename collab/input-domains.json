@@ -1,7 +1,7 @@
 {
   "note": "题面对输入的原话（逐字）与数据实际极值并排记账。由 scripts/build_input_domains.py 生成，tools/full_sweep.py 第 15 条盯着。引文没有数值范围（quote_has_bound=false）不是缺陷，是「这段题面本来就没写上界」，记下来是为了让它可见。",
   "updated": "2026-09-20",
-  "count": 1286,
+  "count": 1287,
   "without_bound": 432,
   "entries": {
     "tests/1000-1999/01001_made": {
@@ -17904,6 +17904,20 @@
       },
       "case_count": 21,
       "data_digest": "f04b0fa49c52a3be3ba44a88753f005563aa65e94bdec4838156388e3fa31527"
+    },
+    "tests/private/1000003_made": {
+      "book": "private",
+      "id": "1000003",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行两个整数 n 和 m（1 ≤ n ≤ 10000，0 ≤ m ≤ 50000），分别是任务数和依赖数。 第二行 n 个整数 t 1 … t n （1 ≤ t i ≤ 1000）。 接下来 m 行，每行两个整数 u v（1 ≤ u, v ≤ n，u ≠ v），表示任务 v 要等任务 u 完成。同一对 (u, v) 最多出现一次。",
+      "quote_has_bound": true,
+      "quote_max_number": 50000,
+      "generated_extremes": {
+        "max_int": 50000,
+        "min_int": 0
+      },
+      "case_count": 21,
+      "data_digest": "ff0dc030db9af5eb82376c0e601eafce29767620c56f1219e448a87309229f98"
     }
   }
 }

@@ -645,6 +645,37 @@ def check_1000001(text):
     return None
 
 
+def check_1000003(text):
+    """1000003 题面：首行 n m（1≤n≤10000，0≤m≤50000）；次行 n 个耗时 1≤t≤1000；
+    其后恰好 m 行 u v，1≤u,v≤n，u≠v，同一对 (u,v) 最多出现一次。"""
+    lines = text.splitlines()
+    if len(lines) < 2:
+        return "至少应有两行"
+    try:
+        n, m = map(int, lines[0].split())
+        times = numbers(lines[1])
+    except ValueError:
+        return "首行应为两个整数 n m，次行应为整数"
+    if not (1 <= n <= 10000 and 0 <= m <= 50000):
+        return f"n={n} 或 m={m} 越出题面约束"
+    if len(times) != n or any(not 1 <= x <= 1000 for x in times):
+        return "耗时个数应为 n 且每个在 1..1000"
+    if len(lines) != 2 + m:
+        return f"依赖应恰好 {m} 行，实际 {len(lines) - 2} 行"
+    seen = set()
+    for line in lines[2:]:
+        pair = line.split()
+        if len(pair) != 2:
+            return "每条依赖应为两个整数"
+        u, v = map(int, pair)
+        if not (1 <= u <= n and 1 <= v <= n) or u == v:
+            return f"依赖 {u} {v} 越界或 u=v"
+        if (u, v) in seen:
+            return f"依赖 {u} {v} 重复"
+        seen.add((u, v))
+    return None
+
+
 def check_31381(text):
     """31381题面：一行字符串；空格与重复字符都是内容，没有数值上界。"""
     body = text
@@ -695,6 +726,7 @@ VALIDATORS = {
     ("practice", "31298"): check_31298,
     ("private", "1000000"): check_1000000,
     ("private", "1000001"): check_1000001,
+    ("private", "1000003"): check_1000003,
     ("practice", "31378"): check_1000000,      # 平台版，题面与私有版逐字相同
 }
 
