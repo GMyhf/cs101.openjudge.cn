@@ -1,0 +1,73 @@
+{
+  "reference_judge": {
+    "python_samplecode": "Accepted",
+    "cpp_independent": "Accepted",
+    "cases": 21
+  },
+  "mutations": {
+    "w1_lf_uses_es": {
+      "judge": "Wrong Answer",
+      "failed_cases": [
+        0,
+        12,
+        13,
+        14,
+        15,
+        16,
+        19,
+        20
+      ]
+    },
+    "w2_no_cycle": {
+      "judge": "Wrong Answer",
+      "failed_cases": [
+        4,
+        8,
+        9,
+        17
+      ]
+    },
+    "w3_index_order": {
+      "judge": "Wrong Answer",
+      "failed_cases": [
+        7,
+        10,
+        12,
+        13,
+        14,
+        15,
+        16,
+        19,
+        20
+      ]
+    },
+    "w4_one_path": {
+      "judge": "Wrong Answer",
+      "failed_cases": [
+        3,
+        6,
+        7,
+        11,
+        13,
+        20
+      ]
+    },
+    "w5_recursive": {
+      "judge": "Runtime Error",
+      "failed_cases": [
+        5
+      ]
+    }
+  },
+  "mutation_notes": {
+    "w1_lf_uses_es": "最迟完成时间取后继的最早开始时间",
+    "w2_no_cycle": "不判环",
+    "w3_index_order": "按编号顺序递推，不做拓扑排序",
+    "w4_one_path": "只回溯一条关键路径",
+    "w5_recursive": "递归 DFS（深链爆栈）"
+  },
+  "deterministic_regeneration": true,
+  "case_files": 21,
+  "definition_check": "n ≤ 60 的 6 组按定义逐个推迟 1 小时核对",
+  "test_mutation_selfcheck": "改坏 0.out 或第 4 组（环）答案后 tests/test_private_1000003 对应用例变红；check_1000003 对 u=v、重复依赖、耗时越界都报错"
+}

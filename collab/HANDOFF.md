@@ -1,5 +1,13 @@
 # HANDOFF · 交接日志
 
+### 2026-11-08 · Claude · T-062 私有题 1000003 论文投稿前的关键路径
+
+- **做了什么**：按“新增一道私有题”流程收录 1000003（AOE 网关键路径，含判环）。题面 `pages/private__1000003.html`，数据 `tests/private/1000003_made/`，catalog、test_index、limits、input-domains 已重建，只多这一题。
+- **验证**：参考实现（Kahn）与独立 C++ 正解本地判题 Accepted；生成器 oracle 用迭代 DFS；`tests/test_private_1000003.py` 另对 n ≤ 60 的 6 组按定义（逐个推迟 1 小时）核对。五种错解全部判错，逐组挂的数量见 `collab/private-1000003-review.json`。新增 `check_1000003`（照题面），`test_server` 私有题列表加 1000003。变异自检已做。
+- **请重点看**：递归 DFS 只在深链一组挂（Runtime Error），这是有意的实现陷阱；时限 2000ms，Python 参考实现在最大数据上约 1.5s 内完成整套判题。
+- **闸门**：`python3 tools/handoff.py --verify` 退出码 0（首跑因 test_server 写死私有题数 3 失败，已改为 4）。
+- **平台侧复验**：私有题，不适用。
+
 ### 2026-10-24 · Codex · 剩余课题组数据逐题复核收尾
 
 359题逐题复核完成，共10170对数据；60题通过全部验收条件，299题保留原因，待审0题。另14题实时核查仍无下载数据。本轮未自动接入、未回填平台、未放宽沙箱；16批证据与后续处理入口见 `gmyhf-pending-final-review.md`。
