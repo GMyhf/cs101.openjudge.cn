@@ -4,6 +4,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 __THEME_HEAD__
 <script src="/static/catalog-books.js"></script>
+<script src="/static/problem-search.js"></script>
 <title>题库目录 · CS101 本机判题</title>
 <style>
   * { box-sizing: border-box; }
@@ -29,6 +30,8 @@ __THEME_HEAD__
   .tag { display:inline-block; padding:1px 8px; border-radius:999px; font-size:12px; white-space:nowrap; }
   .tag.ok { background:var(--badge-ac-bg); color:var(--ok); }
   .tag.none { background:var(--soft); color:var(--none); }
+  .topics { display:block; margin-top:2px; color:var(--muted); font-size:12px; }
+  .snippet { display:block; margin-top:2px; color:var(--muted); font-size:12px; max-width:520px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .empty { padding:40px 0; text-align:center; color:var(--muted); }
   .pagination { display:flex; justify-content:center; align-items:center; gap:12px; padding:18px 0; }
   .pagination button { padding:6px 12px; border:1px solid var(--line); border-radius:5px; background:var(--panel); font:inherit; cursor:pointer; }
@@ -41,8 +44,9 @@ __THEME_HEAD__
   <p class="sub">标注每道题在本地是否有测试数据可判。<a href="/history/">提交记录</a> · <a href="/">返回首页</a></p>
 
   <div class="bar">
-    <input type="search" id="q" placeholder="搜索题号，如 01003 / E19942" autocomplete="off">
+    <input type="search" id="q" placeholder="搜索题号、标题、考点或题面内容" autocomplete="off" aria-label="搜索题号、标题、考点或题面内容">
     <select id="book"><option value="">全部题库</option></select>
+    <select id="topic" aria-label="按考点筛选" title="考点按参考解法与题面提示自动推断，可能不全"><option value="">全部考点</option></select>
     <label class="chk"><input type="checkbox" id="only" checked> 只看可判的</label>
   </div>
 
@@ -56,10 +60,13 @@ __THEME_HEAD__
 </div>
 
 <script>
-const els = { q: q, book: book, only: only, rows: rows, count: count, empty: empty };
-let all = [], bookMeta = {}, pageNumber = 1, dataUniqueTotal = 0, dataUniqueTested = 0;
+const els = { q: q, book: book, topic: topic, only: only, rows: rows, count: count, empty: empty };
+let all = [], bookMeta = {}, pageNumber = 1, dataUniqueTotal = 0, dataUniqueTested = 0, contentHits = new Map();
 const pageSize = 50;
-const requestedBook = new URLSearchParams(location.search).get('book') || '';
+const params = new URLSearchParams(location.search);
+const requestedBook = params.get('book') || '';
+const requestedTopic = params.get('topic') || '';
+if (params.get('q')) els.q.value = params.get('q');
 
 fetch('/api/catalog', { credentials: 'same-origin' })
   .then(r => r.json())
@@ -76,21 +83,30 @@ fetch('/api/catalog', { credentials: 'same-origin' })
       els.only.checked = false;
       document.querySelector('#pageTitle').textContent = (bookMeta[requestedBook] || {}).name || requestedBook;
     }
-    render();
+    for (const [t, n] of problemSearch.topicCounts(all)) {
+      const option = document.createElement('option');
+      option.value = t; option.textContent = `${t}（${n}）`;
+      els.topic.append(option);
+    }
+    if (requestedTopic && [...els.topic.options].some(option => option.value === requestedTopic)) els.topic.value = requestedTopic;
+    if (els.q.value.trim()) onSearch(); else render();
   })
   .catch(() => { els.count.textContent = '题库加载失败。'; });
 
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function judgeable(p) { return (p.test_count || 0) > 0; }
 function titleOf(p) { return (p.title || p.id).replace(new RegExp('^' + p.id + '\\s*[:：]\\s*', 'i'), '') || p.id; }
 
 function render() {
-  const term = els.q.value.trim().toLowerCase();
+  const term = els.q.value;
   const book = els.book.value;
+  const topicFilter = els.topic.value;
   const onlyOk = els.only.checked;
   const hits = all.filter(p =>
     (!book || p.book === book) &&
     (!onlyOk || judgeable(p)) &&
-    (!term || p.id.toLowerCase().includes(term)));
+    problemSearch.hasTopic(p, topicFilter) &&
+    problemSearch.matches(p, term, contentHits));
 
   const total = dataUniqueTotal, ok = dataUniqueTested;
   const pages = Math.max(1, Math.ceil(hits.length / pageSize));
@@ -103,7 +119,7 @@ function render() {
     const has = judgeable(p);
     return `<tr>
       <td class="num"><a class="pid" href="${p.path}">${p.id}</a></td>
-      <td><a class="pid" href="${p.path}">${titleOf(p)}</a></td>
+      <td><a class="pid" href="${p.path}">${esc(titleOf(p))}</a>${(p.topics || []).length ? `<span class="topics">${esc(p.topics.join(' · '))}</span>` : ''}${contentHits.has(problemSearch.key(p)) ? `<span class="snippet" title="${esc(contentHits.get(problemSearch.key(p)))}">${esc(contentHits.get(problemSearch.key(p)))}</span>` : ''}</td>
       <td class="num">${p.pass_rate || '—'}</td>
       <td class="num">${p.accepted_count ? `<a class="pid" href="/history/?book=${encodeURIComponent(p.book)}&problem=${encodeURIComponent(p.id)}">${p.accepted_count}</a>` : '—'}</td>
       <td class="num">${p.attempt_count ? `<a class="pid" href="/history/?book=${encodeURIComponent(p.book)}&problem=${encodeURIComponent(p.id)}">${p.attempt_count}</a>` : '—'}</td>
@@ -115,9 +131,15 @@ function render() {
   next.disabled = pageNumber >= pages;
 }
 
-for (const el of [els.q, els.book, els.only]) {
+for (const el of [els.book, els.topic, els.only]) {
   el.addEventListener('input', () => { pageNumber = 1; render(); });
 }
+// 题号/标题/考点名立刻在本地过滤；题面正文的命中稍后从服务端补上来。
+function onSearch() {
+  render();
+  problemSearch.fetchContent(els.q.value, hits => { contentHits = hits; render(); });
+}
+els.q.addEventListener('input', () => { pageNumber = 1; contentHits = new Map(); onSearch(); });
 prev.addEventListener('click', () => { pageNumber -= 1; render(); });
 next.addEventListener('click', () => { pageNumber += 1; render(); });
 </script>

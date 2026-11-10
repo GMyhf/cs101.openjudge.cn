@@ -549,6 +549,9 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
                 self.assertNotIn("private", payload["book_meta"], (viewer, query))
                 self.assertFalse([p for p in payload["problems"] if p["book"] == "private"],
                                  (viewer, query))
+            # 题面全文检索也是一条路：搜私有题题面里的词，看不到的人一条都不能命中
+            hits = json.loads(request(self.port, "GET", "/api/search?q=nextval", cookie=viewer)[2])
+            self.assertFalse([m for m in hits["matches"] if m["book"] == "private"], viewer)
         for path in ("/api/run", "/api/submit"):
             status, _, _ = request(self.port, "POST", path, {
                 "book": "private", "problem": "1000000", "language": "python",
@@ -559,6 +562,8 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         status, _, body = request(self.port, "GET", "/private/1000000/", cookie=admin)
         self.assertEqual(status, 200)
         self.assertIn("KMP 字符比较次数（nextval）", body.decode("utf-8"))
+        hits = json.loads(request(self.port, "GET", "/api/search?q=nextval", cookie=admin)[2])
+        self.assertIn(("private", "1000000"), {(m["book"], m["id"]) for m in hits["matches"]})
         status, _, body = request(self.port, "GET", "/api/books/private/", cookie=admin)
         self.assertEqual(status, 200)
         self.assertEqual([p["id"] for p in json.loads(body)["problems"]], ["1000000", "1000001", "1000002", "1000003"])
