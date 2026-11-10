@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
 __THEME_HEAD__
   <script src="/static/catalog-books.js"></script>
+  <script src="/static/problem-search.js"></script>
   <title>CS101 题库 · 本机判题</title>
   <style>
     .shell { width: 100%; max-width: 1232px; margin: auto; padding: 0 28px }
@@ -29,6 +30,14 @@ __THEME_HEAD__
     .solution-link { display: inline-flex; align-items: center; justify-content: center; min-height: 54px; padding: 0 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); color: var(--accent); font-size: 14px; font-weight: 650; text-decoration: none; white-space: nowrap }
     .solution-link:hover { background: var(--accent-soft); border-color: var(--accent) }
     .search-note { margin: -8px 0 20px; color: var(--muted); font-size: 13px }
+    .topics { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: -8px 0 24px }
+    .topics-label { color: var(--muted); font-size: 13px; margin-right: 2px }
+    .topic-chip { padding: 4px 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--ink); font: inherit; font-size: 13px; cursor: pointer }
+    .topic-chip:hover { border-color: var(--accent); color: var(--accent) }
+    .topic-chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--panel) }
+    .topic-chip small { margin-left: 4px; opacity: .7; font-size: 11px }
+    .topics-note { flex-basis: 100%; margin: 2px 0 0; color: var(--muted); font-size: 12px }
+    .problem-snippet { display: block; margin-top: 2px; color: var(--muted); font-size: 12px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
 
     .recent { background: var(--accent-soft) }
     .recent .book-head { border-top-color: var(--accent) }
@@ -74,6 +83,10 @@ __THEME_HEAD__
       .toolbar { gap: 8px; margin-bottom: 20px }
       .solution-link { padding: 0 12px }
       .catalog-grid { grid-template-columns: minmax(0, 1fr) }
+      /* 二十多个考点在手机上会占掉半屏：改成一行横滑，说明文字跟在后面。 */
+      .topics { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin }
+      .topic-chip, .topics-label { flex-shrink: 0; white-space: nowrap }
+      .topics-note { flex-basis: auto; flex-shrink: 0; white-space: nowrap }
     }
     @media (max-width: 400px) {
       .top { gap: 8px }
@@ -109,10 +122,11 @@ __THEME_HEAD__
     <div class="toolbar">
       <div class="search-field">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
-        <input id="search" type="search" placeholder="搜索题号或标题" autocomplete="off" aria-label="搜索题号或标题">
+        <input id="search" type="search" placeholder="搜索题号、标题、考点或题面内容，如：并查集" autocomplete="off" aria-label="搜索题号、标题、考点或题面内容">
       </div>
       <a class="solution-link" href="https://fuynaloft.github.io/sol101/" target="_blank" rel="noopener" onclick="window.open(this.href,'sol101-explanations','noopener,width=1280,height=900');return false;">题解 ↗</a>
     </div>
+    <div class="topics" id="topics" role="group" aria-label="按考点筛选" hidden></div>
     <p class="search-note" id="search-note" hidden aria-live="polite"></p>
     <section aria-labelledby="catalog-heading">
       <div class="section-head">
@@ -137,7 +151,12 @@ __THEME_HEAD__
     const list = document.querySelector('#list'), empty = document.querySelector('#empty'),
           search = document.querySelector('#search'), searchNote = document.querySelector('#search-note'),
           recent = document.querySelector('#recent'), recentList = document.querySelector('#recent-list');
-    let problems = [], bookMeta = {};
+    const topicsBox = document.querySelector('#topics');
+    let problems = [], bookMeta = {}, contentHits = new Map();
+    // ?topic=并查集 可以直接分享「某个考点的题」；?q= 同理。
+    const params = new URLSearchParams(location.search);
+    let activeTopic = params.get('topic') || '';
+    if (params.get('q')) search.value = params.get('q');
     const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
     fetch('/api/catalog?summary=1').then(r => r.json()).then(data => {
@@ -149,7 +168,8 @@ __THEME_HEAD__
       const latest = [...problems].sort((a, b) => (a.added_at || '').localeCompare(b.added_at || '')).reverse().slice(0, 5);
       recentList.innerHTML = latest.map(p => problemCard(p)).join('');
       shuffle(problems);
-      render();
+      renderTopics();
+      if (search.value.trim()) onSearch(); else render();
     }).catch(() => { empty.hidden = false; empty.textContent = '题库暂时不可用'; });
 
     function shuffle(items) {
@@ -159,9 +179,30 @@ __THEME_HEAD__
       }
     }
     function titleOf(p) { return (p.title || '').replace(new RegExp('^' + p.id + '\\s*[:：]\\s*', 'i'), '') || p.id; }
-    function problemCard(p) {
-      return `<a class="problem" href="${esc(p.path)}"><span class="pid">${esc(p.id)}</span><span class="problem-main"><span class="problem-title" title="${esc(titleOf(p))}">${esc(titleOf(p))}</span></span><span class="arrow" aria-hidden="true">›</span></a>`;
+    function problemCard(p, snippet) {
+      const extra = snippet ? `<span class="problem-snippet" title="${esc(snippet)}">${esc(snippet)}</span>`
+        : (activeTopic && (p.topics || []).length ? `<span class="problem-snippet">${esc(p.topics.join(' · '))}</span>` : '');
+      return `<a class="problem" href="${esc(p.path)}"><span class="pid">${esc(p.id)}</span><span class="problem-main"><span class="problem-title" title="${esc(titleOf(p))}">${esc(titleOf(p))}</span>${extra}</span><span class="arrow" aria-hidden="true">›</span></a>`;
     }
+
+    function renderTopics() {
+      const counts = problemSearch.topicCounts(problems);
+      if (activeTopic && !counts.some(([t]) => t === activeTopic)) counts.unshift([activeTopic, 0]);
+      topicsBox.hidden = !counts.length;
+      topicsBox.innerHTML = '<span class="topics-label">按考点：</span>' + counts.map(([t, n]) =>
+        `<button type="button" class="topic-chip" data-topic="${esc(t)}" aria-pressed="${t === activeTopic}">${esc(t)}<small>${n}</small></button>`
+      ).join('') + '<p class="topics-note">考点按参考解法与题面提示自动推断，可能不全；没有标到的题可以直接搜题面内容。</p>';
+    }
+    topicsBox.addEventListener('click', e => {
+      const chip = e.target.closest('.topic-chip');
+      if (!chip) return;
+      activeTopic = activeTopic === chip.dataset.topic ? '' : chip.dataset.topic;
+      const url = new URL(location.href);
+      if (activeTopic) url.searchParams.set('topic', activeTopic); else url.searchParams.delete('topic');
+      history.replaceState(null, '', url);
+      renderTopics();
+      render();
+    });
 
     const featuredBooks = ['pctbook', 'practice'];
     // 平时每个题库随机挑 5 道；搜索时放宽到 20 道 —— 原来搜索也只给 5 道，
@@ -170,14 +211,15 @@ __THEME_HEAD__
 
     function render() {
       const q = search.value.trim().toLowerCase();
-      recent.hidden = !!q || !recentList.innerHTML;
-      document.querySelector('#catalog-heading').textContent = q ? '搜索结果' : '探索题库';
-      document.querySelector('#catalog-note').hidden = !!q;
-      const limit = q ? PER_BOOK_SEARCHING : PER_BOOK;
+      const filtering = !!q || !!activeTopic;
+      recent.hidden = filtering || !recentList.innerHTML;
+      document.querySelector('#catalog-heading').textContent = filtering ? '搜索结果' : '探索题库';
+      document.querySelector('#catalog-note').hidden = filtering;
+      const limit = filtering ? PER_BOOK_SEARCHING : PER_BOOK;
       const groups = new Map();
       let matched = 0;
       for (const p of problems) {
-        if (q && !p.id.toLowerCase().includes(q) && !(p.title || '').toLowerCase().includes(q)) continue;
+        if (!problemSearch.hasTopic(p, activeTopic) || !problemSearch.matches(p, q, contentHits)) continue;
         matched++;
         if (!groups.has(p.book)) groups.set(p.book, { items: [], total: 0 });
         const g = groups.get(p.book);
@@ -189,17 +231,22 @@ __THEME_HEAD__
         const meta = bookMeta[book] || {};
         const featured = featuredBooks.includes(book) ? ' featured' : '';
         const href = `/book/${encodeURIComponent(book)}/`;
-        const rows = g.items.map(p => problemCard(p)).join('');
-        const more = q && g.total > g.items.length ? `<a class="more" href="${href}">还有 ${g.total - g.items.length} 道匹配，去题库里看 ›</a>` : '';
+        const rows = g.items.map(p => problemCard(p, contentHits.get(problemSearch.key(p)))).join('');
+        const more = filtering && g.total > g.items.length ? `<a class="more" href="${href}">还有 ${g.total - g.items.length} 道匹配，去题库里看 ›</a>` : '';
         return `<section class="book-block${featured}"><div class="book-head"><h3 class="book-title"><a href="${href}">${esc(meta.name || book)}</a></h3><div class="book-info"><span>${meta.count || 0} 题</span><a class="book-link" href="${href}" aria-label="${esc(meta.name || book)}：查看全部">查看全部 →</a></div></div><div class="list">${rows}${more}</div></section>`;
       }).join('');
       // 作为第六个面板展示；搜索时只显示匹配的题库。
       if (!recent.hidden) list.insertBefore(recent, list.children[5] || null);
       empty.hidden = groups.size > 0 || !recent.hidden;
-      searchNote.hidden = !q || !matched;
-      searchNote.textContent = `共 ${matched} 道匹配，分布在 ${groups.size} 个题库`;
+      searchNote.hidden = !filtering || !matched;
+      searchNote.textContent = (activeTopic ? `考点「${activeTopic}」：` : '') + `共 ${matched} 道匹配，分布在 ${groups.size} 个题库`;
     }
-    search.addEventListener('input', render);
+    // 题号/标题/考点名立刻在本地过滤；题面正文的命中稍后从服务端补上来。
+    function onSearch() {
+      render();
+      problemSearch.fetchContent(search.value, hits => { contentHits = hits; render(); });
+    }
+    search.addEventListener('input', () => { contentHits = new Map(); onSearch(); });
 
     // 在线人数。每一个数都来自 /api/stats，页面上不写死任何统计数字 ——
     // 这里原来的「1,863 收录题目」就是写死的，catalog 早已变成 1849，差了 14。

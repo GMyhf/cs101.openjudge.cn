@@ -182,6 +182,61 @@ def inline_gzip_statement(text):
         return ""
 
 
+def expand_oj_inject(text):
+    """把镜像页里 OJ Inject 压缩的题面解开，换回 `<dl class="problem-content">`。
+
+    Newer OpenJudge pages may keep the rendered statement (including samples) in
+    gzip/base64 OJ Inject data nodes. Decode those nodes so server-side sample
+    extraction — and the full-text search index — see the same content as the browser.
+    """
+    def decode_inject(match):
+        attrs, payload = match.group(1), match.group(2)
+        if 'data-version="2"' not in attrs or not payload.strip():
+            return match.group(0)
+        try:
+            decoded = gzip.decompress(base64.b64decode(payload.strip())).decode("utf-8")
+        except (ValueError, OSError, UnicodeDecodeError):
+            return match.group(0)
+        return decoded
+    text = re.sub(r'<script\b([^>]*application/x-oj-inject-data[^>]*)>(.*?)</script>',
+                  decode_inject, text, flags=re.I | re.S)
+    text = re.sub(r'<p>题目描述加载中。如果持续看到此说明，请确认浏览器没有禁用 JavaScript，并查看是否有加载错误。</p>',
+                  '', text)
+    rendered = markdown_body(text)
+    if rendered:
+        start = text.find('<dl class="problem-content">')
+        end = text.find('<div class="problem-statistics', start)
+        if start >= 0 and end >= 0:
+            replacement = '<dl class="problem-content"><dd>' + rendered + '</dd></dl>\n'
+            text = text[:start] + replacement + text[end:]
+    return text
+
+
+def statement_plain_text(page):
+    """题面正文（描述、输入输出、样例、提示、来源）的纯文本，给全文检索与考点初标用。
+
+    只取 `problem-content` 那一块：整页里还有导航、脚本和「显示标签」按钮，
+    搜「标签」「提交」会把 2058 道题全命中。取不到正文就返回空串。
+    """
+    if not page.is_file():
+        return ""
+    text = expand_oj_inject(page.read_text(encoding="utf-8", errors="replace"))
+    # 截到正文下方的「查看/提交/统计」菜单为止，不用非贪婪的 `</dl>`：30363 这类页里
+    # problem-content 内还套着一层 `<dl class="problem-content">`，非贪婪会停在内层，
+    # 提示里的「并查集」就丢了。
+    start = text.find('<dl class="problem-content">')
+    if start < 0:
+        return ""
+    ends = [at for at in (text.find('<ul class="bottomMenu"', start),
+                          text.find('<div class="problem-statistics', start)) if at >= 0]
+    body = text[start:min(ends) if ends else len(text)]
+    body = re.sub(r"<(script|style)\b.*?</\1>", " ", body, flags=re.S | re.I)
+    # 标签必须以字母开头：镜像题面里有裸写的 `1<=n<=100`，宽松的 `<[^>]+>`
+    # 会把「<=n ... 下一个 >」整段当成标签吃掉，01182 的数据范围就这样没了。
+    body = unescape(re.sub(r"</?[A-Za-z][^>]*>", " ", body)).replace("\u200b", "")
+    return re.sub(r"\s+", " ", body).strip()
+
+
 def markdown_body(text):
     """OJ Inject 解码后的 `<div class="markdown-body">…</div>`，按 div 层数配平取整块。
 
@@ -504,6 +559,12 @@ CATALOG_TITLE_CACHE = {}
 CATALOG_RAW_CACHE = None
 CATALOG_RAW_VERSION = None
 CATALOG_FULL_CACHE = None
+# 全文检索索引：(book, id) -> 小写的「标题 + 题面纯文本」。随 catalog 版本失效。
+SEARCH_INDEX_CACHE = None
+SEARCH_INDEX_VERSION = None
+TOPICS_CACHE = None
+TOPICS_VERSION = None
+CATALOG_FULL_TOPICS = None
 CAPTCHA_CHALLENGES = {}
 
 COURSE = {
@@ -822,6 +883,70 @@ def catalog_raw():
     return CATALOG_RAW_CACHE
 
 
+def problem_topics():
+    """题号 -> 考点列表，来自 `data/openjudge/topics.json`（`scripts/tag_topics.py` 生成）。
+
+    按题号而不是 (题库, 题号) 存：同一道题挂在多个题库里，考点是题目本身的属性。
+    """
+    global TOPICS_CACHE, TOPICS_VERSION
+    path = MIRROR / "topics.json"
+    if not path.is_file():
+        return {}
+    version = file_version(path)
+    if TOPICS_CACHE is None or version is None or TOPICS_VERSION != version:
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            TOPICS_CACHE = {str(k): list(v) for k, v in data.get("topics", {}).items()}
+        except (ValueError, AttributeError, TypeError):
+            TOPICS_CACHE = {}
+        TOPICS_VERSION = version
+    return TOPICS_CACHE
+
+
+def search_index():
+    """每道题的「标题 + 题面纯文本」，小写后缓存；catalog 换版本才重建（2026-11-09 实测 2058 页首建约 1.2 秒，之后每次检索约 5 毫秒）。"""
+    global SEARCH_INDEX_CACHE, SEARCH_INDEX_VERSION
+    raw = catalog_raw()
+    if SEARCH_INDEX_CACHE is None or SEARCH_INDEX_VERSION is not CATALOG_RAW_CACHE:
+        index = {}
+        for item in raw.get("problems", []):
+            book, pid = item.get("book", ""), item.get("id", "")
+            text = statement_plain_text(MIRROR / "pages" / f"{book}__{pid}.html")
+            index[(book, pid)] = (catalog_title(item) + " " + text).casefold(), text
+        SEARCH_INDEX_CACHE, SEARCH_INDEX_VERSION = index, CATALOG_RAW_CACHE
+    return SEARCH_INDEX_CACHE
+
+
+SEARCH_RESULT_LIMIT = 1000
+
+
+def search_payload(query, user):
+    """题面全文检索：空格分隔的每个词都要出现（不分大小写）。
+
+    只在当前用户看得见的题库里搜 —— 私有题库的题面同样不能借检索漏出去。
+    返回命中位置附近的一小段原文作摘要，不返回整份题面。
+    """
+    terms = [t.casefold() for t in query.split() if t.strip()][:8]
+    if not terms:
+        return {"query": query, "matches": [], "truncated": False}
+    matches = []
+    truncated = False
+    for (book, pid), (folded, text) in search_index().items():
+        if book in OFFLINE_BOOKS or not book_visible(book, user):
+            continue
+        if not all(term in folded for term in terms):
+            continue
+        if len(matches) >= SEARCH_RESULT_LIMIT:
+            truncated = True
+            break
+        # folded 以「标题 + 空格」开头；摘要从题面正文里取，命中在标题里就取开头。
+        at = text.casefold().find(terms[0])
+        start = max(0, at - 30) if at >= 0 else 0
+        snippet = ("…" if start else "") + text[start:start + 90] + ("…" if start + 90 < len(text) else "")
+        matches.append({"book": book, "id": pid, "snippet": snippet})
+    return {"query": query, "matches": matches, "truncated": truncated}
+
+
 # `catalog.json` 的 `test_cases` 是每题逐组的数据文件路径清单，占整份目录的 90%
 # （实测：整个响应 4.25MB，其中 3.9MB 是它）。**页面一个字段都没用到** ——
 # `problems.html` 与 `admin.html` 只读 book/id/path/title/test_count/pass_rate/
@@ -843,9 +968,11 @@ def catalog_book_meta(problems):
 
 def catalog_full_payload():
     """Build the complete directory response only once per catalog version."""
-    global CATALOG_FULL_CACHE
-    if CATALOG_FULL_CACHE is None:
+    global CATALOG_FULL_CACHE, CATALOG_FULL_TOPICS
+    topics = problem_topics()
+    if CATALOG_FULL_CACHE is None or CATALOG_FULL_TOPICS is not topics:
         raw = catalog_raw()
+        CATALOG_FULL_TOPICS = topics
         problems = [item for item in raw.get("problems", [])
                     if item.get("book") not in OFFLINE_BOOKS]
         def problem_key(item):
@@ -858,7 +985,9 @@ def catalog_full_payload():
             **raw,
             "count": len(problems),
             "problems": [{**{k: v for k, v in item.items() if k not in CATALOG_INTERNAL_FIELDS},
-                          "title": catalog_title(item)} for item in problems],
+                          "title": catalog_title(item),
+                          "topics": topics.get(item.get("id", ""), [])}
+                         for item in problems],
             "unique_total": len(all_keys),
             "unique_tested_count": len(tested_keys),
             "book_meta": catalog_book_meta(problems),
@@ -902,6 +1031,7 @@ def catalog_summary_payload():
     public = [item for item in problems if item.get("book") not in PRIVATE_BOOKS]
     all_keys = {problem_key(item) for item in public}
     tested_keys = {problem_key(item) for item in public if (item.get("test_count") or 0) > 0}
+    topics = problem_topics()
     return {
         "total": len(all_keys),
         "tested_count": len(tested_keys),
@@ -913,6 +1043,7 @@ def catalog_summary_payload():
                 "path": item.get("path", ""),
                 "test_count": item.get("test_count", 0),
                 "title": catalog_title(item),
+                "topics": topics.get(item.get("id", ""), []),
                 "added_at": item.get("added_at") or added_dates.get(
                     f"{item.get('book', '')}/{item.get('id', '')}", ""),
             }
@@ -1423,30 +1554,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_body(file.read_bytes(), content_type, cache=cache, etag=etag)
 
     def local_page(self, page):
-        text = page.read_text(encoding="utf-8", errors="replace")
-        # Newer OpenJudge pages may keep the rendered statement (including
-        # samples) in gzip/base64 OJ Inject data nodes. Decode those nodes so
-        # server-side sample extraction sees the same content as the browser.
-        def decode_inject(match):
-            attrs, payload = match.group(1), match.group(2)
-            if 'data-version="2"' not in attrs or not payload.strip():
-                return match.group(0)
-            try:
-                decoded = gzip.decompress(base64.b64decode(payload.strip())).decode("utf-8")
-            except (ValueError, OSError, UnicodeDecodeError):
-                return match.group(0)
-            return decoded
-        text = re.sub(r'<script\b([^>]*application/x-oj-inject-data[^>]*)>(.*?)</script>',
-                      decode_inject, text, flags=re.I | re.S)
-        text = re.sub(r'<p>题目描述加载中。如果持续看到此说明，请确认浏览器没有禁用 JavaScript，并查看是否有加载错误。</p>',
-                      '', text)
-        rendered = markdown_body(text)
-        if rendered:
-            start = text.find('<dl class="problem-content">')
-            end = text.find('<div class="problem-statistics', start)
-            if start >= 0 and end >= 0:
-                replacement = '<dl class="problem-content"><dd>' + rendered + '</dd></dl>\n'
-                text = text[:start] + replacement + text[end:]
+        text = expand_oj_inject(page.read_text(encoding="utf-8", errors="replace"))
         text = text.replace("http://cs101.openjudge.cn/", "/")
         text = text.replace("https://cs101.openjudge.cn/", "/")
         text = text.replace("http://cs101.openjudge.cn", "/")
@@ -1839,6 +1947,9 @@ profile.onsubmit=async e=>{e.preventDefault();message.textContent='';const r=awa
             if parse_qs(parsed.query).get("summary") == ["1"]:
                 self.send_json(visible_catalog(catalog_summary_payload(), viewer)); return
             self.send_json(visible_catalog(catalog_full_payload(), viewer)); return
+        if path == "/api/search":
+            query = str(parse_qs(parsed.query).get("q", [""])[0]).strip()[:64]
+            self.send_json(search_payload(query, self.current_user())); return
         book_api = re.fullmatch(r"/api/books/([^/]+)/", path)
         if book_api and book_api.group(1) in BOOK_META:
             query = parse_qs(parsed.query)
