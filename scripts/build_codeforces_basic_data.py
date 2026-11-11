@@ -1308,8 +1308,12 @@ BUILDERS = {
     "2227C": case_2227c,
 }
 
-# 21 组随机数据之外再追加的满规模数据（编号接在后面），只给真需要卡复杂度的题用。
-MAX_CASES = {"230B": case_230b_max}
+# 21 组随机数据之外追加的补充数据：满规模检查或指定反例，编号接在后面。
+EXTRA_CASES = {
+    "230B": case_230b_max,
+    # 10 + 10 + 11 + 11 + 11 = 53，最优为 5 段。
+    "189A": lambda r: ("53 10 11 23\n", "5\n"),
+}
 
 
 def main():
@@ -1341,8 +1345,8 @@ def main():
             (directory / f"{seed}.out").write_text(output, encoding="utf-8")
             cases.append({"input": str((directory / f"{seed}.in").relative_to(MIRROR)),
                           "output": str((directory / f"{seed}.out").relative_to(MIRROR))})
-        if problem in MAX_CASES:
-            payload, output = MAX_CASES[problem](random.Random(sum(map(ord, problem))))
+        if problem in EXTRA_CASES:
+            payload, output = EXTRA_CASES[problem](random.Random(sum(map(ord, problem))))
             seed = len(cases)
             (directory / f"{seed}.in").write_text(payload, encoding="utf-8")
             (directory / f"{seed}.out").write_text(output, encoding="utf-8")
@@ -1392,7 +1396,7 @@ def main():
     # 结尾**不要**补换行：`scripts/index_tests.py` 写出的规范产物最后一个字节就是 `}`，
     # 多一个 "\n" 会让下一次重跑索引冒出一个无关 diff（2026-09-10 复核抓到过一次）。
     CATALOG.write_text(json.dumps(catalog, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"generated {built} problems x 21 cases (+{len(MAX_CASES)} max cases); skipped {skipped} withheld")
+    print(f"generated {built} problems x 21 cases (+{len(EXTRA_CASES)} extra cases); skipped {skipped} withheld")
 
 
 if __name__ == "__main__":
