@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""545C Woodcutters: greedy tree-falling, diverse positions and heights."""
+"""545C 伐木：保留原有数据，并收齐两组官方样例。"""
 from __future__ import annotations
 import random
 import subprocess
@@ -8,6 +8,8 @@ from pathlib import Path
 
 SAMPLE = "5\n1 2\n2 1\n5 10\n10 9\n19 1\n"
 SAMPLE_OUT = "3\n"
+SAMPLE_2 = "5\n1 2\n2 1\n5 10\n10 9\n20 1\n"
+SAMPLE_2_OUT = "4\n"
 REFERENCE = Path(__file__).with_name("samplecode.py")
 
 SIZES = (1, 2, 3, 4, 5, 6, 7, 8, 10, 15, 20, 30, 50, 80, 100, 200, 500, 1000, 5000, 100000)
@@ -85,14 +87,17 @@ def build():
             attempt += 1
             case = generate(seed, attempt)
         cases.append(case)
+    # 末树向右倒时，无须为它向左倒预留空间；旧数据漏掉了这个官方反例。
+    cases.append(SAMPLE_2)
+    sample_answers = {SAMPLE: SAMPLE_OUT, SAMPLE_2: SAMPLE_2_OUT}
     for index, case in enumerate(cases):
         if not valid(case):
             raise SystemExit(f"invalid {index}")
         answer = subprocess.run(
             [sys.executable, str(REFERENCE)], input=case, text=True, capture_output=True, check=True
         ).stdout
-        if index == 0 and answer != SAMPLE_OUT:
-            raise SystemExit(f"sample mismatch: got {answer!r} expected {SAMPLE_OUT!r}")
+        if case in sample_answers and answer != sample_answers[case]:
+            raise SystemExit(f"样例答案不符：实际 {answer!r}，预期 {sample_answers[case]!r}")
         (out / f"{index}.in").write_text(case, encoding="utf-8")
         (out / f"{index}.out").write_text(answer, encoding="utf-8")
 

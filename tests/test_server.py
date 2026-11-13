@@ -708,7 +708,7 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
                          {"2109C1", "2109C2", "2109C3", "2173E", "2209C"})
 
         generated = [item for item in entries if item.get("data_status") == "generated_tests"]
-        self.assertEqual(len(generated), 113)
+        self.assertEqual(len(generated), 112)
         self.assertTrue({"1A", "25A", "50A", "58A", "69A", "71A", "96A", "112A", "118A",
                          "122A", "131A", "151A", "158A", "160A", "230A"}.issubset(
                              {item["id"] for item in generated}))
@@ -726,7 +726,7 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         self.assertTrue({"1195C", "1829E", "1850H", "1881C"}.issubset(
                              {item["id"] for item in generated}))
         self.assertTrue({"1425A", "1526C1", "1879B"}.issubset({item["id"] for item in generated}))
-        self.assertTrue({"1B", "460B", "545C", "580C", "893C"}.issubset(
+        self.assertTrue({"1B", "460B", "580C", "893C"}.issubset(
                              {item["id"] for item in generated}))
         self.assertTrue({"1443C", "2033D"}.issubset({item["id"] for item in generated}))
         self.assertTrue({"508A", "1163B2", "1427B", "2075C", "2132B"}.issubset(
@@ -769,9 +769,9 @@ print(\"YES\" if w % 2 == 0 else \"NO\")
         rebuilt = [item for item in entries if item.get("data_status") == "rebuilt_tests"]
         self.assertEqual({item["id"] for item in rebuilt},
                          {"270A", "456A", "698A", "903C", "1374B", "1374C", "1475A", "1742A", "1764C", "1829D", "1883D", "1970E1", "2140B", "2208C", "2227B",
-                          "116A", "546A", "617A", "734A", "791A", "977A", "2254F",
+                          "116A", "545C", "546A", "617A", "734A", "791A", "977A", "2254F",
                           *REBUILT_2026_09_17_CODEFORCES, *SPECIAL_JUDGE_CODEFORCES})
-        self.assertTrue(all(item["test_count"] == {"2201G": 2, "2254F": 40}.get(item["id"], 21)
+        self.assertTrue(all(item["test_count"] == {"545C": 41, "2201G": 2, "2254F": 40}.get(item["id"], 21)
                             for item in rebuilt))
         for problem_id, field in SPECIAL_JUDGE_CODEFORCES.items():
             item = next(row for row in rebuilt if row["id"] == problem_id)
