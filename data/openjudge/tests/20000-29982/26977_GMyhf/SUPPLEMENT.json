@@ -1,0 +1,91 @@
+{
+  "source": "本仓库自造边界数据，非平台原始下载；由 scripts/strengthen_26977.py 生成",
+  "reason": "用户报告 #53919881 可能假 A，要求补充递减等边界；实测该提交通过新增数据，尚未复现错误",
+  "original_cases": "0..21 保持原始字节，来源及哈希仍见 SOURCE.json",
+  "files": [
+    {
+      "case": 22,
+      "purpose": "严格递减（用户报告 #53919881）",
+      "in_sha256": "5ac9dad8173c53309e4942866f855d01391fbf0b52ba0380dc0e5806d82365d5",
+      "out_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "case": 23,
+      "purpose": "严格递增",
+      "in_sha256": "f19d1b4e07b0194c5b455266bbc842aaacdaa70714a5c9f520f4223134662ecd",
+      "out_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "case": 24,
+      "purpose": "单柱为零",
+      "in_sha256": "5d90ef7fc0d040fd56a1e48697cfa99e0dfaf4fd803aefefc3b5053ec1d36aea",
+      "out_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "case": 25,
+      "purpose": "单柱最高",
+      "in_sha256": "1348719099926da0ca00b1ed57ab6ad6589d4aab4f913453635c68ef37810e9f",
+      "out_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "case": 26,
+      "purpose": "两柱递减",
+      "in_sha256": "d41353fba6b9312698d834f4359631e951dfc9226b85a193f3f6ae4b031a835d",
+      "out_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "case": 27,
+      "purpose": "两柱递增",
+      "in_sha256": "3ffab3b5ece715fb7c1b2463752c5385173d46fe6f41d446138bdf268b67c804",
+      "out_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "case": 28,
+      "purpose": "全零满规模",
+      "in_sha256": "db7695a4d73194e20b66e437e8701a925749ea3eb37d77f046570d919b482439",
+      "out_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "case": 29,
+      "purpose": "等高满规模",
+      "in_sha256": "35ff8ce61bd1e6a8635e2692e5e66eb07a47b9062210a9987fdb621705cd6606",
+      "out_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "case": 30,
+      "purpose": "单峰不蓄水",
+      "in_sha256": "134fd5ce03090c21b4879f5081718e1bc977459c85199710d75d19ef2f5bcfda",
+      "out_sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "case": 31,
+      "purpose": "不等高边界的盆地",
+      "in_sha256": "9a630ad40acd8a8b8080020a26c71bcd9daa499dbe038db3d1589bf97ec31016",
+      "out_sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d"
+    },
+    {
+      "case": 32,
+      "purpose": "连续相等的盆底",
+      "in_sha256": "d0898f4d4437ba612733b97d1a15c53962dea3047a57c91ec595148225f67041",
+      "out_sha256": "7de1555df0c2700329e815b93b32c571c3ea54dc967b89e81ab73b9972b72d1d"
+    },
+    {
+      "case": 33,
+      "purpose": "多个盆地",
+      "in_sha256": "d89b13bb5fcbf6c179d6e0a40d4a6a6df9ec494ee19792ba722c8f33d22dfa94",
+      "out_sha256": "917df3320d778ddbaa5c5c7742bc4046bf803c36ed2b050f30844ed206783469"
+    },
+    {
+      "case": 34,
+      "purpose": "最高柱在中间且两端低",
+      "in_sha256": "b4118e502de31809facf722adc9deeaad094ffda9aafb2c779230397f70f40d1",
+      "out_sha256": "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2"
+    },
+    {
+      "case": 35,
+      "purpose": "蓄水量超过有符号 32 位",
+      "in_sha256": "f0ee0be2d86837c7cf9c11e93880305ff22e9c86f3293deed9d77f1865cd805e",
+      "out_sha256": "7b93c2088b403b8a8925db7820e9e1dd26027f538cc180931312e6e49219aa45"
+    }
+  ]
+}
