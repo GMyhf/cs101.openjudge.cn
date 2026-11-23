@@ -165,6 +165,13 @@ class DsaPrivateFinalTests(unittest.TestCase):
                 source = (BASE / f'{number}_made/samplecode.py').read_text()
                 self.assertEqual(judge('private', str(number), 'python', source)['status'], 'Accepted')
 
+    def test_public_matching_accepts_a_different_valid_answer(self):
+        """公开题库沿用原题语义，不能退化为精确字符串比对。"""
+        source = (BASE / '1000007_made/samplecode.py').read_text()
+        source = source.replace("return s + 'a\\n'",
+                                "return 'a' * (len(s)+1) + '\\n'")
+        self.assertEqual(judge('practice', '1000007', 'python', source)['status'], 'Accepted')
+
 
 if __name__ == '__main__':
     unittest.main()
