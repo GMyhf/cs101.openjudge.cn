@@ -1,0 +1,193 @@
+{
+  "说明": "数算 A 往年题按比赛 URL 导入 private，不通过公开全局题号；沿用仅 GMyhf 可见的权限。参考解、生成器和数据均为本仓库自写，未抓取上游后台测试数据。",
+  "题号映射": [
+    {
+      "id": "1000004",
+      "source_url": "http://dsa.openjudge.cn/2025final/C/",
+      "test_count": 21
+    },
+    {
+      "id": "1000005",
+      "source_url": "http://dsa.openjudge.cn/2025final/E/",
+      "test_count": 21
+    },
+    {
+      "id": "1000006",
+      "source_url": "http://dsa.openjudge.cn/2024final/C/",
+      "test_count": 21
+    },
+    {
+      "id": "1000007",
+      "source_url": "http://dsa.openjudge.cn/2024final/E/",
+      "test_count": 21
+    },
+    {
+      "id": "1000008",
+      "source_url": "http://dsa.openjudge.cn/2023final/2/",
+      "test_count": 21
+    },
+    {
+      "id": "1000009",
+      "source_url": "http://dsa.openjudge.cn/2022final1/1/",
+      "test_count": 21
+    },
+    {
+      "id": "1000010",
+      "source_url": "http://dsa.openjudge.cn/2022final1/3/",
+      "test_count": 21
+    },
+    {
+      "id": "1000011",
+      "source_url": "http://dsa.openjudge.cn/2022final1/5/",
+      "test_count": 21
+    }
+  ],
+  "样例整理": "2024 C 的分隔线转为编号样例；2024 E 的样例编号改为样例输入/输出编号，兼容既有运行样例解析器；保留全部原始样例与来源链接。",
+  "独立核对": {
+    "1000004": "小规模直接构造 C",
+    "1000005": "两个单调队列的游程合并，与堆实现交叉核对全部 21 组；小权重另穷举所有合并顺序",
+    "1000006": "归并排序交叉核对全部 21 组；另随机点集按定义枚举所有点对",
+    "1000007": "二元字母表长度 1..5 的全部字符串与全部掩码穷举子串判断可解性；特判接受不同合法答案、拒绝额外出现/缺失/大写/超长/多 token",
+    "1000008": "按值收集全部下标，检查首尾距离",
+    "1000009": "小规模按定义枚举周期，大规模用 Z 函数，与前缀函数交叉核对",
+    "1000010": "小树逐对沿唯一路径求最大权，最大等权链/星形用闭式核对",
+    "1000011": "小树枚举删去每个叶子后重算；五万节点链用闭式核对"
+  },
+  "实际判题": [
+    {
+      "id": "1000004",
+      "seconds": 0.87,
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 745,
+        "memory_kb": 30132
+      }
+    },
+    {
+      "id": "1000005",
+      "seconds": 5.98,
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 5843,
+        "memory_kb": 56324
+      }
+    },
+    {
+      "id": "1000006",
+      "seconds": 1.91,
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 1815,
+        "memory_kb": 82712
+      }
+    },
+    {
+      "id": "1000007",
+      "seconds": 3.5,
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 2903,
+        "memory_kb": 82712
+      }
+    },
+    {
+      "id": "1000008",
+      "seconds": 0.82,
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 704,
+        "memory_kb": 82712
+      }
+    },
+    {
+      "id": "1000009",
+      "seconds": 0.45,
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 358,
+        "memory_kb": 82712
+      }
+    },
+    {
+      "id": "1000010",
+      "seconds": 0.86,
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 764,
+        "memory_kb": 82712
+      }
+    },
+    {
+      "id": "1000011",
+      "seconds": 0.58,
+      "result": {
+        "status": "Accepted",
+        "cases": 21,
+        "time_ms": 486,
+        "memory_kb": 82712
+      }
+    }
+  ],
+  "变异自检": {
+    "1000004": {
+      "mutation": "i = bisect_right(ends, t) - 1 → i = 0",
+      "test_failed": true,
+      "contract_mutation_caught": true
+    },
+    "1000005": {
+      "mutation": "answer += 2 * w * pairs → answer += w * pairs",
+      "test_failed": true,
+      "contract_mutation_caught": true
+    },
+    "1000006": {
+      "mutation": "answer += bit[j] → answer += 2 * bit[j]",
+      "test_failed": true,
+      "contract_mutation_caught": true
+    },
+    "1000008": {
+      "mutation": "i-first[x] >= 2 → i-first[x] >= 1",
+      "test_failed": true,
+      "contract_mutation_caught": true
+    },
+    "1000009": {
+      "mutation": "period if period == n else (-n) % period → 0 if period == n else period - n % period",
+      "test_failed": true,
+      "contract_mutation_caught": true
+    },
+    "1000010": {
+      "mutation": "(w+1) * size[u] * size[v] - 1 → w * size[u] * size[v] - 1",
+      "test_failed": true,
+      "contract_mutation_caught": true
+    },
+    "1000011": {
+      "mutation": "(-1 if size[v] > other else 1) → (-1 if size[v] >= other else 1)",
+      "test_failed": true,
+      "contract_mutation_caught": true
+    },
+    "1000007": {
+      "mutation": "不可解时返回 a",
+      "test_failed": true,
+      "contract_mutation_caught": true,
+      "checker_mutation_caught": true
+    }
+  },
+  "复现": "python3 -m unittest tests.test_dsa_private_finals；各题 producecase.py 固定种子重建 0..20.in/.out；完整闸门 python3 tools/handoff.py --verify。",
+  "目录可见性核对": {
+    "None": 0,
+    "student": 0,
+    "GMyhf": 8
+  },
+  "题面公式整理": "2025 两题的 SVG 公式改成带上下标的普通 HTML，去掉上游同时残留的重复 LaTeX；数值范围、0 起始下标、全部样例及来源不变。",
+  "完整闸门": {
+    "command": "python3 tools/handoff.py --verify",
+    "exit_code": 0,
+    "说明": "在沙箱外运行，套接字与 NuGet 访问可用；全套 unittest、语法检查、待返工检查及 full_sweep 均通过。"
+  }
+}

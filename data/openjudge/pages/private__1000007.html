@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>1000007: 匹配</title></head>
+<body><div id="pageTitle"><h2>1000007: 匹配</h2></div>
+<dl class="problem-params">
+		<dt>总时间限制: </dt>
+		<dd>10000ms</dd>
+			<dt>单个测试点时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>524288kB</dd>
+	</dl>
+<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><div>给定一个字符串 S 和一个与 S 等长的 01 串 P，请构造一个非空字符串 T，满足以下条件：</div>
+<div>&bull; 对于 1 &le; i &le; |S| - |T| + 1，P[i] = 1 当且仅当 T 作为子串恰好从 S 的下标 i 开始出现；</div>
+<div>&bull; 对于 |S| - |T| + 1 &lt; i &le; |S|，P[i] = 0。</div>
+<div> </div>
+<div>
+<div>
+<div>若满足条件的 T 存在，输出任意一个长度不超过 10<sup>6</sup>+1 的 T（这样的 T 一定存在），否则输出 -1。</div>
+</div>
+</div></dd>
+
+
+				<dt>输入</dt>
+		<dd>第一行一个由小写英文字母构成的字符串 S (1 ≤ |S| ≤ 10<sup>6</sup>)。<br />第二行一个与 S 等长的 01 串 P。</dd>
+		<dt>输出</dt>
+		<dd>输出一个字符串 T 或 -1。如果有多种可能的 T，你可以任意输出一种。<span style="color: #e03e2d;">T必须仅包含英文小写字母。</span></dd>
+		<dt>样例输入</dt>
+		<dd><pre>样例输入1：
+baaababaab
+0001010000
+
+样例输入2：
+zqjzqj
+000000
+
+样例输入3：
+zqjzqj
+100001</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>样例输出1：
+aba
+
+样例输出2：
+test
+
+样例输出3：
+-1</pre></dd>
+				<dt>提示</dt>
+		<dd>对于第一组样例，T 只可能是 aba。<br />对于第二组样例，T 不是 S 的子串即可。<br />对于第三组样例，没有合法的 T，因此答案为 -1。<br /><br />在本题中：<br />对于 30% 的测试点： |S| ≤ 10，且 S 只包含 a 或 b。<br />对于 50% 的测试点： |S| ≤ 100。<br />对于 70% 的测试点： |S| ≤ 1000。<br />对于 100% 的测试点： |S| ≤ 10<sup>6</sup>。</dd>
+						</dl>
+<p>来源：<a href="http://dsa.openjudge.cn/2024final/E/">数算 A · 2024final · E</a>（原题号 E）</p>
+</body></html>

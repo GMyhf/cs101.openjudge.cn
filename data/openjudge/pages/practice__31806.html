@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><title>31806: 带禁用词的字符串构造</title></head>
+<body><div id="pageTitle"><h2>31806: 带禁用词的字符串构造</h2></div>
+<dl class="problem-params">
+<dt>全局题号</dt><dd>31806</dd>
+		<dt>总时间限制: </dt>
+		<dd>10000ms</dd>
+			<dt>单个测试点时间限制: </dt>
+		<dd>1000ms</dd>
+			<dt>内存限制: </dt>
+		<dd>512000kB</dd>
+	</dl>
+<dl class="problem-content">
+		<dt>描述</dt>
+		<dd><div>
+<p>给定只包含小写字母的字符串 <span>A,B</span>，以及 <span>k</span> 个禁止出现的长度为 2 的字符串（称为禁用组合）。</p>
+</div>
+<div>
+<p>构造字符串 <span>C</span> 的方式如下：</p>
+</div>
+<div>
+<ol>
+<li><span>C</span> 起始是空串；</li>
+<li>按顺序枚举 <span>A</span> 的每个字符 <span>A<sub>i</sub></span>，依次与 <span>B</span> 的每个字符 <span>B<sub>j</sub></span> 组合成串 <span>A<sub>i</sub>B<sub>j</sub></span>；</li>
+<li>若 <span>A<sub>i</sub>B<sub>j</sub></span> 不在禁用组合中，则将该串按加入到 <span>C</span> 的末尾。</li>
+</ol>
+</div>
+<div>
+<p>给定 <span>q</span> 个询问，每个询问给出 <span>t<sub>i</sub></span>，求 <span>C</span> 的第 <span>t<sub>i</sub></span> 个字符，保证所有询问都不会越界。</p>
+</div>
+<div> </div></dd>
+
+
+				<dt>输入</dt>
+		<dd><p>第一行包含四个整数 L<sub>A</sub>, L<sub>B</sub>, k, q，其中 L<sub>A</sub>, L<sub>B</sub> 分别为 A, B 的长度。</p>
+<p>第二行包含 L<sub>A</sub> 个小写字符，表示字符串 A。</p>
+<p>第三行包含 L<sub>B</sub> 个小写字符，表示字符串 B。</p>
+<p>接下来 k 行每行有两个小写字符，用一个空格分开，表示 k 组禁用组合。</p>
+<p>接下来 q 行每行一个整数，第 i 个表示第 i 次询问对应的 t<sub>i</sub>。注意字符串的下标从 0 开始。记 C 的长度为 L<sub>C</sub>，保证 0 ≤ t<sub>i</sub> &lt; L<sub>C</sub>。</p></dd>
+		<dt>输出</dt>
+		<dd><p>共 q 行，每行一个字符，第 i 行表示第 i 次询问的答案。</p></dd>
+		<dt>样例输入</dt>
+		<dd><pre>4 2 2 10
+cbaa
+ac
+b c
+a a
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9</pre></dd>
+		<dt>样例输出</dt>
+		<dd><pre>c
+a
+c
+c
+b
+a
+a
+c
+a
+c
+</pre></dd>
+				<dt>提示</dt>
+		<dd><p>对所有数据，L<sub>A</sub>, L<sub>B</sub> ≤ 200000，k ≤ 26<sup>2</sup>，q ≤ 100000。</p>
+<p>对 60% 的数据：L<sub>A</sub>, L<sub>B</sub> ≤ 1000。</p>
+<p>对另外 20% 的数据：q ≤ 10。</p></dd>
+						</dl>
+<p>来源：<a href="http://dsa.openjudge.cn/2025final/C/">数算 A · 2025final · C</a>（原题号 C）</p>
+</body></html>

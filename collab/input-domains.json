@@ -1,8 +1,8 @@
 {
   "note": "题面对输入的原话（逐字）与数据实际极值并排记账。由 scripts/build_input_domains.py 生成，tools/full_sweep.py 第 15 条盯着。引文没有数值范围（quote_has_bound=false）不是缺陷，是「这段题面本来就没写上界」，记下来是为了让它可见。",
   "updated": "2026-09-20",
-  "count": 1287,
-  "without_bound": 432,
+  "count": 1302,
+  "without_bound": 438,
   "entries": {
     "tests/1000-1999/01001_made": {
       "book": "practice",
@@ -12747,6 +12747,103 @@
       "case_count": 24,
       "data_digest": "022723fb1f5d8ad6047fb48f01b89449d0249b09140c179f03641b3ae0ba1ed0"
     },
+    "tests/30000-/31806_made": {
+      "book": "practice",
+      "id": "31806",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行包含四个整数 L A , L B , k, q，其中 L A , L B 分别为 A, B 的长度。 第二行包含 L A 个小写字符，表示字符串 A。 第三行包含 L B 个小写字符，表示字符串 B。 接下来 k 行每行有两个小写字符，用一个空格分开，表示 k 组禁用组合。 接下来 q 行每行一个整数，第 i 个表示第 i 次询问对应的 t i 。注意字符串的下标从 0 开始。记 C 的长度为 L C ，保证 0 ≤ t i < L C 。",
+      "quote_has_bound": true,
+      "quote_max_number": 0,
+      "generated_extremes": {
+        "max_int": 79999999999,
+        "min_int": 0
+      },
+      "case_count": 21,
+      "data_digest": "cf8209e3656e2a6e1e6424fc8108608adb6b7b17f1a3ab73c7544b51cb9d0caa"
+    },
+    "tests/30000-/31807_made": {
+      "book": "practice",
+      "id": "31807",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行，一个整数 n。 接下来 n 行，每行两个整数 a i , b i 。",
+      "quote_has_bound": false,
+      "quote_max_number": null,
+      "generated_extremes": {
+        "max_int": 200000,
+        "min_int": 1
+      },
+      "case_count": 21,
+      "data_digest": "ba817c3c398788b03c55dd8cafe5cf2d4d17fc07f79531b402d15a984df04ba9"
+    },
+    "tests/30000-/31808_made": {
+      "book": "practice",
+      "id": "31808",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行包含一个整数 n ，表示文明的数量。 接下来的 n 行，每行包含两个整数 x_i 和 y_i，表示第 i 个文明的坐标。",
+      "quote_has_bound": false,
+      "quote_max_number": null,
+      "generated_extremes": {
+        "max_int": 1000000000,
+        "min_int": 0
+      },
+      "case_count": 21,
+      "data_digest": "cd95fb4085271d81380453fed02a897704b26002cb73dac6fedd1a50b36b5cb0"
+    },
+    "tests/30000-/31809_made": {
+      "book": "practice",
+      "id": "31809",
+      "source": "mirror_page",
+      "statement_quote": "输入 本题有多组测试数据。第一行一个数字 T(T <= 20) 表示测试数据组数。 对于每一组测试数据，第一行一个数字 n 表示序列长度。 第二行，一行 n 个数字，第 i 个数字表示序列 a 的第 i 个元素 a[i](1 <= a[i] <= 200000)",
+      "quote_has_bound": true,
+      "quote_max_number": 200000,
+      "generated_extremes": {
+        "max_int": 500000,
+        "min_int": 1
+      },
+      "case_count": 21,
+      "data_digest": "94826fd9c8e7214773db02f6dd2c509f506286ebe008f310def93127565398fa"
+    },
+    "tests/30000-/31810_made": {
+      "book": "practice",
+      "id": "31810",
+      "source": "mirror_page",
+      "statement_quote": "输入 输入包括一行，一个字符串 A 保证输入的字符串仅包含小写字符，且串的长度不超过 100,000",
+      "quote_has_bound": true,
+      "quote_max_number": 100000,
+      "generated_extremes": {
+        "integer_tokens": 0
+      },
+      "case_count": 21,
+      "data_digest": "1deff9b97d8d0e6ae539957819a7047385f0f4a3b7ea647440dda06c9a09f073"
+    },
+    "tests/30000-/31811_made": {
+      "book": "practice",
+      "id": "31811",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行 N 表示树 T 的点数 接下来 N-1 行每行三个整数 s[i] t[i] d[i]，表示 T 中有一条连接 s[i] 和 t[i] 且权值为 d[i] 的无向边。 数据保证输入构成一棵树。",
+      "quote_has_bound": false,
+      "quote_max_number": 1,
+      "generated_extremes": {
+        "max_int": 100000,
+        "min_int": 1
+      },
+      "case_count": 21,
+      "data_digest": "48829f24ecf2a2672a18ca7934ee0e70c5f5b871bde84cc1d893e857674dc7c5"
+    },
+    "tests/30000-/31812_made": {
+      "book": "practice",
+      "id": "31812",
+      "source": "mirror_page",
+      "statement_quote": "输入 第1行一个整数 n（在 2 ~ 50,000之间），表示二叉树的节点个数。 第2行到第n行，每行两个数a[i] b[i]，表示a[i]是b[i]的父节点。保证1号节点为二叉树的根。",
+      "quote_has_bound": true,
+      "quote_max_number": 50000,
+      "generated_extremes": {
+        "max_int": 50000,
+        "min_int": 1
+      },
+      "case_count": 21,
+      "data_digest": "5d013aedc2e088a38547b3b94f5d1dc9d635f9a8537b1e235817f024782974c1"
+    },
     "tests/4000-8210/03704_made": {
       "book": "2024sp_routine",
       "id": "03704",
@@ -17918,6 +18015,117 @@
       },
       "case_count": 21,
       "data_digest": "ff0dc030db9af5eb82376c0e601eafce29767620c56f1219e448a87309229f98"
+    },
+    "tests/private/1000004_made": {
+      "book": "private",
+      "id": "1000004",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行包含四个整数 L A , L B , k, q，其中 L A , L B 分别为 A, B 的长度。 第二行包含 L A 个小写字符，表示字符串 A。 第三行包含 L B 个小写字符，表示字符串 B。 接下来 k 行每行有两个小写字符，用一个空格分开，表示 k 组禁用组合。 接下来 q 行每行一个整数，第 i 个表示第 i 次询问对应的 t i 。注意字符串的下标从 0 开始。记 C 的长度为 L C ，保证 0 ≤ t i < L C 。",
+      "quote_has_bound": true,
+      "quote_max_number": 0,
+      "generated_extremes": {
+        "max_int": 79999999999,
+        "min_int": 0
+      },
+      "case_count": 21,
+      "data_digest": "cf8209e3656e2a6e1e6424fc8108608adb6b7b17f1a3ab73c7544b51cb9d0caa"
+    },
+    "tests/private/1000005_made": {
+      "book": "private",
+      "id": "1000005",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行，一个整数 n。 接下来 n 行，每行两个整数 a i , b i 。",
+      "quote_has_bound": false,
+      "quote_max_number": null,
+      "generated_extremes": {
+        "max_int": 200000,
+        "min_int": 1
+      },
+      "case_count": 21,
+      "data_digest": "ba817c3c398788b03c55dd8cafe5cf2d4d17fc07f79531b402d15a984df04ba9"
+    },
+    "tests/private/1000006_made": {
+      "book": "private",
+      "id": "1000006",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行包含一个整数 n ，表示文明的数量。 接下来的 n 行，每行包含两个整数 x_i 和 y_i，表示第 i 个文明的坐标。",
+      "quote_has_bound": false,
+      "quote_max_number": null,
+      "generated_extremes": {
+        "max_int": 1000000000,
+        "min_int": 0
+      },
+      "case_count": 21,
+      "data_digest": "cd95fb4085271d81380453fed02a897704b26002cb73dac6fedd1a50b36b5cb0"
+    },
+    "tests/private/1000007_made": {
+      "book": "private",
+      "id": "1000007",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行一个由小写英文字母构成的字符串 S (1 ≤ |S| ≤ 10 6 )。 第二行一个与 S 等长的 01 串 P。",
+      "quote_has_bound": true,
+      "quote_max_number": 10,
+      "generated_extremes": {
+        "max_int": 1010000,
+        "min_int": 0
+      },
+      "case_count": 21,
+      "data_digest": "5d8095d7e1ad57639b8073c8abee49c997589949e7aee0baa6ecd7f1326b8d0c"
+    },
+    "tests/private/1000008_made": {
+      "book": "private",
+      "id": "1000008",
+      "source": "mirror_page",
+      "statement_quote": "输入 本题有多组测试数据。第一行一个数字 T(T <= 20) 表示测试数据组数。 对于每一组测试数据，第一行一个数字 n 表示序列长度。 第二行，一行 n 个数字，第 i 个数字表示序列 a 的第 i 个元素 a[i](1 <= a[i] <= 200000)",
+      "quote_has_bound": true,
+      "quote_max_number": 200000,
+      "generated_extremes": {
+        "max_int": 500000,
+        "min_int": 1
+      },
+      "case_count": 21,
+      "data_digest": "94826fd9c8e7214773db02f6dd2c509f506286ebe008f310def93127565398fa"
+    },
+    "tests/private/1000009_made": {
+      "book": "private",
+      "id": "1000009",
+      "source": "mirror_page",
+      "statement_quote": "输入 输入包括一行，一个字符串 A 保证输入的字符串仅包含小写字符，且串的长度不超过 100,000",
+      "quote_has_bound": true,
+      "quote_max_number": 100000,
+      "generated_extremes": {
+        "integer_tokens": 0
+      },
+      "case_count": 21,
+      "data_digest": "1deff9b97d8d0e6ae539957819a7047385f0f4a3b7ea647440dda06c9a09f073"
+    },
+    "tests/private/1000010_made": {
+      "book": "private",
+      "id": "1000010",
+      "source": "mirror_page",
+      "statement_quote": "输入 第一行 N 表示树 T 的点数 接下来 N-1 行每行三个整数 s[i] t[i] d[i]，表示 T 中有一条连接 s[i] 和 t[i] 且权值为 d[i] 的无向边。 数据保证输入构成一棵树。",
+      "quote_has_bound": false,
+      "quote_max_number": 1,
+      "generated_extremes": {
+        "max_int": 100000,
+        "min_int": 1
+      },
+      "case_count": 21,
+      "data_digest": "48829f24ecf2a2672a18ca7934ee0e70c5f5b871bde84cc1d893e857674dc7c5"
+    },
+    "tests/private/1000011_made": {
+      "book": "private",
+      "id": "1000011",
+      "source": "mirror_page",
+      "statement_quote": "输入 第1行一个整数 n（在 2 ~ 50,000之间），表示二叉树的节点个数。 第2行到第n行，每行两个数a[i] b[i]，表示a[i]是b[i]的父节点。保证1号节点为二叉树的根。",
+      "quote_has_bound": true,
+      "quote_max_number": 50000,
+      "generated_extremes": {
+        "max_int": 50000,
+        "min_int": 1
+      },
+      "case_count": 21,
+      "data_digest": "5d013aedc2e088a38547b3b94f5d1dc9d635f9a8537b1e235817f024782974c1"
     }
   }
 }
